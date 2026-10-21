@@ -128,8 +128,8 @@ Weighted random draw by usage, with:
 - After constraints, run the validation in §9.2.
 
 ### 6.3 Daily opponent
-- 6 species by usage-weighted draw, then for each species a set drawn by set weight.
-- Coherence constraints (soft, via rejection sampling): at most 1–2 hazard setters, a remover likely present, role balance, no doubled restricted items (Item clause: no repeated items; Species clause: no repeated species).
+- 6 species by usage-weighted draw (weighted by √usage, as built in M3, for more day-to-day variety), then for each species a set drawn by set weight.
+- Coherence constraints (soft, via rejection sampling): at most 1–2 hazard setters, a remover likely present, role balance, Species clause (no repeated species). No item clause: gen4ou has none, so items may repeat.
 - Assign a **style** label (`offense`, `balance`, `stall`) derived from the team's role mix; the AI uses it (§8.5).
 - The generator outputs the full team including sets. The client shows only species.
 

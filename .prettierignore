@@ -4,3 +4,4 @@ coverage
 DESIGN.md
 packages/data/sources
 packages/data/gen4ou
+packages/gen/src/__fixtures__/golden.json

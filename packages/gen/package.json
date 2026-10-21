@@ -6,6 +6,15 @@
   "type": "module",
   "exports": "./src/index.ts",
   "scripts": {
+    "check": "tsx scripts/check.ts",
+    "golden": "tsx scripts/golden.ts",
     "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@daily-battle/data": "workspace:*",
+    "@pkmn/sim": "catalog:"
+  },
+  "devDependencies": {
+    "tsx": "^4.23.15"
   }
 }

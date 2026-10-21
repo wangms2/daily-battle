@@ -258,7 +258,18 @@ importers:
         specifier: ^4.23.15
         version: 4.23.15
 
-  packages/gen: {}
+  packages/gen:
+    dependencies:
+      '@daily-battle/data':
+        specifier: workspace:*
+        version: link:../data
+      '@pkmn/sim':
+        specifier: 'catalog:'
+        version: 0.10.11
+    devDependencies:
+      tsx:
+        specifier: ^4.23.15
+        version: 4.23.15
 
   packages/pipeline: {}
 

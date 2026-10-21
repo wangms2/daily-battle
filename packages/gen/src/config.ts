@@ -1,0 +1,35 @@
+/**
+ * Bump whenever any output could change: an algorithm change, any value in
+ * CONFIG, or a set data refresh. The version is part of every seed key, so
+ * past days only change on purpose. The golden test fails until you do.
+ */
+export const GENERATOR_VERSION = 1;
+
+export const CONFIG = {
+  format: 'gen4ou',
+  /** Species are drawn with weight usage^exponent; 0.5 favors staples without letting them dominate. */
+  usageExponent: 0.5,
+  /** Give up on rejection sampling after this many attempts (never hit in practice; see `check`). */
+  maxAttempts: 10_000,
+  pool: {
+    size: 12,
+    /** At most `topTierMax` of the `topTierSize` most-used species. */
+    topTierSize: 15,
+    topTierMax: 4,
+    minOffense: 3,
+    minDefense: 2,
+    minUtility: 2,
+  },
+  opponent: {
+    size: 6,
+    maxHazardSetters: 2,
+    /** Chance to accept an otherwise valid team that has no hazard remover. */
+    acceptWithoutRemover: 0.5,
+    /** Style: stall if at least this many defensive sets. */
+    stallMinDefense: 3,
+    /** Style: offense if no defensive sets and at least this many offensive ones. */
+    offenseMinOffense: 4,
+  },
+  /** Attacking types with at least this share of usage-weighted STAB moves must be checked by the pool. */
+  majorTypeMinShare: 0.05,
+};

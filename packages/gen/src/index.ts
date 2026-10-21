@@ -1,2 +1,13 @@
-// Seeded weekly pool and daily opponent generation (M3). Placeholder until that milestone.
-export const packageName = '@daily-battle/gen';
+export { CONFIG, GENERATOR_VERSION } from './config';
+export { addDays, dayKey, mondayOf, weekDays, weekKey } from './dates';
+export {
+  generateOpponent,
+  opponentProblems,
+  styleOf,
+  type DailyOpponent,
+  type Style,
+} from './opponent';
+export { generatePool, poolProblems, type WeeklyPool } from './pool';
+export { rngFor, type Rng } from './rng';
+export { findSet, teamSets, toPokemonSet, type TeamSlot } from './sets';
+export { generateWeek, type GeneratedWeek } from './week';
