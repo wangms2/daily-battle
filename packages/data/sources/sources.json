@@ -1,0 +1,13 @@
+{
+  "sets": {
+    "url": "https://data.pkmn.cc/sets/gen4ou.json",
+    "fetchedAt": "2026-10-21T18:28:20.064Z"
+  },
+  "stats": {
+    "url": "https://www.smogon.com/stats/2026-09/chaos/gen4ou-1500.json",
+    "month": "2026-09",
+    "cutoff": 1500,
+    "battles": 57675,
+    "fetchedAt": "2026-10-21T18:28:20.064Z"
+  }
+}

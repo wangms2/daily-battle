@@ -1,0 +1,72 @@
+{
+  "blissey-standard": {
+    "label": "Special wall",
+    "description": "Absorbs special attacks, heals with Soft-Boiled, and sets Stealth Rock."
+  },
+  "clefable-support": {
+    "label": "Support wall",
+    "description": "Paralyzes foes with Thunder Wave, removes items with Knock Off, and heals with Soft-Boiled."
+  },
+  "clefable-wish": {
+    "label": "Wish support",
+    "description": "Passes Wish heals to teammates while chipping foes with Seismic Toss."
+  },
+  "dusknoir-offensive-spinblocker": {
+    "label": "Spinblocker",
+    "description": "Blocks Rapid Spin to keep your hazards up, and hits back with elemental punches."
+  },
+  "gengar-utility": {
+    "label": "Will-O-Wisp attacker",
+    "description": "Burns physical attackers with Will-O-Wisp and stops setup with Taunt while it attacks."
+  },
+  "gliscor-stallbreaker": {
+    "label": "Stallbreaker",
+    "description": "Uses Taunt to stop defensive Pokémon from healing or setting hazards, then wears them down."
+  },
+  "hariyama-attacking-lead": {
+    "label": "Fake Out lead",
+    "description": "Leads with Fake Out for free damage, then hits hard with Close Combat; Flame Orb powers up Guts."
+  },
+  "jirachi-utility": {
+    "label": "Wish support",
+    "description": "Passes big Wish heals to teammates and spreads paralysis with Body Slam."
+  },
+  "jirachi-wish-protect": {
+    "label": "Wish + Protect",
+    "description": "Heals itself and teammates with Wish, scouts with Protect, and pivots out with U-turn."
+  },
+  "rotomheat-utility": {
+    "label": "Bulky pivot",
+    "description": "Burns physical attackers with Will-O-Wisp and heals itself with Pain Split."
+  },
+  "rotommow-utility": {
+    "label": "Bulky pivot",
+    "description": "Burns physical attackers with Will-O-Wisp and heals itself with Pain Split."
+  },
+  "rotomwash-utility": {
+    "label": "Bulky attacker",
+    "description": "Takes hits well, heals with Pain Split, and attacks with wide coverage."
+  },
+  "starmie-defensive-rapid-spin": {
+    "label": "Spinner (Recover)",
+    "description": "Clears entry hazards with Rapid Spin and stays healthy with Recover."
+  },
+  "starmie-offensive-rapid-spin": {
+    "label": "Spinner (offensive)",
+    "description": "Clears entry hazards with Rapid Spin while threatening foes with fast coverage moves."
+  },
+  "suicune-crocune-defensive-calm-mind-resttalk": { "label": "Calm Mind sweeper (RestTalk)" },
+  "suicune-subcune": { "label": "Calm Mind sweeper (Substitute)" },
+  "suicune-supercune-offensive-calm-mind": { "label": "Calm Mind sweeper (offensive)" },
+  "swampert-physically-offensive-stealth-rock": { "label": "Stealth Rock setter (physical)" },
+  "swampert-specially-offensive-stealth-rock": { "label": "Stealth Rock setter (special)" },
+  "swampert-tank": { "label": "Stealth Rock setter (bulky)" },
+  "tyranitar-all-purpose": {
+    "label": "Mixed attacker",
+    "description": "Mixes physical and special attacks, and traps fleeing Ghost and Psychic types with Pursuit."
+  },
+  "yanmega-attacking-lead": {
+    "label": "Speed Boost lead",
+    "description": "Protects on the first turn to gain a Speed Boost, then attacks; Focus Sash lets it survive a hit."
+  }
+}

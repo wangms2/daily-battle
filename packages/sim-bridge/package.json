@@ -9,6 +9,6 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@pkmn/sim": "0.10.11"
+    "@pkmn/sim": "catalog:"
   }
 }

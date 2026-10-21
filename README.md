@@ -43,4 +43,4 @@ Packages export their TypeScript source directly, and Vite and Vitest consume it
 
 Unofficial fan project, free and non-commercial. Not affiliated with or endorsed by Nintendo, Creatures Inc., GAME FREAK inc., The Pokémon Company, or Smogon. Pokémon, Pokémon character names, and sprites are © Nintendo, Creatures Inc., and GAME FREAK inc.
 
-Source code is MIT licensed (see [LICENSE](LICENSE)). `@pkmn/*` packages and Pokémon Showdown code are MIT licensed by their authors. Set and usage data come from Smogon. Whether that data may be redistributed is still open (DESIGN.md §5.1).
+Source code is MIT licensed (see [LICENSE](LICENSE)). `@pkmn/*` packages and Pokémon Showdown code are MIT licensed by their authors. Set and usage data come from Smogon and are used with Smogon's permission (see [packages/data/README.md](packages/data/README.md)).

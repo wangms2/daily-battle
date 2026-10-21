@@ -82,6 +82,8 @@ Daily swap (done on the daily brief screen, shown as "1 change left"):
 ## 5. Data pipeline
 
 ### 5.1 Source
+**As built in M1 (Oct 2026):** curated Smogon analysis sets from `data.pkmn.cc/sets/gen4ou.json`, weighted with Smogon's monthly `chaos/gen4ou-1500.json` usage stats (option 1 below). Smogon granted permission to use the set data. `@smogon/sets` was not used: its last release was in July 2021, and its stats-derived sets are one naive set per species. See `packages/data/README.md` for the method. The original research notes follow.
+
 Researched (Oct 2026). Both packages are open source on npm.
 
 - **Primary: `@smogon/sets`.** Bundled, preprocessed, validated PokemonSet data gathered from Smogon, usage statistics, and third-party sources, grouped by format and generation. Static, works at build time, updated roughly monthly with each package release. Preferred because the build needs no network access.

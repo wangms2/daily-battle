@@ -2,3 +2,5 @@ pnpm-lock.yaml
 dist
 coverage
 DESIGN.md
+packages/data/sources
+packages/data/gen4ou
