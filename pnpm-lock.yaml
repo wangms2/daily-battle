@@ -164,6 +164,15 @@ settings:
 
 catalogs:
   default:
+    '@pkmn/client':
+      specifier: 0.7.3
+      version: 0.7.3
+    '@pkmn/data':
+      specifier: 0.10.11
+      version: 0.10.11
+    '@pkmn/protocol':
+      specifier: 0.7.3
+      version: 0.7.3
     '@pkmn/sim':
       specifier: 0.10.11
       version: 0.10.11
@@ -255,9 +264,25 @@ importers:
 
   packages/sim-bridge:
     dependencies:
+      '@daily-battle/data':
+        specifier: workspace:*
+        version: link:../data
+      '@pkmn/client':
+        specifier: 'catalog:'
+        version: 0.7.3
+      '@pkmn/data':
+        specifier: 'catalog:'
+        version: 0.10.11
+      '@pkmn/protocol':
+        specifier: 'catalog:'
+        version: 0.7.3
       '@pkmn/sim':
         specifier: 'catalog:'
         version: 0.10.11
+    devDependencies:
+      tsx:
+        specifier: ^4.23.15
+        version: 4.23.15
 
 packages:
 
@@ -640,6 +665,19 @@ packages:
 
   '@oxc-project/types@0.154.0':
     resolution: {integrity: sha512-KYOUGQFlLWR+s4QMV2Q9ko38TZm7EdO87Qm7rvZLqk/webse/cDjtyxKhg/47l0byCbs/k46LT8qc4PKjAikzA==}
+
+  '@pkmn/client@0.7.3':
+    resolution: {integrity: sha512-cFiibV4SdG7Q1OX0fhLfkUDlOhAIcMz0ENh4Vw758nxsCKlAU5ik5DN8JkKLGYyrL5tkwN1l3blHsWCJ3wbyLg==}
+
+  '@pkmn/data@0.10.11':
+    resolution: {integrity: sha512-WZiOOZEdIJybC1M2EJVazx+OKH5Hh544cPhNnjgNjn3B0LORP82YkL4jpZqkww+NoIHIXMvJBYLKg3GZBNm4kQ==}
+
+  '@pkmn/dex-types@0.10.11':
+    resolution: {integrity: sha512-6hvvi/iHCdBbUGK7RmWPCKuZGujEC+1elvxcLK2BpL/j7Q0roSuC33xrodDsyg2EuyJ5szGunzRtFztyrtb7aQ==}
+
+  '@pkmn/protocol@0.7.3':
+    resolution: {integrity: sha512-ohSQhckON0OWf/0rlO3gioiR0pFdI/0YNh4lUtsFyrJ2ntrpdsF/n3tasFo2Mxag0fuWNsIGo9lwCFNbxSdi1A==}
+    hasBin: true
 
   '@pkmn/sets@5.2.0':
     resolution: {integrity: sha512-WHAW6bZu0WCo/3b+LTW7BE0fBhYZnWH1lCXIu2an8/wTiZ/+s1eTcQYj7W/YQKxWT5dm/La03AZ6CeqdJip9CQ==}
@@ -1994,6 +2032,23 @@ snapshots:
   '@keyv/serialize@1.1.1': {}
 
   '@oxc-project/types@0.154.0': {}
+
+  '@pkmn/client@0.7.3':
+    dependencies:
+      '@pkmn/data': 0.10.11
+      '@pkmn/protocol': 0.7.3
+
+  '@pkmn/data@0.10.11':
+    dependencies:
+      '@pkmn/dex-types': 0.10.11
+
+  '@pkmn/dex-types@0.10.11':
+    dependencies:
+      '@pkmn/types': 4.0.0
+
+  '@pkmn/protocol@0.7.3':
+    dependencies:
+      '@pkmn/types': 4.0.0
 
   '@pkmn/sets@5.2.0':
     dependencies:

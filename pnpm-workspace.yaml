@@ -5,5 +5,9 @@ packages:
 allowBuilds:
   esbuild: true
 
+# Engine and protocol packages, pinned exactly: resume depends on the sim being deterministic (DESIGN.md §15).
 catalog:
+  '@pkmn/client': 0.7.3
+  '@pkmn/data': 0.10.11
+  '@pkmn/protocol': 0.7.3
   '@pkmn/sim': 0.10.11

@@ -1,2 +1,13 @@
-export { runRandomBattle, type BattleResult, type RunBattleOptions } from './battle';
-export { SAMPLE_TEAM_A, SAMPLE_TEAM_B } from './teams';
+export { legalChoices, RandomPolicy } from './policies/random';
+export { deriveSeed, makeRng, type Rng } from './rng';
+export { BattleError, replayBattle, runBattle } from './run';
+export { randomTeam, toPokemonSet } from './teams';
+export type {
+  BattleResult,
+  PlayerInput,
+  Policy,
+  ReplayInput,
+  RunBattleInput,
+  SideID,
+  SideView,
+} from './types';

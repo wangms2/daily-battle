@@ -6,9 +6,17 @@
   "type": "module",
   "exports": "./src/index.ts",
   "scripts": {
+    "soak": "tsx scripts/soak.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@daily-battle/data": "workspace:*",
+    "@pkmn/client": "catalog:",
+    "@pkmn/data": "catalog:",
+    "@pkmn/protocol": "catalog:",
     "@pkmn/sim": "catalog:"
+  },
+  "devDependencies": {
+    "tsx": "^4.23.15"
   }
 }

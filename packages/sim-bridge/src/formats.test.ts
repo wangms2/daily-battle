@@ -1,6 +1,6 @@
 import { Dex, Teams, TeamValidator } from '@pkmn/sim';
 import { describe, expect, it } from 'vitest';
-import { SAMPLE_TEAM_A, SAMPLE_TEAM_B } from './teams';
+import { SAMPLE_TEAM_A, SAMPLE_TEAM_B } from './fixtures';
 
 function validate(exported: string) {
   const team = Teams.import(exported);

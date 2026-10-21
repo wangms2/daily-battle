@@ -1,117 +1,50 @@
-// Hand-written gen4ou teams for tests and smoke battles. Real sets come from M1's snapshot.
+import { sets as defaultSets, type SetEntry, type SetsFile } from '@daily-battle/data';
+import { TeamValidator, type PokemonSet } from '@pkmn/sim';
+import type { Rng } from './rng';
 
-export const SAMPLE_TEAM_A = `
-Azelf @ Focus Sash
-Ability: Levitate
-EVs: 4 Atk / 252 SpA / 252 Spe
-Naive Nature
-- Stealth Rock
-- Taunt
-- Explosion
-- Fire Blast
+export function toPokemonSet(species: string, set: SetEntry): PokemonSet {
+  return {
+    name: species,
+    species,
+    item: set.item,
+    ability: set.ability,
+    nature: set.nature,
+    evs: { ...set.evs },
+    ivs: { ...set.ivs },
+    moves: [...set.moves],
+    level: 100,
+    gender: '',
+  };
+}
 
-Jirachi @ Choice Scarf
-Ability: Serene Grace
-EVs: 252 Atk / 4 SpD / 252 Spe
-Jolly Nature
-- Iron Head
-- U-turn
-- Ice Punch
-- Trick
+function weightedPick<T extends { weight: number }>(items: T[], rng: Rng): T {
+  let r = rng() * items.reduce((a, x) => a + x.weight, 0);
+  for (const item of items) {
+    r -= item.weight;
+    if (r < 0) return item;
+  }
+  return items[items.length - 1]!;
+}
 
-Scizor @ Choice Band
-Ability: Technician
-EVs: 248 HP / 252 Atk / 8 SpD
-Adamant Nature
-- Bullet Punch
-- U-turn
-- Superpower
-- Pursuit
-
-Heatran @ Choice Scarf
-Ability: Flash Fire
-EVs: 4 HP / 252 SpA / 252 Spe
-Timid Nature
-IVs: 0 Atk
-- Fire Blast
-- Earth Power
-- Dragon Pulse
-- Explosion
-
-Rotom-Wash @ Leftovers
-Ability: Levitate
-EVs: 252 HP / 252 SpA / 4 Spe
-Modest Nature
-IVs: 0 Atk
-- Hydro Pump
-- Thunderbolt
-- Will-O-Wisp
-- Pain Split
-
-Blissey @ Leftovers
-Ability: Natural Cure
-EVs: 252 HP / 252 Def / 4 SpD
-Bold Nature
-IVs: 0 Atk
-- Seismic Toss
-- Soft-Boiled
-- Toxic
-- Aromatherapy
-`;
-
-export const SAMPLE_TEAM_B = `
-Swampert @ Leftovers
-Ability: Torrent
-EVs: 240 HP / 16 Atk / 252 Def
-Relaxed Nature
-- Stealth Rock
-- Earthquake
-- Surf
-- Roar
-
-Gyarados @ Leftovers
-Ability: Intimidate
-EVs: 4 HP / 252 Atk / 252 Spe
-Adamant Nature
-- Dragon Dance
-- Waterfall
-- Earthquake
-- Stone Edge
-
-Gengar @ Life Orb
-Ability: Levitate
-EVs: 4 Atk / 252 SpA / 252 Spe
-Hasty Nature
-- Shadow Ball
-- Focus Blast
-- Thunderbolt
-- Explosion
-
-Infernape @ Life Orb
-Ability: Blaze
-EVs: 64 Atk / 192 SpA / 252 Spe
-Naive Nature
-- Close Combat
-- Fire Blast
-- Grass Knot
-- Mach Punch
-
-Skarmory @ Leftovers
-Ability: Keen Eye
-EVs: 252 HP / 4 Def / 252 SpD
-Careful Nature
-- Spikes
-- Roost
-- Whirlwind
-- Brave Bird
-
-Starmie @ Leftovers
-Ability: Natural Cure
-EVs: 4 HP / 252 SpA / 252 Spe
-Timid Nature
-IVs: 0 Atk
-- Hydro Pump
-- Thunderbolt
-- Rapid Spin
-- Recover
-`;
+/**
+ * A random legal team from the set snapshot: 6 distinct species (uniform),
+ * each with a set drawn by weight. Redraws if the validator rejects the team.
+ */
+export function randomTeam(
+  rng: Rng,
+  data: SetsFile = defaultSets,
+  format = 'gen4ou',
+): PokemonSet[] {
+  const validator = TeamValidator.get(format);
+  const names = Object.keys(data.species);
+  for (let attempt = 0; attempt < 100; attempt++) {
+    const pool = [...names];
+    const team: PokemonSet[] = [];
+    for (let i = 0; i < 6; i++) {
+      const name = pool.splice(Math.floor(rng() * pool.length), 1)[0]!;
+      team.push(toPokemonSet(name, weightedPick(data.species[name]!.sets, rng)));
+    }
+    if (!validator.validateTeam(structuredClone(team))) return team;
+  }
+  throw new Error('Could not draw a legal team in 100 attempts');
+}
