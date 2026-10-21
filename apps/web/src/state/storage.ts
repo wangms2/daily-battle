@@ -10,9 +10,20 @@ export function migrate(raw: unknown): State {
   if (!raw || typeof raw !== 'object') return fresh;
   const saved = raw as Partial<State> & { version?: number };
   if (saved.version === 1) {
+    // Attempts saved before M7 lack the team and engine fields.
+    const days = Object.fromEntries(
+      Object.entries(saved.days ?? {}).map(([k, d]) => [
+        k,
+        {
+          ...d,
+          attempts: d.attempts.map((a) => ({ ...a, team: a.team ?? [], engine: a.engine ?? '' })),
+        },
+      ]),
+    );
     return {
       ...fresh,
       ...saved,
+      days,
       stats: { ...fresh.stats, ...saved.stats },
       settings: { ...fresh.settings, ...saved.settings },
       version: 1,

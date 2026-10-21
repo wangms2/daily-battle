@@ -244,7 +244,9 @@ Versioned schema `state.v1`:
 }
 Slot = { species, setId }
 Attempt = { result: 'win'|'loss'|'forfeit'|'inProgress', remaining: number, ts: number, lead: string,
-            battleSeed: string, aiSeed: string, choices: string[] }  // seeds + choices enable resume (§7)
+            team: Slot[6],   // as sent into battle, lead first
+            battleSeed: string, aiSeed: string, choices: string[],  // seeds + choices enable resume (§7)
+            engine: string } // 'sim <version> ai <AI_VERSION>'; a mismatch on resume records a forfeit (§15)
 ```
 - Wrap all reads/writes in try/catch; the game must work if storage is unavailable (in-memory fallback with a notice).
 - Migration function per version bump.
@@ -442,6 +444,7 @@ See §14.
 Unofficial fan project, not affiliated with or endorsed by Nintendo, Creatures Inc., GAME FREAK inc., The Pokémon Company, or Smogon. Pokémon, Pokémon character names, and sprites are © Nintendo, Creatures Inc., and GAME FREAK inc.
 
 - Code: `@pkmn/*` packages and Pokémon Showdown code are MIT licensed. Keep license notices as required.
+- The Pokémon Showdown *client* (`smogon/pokemon-showdown-client`) is AGPL-3.0. Daily Battle uses none of its code: the battle layout, rendering, and animations are our own, and the battle text comes from `@pkmn/view`'s MIT-licensed `LogFormatter`.
 - Data: confirm redistribution terms for Smogon set and usage data; credit Smogon.
 - Sprites: see §12.3a. Credit Nintendo/Game Freak/Creatures and the Smogon sprite community on the credits page.
 - Keep the project free and non-commercial (no ads, paywalls, or merchandise). Revisit this section if that changes.

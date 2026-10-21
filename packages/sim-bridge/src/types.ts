@@ -43,7 +43,7 @@ export interface RunBattleInput {
 
 /** What `replayBattle` needs: the battle inputs without policies. */
 export type ReplayInput = Omit<RunBattleInput, 'p1' | 'p2'> &
-  Record<SideID, Pick<PlayerInput, 'team'>>;
+  Record<SideID, Pick<PlayerInput, 'team'> & { name?: string }>;
 
 export interface BattleResult {
   winner: SideID | null;

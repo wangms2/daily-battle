@@ -12,6 +12,7 @@ export default defineConfig({
   testDir: './e2e',
   outputDir: './e2e/.results',
   fullyParallel: true,
+  timeout: 60_000,
   reporter: [['list']],
   use: {
     baseURL: 'http://localhost:5179',
@@ -19,9 +20,12 @@ export default defineConfig({
     timezoneId: 'America/New_York',
   },
   webServer: {
-    command: 'pnpm exec vite --port 5179 --strictPort',
+    // The production build: realistic, and the worker loads as one bundle instead of
+    // hundreds of dev modules.
+    command: 'pnpm exec vite build && pnpm exec vite preview --port 5179 --strictPort',
     url: 'http://localhost:5179',
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: false,
+    timeout: 120_000,
   },
   projects: [
     { name: 'phone-360x640', use: phone(360, 640) },

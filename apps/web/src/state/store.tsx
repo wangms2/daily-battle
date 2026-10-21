@@ -15,7 +15,9 @@ export function StoreProvider({
 }) {
   const [storage] = useState(() => given ?? createStorage());
   const [state, dispatch] = useReducer(reducer, undefined, () => storage.load());
-  useEffect(() => storage.save(state), [storage, state]);
+  useEffect(() => {
+    storage.save(state);
+  }, [storage, state]);
   const value = useMemo(
     () => ({ state, dispatch, storageAvailable: storage.available }),
     [state, storage],

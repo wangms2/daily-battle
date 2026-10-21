@@ -126,3 +126,21 @@ export function formatEvs(evs: Record<string, number>): string {
 }
 
 export { STAT_LABEL };
+
+/** A full set for the simulator from a team slot. */
+export function toBattleSet(slot: Slot) {
+  const set = findSet(slot);
+  if (!set) throw new Error(`Unknown set ${slot.species} / ${slot.setId}`);
+  return {
+    name: slot.species,
+    species: slot.species,
+    item: set.item,
+    ability: set.ability,
+    nature: set.nature,
+    evs: { ...set.evs },
+    ivs: { ...set.ivs },
+    moves: [...set.moves],
+    level: 100,
+    gender: '',
+  };
+}

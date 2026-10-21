@@ -6,3 +6,4 @@ export { aiForStyle, UtilityPolicy, type PolicyStats, type UtilityPolicyOptions 
 export { PRESETS, STRONG, type Params } from './presets';
 export { scoreActions, type ScoredAction } from './score';
 export { extractState, type AIState, type FoeMon, type OwnMon } from './state';
+export { AI_VERSION } from './version';

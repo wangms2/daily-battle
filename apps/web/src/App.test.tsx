@@ -5,6 +5,7 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import scheduleJson from '../public/schedule/2026-10-19.json';
 import { App } from './App';
+import { ENGINE_VERSION } from './lib/seed';
 import { initialState, type State } from './state/schema';
 import { createStorage, STORAGE_KEY } from './state/storage';
 import { StoreProvider } from './state/store';
@@ -174,6 +175,54 @@ describe('daily brief', () => {
     expect(await screen.findByText('Change used')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: '1 change left' })).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: `Lead with ${bench}` })).toBeInTheDocument();
+  });
+  it('resumes a battle in progress and locks the change until it ends', async () => {
+    const state = seeded({ team: { week: WEEK } });
+    const team = schedule.suggestedTeams[0]!.team;
+    state.days['2026-10-21'] = {
+      swapUsed: false,
+      attempts: [
+        {
+          result: 'inProgress',
+          remaining: 6,
+          ts: 1,
+          lead: team[0]!.species,
+          team,
+          battleSeed: '1,2,3,4',
+          aiSeed: '5,6,7,8',
+          choices: ['move 1'],
+          engine: ENGINE_VERSION,
+        },
+      ],
+    };
+    renderApp(state);
+    expect(await screen.findByRole('button', { name: 'Resume battle' })).toBeInTheDocument();
+    expect(screen.getByText('Battle in progress')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: '1 change left' })).not.toBeInTheDocument();
+  });
+
+  it('records an unfinished battle from another engine version as a forfeit', async () => {
+    const state = seeded({ team: { week: WEEK } });
+    const team = schedule.suggestedTeams[0]!.team;
+    state.days['2026-10-21'] = {
+      swapUsed: false,
+      attempts: [
+        {
+          result: 'inProgress',
+          remaining: 6,
+          ts: 1,
+          lead: team[0]!.species,
+          team,
+          battleSeed: '1,2,3,4',
+          aiSeed: '5,6,7,8',
+          choices: [],
+          engine: 'sim 0.0.0 ai 0',
+        },
+      ],
+    };
+    renderApp(state);
+    await screen.findByRole('button', { name: /^Start · / });
+    expect(screen.queryByRole('button', { name: 'Resume battle' })).not.toBeInTheDocument();
   });
 });
 

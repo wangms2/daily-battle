@@ -10,9 +10,14 @@ export interface Attempt {
   remaining: number;
   ts: number;
   lead: string;
+  /** The team as sent into battle, lead first (so resume uses the same team). */
+  team: Slot[];
   battleSeed: string;
   aiSeed: string;
+  /** Your choices so far; with the seeds, enough to replay the battle (§7). */
   choices: string[];
+  /** Simulator and AI versions; a mismatch on resume records a forfeit (§15). */
+  engine: string;
 }
 
 /** Today's single change (§4.2); it carries over for the rest of the week. */

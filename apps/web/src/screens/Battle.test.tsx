@@ -1,0 +1,278 @@
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { describe, expect, it, vi } from 'vitest';
+import { BattleBackendContext, type BattleBackend } from '../battle/backend';
+import type {
+  Controls,
+  EngineStart,
+  Frame,
+  MoveOption,
+  TeamMember,
+  TurnPackage,
+  View,
+} from '../battle/frames';
+import { initialState, type Settings } from '../state/schema';
+import { Battle } from './Battle';
+
+const START: EngineStart = {
+  playerTeam: [],
+  opponentTeam: [],
+  style: 'balance',
+  battleSeed: '1,2,3,4',
+  aiSeed: '5,6,7,8',
+  choices: [],
+};
+
+const side = { sr: false, spikes: 0, tspikes: 0, reflect: false, lightScreen: false };
+const mon = (species: string, hp = 100) => ({
+  species,
+  hp,
+  status: '',
+  boosts: {},
+  substitute: false,
+  fainted: hp === 0,
+});
+const view = (turn: number, foeHp = 100): View => ({
+  turn,
+  you: mon('Heatran'),
+  foe: mon('Gyarados', foeHp),
+  yourSide: side,
+  foeSide: side,
+  weather: '',
+  revealed: { Gyarados: { moves: [], item: '', ability: '' } },
+});
+const frame = (text: string, v: View, kind?: NonNullable<Frame['event']>['kind']): Frame => ({
+  text,
+  view: v,
+  event: kind ? { kind, who: 'foe' } : undefined,
+});
+
+const member = (slot: number, species: string, active = false): TeamMember => ({
+  slot,
+  species,
+  hp: 100,
+  hpExact: { hp: 300, max: 300 },
+  status: '',
+  fainted: false,
+  active,
+  item: 'Leftovers',
+  ability: 'Flash Fire',
+  moves: ['Fire Blast'],
+  stats: { atk: 200, def: 250, spa: 300, spd: 250, spe: 230 },
+});
+const TEAM = [member(1, 'Heatran', true), member(2, 'Scizor'), member(3, 'Celebi')];
+
+const move = (name: string, effectiveness: number | null, choice = 'move 1'): MoveOption => ({
+  choice,
+  name,
+  type: 'Electric',
+  category: 'Special',
+  power: 95,
+  accuracy: 100,
+  desc: '10% chance to paralyze the target.',
+  pp: 24,
+  maxpp: 24,
+  disabled: false,
+  effectiveness,
+});
+const MOVES: Controls = {
+  kind: 'move',
+  moves: [move('Thunderbolt', 4), move('Earthquake', 0, 'move 2')],
+  switches: [
+    { choice: 'switch 2', slot: 2 },
+    { choice: 'switch 3', slot: 3 },
+  ],
+  only: null,
+};
+
+const pkg = (over: Partial<TurnPackage>): TurnPackage => ({
+  frames: [],
+  team: TEAM,
+  controls: MOVES,
+  explainers: [],
+  end: null,
+  resumed: false,
+  ...over,
+});
+
+const OPENING = pkg({
+  frames: [
+    frame('Go! **Heatran**!', view(0), 'switch'),
+    frame('The opposing **Gyarados** appeared!', view(0), 'switch'),
+    frame('== Turn 1 ==', view(1), 'turn'),
+  ],
+});
+const TURN_1 = pkg({
+  frames: [
+    frame('**Heatran** used **Thunderbolt**!', view(1, 20), 'damage'),
+    frame('It’s super effective!', view(1, 20)),
+    frame('== Turn 2 ==', view(2, 20), 'turn'),
+  ],
+});
+const WON = pkg({
+  frames: [frame('The opposing **Gyarados** fainted!', view(2, 0), 'faint')],
+  controls: null,
+  end: { winner: 'you', youLeft: 3, foeLeft: 0 },
+});
+
+function fakeBackend(turns: TurnPackage[], start = OPENING) {
+  const calls: string[] = [];
+  const backend: BattleBackend = {
+    start: vi.fn(async () => start),
+    choose: vi.fn(async (c: string) => {
+      calls.push(c);
+      return turns.shift() ?? WON;
+    }),
+    forfeit: vi.fn(async () =>
+      pkg({
+        frames: [frame('You forfeited.', view(2))],
+        controls: null,
+        end: { winner: 'foe', youLeft: 3, foeLeft: 6 },
+      }),
+    ),
+  };
+  return { backend, calls };
+}
+
+function renderBattle(
+  backend: BattleBackend,
+  {
+    speed = 'instant',
+    hints = true,
+    tryNumber = 1,
+  }: { speed?: Settings['battleSpeed']; hints?: boolean; tryNumber?: number } = {},
+) {
+  const settings: Settings = {
+    ...initialState().settings,
+    battleSpeed: speed,
+    beginnerHints: hints,
+  };
+  const props = {
+    onSetting: vi.fn(),
+    onExplainerSeen: vi.fn(),
+    onChoice: vi.fn(),
+    onEnd: vi.fn(),
+    onExit: vi.fn(),
+    onRunItBack: vi.fn(),
+  };
+  render(
+    <BattleBackendContext.Provider value={() => backend}>
+      <Battle start={START} tryNumber={tryNumber} settings={settings} {...props} />
+    </BattleBackendContext.Provider>,
+  );
+  return props;
+}
+
+const thunderbolt = () => screen.findByRole('button', { name: /^Thunderbolt, / });
+
+describe('battle screen', () => {
+  it('keeps the controls off while a turn plays, and a tap skips to the end', async () => {
+    const { backend } = fakeBackend([]);
+    renderBattle(backend, { speed: 'normal' });
+    expect(
+      await screen.findByRole('button', { name: 'Skip to the end of the turn' }),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /^Thunderbolt, / })).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Skip to the end of the turn' }));
+    expect(await thunderbolt()).toBeEnabled();
+    expect(screen.getByRole('button', { name: /^Switch to Scizor/ })).toBeEnabled();
+    expect(screen.getByText('Turn 1')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Open the battle log' })).toHaveTextContent(
+      'Gyarados appeared!',
+    );
+  });
+
+  it('sends a chosen move, saves it, and plays the answer', async () => {
+    const { backend, calls } = fakeBackend([TURN_1]);
+    const props = renderBattle(backend);
+    await userEvent.click(await thunderbolt());
+    await screen.findByText('Turn 2');
+    expect(calls).toEqual(['move 1']);
+    expect(props.onChoice).toHaveBeenCalledWith('move 1');
+    expect(screen.getByRole('button', { name: 'Open the battle log' })).toHaveTextContent(
+      'It’s super effective!',
+    );
+  });
+
+  it('submits the only legal choice by itself', async () => {
+    const only = pkg({ ...TURN_1, controls: { ...MOVES, only: 'move 1' } });
+    const { backend, calls } = fakeBackend([only, TURN_1]);
+    renderBattle(backend);
+    await userEvent.click(await thunderbolt());
+    await waitFor(() => expect(calls).toEqual(['move 1', 'move 1']));
+  });
+
+  it('asks who comes in after a faint', async () => {
+    const forced = pkg({
+      controls: { kind: 'switch', moves: [], switches: MOVES.switches, only: null },
+    });
+    const { backend, calls } = fakeBackend([forced]);
+    renderBattle(backend);
+    await userEvent.click(await thunderbolt());
+    expect(await screen.findByText('Who comes in?')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /^Thunderbolt, / })).not.toBeInTheDocument();
+    await userEvent.click(screen.getAllByRole('button', { name: /^Switch to Celebi/ }).at(-1)!);
+    expect(calls).toEqual(['move 1', 'switch 3']);
+  });
+
+  it('shows move details on a long press without choosing the move', async () => {
+    const { backend, calls } = fakeBackend([]);
+    renderBattle(backend);
+    const button = await thunderbolt();
+    vi.useFakeTimers();
+    try {
+      fireEvent.pointerDown(button, { pointerType: 'touch' });
+      act(() => vi.advanceTimersByTime(500));
+      expect(screen.getByRole('tooltip')).toHaveTextContent('10% chance to paralyze the target.');
+      fireEvent.pointerUp(button, { pointerType: 'touch' });
+    } finally {
+      vi.useRealTimers();
+    }
+    expect(calls).toEqual([]);
+  });
+
+  it('labels type effectiveness only with Beginner hints on', async () => {
+    const { backend } = fakeBackend([]);
+    renderBattle(backend, { hints: true });
+    expect(await thunderbolt()).toHaveAccessibleName(/Super effective ×4/);
+    expect(screen.getByRole('button', { name: /^Earthquake, / })).toHaveAccessibleName(/No effect/);
+  });
+
+  it('hides effectiveness with Beginner hints off', async () => {
+    const { backend } = fakeBackend([]);
+    renderBattle(backend, { hints: false });
+    expect(await thunderbolt()).not.toHaveAccessibleName(/effective/);
+    expect(screen.queryByText(/Super effective/)).not.toBeInTheDocument();
+  });
+
+  it('confirms before giving up, then records a forfeit', async () => {
+    const { backend } = fakeBackend([]);
+    const props = renderBattle(backend);
+    await thunderbolt();
+    await userEvent.click(screen.getByRole('button', { name: 'Battle menu' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Give up' }));
+    const confirm = await screen.findByRole('dialog', { name: 'Give up this battle?' });
+    expect(confirm).toHaveTextContent('first try');
+    expect(backend.forfeit).not.toHaveBeenCalled();
+    await userEvent.click(within(confirm).getByRole('button', { name: 'Give up' }));
+    expect(await screen.findByRole('dialog', { name: 'Battle over' })).toHaveTextContent(
+      'You gave up',
+    );
+    expect(props.onEnd).toHaveBeenCalledWith({ result: 'forfeit', remaining: 3 });
+  });
+
+  it('ends on a result card that offers Run it back', async () => {
+    const { backend } = fakeBackend([TURN_1]);
+    const props = renderBattle(backend, { tryNumber: 2 });
+    await userEvent.click(await thunderbolt());
+    await screen.findByText('Turn 2');
+    await userEvent.click(await thunderbolt());
+    const card = await screen.findByRole('dialog', { name: 'Battle over' });
+    expect(card).toHaveTextContent('You won');
+    expect(card).toHaveTextContent('Try 2');
+    expect(within(card).getByLabelText('3 of 6 Pokémon left')).toBeInTheDocument();
+    expect(props.onEnd).toHaveBeenCalledWith({ result: 'win', remaining: 3 });
+    await userEvent.click(within(card).getByRole('button', { name: 'Run it back' }));
+    expect(props.onRunItBack).toHaveBeenCalled();
+  });
+});

@@ -240,3 +240,156 @@ body {
     animation: none;
   }
 }
+
+/* ---- Battle field ---- */
+.battle-field {
+  background:
+    radial-gradient(
+      120% 70% at 70% 0%,
+      color-mix(in srgb, var(--accent) 10%, transparent),
+      transparent 70%
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--accent-soft) 70%, var(--surface)),
+      var(--surface-2)
+    );
+}
+.battle-field.weather-sunnyday {
+  background-color: color-mix(in srgb, var(--gold) 14%, var(--surface));
+  background-image: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--gold) 18%, transparent),
+    transparent
+  );
+}
+.battle-field.weather-raindance {
+  background-image: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--accent) 22%, transparent),
+    var(--surface-2)
+  );
+}
+.battle-field.weather-sandstorm {
+  background-image: linear-gradient(
+    to bottom,
+    color-mix(in srgb, #b8873a 22%, transparent),
+    var(--surface-2)
+  );
+}
+.battle-field.weather-hail {
+  background-image: linear-gradient(
+    to bottom,
+    color-mix(in srgb, #9fd4e3 28%, transparent),
+    var(--surface-2)
+  );
+}
+.platform {
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--text) 14%, transparent),
+    transparent
+  );
+}
+
+@keyframes hit {
+  0%,
+  100% {
+    transform: translateX(0);
+    filter: none;
+  }
+  15% {
+    transform: translateX(-6px);
+    filter: brightness(2.2);
+  }
+  35% {
+    transform: translateX(6px);
+    filter: none;
+  }
+  55% {
+    transform: translateX(-4px);
+    filter: brightness(1.8);
+  }
+  75% {
+    transform: translateX(3px);
+    filter: none;
+  }
+}
+@keyframes faint {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(30%);
+    opacity: 0;
+  }
+}
+@keyframes in-left {
+  from {
+    transform: translateX(-40%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+@keyframes in-right {
+  from {
+    transform: translateX(40%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+@keyframes lunge-right {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  40% {
+    transform: translate(10%, -6%);
+  }
+}
+@keyframes lunge-left {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  40% {
+    transform: translate(-10%, 6%);
+  }
+}
+.anim-hit {
+  animation: hit 360ms ease-out;
+}
+.anim-faint {
+  animation: faint 380ms ease-in forwards;
+}
+.anim-in-left {
+  animation: in-left 260ms ease-out;
+}
+.anim-in-right {
+  animation: in-right 260ms ease-out;
+}
+.anim-lunge-right {
+  animation: lunge-right 260ms ease-out;
+}
+.anim-lunge-left {
+  animation: lunge-left 260ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .anim-hit,
+  .anim-faint,
+  .anim-in-left,
+  .anim-in-right,
+  .anim-lunge-right,
+  .anim-lunge-left {
+    animation: none;
+  }
+}

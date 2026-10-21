@@ -3,6 +3,7 @@
 import type { ScheduleFile } from '@daily-battle/gen/schedule';
 import clsx from 'clsx';
 import { useEffect, useState, type ReactNode } from 'react';
+import { warmBattleWorker } from '../battle/backend';
 import { findSet, type Slot } from '../lib/data';
 import { getSprite, preloadSprites } from '../lib/sprites';
 import { InfoSheet } from '../sheets/InfoSheet';
@@ -29,6 +30,7 @@ export function DailyBrief({
   onLead,
   onChange,
   onStart,
+  inProgress = false,
   renderTopBar,
 }: {
   schedule: ScheduleFile;
@@ -39,6 +41,8 @@ export function DailyBrief({
   onLead: (species: string) => void;
   onChange: (change: DayChange) => void;
   onStart: () => void;
+  /** A battle today is still being played: Start resumes it, and the daily change waits. */
+  inProgress?: boolean;
   renderTopBar: (left?: ReactNode) => ReactNode;
 }) {
   const wide = useWide();
@@ -57,7 +61,13 @@ export function DailyBrief({
   } | null>(null);
   const [pending, setPending] = useState<DayChange | null>(null);
 
-  useEffect(() => preloadSprites(opponent.team.map((s) => s.species)), [opponent]);
+  useEffect(() => {
+    preloadSprites(opponent.team.map((s) => s.species));
+  }, [opponent]);
+  // Load the battle engine while the player looks at the opponent.
+  useEffect(() => {
+    if (typeof Worker !== 'undefined') warmBattleWorker();
+  }, []);
 
   const editing = mode.kind !== 'view';
   const bench = schedule.pool.species.filter((s) => !team.some((t) => t.species === s));
@@ -67,7 +77,11 @@ export function DailyBrief({
       ? `${c.from.species} → ${c.to.species} (${findSet(c.to)?.label})`
       : `${c.from.species}: ${findSet(c.from)?.label} → ${findSet(c.to)?.label}`;
 
-  const changeChip = dayState.swapUsed ? (
+  const changeChip = inProgress ? (
+    <span className="rounded-chip bg-surface-2 px-3 py-1.5 text-[13px] font-semibold text-muted">
+      Battle in progress
+    </span>
+  ) : dayState.swapUsed ? (
     <span className="rounded-chip bg-surface-2 px-3 py-1.5 text-[13px] font-semibold text-muted">
       Change used
     </span>
@@ -179,7 +193,7 @@ export function DailyBrief({
 
   const start = (
     <Button className="h-12 w-full shrink-0" onClick={onStart} disabled={editing}>
-      Start · {lead} leads
+      {inProgress ? 'Resume battle' : `Start · ${lead} leads`}
     </Button>
   );
 

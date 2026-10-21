@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { reducer } from './reducer';
-import { initialState, type DayChange, type Slot } from './schema';
+import { attemptInProgress, reducer } from './reducer';
+import { initialState, type Attempt, type DayChange, type Slot } from './schema';
 import { createStorage, migrate, STORAGE_KEY } from './storage';
 
 const TEAM: Slot[] = [
@@ -167,5 +167,77 @@ describe('settings', () => {
     state = reducer(state, { type: 'markExplainer', id: 'welcome' });
     expect(reducer(state, { type: 'markExplainer', id: 'welcome' })).toBe(state);
     expect(state.settings.shownExplainers).toEqual(['welcome']);
+  });
+});
+
+describe('attempts', () => {
+  const ENGINE = 'sim 0.10.11 ai 1';
+  const attempt = (over: Partial<Attempt> = {}): Attempt => ({
+    result: 'inProgress',
+    remaining: 6,
+    ts: 1,
+    lead: 'Azelf',
+    team: [TEAM[5]!, ...TEAM.slice(0, 5)],
+    battleSeed: '1,2,3,4',
+    aiSeed: '5,6,7,8',
+    choices: [],
+    engine: ENGINE,
+    ...over,
+  });
+  const started = () => reducer(locked(), { type: 'startAttempt', day: DAY, attempt: attempt() });
+
+  it('records choices and the result of the battle in progress', () => {
+    let state = started();
+    expect(attemptInProgress(state.days[DAY])).toBeDefined();
+    state = reducer(state, { type: 'recordChoice', day: DAY, choice: 'move 1' });
+    state = reducer(state, { type: 'recordChoice', day: DAY, choice: 'switch 3' });
+    state = reducer(state, { type: 'endAttempt', day: DAY, result: 'win', remaining: 2 });
+    expect(state.days[DAY]!.attempts).toEqual([
+      attempt({ choices: ['move 1', 'switch 3'], result: 'win', remaining: 2 }),
+    ]);
+    expect(attemptInProgress(state.days[DAY])).toBeUndefined();
+    // Nothing to record into once it is over.
+    expect(reducer(state, { type: 'recordChoice', day: DAY, choice: 'move 2' })).toBe(state);
+    expect(reducer(state, { type: 'endAttempt', day: DAY, result: 'loss', remaining: 0 })).toBe(
+      state,
+    );
+  });
+
+  it('runs one attempt at a time; a finished one can be run back', () => {
+    const state = started();
+    expect(reducer(state, { type: 'startAttempt', day: DAY, attempt: attempt({ ts: 2 }) })).toBe(
+      state,
+    );
+    const over = reducer(state, { type: 'endAttempt', day: DAY, result: 'loss', remaining: 0 });
+    const again = reducer(over, { type: 'startAttempt', day: DAY, attempt: attempt({ ts: 2 }) });
+    expect(again.days[DAY]!.attempts.map((a) => a.result)).toEqual(['loss', 'inProgress']);
+  });
+
+  it('turns unfinished attempts from past days or another engine into forfeits', () => {
+    const state = started();
+    expect(reducer(state, { type: 'expireAttempts', today: DAY, engine: ENGINE })).toBe(state);
+    const nextDay = reducer(state, { type: 'expireAttempts', today: '2026-10-22', engine: ENGINE });
+    expect(nextDay.days[DAY]!.attempts[0]!.result).toBe('forfeit');
+    const upgraded = reducer(state, {
+      type: 'expireAttempts',
+      today: DAY,
+      engine: 'sim 0.10.12 ai 1',
+    });
+    expect(upgraded.days[DAY]!.attempts[0]!.result).toBe('forfeit');
+  });
+
+  it('locks the daily change mid-battle', () => {
+    const change: DayChange = {
+      kind: 'replace',
+      slot: 1,
+      from: TEAM[1]!,
+      to: { species: 'Gyarados', setId: 'gyarados-offensive-dragon-dance' },
+    };
+    const state = started();
+    expect(reducer(state, { type: 'applyChange', day: DAY, week: WEEK, change })).toBe(state);
+    const over = reducer(state, { type: 'endAttempt', day: DAY, result: 'loss', remaining: 0 });
+    expect(
+      reducer(over, { type: 'applyChange', day: DAY, week: WEEK, change }).days[DAY]!.swapUsed,
+    ).toBe(true);
   });
 });

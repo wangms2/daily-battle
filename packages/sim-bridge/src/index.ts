@@ -1,6 +1,7 @@
 export { legalChoices, RandomPolicy } from './policies/random';
 export { deriveSeed, makeRng, type Rng } from './rng';
-export { BattleError, replayBattle, runBattle } from './run';
+export { replayBattle, runBattle } from './run';
+export { BattleError, BattleSession, SIDES } from './session';
 export { randomTeam, toPokemonSet } from './teams';
 export type {
   BattleResult,

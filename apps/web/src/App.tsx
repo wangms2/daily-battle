@@ -1,9 +1,12 @@
 import { addDays, dayKey, weekKey } from '@daily-battle/gen/dates';
 import { useEffect, useState, type ReactNode } from 'react';
+import { BattleRoute } from './screens/BattleRoute';
 import { DailyBrief } from './screens/DailyBrief';
 import { TeamBuilder } from './screens/TeamBuilder';
 import { SettingsSheet, StatsSheet, WelcomeSheet } from './sheets/misc';
 import { useSchedule } from './lib/schedule';
+import { ENGINE_VERSION, randomSeed } from './lib/seed';
+import { attemptInProgress } from './state/reducer';
 import { emptyDay, type Settings } from './state/schema';
 import { useNow, useStore } from './state/context';
 import { Button } from './ui/bits';
@@ -47,6 +50,46 @@ export function App() {
   const dayState = state.days[day] ?? emptyDay();
   const setSetting = <K extends keyof Settings>(key: K, value: Settings[K]) =>
     dispatch({ type: 'setSetting', key, value });
+
+  // An unfinished battle from an earlier day, or from an older engine, counts as a loss.
+  useEffect(() => {
+    dispatch({ type: 'expireAttempts', today: day, engine: ENGINE_VERSION });
+  }, [day, dispatch]);
+
+  const inProgress = attemptInProgress(dayState);
+  // The attempt the battle screen shows; it stays put after the battle ends.
+  const [battleTs, setBattleTs] = useState<number | null>(null);
+
+  const startBattle = () => {
+    if (!weekState) return;
+    if (inProgress) {
+      setBattleTs(inProgress.ts);
+    } else {
+      const team = weekState.team;
+      const lead = team.find((s) => s.species === dayState.lead) ?? team[0]!;
+      const ts = Date.now();
+      dispatch({
+        type: 'startAttempt',
+        day,
+        attempt: {
+          result: 'inProgress',
+          remaining: 6,
+          ts,
+          lead: lead.species,
+          team: [lead, ...team.filter((s) => s !== lead)],
+          battleSeed: randomSeed(),
+          aiSeed: randomSeed(),
+          choices: [],
+          engine: ENGINE_VERSION,
+        },
+      });
+      setBattleTs(ts);
+    }
+    go('battle');
+  };
+  const shownAttempt =
+    dayState.attempts.find((a) => a.ts === battleTs) ??
+    (route === 'battle' ? inProgress : undefined);
 
   const todayLabel = !dayState.attempts.length
     ? 'Not played yet'
@@ -95,21 +138,22 @@ export function App() {
         }}
       />
     );
-  } else if (route === 'battle') {
+  } else if (route === 'battle' && shownAttempt) {
     screen = (
-      <div className="flex h-full flex-col">
-        {renderTopBar('Battle')()}
-        <div className="grid flex-1 place-items-center p-6 text-center">
-          <div className="space-y-3">
-            <p className="text-[17px] font-semibold">
-              The battle screen arrives in the next milestone.
-            </p>
-            <Button variant="secondary" onClick={() => go('')}>
-              Back to today
-            </Button>
-          </div>
-        </div>
-      </div>
+      <BattleRoute
+        key={shownAttempt.ts}
+        day={day}
+        schedule={schedule.schedule}
+        attempt={shownAttempt}
+        tryNumber={dayState.attempts.indexOf(shownAttempt) + 1}
+        settings={settings}
+        dispatch={dispatch}
+        onExit={() => {
+          setBattleTs(null);
+          go('');
+        }}
+        onRunItBack={startBattle}
+      />
     );
   } else {
     screen = (
@@ -124,7 +168,8 @@ export function App() {
         )}
         onLead={(species) => dispatch({ type: 'setLead', day, species })}
         onChange={(change) => dispatch({ type: 'applyChange', day, week, change })}
-        onStart={() => go('battle')}
+        inProgress={!!inProgress}
+        onStart={startBattle}
       />
     );
   }
