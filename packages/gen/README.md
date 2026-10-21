@@ -20,7 +20,12 @@ generateWeek('2026-10-19'); // { pool, opponents: [Mon..Sun] }, what M5's schedu
 
 ## Weekly pool (12 species)
 
-Each pool has a quota of 2–4 **below-OU** species (tier other than `OU`/`(OU)`: UU, UUBL, NU, PU), chosen uniformly per attempt. The quota and the rest are drawn separately, without replacement, weighted by **√usage**. The pool is redrawn until all of these hold:
+Each pool has a quota of 2–4 **below-OU** species (tier other than `OU`/`(OU)`: UU, UUBL, NU, PU), chosen uniformly per attempt. The quota and the rest are drawn separately, without replacement:
+
+- **OU species** are weighted by **√usage**.
+- **Below-OU species** are weighted by **usage^0.35**. Popular ones still come up more often (Clefable is in about 14% of pools), but no single species dominates, and the most niche are still in about 3%. Under raw usage, Clefable and Donphan were each in over 40% of pools.
+
+The pool is redrawn until all of these hold:
 
 - **Top-tier cap:** at most 4 of the 15 most-used species.
 - **Stealth Rock:** at least 1 setter (required).
@@ -29,7 +34,10 @@ Each pool has a quota of 2–4 **below-OU** species (tier other than `OU`/`(OU)`
 - **Role mix:** at least 3 offensive, 2 defensive, and 2 utility species.
 - **Legality:** a legal 6-of-12 team exists.
 
-Two constraints are **soft**: a pool with no Spikes or Toxic Spikes setter, or no hazard remover (Rapid Spin or Defog), is accepted only half the time each. About 68% of random pools have each anyway, so in practice about 81% of pools end up with each.
+Spikes and removal are handled differently from the rules above:
+
+- **Spikes:** each week decides up front, 50/50, whether its pool includes a Spikes or Toxic Spikes setter, and the pool is redrawn until it matches. So about half of pools have one.
+- **Hazard removal is soft:** a pool with no remover (Rapid Spin or Defog) is accepted half the time. In practice about 75% of pools have one.
 
 The player may pick any of a species' sets, so a species counts for a trait if any of its sets has it.
 
@@ -59,13 +67,14 @@ pnpm --filter @daily-battle/gen check [--n 10000]
 
 `src/verify.ts` checks the output with logic written separately from the generators. The script prints attempt counts, species variety, and the style mix, and exits non-zero on any failure. CI runs 10,000 seeds. Vitest runs 1,000.
 
-Last run (2026-10-21, generator v2, `--n 10000`, 36s): **0 failures**.
+Last run (2026-10-21, generator v3, `--n 10000`, 52s): **0 failures**.
 
 - **Pools:**
-  - 3.41 attempts on average, 30 at most. All 100 species appear.
-  - The most common species are in about 30% of pools (Tyranitar, Azelf, Magnezone); the rarest in about 2%.
-  - 81% of pools have a Spikes or Toxic Spikes setter, and 81% have a remover.
+  - 6.84 attempts on average, 78 at most. All 100 species appear.
+  - The most common species are in about 30–34% of pools (Tyranitar, Azelf, Bronzong); the rarest in about 2%.
+  - 49.6% of pools have a Spikes or Toxic Spikes setter, and 74.5% have a remover.
   - Below-OU species per pool: 2 in 24% of pools, 3 in 33%, 4 in 43%.
+  - Below-OU frequency follows usage, compressed: Donphan is in 17% of pools, Clefable 14%, Magneton 11%; the four least-used (0.10–0.14% usage) are each in about 3%.
 - **Opponents:**
   - 1.69 attempts on average, 10 at most. All 100 species appear.
   - Starmie is in 23% of teams and Tyranitar 22%; the rarest are in about 1%.

@@ -62,9 +62,10 @@ export function poolProblems(species: string[], data: SetsFile = defaultSets): s
 
 /**
  * The weekly pool of 12 species for a week (DESIGN.md §6.2). A quota of
- * below-OU species is drawn separately so they show up despite low usage.
- * Spikes and hazard removal are soft: a pool missing either is accepted only
- * part of the time. Stealth Rock is required.
+ * below-OU species is drawn separately (by their own usage) so they show up
+ * despite low usage overall. Stealth Rock is required. Each week decides up
+ * front whether it gets a Spikes/Toxic Spikes setter, so about `spikesRate`
+ * of pools do. A pool without a hazard remover is accepted only part of the time.
  */
 export function generatePool(week: string, data: SetsFile = defaultSets): WeeklyPool {
   const { pool } = CONFIG;
@@ -72,17 +73,19 @@ export function generatePool(week: string, data: SetsFile = defaultSets): Weekly
   const names = Object.keys(data.species);
   const ou = names.filter((s) => !isBelowOu(data, s));
   const belowOu = names.filter((s) => isBelowOu(data, s));
-  const weight = (s: string) => data.species[s]!.usage ** CONFIG.usageExponent;
+  const ouWeight = (s: string) => data.species[s]!.usage ** CONFIG.usageExponent;
+  const belowOuWeight = (s: string) => data.species[s]!.usage ** pool.belowOuUsageExponent;
+  const wantSpikes = rng() < pool.spikesRate;
 
   for (let attempts = 1; attempts <= CONFIG.maxAttempts; attempts++) {
     const quota = pool.belowOuMin + Math.floor(rng() * (pool.belowOuMax - pool.belowOuMin + 1));
     const species = [
-      ...weightedSample(ou, weight, pool.size - quota, rng),
-      ...weightedSample(belowOu, weight, quota, rng),
+      ...weightedSample(ou, ouWeight, pool.size - quota, rng),
+      ...weightedSample(belowOu, belowOuWeight, quota, rng),
     ];
     if (poolProblems(species, data).length) continue;
     const traits = species.map((s) => speciesTraits(data.species[s]!));
-    if (!traits.some((t) => t.spikes) && rng() >= pool.acceptWithoutSpikes) continue;
+    if (traits.some((t) => t.spikes) !== wantSpikes) continue;
     if (!traits.some((t) => t.remover) && rng() >= pool.acceptWithoutRemover) continue;
     return { generatorVersion: GENERATOR_VERSION, week, species, attempts };
   }

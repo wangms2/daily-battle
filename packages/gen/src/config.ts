@@ -3,7 +3,7 @@
  * CONFIG, or a set data refresh. The version is part of every seed key, so
  * past days only change on purpose. The golden test fails until you do.
  */
-export const GENERATOR_VERSION = 2;
+export const GENERATOR_VERSION = 3;
 
 /** Tiers that count as OU for the pool's below-OU quota; everything else (UU, UUBL, NU, PU...) is below OU. */
 export const OU_TIERS = ['OU', '(OU)'];
@@ -25,8 +25,10 @@ export const CONFIG = {
     /** Each pool has between these many below-OU species (UU, UUBL, NU, ...), drawn separately. */
     belowOuMin: 2,
     belowOuMax: 4,
-    /** Chance to accept an otherwise valid pool with no Spikes/Toxic Spikes setter. */
-    acceptWithoutSpikes: 0.5,
+    /** Below-OU species are drawn with weight usage^exponent: low enough that no one species dominates, but popular ones still come up more (about 4x the most niche). */
+    belowOuUsageExponent: 0.35,
+    /** Share of pools that include a Spikes/Toxic Spikes setter (decided per week, then enforced). */
+    spikesRate: 0.5,
     /** Chance to accept an otherwise valid pool with no hazard remover. */
     acceptWithoutRemover: 0.5,
   },

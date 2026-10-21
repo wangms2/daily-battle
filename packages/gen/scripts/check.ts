@@ -73,6 +73,14 @@ console.log(
     .map(([k, c]) => `${k}: ${pct(c)}`)
     .join(', ')}`,
 );
+const belowOuByUsage = Object.entries(sets.species)
+  .filter(([, e]) => !['OU', '(OU)'].includes(e.tier))
+  .sort((a, b) => b[1].usage - a[1].usage);
+const usageLine = ([s, e]: (typeof belowOuByUsage)[number]) =>
+  `${s} (${(e.usage * 100).toFixed(2)}% usage) ${pct(poolCounts.get(s) ?? 0)}`;
+console.log('  below-OU species, by OU usage → share of pools containing it:');
+console.log(`    most used: ${belowOuByUsage.slice(0, 5).map(usageLine).join(', ')}`);
+console.log(`    least used: ${belowOuByUsage.slice(-4).map(usageLine).join(', ')}`);
 summarize('Opponents', oppAttempts, oppCounts, n);
 const belowOuSlots = [...oppCounts]
   .filter(([s]) => !['OU', '(OU)'].includes(sets.species[s]!.tier))
