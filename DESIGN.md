@@ -331,7 +331,8 @@ One toggle, clearly labeled, available on the home screen and in the battle menu
 
 When on:
 - **First-time explainers:** a one-line dismissible tooltip the first time each mechanic appears (Stealth Rock, Choice lock, Toxic, sleep, and so on). Shown once each, tracked in `settings.shownExplainers`.
-- **Type-effectiveness labels** on move buttons against the opposing active Pokémon.
+- **Type-effectiveness labels** on move buttons against the opposing active Pokémon: each damaging move says whether it's super effective, not very effective, or has no effect.
+- **Team checklist** in the team builder (hazards, removal, attackers, defense) and the brief's tip line. With hints off, the builder never tells the player what their team is missing.
 - **Speed range** line in Pokémon tooltips.
 - **Team-builder checklist** and shared-weakness list (§12.2a).
 
@@ -381,7 +382,7 @@ Pool and opponent validation, reports, schedule files for N weeks. *Accept:* pro
 Weekly pool UI, role-named set picker, suggested-teams row, lock, daily brief with lead picker and daily swap, Beginner hints toggle and settings, localStorage. See §12.2a and §12.2c. *Accept:* a team can be built and locked in under a minute; suggested teams are selectable and editable; state persists across reloads; swap limited to one per day; storage-unavailable path works; turning hints off removes all hint UI.
 
 **M7 — Web client: battle UI**
-Worker-based battle, move/switch UI, protocol rendering, AI turns, win/loss detection, attempts recording, run it back. Includes the sprite interface and self-hosted Gen 4 sprites per §12.3a. *Accept:* full playthrough on mobile and desktop; mid-battle reload handled per §7; no runtime requests to third-party image hosts; layout and flow follow §12.2b; speed control and tap-to-skip work; single-choice forced actions auto-submit; Animations off setting works.
+Worker-based battle, move/switch UI, protocol rendering, AI turns, win/loss detection, attempts recording, run it back. Uses the sprite interface and self-hosted sprites from M6 (§12.3a; brought forward so the team builder could show them). *Accept:* full playthrough on mobile and desktop; mid-battle reload handled per §7; no runtime requests to third-party image hosts; layout and flow follow §12.2b; speed control and tap-to-skip work; single-choice forced actions auto-submit; Animations off setting works.
 
 **M8 — Result and share**
 Share text per §11, clipboard/Web Share. *Accept:* snapshot tests for share output: first-try win, first-try loss then cleared on a later try, never cleared, and swap marker. Streak logic tests: first-try win extends, first-try loss or forfeit resets, retry clear does not extend, missed day resets.

@@ -11,6 +11,12 @@ export default tseslint.config(
   {
     files: ['**/*.{ts,tsx}'],
     languageOptions: { globals: { ...globals.node } },
+    rules: {
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_', ignoreRestSiblings: true },
+      ],
+    },
   },
   {
     // Policies see the battle only through SideView (DESIGN.md §7). Type imports are fine.

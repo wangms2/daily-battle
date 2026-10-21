@@ -1,0 +1,302 @@
+{
+  "version": 1,
+  "generatorVersion": 3,
+  "dataBuiltAt": "2026-10-21T19:36:58.404Z",
+  "week": "2026-11-30",
+  "pool": {
+    "species": [
+      "Shaymin",
+      "Metagross",
+      "Tyranitar",
+      "Scizor",
+      "Electivire",
+      "Starmie",
+      "Magnezone",
+      "Breloom",
+      "Aerodactyl",
+      "Crobat",
+      "Sceptile",
+      "Ambipom"
+    ],
+    "candidate": 0
+  },
+  "suggestedTeams": [
+    {
+      "archetype": "Balanced",
+      "team": [
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-dragon-dance"
+        },
+        {
+          "species": "Shaymin",
+          "setId": "shaymin-rest-sleep-talk"
+        },
+        {
+          "species": "Scizor",
+          "setId": "scizor-bulky-swords-dance"
+        },
+        {
+          "species": "Sceptile",
+          "setId": "sceptile-swords-dance"
+        },
+        {
+          "species": "Magnezone",
+          "setId": "magnezone-choice-scarf"
+        },
+        {
+          "species": "Aerodactyl",
+          "setId": "aerodactyl-lead"
+        }
+      ]
+    },
+    {
+      "archetype": "Offense",
+      "team": [
+        {
+          "species": "Aerodactyl",
+          "setId": "aerodactyl-lead"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-choice-scarf"
+        },
+        {
+          "species": "Electivire",
+          "setId": "electivire-mixed-attacker"
+        },
+        {
+          "species": "Scizor",
+          "setId": "scizor-choice-band"
+        },
+        {
+          "species": "Starmie",
+          "setId": "starmie-defensive-rapid-spin"
+        },
+        {
+          "species": "Shaymin",
+          "setId": "shaymin-rest-sleep-talk"
+        }
+      ]
+    }
+  ],
+  "days": [
+    {
+      "day": "2026-11-30",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Snorlax",
+          "setId": "snorlax-utility"
+        },
+        {
+          "species": "Skarmory",
+          "setId": "skarmory-specially-defensive"
+        },
+        {
+          "species": "Lanturn",
+          "setId": "lanturn-special-tank"
+        },
+        {
+          "species": "Bronzong",
+          "setId": "bronzong-offensive-trick-room"
+        },
+        {
+          "species": "Hariyama",
+          "setId": "hariyama-attacking-lead"
+        },
+        {
+          "species": "Gengar",
+          "setId": "gengar-substitute"
+        }
+      ],
+      "candidate": 4
+    },
+    {
+      "day": "2026-12-01",
+      "style": "stall",
+      "team": [
+        {
+          "species": "Tentacruel",
+          "setId": "tentacruel-defensive-rapid-spin"
+        },
+        {
+          "species": "Gastrodon",
+          "setId": "gastrodon-curse"
+        },
+        {
+          "species": "Latias",
+          "setId": "latias-choice-scarf"
+        },
+        {
+          "species": "Roserade",
+          "setId": "roserade-spikes"
+        },
+        {
+          "species": "Gliscor",
+          "setId": "gliscor-stallbreaker"
+        },
+        {
+          "species": "Ludicolo",
+          "setId": "ludicolo-rain-dance-special-attacker"
+        }
+      ],
+      "candidate": 0
+    },
+    {
+      "day": "2026-12-02",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Celebi",
+          "setId": "celebi-nasty-plot"
+        },
+        {
+          "species": "Drapion",
+          "setId": "drapion-all-out-attacker"
+        },
+        {
+          "species": "Bronzong",
+          "setId": "bronzong-offensive-trick-room"
+        },
+        {
+          "species": "Vaporeon",
+          "setId": "vaporeon-offensive-substitute-pass"
+        },
+        {
+          "species": "Empoleon",
+          "setId": "empoleon-lead"
+        },
+        {
+          "species": "Donphan",
+          "setId": "donphan-standard"
+        }
+      ],
+      "candidate": 0
+    },
+    {
+      "day": "2026-12-03",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Latias",
+          "setId": "latias-choice-specs"
+        },
+        {
+          "species": "Lucario",
+          "setId": "lucario-swords-dance"
+        },
+        {
+          "species": "Infernape",
+          "setId": "infernape-mixed-attacker"
+        },
+        {
+          "species": "Clefable",
+          "setId": "clefable-support"
+        },
+        {
+          "species": "Snorlax",
+          "setId": "snorlax-utility"
+        },
+        {
+          "species": "Rotom-Mow",
+          "setId": "rotommow-choice-scarf"
+        }
+      ],
+      "candidate": 1
+    },
+    {
+      "day": "2026-12-04",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Dragonite",
+          "setId": "dragonite-offensive-dragon-dance"
+        },
+        {
+          "species": "Starmie",
+          "setId": "starmie-offensive-rapid-spin"
+        },
+        {
+          "species": "Azelf",
+          "setId": "azelf-standard-lead"
+        },
+        {
+          "species": "Aerodactyl",
+          "setId": "aerodactyl-lead"
+        },
+        {
+          "species": "Scizor",
+          "setId": "scizor-bulky-swords-dance"
+        },
+        {
+          "species": "Omastar",
+          "setId": "omastar-rain-dance-special-attacker"
+        }
+      ],
+      "candidate": 2
+    },
+    {
+      "day": "2026-12-05",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Blastoise",
+          "setId": "blastoise-resttalk-shuffler"
+        },
+        {
+          "species": "Feraligatr",
+          "setId": "feraligatr-swords-dance"
+        },
+        {
+          "species": "Rotom-Mow",
+          "setId": "rotommow-utility"
+        },
+        {
+          "species": "Metagross",
+          "setId": "metagross-agility"
+        },
+        {
+          "species": "Gyarados",
+          "setId": "gyarados-offensive-dragon-dance"
+        },
+        {
+          "species": "Celebi",
+          "setId": "celebi-utility"
+        }
+      ],
+      "candidate": 15
+    },
+    {
+      "day": "2026-12-06",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Starmie",
+          "setId": "starmie-defensive-rapid-spin"
+        },
+        {
+          "species": "Celebi",
+          "setId": "celebi-utility"
+        },
+        {
+          "species": "Zapdos",
+          "setId": "zapdos-subroost"
+        },
+        {
+          "species": "Milotic",
+          "setId": "milotic-physically-defensive"
+        },
+        {
+          "species": "Gliscor",
+          "setId": "gliscor-swords-dance"
+        },
+        {
+          "species": "Dragonite",
+          "setId": "dragonite-choice-band"
+        }
+      ],
+      "candidate": 13
+    }
+  ]
+}

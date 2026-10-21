@@ -1,0 +1,302 @@
+{
+  "version": 1,
+  "generatorVersion": 3,
+  "dataBuiltAt": "2026-10-21T19:36:58.404Z",
+  "week": "2026-11-02",
+  "pool": {
+    "species": [
+      "Heatran",
+      "Shaymin",
+      "Flygon",
+      "Electivire",
+      "Gyarados",
+      "Latias",
+      "Mamoswine",
+      "Suicune",
+      "Quagsire",
+      "Magneton",
+      "Arcanine",
+      "Donphan"
+    ],
+    "candidate": 0
+  },
+  "suggestedTeams": [
+    {
+      "archetype": "Balanced",
+      "team": [
+        {
+          "species": "Donphan",
+          "setId": "donphan-standard"
+        },
+        {
+          "species": "Latias",
+          "setId": "latias-choice-specs"
+        },
+        {
+          "species": "Magneton",
+          "setId": "magneton-choice-scarf"
+        },
+        {
+          "species": "Flygon",
+          "setId": "flygon-mixed-attacker"
+        },
+        {
+          "species": "Heatran",
+          "setId": "heatran-utility"
+        },
+        {
+          "species": "Gyarados",
+          "setId": "gyarados-offensive-dragon-dance"
+        }
+      ]
+    },
+    {
+      "archetype": "Offense",
+      "team": [
+        {
+          "species": "Latias",
+          "setId": "latias-choice-specs"
+        },
+        {
+          "species": "Gyarados",
+          "setId": "gyarados-offensive-dragon-dance"
+        },
+        {
+          "species": "Suicune",
+          "setId": "suicune-subcune"
+        },
+        {
+          "species": "Shaymin",
+          "setId": "shaymin-rest-sleep-talk"
+        },
+        {
+          "species": "Flygon",
+          "setId": "flygon-choice-scarf"
+        },
+        {
+          "species": "Electivire",
+          "setId": "electivire-mixed-attacker"
+        }
+      ]
+    }
+  ],
+  "days": [
+    {
+      "day": "2026-11-02",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Celebi",
+          "setId": "celebi-utility"
+        },
+        {
+          "species": "Azelf",
+          "setId": "azelf-standard-lead"
+        },
+        {
+          "species": "Gyarados",
+          "setId": "gyarados-offensive-dragon-dance"
+        },
+        {
+          "species": "Yanmega",
+          "setId": "yanmega-attacking-lead"
+        },
+        {
+          "species": "Hitmontop",
+          "setId": "hitmontop-rapid-spin"
+        },
+        {
+          "species": "Jolteon",
+          "setId": "jolteon-choice-specs"
+        }
+      ],
+      "candidate": 2
+    },
+    {
+      "day": "2026-11-03",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Latias",
+          "setId": "latias-choice-specs"
+        },
+        {
+          "species": "Cloyster",
+          "setId": "cloyster-support"
+        },
+        {
+          "species": "Magnezone",
+          "setId": "magnezone-choice-scarf"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-dragon-dance"
+        },
+        {
+          "species": "Gengar",
+          "setId": "gengar-offensive"
+        },
+        {
+          "species": "Heatran",
+          "setId": "heatran-utility"
+        }
+      ],
+      "candidate": 8
+    },
+    {
+      "day": "2026-11-04",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Heatran",
+          "setId": "heatran-choice-scarf"
+        },
+        {
+          "species": "Rotom-Wash",
+          "setId": "rotomwash-choice-scarf"
+        },
+        {
+          "species": "Toxicroak",
+          "setId": "toxicroak-swords-dance"
+        },
+        {
+          "species": "Azelf",
+          "setId": "azelf-standard-lead"
+        },
+        {
+          "species": "Zapdos",
+          "setId": "zapdos-physically-defensive"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-choice-band"
+        }
+      ],
+      "candidate": 2
+    },
+    {
+      "day": "2026-11-05",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Gengar",
+          "setId": "gengar-utility"
+        },
+        {
+          "species": "Infernape",
+          "setId": "infernape-nasty-plot"
+        },
+        {
+          "species": "Azelf",
+          "setId": "azelf-standard-lead"
+        },
+        {
+          "species": "Empoleon",
+          "setId": "empoleon-choice-specs"
+        },
+        {
+          "species": "Weavile",
+          "setId": "weavile-standard"
+        },
+        {
+          "species": "Rotom-Frost",
+          "setId": "rotomfrost-utility"
+        }
+      ],
+      "candidate": 6
+    },
+    {
+      "day": "2026-11-06",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Metagross",
+          "setId": "metagross-agility"
+        },
+        {
+          "species": "Hitmontop",
+          "setId": "hitmontop-rapid-spin"
+        },
+        {
+          "species": "Skarmory",
+          "setId": "skarmory-physically-defensive"
+        },
+        {
+          "species": "Zapdos",
+          "setId": "zapdos-subroost"
+        },
+        {
+          "species": "Empoleon",
+          "setId": "empoleon-choice-specs"
+        },
+        {
+          "species": "Bronzong",
+          "setId": "bronzong-offensive-stealth-rock"
+        }
+      ],
+      "candidate": 2
+    },
+    {
+      "day": "2026-11-07",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Hippowdon",
+          "setId": "hippowdon-specially-defensive"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-all-purpose"
+        },
+        {
+          "species": "Latias",
+          "setId": "latias-choice-specs"
+        },
+        {
+          "species": "Jirachi",
+          "setId": "jirachi-utility"
+        },
+        {
+          "species": "Porygon-Z",
+          "setId": "porygonz-offensive-lead"
+        },
+        {
+          "species": "Scizor",
+          "setId": "scizor-bulky-swords-dance"
+        }
+      ],
+      "candidate": 0
+    },
+    {
+      "day": "2026-11-08",
+      "style": "stall",
+      "team": [
+        {
+          "species": "Clefable",
+          "setId": "clefable-support"
+        },
+        {
+          "species": "Skarmory",
+          "setId": "skarmory-specially-defensive"
+        },
+        {
+          "species": "Suicune",
+          "setId": "suicune-supercune-offensive-calm-mind"
+        },
+        {
+          "species": "Mamoswine",
+          "setId": "mamoswine-physical-attacker"
+        },
+        {
+          "species": "Hitmontop",
+          "setId": "hitmontop-rapid-spin"
+        },
+        {
+          "species": "Bronzong",
+          "setId": "bronzong-offensive-trick-room"
+        }
+      ],
+      "candidate": 17
+    }
+  ]
+}

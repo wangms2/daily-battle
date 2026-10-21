@@ -4,11 +4,15 @@
   "private": true,
   "description": "Gen 4 OU set snapshot scripts and JSON (M1)",
   "type": "module",
-  "exports": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./species": "./src/species-data.ts"
+  },
   "scripts": {
     "refresh": "tsx scripts/refresh.ts",
     "build-sets": "tsx scripts/build-sets.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "build-species": "tsx scripts/build-species.ts"
   },
   "dependencies": {
     "@pkmn/sim": "catalog:"

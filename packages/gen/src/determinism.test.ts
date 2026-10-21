@@ -17,6 +17,17 @@ describe('determinism', () => {
     expect(b).toEqual(a);
   });
 
+  it('keeps candidate 0 on the plain key and draws alternatives for later candidates', () => {
+    expect(generatePool('2026-10-19', undefined, 0)).toEqual(generatePool('2026-10-19'));
+    expect(generateOpponent('2026-10-21', undefined, 0)).toEqual(generateOpponent('2026-10-21'));
+    expect(generatePool('2026-10-19', undefined, 1).species).not.toEqual(
+      generatePool('2026-10-19').species,
+    );
+    expect(generateOpponent('2026-10-21', undefined, 1).team).not.toEqual(
+      generateOpponent('2026-10-21').team,
+    );
+  });
+
   it('gives different output for different keys', () => {
     expect(generatePool('2026-10-19').species).not.toEqual(generatePool('2026-10-26').species);
     expect(generateOpponent('2026-10-21').team).not.toEqual(generateOpponent('2026-10-22').team);

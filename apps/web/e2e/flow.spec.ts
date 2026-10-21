@@ -1,0 +1,119 @@
+// Walks the whole M6 flow on every viewport. At each step it checks that the
+// page doesn't scroll (and no sheet overflows), and saves a screenshot for
+// design review under e2e/screens/<viewport>/.
+import { expect, test, type Page } from '@playwright/test';
+
+const TODAY = new Date('2026-10-21T10:00:00-04:00');
+
+async function noScroll(page: Page, step: string) {
+  const overflow = await page.evaluate(() => {
+    const doc = document.documentElement;
+    const dialogs = [...document.querySelectorAll<HTMLElement>('[role="dialog"]')].map((d) => ({
+      overflow: d.scrollHeight - d.clientHeight,
+      offscreen: d.getBoundingClientRect().top < -1,
+    }));
+    return { page: doc.scrollHeight - window.innerHeight, dialogs };
+  });
+  expect(overflow.page, `${step}: page scrolls`).toBeLessThanOrEqual(1);
+  for (const d of overflow.dialogs) {
+    expect(d.overflow, `${step}: sheet overflows`).toBeLessThanOrEqual(1);
+    expect(d.offscreen, `${step}: sheet runs off the top`).toBe(false);
+  }
+}
+
+async function shot(page: Page, name: string, project: string) {
+  await page.waitForTimeout(250); // let sheet animations settle
+  await noScroll(page, name);
+  await page.screenshot({ path: `e2e/screens/${project}/${name}.png` });
+}
+
+for (const scheme of ['light', 'dark'] as const) {
+  test(`full flow (${scheme})`, async ({ page }, info) => {
+    const project = `${info.project.name}/${scheme}`;
+    await page.clock.setFixedTime(TODAY);
+    await page.emulateMedia({ colorScheme: scheme });
+    await page.goto('/');
+
+    // First run: welcome sheet.
+    await expect(page.getByRole('dialog', { name: 'Welcome to Daily Battle' })).toBeVisible();
+    await shot(page, '01-welcome', project);
+    await page.getByRole('button', { name: 'Let’s go' }).click();
+
+    // Builder: empty, then a suggested team, then info and set picker.
+    await expect(page.getByRole('button', { name: /Pick 6 more/ })).toBeVisible();
+    await shot(page, '02-builder-empty', project);
+    const firstTile = page.getByRole('button', { name: /^Add .* to team$/ }).first();
+    await firstTile.click();
+    await shot(page, '03-builder-one', project);
+    await page
+      .getByRole('button', { name: /^Remove .* from team$/ })
+      .first()
+      .click();
+
+    await page.getByRole('button', { name: 'Balanced' }).click();
+    await expect(page.getByRole('button', { name: 'Lock in team' })).toBeEnabled();
+    await shot(page, '04-builder-full', project);
+
+    await page
+      .getByRole('button', { name: /^About / })
+      .first()
+      .click();
+    await shot(page, '05-info', project);
+    await page.keyboard.press('Escape');
+
+    await page
+      .getByRole('button', { name: /Change set|Change$/ })
+      .first()
+      .click();
+    await expect(page.getByRole('dialog', { name: /pick a set/ })).toBeVisible();
+    await shot(page, '06-set-picker', project);
+    await page.getByRole('button', { name: 'Details' }).first().click();
+    await shot(page, '07-set-details', project);
+    await page.keyboard.press('Escape');
+
+    if (await page.getByRole('button', { name: /Team checklist/ }).isVisible()) {
+      await page.getByRole('button', { name: /Team checklist/ }).click();
+      await shot(page, '08-checklist', project);
+      await page.keyboard.press('Escape');
+    }
+
+    await page.getByRole('button', { name: 'Lock in team' }).click();
+    await shot(page, '09-lock-confirm', project);
+    await page.getByRole('button', { name: 'Lock in', exact: true }).click();
+
+    // Daily brief: lead, edit mode, swap.
+    await expect(page.getByRole('button', { name: /^Start · / })).toBeVisible();
+    await shot(page, '10-brief', project);
+    await page
+      .getByRole('button', { name: /^Lead with / })
+      .first()
+      .click();
+    await expect(page.getByRole('button', { name: /leads$/ })).toBeVisible();
+
+    await page.getByRole('button', { name: '1 change left' }).click();
+    await shot(page, '11-brief-edit', project);
+    await page.getByRole('button', { name: 'Swap' }).first().click();
+    await shot(page, '12-brief-replace', project);
+    await page
+      .getByRole('button', { name: /^Bring in / })
+      .first()
+      .click();
+    await page.getByRole('button', { name: 'Bring in' }).first().click();
+    await shot(page, '13-change-confirm', project);
+    await page.getByRole('button', { name: 'Make change' }).click();
+    await expect(page.getByText('Change used')).toBeVisible();
+
+    // Sheets from the top bar.
+    await page.getByRole('button', { name: /^Stats/ }).click();
+    await shot(page, '14-stats', project);
+    await page.keyboard.press('Escape');
+    await page.getByRole('button', { name: 'Settings' }).click();
+    await shot(page, '15-settings', project);
+    await page.keyboard.press('Escape');
+
+    // State survives a reload.
+    await page.reload();
+    await expect(page.getByText('Change used')).toBeVisible();
+    await expect(page.getByRole('dialog', { name: 'Welcome to Daily Battle' })).toHaveCount(0);
+  });
+}

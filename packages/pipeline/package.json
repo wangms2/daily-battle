@@ -6,6 +6,17 @@
   "type": "module",
   "exports": "./src/index.ts",
   "scripts": {
+    "schedule": "tsx scripts/schedule.ts",
     "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@daily-battle/ai": "workspace:*",
+    "@daily-battle/data": "workspace:*",
+    "@daily-battle/gen": "workspace:*",
+    "@daily-battle/sim-bridge": "workspace:*",
+    "@pkmn/sim": "catalog:"
+  },
+  "devDependencies": {
+    "tsx": "^4.23.15"
   }
 }

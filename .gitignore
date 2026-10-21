@@ -7,3 +7,9 @@ coverage/
 .env.*
 .DS_Store
 Thumbs.db
+
+# Playwright output
+apps/web/e2e/.results/
+apps/web/e2e/screens/
+apps/web/e2e/look/
+playwright-report/

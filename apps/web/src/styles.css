@@ -1,0 +1,242 @@
+@import 'tailwindcss';
+@import '@fontsource/ibm-plex-sans/latin-400.css';
+@import '@fontsource/ibm-plex-sans/latin-500.css';
+@import '@fontsource/ibm-plex-sans/latin-600.css';
+@import '@fontsource/ibm-plex-sans/latin-700.css';
+
+/*
+ * Design tokens. Every visual decision comes from these.
+ * Palette: muted colors from the Sinnoh legendaries. Dialga's steel blue for
+ * actions and selection, Palkia's pearl and mauve for soft highlights,
+ * Giratina's gold for the lead and streak and its crimson for destructive
+ * actions. Crisp: small corners, 1px borders, near-flat shadows.
+ */
+:root {
+  --bg: #f5f5f7;
+  --surface: #ffffff;
+  --surface-2: #efeff3;
+  --border: #dcdce4;
+  --text: #1b1d26;
+  --muted: #646778;
+  --accent: #3f5f8a;
+  --accent-text: #ffffff;
+  --accent-soft: #ece7f2;
+  --accent-soft-text: #6b5482;
+  --gold: #a9842f;
+  --gold-soft: #f3ead6;
+  --gold-text: #ffffff;
+  --good: #3d7a5a;
+  --bad: #a33a46;
+
+  --font-body: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+  --display-weight: 600;
+
+  --r-card: 8px;
+  --r-btn: 8px;
+  --r-chip: 6px;
+  --r-sheet: 14px;
+  --r-badge: 5px;
+  --card-bw: 1px;
+  --card-shadow: 0 1px 2px rgb(27 29 38 / 0.05);
+  --btn-bg: var(--accent);
+  --btn-fg: var(--accent-text);
+  --btn-border: color-mix(in srgb, var(--accent) 82%, black);
+  --btn-shadow: inset 0 1px 0 rgb(255 255 255 / 0.12);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #121218;
+    --surface: #1a1a22;
+    --surface-2: #23232d;
+    --border: #30303c;
+    --text: #ececf1;
+    --muted: #9c9daf;
+    --accent: #8fadd4;
+    --accent-text: #121218;
+    --accent-soft: #2a2433;
+    --accent-soft-text: #c7b5da;
+    --gold: #d2ae63;
+    --gold-soft: #3a3021;
+    --gold-text: #1b1408;
+    --good: #7cc39c;
+    --bad: #e07a85;
+    --card-shadow: 0 1px 2px rgb(0 0 0 / 0.35);
+    --btn-border: color-mix(in srgb, var(--accent) 80%, white);
+    --btn-shadow: none;
+    color-scheme: dark;
+  }
+}
+
+@theme inline {
+  --font-sans: var(--font-body);
+  --font-display: var(--font-display);
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--border);
+  --color-ink: var(--text);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-soft-ink: var(--accent-soft-text);
+  --color-gold: var(--gold);
+  --color-gold-soft: var(--gold-soft);
+  --color-on-gold: var(--gold-text);
+  --color-on-accent: var(--accent-text);
+  --color-good: var(--good);
+  --color-bad: var(--bad);
+  --shadow-card: var(--card-shadow);
+  --radius-card: var(--r-card);
+  --radius-btn: var(--r-btn);
+  --radius-chip: var(--r-chip);
+  --radius-sheet: var(--r-sheet);
+  --radius-badge: var(--r-badge);
+  --breakpoint-wide: 900px;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+}
+
+/* ---- Components that differ by style ---- */
+.card {
+  background: var(--surface);
+  border: var(--card-bw) solid var(--border);
+  border-radius: var(--r-card);
+  box-shadow: var(--card-shadow);
+}
+.card.is-selected {
+  border-color: var(--accent);
+  box-shadow:
+    var(--card-shadow),
+    0 0 0 2px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+.display {
+  font-family: var(--font-display);
+  font-weight: var(--display-weight);
+}
+.btn {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: var(--r-btn);
+  padding: 0 1rem;
+  font-size: 15px;
+  font-weight: 600;
+  transition:
+    transform 120ms,
+    opacity 120ms;
+}
+.btn:active:not(:disabled) {
+  transform: translateY(1px) scale(0.99);
+}
+.btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+.btn-primary {
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  border: var(--card-bw) solid var(--btn-border);
+  box-shadow: var(--btn-shadow);
+}
+.btn-secondary {
+  background: var(--surface-2);
+  color: var(--text);
+  border: var(--card-bw) solid color-mix(in srgb, var(--border) 55%, transparent);
+}
+.btn-ghost {
+  color: var(--accent);
+}
+.chip {
+  border-radius: var(--r-chip);
+  border: var(--card-bw) solid var(--border);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+}
+
+/* Pixel sprites stay crisp when scaled. */
+.pixelated {
+  image-rendering: pixelated;
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.06);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
+@keyframes sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.animate-pop {
+  animation: pop 180ms ease-out;
+}
+.animate-shake {
+  animation: shake 260ms ease-in-out;
+}
+.animate-sheet-in {
+  animation: sheet-in 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.animate-fade-in {
+  animation: fade-in 160ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-pop,
+  .animate-shake,
+  .animate-sheet-in,
+  .animate-fade-in {
+    animation: none;
+  }
+}

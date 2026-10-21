@@ -102,6 +102,37 @@ export function hit(
   return result;
 }
 
+/** A full set for one side of a quick damage check. */
+export interface SetLike {
+  species: string;
+  item: string;
+  ability: string;
+  nature: string;
+  evs: Partial<Stats>;
+  ivs: Partial<Stats>;
+  moves: string[];
+}
+
+const EMPTY_SIDE: SideConds = {
+  sr: false,
+  spikes: 0,
+  tspikes: 0,
+  reflect: false,
+  lightScreen: false,
+};
+
+/**
+ * Best expected damage (fraction of max HP) any of the attacker's moves does
+ * to the defender at full HP, on a neutral field. Used offline (M5) to spot
+ * Pokémon a pool has no answer to.
+ */
+export function bestDamage(attacker: SetLike, defender: SetLike): number {
+  const a = makeMon({ ...attacker, boosts: {}, status: '', hpFrac: 1 });
+  const d = makeMon({ ...defender, boosts: {}, status: '', hpFrac: 1 });
+  const field = makeField('', EMPTY_SIDE, EMPTY_SIDE);
+  return Math.max(0, ...attacker.moves.map((m) => hit(a, d, m, field).frac));
+}
+
 export function moveInfo(name: string) {
   const move = new Move(gen, name);
   return { category: move.category, type: move.type, priority: move.priority, bp: move.bp };

@@ -1,7 +1,7 @@
 import { sets as defaultSets, type SetsFile } from '@daily-battle/data';
 import { TeamValidator } from '@pkmn/sim';
 import { CONFIG, GENERATOR_VERSION, OU_TIERS } from './config';
-import { rngFor, weightedSample } from './rng';
+import { candidateKey, rngFor, weightedSample } from './rng';
 import { toPokemonSet } from './sets';
 import { checksType, majorOffensiveTypes, speciesTraits } from './traits';
 
@@ -67,9 +67,14 @@ export function poolProblems(species: string[], data: SetsFile = defaultSets): s
  * front whether it gets a Spikes/Toxic Spikes setter, so about `spikesRate`
  * of pools do. A pool without a hazard remover is accepted only part of the time.
  */
-export function generatePool(week: string, data: SetsFile = defaultSets): WeeklyPool {
+export function generatePool(
+  week: string,
+  data: SetsFile = defaultSets,
+  /** Alternative draws for the same week, used when validation rejects one (M5). */
+  candidate = 0,
+): WeeklyPool {
   const { pool } = CONFIG;
-  const rng = rngFor(`gen${GENERATOR_VERSION}:week:${week}`);
+  const rng = rngFor(candidateKey(`gen${GENERATOR_VERSION}:week:${week}`, candidate));
   const names = Object.keys(data.species);
   const ou = names.filter((s) => !isBelowOu(data, s));
   const belowOu = names.filter((s) => isBelowOu(data, s));

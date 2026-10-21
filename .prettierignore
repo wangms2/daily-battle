@@ -5,3 +5,8 @@ DESIGN.md
 packages/data/sources
 packages/data/gen4ou
 packages/gen/src/__fixtures__/golden.json
+apps/web/public/schedule
+packages/pipeline/reports
+apps/web/e2e/screens
+apps/web/e2e/look
+apps/web/e2e/.results

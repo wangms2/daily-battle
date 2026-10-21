@@ -1,0 +1,331 @@
+{
+  "version": 1,
+  "generatorVersion": 3,
+  "dataBuiltAt": "2026-10-21T19:36:58.404Z",
+  "week": "2026-11-23",
+  "pool": {
+    "species": [
+      "Dragonite",
+      "Scizor",
+      "Empoleon",
+      "Jolteon",
+      "Hippowdon",
+      "Forretress",
+      "Breloom",
+      "Vaporeon",
+      "Kingdra",
+      "Suicune",
+      "Ludicolo",
+      "Milotic"
+    ],
+    "candidate": 0
+  },
+  "suggestedTeams": [
+    {
+      "archetype": "Balanced",
+      "team": [
+        {
+          "species": "Kingdra",
+          "setId": "kingdra-dragon-dance"
+        },
+        {
+          "species": "Ludicolo",
+          "setId": "ludicolo-rain-dance-special-attacker"
+        },
+        {
+          "species": "Scizor",
+          "setId": "scizor-choice-band"
+        },
+        {
+          "species": "Suicune",
+          "setId": "suicune-supercune-offensive-calm-mind"
+        },
+        {
+          "species": "Milotic",
+          "setId": "milotic-physically-defensive"
+        },
+        {
+          "species": "Hippowdon",
+          "setId": "hippowdon-physically-defensive"
+        }
+      ]
+    },
+    {
+      "archetype": "Offense",
+      "team": [
+        {
+          "species": "Forretress",
+          "setId": "forretress-physically-defensive"
+        },
+        {
+          "species": "Suicune",
+          "setId": "suicune-subcune"
+        },
+        {
+          "species": "Scizor",
+          "setId": "scizor-choice-band"
+        },
+        {
+          "species": "Dragonite",
+          "setId": "dragonite-offensive-dragon-dance"
+        },
+        {
+          "species": "Kingdra",
+          "setId": "kingdra-dragon-dance"
+        },
+        {
+          "species": "Jolteon",
+          "setId": "jolteon-choice-specs"
+        }
+      ]
+    },
+    {
+      "archetype": "Stall",
+      "team": [
+        {
+          "species": "Hippowdon",
+          "setId": "hippowdon-specially-defensive"
+        },
+        {
+          "species": "Scizor",
+          "setId": "scizor-choice-band"
+        },
+        {
+          "species": "Jolteon",
+          "setId": "jolteon-choice-specs"
+        },
+        {
+          "species": "Milotic",
+          "setId": "milotic-physically-defensive"
+        },
+        {
+          "species": "Suicune",
+          "setId": "suicune-crocune-defensive-calm-mind-resttalk"
+        },
+        {
+          "species": "Ludicolo",
+          "setId": "ludicolo-rain-dance-special-attacker"
+        }
+      ]
+    }
+  ],
+  "days": [
+    {
+      "day": "2026-11-23",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-choice-band"
+        },
+        {
+          "species": "Blissey",
+          "setId": "blissey-standard"
+        },
+        {
+          "species": "Dusknoir",
+          "setId": "dusknoir-offensive-spinblocker"
+        },
+        {
+          "species": "Latias",
+          "setId": "latias-choice-specs"
+        },
+        {
+          "species": "Milotic",
+          "setId": "milotic-physically-defensive"
+        },
+        {
+          "species": "Gallade",
+          "setId": "gallade-attacking-lead"
+        }
+      ],
+      "candidate": 2
+    },
+    {
+      "day": "2026-11-24",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Bronzong",
+          "setId": "bronzong-tank"
+        },
+        {
+          "species": "Suicune",
+          "setId": "suicune-supercune-offensive-calm-mind"
+        },
+        {
+          "species": "Abomasnow",
+          "setId": "abomasnow-all-out-attacker"
+        },
+        {
+          "species": "Torterra",
+          "setId": "torterra-rock-polish"
+        },
+        {
+          "species": "Hitmontop",
+          "setId": "hitmontop-rapid-spin"
+        },
+        {
+          "species": "Snorlax",
+          "setId": "snorlax-utility"
+        }
+      ],
+      "candidate": 5
+    },
+    {
+      "day": "2026-11-25",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Zapdos",
+          "setId": "zapdos-physically-defensive"
+        },
+        {
+          "species": "Heracross",
+          "setId": "heracross-choice-scarf"
+        },
+        {
+          "species": "Lucario",
+          "setId": "lucario-swords-dance"
+        },
+        {
+          "species": "Heatran",
+          "setId": "heatran-choice-scarf"
+        },
+        {
+          "species": "Bronzong",
+          "setId": "bronzong-offensive-trick-room"
+        },
+        {
+          "species": "Weavile",
+          "setId": "weavile-standard"
+        }
+      ],
+      "candidate": 1
+    },
+    {
+      "day": "2026-11-26",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Lanturn",
+          "setId": "lanturn-substitute-charge-beam"
+        },
+        {
+          "species": "Gengar",
+          "setId": "gengar-offensive"
+        },
+        {
+          "species": "Donphan",
+          "setId": "donphan-standard"
+        },
+        {
+          "species": "Scyther",
+          "setId": "scyther-choice-band"
+        },
+        {
+          "species": "Vaporeon",
+          "setId": "vaporeon-offensive-substitute-pass"
+        },
+        {
+          "species": "Drapion",
+          "setId": "drapion-swords-dance"
+        }
+      ],
+      "candidate": 9
+    },
+    {
+      "day": "2026-11-27",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Magneton",
+          "setId": "magneton-choice-scarf"
+        },
+        {
+          "species": "Moltres",
+          "setId": "moltres-subroost"
+        },
+        {
+          "species": "Metagross",
+          "setId": "metagross-agility"
+        },
+        {
+          "species": "Gengar",
+          "setId": "gengar-offensive"
+        },
+        {
+          "species": "Heatran",
+          "setId": "heatran-utility"
+        },
+        {
+          "species": "Honchkrow",
+          "setId": "honchkrow-life-orb"
+        }
+      ],
+      "candidate": 1
+    },
+    {
+      "day": "2026-11-28",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Suicune",
+          "setId": "suicune-crocune-defensive-calm-mind-resttalk"
+        },
+        {
+          "species": "Hitmontop",
+          "setId": "hitmontop-rapid-spin"
+        },
+        {
+          "species": "Swampert",
+          "setId": "swampert-physically-offensive-stealth-rock"
+        },
+        {
+          "species": "Honchkrow",
+          "setId": "honchkrow-life-orb"
+        },
+        {
+          "species": "Rotom-Wash",
+          "setId": "rotomwash-choice-scarf"
+        },
+        {
+          "species": "Empoleon",
+          "setId": "empoleon-choice-specs"
+        }
+      ],
+      "candidate": 1
+    },
+    {
+      "day": "2026-11-29",
+      "style": "stall",
+      "team": [
+        {
+          "species": "Scizor",
+          "setId": "scizor-bulky-swords-dance"
+        },
+        {
+          "species": "Kingdra",
+          "setId": "kingdra-rain-dance"
+        },
+        {
+          "species": "Honchkrow",
+          "setId": "honchkrow-life-orb"
+        },
+        {
+          "species": "Starmie",
+          "setId": "starmie-offensive-rapid-spin"
+        },
+        {
+          "species": "Swampert",
+          "setId": "swampert-tank"
+        },
+        {
+          "species": "Roserade",
+          "setId": "roserade-spikes"
+        }
+      ],
+      "candidate": 0
+    }
+  ]
+}

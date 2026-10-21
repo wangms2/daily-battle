@@ -24,3 +24,5 @@ jobs:
       - run: pnpm --filter @daily-battle/gen check --n 10000
       - run: pnpm --filter @daily-battle/ai eval --n 100 --assert
       - run: pnpm --filter web build
+      - run: pnpm --filter web exec playwright install --with-deps chromium
+      - run: pnpm --filter web e2e

@@ -1,0 +1,331 @@
+{
+  "version": 1,
+  "generatorVersion": 3,
+  "dataBuiltAt": "2026-10-21T19:36:58.404Z",
+  "week": "2026-11-09",
+  "pool": {
+    "species": [
+      "Bronzong",
+      "Azelf",
+      "Blissey",
+      "Starmie",
+      "Breloom",
+      "Magnezone",
+      "Gengar",
+      "Mamoswine",
+      "Kabutops",
+      "Staraptor",
+      "Heracross",
+      "Donphan"
+    ],
+    "candidate": 0
+  },
+  "suggestedTeams": [
+    {
+      "archetype": "Balanced",
+      "team": [
+        {
+          "species": "Blissey",
+          "setId": "blissey-standard"
+        },
+        {
+          "species": "Magnezone",
+          "setId": "magnezone-magnet-rise"
+        },
+        {
+          "species": "Mamoswine",
+          "setId": "mamoswine-physical-attacker"
+        },
+        {
+          "species": "Heracross",
+          "setId": "heracross-choice-scarf"
+        },
+        {
+          "species": "Donphan",
+          "setId": "donphan-standard"
+        },
+        {
+          "species": "Kabutops",
+          "setId": "kabutops-swords-dance"
+        }
+      ]
+    },
+    {
+      "archetype": "Offense",
+      "team": [
+        {
+          "species": "Starmie",
+          "setId": "starmie-defensive-rapid-spin"
+        },
+        {
+          "species": "Heracross",
+          "setId": "heracross-swords-dance"
+        },
+        {
+          "species": "Staraptor",
+          "setId": "staraptor-choice-band"
+        },
+        {
+          "species": "Breloom",
+          "setId": "breloom-swords-dance"
+        },
+        {
+          "species": "Gengar",
+          "setId": "gengar-utility"
+        },
+        {
+          "species": "Magnezone",
+          "setId": "magnezone-choice-scarf"
+        }
+      ]
+    },
+    {
+      "archetype": "Stall",
+      "team": [
+        {
+          "species": "Mamoswine",
+          "setId": "mamoswine-physical-attacker"
+        },
+        {
+          "species": "Breloom",
+          "setId": "breloom-defensive"
+        },
+        {
+          "species": "Donphan",
+          "setId": "donphan-standard"
+        },
+        {
+          "species": "Blissey",
+          "setId": "blissey-standard"
+        },
+        {
+          "species": "Bronzong",
+          "setId": "bronzong-offensive-stealth-rock"
+        },
+        {
+          "species": "Azelf",
+          "setId": "azelf-standard-lead"
+        }
+      ]
+    }
+  ],
+  "days": [
+    {
+      "day": "2026-11-09",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Blastoise",
+          "setId": "blastoise-utility"
+        },
+        {
+          "species": "Blissey",
+          "setId": "blissey-standard"
+        },
+        {
+          "species": "Bronzong",
+          "setId": "bronzong-offensive-trick-room"
+        },
+        {
+          "species": "Gyarados",
+          "setId": "gyarados-offensive-dragon-dance"
+        },
+        {
+          "species": "Heatran",
+          "setId": "heatran-substitute"
+        },
+        {
+          "species": "Starmie",
+          "setId": "starmie-offensive-rapid-spin"
+        }
+      ],
+      "candidate": 5
+    },
+    {
+      "day": "2026-11-10",
+      "style": "offense",
+      "team": [
+        {
+          "species": "Starmie",
+          "setId": "starmie-defensive-rapid-spin"
+        },
+        {
+          "species": "Yanmega",
+          "setId": "yanmega-attacking-lead"
+        },
+        {
+          "species": "Weavile",
+          "setId": "weavile-standard"
+        },
+        {
+          "species": "Ludicolo",
+          "setId": "ludicolo-rain-dance-special-attacker"
+        },
+        {
+          "species": "Jirachi",
+          "setId": "jirachi-utility"
+        },
+        {
+          "species": "Swampert",
+          "setId": "swampert-physically-offensive-stealth-rock"
+        }
+      ],
+      "candidate": 3
+    },
+    {
+      "day": "2026-11-11",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Porygon2",
+          "setId": "porygon2-utility-counter"
+        },
+        {
+          "species": "Latias",
+          "setId": "latias-calm-mind-2-attacks"
+        },
+        {
+          "species": "Starmie",
+          "setId": "starmie-offensive-rapid-spin"
+        },
+        {
+          "species": "Drapion",
+          "setId": "drapion-all-out-attacker"
+        },
+        {
+          "species": "Gyarados",
+          "setId": "gyarados-offensive-dragon-dance"
+        },
+        {
+          "species": "Magnezone",
+          "setId": "magnezone-choice-scarf"
+        }
+      ],
+      "candidate": 5
+    },
+    {
+      "day": "2026-11-12",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Bronzong",
+          "setId": "bronzong-offensive-stealth-rock"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-all-purpose"
+        },
+        {
+          "species": "Lucario",
+          "setId": "lucario-swords-dance"
+        },
+        {
+          "species": "Breloom",
+          "setId": "breloom-defensive"
+        },
+        {
+          "species": "Swampert",
+          "setId": "swampert-physically-offensive-stealth-rock"
+        },
+        {
+          "species": "Milotic",
+          "setId": "milotic-physically-defensive"
+        }
+      ],
+      "candidate": 1
+    },
+    {
+      "day": "2026-11-13",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Latias",
+          "setId": "latias-choice-scarf"
+        },
+        {
+          "species": "Spiritomb",
+          "setId": "spiritomb-curse"
+        },
+        {
+          "species": "Swampert",
+          "setId": "swampert-specially-offensive-stealth-rock"
+        },
+        {
+          "species": "Hitmontop",
+          "setId": "hitmontop-rapid-spin"
+        },
+        {
+          "species": "Abomasnow",
+          "setId": "abomasnow-leech-seed"
+        },
+        {
+          "species": "Heatran",
+          "setId": "heatran-trapper"
+        }
+      ],
+      "candidate": 0
+    },
+    {
+      "day": "2026-11-14",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-choice-band"
+        },
+        {
+          "species": "Azelf",
+          "setId": "azelf-standard-lead"
+        },
+        {
+          "species": "Donphan",
+          "setId": "donphan-standard"
+        },
+        {
+          "species": "Gallade",
+          "setId": "gallade-attacking-lead"
+        },
+        {
+          "species": "Rotom-Mow",
+          "setId": "rotommow-utility"
+        },
+        {
+          "species": "Latias",
+          "setId": "latias-choice-scarf"
+        }
+      ],
+      "candidate": 3
+    },
+    {
+      "day": "2026-11-15",
+      "style": "offense",
+      "team": [
+        {
+          "species": "Rotom-Heat",
+          "setId": "rotomheat-choice-scarf"
+        },
+        {
+          "species": "Suicune",
+          "setId": "suicune-supercune-offensive-calm-mind"
+        },
+        {
+          "species": "Ludicolo",
+          "setId": "ludicolo-rain-dance-special-attacker"
+        },
+        {
+          "species": "Azelf",
+          "setId": "azelf-standard-lead"
+        },
+        {
+          "species": "Flygon",
+          "setId": "flygon-mixed-attacker"
+        },
+        {
+          "species": "Metagross",
+          "setId": "metagross-agility"
+        }
+      ],
+      "candidate": 7
+    }
+  ]
+}

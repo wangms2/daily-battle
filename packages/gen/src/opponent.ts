@@ -1,7 +1,7 @@
 import { sets as defaultSets, type SetEntry, type SetsFile } from '@daily-battle/data';
 import { TeamValidator } from '@pkmn/sim';
 import { CONFIG, GENERATOR_VERSION } from './config';
-import { rngFor, weightedSample } from './rng';
+import { candidateKey, rngFor, weightedSample } from './rng';
 import { findSet, teamSets, type TeamSlot } from './sets';
 import { setTraits } from './traits';
 
@@ -52,8 +52,13 @@ function pickSet(sets: SetEntry[], r: number): SetEntry {
 }
 
 /** The daily opponent for a day: 6 species with hidden sets (DESIGN.md §6.3). */
-export function generateOpponent(day: string, data: SetsFile = defaultSets): DailyOpponent {
-  const rng = rngFor(`gen${GENERATOR_VERSION}:day:${day}`);
+export function generateOpponent(
+  day: string,
+  data: SetsFile = defaultSets,
+  /** Alternative draws for the same day, used when validation rejects one (M5). */
+  candidate = 0,
+): DailyOpponent {
+  const rng = rngFor(candidateKey(`gen${GENERATOR_VERSION}:day:${day}`, candidate));
   const names = Object.keys(data.species);
   const weight = (s: string) => data.species[s]!.usage ** CONFIG.usageExponent;
   for (let attempts = 1; attempts <= CONFIG.maxAttempts; attempts++) {

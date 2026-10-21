@@ -70,3 +70,8 @@ export function weightedSample<T>(
   }
   return out;
 }
+
+/** Seed key for an alternative candidate; candidate 0 is the plain key. */
+export function candidateKey(key: string, candidate: number): string {
+  return candidate ? `${key}:c${candidate}` : key;
+}

@@ -1,0 +1,331 @@
+{
+  "version": 1,
+  "generatorVersion": 3,
+  "dataBuiltAt": "2026-10-21T19:36:58.404Z",
+  "week": "2026-10-19",
+  "pool": {
+    "species": [
+      "Lucario",
+      "Roserade",
+      "Heatran",
+      "Celebi",
+      "Scizor",
+      "Jirachi",
+      "Hippowdon",
+      "Tyranitar",
+      "Suicune",
+      "Azelf",
+      "Clefable",
+      "Rhyperior"
+    ],
+    "candidate": 0
+  },
+  "suggestedTeams": [
+    {
+      "archetype": "Balanced",
+      "team": [
+        {
+          "species": "Hippowdon",
+          "setId": "hippowdon-physically-defensive"
+        },
+        {
+          "species": "Azelf",
+          "setId": "azelf-standard-lead"
+        },
+        {
+          "species": "Celebi",
+          "setId": "celebi-utility"
+        },
+        {
+          "species": "Lucario",
+          "setId": "lucario-swords-dance"
+        },
+        {
+          "species": "Heatran",
+          "setId": "heatran-choice-scarf"
+        },
+        {
+          "species": "Jirachi",
+          "setId": "jirachi-offensive"
+        }
+      ]
+    },
+    {
+      "archetype": "Offense",
+      "team": [
+        {
+          "species": "Rhyperior",
+          "setId": "rhyperior-choice-band"
+        },
+        {
+          "species": "Celebi",
+          "setId": "celebi-nasty-plot"
+        },
+        {
+          "species": "Jirachi",
+          "setId": "jirachi-choice-scarf"
+        },
+        {
+          "species": "Suicune",
+          "setId": "suicune-supercune-offensive-calm-mind"
+        },
+        {
+          "species": "Scizor",
+          "setId": "scizor-choice-band"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-all-purpose"
+        }
+      ]
+    },
+    {
+      "archetype": "Stall",
+      "team": [
+        {
+          "species": "Lucario",
+          "setId": "lucario-swords-dance"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-choice-scarf"
+        },
+        {
+          "species": "Suicune",
+          "setId": "suicune-subcune"
+        },
+        {
+          "species": "Scizor",
+          "setId": "scizor-bulky-swords-dance"
+        },
+        {
+          "species": "Celebi",
+          "setId": "celebi-utility"
+        },
+        {
+          "species": "Roserade",
+          "setId": "roserade-spikes"
+        }
+      ]
+    }
+  ],
+  "days": [
+    {
+      "day": "2026-10-19",
+      "style": "stall",
+      "team": [
+        {
+          "species": "Nidoqueen",
+          "setId": "nidoqueen-physically-defensive-toxic-spikes"
+        },
+        {
+          "species": "Skarmory",
+          "setId": "skarmory-specially-defensive"
+        },
+        {
+          "species": "Latias",
+          "setId": "latias-choice-scarf"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-dragon-dance"
+        },
+        {
+          "species": "Alakazam",
+          "setId": "alakazam-substitute-3-attacks"
+        },
+        {
+          "species": "Slowbro",
+          "setId": "slowbro-utility-counter"
+        }
+      ],
+      "candidate": 3
+    },
+    {
+      "day": "2026-10-20",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Azelf",
+          "setId": "azelf-standard-lead"
+        },
+        {
+          "species": "Zapdos",
+          "setId": "zapdos-subroost"
+        },
+        {
+          "species": "Starmie",
+          "setId": "starmie-offensive-rapid-spin"
+        },
+        {
+          "species": "Aerodactyl",
+          "setId": "aerodactyl-life-orb"
+        },
+        {
+          "species": "Metagross",
+          "setId": "metagross-utility"
+        },
+        {
+          "species": "Cresselia",
+          "setId": "cresselia-defensive"
+        }
+      ],
+      "candidate": 0
+    },
+    {
+      "day": "2026-10-21",
+      "style": "offense",
+      "team": [
+        {
+          "species": "Metagross",
+          "setId": "metagross-agility"
+        },
+        {
+          "species": "Zapdos",
+          "setId": "zapdos-subroost"
+        },
+        {
+          "species": "Empoleon",
+          "setId": "empoleon-lead"
+        },
+        {
+          "species": "Toxicroak",
+          "setId": "toxicroak-swords-dance"
+        },
+        {
+          "species": "Aerodactyl",
+          "setId": "aerodactyl-lead"
+        },
+        {
+          "species": "Raikou",
+          "setId": "raikou-calm-mind-protect"
+        }
+      ],
+      "candidate": 0
+    },
+    {
+      "day": "2026-10-22",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Heatran",
+          "setId": "heatran-utility"
+        },
+        {
+          "species": "Toxicroak",
+          "setId": "toxicroak-swords-dance"
+        },
+        {
+          "species": "Slowbro",
+          "setId": "slowbro-utility-counter"
+        },
+        {
+          "species": "Dragonite",
+          "setId": "dragonite-choice-band"
+        },
+        {
+          "species": "Nidoqueen",
+          "setId": "nidoqueen-specially-defensive-toxic-spikes"
+        },
+        {
+          "species": "Breloom",
+          "setId": "breloom-swords-dance"
+        }
+      ],
+      "candidate": 1
+    },
+    {
+      "day": "2026-10-23",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Metagross",
+          "setId": "metagross-agility"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-dragon-dance"
+        },
+        {
+          "species": "Latias",
+          "setId": "latias-calm-mind-2-attacks"
+        },
+        {
+          "species": "Breloom",
+          "setId": "breloom-swords-dance"
+        },
+        {
+          "species": "Gengar",
+          "setId": "gengar-substitute"
+        },
+        {
+          "species": "Donphan",
+          "setId": "donphan-standard"
+        }
+      ],
+      "candidate": 4
+    },
+    {
+      "day": "2026-10-24",
+      "style": "stall",
+      "team": [
+        {
+          "species": "Scizor",
+          "setId": "scizor-bulky-swords-dance"
+        },
+        {
+          "species": "Metagross",
+          "setId": "metagross-agility"
+        },
+        {
+          "species": "Swampert",
+          "setId": "swampert-tank"
+        },
+        {
+          "species": "Flygon",
+          "setId": "flygon-choice-scarf"
+        },
+        {
+          "species": "Clefable",
+          "setId": "clefable-support"
+        },
+        {
+          "species": "Shaymin",
+          "setId": "shaymin-rest-sleep-talk"
+        }
+      ],
+      "candidate": 0
+    },
+    {
+      "day": "2026-10-25",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Metagross",
+          "setId": "metagross-utility"
+        },
+        {
+          "species": "Celebi",
+          "setId": "celebi-utility"
+        },
+        {
+          "species": "Dusknoir",
+          "setId": "dusknoir-offensive-spinblocker"
+        },
+        {
+          "species": "Weavile",
+          "setId": "weavile-standard"
+        },
+        {
+          "species": "Blaziken",
+          "setId": "blaziken-swords-dance"
+        },
+        {
+          "species": "Suicune",
+          "setId": "suicune-subcune"
+        }
+      ],
+      "candidate": 12
+    }
+  ]
+}
