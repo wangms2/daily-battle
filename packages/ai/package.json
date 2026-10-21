@@ -1,0 +1,11 @@
+{
+  "name": "@daily-battle/ai",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Opponent AI: belief model, utility scoring, policies (M4)",
+  "type": "module",
+  "exports": "./src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  }
+}
