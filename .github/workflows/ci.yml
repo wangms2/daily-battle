@@ -22,4 +22,5 @@ jobs:
       - run: pnpm test
       - run: pnpm --filter @daily-battle/sim-bridge soak --n 1000
       - run: pnpm --filter @daily-battle/gen check --n 10000
+      - run: pnpm --filter @daily-battle/ai eval --n 100 --assert
       - run: pnpm --filter web build

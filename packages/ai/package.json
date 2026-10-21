@@ -6,6 +6,18 @@
   "type": "module",
   "exports": "./src/index.ts",
   "scripts": {
+    "eval": "tsx scripts/eval.ts",
     "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@daily-battle/data": "workspace:*",
+    "@daily-battle/gen": "workspace:*",
+    "@daily-battle/sim-bridge": "workspace:*",
+    "@pkmn/protocol": "catalog:",
+    "@smogon/calc": "catalog:"
+  },
+  "devDependencies": {
+    "@pkmn/client": "catalog:",
+    "tsx": "^4.23.15"
   }
 }

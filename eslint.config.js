@@ -14,8 +14,18 @@ export default tseslint.config(
   },
   {
     // Policies see the battle only through SideView (DESIGN.md §7). Type imports are fine.
+    // All their randomness comes from the seeded rng they're given, so battles can be replayed.
     files: ['packages/ai/**/*.ts', 'packages/sim-bridge/src/policies/**/*.ts'],
     rules: {
+      'no-restricted-properties': [
+        'error',
+        {
+          object: 'Math',
+          property: 'random',
+          message:
+            'Use the seeded rng passed to choose(), so battles replay exactly (DESIGN.md §7).',
+        },
+      ],
       '@typescript-eslint/no-restricted-imports': [
         'error',
         {
