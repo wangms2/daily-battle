@@ -120,9 +120,10 @@ Document which option is used, and keep species-level weights (overall usage ran
 Weighted random draw by usage, with:
 - Cap on how many top-tier species appear (no pool of 12 staples).
 - Dedupe by species; respect species clause and standard Gen 4 OU restrictions.
+- A quota of 2–4 below-OU species (UU, UUBL, and lower, drawn from those with real OU usage) so pools aren't only OU staples.
 - Coverage constraints so at least one viable team exists:
-  - ≥1 Stealth Rock setter and ≥1 Spikes or Toxic Spikes setter among possible sets (or at least SR)
-  - ≥1 hazard remover (Rapid Spin or Defog)
+  - ≥1 Stealth Rock setter (required)
+  - A Spikes or Toxic Spikes setter, and a hazard remover (Rapid Spin or Defog): soft; a pool missing either is accepted about half the time
   - ≥1 Pokémon that checks each of the major offensive types in the pool
   - A mix of offensive, defensive, and utility roles
 - After constraints, run the validation in §9.2.

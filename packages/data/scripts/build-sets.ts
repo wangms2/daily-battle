@@ -9,6 +9,7 @@ const readJson = <T>(path: string) => JSON.parse(readFileSync(path, 'utf8')) as 
 
 const { file, dropped } = buildSets({
   curated: readJson<CuratedSets>(SOURCES.sets),
+  curatedUU: readJson<CuratedSets>(SOURCES.uuSets),
   stats: readJson<ChaosStats>(SOURCES.stats),
   sources: readJson<SourcesMeta>(SOURCES.meta),
   overrides: existsSync(OVERRIDES) ? readJson<RoleOverrides>(OVERRIDES) : {},

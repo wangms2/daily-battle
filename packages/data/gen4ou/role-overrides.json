@@ -1,4 +1,16 @@
 {
+  "ambipom-attacking-lead": {
+    "label": "Fake Out lead",
+    "description": "Leads with Fake Out and Taunt to stop setup, then scouts with U-turn."
+  },
+  "ambipom-weather-support": {
+    "label": "Rain Dance support",
+    "description": "Sets long-lasting rain with Damp Rock to power up Water-type teammates."
+  },
+  "arcanine-morning-glory-physical-attacker": {
+    "label": "Bulky attacker",
+    "description": "Burns physical attackers with Will-O-Wisp, heals with Morning Sun, and hits hard with Flare Blitz."
+  },
   "blissey-standard": {
     "label": "Special wall",
     "description": "Absorbs special attacks, heals with Soft-Boiled, and sets Stealth Rock."
@@ -10,6 +22,9 @@
   "clefable-wish": {
     "label": "Wish support",
     "description": "Passes Wish heals to teammates while chipping foes with Seismic Toss."
+  },
+  "crobat-stallbreaker": {
+    "description": "Uses Taunt to stop defensive Pokémon from healing or setting hazards, and pivots out with U-turn."
   },
   "dusknoir-offensive-spinblocker": {
     "label": "Spinblocker",
@@ -35,6 +50,14 @@
     "label": "Wish + Protect",
     "description": "Heals itself and teammates with Wish, scouts with Protect, and pivots out with U-turn."
   },
+  "lanturn-special-tank": {
+    "label": "Bulky attacker",
+    "description": "Absorbs Electric attacks with Volt Absorb, spreads paralysis with Discharge, and cures the team with Heal Bell."
+  },
+  "omastar-rain-dance-special-attacker": {
+    "label": "Rain sweeper",
+    "description": "Sets rain to double its Speed with Swift Swim, then hits hard with Surf."
+  },
   "rotomheat-utility": {
     "label": "Bulky pivot",
     "description": "Burns physical attackers with Will-O-Wisp and heals itself with Pain Split."
@@ -55,12 +78,24 @@
     "label": "Spinner (offensive)",
     "description": "Clears entry hazards with Rapid Spin while threatening foes with fast coverage moves."
   },
-  "suicune-crocune-defensive-calm-mind-resttalk": { "label": "Calm Mind sweeper (RestTalk)" },
-  "suicune-subcune": { "label": "Calm Mind sweeper (Substitute)" },
-  "suicune-supercune-offensive-calm-mind": { "label": "Calm Mind sweeper (offensive)" },
-  "swampert-physically-offensive-stealth-rock": { "label": "Stealth Rock setter (physical)" },
-  "swampert-specially-offensive-stealth-rock": { "label": "Stealth Rock setter (special)" },
-  "swampert-tank": { "label": "Stealth Rock setter (bulky)" },
+  "suicune-crocune-defensive-calm-mind-resttalk": {
+    "label": "Calm Mind sweeper (RestTalk)"
+  },
+  "suicune-subcune": {
+    "label": "Calm Mind sweeper (Substitute)"
+  },
+  "suicune-supercune-offensive-calm-mind": {
+    "label": "Calm Mind sweeper (offensive)"
+  },
+  "swampert-physically-offensive-stealth-rock": {
+    "label": "Stealth Rock setter (physical)"
+  },
+  "swampert-specially-offensive-stealth-rock": {
+    "label": "Stealth Rock setter (special)"
+  },
+  "swampert-tank": {
+    "label": "Stealth Rock setter (bulky)"
+  },
   "tyranitar-all-purpose": {
     "label": "Mixed attacker",
     "description": "Mixes physical and special attacks, and traps fleeing Ghost and Psychic types with Pursuit."

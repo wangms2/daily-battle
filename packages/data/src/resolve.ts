@@ -115,9 +115,10 @@ export function resolveSet(
   const hiddenPower = moves.find(
     (m) => toID(m).startsWith('hiddenpower') && toID(m) !== 'hiddenpower',
   );
-  if (hiddenPower && !set.ivs) {
+  if (hiddenPower) {
+    // The curated IVs may be for a different Hidden Power option than the one picked.
     const type = dex.moves.get(hiddenPower).type;
-    Object.assign(ivs, dex.types.get(type).HPivs);
+    if (dex.getHiddenPower(ivs).type !== type) Object.assign(ivs, dex.types.get(type).HPivs);
   }
 
   return {

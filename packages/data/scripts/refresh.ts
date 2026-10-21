@@ -5,6 +5,7 @@ import type { ChaosSpecies, ChaosStats, SourcesMeta } from '../src/types';
 import { SOURCES } from './paths';
 
 const SETS_URL = 'https://data.pkmn.cc/sets/gen4ou.json';
+const UU_SETS_URL = 'https://data.pkmn.cc/sets/gen4uu.json';
 const STATS_INDEX = 'https://www.smogon.com/stats/';
 const CUTOFF = 1500;
 
@@ -29,6 +30,7 @@ const month = monthArg > 0 ? process.argv[monthArg + 1]! : await latestMonth();
 const statsUrl = `${STATS_INDEX}${month}/chaos/gen4ou-${CUTOFF}.json`;
 
 const curated = (await (await get(SETS_URL)).json()) as Record<string, unknown>;
+const curatedUU = (await (await get(UU_SETS_URL)).json()) as Record<string, unknown>;
 type RawChaosSpecies = Omit<ChaosSpecies, 'Natures'> & { Spreads: Record<string, number> };
 const chaos = (await (await get(statsUrl)).json()) as Omit<ChaosStats, 'data'> & {
   data: Record<string, RawChaosSpecies>;
@@ -55,6 +57,7 @@ for (const [name, s] of Object.entries(chaos.data)) {
 const fetchedAt = new Date().toISOString();
 const meta: SourcesMeta = {
   sets: { url: SETS_URL, fetchedAt },
+  uuSets: { url: UU_SETS_URL, fetchedAt },
   stats: {
     url: statsUrl,
     month,
@@ -65,8 +68,9 @@ const meta: SourcesMeta = {
 };
 
 writeJson(SOURCES.sets, curated);
+writeJson(SOURCES.uuSets, curatedUU);
 writeJson(SOURCES.stats, { info: chaos.info, data });
 writeJson(SOURCES.meta, meta);
 console.log(
-  `Fetched ${Object.keys(curated).length} curated species and ${month} stats (${meta.stats.battles} battles).`,
+  `Fetched ${Object.keys(curated).length} OU and ${Object.keys(curatedUU).length} UU curated species and ${month} stats (${meta.stats.battles} battles).`,
 );

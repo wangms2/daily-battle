@@ -24,9 +24,12 @@ export function verifyPool(pool: WeeklyPool, data: SetsFile, majorTypes: string[
   if (species.some((s) => !data.species[s])) problems.push('unknown species');
 
   const anySet = (pred: (s: SetEntry) => boolean) => species.filter((sp) => allSets(sp).some(pred));
+  // Spikes and hazard removal are soft constraints, so only Stealth Rock is required.
   if (!anySet((s) => s.moves.includes('Stealth Rock')).length) problems.push('no Stealth Rock');
-  if (!anySet((s) => usesAny(s, ['Spikes', 'Toxic Spikes'])).length) problems.push('no Spikes');
-  if (!anySet((s) => usesAny(s, ['Rapid Spin', 'Defog'])).length) problems.push('no remover');
+  const belowOu = species.filter((s) => !['OU', '(OU)'].includes(data.species[s]?.tier ?? ''));
+  if (belowOu.length < CONFIG.pool.belowOuMin || belowOu.length > CONFIG.pool.belowOuMax) {
+    problems.push(`${belowOu.length} below-OU species`);
+  }
   if (anySet(bulky).length < CONFIG.pool.minDefense) problems.push('too few defensive');
   const offensive = anySet((s) => !bulky(s) && Math.max(s.evs.atk, s.evs.spa) >= 200);
   if (offensive.length < CONFIG.pool.minOffense) problems.push('too few offensive');

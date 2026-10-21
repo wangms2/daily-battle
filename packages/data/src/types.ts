@@ -22,13 +22,18 @@ export interface SetEntry {
 }
 
 export interface SpeciesEntry {
-  /** Species-level weighted usage from the stats source (not normalized). */
+  /** Species-level weighted usage in OU, from the stats source (not normalized). */
   usage: number;
+  /** Current Gen 4 tier from the sim's data, e.g. `OU`, `UU`, `UUBL`, `NU`. */
+  tier: string;
+  /** Which curated set list the sets came from. All sets are legal in gen4ou. */
+  setSource: 'gen4ou' | 'gen4uu';
   sets: SetEntry[];
 }
 
 export interface SourcesMeta {
   sets: { url: string; fetchedAt: string };
+  uuSets: { url: string; fetchedAt: string };
   stats: { url: string; month: string; cutoff: number; battles: number; fetchedAt: string };
 }
 

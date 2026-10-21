@@ -3,7 +3,10 @@
  * CONFIG, or a set data refresh. The version is part of every seed key, so
  * past days only change on purpose. The golden test fails until you do.
  */
-export const GENERATOR_VERSION = 1;
+export const GENERATOR_VERSION = 2;
+
+/** Tiers that count as OU for the pool's below-OU quota; everything else (UU, UUBL, NU, PU...) is below OU. */
+export const OU_TIERS = ['OU', '(OU)'];
 
 export const CONFIG = {
   format: 'gen4ou',
@@ -19,6 +22,13 @@ export const CONFIG = {
     minOffense: 3,
     minDefense: 2,
     minUtility: 2,
+    /** Each pool has between these many below-OU species (UU, UUBL, NU, ...), drawn separately. */
+    belowOuMin: 2,
+    belowOuMax: 4,
+    /** Chance to accept an otherwise valid pool with no Spikes/Toxic Spikes setter. */
+    acceptWithoutSpikes: 0.5,
+    /** Chance to accept an otherwise valid pool with no hazard remover. */
+    acceptWithoutRemover: 0.5,
   },
   opponent: {
     size: 6,

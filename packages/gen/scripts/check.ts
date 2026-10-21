@@ -30,10 +30,19 @@ const failures: string[] = [];
 
 const poolAttempts: number[] = [];
 const poolCounts = new Map<string, number>();
+const hasMove = (species: string, moves: string[]) =>
+  sets.species[species]!.sets.some((s) => s.moves.some((m) => moves.includes(m)));
+let withSpikes = 0;
+let withRemover = 0;
+const belowOuCounts = new Map<number, number>();
 for (let k = 0; k < n; k++) {
   const pool = generatePool(addDays(START, 7 * k));
   poolAttempts.push(pool.attempts);
   for (const s of pool.species) poolCounts.set(s, (poolCounts.get(s) ?? 0) + 1);
+  if (pool.species.some((s) => hasMove(s, ['Spikes', 'Toxic Spikes']))) withSpikes++;
+  if (pool.species.some((s) => hasMove(s, ['Rapid Spin', 'Defog']))) withRemover++;
+  const below = pool.species.filter((s) => !['OU', '(OU)'].includes(sets.species[s]!.tier)).length;
+  belowOuCounts.set(below, (belowOuCounts.get(below) ?? 0) + 1);
   const problems = verifyPool(pool, sets, majorTypes);
   if (problems.length) failures.push(`pool ${pool.week}: ${problems.join(', ')}`);
 }
@@ -56,7 +65,19 @@ console.log(
 );
 console.log(`Major offensive types: ${majorTypes.join(', ')}`);
 summarize('Pools', poolAttempts, poolCounts, n);
+const pct = (c: number) => `${((100 * c) / n).toFixed(1)}%`;
+console.log(`  with Spikes/Toxic Spikes: ${pct(withSpikes)}, with a remover: ${pct(withRemover)}`);
+console.log(
+  `  below-OU species per pool: ${[...belowOuCounts]
+    .sort((a, b) => a[0] - b[0])
+    .map(([k, c]) => `${k}: ${pct(c)}`)
+    .join(', ')}`,
+);
 summarize('Opponents', oppAttempts, oppCounts, n);
+const belowOuSlots = [...oppCounts]
+  .filter(([s]) => !['OU', '(OU)'].includes(sets.species[s]!.tier))
+  .reduce((a, [, c]) => a + c, 0);
+console.log(`  below-OU share of opponent slots: ${((100 * belowOuSlots) / (6 * n)).toFixed(1)}%`);
 console.log(
   `  styles: ${[...styles].map(([s, c]) => `${s} ${((100 * c) / n).toFixed(1)}%`).join(', ')}`,
 );

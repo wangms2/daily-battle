@@ -4,6 +4,7 @@ const root = (p: string) => fileURLToPath(new URL(`../${p}`, import.meta.url));
 
 export const SOURCES = {
   sets: root('sources/gen4ou-sets.json'),
+  uuSets: root('sources/gen4uu-sets.json'),
   stats: root('sources/gen4ou-stats.json'),
   meta: root('sources/sources.json'),
 };

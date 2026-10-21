@@ -20,15 +20,16 @@ generateWeek('2026-10-19'); // { pool, opponents: [Mon..Sun] }, what M5's schedu
 
 ## Weekly pool (12 species)
 
-Species are drawn without replacement, weighted by **√usage**, and redrawn until all of these hold:
+Each pool has a quota of 2–4 **below-OU** species (tier other than `OU`/`(OU)`: UU, UUBL, NU, PU), chosen uniformly per attempt. The quota and the rest are drawn separately, without replacement, weighted by **√usage**. The pool is redrawn until all of these hold:
 
 - **Top-tier cap:** at most 4 of the 15 most-used species.
-- **Hazards:** at least 1 Stealth Rock setter and at least 1 Spikes or Toxic Spikes setter.
-- **Removal:** at least 1 hazard remover (Rapid Spin or Defog).
+- **Stealth Rock:** at least 1 setter (required).
 - **Type coverage:** every _major offensive type_ has a checker in the pool, meaning a species that resists it, is immune by type, or has an immunity ability its sets use (Levitate, Flash Fire, and so on).
   - Major types are the STAB attacking types with at least 5% of usage-weighted share. Currently: Water, Steel, Dragon, Ground, Electric, Dark, Fighting, Ghost, Fire.
 - **Role mix:** at least 3 offensive, 2 defensive, and 2 utility species.
 - **Legality:** a legal 6-of-12 team exists.
+
+Two constraints are **soft**: a pool with no Spikes or Toxic Spikes setter, or no hazard remover (Rapid Spin or Defog), is accepted only half the time each. About 68% of random pools have each anyway, so in practice about 81% of pools end up with each.
 
 The player may pick any of a species' sets, so a species counts for a trait if any of its sets has it.
 
@@ -58,7 +59,15 @@ pnpm --filter @daily-battle/gen check [--n 10000]
 
 `src/verify.ts` checks the output with logic written separately from the generators. The script prints attempt counts, species variety, and the style mix, and exits non-zero on any failure. CI runs 10,000 seeds. Vitest runs 1,000.
 
-Last run (2026-10-21, `--n 10000`, 33s): **0 failures**.
+Last run (2026-10-21, generator v2, `--n 10000`, 36s): **0 failures**.
 
-- **Pools:** 5.75 attempts on average, 54 at most. All 70 species appear. Forretress is in 44% of pools, because it's one of only five Spikes setters and also spins. The rarest species are in about 6%.
-- **Opponents:** 1.70 attempts on average, 13 at most. All 70 species appear. Starmie is in 27% of teams and Tyranitar 23%; the rarest are in about 2.5%. Styles: balance 71%, offense 17%, stall 12%.
+- **Pools:**
+  - 3.41 attempts on average, 30 at most. All 100 species appear.
+  - The most common species are in about 30% of pools (Tyranitar, Azelf, Magnezone); the rarest in about 2%.
+  - 81% of pools have a Spikes or Toxic Spikes setter, and 81% have a remover.
+  - Below-OU species per pool: 2 in 24% of pools, 3 in 33%, 4 in 43%.
+- **Opponents:**
+  - 1.69 attempts on average, 10 at most. All 100 species appear.
+  - Starmie is in 23% of teams and Tyranitar 22%; the rarest are in about 1%.
+  - Below-OU species fill 29% of slots through √usage weighting alone.
+  - Styles: balance 71%, offense 17%, stall 12%.

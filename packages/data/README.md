@@ -13,6 +13,7 @@ sets.species['Tyranitar'].sets; // [{ id, label, description, weight, moves, ite
 | File                        | From                                                                                                                                                  | License                                                             |
 | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | `sources/gen4ou-sets.json`  | Smogon's curated analysis sets, via [data.pkmn.cc](https://data.pkmn.cc/sets/gen4ou.json)                                                             | © Smogon.com and contributors. Used **with permission** (see below) |
+| `sources/gen4uu-sets.json`  | Smogon's curated gen4uu analysis sets, via [data.pkmn.cc](https://data.pkmn.cc/sets/gen4uu.json), for UU species without OU sets                      | © Smogon.com and contributors. Used **with permission**             |
 | `sources/gen4ou-stats.json` | [Smogon monthly usage stats](https://www.smogon.com/stats/), `chaos/gen4ou-1500.json`, trimmed to the fields we use, plus natures summed from spreads | Usage statistics from Pokémon Showdown ladder play                  |
 | `sources/sources.json`      | URLs, fetch time, stats month, cutoff, and battle count                                                                                               |                                                                     |
 
@@ -24,7 +25,11 @@ sets.species['Tyranitar'].sets; // [{ id, label, description, weight, moves, ite
 
 `src/build.ts` is a pure function from sources to output. `scripts/build-sets.ts` runs it.
 
-1. **Species:** ranked by weighted usage. The top `SPECIES_COUNT` (70) that have at least one valid curated set are kept.
+1. **Species:** ranked by weighted OU usage. Two groups are kept:
+   - The top `SPECIES_COUNT` (70) that have curated gen4ou sets. This already includes some UU and lower-tier species with real OU usage.
+   - Every **UU or UUBL** species (by the sim's current Gen 4 tiers) with at least `UU_MIN_USAGE` (0.1%) OU usage. These use curated gen4ou sets if they have any, otherwise curated **gen4uu** sets. Either way, the sets are weighted by OU usage and validated for gen4ou.
+   - Each species records its `tier` and `setSource`.
+   - Currently 100 species: 70 + 30 UU/UUBL.
 2. **Resolve options:** curated sets list alternatives (slashed moves, several items or natures). The move slots get the combination with the highest product of usage shares, with no repeats. The item, ability, and nature each take their most-used option. A missing ability comes from the species' legal Gen 4 abilities. Hidden Power sets get the matching IVs.
 3. **Validate:** every resolved set goes through `@pkmn/sim`'s `gen4ou` validator. Failures are dropped and reported. In the current data that's Spore and Sleep Powder sets (gen4ou bans sleep moves) and event-only moves that require a shiny.
 4. **Weight** (DESIGN.md §5.1, option 1):
