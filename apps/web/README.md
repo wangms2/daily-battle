@@ -76,8 +76,8 @@ The battle backgrounds (Gen 4), hazard sprites, weather overlays, and Poké Ball
 ## Deploy (Cloudflare Pages)
 
 1. Cloudflare dashboard → Workers & Pages → Create → Pages → Connect to Git → pick `daily-battle`.
-2. Build command `pnpm --filter web build`, output directory `apps/web/dist`, root `/`.
-3. Environment variables: `NODE_VERSION=24`, and `VITE_SITE_URL=https://<your production URL>` (for link previews; previews fall back to their own URL).
+2. Build command `bash scripts/cf-build.sh` (installs pnpm via npm with retries; the builder's own pnpm download times out), deploy command `npx wrangler deploy` (config in `wrangler.jsonc`).
+3. Build variables: `SKIP_DEPENDENCY_INSTALL=1`, `NODE_VERSION=24`, and `VITE_SITE_URL=https://<your production URL>` (for link previews; previews fall back to their own URL).
 4. Every push to `main` deploys; branches get preview URLs. `public/_headers` sets caching and a self-only CSP (covered by `e2e/deploy.spec.ts`).
 
 New weeks: `pnpm --filter @daily-battle/pipeline schedule --from <monday>`. Playtest reports: testers use Settings → Copy playtest report; compare with `pnpm --filter @daily-battle/pipeline calibrate <files…>`.
