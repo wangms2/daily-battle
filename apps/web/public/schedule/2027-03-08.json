@@ -1,0 +1,331 @@
+{
+  "version": 1,
+  "generatorVersion": 4,
+  "dataBuiltAt": "2026-10-22T13:34:45.150Z",
+  "week": "2027-03-08",
+  "pool": {
+    "species": [
+      "Rotom-Heat",
+      "Blissey",
+      "Gliscor",
+      "Roserade",
+      "Breloom",
+      "Tyranitar",
+      "Togekiss",
+      "Jirachi",
+      "Yanmega",
+      "Kabutops",
+      "Qwilfish",
+      "Donphan"
+    ],
+    "candidate": 1
+  },
+  "suggestedTeams": [
+    {
+      "archetype": "Balanced",
+      "team": [
+        {
+          "species": "Donphan",
+          "setId": "donphan-standard"
+        },
+        {
+          "species": "Yanmega",
+          "setId": "yanmega-attacking-lead"
+        },
+        {
+          "species": "Togekiss",
+          "setId": "togekiss-defensive-nasty-plot"
+        },
+        {
+          "species": "Gliscor",
+          "setId": "gliscor-swords-dance"
+        },
+        {
+          "species": "Blissey",
+          "setId": "blissey-standard"
+        },
+        {
+          "species": "Roserade",
+          "setId": "roserade-spikes"
+        }
+      ]
+    },
+    {
+      "archetype": "Offense",
+      "team": [
+        {
+          "species": "Roserade",
+          "setId": "roserade-toxic-spikes-lead"
+        },
+        {
+          "species": "Jirachi",
+          "setId": "jirachi-utility"
+        },
+        {
+          "species": "Kabutops",
+          "setId": "kabutops-swords-dance"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-dragon-dance"
+        },
+        {
+          "species": "Yanmega",
+          "setId": "yanmega-choice-specs"
+        },
+        {
+          "species": "Togekiss",
+          "setId": "togekiss-defensive-nasty-plot"
+        }
+      ]
+    },
+    {
+      "archetype": "Stall",
+      "team": [
+        {
+          "species": "Blissey",
+          "setId": "blissey-standard"
+        },
+        {
+          "species": "Gliscor",
+          "setId": "gliscor-stallbreaker"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-all-purpose"
+        },
+        {
+          "species": "Roserade",
+          "setId": "roserade-spikes"
+        },
+        {
+          "species": "Donphan",
+          "setId": "donphan-standard"
+        },
+        {
+          "species": "Jirachi",
+          "setId": "jirachi-wish-protect"
+        }
+      ]
+    }
+  ],
+  "days": [
+    {
+      "day": "2027-03-08",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Scizor",
+          "setId": "scizor-choice-band"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-all-purpose"
+        },
+        {
+          "species": "Latias",
+          "setId": "latias-choice-specs"
+        },
+        {
+          "species": "Steelix",
+          "setId": "steelix-standard-wall"
+        },
+        {
+          "species": "Venusaur",
+          "setId": "venusaur-subseed"
+        },
+        {
+          "species": "Hitmontop",
+          "setId": "hitmontop-rapid-spin"
+        }
+      ],
+      "candidate": 1
+    },
+    {
+      "day": "2027-03-09",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Celebi",
+          "setId": "celebi-utility"
+        },
+        {
+          "species": "Flygon",
+          "setId": "flygon-choice-scarf"
+        },
+        {
+          "species": "Gengar",
+          "setId": "gengar-substitute"
+        },
+        {
+          "species": "Bronzong",
+          "setId": "bronzong-offensive-trick-room"
+        },
+        {
+          "species": "Scizor",
+          "setId": "scizor-bulky-swords-dance"
+        },
+        {
+          "species": "Jolteon",
+          "setId": "jolteon-choice-specs"
+        }
+      ],
+      "candidate": 1
+    },
+    {
+      "day": "2027-03-10",
+      "style": "offense",
+      "team": [
+        {
+          "species": "Lanturn",
+          "setId": "lanturn-resttalk"
+        },
+        {
+          "species": "Jolteon",
+          "setId": "jolteon-choice-specs"
+        },
+        {
+          "species": "Bronzong",
+          "setId": "bronzong-offensive-trick-room"
+        },
+        {
+          "species": "Arcanine",
+          "setId": "arcanine-life-orb"
+        },
+        {
+          "species": "Latias",
+          "setId": "latias-choice-specs"
+        },
+        {
+          "species": "Flygon",
+          "setId": "flygon-choice-scarf"
+        }
+      ],
+      "candidate": 6
+    },
+    {
+      "day": "2027-03-11",
+      "style": "stall",
+      "team": [
+        {
+          "species": "Jirachi",
+          "setId": "jirachi-wish-protect"
+        },
+        {
+          "species": "Hippowdon",
+          "setId": "hippowdon-physically-defensive"
+        },
+        {
+          "species": "Blissey",
+          "setId": "blissey-standard"
+        },
+        {
+          "species": "Mamoswine",
+          "setId": "mamoswine-physical-attacker"
+        },
+        {
+          "species": "Empoleon",
+          "setId": "empoleon-agility"
+        },
+        {
+          "species": "Rhyperior",
+          "setId": "rhyperior-physical-attacker"
+        }
+      ],
+      "candidate": 0
+    },
+    {
+      "day": "2027-03-12",
+      "style": "stall",
+      "team": [
+        {
+          "species": "Tentacruel",
+          "setId": "tentacruel-defensive-rapid-spin"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-dragon-dance"
+        },
+        {
+          "species": "Flygon",
+          "setId": "flygon-mixed-attacker"
+        },
+        {
+          "species": "Kingdra",
+          "setId": "kingdra-dragon-dance"
+        },
+        {
+          "species": "Clefable",
+          "setId": "clefable-calm-mind"
+        },
+        {
+          "species": "Uxie",
+          "setId": "uxie-utility-lead"
+        }
+      ],
+      "candidate": 16
+    },
+    {
+      "day": "2027-03-13",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Vaporeon",
+          "setId": "vaporeon-wish-support"
+        },
+        {
+          "species": "Gengar",
+          "setId": "gengar-utility"
+        },
+        {
+          "species": "Scizor",
+          "setId": "scizor-choice-scarf"
+        },
+        {
+          "species": "Ludicolo",
+          "setId": "ludicolo-rain-dance-special-attacker"
+        },
+        {
+          "species": "Lucario",
+          "setId": "lucario-swords-dance"
+        },
+        {
+          "species": "Staraptor",
+          "setId": "staraptor-choice-scarf"
+        }
+      ],
+      "candidate": 2
+    },
+    {
+      "day": "2027-03-14",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Gallade",
+          "setId": "gallade-attacking-lead"
+        },
+        {
+          "species": "Latias",
+          "setId": "latias-choice-scarf"
+        },
+        {
+          "species": "Rotom-Heat",
+          "setId": "rotomheat-choice-scarf"
+        },
+        {
+          "species": "Blissey",
+          "setId": "blissey-calm-mind"
+        },
+        {
+          "species": "Lucario",
+          "setId": "lucario-swords-dance"
+        },
+        {
+          "species": "Heracross",
+          "setId": "heracross-choice-scarf"
+        }
+      ],
+      "candidate": 5
+    }
+  ]
+}

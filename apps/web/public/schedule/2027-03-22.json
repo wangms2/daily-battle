@@ -1,0 +1,331 @@
+{
+  "version": 1,
+  "generatorVersion": 4,
+  "dataBuiltAt": "2026-10-22T13:34:45.150Z",
+  "week": "2027-03-22",
+  "pool": {
+    "species": [
+      "Magnezone",
+      "Latias",
+      "Roserade",
+      "Infernape",
+      "Tentacruel",
+      "Mamoswine",
+      "Scizor",
+      "Heatran",
+      "Alakazam",
+      "Donphan",
+      "Yanmega",
+      "Arcanine"
+    ],
+    "candidate": 0
+  },
+  "suggestedTeams": [
+    {
+      "archetype": "Balanced",
+      "team": [
+        {
+          "species": "Donphan",
+          "setId": "donphan-rapid-spin"
+        },
+        {
+          "species": "Roserade",
+          "setId": "roserade-spikes"
+        },
+        {
+          "species": "Tentacruel",
+          "setId": "tentacruel-defensive-rapid-spin"
+        },
+        {
+          "species": "Latias",
+          "setId": "latias-choice-specs"
+        },
+        {
+          "species": "Heatran",
+          "setId": "heatran-utility"
+        },
+        {
+          "species": "Scizor",
+          "setId": "scizor-choice-band"
+        }
+      ]
+    },
+    {
+      "archetype": "Offense",
+      "team": [
+        {
+          "species": "Tentacruel",
+          "setId": "tentacruel-offensive-rapid-spin"
+        },
+        {
+          "species": "Mamoswine",
+          "setId": "mamoswine-physical-attacker"
+        },
+        {
+          "species": "Roserade",
+          "setId": "roserade-toxic-spikes-lead"
+        },
+        {
+          "species": "Yanmega",
+          "setId": "yanmega-choice-specs"
+        },
+        {
+          "species": "Latias",
+          "setId": "latias-choice-scarf"
+        },
+        {
+          "species": "Alakazam",
+          "setId": "alakazam-substitute-3-attacks"
+        }
+      ]
+    },
+    {
+      "archetype": "Stall",
+      "team": [
+        {
+          "species": "Mamoswine",
+          "setId": "mamoswine-mixed"
+        },
+        {
+          "species": "Roserade",
+          "setId": "roserade-spikes"
+        },
+        {
+          "species": "Donphan",
+          "setId": "donphan-standard"
+        },
+        {
+          "species": "Arcanine",
+          "setId": "arcanine-physically-defensive"
+        },
+        {
+          "species": "Tentacruel",
+          "setId": "tentacruel-defensive-rapid-spin"
+        },
+        {
+          "species": "Heatran",
+          "setId": "heatran-utility"
+        }
+      ]
+    }
+  ],
+  "days": [
+    {
+      "day": "2027-03-22",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Torterra",
+          "setId": "torterra-rock-polish"
+        },
+        {
+          "species": "Nidoqueen",
+          "setId": "nidoqueen-physically-defensive-toxic-spikes"
+        },
+        {
+          "species": "Latias",
+          "setId": "latias-choice-specs"
+        },
+        {
+          "species": "Clefable",
+          "setId": "clefable-calm-mind"
+        },
+        {
+          "species": "Scizor",
+          "setId": "scizor-choice-band"
+        },
+        {
+          "species": "Gengar",
+          "setId": "gengar-substitute"
+        }
+      ],
+      "candidate": 17
+    },
+    {
+      "day": "2027-03-23",
+      "style": "stall",
+      "team": [
+        {
+          "species": "Aggron",
+          "setId": "aggron-choice-band"
+        },
+        {
+          "species": "Celebi",
+          "setId": "celebi-utility"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-choice-band"
+        },
+        {
+          "species": "Rotom-Wash",
+          "setId": "rotomwash-choice-scarf"
+        },
+        {
+          "species": "Donphan",
+          "setId": "donphan-standard"
+        },
+        {
+          "species": "Zapdos",
+          "setId": "zapdos-physically-defensive"
+        }
+      ],
+      "candidate": 3
+    },
+    {
+      "day": "2027-03-24",
+      "style": "offense",
+      "team": [
+        {
+          "species": "Snorlax",
+          "setId": "snorlax-utility"
+        },
+        {
+          "species": "Starmie",
+          "setId": "starmie-offensive-rapid-spin"
+        },
+        {
+          "species": "Suicune",
+          "setId": "suicune-supercune-offensive-calm-mind"
+        },
+        {
+          "species": "Gallade",
+          "setId": "gallade-attacking-lead"
+        },
+        {
+          "species": "Gliscor",
+          "setId": "gliscor-stallbreaker"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-choice-scarf"
+        }
+      ],
+      "candidate": 4
+    },
+    {
+      "day": "2027-03-25",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Snorlax",
+          "setId": "snorlax-utility"
+        },
+        {
+          "species": "Swampert",
+          "setId": "swampert-tank"
+        },
+        {
+          "species": "Metagross",
+          "setId": "metagross-utility"
+        },
+        {
+          "species": "Jolteon",
+          "setId": "jolteon-substitute-baton-pass"
+        },
+        {
+          "species": "Toxicroak",
+          "setId": "toxicroak-nasty-plot"
+        },
+        {
+          "species": "Gengar",
+          "setId": "gengar-offensive"
+        }
+      ],
+      "candidate": 3
+    },
+    {
+      "day": "2027-03-26",
+      "style": "offense",
+      "team": [
+        {
+          "species": "Rotom-Wash",
+          "setId": "rotomwash-utility"
+        },
+        {
+          "species": "Infernape",
+          "setId": "infernape-mixed-attacker"
+        },
+        {
+          "species": "Magnezone",
+          "setId": "magnezone-choice-scarf"
+        },
+        {
+          "species": "Starmie",
+          "setId": "starmie-offensive-rapid-spin"
+        },
+        {
+          "species": "Kangaskhan",
+          "setId": "kangaskhan-physical-attacker"
+        },
+        {
+          "species": "Metagross",
+          "setId": "metagross-utility"
+        }
+      ],
+      "candidate": 6
+    },
+    {
+      "day": "2027-03-27",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Blissey",
+          "setId": "blissey-calm-mind"
+        },
+        {
+          "species": "Latias",
+          "setId": "latias-calm-mind-2-attacks"
+        },
+        {
+          "species": "Infernape",
+          "setId": "infernape-mixed-attacker"
+        },
+        {
+          "species": "Skarmory",
+          "setId": "skarmory-specially-defensive"
+        },
+        {
+          "species": "Ludicolo",
+          "setId": "ludicolo-swords-dance"
+        },
+        {
+          "species": "Kingdra",
+          "setId": "kingdra-dragon-dance"
+        }
+      ],
+      "candidate": 3
+    },
+    {
+      "day": "2027-03-28",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Heracross",
+          "setId": "heracross-choice-scarf"
+        },
+        {
+          "species": "Metagross",
+          "setId": "metagross-utility"
+        },
+        {
+          "species": "Quagsire",
+          "setId": "quagsire-wall"
+        },
+        {
+          "species": "Slowbro",
+          "setId": "slowbro-utility-counter"
+        },
+        {
+          "species": "Jirachi",
+          "setId": "jirachi-offensive"
+        },
+        {
+          "species": "Abomasnow",
+          "setId": "abomasnow-all-out-attacker"
+        }
+      ],
+      "candidate": 0
+    }
+  ]
+}

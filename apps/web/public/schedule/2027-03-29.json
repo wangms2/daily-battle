@@ -1,0 +1,331 @@
+{
+  "version": 1,
+  "generatorVersion": 4,
+  "dataBuiltAt": "2026-10-22T13:34:45.150Z",
+  "week": "2027-03-29",
+  "pool": {
+    "species": [
+      "Rotom-Frost",
+      "Lucario",
+      "Gyarados",
+      "Tyranitar",
+      "Kingdra",
+      "Scizor",
+      "Latias",
+      "Breloom",
+      "Azelf",
+      "Donphan",
+      "Azumarill",
+      "Rhyperior"
+    ],
+    "candidate": 0
+  },
+  "suggestedTeams": [
+    {
+      "archetype": "Balanced",
+      "team": [
+        {
+          "species": "Lucario",
+          "setId": "lucario-swords-dance"
+        },
+        {
+          "species": "Rhyperior",
+          "setId": "rhyperior-tank"
+        },
+        {
+          "species": "Kingdra",
+          "setId": "kingdra-choice-specs"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-choice-scarf"
+        },
+        {
+          "species": "Breloom",
+          "setId": "breloom-defensive"
+        },
+        {
+          "species": "Rotom-Frost",
+          "setId": "rotomfrost-utility"
+        }
+      ]
+    },
+    {
+      "archetype": "Offense",
+      "team": [
+        {
+          "species": "Azumarill",
+          "setId": "azumarill-choice-band"
+        },
+        {
+          "species": "Kingdra",
+          "setId": "kingdra-choice-specs"
+        },
+        {
+          "species": "Rotom-Frost",
+          "setId": "rotomfrost-choice-scarf"
+        },
+        {
+          "species": "Azelf",
+          "setId": "azelf-standard-lead"
+        },
+        {
+          "species": "Rhyperior",
+          "setId": "rhyperior-substitute"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-choice-scarf"
+        }
+      ]
+    },
+    {
+      "archetype": "Stall",
+      "team": [
+        {
+          "species": "Donphan",
+          "setId": "donphan-standard"
+        },
+        {
+          "species": "Rhyperior",
+          "setId": "rhyperior-tank"
+        },
+        {
+          "species": "Latias",
+          "setId": "latias-calm-mind-2-attacks"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-all-purpose"
+        },
+        {
+          "species": "Gyarados",
+          "setId": "gyarados-defensive-resttalk"
+        },
+        {
+          "species": "Rotom-Frost",
+          "setId": "rotomfrost-defensive"
+        }
+      ]
+    }
+  ],
+  "days": [
+    {
+      "day": "2027-03-29",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Scizor",
+          "setId": "scizor-choice-band"
+        },
+        {
+          "species": "Dragonite",
+          "setId": "dragonite-choice-band"
+        },
+        {
+          "species": "Swampert",
+          "setId": "swampert-physically-offensive-stealth-rock"
+        },
+        {
+          "species": "Raikou",
+          "setId": "raikou-calm-mind-protect"
+        },
+        {
+          "species": "Lucario",
+          "setId": "lucario-swords-dance"
+        },
+        {
+          "species": "Hippowdon",
+          "setId": "hippowdon-physically-defensive"
+        }
+      ],
+      "candidate": 10
+    },
+    {
+      "day": "2027-03-30",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Scizor",
+          "setId": "scizor-choice-band"
+        },
+        {
+          "species": "Gyarados",
+          "setId": "gyarados-offensive-dragon-dance"
+        },
+        {
+          "species": "Blissey",
+          "setId": "blissey-wish-support"
+        },
+        {
+          "species": "Mamoswine",
+          "setId": "mamoswine-physical-attacker"
+        },
+        {
+          "species": "Toxicroak",
+          "setId": "toxicroak-swords-dance"
+        },
+        {
+          "species": "Gliscor",
+          "setId": "gliscor-swords-dance"
+        }
+      ],
+      "candidate": 15
+    },
+    {
+      "day": "2027-03-31",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Forretress",
+          "setId": "forretress-specially-defensive"
+        },
+        {
+          "species": "Gyarados",
+          "setId": "gyarados-offensive-dragon-dance"
+        },
+        {
+          "species": "Scizor",
+          "setId": "scizor-choice-band"
+        },
+        {
+          "species": "Skarmory",
+          "setId": "skarmory-specially-defensive"
+        },
+        {
+          "species": "Drapion",
+          "setId": "drapion-swords-dance"
+        },
+        {
+          "species": "Starmie",
+          "setId": "starmie-defensive-rapid-spin"
+        }
+      ],
+      "candidate": 7
+    },
+    {
+      "day": "2027-04-01",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Rotom-Frost",
+          "setId": "rotomfrost-utility"
+        },
+        {
+          "species": "Kingdra",
+          "setId": "kingdra-choice-specs"
+        },
+        {
+          "species": "Kangaskhan",
+          "setId": "kangaskhan-physical-attacker"
+        },
+        {
+          "species": "Claydol",
+          "setId": "claydol-lead"
+        },
+        {
+          "species": "Heracross",
+          "setId": "heracross-swords-dance"
+        },
+        {
+          "species": "Gyarados",
+          "setId": "gyarados-offensive-dragon-dance"
+        }
+      ],
+      "candidate": 1
+    },
+    {
+      "day": "2027-04-02",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Aerodactyl",
+          "setId": "aerodactyl-lead"
+        },
+        {
+          "species": "Weezing",
+          "setId": "weezing-physically-defensive"
+        },
+        {
+          "species": "Jirachi",
+          "setId": "jirachi-offensive"
+        },
+        {
+          "species": "Rotom-Wash",
+          "setId": "rotomwash-choice-scarf"
+        },
+        {
+          "species": "Magneton",
+          "setId": "magneton-choice-scarf"
+        },
+        {
+          "species": "Dragonite",
+          "setId": "dragonite-offensive-dragon-dance"
+        }
+      ],
+      "candidate": 0
+    },
+    {
+      "day": "2027-04-03",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Heatran",
+          "setId": "heatran-substitute"
+        },
+        {
+          "species": "Zapdos",
+          "setId": "zapdos-subroost"
+        },
+        {
+          "species": "Hippowdon",
+          "setId": "hippowdon-physically-defensive"
+        },
+        {
+          "species": "Gyarados",
+          "setId": "gyarados-offensive-dragon-dance"
+        },
+        {
+          "species": "Alakazam",
+          "setId": "alakazam-calm-mind"
+        },
+        {
+          "species": "Rotom-Heat",
+          "setId": "rotomheat-choice-scarf"
+        }
+      ],
+      "candidate": 18
+    },
+    {
+      "day": "2027-04-04",
+      "style": "stall",
+      "team": [
+        {
+          "species": "Zapdos",
+          "setId": "zapdos-physically-defensive"
+        },
+        {
+          "species": "Tentacruel",
+          "setId": "tentacruel-defensive-rapid-spin"
+        },
+        {
+          "species": "Gyarados",
+          "setId": "gyarados-offensive-dragon-dance"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-all-purpose"
+        },
+        {
+          "species": "Scizor",
+          "setId": "scizor-bulky-swords-dance"
+        },
+        {
+          "species": "Infernape",
+          "setId": "infernape-choice-band"
+        }
+      ],
+      "candidate": 4
+    }
+  ]
+}

@@ -1,0 +1,331 @@
+{
+  "version": 1,
+  "generatorVersion": 4,
+  "dataBuiltAt": "2026-10-22T13:34:45.150Z",
+  "week": "2027-03-01",
+  "pool": {
+    "species": [
+      "Zapdos",
+      "Mamoswine",
+      "Empoleon",
+      "Magnezone",
+      "Gengar",
+      "Aerodactyl",
+      "Suicune",
+      "Breloom",
+      "Gastrodon",
+      "Scyther",
+      "Raikou",
+      "Hariyama"
+    ],
+    "candidate": 0
+  },
+  "suggestedTeams": [
+    {
+      "archetype": "Balanced",
+      "team": [
+        {
+          "species": "Suicune",
+          "setId": "suicune-crocune-defensive-calm-mind-resttalk"
+        },
+        {
+          "species": "Aerodactyl",
+          "setId": "aerodactyl-lead"
+        },
+        {
+          "species": "Zapdos",
+          "setId": "zapdos-physically-defensive"
+        },
+        {
+          "species": "Hariyama",
+          "setId": "hariyama-attacking-lead"
+        },
+        {
+          "species": "Gastrodon",
+          "setId": "gastrodon-curse"
+        },
+        {
+          "species": "Raikou",
+          "setId": "raikou-choice-specs"
+        }
+      ]
+    },
+    {
+      "archetype": "Offense",
+      "team": [
+        {
+          "species": "Raikou",
+          "setId": "raikou-calm-mind-protect"
+        },
+        {
+          "species": "Aerodactyl",
+          "setId": "aerodactyl-lead"
+        },
+        {
+          "species": "Zapdos",
+          "setId": "zapdos-agility"
+        },
+        {
+          "species": "Hariyama",
+          "setId": "hariyama-attacking-lead"
+        },
+        {
+          "species": "Gengar",
+          "setId": "gengar-offensive"
+        },
+        {
+          "species": "Suicune",
+          "setId": "suicune-subcune"
+        }
+      ]
+    },
+    {
+      "archetype": "Stall",
+      "team": [
+        {
+          "species": "Gastrodon",
+          "setId": "gastrodon-curse"
+        },
+        {
+          "species": "Aerodactyl",
+          "setId": "aerodactyl-subroost"
+        },
+        {
+          "species": "Zapdos",
+          "setId": "zapdos-physically-defensive"
+        },
+        {
+          "species": "Suicune",
+          "setId": "suicune-crocune-defensive-calm-mind-resttalk"
+        },
+        {
+          "species": "Empoleon",
+          "setId": "empoleon-specially-defensive"
+        },
+        {
+          "species": "Gengar",
+          "setId": "gengar-utility"
+        }
+      ]
+    }
+  ],
+  "days": [
+    {
+      "day": "2027-03-01",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Gyarados",
+          "setId": "gyarados-offensive-dragon-dance"
+        },
+        {
+          "species": "Steelix",
+          "setId": "steelix-standard-wall"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-dragon-dance"
+        },
+        {
+          "species": "Kingdra",
+          "setId": "kingdra-dragon-dance"
+        },
+        {
+          "species": "Blaziken",
+          "setId": "blaziken-mixed-attacker"
+        },
+        {
+          "species": "Dusknoir",
+          "setId": "dusknoir-offensive-spinblocker"
+        }
+      ],
+      "candidate": 3
+    },
+    {
+      "day": "2027-03-02",
+      "style": "offense",
+      "team": [
+        {
+          "species": "Forretress",
+          "setId": "forretress-physically-defensive"
+        },
+        {
+          "species": "Magnezone",
+          "setId": "magnezone-choice-scarf"
+        },
+        {
+          "species": "Bronzong",
+          "setId": "bronzong-offensive-trick-room"
+        },
+        {
+          "species": "Flygon",
+          "setId": "flygon-choice-scarf"
+        },
+        {
+          "species": "Breloom",
+          "setId": "breloom-swords-dance"
+        },
+        {
+          "species": "Infernape",
+          "setId": "infernape-physical-attacker"
+        }
+      ],
+      "candidate": 1
+    },
+    {
+      "day": "2027-03-03",
+      "style": "stall",
+      "team": [
+        {
+          "species": "Blastoise",
+          "setId": "blastoise-utility"
+        },
+        {
+          "species": "Abomasnow",
+          "setId": "abomasnow-leech-seed"
+        },
+        {
+          "species": "Hippowdon",
+          "setId": "hippowdon-physically-defensive"
+        },
+        {
+          "species": "Suicune",
+          "setId": "suicune-crocune-defensive-calm-mind-resttalk"
+        },
+        {
+          "species": "Starmie",
+          "setId": "starmie-defensive-rapid-spin"
+        },
+        {
+          "species": "Qwilfish",
+          "setId": "qwilfish-swords-dance"
+        }
+      ],
+      "candidate": 1
+    },
+    {
+      "day": "2027-03-04",
+      "style": "offense",
+      "team": [
+        {
+          "species": "Gyarados",
+          "setId": "gyarados-offensive-dragon-dance"
+        },
+        {
+          "species": "Rhyperior",
+          "setId": "rhyperior-substitute"
+        },
+        {
+          "species": "Suicune",
+          "setId": "suicune-supercune-offensive-calm-mind"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-all-purpose"
+        },
+        {
+          "species": "Ludicolo",
+          "setId": "ludicolo-rain-dance-special-attacker"
+        },
+        {
+          "species": "Aerodactyl",
+          "setId": "aerodactyl-life-orb"
+        }
+      ],
+      "candidate": 1
+    },
+    {
+      "day": "2027-03-05",
+      "style": "offense",
+      "team": [
+        {
+          "species": "Empoleon",
+          "setId": "empoleon-lead"
+        },
+        {
+          "species": "Bronzong",
+          "setId": "bronzong-offensive-stealth-rock"
+        },
+        {
+          "species": "Staraptor",
+          "setId": "staraptor-choice-band"
+        },
+        {
+          "species": "Kabutops",
+          "setId": "kabutops-swords-dance"
+        },
+        {
+          "species": "Snorlax",
+          "setId": "snorlax-utility"
+        },
+        {
+          "species": "Rotom-Heat",
+          "setId": "rotomheat-utility"
+        }
+      ],
+      "candidate": 4
+    },
+    {
+      "day": "2027-03-06",
+      "style": "stall",
+      "team": [
+        {
+          "species": "Quagsire",
+          "setId": "quagsire-curse"
+        },
+        {
+          "species": "Skarmory",
+          "setId": "skarmory-physically-defensive"
+        },
+        {
+          "species": "Milotic",
+          "setId": "milotic-physically-defensive"
+        },
+        {
+          "species": "Weavile",
+          "setId": "weavile-swords-dance"
+        },
+        {
+          "species": "Dragonite",
+          "setId": "dragonite-offensive-dragon-dance"
+        },
+        {
+          "species": "Scizor",
+          "setId": "scizor-choice-band"
+        }
+      ],
+      "candidate": 4
+    },
+    {
+      "day": "2027-03-07",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Bronzong",
+          "setId": "bronzong-offensive-stealth-rock"
+        },
+        {
+          "species": "Quagsire",
+          "setId": "quagsire-wall"
+        },
+        {
+          "species": "Magneton",
+          "setId": "magneton-choice-scarf"
+        },
+        {
+          "species": "Nidoqueen",
+          "setId": "nidoqueen-physically-defensive-toxic-spikes"
+        },
+        {
+          "species": "Suicune",
+          "setId": "suicune-supercune-offensive-calm-mind"
+        },
+        {
+          "species": "Kingdra",
+          "setId": "kingdra-choice-specs"
+        }
+      ],
+      "candidate": 2
+    }
+  ]
+}
