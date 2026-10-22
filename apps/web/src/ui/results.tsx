@@ -2,53 +2,74 @@
 // that falls back to copying (or showing the text to copy).
 import clsx from 'clsx';
 import { useEffect, useState, type ReactNode } from 'react';
-import { COUNTED_TRIES, type DaySummary } from '../lib/results';
+import { type DaySummary } from '../lib/results';
 import { shareResult } from '../lib/share';
 import { Sheet } from './Sheet';
 import { Button } from './bits';
 
-/** The tries that count, one row of six squares each (green = Pokémon left). */
+type Try = DaySummary['tries'][number];
+
+function TryRow({ a, label, current }: { a: Try; label: string; current: boolean }) {
+  return (
+    <div
+      className={clsx(
+        'flex items-center gap-1.5 rounded-badge px-1.5 py-0.5',
+        current && 'bg-surface-2',
+      )}
+      role="img"
+      aria-label={`${label}: ${a.result === 'win' ? 'won' : a.result === 'forfeit' ? 'gave up' : 'lost'}, ${a.remaining} of 6 left`}
+    >
+      <span
+        className={clsx(
+          'w-4 text-center text-[13px] font-bold',
+          a.result === 'win' ? 'text-good' : 'text-bad',
+        )}
+        aria-hidden
+      >
+        {a.result === 'win' ? '✓' : '✗'}
+      </span>
+      {Array.from({ length: 6 }, (_, j) => (
+        <span
+          key={j}
+          aria-hidden
+          className={clsx(
+            'size-4 rounded-[4px]',
+            j >= a.remaining
+              ? 'bg-surface-2 ring-1 ring-line'
+              : a.result === 'forfeit'
+                ? 'bg-muted/50' // given up: still standing, but not a result
+                : 'bg-good',
+          )}
+        />
+      ))}
+    </div>
+  );
+}
+
+/**
+ * The tries that count, one row of six squares each (green = Pokémon left). A
+ * practice run being shown gets its own row under a "Practice" label.
+ */
 export function TryRows({ summary, current }: { summary: DaySummary; current?: number }) {
+  const practice = summary.tries.slice(summary.counted.length);
+  const shown = practice.find((a) => a.ts === current);
+  const others = practice.length - (shown ? 1 : 0);
   return (
     <div className="flex flex-col items-center gap-1">
       {summary.counted.map((a, i) => (
-        <div
-          key={i}
-          className={clsx(
-            'flex items-center gap-1.5 rounded-badge px-1.5 py-0.5',
-            current === a.ts && 'bg-surface-2',
-          )}
-          role="img"
-          aria-label={`Try ${i + 1}: ${a.result === 'win' ? 'won' : a.result === 'forfeit' ? 'gave up' : 'lost'}, ${a.remaining} of 6 left`}
-        >
-          <span
-            className={clsx(
-              'w-4 text-center text-[13px] font-bold',
-              a.result === 'win' ? 'text-good' : 'text-bad',
-            )}
-            aria-hidden
-          >
-            {a.result === 'win' ? '✓' : '✗'}
-          </span>
-          {Array.from({ length: 6 }, (_, j) => (
-            <span
-              key={j}
-              aria-hidden
-              className={clsx(
-                'size-4 rounded-[4px]',
-                j >= a.remaining
-                  ? 'bg-surface-2 ring-1 ring-line'
-                  : a.result === 'forfeit'
-                    ? 'bg-muted/50' // given up: still standing, but not a result
-                    : 'bg-good',
-              )}
-            />
-          ))}
-        </div>
+        <TryRow key={a.ts} a={a} label={`Try ${i + 1}`} current={a.ts === current} />
       ))}
-      {summary.tries.length > COUNTED_TRIES && (
+      {shown && (
+        <>
+          <span className="mt-1 text-[11px] font-semibold tracking-wide text-muted uppercase">
+            Practice
+          </span>
+          <TryRow a={shown} label="Practice" current />
+        </>
+      )}
+      {others > 0 && (
         <span className="text-[12px] text-muted">
-          + {summary.tries.length - COUNTED_TRIES} practice
+          + {others} {shown ? 'more ' : ''}practice
         </span>
       )}
     </div>

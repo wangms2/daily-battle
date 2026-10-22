@@ -1,6 +1,7 @@
 // A small Showdown-style details card for a Pokémon: the essentials only.
 // Foes show just what the battle has revealed; yours show the set you brought.
 import clsx from 'clsx';
+import type { ReactNode } from 'react';
 import { speciesInfo } from '../../lib/data';
 import { TypeBadge } from '../../ui/bits';
 import type { MonView, Revealed, TeamMember } from '../frames';
@@ -11,7 +12,11 @@ function speedRange(base: number): [number, number] {
   return [Math.floor((2 * base + 31 + 5) * 0.9), Math.floor((2 * base + 31 + 63 + 5) * 1.1)];
 }
 
-type Props = { className?: string } & (
+type Props = {
+  className?: string;
+  /** Actions under the details (e.g. a Switch button); makes the card tappable. */
+  children?: ReactNode;
+} & (
   | { foe: true; mon: MonView; revealed?: Revealed; hints: boolean }
   | { foe: false; member: TeamMember; mon?: MonView | null }
 );
@@ -46,9 +51,12 @@ export function MonPopover(props: Props) {
 
   return (
     <div
-      role="tooltip"
+      role={props.children ? 'dialog' : 'tooltip'}
+      aria-label={props.children ? species : undefined}
       className={clsx(
-        'card animate-fade-in pointer-events-none z-30 w-[min(15rem,calc(100vw-2rem))] p-2.5 text-left',
+        'card animate-fade-in z-30',
+        !props.children && 'pointer-events-none',
+        'w-[min(15rem,calc(100vw-2rem))] p-2.5 text-left',
         props.className,
       )}
     >
@@ -66,6 +74,7 @@ export function MonPopover(props: Props) {
           {l}
         </p>
       ))}
+      {props.children}
     </div>
   );
 }

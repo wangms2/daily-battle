@@ -123,6 +123,55 @@ test('plays a full battle and stays on our own hosts', async ({ page }) => {
   await expect(page.getByRole('button', { name: /^(Try again|Play again) · / })).toBeVisible();
 });
 
+test('on a touch screen, a bench tap opens details and its button switches', async ({
+  page,
+}, info) => {
+  test.skip(!info.project.use.hasTouch, 'touch only');
+  await open(page, 'instant');
+  await page.getByRole('button', { name: /^Start · / }).click();
+  test.skip((await waitForChoice(page)) !== 'moves', 'no move turn to switch from');
+  const mon = page.locator(SWITCHES).first();
+  const species = (await mon.getAttribute('aria-label'))!.match(/^Switch to (.+?),/)![1]!;
+  await mon.tap();
+  const card = page.getByRole('dialog', { name: species });
+  await expect(card).toBeVisible();
+  await expect(page.locator('main')).not.toContainText(', come back!'); // not switched yet
+  await page.waitForTimeout(250);
+  await noScroll(page, 'bench card');
+  await page.screenshot({ path: `e2e/screens/${info.project.name}/light/27-bench-card.png` });
+  await card.getByRole('button', { name: `Switch to ${species}` }).tap();
+  await expect(card).toBeHidden();
+  await expect(page.locator('main')).toContainText(', come back!');
+});
+
+test('a run after the day is won is practice, and shares as practice', async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'share', { value: undefined });
+    Object.defineProperty(navigator, 'clipboard', {
+      value: {
+        writeText: async (t: string) => {
+          (window as unknown as { copied: string }).copied = t;
+        },
+      },
+    });
+  });
+  await open(page, 'instant', { '2026-10-21': { swapUsed: false, attempts: [tried('win', 4)] } });
+  await page.getByRole('button', { name: 'Play again · practice' }).click();
+  await waitForChoice(page);
+  await page.getByRole('button', { name: 'Battle menu' }).click();
+  await page.getByRole('button', { name: 'Give up' }).click();
+  const confirm = page.getByRole('dialog', { name: 'Give up this battle?' });
+  await expect(confirm).toContainText('practice run');
+  await confirm.getByRole('button', { name: 'Give up' }).click();
+  const card = page.getByRole('dialog', { name: 'Battle over' });
+  await expect(card).toContainText('Practice');
+  await expect(card).not.toContainText('of 3');
+  await card.getByRole('button', { name: 'Share' }).click();
+  const copied = await page.evaluate(() => (window as unknown as { copied: string }).copied);
+  expect(copied).toContain('⭐ First try! 4/6 left');
+  expect(copied).toMatch(/🔁 Practice ❌ /);
+});
+
 test('resumes a battle after a reload', async ({ page }) => {
   await open(page, 'instant');
   await page.getByRole('button', { name: /^Start · / }).click();

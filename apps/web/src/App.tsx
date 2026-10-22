@@ -167,7 +167,19 @@ export function App() {
           go('');
         }}
         onRunItBack={startBattle}
-        result={{ summary, streak: stats.streak, share }}
+        result={{
+          summary,
+          streak: stats.streak,
+          // From the end card, share this run (a practice run adds its own line).
+          share: shareText({
+            day,
+            summary,
+            streak: stats.streak,
+            change: dayState.change,
+            run: shownAttempt,
+            url: window.location.origin,
+          }),
+        }}
       />
     );
   } else {

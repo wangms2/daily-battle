@@ -1,7 +1,8 @@
 // The player's choices, Showdown-style: a "What will X do?" prompt, a 2×2
 // grid of type-tinted move buttons, and the bench; or a "who comes in?" grid
-// on a forced switch. Long-press (or hover) a move or a benched Pokémon to see
-// what it is.
+// on a forced switch. Long-press (or hover) a move to see what it does. On a
+// touch screen a tap on a benched Pokémon opens its details with a Switch
+// button; a mouse hovers for details and clicks to switch.
 import clsx from 'clsx';
 import {
   useEffect,
@@ -11,6 +12,7 @@ import {
   type PointerEvent as ReactPointerEvent,
 } from 'react';
 import { getSprite } from '../../lib/sprites';
+import { Button } from '../../ui/bits';
 import { TYPE_COLORS } from '../../lib/types';
 import { TypeBadge } from '../../ui/bits';
 import type { Controls, MoveOption, TeamMember } from '../frames';
@@ -28,9 +30,14 @@ function effectivenessTag(e: number | null): { label: string; tone: string } | n
 
 /**
  * Long-press (touch) or hover (mouse) shows info; a plain tap acts. A tap that
- * ends a long-press only closes the info.
+ * ends a long-press only closes the info. Without `longPress`, touch only taps.
  */
-function usePressInfo(show: () => void, hide: () => void, act: (pointer: string) => void) {
+function usePressInfo(
+  show: () => void,
+  hide: () => void,
+  act: (pointer: string) => void,
+  longPress = true,
+) {
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const longPressed = useRef(false);
   const pointer = useRef('');
@@ -42,7 +49,7 @@ function usePressInfo(show: () => void, hide: () => void, act: (pointer: string)
     onPointerDown: (e: ReactPointerEvent) => {
       longPressed.current = false;
       pointer.current = e.pointerType;
-      if (e.pointerType === 'mouse') return;
+      if (e.pointerType === 'mouse' || !longPress) return;
       timer.current = setTimeout(() => {
         longPressed.current = true;
         show();
@@ -128,6 +135,7 @@ function BenchButton({
   choice,
   onChoose,
   onInfo,
+  onPin,
   shown = false,
   big = false,
   off = false,
@@ -136,7 +144,9 @@ function BenchButton({
   choice?: string;
   onChoose: (c: string) => void;
   onInfo: (m: TeamMember | null) => void;
-  /** Its details card is open. */
+  /** Opens (or closes) its tapped details card, the one with the Switch button. */
+  onPin: (m: TeamMember | null) => void;
+  /** Its tapped details card is open. */
   shown?: boolean;
   big?: boolean;
   /** The whole panel is disabled (a turn is playing). */
@@ -146,21 +156,23 @@ function BenchButton({
   const press = usePressInfo(
     () => onInfo(member),
     () => onInfo(null),
-    // A tap switches when it can; otherwise a touch toggles the details (a mouse
-    // already sees them on hover).
+    // A mouse click (which already saw the details on hover) or the keyboard
+    // switches; a touch opens the details first, and their button switches.
     (type) => {
-      if (!disabled) {
-        if (choice) onChoose(choice);
-      } else if (type !== 'mouse') onInfo(shown ? null : member);
+      if (type === 'mouse' || type === '') {
+        if (!disabled && choice) onChoose(choice);
+      } else onPin(shown ? null : member);
     },
+    false,
   );
   return (
     <button
       type="button"
-      // Fainted or locked-in Pokémon still show their details on a long-press.
+      // Fainted or locked-in Pokémon still show their details.
       aria-disabled={disabled}
       {...press}
       data-bench
+      aria-expanded={shown || undefined}
       aria-label={`Switch to ${member.species}, ${member.hp}% HP${member.fainted ? ', fainted' : ''}`}
       className={clsx(
         'card flex min-w-0 flex-1 flex-col items-center justify-center gap-0.5 px-1 select-none',
@@ -220,22 +232,35 @@ export function ControlPanel({
   disabled: boolean;
   onChoose: (choice: string) => void;
 }) {
-  const [info, setInfo] = useState<Info>(null);
+  // Hover and focus cards belong to the turn they opened in too: a button that
+  // goes away (a forced switch made) never sees the pointer leave.
+  const [hover, setHover] = useState<{ info: Info; at: Controls | null } | null>(null);
+  const info = hover && hover.at === controls ? hover.info : null;
+  const setInfo = (i: Info) => setHover(i && { info: i, at: controls });
+  const off = disabled || !controls;
+  // The bench card opened by a tap (touch), which carries the Switch button.
+  // It belongs to the turn it was opened in, so it closes when the turn moves on.
+  const [pin, setPin] = useState<{ member: TeamMember; at: [Controls | null, boolean] } | null>(
+    null,
+  );
+  const pinned = pin && pin.at[0] === controls && pin.at[1] === off ? pin.member : null;
+  const setPinned = (m: TeamMember | null) => setPin(m && { member: m, at: [controls, off] });
   const active = team.find((m) => m.active);
   const bench = team.filter((m) => !m.active);
   const switchFor = (m: TeamMember) => controls?.switches.find((s) => s.slot === m.slot)?.choice;
-  const off = disabled || !controls;
   const memberInfo = (m: TeamMember | null) => setInfo(m && { member: m });
-  const shownSlot = info && 'member' in info ? info.member.slot : null;
-  // A bench card opened by a tap closes on a tap anywhere else.
+  const pinnedSlot = pinned?.slot ?? null;
+  // A tapped bench card closes on a tap anywhere else.
   useEffect(() => {
-    if (shownSlot === null) return;
+    if (pinnedSlot === null) return;
     const close = (e: PointerEvent) => {
-      if (!(e.target as Element | null)?.closest?.('[data-bench]')) setInfo(null);
+      if (!(e.target as Element | null)?.closest?.('[data-bench],[data-bench-card]')) {
+        setPin(null);
+      }
     };
     document.addEventListener('pointerdown', close);
     return () => document.removeEventListener('pointerdown', close);
-  }, [shownSlot]);
+  }, [pinnedSlot]);
   const panel = useRef<HTMLDivElement>(null);
   // When choices come back after a turn and focus was lost, put it on the first one.
   useEffect(() => {
@@ -247,7 +272,24 @@ export function ControlPanel({
       ?.focus();
   }, [off, controls]);
 
-  const tooltip =
+  const pinnedChoice = pinned && !off ? switchFor(pinned) : undefined;
+  const tooltip = pinned ? (
+    <div data-bench-card className="absolute bottom-full left-0 z-30 mb-2">
+      <MonPopover foe={false} member={pinned}>
+        {pinnedChoice && (
+          <Button
+            className="mt-2 h-10 w-full"
+            onClick={() => {
+              setPinned(null);
+              onChoose(pinnedChoice);
+            }}
+          >
+            {controls?.kind === 'switch' ? 'Send in' : 'Switch to'} {pinned.species}
+          </Button>
+        )}
+      </MonPopover>
+    </div>
+  ) : (
     info &&
     ('move' in info ? (
       <div
@@ -268,7 +310,8 @@ export function ControlPanel({
       </div>
     ) : (
       <MonPopover foe={false} member={info.member} className="absolute bottom-full left-0 mb-2" />
-    ));
+    ))
+  );
 
   if (controls?.kind === 'switch') {
     return (
@@ -283,7 +326,8 @@ export function ControlPanel({
               choice={switchFor(m)}
               onChoose={onChoose}
               onInfo={memberInfo}
-              shown={shownSlot === m.slot}
+              onPin={setPinned}
+              shown={pinnedSlot === m.slot}
               off={disabled}
               big
             />
@@ -350,7 +394,8 @@ export function ControlPanel({
             choice={switchFor(m)}
             onChoose={onChoose}
             onInfo={memberInfo}
-            shown={shownSlot === m.slot}
+            onPin={setPinned}
+            shown={pinnedSlot === m.slot}
             off={off}
           />
         ))}

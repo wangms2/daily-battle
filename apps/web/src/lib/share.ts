@@ -13,6 +13,7 @@ export function shareText({
   summary,
   streak,
   change,
+  run,
   url,
 }: {
   /** `YYYY-MM-DD` */
@@ -20,6 +21,8 @@ export function shareText({
   summary: DaySummary;
   streak: number;
   change?: DayChange;
+  /** The run being shared from its end card; a practice run gets a line of its own. */
+  run?: Attempt;
   /** Where to play, added as the last line so friends can tap through. */
   url?: string;
 }): string {
@@ -38,6 +41,22 @@ export function shareText({
     else if (status === 'failed') lines.push(`❌ Not cleared in 3 tries`);
     else lines.push(`Not cleared yet · ${counted.length} of 3 tries`);
     for (const a of counted) lines.push(`${a.result === 'win' ? '✅' : '❌'} ${squares(a)}`);
+  }
+
+  // A practice run after the day was decided: shown as an extra, never as a try.
+  const practice =
+    run &&
+    run.result !== 'inProgress' &&
+    run.ts !== winning?.ts &&
+    !counted.some((a) => a.ts === run.ts)
+      ? run
+      : undefined;
+  if (practice) {
+    const swap = practice.practiceChange;
+    const note = swap?.kind === 'replace' ? ` · with ${swap.to.species}` : '';
+    lines.push(
+      `🔁 Practice ${practice.result === 'win' ? '✅' : '❌'} ${squares(practice)}${note}`,
+    );
   }
 
   // The team from the deciding try: the win, or the latest try that counted.

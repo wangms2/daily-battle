@@ -392,7 +392,7 @@ export function Battle({
 
   // Which of today's tries this battle was (known once its result is saved).
   const tryIndex = result.summary.tries.findIndex((a) => a.ts === result.ts) + 1;
-  const counts = tryIndex > 0 && tryIndex <= 3;
+  const counts = tryIndex > 0 && tryIndex <= result.summary.counted.length;
   const firstTryWin = tryIndex === 1 && result.summary.status === 'firstTry';
   const streakText = streakLine(result.summary, result.streak);
   const endCard = end && (
@@ -534,6 +534,7 @@ export function Battle({
         onOpenChange={setGiveUpOpen}
         onConfirm={giveUp}
         firstTry={tryNumber === 1}
+        practice={!end && !['none', 'pending'].includes(result.summary.status)}
       />
     </div>
   );

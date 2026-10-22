@@ -346,23 +346,38 @@ describe('battle screen', () => {
     expect(calls).toEqual(['move 1']);
   });
 
-  it('shows a benched Pokémon’s details on a long press without switching', async () => {
+  it('opens a benched Pokémon’s details on a touch, switching only from its button', async () => {
     const { backend, calls } = fakeBackend([]);
     renderBattle(backend);
     await thunderbolt();
     const scizor = screen.getByRole('button', { name: /^Switch to Scizor/ });
-    vi.useFakeTimers();
-    try {
-      fireEvent.pointerDown(scizor, { pointerType: 'touch' });
-      act(() => vi.advanceTimersByTime(500));
-      expect(screen.getByRole('tooltip')).toHaveTextContent('Scizor');
-      fireEvent.pointerUp(scizor, { pointerType: 'touch' });
-      fireEvent.click(scizor);
-    } finally {
-      vi.useRealTimers();
-    }
+    fireEvent.pointerDown(scizor, { pointerType: 'touch' });
+    fireEvent.pointerUp(scizor, { pointerType: 'touch' });
+    fireEvent.click(scizor);
     expect(calls).toEqual([]);
-    expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
+    const card = screen.getByRole('dialog', { name: 'Scizor' });
+    expect(scizor).toHaveAttribute('aria-expanded', 'true');
+    // A tap elsewhere closes it; tapping the Pokémon again reopens it.
+    fireEvent.pointerDown(document.body);
+    expect(card).not.toBeInTheDocument();
+    fireEvent.pointerDown(scizor, { pointerType: 'touch' });
+    fireEvent.click(scizor);
+    await userEvent.click(
+      within(screen.getByRole('dialog', { name: 'Scizor' })).getByRole('button', {
+        name: 'Switch to Scizor',
+      }),
+    );
+    expect(calls).toEqual(['switch 2']);
+  });
+
+  it('switches straight away on a mouse click', async () => {
+    const { backend, calls } = fakeBackend([]);
+    renderBattle(backend);
+    await thunderbolt();
+    const scizor = screen.getByRole('button', { name: /^Switch to Scizor/ });
+    fireEvent.pointerDown(scizor, { pointerType: 'mouse' });
+    fireEvent.click(scizor);
+    expect(calls).toEqual(['switch 2']);
   });
 
   it('confirms before giving up, then records a forfeit', async () => {
@@ -429,6 +444,20 @@ describe('battle screen', () => {
     } finally {
       vi.unstubAllGlobals();
     }
+  });
+
+  it('labels a run after the day is decided as practice, not a try', async () => {
+    const { backend } = fakeBackend([TURN_1]);
+    renderBattle(backend, {
+      tryNumber: 2,
+      result: dayResult([tried('win', 3, 1), tried('win', 5, 2)], 1),
+    });
+    const card = await winBattle();
+    expect(card).not.toHaveTextContent('of 3');
+    expect(card).not.toHaveTextContent('First try');
+    expect(within(card).getByLabelText('Try 1: won, 3 of 6 left')).toBeInTheDocument();
+    expect(within(card).getByLabelText('Practice: won, 5 of 6 left')).toBeInTheDocument();
+    expect(within(card).queryByLabelText(/^Try 2/)).not.toBeInTheDocument();
   });
 
   it('marks a first-try win with a gold star', async () => {

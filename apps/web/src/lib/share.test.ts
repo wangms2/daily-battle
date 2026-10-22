@@ -8,10 +8,11 @@ const DAY = '2026-10-21';
 const TEAM: Slot[] = ['Hippowdon', 'Azelf', 'Celebi', 'Heatran', 'Jirachi', 'Lucario'].map(
   (species) => ({ species, setId: `${species.toLowerCase()}-x` }),
 );
+let nextTs = 1;
 const a = (result: Attempt['result'], remaining: number): Attempt => ({
   result,
   remaining,
-  ts: 1,
+  ts: nextTs++,
   lead: 'Hippowdon',
   team: TEAM,
   battleSeed: '1',
@@ -28,10 +29,15 @@ const swap: DayChange = {
 function text(
   attempts: Attempt[],
   streak: number,
-  { isToday = true, change, url }: { isToday?: boolean; change?: DayChange; url?: string } = {},
+  {
+    isToday = true,
+    change,
+    run,
+    url,
+  }: { isToday?: boolean; change?: DayChange; run?: Attempt; url?: string } = {},
 ) {
   const day: DayState = { swapUsed: !!change, change, attempts };
-  return shareText({ day: DAY, summary: summarizeDay(day, isToday), streak, change, url });
+  return shareText({ day: DAY, summary: summarizeDay(day, isToday), streak, change, run, url });
 }
 
 describe('share text', () => {
@@ -97,6 +103,25 @@ describe('share text', () => {
       ].join('\n'),
     );
     expect(text([a('loss', 1)], 0)).not.toContain('🔥');
+  });
+
+  it('adds a practice run shared from its end card, without counting it as a try', () => {
+    const practice = { ...a('win', 6), practiceChange: swap };
+    const tries = [a('win', 4), a('loss', 0), practice];
+    expect(text(tries, 5, { run: practice })).toBe(
+      [
+        'Daily Battle · Oct 21',
+        '⭐ First try! 4/6 left',
+        '🟩🟩🟩🟩⬛⬛',
+        '🔁 Practice ✅ 🟩🟩🟩🟩🟩🟩 · with Heatran',
+        'Hippowdon, Azelf, Celebi, Heatran, Jirachi, Lucario',
+        '🔥 5-day streak',
+      ].join('\n'),
+    );
+    // A try that counted, or the day's late win, isn't repeated as practice.
+    expect(text(tries, 5, { run: tries[0] })).not.toContain('Practice');
+    const late = [a('loss', 0), a('loss', 0), a('loss', 0), a('win', 2)];
+    expect(text(late, 0, { run: late[3] })).not.toContain('Practice');
   });
 
   it('ends with the link to play', () => {

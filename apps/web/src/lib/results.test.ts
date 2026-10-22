@@ -45,6 +45,12 @@ describe('day status', () => {
 });
 
 describe('streak (3 tries)', () => {
+  it('counts tries only up to the first win; the rest are practice', () => {
+    expect(summarizeDay(day(W, L, W), true).counted).toHaveLength(1);
+    expect(summarizeDay(day(L, W, L), true).counted).toHaveLength(2);
+    expect(summarizeDay(day(L, L, L, W), true).counted).toHaveLength(3);
+  });
+
   it('extends with a win on try 1, 2, or 3', () => {
     expect(streak(day(W), day(L, W), day(L, L, W))).toBe(3);
   });

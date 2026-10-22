@@ -25,7 +25,7 @@ export interface DaySummary {
   status: DayStatus;
   /** Finished tries, in order. */
   tries: Attempt[];
-  /** The first 3 finished tries: the ones that count. */
+  /** The tries that count: up to the first win, at most 3. Later ones are practice. */
   counted: Attempt[];
   /** 1-based try of the day's first win, if any (it may be a practice try). */
   winTry: number | null;
@@ -37,9 +37,9 @@ const won = (a: Attempt) => a.result === 'win';
 
 export function summarizeDay(day: DayState | undefined, isToday: boolean): DaySummary {
   const tries = (day?.attempts ?? []).filter((a) => a.result !== 'inProgress');
-  const counted = tries.slice(0, COUNTED_TRIES);
   const first = tries.findIndex(won);
   const winTry = first >= 0 ? first + 1 : null;
+  const counted = tries.slice(0, Math.min(winTry ?? COUNTED_TRIES, COUNTED_TRIES));
   let status: DayStatus;
   if (!tries.length) status = 'none';
   else if (winTry === 1) status = 'firstTry';
