@@ -5,7 +5,7 @@ import { getSprite } from '../lib/sprites';
 import { Sheet } from '../ui/Sheet';
 import { Button, TypeBadge } from '../ui/bits';
 
-const MAX_STAT = 160;
+export const MAX_STAT = 160;
 
 export function InfoSheet({
   species,
@@ -94,7 +94,7 @@ export function InfoSheet({
   );
 }
 
-function MatchupRow({
+export function MatchupRow({
   label,
   types,
   extra,

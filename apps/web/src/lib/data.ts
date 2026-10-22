@@ -131,6 +131,15 @@ export function formatEvs(evs: Record<string, number>): string {
     .join(' / ');
 }
 
+/** A tab-sized name: "Choice Scarf attacker" → "Scarf", "Swords Dance sweeper" → "Swords Dance". */
+export function shortLabel(label: string): string {
+  return label
+    .replace(/^Choice /, '')
+    .replace(/ (attacker|sweeper|setter)\b/, '')
+    .replace(/\(physically defensive\)/, '(Phys. def.)')
+    .replace(/\(specially defensive\)/, '(Spec. def.)');
+}
+
 export { STAT_LABEL };
 
 /** A full set for the simulator from a team slot. */

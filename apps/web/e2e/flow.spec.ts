@@ -42,16 +42,23 @@ for (const scheme of ['light', 'dark'] as const) {
     // Builder: empty, then a suggested team, then info and set picker.
     await expect(page.getByRole('button', { name: /Pick 6 more/ })).toBeVisible();
     await shot(page, '02-builder-empty', project);
-    // Adding a Pokémon prompts for its set, with the most used one ready.
+    // Wide screens show sets in a panel under the pool instead of sheets.
+    const wide = page.viewportSize()!.width >= 900;
     await page
       .getByRole('button', { name: /^Add .* to team$/ })
       .first()
       .click();
-    // A Pokémon with more than one set prompts for it, the most used one ready.
-    const prompt = page.getByRole('dialog', { name: /pick a set/ });
-    await expect(prompt.getByRole('tab', { selected: true })).toBeVisible();
-    await shot(page, '03-add-prompt', project);
-    await prompt.getByRole('button', { name: /^Add / }).click();
+    if (wide) {
+      // Added with the most used set; the panel shows its sets to change it.
+      const panel = page.getByRole('region', { name: / details$/ });
+      await expect(panel.getByRole('button', { name: 'Remove from team' })).toBeVisible();
+    } else {
+      // A Pokémon with more than one set prompts for it, the most used one ready.
+      const prompt = page.getByRole('dialog', { name: /pick a set/ });
+      await expect(prompt.getByRole('tab', { selected: true })).toBeVisible();
+      await shot(page, '03-add-prompt', project);
+      await prompt.getByRole('button', { name: /^Add / }).click();
+    }
     await shot(page, '03-builder-one', project);
     await page
       .getByRole('button', { name: /^Remove .* from team$/ })
@@ -67,20 +74,22 @@ for (const scheme of ['light', 'dark'] as const) {
       .first()
       .click();
     await shot(page, '05-info', project);
-    await page.keyboard.press('Escape');
+    if (!wide) await page.keyboard.press('Escape');
 
     await page
       .getByRole('button', { name: /Change set|Change$/ })
       .first()
       .click();
-    await expect(page.getByRole('dialog', { name: /pick a set/ })).toBeVisible();
+    if (wide) await expect(page.getByRole('region', { name: / details$/ })).toBeVisible();
+    else await expect(page.getByRole('dialog', { name: /pick a set/ })).toBeVisible();
     await shot(page, '06-set-picker', project);
     const tabs = page.getByRole('tab');
     if ((await tabs.count()) > 1) {
       await tabs.nth(1).click();
+      if (wide) await expect(tabs.nth(1)).toHaveAttribute('aria-selected', 'true');
       await shot(page, '07-set-other', project);
     }
-    await page.keyboard.press('Escape');
+    if (!wide) await page.keyboard.press('Escape');
 
     if (await page.getByRole('button', { name: /Team checklist/ }).isVisible()) {
       await page.getByRole('button', { name: /Team checklist/ }).click();

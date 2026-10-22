@@ -1,6 +1,6 @@
 // Weekly team builder (DESIGN.md §12.2a). Phone: one screen, no scrolling:
 // suggestions, the 4×3 pool, the checklist, the tray, and Lock in.
-// Wide: the pool on the left, the team panel on the right.
+// Wide: compact pool cards on the left, the team panel on the right.
 import type { ScheduleFile } from '@daily-battle/gen/schedule';
 import clsx from 'clsx';
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
@@ -11,7 +11,8 @@ import { InfoSheet } from '../sheets/InfoSheet';
 import { SetPicker } from '../sheets/SetPicker';
 import { Button, SectionLabel } from '../ui/bits';
 import { CheckIcon, ChevronIcon, CloseIcon, PencilIcon } from '../ui/icons';
-import { PokemonTile, SlotBadge } from '../ui/PokemonTile';
+import { PokemonRow, PokemonTile, SlotBadge } from '../ui/PokemonTile';
+import { DetailsPanel } from '../ui/DetailsPanel';
 import { useWide } from '../ui/useWide';
 
 /** Archetype dots: Dialga blue, Giratina crimson, Palkia mauve. */
@@ -64,6 +65,13 @@ export function TeamBuilder({
   const [checklistOpen, setChecklistOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [snack, setSnack] = useState<{ message: string; undo: Slot[] } | null>(null);
+  // Wide: the Pokémon in the details panel, and the set previewed for it.
+  const [viewing, setViewing] = useState<string | null>(null);
+  const [preview, setPreview] = useState<string | undefined>();
+  const view = (species: string) => {
+    if (species !== viewing) setPreview(undefined);
+    setViewing(species);
+  };
 
   const pool = schedule.pool.species;
   const index = (species: string) => team.findIndex((s) => s.species === species);
@@ -94,6 +102,14 @@ export function TeamBuilder({
     setTeam((t) => [...t, { species, setId }]);
   };
 
+  // Wide: a click adds with the previewed (or most used) set; the panel can change it.
+  const toggleWide = (species: string) => {
+    view(species);
+    if (index(species) >= 0 || full) return toggle(species);
+    setSnack(null);
+    add(species, (species === viewing && preview) || topSet(species).id);
+  };
+
   const applySuggested = (i: number) => {
     const s = schedule.suggestedTeams[i]!;
     setSnack({ message: `Applied ${s.archetype}`, undo: team });
@@ -103,47 +119,52 @@ export function TeamBuilder({
   const setSetFor = (species: string, setId: string) =>
     setTeam((t) => t.map((s) => (s.species === species ? { ...s, setId } : s)));
 
-  // The undo message takes the suggestions row's place, so it never covers controls.
-  const suggestions =
-    schedule.suggestedTeams.length > 0 &&
-    (snack ? (
-      <div
-        role="status"
-        className="flex h-10 shrink-0 items-center gap-2 rounded-chip bg-accent-soft px-4"
-      >
-        <CheckIcon width={16} height={16} className="text-soft-ink" />
-        <span className="flex-1 text-[14px] font-semibold">{snack.message}</span>
-        <button
-          type="button"
-          className="h-9 px-2 text-[14px] font-bold text-soft-ink"
-          onClick={() => {
-            setTeam(snack.undo);
-            setSnack(null);
-          }}
+  // The undo message takes the chips' place, so it never covers controls.
+  const suggestions = schedule.suggestedTeams.length > 0 && (
+    <div className="flex shrink-0 flex-col gap-1">
+      <div className="flex items-baseline gap-2">
+        <h2 className="display text-[12px] tracking-wider text-muted uppercase">Suggested teams</h2>
+        <span className="truncate text-[12px] text-muted">Pick one to fill your team</span>
+      </div>
+      {snack ? (
+        <div
+          role="status"
+          className="flex h-10 items-center gap-2 rounded-chip bg-accent-soft px-4"
         >
-          Undo
-        </button>
-      </div>
-    ) : (
-      <div className="flex h-10 shrink-0 items-center gap-2 overflow-hidden">
-        <span className="text-[13px] font-medium text-muted wide:sr-only">Suggested</span>
-        {schedule.suggestedTeams.map((s, i) => (
+          <CheckIcon width={16} height={16} className="text-soft-ink" />
+          <span className="flex-1 text-[14px] font-semibold">{snack.message}</span>
           <button
-            key={s.archetype}
             type="button"
-            onClick={() => applySuggested(i)}
-            className="chip flex h-9 items-center gap-1.5 px-3 text-[14px] font-semibold active:scale-[0.97]"
+            className="h-9 px-2 text-[14px] font-bold text-soft-ink"
+            onClick={() => {
+              setTeam(snack.undo);
+              setSnack(null);
+            }}
           >
-            <span
-              className="size-2 rounded-full"
-              style={{ background: ARCHETYPE_DOT[s.archetype] }}
-              aria-hidden
-            />
-            {s.archetype}
+            Undo
           </button>
-        ))}
-      </div>
-    ));
+        </div>
+      ) : (
+        <div className="flex h-10 items-center gap-2 overflow-hidden">
+          {schedule.suggestedTeams.map((s, i) => (
+            <button
+              key={s.archetype}
+              type="button"
+              onClick={() => applySuggested(i)}
+              className="chip flex h-9 items-center gap-1.5 px-3 text-[14px] font-semibold active:scale-[0.97]"
+            >
+              <span
+                className="size-2 rounded-full"
+                style={{ background: ARCHETYPE_DOT[s.archetype] }}
+                aria-hidden
+              />
+              {s.archetype}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 
   const done = CHECK_ITEMS.filter((c) => checks[c.key]);
   const missing = CHECK_ITEMS.filter((c) => !checks[c.key]);
@@ -182,13 +203,29 @@ export function TeamBuilder({
     </Button>
   );
 
-  const poolGrid = (
-    <div
-      className={clsx(
-        'grid min-h-0 flex-1 gap-2',
-        wide ? 'grid-cols-6 grid-rows-2' : 'grid-cols-4 grid-rows-3',
-      )}
-    >
+  const poolGrid = wide ? (
+    <div className="grid grid-cols-3 content-start gap-2">
+      {pool.map((species) => {
+        const i = index(species);
+        return (
+          <PokemonRow
+            key={species}
+            species={species}
+            selected={i >= 0}
+            dimmed={full && i < 0}
+            pop={popped === species}
+            badge={i >= 0 ? <SlotBadge n={i + 1} /> : undefined}
+            onTap={() => toggleWide(species)}
+            onInfo={() => view(species)}
+            label={i >= 0 ? `Remove ${species} from team` : `Add ${species} to team`}
+            role={topSet(species).label}
+            active={viewing === species}
+          />
+        );
+      })}
+    </div>
+  ) : (
+    <div className="grid min-h-0 flex-1 grid-cols-4 grid-rows-3 gap-2">
       {pool.map((species) => {
         const i = index(species);
         return (
@@ -202,13 +239,6 @@ export function TeamBuilder({
             onTap={() => toggle(species)}
             onInfo={() => setInfoFor(species)}
             label={i >= 0 ? `Remove ${species} from team` : `Add ${species} to team`}
-            footer={
-              wide ? (
-                <span className="truncate px-2 pb-2 text-center text-[12px] text-muted">
-                  {topSet(species).label}
-                </span>
-              ) : undefined
-            }
           />
         );
       })}
@@ -221,12 +251,25 @@ export function TeamBuilder({
     <div className="flex h-full flex-col">
       {topBar}
       {wide ? (
-        <main className="grid min-h-0 flex-1 grid-cols-[1fr_380px] gap-6 px-6 pb-6">
-          <section className="flex min-h-0 flex-col gap-3">
+        <main className="grid min-h-0 flex-1 grid-cols-[1fr_380px] items-start gap-6 px-6 pb-6">
+          <section className="flex max-h-full flex-col gap-3 overflow-y-auto">
             <SectionLabel>This week’s pool · pick 6</SectionLabel>
             {poolGrid}
+            <DetailsPanel
+              key={viewing}
+              species={viewing}
+              setId={
+                viewing ? (team.find((s) => s.species === viewing)?.setId ?? preview) : undefined
+              }
+              onSelectSet={(id) =>
+                viewing && index(viewing) >= 0 ? setSetFor(viewing, id) : setPreview(id)
+              }
+              inTeam={!!viewing && index(viewing) >= 0}
+              full={full}
+              onToggle={() => viewing && toggleWide(viewing)}
+            />
           </section>
-          <aside className="card flex min-h-0 flex-col gap-3 p-4">
+          <aside className="card flex flex-col gap-3 p-4">
             {noticeBar}
             {suggestions}
             <SectionLabel
@@ -234,13 +277,13 @@ export function TeamBuilder({
             >
               Your team
             </SectionLabel>
-            <ul className="flex min-h-0 flex-1 flex-col gap-1.5">
+            <ul className="flex flex-col gap-1.5">
               {traySlots.map((slot, i) => (
-                <li key={i} className="min-h-0 flex-1">
+                <li key={i} className="h-14">
                   {slot ? (
                     <button
                       type="button"
-                      onClick={() => setPickerFor(slot.species)}
+                      onClick={() => view(slot.species)}
                       className="flex h-full w-full items-center gap-3 rounded-card bg-surface-2 px-3 text-left"
                     >
                       <img

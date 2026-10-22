@@ -120,3 +120,81 @@ export function SlotBadge({ n }: { n: number }) {
     </span>
   );
 }
+
+/**
+ * A compact horizontal Pokémon card for wide screens: sprite on the left,
+ * name, types and role on the right, so a whole pool scans like a list.
+ */
+export function PokemonRow({
+  species,
+  onTap,
+  onInfo,
+  selected = false,
+  dimmed = false,
+  badge,
+  role,
+  label,
+  pop = false,
+  active = false,
+}: {
+  species: string;
+  onTap: () => void;
+  onInfo: () => void;
+  selected?: boolean;
+  dimmed?: boolean;
+  badge?: ReactNode;
+  /** The set's role, under the types. */
+  role: string;
+  label: string;
+  pop?: boolean;
+  /** Shown in the details panel. */
+  active?: boolean;
+}) {
+  const { types } = speciesInfo(species);
+  return (
+    <div
+      className={clsx(
+        'card relative min-w-0 transition-[opacity,box-shadow]',
+        selected && 'is-selected',
+        active && 'outline-2 outline-offset-2 outline-gold',
+        dimmed && 'opacity-45',
+        pop && 'animate-pop',
+      )}
+    >
+      <button
+        type="button"
+        onClick={onTap}
+        aria-pressed={selected}
+        aria-label={label}
+        className="flex h-[76px] w-full items-center gap-2 rounded-card py-1.5 pr-8 pl-2 text-left focus-visible:outline-2 focus-visible:outline-accent"
+      >
+        <span className="grid size-16 shrink-0 place-items-center">
+          <img
+            src={getSprite(species)}
+            alt=""
+            draggable={false}
+            className="pixelated max-h-16 max-w-16 object-contain"
+          />
+        </span>
+        <span className="flex min-w-0 flex-col gap-0.5">
+          <span className="truncate text-[14px] leading-tight font-semibold">{species}</span>
+          <span className="flex gap-0.5">
+            {types.map((t) => (
+              <TypeBadge key={t} type={t} size="sm" />
+            ))}
+          </span>
+          <span className="truncate text-[12px] text-muted">{role}</span>
+        </span>
+      </button>
+      {badge && <span className="pointer-events-none absolute top-1 left-1">{badge}</span>}
+      <button
+        type="button"
+        onClick={onInfo}
+        aria-label={`About ${species}`}
+        className="absolute top-0 right-0 grid size-8 place-items-center rounded-full text-muted hover:text-ink"
+      >
+        <InfoIcon width={16} height={16} />
+      </button>
+    </div>
+  );
+}

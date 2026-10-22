@@ -5,19 +5,10 @@
 import type { SetEntry } from '@daily-battle/data';
 import clsx from 'clsx';
 import { useRef, useState, type KeyboardEvent } from 'react';
-import { formatEvs, setsOf, speciesInfo, topSet } from '../lib/data';
+import { formatEvs, setsOf, shortLabel, speciesInfo, topSet } from '../lib/data';
 import { getSprite } from '../lib/sprites';
 import { Sheet } from '../ui/Sheet';
 import { Button, TypeBadge } from '../ui/bits';
-
-/** A tab-sized name: "Choice Scarf attacker" → "Scarf", "Swords Dance sweeper" → "Swords Dance". */
-function shortLabel(label: string): string {
-  return label
-    .replace(/^Choice /, '')
-    .replace(/ (attacker|sweeper|setter)\b/, '')
-    .replace(/\(physically defensive\)/, '(Phys. def.)')
-    .replace(/\(specially defensive\)/, '(Spec. def.)');
-}
 
 function SetCard({ set, badge }: { set: SetEntry; badge: string | null }) {
   return (
