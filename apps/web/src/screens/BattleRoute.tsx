@@ -7,7 +7,7 @@ import type { EngineStart } from '../battle/frames';
 import { toBattleSet } from '../lib/data';
 import type { Action } from '../state/reducer';
 import type { Attempt, Settings } from '../state/schema';
-import { Battle } from './Battle';
+import { Battle, type DayResult } from './Battle';
 
 export function BattleRoute({
   day,
@@ -18,7 +18,10 @@ export function BattleRoute({
   dispatch,
   onExit,
   onRunItBack,
+  result,
 }: {
+  /** Today's result so far, for the end card. */
+  result: Omit<DayResult, 'ts'>;
   day: string;
   schedule: ScheduleFile;
   attempt: Attempt;
@@ -52,6 +55,7 @@ export function BattleRoute({
       onEnd={({ result, remaining }) => dispatch({ type: 'endAttempt', day, result, remaining })}
       onExit={onExit}
       onRunItBack={onRunItBack}
+      result={{ ...result, ts: attempt.ts }}
     />
   );
 }

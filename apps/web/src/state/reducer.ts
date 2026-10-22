@@ -1,3 +1,5 @@
+import { mondayOf } from '@daily-battle/gen/dates';
+import { summarizeDay } from '../lib/results';
 import {
   emptyDay,
   type Attempt,
@@ -12,6 +14,8 @@ export type Action =
   | { type: 'lockTeam'; week: string; poolId: string; team: Slot[] }
   | { type: 'setLead'; day: string; species: string }
   | { type: 'applyChange'; day: string; week: string; change: DayChange }
+  /** A change for the next practice run only (after today's counted tries). */
+  | { type: 'setPracticeChange'; day: string; week: string; change: DayChange | null }
   | { type: 'setSetting'; key: keyof Settings; value: Settings[keyof Settings] }
   | { type: 'markExplainer'; id: string }
   | { type: 'startAttempt'; day: string; attempt: Attempt }
@@ -24,6 +28,26 @@ export type Action =
 export function attemptInProgress(day: DayState | undefined): Attempt | undefined {
   const last = day?.attempts.at(-1);
   return last?.result === 'inProgress' ? last : undefined;
+}
+
+/** The team with a change applied. */
+export function withChange(team: Slot[], change: DayChange | undefined): Slot[] {
+  return change ? team.map((s, i) => (i === change.slot ? change.to : s)) : team;
+}
+
+/** Whether a change still fits the team: the slot holds `from`, and no species twice. */
+function changeFits(team: Slot[], change: DayChange): boolean {
+  const { slot, from, to } = change;
+  const current = team[slot];
+  if (!current || current.species !== from.species || current.setId !== from.setId) return false;
+  if (change.kind === 'set') return to.species === from.species;
+  return !team.some((s) => s.species === to.species);
+}
+
+/** Today's counted tries are over (won, or 3 lost): further runs are practice. */
+export function dayDecided(day: DayState | undefined): boolean {
+  const status = summarizeDay(day, true).status;
+  return status === 'firstTry' || status === 'won' || status === 'failed';
 }
 
 function updateLast(day: DayState, change: (a: Attempt) => Attempt): DayState {
@@ -51,14 +75,10 @@ export function reducer(state: State, action: Action): State {
       const week = state.weeks[action.week];
       if (day.swapUsed || !week) return state; // one change per day
       if (attemptInProgress(day)) return state; // not mid-battle
-      const { slot, from, to } = action.change;
-      const current = week.team[slot];
-      if (!current || current.species !== from.species || current.setId !== from.setId)
-        return state;
-      if (action.change.kind === 'set' && to.species !== from.species) return state;
-      if (action.change.kind === 'replace' && week.team.some((s) => s.species === to.species))
-        return state;
-      const team = week.team.map((s, i) => (i === slot ? to : s));
+      if (dayDecided(day)) return state; // after the counted tries, changes are practice only
+      if (!changeFits(week.team, action.change)) return state;
+      const { from, to } = action.change;
+      const team = withChange(week.team, action.change);
       // A replaced lead hands the lead to whoever takes its slot.
       const lead = day.lead === from.species ? to.species : day.lead;
       return {
@@ -70,16 +90,32 @@ export function reducer(state: State, action: Action): State {
         },
       };
     }
+    case 'setPracticeChange': {
+      const day = state.days[action.day];
+      const week = state.weeks[action.week];
+      if (!day || !week || !dayDecided(day) || attemptInProgress(day)) return state;
+      if (action.change && !changeFits(week.team, action.change)) return state;
+      const { practiceChange: _, ...rest } = day;
+      return {
+        ...state,
+        days: {
+          ...state.days,
+          [action.day]: action.change ? { ...rest, practiceChange: action.change } : rest,
+        },
+      };
+    }
     case 'setSetting':
       return { ...state, settings: { ...state.settings, [action.key]: action.value } };
     case 'startAttempt': {
       const day = state.days[action.day] ?? emptyDay();
       if (attemptInProgress(day)) return state;
+      // A practice change goes with the run that uses it; the next run decides afresh.
+      const { practiceChange: _, ...rest } = day;
       return {
         ...state,
         days: {
           ...state.days,
-          [action.day]: { ...day, attempts: [...day.attempts, action.attempt] },
+          [action.day]: { ...rest, attempts: [...day.attempts, action.attempt] },
         },
       };
     }
@@ -96,18 +132,28 @@ export function reducer(state: State, action: Action): State {
     }
     case 'endAttempt': {
       const day = state.days[action.day];
-      if (!attemptInProgress(day)) return state;
-      return {
-        ...state,
-        days: {
-          ...state.days,
-          [action.day]: updateLast(day!, (a) => ({
-            ...a,
-            result: action.result,
-            remaining: action.remaining,
-          })),
-        },
+      const attempt = attemptInProgress(day);
+      if (!attempt) return state;
+      const days = {
+        ...state.days,
+        [action.day]: updateLast(day!, (a) => ({
+          ...a,
+          result: action.result,
+          remaining: action.remaining,
+        })),
       };
+      // Winning a practice run keeps its change: the team carries it from tomorrow.
+      const weekKey = mondayOf(action.day);
+      const week = state.weeks[weekKey];
+      const change = attempt.practiceChange;
+      if (action.result === 'win' && change && week && changeFits(week.team, change)) {
+        return {
+          ...state,
+          days,
+          weeks: { ...state.weeks, [weekKey]: { ...week, team: withChange(week.team, change) } },
+        };
+      }
+      return { ...state, days };
     }
     case 'expireAttempts': {
       let days = state.days;

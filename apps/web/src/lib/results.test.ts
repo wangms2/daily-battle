@@ -1,0 +1,110 @@
+import { describe, expect, it } from 'vitest';
+import type { Attempt, DayState } from '../state/schema';
+import { computeStats, summarizeDay } from './results';
+
+const TODAY = '2026-10-21';
+const attempt = (result: Attempt['result'], remaining = 0): Attempt => ({
+  result,
+  remaining,
+  ts: 1,
+  lead: 'Heatran',
+  team: [],
+  battleSeed: '1',
+  aiSeed: '2',
+  choices: [],
+  engine: 'e',
+});
+const W = attempt('win', 3);
+const L = attempt('loss');
+const F = attempt('forfeit', 2);
+const day = (...attempts: Attempt[]): DayState => ({ swapUsed: false, attempts });
+/** Days ending today, oldest first; `null` is a missed day. */
+function history(...ds: (DayState | null)[]): Record<string, DayState> {
+  const out: Record<string, DayState> = {};
+  ds.forEach((d, i) => {
+    const date = new Date(`${TODAY}T12:00:00Z`);
+    date.setUTCDate(date.getUTCDate() - (ds.length - 1 - i));
+    if (d) out[date.toISOString().slice(0, 10)] = d;
+  });
+  return out;
+}
+const streak = (...ds: (DayState | null)[]) => computeStats(history(...ds), TODAY).streak;
+
+describe('day status', () => {
+  it('reads a day from its finished tries', () => {
+    expect(summarizeDay(undefined, true).status).toBe('none');
+    expect(summarizeDay(day(attempt('inProgress')), true).status).toBe('none');
+    expect(summarizeDay(day(W), true).status).toBe('firstTry');
+    expect(summarizeDay(day(L, L, W), true)).toMatchObject({ status: 'won', winTry: 3 });
+    expect(summarizeDay(day(L, F), true)).toMatchObject({ status: 'pending', triesLeft: 1 });
+    expect(summarizeDay(day(L, F), false).status).toBe('failed');
+    expect(summarizeDay(day(L, L, L), true)).toMatchObject({ status: 'failed', triesLeft: 0 });
+    // A win on try 4 clears the day but doesn't keep the streak.
+    expect(summarizeDay(day(L, L, F, W), true)).toMatchObject({ status: 'failed', winTry: 4 });
+  });
+});
+
+describe('streak (3 tries)', () => {
+  it('extends with a win on try 1, 2, or 3', () => {
+    expect(streak(day(W), day(L, W), day(L, L, W))).toBe(3);
+  });
+
+  it('resets on the 3rd loss, giving up included, as soon as it happens', () => {
+    expect(streak(day(W), day(W), day(L, L, L))).toBe(0);
+    expect(streak(day(W), day(W), day(L, L, F))).toBe(0);
+  });
+
+  it('does not extend with a win on try 4', () => {
+    expect(streak(day(W), day(L, L, L, W))).toBe(0);
+    expect(streak(day(L, L, L, W), day(W))).toBe(1);
+  });
+
+  it('resets after a missed day', () => {
+    expect(streak(day(W), day(W), null, day(W))).toBe(1);
+    // Yesterday missed, today not played yet.
+    expect(streak(day(W), day(W), null, null)).toBe(0);
+  });
+
+  it('keeps yesterday’s streak while today is unplayed or still in its 3 tries', () => {
+    expect(streak(day(W), day(W), null)).toBe(2); // today not played yet
+    expect(streak(day(W), day(W))).toBe(2);
+    const h = history(day(W), day(W));
+    expect(computeStats(h, '2026-10-22').streak).toBe(2); // today not played yet
+    expect(streak(day(W), day(W), day(L))).toBe(2);
+    expect(streak(day(W), day(W), day(L, F))).toBe(2);
+  });
+
+  it('ignores a battle still in progress', () => {
+    expect(streak(day(W), day(L, L, attempt('inProgress')))).toBe(1);
+  });
+});
+
+describe('stats', () => {
+  it('counts first tries, clears, win rate, best streak, and tries per clear', () => {
+    const stats = computeStats(
+      history(day(W), day(L, W), day(W), null, day(L, L, L, L, W), day(W), day(L)),
+      TODAY,
+    );
+    expect(stats).toEqual({
+      streak: 1,
+      bestStreak: 3,
+      firstTryWins: 3,
+      daysPlayed: 6,
+      winRate: 80, // 4 of 5 decided days (today is still pending)
+      clears: 5,
+      triesPerClear: (1 + 2 + 1 + 5 + 1) / 5,
+    });
+  });
+
+  it('starts at zero', () => {
+    expect(computeStats({}, TODAY)).toEqual({
+      streak: 0,
+      bestStreak: 0,
+      firstTryWins: 0,
+      daysPlayed: 0,
+      winRate: 0,
+      clears: 0,
+      triesPerClear: null,
+    });
+  });
+});

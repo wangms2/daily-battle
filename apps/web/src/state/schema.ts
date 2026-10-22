@@ -18,6 +18,8 @@ export interface Attempt {
   choices: string[];
   /** Simulator and AI versions; a mismatch on resume records a forfeit (§15). */
   engine: string;
+  /** A practice run's one-off change; if the run is won, it carries over to the team. */
+  practiceChange?: DayChange;
 }
 
 /** Today's single change (§4.2); it carries over for the rest of the week. */
@@ -34,6 +36,12 @@ export interface DayState {
   change?: DayChange;
   /** Species chosen to lead today. */
   lead?: string;
+  /**
+   * Once today's counted tries are done, each practice run may make one change of
+   * its own, kept here until the run starts. It doesn't touch the weekly team
+   * unless that run is won.
+   */
+  practiceChange?: DayChange;
   attempts: Attempt[];
 }
 
@@ -41,16 +49,6 @@ export interface WeekState {
   team: Slot[];
   /** Which published pool this team came from: `<week>:c<candidate>`. */
   poolId: string;
-}
-
-export interface Stats {
-  daysPlayed: number;
-  firstTryWins: number;
-  firstTryStreak: number;
-  bestFirstTryStreak: number;
-  lastScoredDay: string | null;
-  clears: number;
-  totalAttempts: number;
 }
 
 export interface Settings {
@@ -61,28 +59,19 @@ export interface Settings {
   shownExplainers: string[];
 }
 
+/** Streaks and stats are derived from `days` (lib/results.ts), not stored. */
 export interface State {
-  version: 1;
+  version: 2;
   weeks: Record<string, WeekState>;
   days: Record<string, DayState>;
-  stats: Stats;
   settings: Settings;
 }
 
 export function initialState(): State {
   return {
-    version: 1,
+    version: 2,
     weeks: {},
     days: {},
-    stats: {
-      daysPlayed: 0,
-      firstTryWins: 0,
-      firstTryStreak: 0,
-      bestFirstTryStreak: 0,
-      lastScoredDay: null,
-      clears: 0,
-      totalAttempts: 0,
-    },
     settings: { beginnerHints: true, battleSpeed: 'fast', animations: true, shownExplainers: [] },
   };
 }

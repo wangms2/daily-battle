@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { attemptInProgress, reducer } from './reducer';
-import { initialState, type Attempt, type DayChange, type Slot } from './schema';
+import { initialState, type Attempt, type DayChange, type Slot, type State } from './schema';
 import { createStorage, migrate, STORAGE_KEY } from './storage';
 
 const TEAM: Slot[] = [
@@ -67,7 +67,20 @@ describe('storage', () => {
       settings: { beginnerHints: false },
     });
     expect(migrated.settings).toEqual({ ...initialState().settings, beginnerHints: false });
-    expect(migrated.stats).toEqual(initialState().stats);
+    expect(migrated.version).toBe(2);
+  });
+
+  it('drops the stored stats of a v1 save and keeps everything else', () => {
+    const v1 = {
+      version: 1,
+      weeks: { [WEEK]: { team: TEAM, poolId: `${WEEK}:c0` } },
+      days: { [DAY]: { swapUsed: true, attempts: [] } },
+      stats: { daysPlayed: 0, firstTryStreak: 0 },
+      settings: initialState().settings,
+    };
+    const migrated = migrate(v1);
+    expect(migrated).not.toHaveProperty('stats');
+    expect(migrated).toEqual({ version: 2, weeks: v1.weeks, days: v1.days, settings: v1.settings });
   });
 });
 
@@ -239,5 +252,76 @@ describe('attempts', () => {
     expect(
       reducer(over, { type: 'applyChange', day: DAY, week: WEEK, change }).days[DAY]!.swapUsed,
     ).toBe(true);
+  });
+});
+
+describe('practice runs', () => {
+  const attempt = (ts: number, over: Partial<Attempt> = {}): Attempt => ({
+    result: 'inProgress',
+    remaining: 6,
+    ts,
+    lead: 'Heatran',
+    team: TEAM,
+    battleSeed: '1,2,3,4',
+    aiSeed: '5,6,7,8',
+    choices: [],
+    engine: 'e',
+    ...over,
+  });
+  const swap: DayChange = {
+    kind: 'replace',
+    slot: 1,
+    from: TEAM[1]!,
+    to: { species: 'Gyarados', setId: 'gyarados-offensive-dragon-dance' },
+  };
+  /** Plays a try to the end. */
+  const play = (
+    state: State,
+    ts: number,
+    result: 'win' | 'loss',
+    over: Partial<Attempt> = {},
+  ): State =>
+    reducer(reducer(state, { type: 'startAttempt', day: DAY, attempt: attempt(ts, over) }), {
+      type: 'endAttempt',
+      day: DAY,
+      result,
+      remaining: result === 'win' ? 2 : 0,
+    });
+  const decided = () => [1, 2, 3].reduce((s, ts) => play(s, ts, 'loss'), locked());
+
+  it('only offers practice changes once the counted tries are done, and never the daily change', () => {
+    const fresh = play(locked(), 1, 'loss');
+    const practice = { type: 'setPracticeChange', day: DAY, week: WEEK, change: swap } as const;
+    expect(reducer(fresh, practice)).toBe(fresh);
+    const done = decided();
+    expect(reducer(done, { type: 'applyChange', day: DAY, week: WEEK, change: swap })).toBe(done);
+    const changed = reducer(done, practice);
+    expect(changed.days[DAY]!.practiceChange).toEqual(swap);
+    expect(changed.weeks[WEEK]!.team).toEqual(TEAM); // the weekly team is untouched
+    expect(changed.days[DAY]!.swapUsed).toBe(false);
+    // Undo, and decide again.
+    const undone = reducer(changed, { ...practice, change: null });
+    expect(undone.days[DAY]!.practiceChange).toBeUndefined();
+  });
+
+  it('decides afresh for each run: starting one clears the practice change', () => {
+    const changed = reducer(decided(), {
+      type: 'setPracticeChange',
+      day: DAY,
+      week: WEEK,
+      change: swap,
+    });
+    const lost = play(changed, 4, 'loss', { practiceChange: swap });
+    expect(lost.days[DAY]!.practiceChange).toBeUndefined();
+    expect(lost.weeks[WEEK]!.team).toEqual(TEAM); // a lost practice run changes nothing
+  });
+
+  it('keeps the change of a practice run that wins, from tomorrow on', () => {
+    const won = play(decided(), 4, 'win', { practiceChange: swap });
+    expect(won.weeks[WEEK]!.team[1]).toEqual(swap.to);
+    const tomorrow = '2026-10-22';
+    expect(
+      reducer(won, { type: 'setLead', day: tomorrow, species: 'Gyarados' }).weeks[WEEK]!.team,
+    ).toContainEqual(swap.to);
   });
 });

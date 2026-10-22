@@ -8,9 +8,10 @@ export const STORAGE_KEY = 'daily-battle:state';
 export function migrate(raw: unknown): State {
   const fresh = initialState();
   if (!raw || typeof raw !== 'object') return fresh;
-  const saved = raw as Partial<State> & { version?: number };
-  if (saved.version === 1) {
-    // Attempts saved before M7 lack the team and engine fields.
+  const saved = raw as Partial<Omit<State, 'version'>> & { version?: number; stats?: unknown };
+  if (saved.version === 1 || saved.version === 2) {
+    // v1: attempts saved before M7 lack the team and engine fields, and the
+    // stored stats block is gone (streaks and stats are derived since M8).
     const days = Object.fromEntries(
       Object.entries(saved.days ?? {}).map(([k, d]) => [
         k,
@@ -21,12 +22,10 @@ export function migrate(raw: unknown): State {
       ]),
     );
     return {
-      ...fresh,
-      ...saved,
+      version: 2,
+      weeks: saved.weeks ?? fresh.weeks,
       days,
-      stats: { ...fresh.stats, ...saved.stats },
       settings: { ...fresh.settings, ...saved.settings },
-      version: 1,
     };
   }
   // Unknown or future version: start fresh rather than misread it.

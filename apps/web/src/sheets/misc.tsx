@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react';
 import { CHECK_ITEMS, sharedWeaknesses, type Checklist } from '../lib/data';
 import { getSprite } from '../lib/sprites';
-import type { Settings, Stats } from '../state/schema';
+import type { Stats } from '../lib/results';
+import type { Settings } from '../state/schema';
 import { Sheet } from '../ui/Sheet';
 import { Button, Switch, TypeBadge } from '../ui/bits';
 import { CheckIcon, CloseIcon } from '../ui/icons';
@@ -23,10 +24,7 @@ export function WelcomeSheet({
       'Beat today’s opponent',
       'A new opponent every day. You can see its Pokémon, but not their sets.',
     ],
-    [
-      'Your first try counts',
-      'Retry as often as you like, but only your first try keeps your streak.',
-    ],
+    ['Win within 3 tries', 'That keeps your streak going. Winning on your first try earns a ⭐.'],
   ];
   return (
     <Sheet open={open} onOpenChange={(o) => !o && onDone()} title="Welcome to Daily Battle">
@@ -80,8 +78,6 @@ export function StatsSheet({
   todayLabel: string;
   countdown: string;
 }) {
-  const winRate = stats.daysPlayed ? Math.round((100 * stats.firstTryWins) / stats.daysPlayed) : 0;
-  const avgTries = stats.clears ? (stats.totalAttempts / stats.clears).toFixed(1) : '–';
   return (
     <Sheet open={open} onOpenChange={onOpenChange} title="Your stats">
       <div className="card px-4 py-3">
@@ -89,12 +85,15 @@ export function StatsSheet({
         <div className="text-[16px] font-semibold">{todayLabel}</div>
       </div>
       <div className="mt-3 grid grid-cols-3 gap-2">
-        <StatTile value={stats.firstTryStreak} label="Streak" />
-        <StatTile value={stats.bestFirstTryStreak} label="Best streak" />
-        <StatTile value={`${winRate}%`} label="First-try wins" />
+        <StatTile value={stats.streak} label="Streak" />
+        <StatTile value={stats.bestStreak} label="Best streak" />
+        <StatTile value={`⭐ ${stats.firstTryWins}`} label="First-try wins" />
+        <StatTile value={`${stats.winRate}%`} label="Won in 3" />
         <StatTile value={stats.daysPlayed} label="Days played" />
-        <StatTile value={stats.clears} label="Clears" />
-        <StatTile value={avgTries} label="Tries per clear" />
+        <StatTile
+          value={stats.triesPerClear === null ? '–' : stats.triesPerClear.toFixed(1)}
+          label="Tries per clear"
+        />
       </div>
       <p className="mt-4 text-center text-[14px] text-muted">
         Next opponent in <span className="font-semibold text-ink tabular-nums">{countdown}</span>

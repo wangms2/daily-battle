@@ -23,7 +23,7 @@ export function TopBar({
           type="button"
           onClick={onStats}
           className="flex h-10 items-center gap-1 rounded-full px-3 text-[15px] font-semibold hover:bg-surface-2"
-          aria-label={`Stats. First-try streak ${streak}`}
+          aria-label={`Stats. Streak ${streak}`}
         >
           <FlameIcon className={streak > 0 ? 'text-gold' : 'text-muted'} />
           {streak}

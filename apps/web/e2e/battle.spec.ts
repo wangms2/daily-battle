@@ -9,20 +9,25 @@ const TODAY = new Date('2026-10-21T10:00:00-04:00');
 const MOVES = 'main button[aria-label*=" PP"]:enabled';
 const SWITCHES = 'main button[aria-label^="Switch to"]:not([aria-disabled="true"])';
 
-function seededState(speed: 'normal' | 'fast' | 'instant') {
+const TEAM = schedule.suggestedTeams[0]!.team;
+/** A finished try, for seeding earlier days. */
+const tried = (result: 'win' | 'loss', remaining: number) => ({
+  result,
+  remaining,
+  ts: 1,
+  lead: TEAM[0]!.species,
+  team: TEAM,
+  battleSeed: '1,2,3,4',
+  aiSeed: '5,6,7,8',
+  choices: [],
+  engine: '',
+});
+
+function seededState(speed: 'normal' | 'fast' | 'instant', days: Record<string, unknown> = {}) {
   return {
-    version: 1,
-    weeks: { '2026-10-19': { team: schedule.suggestedTeams[0]!.team, poolId: '2026-10-19:c0' } },
-    days: {},
-    stats: {
-      daysPlayed: 0,
-      firstTryWins: 0,
-      firstTryStreak: 0,
-      bestFirstTryStreak: 0,
-      lastScoredDay: null,
-      clears: 0,
-      totalAttempts: 0,
-    },
+    version: 2,
+    weeks: { '2026-10-19': { team: TEAM, poolId: '2026-10-19:c0' } },
+    days,
     settings: {
       beginnerHints: true,
       battleSpeed: speed,
@@ -32,13 +37,17 @@ function seededState(speed: 'normal' | 'fast' | 'instant') {
   };
 }
 
-async function open(page: Page, speed: 'normal' | 'fast' | 'instant') {
+async function open(
+  page: Page,
+  speed: 'normal' | 'fast' | 'instant',
+  days: Record<string, unknown> = {},
+) {
   await page.addInitScript(
     (s) => {
       if (!localStorage.getItem('daily-battle:state'))
         localStorage.setItem('daily-battle:state', s);
     },
-    JSON.stringify(seededState(speed)),
+    JSON.stringify(seededState(speed, days)),
   );
   await page.clock.setFixedTime(TODAY);
   await page.goto('/');
@@ -105,8 +114,13 @@ test('plays a full battle and stays on our own hosts', async ({ page }) => {
   await noScroll(page, 'end card');
   expect(foreign).toEqual([]);
 
+  await expect(page.getByRole('dialog', { name: 'Battle over' })).toContainText(
+    /Try 1 of 3|⭐ First try/,
+  );
   await page.getByRole('button', { name: 'Back to today' }).click();
-  await expect(page.getByRole('button', { name: /^Start · / })).toBeVisible();
+  // Today's result now shows on the brief.
+  await expect(page.getByRole('region', { name: 'Today’s result' })).toBeVisible();
+  await expect(page.getByRole('button', { name: /^(Try again|Play again) · / })).toBeVisible();
 });
 
 test('resumes a battle after a reload', async ({ page }) => {
@@ -203,3 +217,61 @@ for (const scheme of ['light', 'dark'] as const) {
     await page.screenshot({ path: `${dir}/26-battle-end.png` });
   });
 }
+
+test('three lost tries break the streak, and the result copies to share', async ({
+  page,
+}, info) => {
+  const dir = `e2e/screens/${info.project.name}/light`;
+  // No system share sheet, so Share copies; capture exactly what's copied.
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'share', { value: undefined });
+    Object.defineProperty(navigator, 'clipboard', {
+      value: {
+        writeText: async (t: string) => {
+          (window as unknown as { copied: string }).copied = t;
+        },
+      },
+    });
+  });
+  await open(page, 'instant', { '2026-10-20': { swapUsed: false, attempts: [tried('win', 3)] } });
+  await expect(page.getByRole('button', { name: 'Stats. Streak 1' })).toBeVisible();
+
+  for (let i = 1; i <= 3; i++) {
+    await page.getByRole('button', { name: /^(Start|Try again) · / }).click();
+    await waitForChoice(page);
+    await page.getByRole('button', { name: 'Battle menu' }).click();
+    await page.getByRole('button', { name: 'Give up' }).click();
+    await page.getByRole('button', { name: 'Give up' }).last().click();
+    const card = page.getByRole('dialog', { name: 'Battle over' });
+    await expect(card).toContainText('You gave up');
+    await expect(card).toContainText(`Try ${i} of 3`);
+    if (i < 3) await expect(card).toContainText(`${3 - i} ${i === 2 ? 'try' : 'tries'} left`);
+    else {
+      await expect(card).toContainText('Streak reset');
+      await page.waitForTimeout(300);
+      await noScroll(page, 'end card, 3 tries');
+      await page.screenshot({ path: `${dir}/28-end-tries.png` });
+    }
+    await card.getByRole('button', { name: 'Back to today' }).click();
+  }
+
+  const strip = page.getByRole('region', { name: 'Today’s result' });
+  await expect(strip).toContainText('Not cleared in 3 tries');
+  await expect(page.getByRole('button', { name: 'Stats. Streak 0' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Play again · practice' })).toBeVisible();
+  // From here on, changes are per practice run; the daily change is gone.
+  await expect(page.getByRole('button', { name: 'Practice change' })).toBeVisible();
+  await noScroll(page, 'brief with result');
+  await page.screenshot({ path: `${dir}/29-brief-result.png` });
+
+  await strip.getByRole('button', { name: 'Share' }).click();
+  await expect(page.getByRole('status')).toContainText('Copied');
+  const copied = await page.evaluate(() => (window as unknown as { copied: string }).copied);
+  const lines = copied.split('\n');
+  expect(lines.slice(0, 2)).toEqual(['Daily Battle · Oct 21', '❌ Not cleared in 3 tries']);
+  for (const row of lines.slice(2, 5)) expect(row).toMatch(/^❌ ⬜+⬛*$/u); // given up: grey
+  expect(copied).toContain('🔥 Streak reset');
+  for (const s of schedule.days.find((d) => d.day === '2026-10-21')!.team) {
+    if (!TEAM.some((t) => t.species === s.species)) expect(copied).not.toContain(s.species);
+  }
+});

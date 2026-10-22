@@ -26,12 +26,24 @@ import { EXPLAINERS, textLines } from '../battle/ui/labels';
 import { MonPopover } from '../battle/ui/MonPopover';
 import { GiveUpDialog, LogList, LogSheet, MenuSheet } from '../battle/ui/sheets';
 import type { Settings } from '../state/schema';
+import { streakLine, type DaySummary } from '../lib/results';
 import { Button } from '../ui/bits';
+import { ShareButton, TryRows } from '../ui/results';
 import { CloseIcon, ExpandIcon, InfoIcon } from '../ui/icons';
 import { useWide } from '../ui/useWide';
 
 const DELAY: Record<Settings['battleSpeed'], number> = { normal: 850, fast: 320, instant: 0 };
 const SPEEDS: Settings['battleSpeed'][] = ['normal', 'fast', 'instant'];
+
+/** Today's result, recomputed from saved attempts as each battle ends. */
+export interface DayResult {
+  summary: DaySummary;
+  streak: number;
+  /** The share text for today. */
+  share: string;
+  /** This battle's attempt. */
+  ts: number;
+}
 
 export interface BattleOutcome {
   result: 'win' | 'loss' | 'forfeit';
@@ -50,7 +62,9 @@ export function Battle({
   onRunItBack,
   topBarRight,
   background,
+  result,
 }: {
+  result: DayResult;
   start: EngineStart;
   /** The day's battle background image URL. */
   background: string;
@@ -351,6 +365,11 @@ export function Battle({
     />
   );
 
+  // Which of today's tries this battle was (known once its result is saved).
+  const tryIndex = result.summary.tries.findIndex((a) => a.ts === result.ts) + 1;
+  const counts = tryIndex > 0 && tryIndex <= 3;
+  const firstTryWin = tryIndex === 1 && result.summary.status === 'firstTry';
+  const streakText = streakLine(result.summary, result.streak);
   const endCard = end && (
     <div className="animate-fade-in absolute inset-0 z-20 grid place-items-center bg-black/35 p-4">
       <div
@@ -361,32 +380,33 @@ export function Battle({
         <p className="display text-[22px]">
           {gaveUp ? 'You gave up' : end.winner === 'you' ? 'You won' : 'You lost'}
         </p>
-        <p className="mt-0.5 text-[14px] text-muted">
-          {tryNumber === 1 ? 'First try' : `Try ${tryNumber}`}
-        </p>
-        <div
-          className="mt-3 flex justify-center gap-1.5"
-          aria-label={`${end.youLeft} of 6 Pokémon left`}
-        >
-          {Array.from({ length: 6 }, (_, i) => (
-            <span
-              key={i}
-              className={clsx(
-                'size-5 rounded-badge',
-                i < end.youLeft ? 'bg-good' : 'bg-surface-2 ring-1 ring-line',
-              )}
-            />
-          ))}
+        <div className="mt-1 flex justify-center">
+          {firstTryWin ? (
+            <span className="flex items-center gap-1 rounded-badge bg-gold px-2 py-0.5 text-[13px] font-bold text-on-gold">
+              ⭐ First try
+            </span>
+          ) : (
+            <span className="h-5 text-[14px] text-muted">
+              {tryIndex === 0 ? null : counts ? `Try ${tryIndex} of 3` : 'Practice'}
+            </span>
+          )}
         </div>
-        <p className="mt-1.5 text-[13px] text-muted">
-          {end.youLeft} of your Pokémon left
-          {end.winner !== 'you' && !gaveUp && ` · ${end.foeLeft} of theirs`}
-        </p>
+        <div className="mt-3">
+          <TryRows summary={result.summary} current={result.ts} />
+        </div>
+        {streakText && <p className="mt-2 text-[14px] font-semibold">{streakText}</p>}
         <div className="mt-4 grid gap-2">
-          <Button onClick={onRunItBack}>Run it back</Button>
-          <Button variant="secondary" onClick={onExit}>
-            Back to today
-          </Button>
+          <ShareButton text={result.share} />
+          <div className="grid grid-cols-2 gap-2">
+            <Button variant="secondary" onClick={onRunItBack}>
+              {result.summary.status === 'pending'
+                ? `Try again · ${result.summary.triesLeft} left`
+                : 'Play again'}
+            </Button>
+            <Button variant="secondary" onClick={onExit}>
+              Back to today
+            </Button>
+          </div>
         </div>
       </div>
     </div>

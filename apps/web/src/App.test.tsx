@@ -221,8 +221,94 @@ describe('daily brief', () => {
       ],
     };
     renderApp(state);
-    await screen.findByRole('button', { name: /^Start · / });
+    // The expired battle counts as a lost try.
+    await screen.findByRole('button', { name: /^Try again · / });
     expect(screen.queryByRole('button', { name: 'Resume battle' })).not.toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Today’s result' })).toHaveTextContent(
+      'Not cleared yet · 1 of 3 tries',
+    );
+  });
+});
+
+describe('results and streak', () => {
+  const finished = (result: 'win' | 'loss', remaining: number, ts: number) => ({
+    result,
+    remaining,
+    ts,
+    lead: schedule.suggestedTeams[0]!.team[0]!.species,
+    team: schedule.suggestedTeams[0]!.team,
+    battleSeed: '1,2,3,4',
+    aiSeed: '5,6,7,8',
+    choices: [],
+    engine: ENGINE_VERSION,
+  });
+
+  it('shows today’s result, the streak, and Share after a first-try win', async () => {
+    const state = seeded({ team: { week: WEEK } });
+    state.days['2026-10-20'] = {
+      swapUsed: false,
+      attempts: [finished('loss', 0, 1), finished('win', 2, 2)],
+    };
+    state.days['2026-10-21'] = { swapUsed: false, attempts: [finished('win', 4, 3)] };
+    renderApp(state);
+    const strip = await screen.findByRole('region', { name: 'Today’s result' });
+    expect(strip).toHaveTextContent('⭐ First try! · 4/6 left');
+    expect(strip).toHaveTextContent('🔥 2-day streak');
+    expect(strip).toHaveTextContent(/Next in \d+:\d\d:\d\d/);
+    expect(within(strip).getByRole('button', { name: 'Share' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Play again · practice' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Stats. Streak 2' })).toBeInTheDocument();
+  });
+
+  it('resets the streak on the 3rd loss and says so', async () => {
+    const state = seeded({ team: { week: WEEK } });
+    state.days['2026-10-20'] = { swapUsed: false, attempts: [finished('win', 2, 1)] };
+    state.days['2026-10-21'] = {
+      swapUsed: false,
+      attempts: [finished('loss', 0, 2), finished('loss', 1, 3), finished('loss', 0, 4)],
+    };
+    renderApp(state);
+    const strip = await screen.findByRole('region', { name: 'Today’s result' });
+    expect(strip).toHaveTextContent('❌ Not cleared in 3 tries');
+    expect(strip).toHaveTextContent('Streak reset');
+    expect(screen.getByRole('button', { name: 'Stats. Streak 0' })).toBeInTheDocument();
+  });
+
+  it('offers a practice change once the counted tries are done, leaving the weekly team alone', async () => {
+    const user = userEvent.setup();
+    const state = seeded({ team: { week: WEEK } });
+    state.days['2026-10-21'] = {
+      swapUsed: false,
+      attempts: [finished('loss', 0, 1), finished('loss', 0, 2), finished('loss', 0, 3)],
+    };
+    renderApp(state);
+    expect(await screen.findByRole('button', { name: 'Practice change' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: '1 change left' })).not.toBeInTheDocument();
+
+    const team = schedule.suggestedTeams[0]!.team;
+    const bench = schedule.pool.species.find((s) => !team.some((t) => t.species === s))!;
+    await user.click(screen.getByRole('button', { name: 'Practice change' }));
+    await user.click(screen.getAllByRole('button', { name: 'Swap' })[1]!);
+    await user.click(screen.getByRole('button', { name: `Bring in ${bench}` }));
+    await user.click(
+      within(await screen.findByRole('dialog')).getAllByRole('button', { name: 'Bring in' })[0]!,
+    );
+    expect(
+      await screen.findByRole('dialog', { name: 'Change for this practice run?' }),
+    ).toHaveTextContent('Just for your next practice run');
+    await user.click(screen.getByRole('button', { name: 'Make change' }));
+    expect(await screen.findByRole('button', { name: `Lead with ${bench}` })).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Undo practice change' }));
+    expect(screen.queryByRole('button', { name: `Lead with ${bench}` })).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: `Lead with ${team[1]!.species}` }),
+    ).toBeInTheDocument();
+  });
+
+  it('has no result strip before the first try', async () => {
+    renderApp(seeded({ team: { week: WEEK } }));
+    await screen.findByRole('button', { name: /^Start · / });
+    expect(screen.queryByRole('region', { name: 'Today’s result' })).not.toBeInTheDocument();
   });
 });
 

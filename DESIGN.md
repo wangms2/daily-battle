@@ -32,7 +32,7 @@ This doc is written to be split into implementation chunks. Section 13 lists mil
 | Streak | Consecutive days with a first-attempt win. Breaks on a first-attempt loss or a missed day. No freezes |
 | Difficulty | ~50% first-attempt win rate for an average player; typically 2–3 attempts to clear |
 | AI | Utility scoring + softmax noise, tuned to average ladder behavior, acts only on revealed info plus set priors |
-| Share | Team (species only), first-try result as the headline, final result and attempt count if cleared later, Pokémon remaining, streak. No opponent info, no sets, no turn counts |
+| Share | Headline (⭐ first try, won on try N, or not cleared), one row per counted try with Pokémon remaining, team (species only), streak. No opponent info, no sets, no turn counts (§11) |
 | Battle UI | Mirrors Pokémon Showdown's battle layout and flow, simplified where it makes sense. Classic experience with no extra clutter when Beginner hints are off |
 | Beginner hints | A clearly labeled toggle, on by default for new players, persisted. Covers first-time explainers, type-effectiveness labels, speed range in tooltips, and the team-builder checklist. Easy to turn off |
 | Pacing | Quick like Showdown, with speed control and tap-to-skip |
@@ -64,6 +64,7 @@ Daily swap (done on the daily brief screen, shown as "1 change left"):
 - One per day, resets at local midnight.
 - Either replace one team member with another of the 12 (choosing a set), or change the set of one existing member.
 - Unused swaps do not accumulate.
+- Once the day's counted tries are over (won within 3, or 3 lost), the daily swap is no longer offered. Instead each practice run may make one **practice change** (a swap or a set change) for that run only; the weekly team is untouched, and the next run decides afresh. If a practice run is won, its change stays on the team from then on.
 
 ### 4.3 Daily battle
 1. Player sees the **daily brief**: the opponent's 6 species (no sets), their own locked team, and the daily swap ("1 change left").
@@ -74,10 +75,11 @@ Daily swap (done on the daily brief screen, shown as "1 change left"):
 
 ### 4.4 Stats
 - Per day: attempts, result of each, and whether the day has been cleared.
-- **The first attempt is the scored result.** Its win or loss is fixed once that attempt ends and cannot be changed by retries. A first attempt that is forfeited or abandoned counts as a loss (reload resumes it, §7, so a reload cannot be used to dodge a loss).
-- **Streak:** consecutive days whose first attempt was a win. It resets on a first-attempt loss or a missed day. No streak freezes.
-- Also track: first-try win rate, clears (days eventually won), average attempts per clear, best streak.
-- A day shows one of: not played, first-try win, cleared on retry, or not cleared yet. Cleared-on-retry does not extend the streak.
+- **Streak (decided in M8):** consecutive days won **within the first 3 tries**. The 3rd lost try breaks it at once (a forfeit or an abandoned try counts as a loss; reload resumes, §7, so a reload can't dodge one), and so does a missed day. Tries after the 3rd are practice: they can clear the day but don't count. No streak freezes.
+- **First-try wins are the best result.** They're celebrated simply: a ⭐ "First try!" headline in the share and a gold badge on the result card, plus a first-try count in stats.
+- Also track: best streak, win rate within 3 tries, days played, clears (days eventually won), average tries per clear.
+- A day shows one of: not played, first-try win, won on try 2–3, not cleared yet (fewer than 3 tries today), or not cleared in 3 tries.
+- Streaks and stats are derived from the saved attempts (`apps/web/src/lib/results.ts`), not stored.
 
 ## 5. Data pipeline
 
@@ -233,20 +235,20 @@ Weights are parameters (§8.5).
 
 ## 10. Client state (localStorage)
 
-Versioned schema `state.v1`:
+Versioned schema, now `version: 2` (v2 dropped the stored `stats` block; streaks and stats are derived from `days`, §4.4):
 ```ts
 {
-  version: 1,
+  version: 2,
   weeks: { [weekKey]: { team: Slot[6], poolId: string } },
-  days: { [dayKey]: { swapUsed: boolean, attempts: Attempt[] } },
-  stats: { daysPlayed, firstTryWins, firstTryStreak, bestFirstTryStreak, lastScoredDay, clears, totalAttempts },
+  days: { [dayKey]: { swapUsed: boolean, change?: DayChange, lead?: string, practiceChange?: DayChange, attempts: Attempt[] } },
   settings: { beginnerHints: boolean, battleSpeed: 'normal'|'fast'|'instant', animations: boolean, shownExplainers: string[] }
 }
 Slot = { species, setId }
 Attempt = { result: 'win'|'loss'|'forfeit'|'inProgress', remaining: number, ts: number, lead: string,
             team: Slot[6],   // as sent into battle, lead first
             battleSeed: string, aiSeed: string, choices: string[],  // seeds + choices enable resume (§7)
-            engine: string } // 'sim <version> ai <AI_VERSION>'; a mismatch on resume records a forfeit (§15)
+            engine: string,  // 'sim <version> ai <AI_VERSION>'; a mismatch on resume records a forfeit (§15)
+            practiceChange?: DayChange }  // a practice run's one-off change (§4.2)
 ```
 - Wrap all reads/writes in try/catch; the game must work if storage is unavailable (in-memory fallback with a notice).
 - Migration function per version bump.
@@ -254,30 +256,31 @@ Attempt = { result: 'win'|'loss'|'forfeit'|'inProgress', remaining: number, ts: 
 
 ## 11. Share format
 
-First attempt lost, cleared on a retry:
+First-try win:
 ```
-Daily Battle · Oct 20
-Team: Garchomp, Heatran, Gliscor, Rotom-W, Scizor, Gyarados
-First try ❌ 🟩⬛⬛⬛⬛⬛
-Cleared on try 3 ✅ 🟩🟩🟩⬛⬛⬛
-Streak: 0
-```
-
-First attempt won:
-```
-Daily Battle · Oct 20
-Team: Garchomp, Heatran, Gliscor, Rotom-W, Scizor, Gyarados
-First try ✅ 🟩🟩🟩🟩⬛⬛
-Streak: 5
+Daily Battle · Oct 21
+⭐ First try! 4/6 left
+🟩🟩🟩🟩⬛⬛
+Hippowdon, Azelf, Celebi, Heatran*, Jirachi, Lucario
+🔥 5-day streak
 ```
 
-Not cleared yet or given up: the second line reads `Not cleared · 4 tries`.
+Won on a later try (one row per try that counts, up to 3):
+```
+Daily Battle · Oct 21
+✅ Won on try 3 · 2/6 left
+❌ 🟩⬛⬛⬛⬛⬛
+❌ ⬜⬜⬛⬛⬛⬛
+✅ 🟩🟩⬛⬛⬛⬛
+Hippowdon, Azelf, Celebi, Heatran*, Jirachi, Lucario
+🔥 6-day streak
+```
 
-- The **first-try row is the headline** and always comes first. The streak is the first-try win streak.
-- Species only, lead first, as used that day. Asterisk on a species swapped in that day (optional).
-- Each row shows the result and Pokémon remaining out of 6 (green = alive).
-- Intermediate attempts are not listed; the second row gives the final result and the attempt number. Keep the share to four lines or fewer.
-- Plain text by default (pastes anywhere). Use the Web Share API/clipboard.
+Other headlines: `❌ Not cleared in 3 tries` (with `🔥 Streak reset`), `✅ Won on try 5` for a practice clear (rows still show the first 3 tries, with `🔥 Streak reset`), and `Not cleared yet · 1 of 3 tries` mid-day.
+
+- Each row shows that try's result and your Pokémon left out of 6 (green = alive; grey ⬜ = still standing on a try that was given up). At most 7 lines.
+- Team: species only, lead first, from the deciding try (the win, or the latest try that counted); `*` marks a species swapped in that day.
+- Plain text by default (pastes anywhere): Web Share API where available, else the clipboard, else the text is shown to copy.
 - Never include opponent species, sets, or turn counts.
 
 ## 12. UI and tech
@@ -298,11 +301,11 @@ Not cleared yet or given up: the second line reads `Not cleared · 4 tries`.
   ```
 
 ### 12.2 Screens
-1. **Home**: today's status (first-try result once played, cleared or not), attempts, first-try streak, countdown to next day.
+1. **Home** (the daily brief): once played, today's result, tries, streak, Share, and the countdown to the next day.
 2. **Weekly team builder**: pool of 12, role-named set picker, suggested teams, lock (§12.2a).
 3. **Daily brief**: opponent species, your team, lead picker, daily swap ("1 change left"), Start.
 4. **Battle**: Showdown-style layout and flow (§12.2b). Mobile-first.
-5. **Result**: outcome and Pokémon remaining, with the day's first-try result as the headline. Run it back, Share.
+5. **Result** (a card over the field): outcome, a ⭐ for a first-try win, today's tries as rows, the streak, Share, Try again / Play again, Back to today.
 
 ### 12.2a Team builder (should be a pleasure to use)
 
@@ -388,7 +391,7 @@ Weekly pool UI, role-named set picker, suggested-teams row, lock, daily brief wi
 Worker-based battle, move/switch UI, protocol rendering, AI turns, win/loss detection, attempts recording, run it back. Uses the sprite interface and self-hosted sprites from M6 (§12.3a; brought forward so the team builder could show them). *Accept:* full playthrough on mobile and desktop; mid-battle reload handled per §7; no runtime requests to third-party image hosts; layout and flow follow §12.2b; speed control and tap-to-skip work; single-choice forced actions auto-submit; Animations off setting works.
 
 **M8 — Result and share**
-Share text per §11, clipboard/Web Share. *Accept:* snapshot tests for share output: first-try win, first-try loss then cleared on a later try, never cleared, and swap marker. Streak logic tests: first-try win extends, first-try loss or forfeit resets, retry clear does not extend, missed day resets.
+Share text per §11, clipboard/Web Share; result card and daily-brief summary; derived streak and stats (§4.4); practice changes (§4.2). *Accept:* snapshot tests for share output: first-try win, won on try 3, not cleared in 3, practice clear, mid-day, and swap marker; never any opponent species. Streak logic tests: a win on try 1–3 extends, the 3rd loss (forfeits included) resets, a win on try 4+ does not extend, a missed day resets, and an unfinished today doesn't break yesterday's streak.
 
 **M9 — Polish and calibration**
 Playtest, tune AI parameters and validation thresholds, accessibility pass, legal/disclaimer page. *Accept:* playtest notes incorporated; thresholds documented.
@@ -412,9 +415,9 @@ See §14.
 - **Difficulty with hidden info and variance:** some losses come from wrong guesses and RNG; thresholds need real-player data.
 - **Mid-battle persistence:** resolved by seed + choice-log replay (§7). Risk: any nondeterminism in the sim, AI, or a dependency upgrade breaks resume. Pin `@pkmn/sim` per release, and if a stored in-progress attempt was made under a different engine version, record it as a forfeit rather than resuming.
 - **Assets and IP:** this is an unofficial fan project. Include a clear disclaimer, and resolve sprite and name licensing.
-- **First-try streak fragility:** one unlucky first attempt (crit, miss, or a wrong read) breaks the streak and retries cannot repair it. Variance matters more than under a retry-based score. Mitigated by validating matchups over many simulated first attempts (§9.3). If playtests show it feels unfair, consider options later (streak shield earned by clears, or limiting crit-dependent matchups further). No streak freezes in v1.
+- **Streak fragility:** addressed in M8 by counting a day won within 3 tries, so one unlucky first attempt (crit, miss, or a wrong read) no longer breaks the streak; the first try is still rewarded with a ⭐. Retries do leak the opponent's sets, which makes tries 2–3 easier; watch in playtests whether 3 is the right number. No streak freezes in v1.
 - **Time zones:** local-date keyed content means players in different zones see different days at the same moment. Accepted for v1.
-- **Retries leak sets:** intentional. Retries help the clear but cannot change the first-try result or the streak, and the share screen shows the attempt count.
+- **Retries leak sets:** intentional. Retries help the clear and can keep the streak within 3 tries, but cannot earn the ⭐, and the share shows every try that counted.
 
 ## 15a. Open decisions
 
@@ -424,7 +427,7 @@ See §14.
 |---|---|---|---|
 | D1 | Name and branding | Decided | **Daily Battle**, served from a subdomain of an existing domain (e.g. `battle.<yourdomain>`). Keep "Pokémon" out of the name and subdomain. The share header and credits page use the name. The format ("Gen 4 OU") is not part of the share text; it can appear elsewhere in the UI |
 | D2 | Target difficulty | Decided | About 50% first-attempt win rate for an average player; 2–3 attempts to clear. Validation bands in §9.3 |
-| D3 | Streak definition | Decided | Consecutive days with a first-attempt win. The first attempt is the scored result and is emphasized in the UI and the share |
+| D3 | Streak definition | Decided (revised in M8) | Consecutive days won within 3 tries; the 3rd loss or a missed day breaks it. A first-try win is the best result, marked with a ⭐ in the share and on the result card |
 | D4 | In-battle assistance | Decided | One "Beginner hints" toggle, on by default for new players, easy to turn off (§12.2c). Hints cover first-time explainers, type-effectiveness labels, speed range, and the team-builder checklist. With hints off, the battle mirrors classic Showdown. No damage ranges and no "usually runs" info |
 | D5 | Telemetry | Decided | None in v1 (static site). Calibrate difficulty with friends and manual feedback; consider an opt-in anonymous endpoint after launch |
 
@@ -435,7 +438,7 @@ See §14.
 - **Suggested teams:** 2–3 validated teams offered as a selection in the team builder (§12.2a). Never applied by default; always editable before locking.
 - **Weekly pool timing:** visible to everyone at the start of the week. Late joiners get the same pool and the same daily swap rule.
 - **Opponent style hint:** not shown in v1. It would give away information.
-- **Streak freezes:** none (see the first-try streak fragility risk in §15).
+- **Streak freezes:** none (see the streak fragility risk in §15).
 - **Audio:** off by default, optional sound effects, no music in v1.
 - **Anti-cheat:** none. The game is client-side and single-player; state can be edited in dev tools. Accepted.
 - **Forfeit and reload:** per §7 (forfeit counts as an attempt; reload resumes).

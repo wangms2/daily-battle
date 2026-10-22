@@ -5,6 +5,7 @@ import clsx from 'clsx';
 import { useEffect, useState, type ReactNode } from 'react';
 import { warmBattleWorker } from '../battle/backend';
 import { findSet, type Slot } from '../lib/data';
+import { dayHeadline, streakLine, type DaySummary } from '../lib/results';
 import { getSprite, preloadSprites } from '../lib/sprites';
 import { InfoSheet } from '../sheets/InfoSheet';
 import { ConfirmDialog } from '../sheets/misc';
@@ -13,6 +14,7 @@ import type { DayChange, DayState } from '../state/schema';
 import { Button, SectionLabel } from '../ui/bits';
 import { StarIcon } from '../ui/icons';
 import { PokemonTile } from '../ui/PokemonTile';
+import { ShareButton } from '../ui/results';
 import { useWide } from '../ui/useWide';
 
 type Mode =
@@ -32,14 +34,23 @@ export function DailyBrief({
   onStart,
   inProgress = false,
   renderTopBar,
+  result,
+  practice = false,
 }: {
+  /**
+   * Today's counted tries are done: the change applies to the next practice run
+   * only (and carries over if that run is won). `onChange(null)` undoes it.
+   */
+  practice?: boolean;
+  /** Today's result so far, the share text, and time to the next opponent. */
+  result: { summary: DaySummary; streak: number; share: string; countdown: string };
   schedule: ScheduleFile;
   day: string;
   team: Slot[];
   dayState: DayState;
   hints: boolean;
   onLead: (species: string) => void;
-  onChange: (change: DayChange) => void;
+  onChange: (change: DayChange | null) => void;
   onStart: () => void;
   /** A battle today is still being played: Start resumes it, and the daily change waits. */
   inProgress?: boolean;
@@ -77,10 +88,28 @@ export function DailyBrief({
       ? `${c.from.species} → ${c.to.species} (${findSet(c.to)?.label})`
       : `${c.from.species}: ${findSet(c.from)?.label} → ${findSet(c.to)?.label}`;
 
+  const practiceChange = practice ? dayState.practiceChange : undefined;
   const changeChip = inProgress ? (
     <span className="rounded-chip bg-surface-2 px-3 py-1.5 text-[13px] font-semibold text-muted">
       Battle in progress
     </span>
+  ) : practiceChange ? (
+    <button
+      type="button"
+      onClick={() => onChange(null)}
+      className="rounded-chip bg-accent-soft px-3 py-1.5 text-[13px] font-semibold text-soft-ink"
+    >
+      Undo practice change
+    </button>
+  ) : practice ? (
+    <button
+      type="button"
+      onClick={() => setMode(editing ? { kind: 'view' } : { kind: 'edit' })}
+      className="rounded-chip bg-accent-soft px-3 py-1.5 text-[13px] font-semibold text-soft-ink"
+      aria-pressed={editing}
+    >
+      {editing ? 'Done' : 'Practice change'}
+    </button>
   ) : dayState.swapUsed ? (
     <span className="rounded-chip bg-surface-2 px-3 py-1.5 text-[13px] font-semibold text-muted">
       Change used
@@ -191,10 +220,36 @@ export function DailyBrief({
     </section>
   );
 
+  const { summary } = result;
   const start = (
     <Button className="h-12 w-full shrink-0" onClick={onStart} disabled={editing}>
-      {inProgress ? 'Resume battle' : `Start · ${lead} leads`}
+      {inProgress
+        ? 'Resume battle'
+        : summary.status === 'none'
+          ? `Start · ${lead} leads`
+          : summary.status === 'pending'
+            ? `Try again · ${lead} leads`
+            : 'Play again · practice'}
     </Button>
+  );
+
+  // After a finished try: how today went, the streak, and Share.
+  const decided = summary.status !== 'none' && summary.status !== 'pending';
+  const strip = summary.status !== 'none' && !editing && (
+    <section
+      aria-label="Today’s result"
+      className="card flex h-14 shrink-0 items-center gap-3 px-3"
+    >
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-[14px] font-semibold">{dayHeadline(summary)}</p>
+        <p className="truncate text-[12.5px] text-muted">
+          {[streakLine(summary, result.streak), decided && `Next in ${result.countdown}`]
+            .filter(Boolean)
+            .join(' · ')}
+        </p>
+      </div>
+      <ShareButton text={result.share} variant="secondary" className="h-9 shrink-0 px-4" />
+    </section>
   );
 
   const vs = (
@@ -221,7 +276,7 @@ export function DailyBrief({
           Cancel
         </button>
         <span className="text-muted">·</span>
-        <span>Today’s change</span>
+        <span>{practice ? 'Practice change' : 'Today’s change'}</span>
       </span>
     ) : undefined,
   );
@@ -236,18 +291,22 @@ export function DailyBrief({
             {vs}
             {teamSection}
           </div>
-          <div className="mx-auto w-full max-w-md">{start}</div>
+          <div className="mx-auto flex w-full max-w-md flex-col gap-2">
+            {strip}
+            {start}
+          </div>
         </main>
       ) : (
         <main className="flex min-h-0 flex-1 flex-col gap-2 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
           {opponentSection}
           {vs}
           {teamSection}
-          {hints && !editing && (
+          {hints && !editing && !strip && (
             <p className="shrink-0 text-center text-[13px] text-muted">
               Tap a Pokémon to lead · ⓘ shows its set
             </p>
           )}
+          {strip}
           {start}
         </main>
       )}
@@ -295,8 +354,14 @@ export function DailyBrief({
       <ConfirmDialog
         open={!!pending}
         onOpenChange={(o) => !o && setPending(null)}
-        title="Use today’s change?"
-        body={pending ? `${describe(pending)}. This sticks for the rest of the week.` : ''}
+        title={practice ? 'Change for this practice run?' : 'Use today’s change?'}
+        body={
+          pending
+            ? practice
+              ? `${describe(pending)}. Just for your next practice run; win it and the change stays on your team.`
+              : `${describe(pending)}. This sticks for the rest of the week.`
+            : ''
+        }
         confirm="Make change"
         onConfirm={() => {
           if (pending) onChange(pending);

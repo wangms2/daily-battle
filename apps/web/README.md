@@ -50,8 +50,8 @@ The full spec is in DESIGN.md §12 and the M6 and M7 plans.
 | `src/battle/`      | Battle engine, worker, worker client, frame types; `ui/` holds the field, controls, and sheets |
 | `src/sheets/`      | Set picker, Pokémon info, welcome, stats, settings, team checklist, confirm                    |
 | `src/ui/`          | Pokémon tile, sheet, top bar, buttons, switch, icons                                           |
-| `src/state/`       | `state.v1` schema, reducer, localStorage with in-memory fallback, store context, clock         |
-| `src/lib/`         | Set and species helpers, type matchups, sprites (`getSprite`), schedule loading                |
+| `src/state/`       | `state` v2 schema, reducer, localStorage with in-memory fallback, store context, clock         |
+| `src/lib/`         | Set and species helpers, type matchups, sprites, fx, schedule loading, results and share       |
 | `public/schedule/` | Published weekly schedules from `@daily-battle/pipeline`                                       |
 | `public/sprites/`  | Self-hosted animated front and back sprites and box icons                                      |
 | `e2e/`             | Playwright flow and battle tests, and an opt-in screenshot set (`LOOK=1`, `look.spec.ts`)      |
@@ -59,8 +59,11 @@ The full spec is in DESIGN.md §12 and the M6 and M7 plans.
 ## State and rules
 
 - **Weekly team:** locked once a week (6 Pokémon, any of each species' sets).
-- **Daily change:** one per local day, either swapping in a benched pool Pokémon or changing a set. The change sticks for the rest of the week, and the day records it (for the share asterisk in M8).
+- **Daily change:** one per local day, either swapping in a benched pool Pokémon or changing a set. The change sticks for the rest of the week, and the day records it (the share marks a swapped-in species with `*`).
 - **Lead:** chosen freely each day.
+- **Practice runs:** once today's counted tries are done, the daily change gives way to a practice change per run (`day.practiceChange`, cleared when a run starts). It never touches the weekly team, unless that run is won: then it carries over.
+- **Streak:** consecutive days won within 3 tries. The 3rd loss (giving up counts) or a missed day breaks it; later tries are practice. A first-try win gets a ⭐. Streaks and stats are derived from the saved attempts in `src/lib/results.ts`, not stored (state v2 dropped the old `stats` block).
+- **Results and sharing:** the end card shows today's tries as rows, the streak, and Share; the daily brief shows a summary strip once you've played. `src/lib/share.ts` builds the share text (DESIGN.md §11) and sends it with the Web Share API, the clipboard, or a sheet to copy from.
 - **Storage:** if storage is blocked, the app keeps working in memory and shows a notice.
 - **Schedule:** if a week's schedule file is missing, the client generates the same content in the browser and logs a warning.
 

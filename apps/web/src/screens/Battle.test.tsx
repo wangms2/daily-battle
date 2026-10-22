@@ -11,8 +11,9 @@ import type {
   TurnPackage,
   View,
 } from '../battle/frames';
-import { initialState, type Settings } from '../state/schema';
-import { Battle } from './Battle';
+import { summarizeDay } from '../lib/results';
+import { initialState, type Attempt, type Settings } from '../state/schema';
+import { Battle, type DayResult } from './Battle';
 
 const START: EngineStart = {
   playerTeam: [],
@@ -149,7 +150,13 @@ function renderBattle(
     speed = 'instant',
     hints = true,
     tryNumber = 1,
-  }: { speed?: Settings['battleSpeed']; hints?: boolean; tryNumber?: number } = {},
+    result = { summary: summarizeDay(undefined, true), streak: 0, share: '', ts: 1 },
+  }: {
+    speed?: Settings['battleSpeed'];
+    hints?: boolean;
+    tryNumber?: number;
+    result?: DayResult;
+  } = {},
 ) {
   const settings: Settings = {
     ...initialState().settings,
@@ -171,6 +178,7 @@ function renderBattle(
         background="/fx/bg-gen4.png"
         tryNumber={tryNumber}
         settings={settings}
+        result={result}
         {...props}
       />
     </BattleBackendContext.Provider>,
@@ -333,18 +341,79 @@ describe('battle screen', () => {
     expect(props.onEnd).toHaveBeenCalledWith({ result: 'forfeit', remaining: 3 });
   });
 
-  it('ends on a result card that offers Run it back', async () => {
-    const { backend } = fakeBackend([TURN_1]);
-    const props = renderBattle(backend, { tryNumber: 2 });
+  const tried = (result: Attempt['result'], remaining: number, ts: number): Attempt => ({
+    result,
+    remaining,
+    ts,
+    lead: 'Heatran',
+    team: [],
+    battleSeed: '1',
+    aiSeed: '2',
+    choices: [],
+    engine: 'e',
+  });
+  const dayResult = (attempts: Attempt[], streak: number): DayResult => ({
+    summary: summarizeDay({ swapUsed: false, attempts }, true),
+    streak,
+    share: 'SHARE TEXT',
+    ts: attempts.at(-1)!.ts,
+  });
+  async function winBattle() {
     await userEvent.click(await thunderbolt());
     await within(screen.getByRole('banner')).findByText('Turn 2');
     await userEvent.click(await thunderbolt());
-    const card = await screen.findByRole('dialog', { name: 'Battle over' });
-    expect(card).toHaveTextContent('You won');
-    expect(card).toHaveTextContent('Try 2');
-    expect(within(card).getByLabelText('3 of 6 Pokémon left')).toBeInTheDocument();
-    expect(props.onEnd).toHaveBeenCalledWith({ result: 'win', remaining: 3 });
-    await userEvent.click(within(card).getByRole('button', { name: 'Run it back' }));
-    expect(props.onRunItBack).toHaveBeenCalled();
+    return screen.findByRole('dialog', { name: 'Battle over' });
+  }
+
+  it('ends on a result card with today’s tries, the streak, and Share', async () => {
+    const share = vi.fn(async () => {});
+    vi.stubGlobal('navigator', { ...navigator, share });
+    try {
+      const { backend } = fakeBackend([TURN_1]);
+      const props = renderBattle(backend, {
+        tryNumber: 2,
+        result: dayResult([tried('loss', 0, 1), tried('win', 3, 2)], 4),
+      });
+      const card = await winBattle();
+      expect(card).toHaveTextContent('You won');
+      expect(card).toHaveTextContent('Try 2 of 3');
+      expect(card).not.toHaveTextContent('First try');
+      expect(within(card).getByLabelText('Try 1: lost, 0 of 6 left')).toBeInTheDocument();
+      expect(within(card).getByLabelText('Try 2: won, 3 of 6 left')).toBeInTheDocument();
+      expect(card).toHaveTextContent('🔥 4-day streak');
+      expect(props.onEnd).toHaveBeenCalledWith({ result: 'win', remaining: 3 });
+      await userEvent.click(within(card).getByRole('button', { name: 'Share' }));
+      expect(share).toHaveBeenCalledWith({ text: 'SHARE TEXT' });
+      await userEvent.click(within(card).getByRole('button', { name: 'Play again' }));
+      expect(props.onRunItBack).toHaveBeenCalled();
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it('marks a first-try win with a gold star', async () => {
+    const { backend } = fakeBackend([TURN_1]);
+    renderBattle(backend, { result: dayResult([tried('win', 3, 1)], 1) });
+    const card = await winBattle();
+    expect(card).toHaveTextContent('⭐ First try');
+    expect(card).toHaveTextContent('🔥 1-day streak');
+  });
+
+  it('offers the tries left while they still count, and copies when there’s no share sheet', async () => {
+    const writeText = vi.fn(async () => {});
+    vi.stubGlobal('navigator', { ...navigator, share: undefined, clipboard: { writeText } });
+    try {
+      const { backend } = fakeBackend([TURN_1]);
+      renderBattle(backend, { result: dayResult([tried('loss', 1, 1)], 2) });
+      const card = await winBattle();
+      expect(card).toHaveTextContent('Try 1 of 3');
+      expect(card).toHaveTextContent('🔥 2-day streak · 2 tries left to keep it');
+      expect(within(card).getByRole('button', { name: 'Try again · 2 left' })).toBeInTheDocument();
+      await userEvent.click(within(card).getByRole('button', { name: 'Share' }));
+      expect(writeText).toHaveBeenCalledWith('SHARE TEXT');
+      expect(await screen.findByRole('status')).toHaveTextContent('Copied to clipboard');
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 });

@@ -1,12 +1,14 @@
 import { addDays, dayKey, weekKey } from '@daily-battle/gen/dates';
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { BattleRoute } from './screens/BattleRoute';
 import { DailyBrief } from './screens/DailyBrief';
 import { TeamBuilder } from './screens/TeamBuilder';
 import { SettingsSheet, StatsSheet, WelcomeSheet } from './sheets/misc';
+import { computeStats, dayHeadline, summarizeDay } from './lib/results';
 import { useSchedule } from './lib/schedule';
 import { ENGINE_VERSION, randomSeed } from './lib/seed';
-import { attemptInProgress } from './state/reducer';
+import { shareText } from './lib/share';
+import { attemptInProgress, dayDecided, withChange } from './state/reducer';
 import { emptyDay, type Settings } from './state/schema';
 import { useNow, useStore } from './state/context';
 import { Button } from './ui/bits';
@@ -45,9 +47,14 @@ export function App() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [storageNoticeDismissed, setStorageNoticeDismissed] = useState(false);
 
-  const { settings, stats } = state;
+  const { settings } = state;
   const weekState = state.weeks[week];
   const dayState = state.days[day] ?? emptyDay();
+  // Streaks and stats come from the saved attempts (lib/results.ts).
+  const stats = useMemo(() => computeStats(state.days, day), [state.days, day]);
+  const summary = useMemo(() => summarizeDay(state.days[day], true), [state.days, day]);
+  const share = shareText({ day, summary, streak: stats.streak, change: dayState.change });
+  const countdown = countdownTo(now, addDays(day, 1));
   const setSetting = <K extends keyof Settings>(key: K, value: Settings[K]) =>
     dispatch({ type: 'setSetting', key, value });
 
@@ -57,6 +64,10 @@ export function App() {
   }, [day, dispatch]);
 
   const inProgress = attemptInProgress(dayState);
+  // After today's counted tries, runs are practice and may carry a one-off change.
+  const practice = dayDecided(dayState);
+  const practiceChange = practice ? dayState.practiceChange : undefined;
+  const runTeam = weekState ? withChange(weekState.team, practiceChange) : [];
   // The attempt the battle screen shows; it stays put after the battle ends.
   const [battleTs, setBattleTs] = useState<number | null>(null);
 
@@ -65,9 +76,10 @@ export function App() {
     if (inProgress) {
       setBattleTs(inProgress.ts);
     } else {
-      const team = weekState.team;
+      const team = runTeam;
       const lead = team.find((s) => s.species === dayState.lead) ?? team[0]!;
-      const ts = Date.now();
+      // Attempts are identified by ts, so keep it unique even if the clock repeats.
+      const ts = Math.max(Date.now(), (dayState.attempts.at(-1)?.ts ?? 0) + 1);
       dispatch({
         type: 'startAttempt',
         day,
@@ -81,6 +93,7 @@ export function App() {
           aiSeed: randomSeed(),
           choices: [],
           engine: ENGINE_VERSION,
+          ...(practiceChange && { practiceChange }),
         },
       });
       setBattleTs(ts);
@@ -91,19 +104,11 @@ export function App() {
     dayState.attempts.find((a) => a.ts === battleTs) ??
     (route === 'battle' ? inProgress : undefined);
 
-  const todayLabel = !dayState.attempts.length
-    ? 'Not played yet'
-    : dayState.attempts[0]!.result === 'win'
-      ? 'First-try win'
-      : dayState.attempts.some((a) => a.result === 'win')
-        ? 'Cleared on a retry'
-        : 'Not cleared yet';
-
   const renderTopBar = (title: string) => (left?: ReactNode) => (
     <TopBar
       title={title}
       left={left}
-      streak={stats.firstTryStreak}
+      streak={stats.streak}
       onStats={() => setStatsOpen(true)}
       onSettings={() => setSettingsOpen(true)}
     />
@@ -153,6 +158,7 @@ export function App() {
           go('');
         }}
         onRunItBack={startBattle}
+        result={{ summary, streak: stats.streak, share }}
       />
     );
   } else {
@@ -160,16 +166,21 @@ export function App() {
       <DailyBrief
         schedule={schedule.schedule}
         day={day}
-        team={weekState.team}
+        team={runTeam}
         dayState={dayState}
+        practice={practice}
         hints={settings.beginnerHints}
         renderTopBar={renderTopBar(
           `Today · ${fmtDay(day, { weekday: 'short', month: 'short', day: 'numeric' })}`,
         )}
         onLead={(species) => dispatch({ type: 'setLead', day, species })}
-        onChange={(change) => dispatch({ type: 'applyChange', day, week, change })}
+        onChange={(change) => {
+          if (practice) dispatch({ type: 'setPracticeChange', day, week, change });
+          else if (change) dispatch({ type: 'applyChange', day, week, change });
+        }}
         inProgress={!!inProgress}
         onStart={startBattle}
+        result={{ summary, streak: stats.streak, share, countdown }}
       />
     );
   }
@@ -202,8 +213,8 @@ export function App() {
         open={statsOpen}
         onOpenChange={setStatsOpen}
         stats={stats}
-        todayLabel={todayLabel}
-        countdown={countdownTo(now, addDays(day, 1))}
+        todayLabel={dayHeadline(summary)}
+        countdown={countdown}
       />
       <SettingsSheet
         open={settingsOpen}
