@@ -306,6 +306,37 @@ describe('battle screen', () => {
     expect(screen.getByRole('tooltip')).toHaveTextContent('Leftovers · Flash Fire');
   });
 
+  it('opens details from a tap on the Pokémon itself', async () => {
+    const { backend } = fakeBackend([]);
+    renderBattle(backend);
+    await thunderbolt();
+    const sprites = document.querySelectorAll('[data-mon][role="presentation"]');
+    fireEvent.click(sprites[0]!); // the foe's sprite comes first
+    expect(screen.getByRole('tooltip')).toHaveTextContent('Gyarados');
+    fireEvent.pointerDown(document.body);
+    expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
+  });
+
+  it('shows a benched Pokémon’s details on a tap while it can’t switch in', async () => {
+    const { backend, calls } = fakeBackend([TURN_1]);
+    renderBattle(backend, { speed: 'normal' });
+    await userEvent.click(screen.getByRole('log', { name: 'Battle log' })); // skip the opening
+    await userEvent.click(await thunderbolt());
+    // The turn is playing: the bench can't switch, so a tap shows details instead.
+    const scizor = screen.getByRole('button', { name: /^Switch to Scizor/ });
+    expect(scizor).toHaveAttribute('aria-disabled', 'true');
+    const tap = () => {
+      fireEvent.pointerDown(scizor, { pointerType: 'touch' });
+      fireEvent.pointerUp(scizor, { pointerType: 'touch' });
+      fireEvent.click(scizor);
+    };
+    tap();
+    expect(screen.getByRole('tooltip')).toHaveTextContent('Scizor');
+    tap();
+    expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
+    expect(calls).toEqual(['move 1']);
+  });
+
   it('shows a benched Pokémon’s details on a long press without switching', async () => {
     const { backend, calls } = fakeBackend([]);
     renderBattle(backend);

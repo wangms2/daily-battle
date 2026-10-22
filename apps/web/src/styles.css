@@ -521,3 +521,20 @@ body {
     animation: none !important;
   }
 }
+
+/* Touch: no iOS image callout, text selection, or grey tap flash on controls
+   and the field, so taps and long-presses reach the game. */
+button,
+img,
+.battle-field {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+img {
+  -webkit-user-drag: none;
+}
+button {
+  touch-action: manipulation;
+}

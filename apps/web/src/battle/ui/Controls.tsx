@@ -30,9 +30,10 @@ function effectivenessTag(e: number | null): { label: string; tone: string } | n
  * Long-press (touch) or hover (mouse) shows info; a plain tap acts. A tap that
  * ends a long-press only closes the info.
  */
-function usePressInfo(show: () => void, hide: () => void, act: () => void) {
+function usePressInfo(show: () => void, hide: () => void, act: (pointer: string) => void) {
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const longPressed = useRef(false);
+  const pointer = useRef('');
   const clear = () => {
     if (timer.current) clearTimeout(timer.current);
     timer.current = null;
@@ -40,6 +41,7 @@ function usePressInfo(show: () => void, hide: () => void, act: () => void) {
   return {
     onPointerDown: (e: ReactPointerEvent) => {
       longPressed.current = false;
+      pointer.current = e.pointerType;
       if (e.pointerType === 'mouse') return;
       timer.current = setTimeout(() => {
         longPressed.current = true;
@@ -67,8 +69,11 @@ function usePressInfo(show: () => void, hide: () => void, act: () => void) {
         hide();
         return;
       }
-      hide();
-      act();
+      const type = pointer.current;
+      pointer.current = '';
+      // A mouse click keeps a hover card in place; anything else starts fresh.
+      if (type !== 'mouse') hide();
+      act(type);
     },
   };
 }
@@ -89,7 +94,10 @@ function MoveButton({
   const press = usePressInfo(
     () => onInfo(move),
     () => onInfo(null),
-    onChoose,
+    () => {
+      onInfo(null);
+      onChoose();
+    },
   );
   return (
     <button
@@ -120,6 +128,7 @@ function BenchButton({
   choice,
   onChoose,
   onInfo,
+  shown = false,
   big = false,
   off = false,
 }: {
@@ -127,6 +136,8 @@ function BenchButton({
   choice?: string;
   onChoose: (c: string) => void;
   onInfo: (m: TeamMember | null) => void;
+  /** Its details card is open. */
+  shown?: boolean;
   big?: boolean;
   /** The whole panel is disabled (a turn is playing). */
   off?: boolean;
@@ -135,7 +146,13 @@ function BenchButton({
   const press = usePressInfo(
     () => onInfo(member),
     () => onInfo(null),
-    () => !disabled && choice && onChoose(choice),
+    // A tap switches when it can; otherwise a touch toggles the details (a mouse
+    // already sees them on hover).
+    (type) => {
+      if (!disabled) {
+        if (choice) onChoose(choice);
+      } else if (type !== 'mouse') onInfo(shown ? null : member);
+    },
   );
   return (
     <button
@@ -143,6 +160,7 @@ function BenchButton({
       // Fainted or locked-in Pokémon still show their details on a long-press.
       aria-disabled={disabled}
       {...press}
+      data-bench
       aria-label={`Switch to ${member.species}, ${member.hp}% HP${member.fainted ? ', fainted' : ''}`}
       className={clsx(
         'card flex min-w-0 flex-1 flex-col items-center justify-center gap-0.5 px-1 select-none',
@@ -204,6 +222,16 @@ export function ControlPanel({
   const switchFor = (m: TeamMember) => controls?.switches.find((s) => s.slot === m.slot)?.choice;
   const off = disabled || !controls;
   const memberInfo = (m: TeamMember | null) => setInfo(m && { member: m });
+  const shownSlot = info && 'member' in info ? info.member.slot : null;
+  // A bench card opened by a tap closes on a tap anywhere else.
+  useEffect(() => {
+    if (shownSlot === null) return;
+    const close = (e: PointerEvent) => {
+      if (!(e.target as Element | null)?.closest?.('[data-bench]')) setInfo(null);
+    };
+    document.addEventListener('pointerdown', close);
+    return () => document.removeEventListener('pointerdown', close);
+  }, [shownSlot]);
   const panel = useRef<HTMLDivElement>(null);
   // When choices come back after a turn and focus was lost, put it on the first one.
   useEffect(() => {
@@ -251,6 +279,7 @@ export function ControlPanel({
               choice={switchFor(m)}
               onChoose={onChoose}
               onInfo={memberInfo}
+              shown={shownSlot === m.slot}
               off={disabled}
               big
             />
@@ -317,6 +346,7 @@ export function ControlPanel({
             choice={switchFor(m)}
             onChoose={onChoose}
             onInfo={memberInfo}
+            shown={shownSlot === m.slot}
             off={off}
           />
         ))}

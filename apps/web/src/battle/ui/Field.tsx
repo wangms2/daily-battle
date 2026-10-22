@@ -110,7 +110,7 @@ function StatBar({
   return (
     <button
       type="button"
-      data-statbar
+      data-mon
       onClick={(e) => {
         e.stopPropagation();
         onInfo(who, 'tap');
@@ -258,11 +258,14 @@ function FieldSprite({
   who,
   anim,
   animate,
+  onTap,
 }: {
   mon: MonView | null;
   who: Who;
   anim: Anim | null;
   animate: boolean;
+  /** Tapping the Pokémon itself: details (the stat bar is the accessible control). */
+  onTap: () => void;
 }) {
   const [natural, setNatural] = useState<{ w: number; h: number } | null>(null);
   if (!mon) return null;
@@ -288,7 +291,13 @@ function FieldSprite({
   const scale = who === 'you' ? 1.2 : 1;
   return (
     <div
-      className="absolute flex -translate-x-1/2 items-end justify-center"
+      data-mon
+      role="presentation"
+      onClick={(e) => {
+        e.stopPropagation();
+        onTap();
+      }}
+      className="absolute flex -translate-x-1/2 cursor-pointer items-end justify-center"
       style={{ left: X(spot.x), bottom: `calc(100cqh - ${Y(spot.feet)})` }}
     >
       <img
@@ -330,7 +339,10 @@ export function Field({
   onInfo,
   popover,
   className,
+  busy = false,
 }: {
+  /** A turn is playing: tapping a Pokémon skips instead of opening details. */
+  busy?: boolean;
   /** Sizing from the layout (fixed shape on phones, fill on wide screens). */
   className?: string;
   view: View | null;
@@ -355,7 +367,7 @@ export function Field({
   useEffect(() => {
     if (!info || hovered) return;
     const close = (e: PointerEvent) => {
-      if (!(e.target as Element | null)?.closest?.('[data-statbar]')) onInfo(null);
+      if (!(e.target as Element | null)?.closest?.('[data-mon]')) onInfo(null);
     };
     document.addEventListener('pointerdown', close);
     return () => document.removeEventListener('pointerdown', close);
@@ -398,9 +410,21 @@ export function Field({
       )}
 
       {view && <SideEffects side={view.foeSide} who="foe" />}
-      <FieldSprite mon={view?.foe ?? null} who="foe" anim={anim} animate={animate} />
+      <FieldSprite
+        mon={view?.foe ?? null}
+        who="foe"
+        anim={anim}
+        animate={animate}
+        onTap={() => (busy ? onTap() : handleInfo('foe', 'tap'))}
+      />
       {view && <SideEffects side={view.yourSide} who="you" />}
-      <FieldSprite mon={view?.you ?? null} who="you" anim={anim} animate={animate} />
+      <FieldSprite
+        mon={view?.you ?? null}
+        who="you"
+        anim={anim}
+        animate={animate}
+        onTap={() => (busy ? onTap() : handleInfo('you', 'tap'))}
+      />
 
       {view?.foe && (
         <StatBar

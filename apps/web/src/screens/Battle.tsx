@@ -32,7 +32,7 @@ import { ShareButton, TryRows } from '../ui/results';
 import { CloseIcon, ExpandIcon, InfoIcon } from '../ui/icons';
 import { useWide } from '../ui/useWide';
 
-const DELAY: Record<Settings['battleSpeed'], number> = { normal: 850, fast: 320, instant: 0 };
+const DELAY: Record<Settings['battleSpeed'], number> = { normal: 1000, fast: 500, instant: 0 };
 const SPEEDS: Settings['battleSpeed'][] = ['normal', 'fast', 'instant'];
 
 /** Today's result, recomputed from saved attempts as each battle ends. */
@@ -338,6 +338,7 @@ export function Battle({
       onTap={skip}
       info={monFor}
       onInfo={setMonFor}
+      busy={playing}
       popover={popover}
     />
   );
