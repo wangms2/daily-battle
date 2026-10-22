@@ -14,6 +14,7 @@ import {
 } from '../lib/data';
 import { getSprite } from '../lib/sprites';
 import { MatchupRow, MAX_STAT } from '../sheets/InfoSheet';
+import { MoveList } from './MoveList';
 import { Button, TypeBadge } from './bits';
 
 export function DetailsPanel({
@@ -133,17 +134,7 @@ export function DetailsPanel({
           <p className="line-clamp-2 text-[13px] leading-snug text-muted">
             <span className="font-semibold text-ink">{set.label}.</span> {set.description}
           </p>
-          <ul className="grid grid-cols-2 gap-1.5" aria-label="Moves">
-            {set.moves.map((mv) => (
-              <li
-                key={mv}
-                className="truncate rounded-badge bg-surface-2 px-2.5 py-1.5 text-[13px] font-medium"
-                title={mv}
-              >
-                {mv}
-              </li>
-            ))}
-          </ul>
+          <MoveList key={set.id} moves={set.moves} />
           <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-[13px]">
             <dt className="text-muted">Item</dt>
             <dd className="truncate font-medium">{set.item || 'None'}</dd>

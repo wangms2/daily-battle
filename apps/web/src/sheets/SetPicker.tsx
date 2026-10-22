@@ -8,6 +8,7 @@ import { useRef, useState, type KeyboardEvent } from 'react';
 import { formatEvs, setsOf, shortLabel, speciesInfo, topSet } from '../lib/data';
 import { getSprite } from '../lib/sprites';
 import { Sheet } from '../ui/Sheet';
+import { MoveList } from '../ui/MoveList';
 import { Button, TypeBadge } from '../ui/bits';
 
 function SetCard({ set, badge }: { set: SetEntry; badge: string | null }) {
@@ -22,17 +23,7 @@ function SetCard({ set, badge }: { set: SetEntry; badge: string | null }) {
         )}
       </div>
       <p className="mt-1.5 line-clamp-2 text-[14px] leading-snug text-muted">{set.description}</p>
-      <ul className="mt-3 grid grid-cols-2 gap-1.5" aria-label="Moves">
-        {set.moves.map((m) => (
-          <li
-            key={m}
-            className="truncate rounded-badge bg-surface-2 px-2.5 py-2 text-[13px] font-medium"
-            title={m}
-          >
-            {m}
-          </li>
-        ))}
-      </ul>
+      <MoveList moves={set.moves} className="mt-3" />
       <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-[13px]">
         <dt className="text-muted">Item</dt>
         <dd className="font-medium">{set.item || 'None'}</dd>

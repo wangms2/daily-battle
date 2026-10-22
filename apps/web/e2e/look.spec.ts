@@ -38,6 +38,9 @@ for (const scheme of ['light', 'dark'] as const) {
         .click();
       await page.waitForTimeout(300);
       await page.screenshot({ path: `${dir}/set-picker.png` });
+      await page.getByRole('list', { name: 'Moves' }).getByRole('button').nth(1).click();
+      await page.screenshot({ path: `${dir}/move-info.png` });
+      await page.keyboard.press('Escape');
       await page.keyboard.press('Escape');
 
       await page.getByRole('button', { name: 'Lock in team' }).click();

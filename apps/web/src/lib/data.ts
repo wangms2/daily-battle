@@ -1,6 +1,6 @@
 // Read-only helpers over the set data and species facts. No simulator code here.
 import { sets, type SetEntry } from '@daily-battle/data';
-import { speciesData, type SpeciesInfo } from '@daily-battle/data/species';
+import { speciesData, type MoveInfo, type SpeciesInfo } from '@daily-battle/data/species';
 
 export interface Slot {
   species: string;
@@ -138,6 +138,11 @@ export function shortLabel(label: string): string {
     .replace(/ (attacker|sweeper|setter)\b/, '')
     .replace(/\(physically defensive\)/, '(Phys. def.)')
     .replace(/\(specially defensive\)/, '(Spec. def.)');
+}
+
+/** What a set's move does (any move a set uses). */
+export function moveInfo(name: string): MoveInfo | undefined {
+  return speciesData.moves[name];
 }
 
 export { STAT_LABEL };
