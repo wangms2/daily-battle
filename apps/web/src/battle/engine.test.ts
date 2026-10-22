@@ -117,7 +117,7 @@ describe('BattleEngine', () => {
     expect(pkg.controls).toBeNull();
   });
 
-  it('flags a single legal choice for auto-submit', () => {
+  it('flags a single legal choice', () => {
     let forcedSingles = 0;
     for (let i = 0; i < 6; i++) {
       for (const pkg of play(start(30 + i)).packages) {

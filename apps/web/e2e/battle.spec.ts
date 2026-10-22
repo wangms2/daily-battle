@@ -97,7 +97,7 @@ async function waitForChoice(page: Page): Promise<State> {
 async function act(page: Page): Promise<State> {
   const state = await waitForChoice(page);
   if (state === 'end') return state;
-  // The app may auto-submit a lone legal choice first; then the buttons disable and we just go round again.
+  // If the click misses (the buttons disabled mid-turn), we just go round again.
   await page
     .locator(state === 'moves' ? MOVES : SWITCHES)
     .first()

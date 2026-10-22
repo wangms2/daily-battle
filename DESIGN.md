@@ -372,7 +372,7 @@ Mirror Pokémon Showdown's battle layout and flow, simplified where it makes sen
 - **Pacing (quick, like Showdown):**
   - Speeds are Slow / Normal / Fast (about 1150 / 800 / 450 ms per line), Normal by default, always reachable from the top bar. (An instant mode exists for automated tests only.)
   - Tap anywhere to skip the rest of the current turn's animation and text.
-  - Forced actions with a single legal choice are submitted automatically (a recharge turn, a locked move), except sending in your last Pokémon: the prompt says "Send in your last Pokémon" and one tap sends it, so it never appears unannounced.
+  - Nothing is chosen for you, even with a single legal choice: you tap a locked move or recharge turn yourself, and sending in your last Pokémon has its own prompt ("Send in your last Pokémon") and takes one tap.
   - The next turn's choices appear as soon as the previous turn ends; no extra confirmation steps.
 
 ### 12.2c Beginner hints
@@ -435,7 +435,7 @@ Pool and opponent validation, reports, schedule files for N weeks. _Accept:_ pro
 Weekly pool UI, role-named set picker, suggested-teams row, lock, daily brief with lead picker and daily swap, Beginner hints toggle and settings, localStorage. See §12.2a and §12.2c. _Accept:_ a team can be built and locked in under a minute; suggested teams are selectable and editable; state persists across reloads; swap limited to one per day; storage-unavailable path works; turning hints off removes all hint UI.
 
 **M7 — Web client: battle UI**
-Worker-based battle, move/switch UI, protocol rendering, AI turns, win/loss detection, attempts recording, run it back. Uses the sprite interface and self-hosted sprites from M6 (§12.3a; brought forward so the team builder could show them). _Accept:_ full playthrough on mobile and desktop; mid-battle reload handled per §7; no runtime requests to third-party image hosts; layout and flow follow §12.2b; speed control and tap-to-skip work; single-choice forced actions auto-submit; Animations off setting works.
+Worker-based battle, move/switch UI, protocol rendering, AI turns, win/loss detection, attempts recording, run it back. Uses the sprite interface and self-hosted sprites from M6 (§12.3a; brought forward so the team builder could show them). _Accept:_ full playthrough on mobile and desktop; mid-battle reload handled per §7; no runtime requests to third-party image hosts; layout and flow follow §12.2b; speed control and tap-to-skip work; single-choice turns wait for your tap; Animations off setting works.
 
 **M8 — Result and share**
 Share text per §11, clipboard/Web Share; result card and daily-brief summary; derived streak and stats (§4.4); practice changes (§4.2). _Accept:_ snapshot tests for share output: first-try win, won on try 3, not cleared in 3, practice clear, mid-day, and swap marker; never any opponent species. Streak logic tests: a win on try 1–3 extends, the 3rd loss (forfeits included) resets, a win on try 4+ does not extend, a missed day resets, and an unfinished today doesn't break yesterday's streak.

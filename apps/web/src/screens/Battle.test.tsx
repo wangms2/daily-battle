@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { BattleBackendContext, type BattleBackend } from '../battle/backend';
@@ -233,12 +233,15 @@ describe('battle screen', () => {
     );
   });
 
-  it('submits the only legal choice by itself', async () => {
+  it('waits for you to pick a locked move, even as the only choice', async () => {
     const only = pkg({ ...TURN_1, controls: { ...MOVES, only: 'move 1' } });
     const { backend, calls } = fakeBackend([only, TURN_1]);
     renderBattle(backend);
     await userEvent.click(await thunderbolt());
-    await waitFor(() => expect(calls).toEqual(['move 1', 'move 1']));
+    await new Promise((r) => setTimeout(r, 700));
+    expect(calls).toEqual(['move 1']);
+    await userEvent.click(await thunderbolt());
+    expect(calls).toEqual(['move 1', 'move 1']);
   });
 
   it('asks who comes in after a faint', async () => {

@@ -122,7 +122,7 @@ export interface Controls {
   moves: MoveOption[];
   /** Legal switch choices (`switch N`), by team slot. */
   switches: { choice: string; slot: number }[];
-  /** The only legal choice, if there is exactly one: submitted automatically unless it's a switch. */
+  /** The only legal choice, if there is exactly one. You still make it yourself (a locked move, your last Pokémon). */
   only: string | null;
 }
 
