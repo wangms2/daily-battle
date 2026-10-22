@@ -149,6 +149,41 @@ test('on a touch screen, a bench tap opens details and its button switches', asy
   await expect(page.locator('main')).toContainText(', come back!');
 });
 
+test('on a touch screen, holding a move shows its details and keeps them; a tap chooses', async ({
+  page,
+}, info) => {
+  test.skip(!info.project.use.hasTouch, 'touch only');
+  await open(page, 'instant');
+  await page.getByRole('button', { name: /^Start · / }).click();
+  test.skip((await waitForChoice(page)) !== 'moves', 'no move turn');
+  const move = page.locator(MOVES).first();
+  const box = (await move.boundingBox())!;
+  const at = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+  const cdp = await page.context().newCDPSession(page);
+  const touch = (type: 'touchStart' | 'touchEnd') =>
+    cdp.send('Input.dispatchTouchEvent', {
+      type,
+      touchPoints: type === 'touchStart' ? [at] : [],
+    });
+  // Hold: the details appear almost at once and stay after the finger lifts.
+  await touch('touchStart');
+  await page.waitForTimeout(250);
+  await expect(page.getByRole('tooltip')).toBeVisible();
+  await page.waitForTimeout(400);
+  await touch('touchEnd');
+  await page.waitForTimeout(200);
+  await expect(page.getByRole('tooltip')).toBeVisible();
+  await expect(page.getByRole('tooltip')).toContainText('Power');
+  await noScroll(page, 'move details');
+  await page.screenshot({ path: `e2e/screens/${info.project.name}/light/31-move-hold.png` });
+  await expect(page.locator('main')).not.toContainText(' used '); // not chosen
+  // A tap elsewhere closes it; a quick tap on the move chooses it.
+  await page.locator('header').tap();
+  await expect(page.getByRole('tooltip')).toBeHidden();
+  await move.tap();
+  await expect(page.locator('main')).toContainText(' used ');
+});
+
 test('a run after the day is won is practice, and shares as practice', async ({ page }) => {
   await page.addInitScript(() => {
     Object.defineProperty(navigator, 'share', { value: undefined });
@@ -326,6 +361,10 @@ test('three lost tries break the streak, and the result copies to share', async 
   const choice = page.getByRole('dialog', { name: 'Share your result' });
   // The card image is drawn for the preview; the image button waits for it.
   await expect(choice.getByRole('img')).toBeVisible();
+  // Actually shown, not blocked: the preview server sends the deployed CSP.
+  await expect
+    .poll(() => choice.getByRole('img').evaluate((img: HTMLImageElement) => img.naturalWidth))
+    .toBe(2400);
   await expect(choice.getByRole('button', { name: /^(Share|Copy|Save) image$/ })).toBeEnabled();
   await page.waitForTimeout(300);
   await noScroll(page, 'share choice');

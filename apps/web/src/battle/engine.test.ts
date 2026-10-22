@@ -1,7 +1,7 @@
 import { Dex } from '@pkmn/sim';
 import { deriveSeed, makeRng, randomTeam } from '@daily-battle/sim-bridge';
 import { describe, expect, it } from 'vitest';
-import { BattleEngine, cleanText, effectiveness } from './engine';
+import { BattleEngine, cleanText, effectiveness, moveDesc } from './engine';
 import type { EngineStart, TurnPackage } from './frames';
 
 function start(i: number, extra: Partial<EngineStart> = {}): EngineStart {
@@ -217,6 +217,26 @@ describe('cleanText', () => {
     expect(cleanText('(Hitmontop lost ||−270/304||88.8%|| of its health!)')).toBe(
       '(Hitmontop lost 88.8% of its health!)',
     );
+  });
+});
+
+describe('move details', () => {
+  const gen4 = Dex.forGen(4);
+  it('reads the full text when it is short, else the summary', () => {
+    expect(moveDesc(gen4.moves.get('Flare Blitz'))).toMatch(/recoil damage equal to 1\/3/);
+    expect(moveDesc(gen4.moves.get('Substitute'))).toBe(gen4.moves.get('Substitute').shortDesc);
+    expect(moveDesc(gen4.moves.get('Hidden Power Ice'))).toMatch(/Power varies between 30 and 70/);
+  });
+
+  it('names moves cleanly and carries priority and contact', () => {
+    const { packages } = play(start(0), 60);
+    const moves = packages.flatMap((p) => p.controls?.moves ?? []);
+    expect(moves.length).toBeGreaterThan(0);
+    for (const m of moves) {
+      expect(m.name).not.toMatch(/\d$/); // never "Return 102"
+      expect(Number.isInteger(m.priority)).toBe(true);
+      expect(typeof m.contact).toBe('boolean');
+    }
   });
 });
 

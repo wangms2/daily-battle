@@ -80,6 +80,8 @@ const move = (name: string, effectiveness: number | null, choice = 'move 1'): Mo
   category: 'Special',
   power: 95,
   accuracy: 100,
+  priority: 0,
+  contact: false,
   desc: '10% chance to paralyze the target.',
   pp: 24,
   maxpp: 24,
@@ -270,20 +272,53 @@ describe('battle screen', () => {
     expect(calls).toEqual(['move 1', 'switch 3']);
   });
 
-  it('shows move details on a long press without choosing the move', async () => {
+  /** A touch press held for `ms`, then lifted (pointerup, the lift's leave, click). */
+  const press = (el: HTMLElement, ms: number) => {
+    fireEvent.pointerDown(el, { pointerType: 'touch' });
+    act(() => vi.advanceTimersByTime(ms));
+    fireEvent.pointerUp(el, { pointerType: 'touch' });
+    fireEvent.pointerLeave(el, { pointerType: 'touch' });
+    fireEvent.click(el);
+  };
+
+  it('shows move details on a hold, keeps them open, and doesn’t choose the move', async () => {
     const { backend, calls } = fakeBackend([]);
-    renderBattle(backend);
+    renderBattle(backend, { hints: true });
     const button = await thunderbolt();
     vi.useFakeTimers();
     try {
       fireEvent.pointerDown(button, { pointerType: 'touch' });
-      act(() => vi.advanceTimersByTime(500));
-      expect(screen.getByRole('tooltip')).toHaveTextContent('10% chance to paralyze the target.');
+      act(() => vi.advanceTimersByTime(160)); // almost at once
+      const card = screen.getByRole('tooltip');
+      expect(card).toHaveTextContent('10% chance to paralyze the target.');
+      expect(card).toHaveTextContent('Power95');
+      expect(card).toHaveTextContent('Super effective ×4');
+      act(() => vi.advanceTimersByTime(400));
       fireEvent.pointerUp(button, { pointerType: 'touch' });
+      fireEvent.pointerLeave(button, { pointerType: 'touch' });
+      fireEvent.click(button);
+      expect(screen.getByRole('tooltip')).toBeInTheDocument(); // stays after the lift
+      expect(calls).toEqual([]);
+      fireEvent.pointerDown(document.body); // the next tap anywhere closes it
+      expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
     } finally {
       vi.useRealTimers();
     }
     expect(calls).toEqual([]);
+  });
+
+  it('chooses the move on a quick tap, even once its details have flashed up', async () => {
+    const { backend, calls } = fakeBackend([TURN_1]);
+    renderBattle(backend);
+    const button = await thunderbolt();
+    vi.useFakeTimers();
+    try {
+      press(button, 250);
+    } finally {
+      vi.useRealTimers();
+    }
+    expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
+    expect(calls).toEqual(['move 1']);
   });
 
   it('labels type effectiveness only with Beginner hints on', async () => {

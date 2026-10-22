@@ -246,6 +246,19 @@ export function effectiveness(moveName: string, species: string | undefined): nu
   return 2 ** dex.getEffectiveness(move.type, types);
 }
 
+/** Full descriptions run up to ~900 characters (Substitute); past this, the short one. */
+const DESC_MAX = 280;
+
+/** A move's description for its details card; Hidden Power's typed forms have none of their own. */
+export function moveDesc(move: ReturnType<typeof dex.moves.get>): string {
+  const m =
+    move.exists && !move.desc && move.id.startsWith('hiddenpower')
+      ? dex.moves.get('hiddenpower')
+      : move;
+  if (!m.exists) return '';
+  return m.desc && m.desc.length <= DESC_MAX ? m.desc : m.shortDesc || m.desc;
+}
+
 /**
  * Showdown marks some numbers with `||exact||shown||` (e.g. your own HP lost as
  * `||−270/304||88.8%||`); keep the shown part.
@@ -400,8 +413,8 @@ export class BattleEngine {
     let moves: MoveOption[] = [];
     if (request.requestType === 'move') {
       moves = (request.active[0]?.moves ?? []).map((m, i) => {
-        // Requests name some moves with their power ("Return 102"); the id is clean.
-        const move = dex.moves.get(m.id);
+        // Requests tack the power onto some moves ("Return 102", id return102).
+        const move = dex.moves.get(m.id.replace(/\d+$/, ''));
         const choice = `move ${i + 1}`;
         return {
           choice,
@@ -410,7 +423,9 @@ export class BattleEngine {
           category: (move.exists ? move.category : 'Physical') as MoveOption['category'],
           power: move.exists ? move.basePower : 0,
           accuracy: move.exists ? move.accuracy : true,
-          desc: move.exists ? move.shortDesc || move.desc : '',
+          priority: move.exists ? move.priority : 0,
+          contact: move.exists && !!move.flags.contact,
+          desc: moveDesc(move),
           pp: 'pp' in m ? m.pp : 0,
           maxpp: 'maxpp' in m ? m.maxpp : 0,
           disabled: !legal.includes(choice),

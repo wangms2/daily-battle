@@ -367,6 +367,7 @@ Mirror Pokémon Showdown's battle layout and flow, simplified where it makes sen
 - **Improved for mobile (M7.1):** the field keeps the Gen 4 scene's shape on phones, and the log takes the spare height below it (newest at the bottom, the whole battle scrollable inside it, expandable to a full sheet) instead of Showdown's chat-sidebar log and one-line message box. Floating result labels ("−24%", "Paralyzed", "Item knocked off") and ability/item pop-ups replace the in-field message box. The foe's HP bar carries six team marks: revealed Pokémon as icons, unrevealed as Poké Balls, fainted greyed. Your own team shows on the bench row, so your bar has none. Details open as a small card, not a full sheet.
 - **Simplified vs Showdown:** no timer, chat, user list, ladder rating, or spectators. No team preview screen. Forfeit is a "Give up" item in a menu.
 - **Tooltips:** tap (or hover on desktop) a Pokémon for Showdown-style details. For the opponent, show only revealed information: types, HP %, status, boosts, revealed moves, and the item or ability if revealed. No "usually runs" or usage hints. Own Pokémon show full info.
+- **Move details:** hover (desktop) or press (touch) a move, Showdown-style. On touch the card shows about 150ms into a press: lift before ~450ms and the tap chooses the move (the card goes); hold past it and the card stays open without choosing, until the next tap anywhere. It shows type, category, power, accuracy, PP, the move's description (the full Gen 4 text up to ~280 characters, else the summary), priority, and contact; with hints on, its effectiveness against the opposing active Pokémon.
 - **Pacing (quick, like Showdown):**
   - Speeds are Slow / Normal / Fast (about 1150 / 800 / 450 ms per line), Normal by default, always reachable from the top bar. (An instant mode exists for automated tests only.)
   - Tap anywhere to skip the rest of the current turn's animation and text.
@@ -380,7 +381,7 @@ One toggle, clearly labeled, available on the home screen and in the battle menu
 When on:
 
 - **First-time explainers:** a one-line dismissible tooltip the first time each mechanic appears (Stealth Rock, Choice lock, Toxic, sleep, and so on). Shown once each, tracked in `settings.shownExplainers`.
-- **Type-effectiveness labels** on move buttons against the opposing active Pokémon: each damaging move says whether it's super effective, not very effective, or has no effect.
+- **Type-effectiveness labels** on move buttons against the opposing active Pokémon: the bottom line keeps the type and adds a short tag by the PP (Super, Super ×4, Neutral, Weak, Weak ×¼, No effect; Status for status moves), spelled out in the move's details card.
 - **Team checklist** in the team builder (hazards, removal, attackers, defense) and the brief's tip line. With hints off, the builder never tells the player what their team is missing.
 - **Speed range** line in Pokémon tooltips.
 - **Team-builder checklist** and shared-weakness list (§12.2a).

@@ -20,17 +20,32 @@ import { HpBar } from './Field';
 import { STATUS_COLOR } from './labels';
 import { MonPopover } from './MonPopover';
 
-function effectivenessTag(e: number | null): { label: string; tone: string } | null {
+/** Effectiveness for the move's details card, and a short tag for its button. */
+function effectivenessTag(e: number | null): { label: string; short: string; tone: string } | null {
   if (e === null) return null;
-  if (e === 0) return { label: 'No effect', tone: 'text-bad' };
-  if (e > 1) return { label: e >= 4 ? 'Super effective ×4' : 'Super effective', tone: 'text-good' };
-  if (e < 1) return { label: 'Not very effective', tone: 'text-muted' };
-  return { label: 'Effective', tone: 'text-muted' };
+  if (e === 0) return { label: 'No effect', short: 'No effect', tone: 'text-bad' };
+  if (e > 1) {
+    return e >= 4
+      ? { label: 'Super effective ×4', short: 'Super ×4', tone: 'text-good' }
+      : { label: 'Super effective ×2', short: 'Super', tone: 'text-good' };
+  }
+  if (e < 1) {
+    return e <= 0.25
+      ? { label: 'Not very effective ×¼', short: 'Weak ×¼', tone: 'text-muted' }
+      : { label: 'Not very effective ×½', short: 'Weak', tone: 'text-muted' };
+  }
+  return { label: 'Neutral ×1', short: 'Neutral', tone: 'text-muted' };
 }
 
+/** Touch: the details show this soon into a press, and a press this long keeps them. */
+const SHOW_AFTER = 150;
+const HOLD = 450;
+
 /**
- * Long-press (touch) or hover (mouse) shows info; a plain tap acts. A tap that
- * ends a long-press only closes the info. Without `longPress`, touch only taps.
+ * Hover (mouse) or a press (touch) shows info; a plain tap acts. On touch, as
+ * on Showdown, the info appears almost at once: lift quickly and the tap acts
+ * (the info goes); hold past HOLD and the info stays open without acting,
+ * until the next tap anywhere. Without `longPress`, touch only taps.
  */
 function usePressInfo(
   show: () => void,
@@ -38,29 +53,47 @@ function usePressInfo(
   act: (pointer: string) => void,
   longPress = true,
 ) {
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const longPressed = useRef(false);
+  const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const held = useRef(false);
+  const down = useRef(false);
   const pointer = useRef('');
   const clear = () => {
-    if (timer.current) clearTimeout(timer.current);
-    timer.current = null;
+    timers.current.forEach(clearTimeout);
+    timers.current = [];
   };
   return {
     onPointerDown: (e: ReactPointerEvent) => {
-      longPressed.current = false;
+      held.current = false;
+      down.current = true;
       pointer.current = e.pointerType;
       if (e.pointerType === 'mouse' || !longPress) return;
-      timer.current = setTimeout(() => {
-        longPressed.current = true;
-        show();
-      }, 420);
-    },
-    onPointerUp: clear,
-    onPointerLeave: (e: ReactPointerEvent) => {
       clear();
-      if (e.pointerType === 'mouse' || longPressed.current) hide();
+      timers.current = [
+        setTimeout(show, SHOW_AFTER),
+        setTimeout(() => (held.current = true), HOLD),
+      ];
     },
-    onPointerCancel: clear,
+    onPointerUp: () => {
+      down.current = false;
+      clear();
+      // Held: the info stays until the next tap anywhere (which closes it first).
+      if (held.current) {
+        document.addEventListener('pointerdown', hide, { capture: true, once: true });
+      }
+    },
+    onPointerLeave: (e: ReactPointerEvent) => {
+      if (e.pointerType === 'mouse') return hide();
+      // A finger lifting also "leaves"; only one sliding off (a scroll) cancels.
+      if (!down.current) return;
+      down.current = false;
+      clear();
+      if (!held.current) hide();
+    },
+    onPointerCancel: () => {
+      down.current = false;
+      clear();
+      if (!held.current) hide();
+    },
     onPointerEnter: (e: ReactPointerEvent) => {
       if (e.pointerType === 'mouse') show();
     },
@@ -71,9 +104,8 @@ function usePressInfo(
     },
     onBlur: hide,
     onClick: () => {
-      if (longPressed.current) {
-        longPressed.current = false;
-        hide();
+      if (held.current) {
+        held.current = false;
         return;
       }
       const type = pointer.current;
@@ -118,12 +150,19 @@ function MoveButton({
       <span className="truncate text-center text-[14.5px] leading-5 font-semibold">
         {move.name}
       </span>
+      {/* Type on the left; with hints, a short effectiveness tag beside the PP. */}
       <span className="flex items-baseline justify-between gap-1 text-[11px] leading-4">
-        <span className={clsx('truncate font-medium', tag ? tag.tone : 'text-muted')}>
-          {tag ? tag.label : move.type}
-        </span>
-        <span className="shrink-0 text-muted tabular-nums">
-          {move.pp}/{move.maxpp}
+        <span className="truncate font-medium text-muted">{move.type}</span>
+        <span className="flex shrink-0 items-baseline gap-1 tabular-nums">
+          {hints && (
+            <span className={clsx('font-semibold', tag ? tag.tone : 'text-muted')}>
+              {tag ? tag.short : 'Status'}
+            </span>
+          )}
+          {hints && <span className="text-muted">·</span>}
+          <span className="text-muted">
+            {move.pp}/{move.maxpp}
+          </span>
         </span>
       </span>
     </button>
@@ -208,6 +247,45 @@ function BenchButton({
         )}
       </span>
     </button>
+  );
+}
+
+/** A move's details card: what matters for choosing it, Showdown-style. */
+function MoveDetails({ move, hints }: { move: MoveOption; hints: boolean }) {
+  const tag = hints ? effectivenessTag(move.effectiveness) : null;
+  const facts: [string, string][] = [
+    ['Power', move.power ? String(move.power) : '—'],
+    ['Accuracy', move.accuracy === true ? 'Never misses' : `${move.accuracy}%`],
+    ['PP', `${move.pp}/${move.maxpp}`],
+  ];
+  const notes = [
+    move.priority > 0 && `Priority +${move.priority}: usually moves first`,
+    move.priority < 0 && `Priority ${move.priority}: usually moves last`,
+    move.contact && 'Makes contact',
+  ].filter(Boolean);
+  return (
+    <>
+      <div className="flex items-center gap-2">
+        <span className="text-[15px] font-semibold">{move.name}</span>
+        <TypeBadge type={move.type} />
+        <span className="text-[12px] text-muted">{move.category}</span>
+        {tag && (
+          <span className={clsx('ml-auto text-[12px] font-semibold', tag.tone)}>{tag.label}</span>
+        )}
+      </div>
+      <dl className="mt-1.5 flex gap-4 text-[12px] tabular-nums">
+        {facts.map(([k, v]) => (
+          <div key={k} className="flex gap-1">
+            <dt className="text-muted">{k}</dt>
+            <dd className="font-semibold">{v}</dd>
+          </div>
+        ))}
+      </dl>
+      {move.desc && <p className="mt-1.5 text-[13px] leading-snug">{move.desc}</p>}
+      {notes.length > 0 && (
+        <p className="mt-1 text-[12px] font-medium text-muted">{notes.join(' · ')}</p>
+      )}
+    </>
   );
 }
 
@@ -299,17 +377,7 @@ export function ControlPanel({
         className="card animate-fade-in pointer-events-none absolute inset-x-0 bottom-full z-10 mb-2 p-3"
         role="tooltip"
       >
-        <div className="flex items-center gap-2">
-          <span className="text-[15px] font-semibold">{info.move.name}</span>
-          <TypeBadge type={info.move.type} />
-          <span className="text-[12px] text-muted">{info.move.category}</span>
-        </div>
-        <p className="mt-1 text-[12px] text-muted tabular-nums">
-          {info.move.power ? `Power ${info.move.power}` : 'No damage'} · Accuracy{' '}
-          {info.move.accuracy === true ? '—' : `${info.move.accuracy}%`} · PP {info.move.pp}/
-          {info.move.maxpp}
-        </p>
-        {info.move.desc && <p className="mt-1 text-[13px]">{info.move.desc}</p>}
+        <MoveDetails move={info.move} hints={hints} />
       </div>
     ) : (
       <MonPopover foe={false} member={info.member} className="absolute bottom-full left-0 mb-2" />

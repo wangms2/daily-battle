@@ -89,6 +89,11 @@ export interface MoveOption {
   category: 'Physical' | 'Special' | 'Status';
   power: number;
   accuracy: number | true;
+  /** -7 to +5; nonzero moves go before or after others regardless of Speed. */
+  priority: number;
+  /** Makes contact (Rough Skin, Static, Flame Body, …). */
+  contact: boolean;
+  /** What it does, with its mechanics: the full text when it's short enough to read in battle. */
   desc: string;
   pp: number;
   maxpp: number;
