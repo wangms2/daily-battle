@@ -99,21 +99,42 @@ describe('settings', () => {
 });
 
 describe('team builder', () => {
-  it('adds with the most common set, removes on a second tap, and caps at 6', async () => {
+  it('prompts for a set with the most used one ready, and caps the team at 6', async () => {
     const user = userEvent.setup();
     renderApp(seeded());
     const pool = schedule.pool.species;
-    await user.click(await screen.findByRole('button', { name: `Add ${pool[0]} to team` }));
-    const top = [...sets.species[pool[0]!]!.sets].sort((a, b) => b.weight - a.weight)[0]!;
+    const multi = pool.find((p) => sets.species[p]!.sets.length > 1)!;
+    const byWeight = [...sets.species[multi]!.sets].sort((a, b) => b.weight - a.weight);
+
+    // Closing the prompt adds nothing.
+    await user.click(await screen.findByRole('button', { name: `Add ${multi} to team` }));
+    let picker = await screen.findByRole('dialog', { name: `${multi} · pick a set` });
+    expect(within(picker).getByRole('tab', { selected: true })).toHaveAccessibleName(
+      byWeight[0]!.label,
+    );
+    expect(picker).toHaveTextContent('Most used');
+    await user.keyboard('{Escape}');
+    expect(screen.getByRole('button', { name: /Pick 6 more/ })).toBeInTheDocument();
+
+    // Pick another set and add it.
+    await user.click(screen.getByRole('button', { name: `Add ${multi} to team` }));
+    picker = await screen.findByRole('dialog', { name: `${multi} · pick a set` });
+    await user.click(within(picker).getByRole('tab', { name: byWeight[1]!.label }));
+    expect(picker).toHaveTextContent(byWeight[1]!.moves[0]!);
+    await user.click(within(picker).getByRole('button', { name: `Add ${multi}` }));
     expect(
-      screen.getByRole('button', { name: `${pool[0]}, ${top.label}. Change set` }),
+      screen.getByRole('button', { name: `${multi}, ${byWeight[1]!.label}. Change set` }),
     ).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: `Remove ${pool[0]} from team` }));
+    await user.click(screen.getByRole('button', { name: `Remove ${multi} from team` }));
     expect(screen.getByRole('button', { name: /Pick 6 more/ })).toBeInTheDocument();
 
     for (const s of pool.slice(0, 7)) {
       const add = screen.queryByRole('button', { name: `Add ${s} to team` });
-      if (add) await user.click(add);
+      if (!add) continue;
+      await user.click(add);
+      // One tap on the preselected set confirms it.
+      const confirm = screen.queryByRole('button', { name: `Add ${s}` });
+      if (confirm) await user.click(confirm);
     }
     expect(screen.getByRole('button', { name: 'Lock in team' })).toBeEnabled();
     expect(screen.getAllByRole('button', { name: /^Remove .* from team$/ })).toHaveLength(6);

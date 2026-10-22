@@ -13,8 +13,14 @@ export function setsOf(species: string): SetEntry[] {
   return sets.species[species]?.sets ?? [];
 }
 
+/**
+ * The set a slot names. A set merged away in a data update (one that did the
+ * same job as another) falls back to the species' most common set, so saved
+ * teams keep working.
+ */
 export function findSet(slot: Slot): SetEntry | undefined {
-  return setsOf(slot.species).find((s) => s.id === slot.setId);
+  const sets = setsOf(slot.species);
+  return sets.find((s) => s.id === slot.setId) ?? (sets.length ? topSet(slot.species) : undefined);
 }
 
 /** The most common set for a species (what a tap on a pool tile picks). */

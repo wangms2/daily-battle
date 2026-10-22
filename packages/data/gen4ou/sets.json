@@ -3,7 +3,7 @@
     "format": "gen4ou",
     "method": "curated-usage-weighted-v1",
     "simVersion": "0.10.11",
-    "builtAt": "2026-10-21T19:36:58.404Z",
+    "builtAt": "2026-10-22T12:59:28.652Z",
     "sources": {
       "sets": {
         "url": "https://data.pkmn.cc/sets/gen4ou.json",
@@ -6345,7 +6345,7 @@
           "sourceName": "Morning Glory (Physical Attacker)",
           "label": "Bulky attacker",
           "description": "Burns physical attackers with Will-O-Wisp, heals with Morning Sun, and hits hard with Flare Blitz.",
-          "weight": 0.5322,
+          "weight": 0.5094,
           "moves": [
             "Flare Blitz",
             "Extreme Speed",
@@ -6377,7 +6377,7 @@
           "sourceName": "Life Orb",
           "label": "Life Orb attacker",
           "description": "Gives up a little HP with each attack for a big boost in power.",
-          "weight": 0.4113,
+          "weight": 0.4365,
           "moves": [
             "Flare Blitz",
             "Thunder Fang",
@@ -6409,7 +6409,7 @@
           "sourceName": "Physically Defensive",
           "label": "Physical wall",
           "description": "Soaks up physical attacks while wearing the opponent down.",
-          "weight": 0.0565,
+          "weight": 0.0541,
           "moves": [
             "Will-O-Wisp",
             "Morning Sun",
@@ -7119,7 +7119,7 @@
           "sourceName": "Nasty Plot",
           "label": "Nasty Plot sweeper",
           "description": "Boosts itself with Nasty Plot, then tries to sweep through the opposing team.",
-          "weight": 0.3646,
+          "weight": 0.6085,
           "moves": [
             "Substitute",
             "Nasty Plot",
@@ -7176,38 +7176,6 @@
             "spa": 31,
             "spd": 31,
             "spe": 31
-          }
-        },
-        {
-          "id": "mismagius-calm-mind",
-          "sourceName": "Calm Mind",
-          "label": "Calm Mind sweeper",
-          "description": "Boosts itself with Calm Mind, then tries to sweep through the opposing team.",
-          "weight": 0.2439,
-          "moves": [
-            "Substitute",
-            "Calm Mind",
-            "Shadow Ball",
-            "Hidden Power Fighting"
-          ],
-          "item": "Leftovers",
-          "ability": "Levitate",
-          "nature": "Timid",
-          "evs": {
-            "hp": 4,
-            "atk": 0,
-            "def": 0,
-            "spa": 252,
-            "spd": 0,
-            "spe": 252
-          },
-          "ivs": {
-            "hp": 31,
-            "atk": 31,
-            "def": 30,
-            "spa": 30,
-            "spd": 30,
-            "spe": 30
           }
         },
         {

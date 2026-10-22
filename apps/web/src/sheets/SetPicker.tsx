@@ -1,85 +1,57 @@
-// Pick a set for a team member (§12.2a): role cards you swipe through on
-// phones, side by side on wide screens. "Details" flips a card to show item,
-// ability, nature, and EVs, so nothing has to scroll.
+// Pick a set for a team member (§12.2a): a tab per set across the top and the
+// selected set's full card below (description, moves, item, ability, nature,
+// EVs), then one button to confirm. The current set, or else the most common
+// one, starts selected, so a single tap confirms it. Nothing scrolls.
 import type { SetEntry } from '@daily-battle/data';
 import clsx from 'clsx';
-import useEmblaCarousel from 'embla-carousel-react';
-import { useEffect, useState } from 'react';
-import { formatEvs, setsOf, speciesInfo } from '../lib/data';
+import { useRef, useState, type KeyboardEvent } from 'react';
+import { formatEvs, setsOf, speciesInfo, topSet } from '../lib/data';
 import { getSprite } from '../lib/sprites';
 import { Sheet } from '../ui/Sheet';
 import { Button, TypeBadge } from '../ui/bits';
-import { useWide } from '../ui/useWide';
 
-function SetCard({
-  set,
-  current,
-  chooseLabel,
-  onChoose,
-}: {
-  set: SetEntry;
-  current: boolean;
-  chooseLabel: string | null;
-  onChoose: () => void;
-}) {
-  const [flipped, setFlipped] = useState(false);
+/** A tab-sized name: "Choice Scarf attacker" → "Scarf", "Swords Dance sweeper" → "Swords Dance". */
+function shortLabel(label: string): string {
+  return label
+    .replace(/^Choice /, '')
+    .replace(/ (attacker|sweeper|setter)\b/, '')
+    .replace(/\(physically defensive\)/, '(Phys. def.)')
+    .replace(/\(specially defensive\)/, '(Spec. def.)');
+}
+
+function SetCard({ set, badge }: { set: SetEntry; badge: string | null }) {
   return (
-    <article
-      className={clsx('card flex h-full flex-col p-4', current && 'is-selected')}
-      aria-label={set.label}
-    >
+    <article className="card flex flex-col p-4" aria-label={set.label}>
       <div className="flex items-start justify-between gap-2">
         <h3 className="display text-[16px] leading-tight">{set.label}</h3>
-        {current && (
+        {badge && (
           <span className="shrink-0 rounded-badge bg-accent-soft px-2 py-0.5 text-[12px] font-semibold text-soft-ink">
-            Current
+            {badge}
           </span>
         )}
       </div>
-      <div className="mt-2 min-h-0 flex-1">
-        {!flipped ? (
-          <>
-            <p className="line-clamp-3 text-[14px] leading-snug text-muted">{set.description}</p>
-            <ul className="mt-3 grid grid-cols-2 gap-1.5">
-              {set.moves.map((m) => (
-                <li
-                  key={m}
-                  className="truncate rounded-badge bg-surface-2 px-2.5 py-2 text-[13px] font-medium"
-                  title={m}
-                >
-                  {m}
-                </li>
-              ))}
-            </ul>
-          </>
-        ) : (
-          <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-[14px]">
-            <dt className="text-muted">Item</dt>
-            <dd className="font-medium">{set.item || 'None'}</dd>
-            <dt className="text-muted">Ability</dt>
-            <dd className="font-medium">{set.ability}</dd>
-            <dt className="text-muted">Nature</dt>
-            <dd className="font-medium">{set.nature}</dd>
-            <dt className="text-muted">EVs</dt>
-            <dd className="font-medium">{formatEvs(set.evs)}</dd>
-          </dl>
-        )}
-      </div>
-      <div className="mt-3 flex gap-2">
-        <Button
-          variant="secondary"
-          className="flex-1"
-          onClick={() => setFlipped((f) => !f)}
-          aria-pressed={flipped}
-        >
-          {flipped ? 'Moves' : 'Details'}
-        </Button>
-        {chooseLabel && (
-          <Button className="flex-1" onClick={onChoose} disabled={current}>
-            {current ? 'Chosen' : chooseLabel}
-          </Button>
-        )}
-      </div>
+      <p className="mt-1.5 line-clamp-2 text-[14px] leading-snug text-muted">{set.description}</p>
+      <ul className="mt-3 grid grid-cols-2 gap-1.5" aria-label="Moves">
+        {set.moves.map((m) => (
+          <li
+            key={m}
+            className="truncate rounded-badge bg-surface-2 px-2.5 py-2 text-[13px] font-medium"
+            title={m}
+          >
+            {m}
+          </li>
+        ))}
+      </ul>
+      <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-[13px]">
+        <dt className="text-muted">Item</dt>
+        <dd className="font-medium">{set.item || 'None'}</dd>
+        <dt className="text-muted">Ability</dt>
+        <dd className="font-medium">{set.ability}</dd>
+        <dt className="text-muted">Nature</dt>
+        <dd className="font-medium">{set.nature}</dd>
+        <dt className="text-muted">EVs</dt>
+        <dd className="font-medium">{formatEvs(set.evs)}</dd>
+      </dl>
     </article>
   );
 }
@@ -91,12 +63,13 @@ export function SetPicker({
   currentSetId,
   onChoose,
   onRemove,
-  chooseLabel = 'Choose',
+  chooseLabel = 'Use this set',
   title,
 }: {
   species: string | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** The set it has now, if any; it starts selected. */
   currentSetId?: string;
   /** Omit for a read-only view. */
   onChoose?: (setId: string) => void;
@@ -104,38 +77,31 @@ export function SetPicker({
   chooseLabel?: string;
   title?: string;
 }) {
-  const wide = useWide();
   const sets = species ? setsOf(species) : [];
-  const startIndex = Math.max(
-    0,
-    sets.findIndex((s) => s.id === currentSetId),
+  const common = species && sets.length ? topSet(species).id : undefined;
+  const [selected, setSelected] = useState(
+    sets.some((s) => s.id === currentSetId) ? currentSetId! : common,
   );
-  const [emblaRef, embla] = useEmblaCarousel({
-    align: 'start',
-    startIndex,
-    containScroll: 'trimSnaps',
-  });
-  const [index, setIndex] = useState(startIndex);
-  useEffect(() => {
-    if (!embla) return;
-    const on = () => setIndex(embla.selectedScrollSnap());
-    embla.on('select', on);
-    return () => void embla.off('select', on);
-  }, [embla]);
+  const tabs = useRef<(HTMLButtonElement | null)[]>([]);
 
   if (!species) return null;
   const info = speciesInfo(species);
-  const card = (set: SetEntry) => (
-    <SetCard
-      set={set}
-      current={set.id === currentSetId}
-      chooseLabel={onChoose ? chooseLabel : null}
-      onChoose={() => onChoose?.(set.id)}
-    />
-  );
+  const set = sets.find((s) => s.id === selected) ?? sets[0]!;
+  const badge = set.id === currentSetId ? 'Current' : set.id === common ? 'Most used' : null;
+  const unchanged = set.id === currentSetId;
+
+  // Arrow keys move between tabs (WAI-ARIA tabs pattern).
+  const onKey = (e: KeyboardEvent, i: number) => {
+    const step = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+    if (!step) return;
+    e.preventDefault();
+    const next = (i + step + sets.length) % sets.length;
+    setSelected(sets[next]!.id);
+    tabs.current[next]?.focus();
+  };
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange} title={title ?? `${species} · pick a set`} wide>
+    <Sheet open={open} onOpenChange={onOpenChange} title={title ?? `${species} · pick a set`}>
       <div className="mb-3 flex items-center gap-2">
         <img
           src={getSprite(species, 'icon')}
@@ -149,53 +115,52 @@ export function SetPicker({
           {sets.length} set{sets.length === 1 ? '' : 's'}
         </span>
       </div>
-      {wide ? (
-        <div className="grid auto-cols-fr grid-flow-col gap-3 pb-1">
-          {sets.map((s) => (
-            <div key={s.id} className="h-[300px]">
-              {card(s)}
-            </div>
+      {sets.length > 1 && (
+        <div
+          role="tablist"
+          aria-label="Sets"
+          className="mb-3 grid gap-1 rounded-btn bg-surface-2 p-1"
+          style={{ gridTemplateColumns: `repeat(${sets.length}, minmax(0, 1fr))` }}
+        >
+          {sets.map((s, i) => (
+            <button
+              key={s.id}
+              ref={(el) => {
+                tabs.current[i] = el;
+              }}
+              type="button"
+              role="tab"
+              id={`set-tab-${s.id}`}
+              aria-selected={s.id === set.id}
+              aria-controls="set-panel"
+              aria-label={s.label}
+              tabIndex={s.id === set.id ? 0 : -1}
+              onClick={() => setSelected(s.id)}
+              onKeyDown={(e) => onKey(e, i)}
+              className={clsx(
+                'flex min-h-11 items-center justify-center rounded-[6px] px-1.5 py-1 text-center text-[13px] leading-tight font-semibold',
+                s.id === set.id ? 'bg-surface text-ink shadow-card' : 'text-muted',
+              )}
+            >
+              <span className="line-clamp-2">{shortLabel(s.label)}</span>
+            </button>
           ))}
         </div>
-      ) : (
-        <>
-          <div className="-mx-5 overflow-hidden px-5" ref={emblaRef}>
-            <div className="flex gap-3">
-              {sets.map((s) => (
-                <div
-                  key={s.id}
-                  className={clsx(
-                    'h-[290px] shrink-0',
-                    sets.length > 1 ? 'basis-[86%]' : 'basis-full',
-                  )}
-                >
-                  {card(s)}
-                </div>
-              ))}
-            </div>
-          </div>
-          {sets.length > 1 && (
-            <div className="mt-3 flex justify-center gap-2" role="tablist" aria-label="Sets">
-              {sets.map((s, i) => (
-                <button
-                  key={s.id}
-                  type="button"
-                  role="tab"
-                  aria-selected={i === index}
-                  aria-label={s.label}
-                  onClick={() => embla?.scrollTo(i)}
-                  className={clsx(
-                    'h-2 rounded-full transition-all',
-                    i === index ? 'w-5 bg-accent' : 'w-2 bg-line',
-                  )}
-                />
-              ))}
-            </div>
-          )}
-        </>
+      )}
+      <div
+        role={sets.length > 1 ? 'tabpanel' : undefined}
+        id="set-panel"
+        aria-labelledby={sets.length > 1 ? `set-tab-${set.id}` : undefined}
+      >
+        <SetCard set={set} badge={badge} />
+      </div>
+      {onChoose && (
+        <Button className="mt-3 h-12 w-full" disabled={unchanged} onClick={() => onChoose(set.id)}>
+          {unchanged ? 'Current set' : chooseLabel}
+        </Button>
       )}
       {onRemove && (
-        <div className="mt-2 flex justify-center">
+        <div className="mt-1 flex justify-center">
           <Button variant="ghost" className="text-bad" onClick={onRemove}>
             Remove from team
           </Button>

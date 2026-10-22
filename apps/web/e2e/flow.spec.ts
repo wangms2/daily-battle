@@ -42,8 +42,13 @@ for (const scheme of ['light', 'dark'] as const) {
     // Builder: empty, then a suggested team, then info and set picker.
     await expect(page.getByRole('button', { name: /Pick 6 more/ })).toBeVisible();
     await shot(page, '02-builder-empty', project);
-    const firstTile = page.getByRole('button', { name: /^Add .* to team$/ }).first();
-    await firstTile.click();
+    // Heatran (in this week's pool) has several sets, so adding it prompts for one.
+    await page.getByRole('button', { name: 'Add Heatran to team' }).click();
+    // A Pokémon with more than one set prompts for it, the most used one ready.
+    const prompt = page.getByRole('dialog', { name: 'Heatran · pick a set' });
+    await expect(prompt.getByRole('tab', { selected: true })).toBeVisible();
+    await shot(page, '03-add-prompt', project);
+    await prompt.getByRole('button', { name: 'Add Heatran' }).click();
     await shot(page, '03-builder-one', project);
     await page
       .getByRole('button', { name: /^Remove .* from team$/ })
@@ -67,8 +72,11 @@ for (const scheme of ['light', 'dark'] as const) {
       .click();
     await expect(page.getByRole('dialog', { name: /pick a set/ })).toBeVisible();
     await shot(page, '06-set-picker', project);
-    await page.getByRole('button', { name: 'Details' }).first().click();
-    await shot(page, '07-set-details', project);
+    const tabs = page.getByRole('tab');
+    if ((await tabs.count()) > 1) {
+      await tabs.nth(1).click();
+      await shot(page, '07-set-other', project);
+    }
     await page.keyboard.press('Escape');
 
     if (await page.getByRole('button', { name: /Team checklist/ }).isVisible()) {

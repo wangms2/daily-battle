@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
 import { Dex, TeamValidator, toID } from '@pkmn/sim';
+import { samePurpose } from './distinct';
 import { resolveSet, usageShares } from './resolve';
 import { assignRoles } from './roles';
 import type {
@@ -146,8 +147,22 @@ export function buildSets(
     }
     if (!candidates.length) continue;
 
-    const selected = selectAndWeight(candidates);
-    for (const c of candidates) {
+    // Sets that do the same job fold into the more used one, which keeps their usage.
+    const distinct: typeof candidates = [];
+    for (const c of [...candidates].sort((x, y) => y.score - x.score)) {
+      const same = distinct.find((d) => samePurpose(d.item, c.item));
+      if (same) {
+        same.score += c.score;
+        dropped.push({
+          species: name,
+          set: c.item.sourceName,
+          reason: `same job as ${same.item.sourceName}`,
+        });
+      } else distinct.push(c);
+    }
+
+    const selected = selectAndWeight(distinct);
+    for (const c of distinct) {
       if (!selected.some((s) => s.item === c.item)) {
         dropped.push({ species: name, set: c.item.sourceName, reason: 'low usage weight' });
       }

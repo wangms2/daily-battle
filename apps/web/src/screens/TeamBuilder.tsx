@@ -4,7 +4,7 @@
 import type { ScheduleFile } from '@daily-battle/gen/schedule';
 import clsx from 'clsx';
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
-import { CHECK_ITEMS, checklist, findSet, topSet, type Slot } from '../lib/data';
+import { CHECK_ITEMS, checklist, findSet, setsOf, topSet, type Slot } from '../lib/data';
 import { getSprite } from '../lib/sprites';
 import { ConfirmDialog, TeamCheckSheet } from '../sheets/misc';
 import { InfoSheet } from '../sheets/InfoSheet';
@@ -37,7 +37,10 @@ export function TeamBuilder({
   const [popped, setPopped] = useState<string | null>(null);
   const [shake, setShake] = useState(0);
   const [infoFor, setInfoFor] = useState<string | null>(null);
-  const [pickerFor, setPickerFor] = useState<string | null>(null);
+  // The set picker: for a team member (change its set) or a Pokémon being added.
+  const [picker, setPicker] = useState<{ species: string; adding: boolean } | null>(null);
+  const setPickerFor = (species: string | null) =>
+    setPicker(species ? { species, adding: false } : null);
   const [checklistOpen, setChecklistOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [snack, setSnack] = useState<{ message: string; undo: Slot[] } | null>(null);
@@ -60,10 +63,17 @@ export function TeamBuilder({
       setTeam(team.filter((s) => s.species !== species));
     } else if (full) {
       setShake((n) => n + 1);
+    } else if (setsOf(species).length > 1) {
+      // Prompt for the set, with the most used one ready to confirm.
+      setPicker({ species, adding: true });
     } else {
-      setPopped(species);
-      setTeam([...team, { species, setId: topSet(species).id }]);
+      add(species, topSet(species).id);
     }
+  };
+
+  const add = (species: string, setId: string) => {
+    setPopped(species);
+    setTeam((t) => [...t, { species, setId }]);
   };
 
   const applySuggested = (i: number) => {
@@ -300,19 +310,30 @@ export function TeamBuilder({
         }
       />
       <SetPicker
-        key={pickerFor ?? ''}
-        species={pickerFor}
-        open={!!pickerFor}
-        onOpenChange={(o) => !o && setPickerFor(null)}
-        currentSetId={team.find((s) => s.species === pickerFor)?.setId}
+        key={picker ? `${picker.species}-${picker.adding}` : ''}
+        species={picker?.species ?? null}
+        open={!!picker}
+        onOpenChange={(o) => !o && setPicker(null)}
+        currentSetId={
+          picker && !picker.adding
+            ? team.find((s) => s.species === picker.species)?.setId
+            : undefined
+        }
+        chooseLabel={picker?.adding ? `Add ${picker.species}` : 'Use this set'}
         onChoose={(setId) => {
-          setSetFor(pickerFor!, setId);
-          setPickerFor(null);
+          if (!picker) return;
+          if (picker.adding) add(picker.species, setId);
+          else setSetFor(picker.species, setId);
+          setPicker(null);
         }}
-        onRemove={() => {
-          toggle(pickerFor!);
-          setPickerFor(null);
-        }}
+        onRemove={
+          picker && !picker.adding
+            ? () => {
+                toggle(picker.species);
+                setPicker(null);
+              }
+            : undefined
+        }
       />
       <TeamCheckSheet
         open={checklistOpen}
