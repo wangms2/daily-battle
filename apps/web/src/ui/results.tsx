@@ -7,6 +7,7 @@ import {
   formatShareText,
   imageMode,
   shareImage,
+  copyText,
   shareResult,
   type ImageMode,
   type ImageOutcome,
@@ -172,9 +173,9 @@ export function TextShareButton({
 }
 
 /**
- * Share opens a choice: the result card as an image (previewed), or the text.
- * Each goes to the share sheet where there is one, else the clipboard; text
- * that can't be copied is shown to copy by hand.
+ * Share opens a choice: the result card as an image (previewed), which goes
+ * to the share sheet where there is one, else the clipboard; or the text,
+ * copied straight to the clipboard (shown to copy by hand if that fails).
  */
 export function ShareButton({
   share,
@@ -216,10 +217,11 @@ export function ShareButton({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [choosing, text]);
 
-  const finish = (outcome: ImageOutcome | ShareOutcome) => {
+  // The toast says what was copied: "Text copied", "Image copied".
+  const finish = (outcome: ImageOutcome | ShareOutcome, what: 'Text' | 'Image') => {
     setChoosing(false);
     if (outcome === 'manual') setManual(true);
-    setToast(TOAST[outcome] ?? null);
+    setToast(outcome === 'copied' ? `${what} copied` : (TOAST[outcome] ?? null));
   };
   const ready = image && image !== 'failed' ? image : null;
 
@@ -251,15 +253,14 @@ export function ShareButton({
                   await shareImage(ready.blob, {
                     name: `daily-battle-${share.date.replace(/\s+/g, '-').toLowerCase()}.png`,
                   }),
+                  'Image',
                 )
               }
             >
               {IMAGE_LABEL[mode]}
             </Button>
-            <Button variant="secondary" onClick={async () => finish(await shareResult(text))}>
-              {typeof navigator !== 'undefined' && typeof navigator.share === 'function'
-                ? 'Share text'
-                : 'Copy text'}
+            <Button variant="secondary" onClick={async () => finish(await copyText(text), 'Text')}>
+              Copy text
             </Button>
           </div>
         </div>

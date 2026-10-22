@@ -19,25 +19,25 @@ This doc is written to be split into implementation chunks. Section 13 lists mil
 
 ## 2. Locked decisions
 
-| Area | Decision |
-|---|---|
-| Format | Gen 4 OU, singles, 6v6, Showdown mechanics |
-| Engine | `@pkmn/sim` (standalone Showdown simulator), self-hosted, no Showdown server |
-| Set data | Smogon data (usage-weighted). 1–4 most common sets per species, weighted by usage |
-| Player team | Weekly. Pick 6 of 12, choose a role-named set for each, lock for the week. Optional suggested teams are a selection, not a default. No lineup ordering; the lead is picked on the daily brief |
-| Daily swap | One per day: replace one Pokémon (from the original 12) OR change one set. Not both. Done on the daily brief screen |
-| Opponent | New each day. Species visible, sets hidden |
-| Attempts | Unlimited, with "run it back". The first attempt of the day is the scored result; retries still count as a clear but never change the streak |
-| Battle RNG | Fresh random seed per attempt, stored for resume (§7), never shared, so replays cannot be memorized. Team and set generation ARE seeded by date |
-| Streak | Consecutive days with a first-attempt win. Breaks on a first-attempt loss or a missed day. No freezes |
-| Difficulty | ~50% first-attempt win rate for an average player; typically 2–3 attempts to clear |
-| AI | Utility scoring + softmax noise, tuned to average ladder behavior, acts only on revealed info plus set priors |
-| Share | Headline (⭐ first try, won on try N, or not cleared), one row per counted try with Pokémon remaining, team (species only), streak. No opponent info, no sets, no turn counts (§11) |
-| Battle UI | Mirrors Pokémon Showdown's battle layout and flow, simplified where it makes sense. Classic experience with no extra clutter when Beginner hints are off |
-| Beginner hints | A clearly labeled toggle, on by default for new players, persisted. Covers first-time explainers, type-effectiveness labels, speed range in tooltips, and the team-builder checklist. Easy to turn off |
-| Pacing | Quick like Showdown, with speed control and tap-to-skip |
-| Animations | Whatever Showdown does (animated sprites, its own battle effects), nothing custom, with an off setting like Showdown's |
-| Second mode (later) | Mid-battle puzzles on the same engine |
+| Area                | Decision                                                                                                                                                                                               |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Format              | Gen 4 OU, singles, 6v6, Showdown mechanics                                                                                                                                                             |
+| Engine              | `@pkmn/sim` (standalone Showdown simulator), self-hosted, no Showdown server                                                                                                                           |
+| Set data            | Smogon data (usage-weighted). 1–4 most common sets per species, weighted by usage                                                                                                                      |
+| Player team         | Weekly. Pick 6 of 12, choose a role-named set for each, lock for the week. Optional suggested teams are a selection, not a default. No lineup ordering; the lead is picked on the daily brief          |
+| Daily swap          | One per day: replace one Pokémon (from the original 12) OR change one set. Not both. Done on the daily brief screen                                                                                    |
+| Opponent            | New each day. Species visible, sets hidden                                                                                                                                                             |
+| Attempts            | Unlimited, with "run it back". The first attempt of the day is the scored result; retries still count as a clear but never change the streak                                                           |
+| Battle RNG          | Fresh random seed per attempt, stored for resume (§7), never shared, so replays cannot be memorized. Team and set generation ARE seeded by date                                                        |
+| Streak              | Consecutive days with a first-attempt win. Breaks on a first-attempt loss or a missed day. No freezes                                                                                                  |
+| Difficulty          | ~50% first-attempt win rate for an average player; typically 2–3 attempts to clear                                                                                                                     |
+| AI                  | Utility scoring + softmax noise, tuned to average ladder behavior, acts only on revealed info plus set priors                                                                                          |
+| Share               | Headline (⭐ first try, won on try N, or not cleared), one row per counted try with Pokémon remaining, team (species only), streak. No opponent info, no sets, no turn counts (§11)                    |
+| Battle UI           | Mirrors Pokémon Showdown's battle layout and flow, simplified where it makes sense. Classic experience with no extra clutter when Beginner hints are off                                               |
+| Beginner hints      | A clearly labeled toggle, on by default for new players, persisted. Covers first-time explainers, type-effectiveness labels, speed range in tooltips, and the team-builder checklist. Easy to turn off |
+| Pacing              | Quick like Showdown, with speed control and tap-to-skip                                                                                                                                                |
+| Animations          | Whatever Showdown does (animated sprites, its own battle effects), nothing custom, with an off setting like Showdown's                                                                                 |
+| Second mode (later) | Mid-battle puzzles on the same engine                                                                                                                                                                  |
 
 ## 3. Non-goals
 
@@ -50,23 +50,27 @@ This doc is written to be split into implementation chunks. Section 13 lists mil
 ## 4. Game rules and flow
 
 ### 4.1 Time
+
 - A **day** and a **week** are keyed off the player's local calendar date, matching the existing site's "midnight in your time zone" behavior.
 - The week starts Monday. The weekly pool and daily opponents are keyed by date strings (`YYYY-MM-DD`) so every player sees the same content for the same local date.
 - Edge case: players in different time zones see different "today" content at the same instant. Accepted.
 
 ### 4.2 Weekly team building
+
 1. On the first visit of a week, show the **pool of 12** (same for everyone).
 2. Player selects 6, then a set for each. Sets are presented by **role** ("Choice Scarf attacker", "Stealth Rock lead") with a one-line description and the four moves; item, ability, nature, and EVs are behind a "Details" tap. No usage percentages.
 3. Optionally, instead of building from scratch, the player can pick one of 2–3 **suggested teams** (§12.2a). This is a selection the player chooses, not a default, and the result stays editable.
 4. Team locks for the week. There is no lineup ordering: in singles, only the lead matters, and it is chosen on the daily brief (§4.3).
 
 Daily swap (done on the daily brief screen, shown as "1 change left"):
+
 - One per day, resets at local midnight.
 - Either replace one team member with another of the 12 (choosing a set), or change the set of one existing member.
 - Unused swaps do not accumulate.
 - Once the day's counted tries are over (won within 3, or 3 lost), the daily swap is no longer offered. Instead each practice run may make one **practice change** (a swap or a set change) for that run only; the weekly team is untouched, and the next run decides afresh. If a practice run is won, its change stays on the team from then on.
 
 ### 4.3 Daily battle
+
 1. Player sees the **daily brief**: the opponent's 6 species (no sets), their own locked team, and the daily swap ("1 change left").
 2. Player picks which Pokémon **leads** for this attempt (free, not a swap). After a faint, the player chooses the next Pokémon as in any singles battle.
 3. Battle runs turn by turn. Win = all opponent Pokémon fainted.
@@ -74,6 +78,7 @@ Daily swap (done on the daily brief screen, shown as "1 change left"):
 5. Gen 4 has no team preview in the simulator; the brief is a UI screen, not a sim feature.
 
 ### 4.4 Stats
+
 - Per day: attempts, result of each, and whether the day has been cleared.
 - **Streak (decided in M8):** consecutive days won **within the first 3 tries**. The 3rd lost try breaks it at once (a forfeit or an abandoned try counts as a loss; reload resumes, §7, so a reload can't dodge one), and so does a missed day. Tries after the 3rd are practice: they can clear the day but don't count. No streak freezes.
 - **First-try wins are the best result.** They're celebrated simply: a ⭐ "First try!" headline in the share and a gold badge on the result card, plus a first-try count in stats.
@@ -84,6 +89,7 @@ Daily swap (done on the daily brief screen, shown as "1 change left"):
 ## 5. Data pipeline
 
 ### 5.1 Source
+
 **As built in M1 (Oct 2026):** curated Smogon analysis sets from `data.pkmn.cc/sets/gen4ou.json`, weighted with Smogon's monthly `chaos/gen4ou-1500.json` usage stats (option 1 below). Smogon granted permission to use the set data. `@smogon/sets` was not used: its last release was in July 2021, and its stats-derived sets are one naive set per species. See `packages/data/README.md` for the method. The original research notes follow.
 
 Researched (Oct 2026). Both packages are open source on npm.
@@ -94,14 +100,16 @@ Researched (Oct 2026). Both packages are open source on npm.
 - Dependencies for legality and data: `@pkmn/sim`, `@pkmn/data`, `@pkmn/dex`.
 
 **Known gap: set-level usage weights.** Usage stats give per-species distributions of moves, items, and abilities, not usage shares for whole sets. Curated Smogon analysis sets have no usage weights. So "1–4 most common sets, weighted by usage" is not a ready-made field and M1 must derive it. Options to evaluate:
+
 1. Take the curated sets for a species and weight each by how closely its moves/item/ability match the species' usage stats (e.g. product or average of the move and item usage shares).
 2. Build sets from the stats directly (top moves/items/abilities per species) and cluster into 1–4 coherent sets.
 3. Use whatever set-level weights `@smogon/sets` already provides, if its usage-derived sets carry them.
-Document which option is used, and keep species-level weights (overall usage rank) separate from set-level weights.
+   Document which option is used, and keep species-level weights (overall usage rank) separate from set-level weights.
 
 **Licensing check:** the packages' code is MIT. Confirm whether Smogon's set and usage data may be redistributed in the shipped JSON, and add attribution to Smogon in the credits.
 
 ### 5.2 Build-time snapshot
+
 - A script downloads and normalizes data into versioned static JSON checked into or generated at build: `data/gen4ou/sets.json`.
 - For each species: up to 4 sets, each with name, moves, item, ability, nature, EVs, IVs (default perfect unless set says otherwise), a normalized `weight` (usage share among the kept sets), and a player-facing **role label** plus a one-line description (e.g. "Choice Scarf attacker: fast and hits hard, locked into one move"). Derive labels with rules from item and moves (Choice Scarf plus attacks, Stealth Rock, Swords Dance, and so on), then human-review the output.
 - **2–4 sets per species, for variety.** Candidates come from the species' own Smogon analysis, the other tier's analysis, and a hand-curated file (`gen4ou/set-curation.json`) that adds creative sets where the analyses are thin (Choice Specs Roserade; Nasty Plot and Specs Azelf) and drops weak ones (Azelf's Rain Dance lead). Usage ranks them: the most used set is the default, the top 4 distinct sets are kept, and no set is dropped for low usage; each kept set gets at least a 5% weight so rarer sets still appear on opponents. On a same-job tie the species' own analysis wins, so extra sources only add variety and published set ids stay stable. A test enforces 2–4 sets for every species.
@@ -110,6 +118,7 @@ Document which option is used, and keep species-level weights (overall usage ran
 - No runtime fetches to external data sources.
 
 ### 5.3 Validation
+
 - Every set must pass the sim's validator for the `gen4ou` format.
 - Unit test that loads all sets and validates them. Fail the build on any invalid set.
 - Neither data package guarantees validity, since validation rules change over time. Re-run validation on every data refresh and when `@pkmn/sim` is upgraded.
@@ -117,11 +126,14 @@ Document which option is used, and keep species-level weights (overall usage ran
 ## 6. Generation
 
 ### 6.1 Seeded PRNG
+
 - Use a small deterministic PRNG (e.g. mulberry32 or the sim's own `PRNG`) seeded by a hash of a string key.
 - Keys: `week:YYYY-MM-DD` (Monday date) for pools; `day:YYYY-MM-DD` for opponents. Include a `generatorVersion` in the key so algorithm changes can be rolled out without silently rewriting past days.
 
 ### 6.2 Weekly pool of 12
+
 Weighted random draw by usage, with:
+
 - Cap on how many top-tier species appear (no pool of 12 staples).
 - Dedupe by species; respect species clause and standard Gen 4 OU restrictions.
 - A quota of 2–4 below-OU species (UU, UUBL, and lower, drawn from those with real OU usage) so pools aren't only OU staples. They are weighted by usage^0.35, so more popular ones come up more often without any one dominating.
@@ -134,12 +146,14 @@ Weighted random draw by usage, with:
 - After constraints, run the validation in §9.2.
 
 ### 6.3 Daily opponent
+
 - 6 species by usage-weighted draw (weighted by √usage, as built in M3, for more day-to-day variety), then for each species a set drawn by set weight.
 - Coherence constraints (soft, via rejection sampling): at most 1–2 hazard setters, a remover likely present, role balance, Species clause (no repeated species). No item clause: gen4ou has none, so items may repeat.
 - Assign a **style** label (`offense`, `balance`, `stall`) derived from the team's role mix; the AI uses it (§8.5).
 - The generator outputs the full team including sets. The client shows only species.
 
 ### 6.4 Schedule file
+
 - Prefer **pre-generating a published schedule** over generating at runtime: a build-time script emits `schedule/2026-W44.json` etc. containing the weekly pool and the 7 daily opponents. The client reads the file for the current date.
 - Benefits: one source of truth, validated content only, easy to roll back, no cross-browser divergence.
 - Pre-generate several weeks ahead. Fall back to runtime generation with the same seed only if a schedule file is missing (log it).
@@ -167,20 +181,25 @@ Weighted random draw by usage, with:
 Goal: realistic average-ladder-player behavior, imperfect but not random, legible enough that players can reason about it.
 
 ### 8.1 Interface
+
 ```ts
 interface BattleAI {
   choose(view: SideView, rng: () => number): Choice; // Choice = move/switch
 }
 ```
+
 `SideView` is derived only from the AI's side's request plus the public battle log. It contains: own team (full info), opponent's revealed Pokémon, moves, items, abilities, current HP percentages, status, boosts, hazards, weather, field state.
 
 ### 8.2 Belief model
+
 - Maintain, for each opposing Pokémon, a candidate set distribution: start from the usage-weighted sets for that species, then filter and renormalize as moves, items, and abilities are revealed.
 - If nothing matches (player is off-meta), fall back to "unknown set" using the species' most common moves.
 - Use `@smogon/calc` (or the sim's damage logic) to estimate damage by sampling or taking expected value over candidate sets. Verify the package supports Gen 4.
 
 ### 8.3 Utility scoring
+
 For each legal action compute a score from weighted features:
+
 - Expected damage dealt (as % of target HP) and KO potential
 - Expected damage taken from likely opposing moves
 - Speed comparison (who moves first)
@@ -194,6 +213,7 @@ For each legal action compute a score from weighted features:
 Weights are parameters (§8.5).
 
 ### 8.4 Choice with noise
+
 - Convert scores to a probability distribution with **softmax** and a temperature parameter, then sample.
 - Targeted behaviors on top, as soft biases rather than hard rules:
   - High rate of picking the highest-damage move
@@ -204,21 +224,25 @@ Weights are parameters (§8.5).
 - No omniscience: if the player's Pokémon is not revealed, the AI treats it by priors.
 
 ### 8.5 Parameters and styles
+
 - A config object: feature weights, softmax temperature, prediction rate, switch aggressiveness.
 - Preset parameter sets per style (`offense`, `balance`, `stall`) selected from the daily opponent's style label.
 - Tune against aggregate stats from mid-ladder Gen 4 OU play (switch rate, max-damage rate, turn of first hazard). If using public replay data, check Showdown's terms and strip usernames. If no data is used, tune by hand and document the targets.
 
 ### 8.6 Testing
+
 - Deterministic unit tests using a fixed rng and constructed positions (e.g. AI picks the KO move when available at low temperature, AI does not use information it hasn't seen).
 - Bot-vs-bot simulations used in §9.
 
 ## 9. Validation and calibration (offline)
 
 ### 9.1 Player bots
+
 - Implement 2–3 player bots of different skill: a naive one (max damage), a mid one (the §8 AI with low noise), and a stronger one (lookahead or the §8 AI with high weights and low temperature).
 - Each bot has two information modes: **uninformed** (opponent sets known only through priors and reveals, modeling a first attempt) and **informed** (given the opponent's actual sets, modeling a retry).
 
 ### 9.2 Pool validation (weekly)
+
 - Sample many legal 6-of-12 teams from the pool with random set choices. Simulate against several random daily opponents.
 - Require: sufficient viable teams (win rate above a floor for the mid bot), and no single dominating team (cap on the best team's win rate).
 - Also emit 2–3 **suggested teams** per week with distinct archetypes (e.g. Balanced, Offense, Stall) that pass validation, for the team builder's suggestion row (§12.2a).
@@ -228,6 +252,7 @@ Weights are parameters (§8.5).
   - Pool acceptance is unaffected: it still checks that viable random teams come in more than one style.
 
 ### 9.3 Opponent validation (daily)
+
 - Simulate each candidate daily opponent against sampled teams from that week's pool using the bots.
 - Target: about a 50% first-attempt win rate for an average player and 2–3 attempts to clear. With first-attempt win rate f and later-attempt win rate p, the mean attempts per day is about f + (1 − f)(1 + 1/p) (for f = 0.5: p = 0.5 gives 2.0, p = 0.4 gives 2.25, p = 0.33 gives 2.5).
 - Starting bands (config): **uninformed mid bot 45–55%** (first attempt) and **informed mid bot 35–55%** (retries).
@@ -237,12 +262,14 @@ Weights are parameters (§8.5).
 - Reject degenerate cases: stalemates (turn cap, e.g. 300 turns), hard counters with no answers in the pool.
 
 ### 9.4 Reporting
+
 - The pipeline writes a report per schedule file (win rates by bot, rejected candidates and reasons) for human review.
 - Thresholds are config, tuned after playtesting real players.
 
 ## 10. Client state (localStorage)
 
 Versioned schema, now `version: 2` (v2 dropped the stored `stats` block; streaks and stats are derived from `days`, §4.4):
+
 ```ts
 {
   version: 2,
@@ -257,6 +284,7 @@ Attempt = { result: 'win'|'loss'|'forfeit'|'inProgress', remaining: number, ts: 
             engine: string,  // 'sim <version> ai <AI_VERSION>'; a mismatch on resume records a forfeit (§15)
             practiceChange?: DayChange }  // a practice run's one-off change (§4.2)
 ```
+
 - Wrap all reads/writes in try/catch; the game must work if storage is unavailable (in-memory fallback with a notice).
 - Migration function per version bump.
 - Export/import of state as JSON (nice-to-have, since there are no accounts).
@@ -264,6 +292,7 @@ Attempt = { result: 'win'|'loss'|'forfeit'|'inProgress', remaining: number, ts: 
 ## 11. Share format
 
 First-try win:
+
 ```
 Daily Battle · Oct 21
 ⭐ First try! 4/6 left
@@ -273,6 +302,7 @@ Hippowdon, Azelf, Celebi, Heatran*, Jirachi, Lucario
 ```
 
 Won on a later try (one row per try that counts, up to 3):
+
 ```
 Daily Battle · Oct 21
 ✅ Won on try 3 · 2/6 left
@@ -289,13 +319,14 @@ Other headlines: `❌ Not cleared in 3 tries` (with `🔥 Streak reset`), `✅ W
 - Each row shows that try's result and your Pokémon left out of 6 (green = alive; grey ⬜ = still standing on a try that was given up), led by one emoji (✅/❌, a first try too) so the squares line up. A practice run shared from its end card adds `🔁 🟩🟩🟩⬛⬛⬛ practice` (`practice, with Gengar` if it swapped one in). At most 7 lines plus the link.
 - Team: species only, lead first, from the deciding try (the win, or the latest try that counted); `*` marks a species swapped in that day.
 - **Share opens a choice: image or text.** Both say the same thing, built from one model (`lib/share.ts`).
-  - **Text:** plain text that pastes anywhere: Web Share API where available, else the clipboard, else it's shown to copy.
+  - **Text:** plain text that pastes anywhere, copied straight to the clipboard (never the share sheet), else shown to copy.
   - **Image:** a 1200×630 card in the app's light theme (`lib/shareCard.ts`), drawn on a canvas in the browser: the date, the headline (gold "⭐ First try" badge), the try rows as squares, a practice row when sharing one, the team as sprites with names (`*` and gold for the day's swap), the streak, and the site address. The sheet previews it; it goes to the share sheet as the image alone where files can be shared (phones; with text alongside, iOS's Copy and some apps keep only the text, and the card shows the address anyway), else the clipboard, else a download. The preview is a `blob:` image, which the CSP allows (`img-src 'self' data: blob:`).
 - Never include opponent species, sets, or turn counts.
 
 ## 12. UI and tech
 
 ### 12.1 Stack (proposed)
+
 - TypeScript, Vite, a component framework of choice (React or Svelte), Vitest for tests.
 - Static hosting (any static host/CDN). No backend in v1.
 - Monorepo layout:
@@ -311,6 +342,7 @@ Other headlines: `❌ Not cleared in 3 tries` (with `🔥 Streak reset`), `✅ W
   ```
 
 ### 12.2 Screens
+
 1. **Home** (the daily brief): once played, today's result, tries, streak, Share, and the countdown to the next day.
 2. **Weekly team builder**: pool of 12, role-named set picker, suggested teams, lock (§12.2a).
 3. **Daily brief**: opponent species, your team, lead picker, daily swap ("1 change left"), Start.
@@ -346,6 +378,7 @@ Mirror Pokémon Showdown's battle layout and flow, simplified where it makes sen
 One toggle, clearly labeled, available on the home screen and in the battle menu, persisted in settings. On by default for new players, with a short note on first run that it can be turned off. Turning it off hides all hint UI immediately, including any pending explainers.
 
 When on:
+
 - **First-time explainers:** a one-line dismissible tooltip the first time each mechanic appears (Stealth Rock, Choice lock, Toxic, sleep, and so on). Shown once each, tracked in `settings.shownExplainers`.
 - **Type-effectiveness labels** on move buttons against the opposing active Pokémon: each damaging move says whether it's super effective, not very effective, or has no effect.
 - **Team checklist** in the team builder (hazards, removal, attackers, defense) and the brief's tip line. With hints off, the builder never tells the player what their team is missing.
@@ -355,6 +388,7 @@ When on:
 Never included: damage ranges, or usage-based set hints for the opponent.
 
 ### 12.3 Rendering the battle
+
 - Evaluate `@pkmn/client` and `@pkmn/view` for parsing/rendering protocol vs a minimal custom renderer. Pick the option that gets closest to Showdown's own look and flow (§12.2b) with the least custom work, and supports clear HP, status, hazards, weather, and move reveals.
 
 ### 12.3a Sprites
@@ -370,6 +404,7 @@ This is a free, non-commercial fan project, and the priority is the best player 
 - **Attribution:** credits page and footer disclaimer (see §16). One note: a community spriter has objected to Showdown using their later-generation work without credit, so credit Smogon sprite artists generally and do not strip any watermarks.
 
 ### 12.4 Accessibility and mobile
+
 - Touch targets, readable contrast, not color-only HP/result indicators, keyboard support on desktop.
 
 ## 13. Milestones
@@ -377,34 +412,34 @@ This is a free, non-commercial fan project, and the priority is the best player 
 Each milestone is shippable on its own and has acceptance criteria.
 
 **M0 — Repo and tooling**
-Monorepo, TS config, lint, test runner, CI. *Accept:* `pnpm test` runs; CI green.
+Monorepo, TS config, lint, test runner, CI. _Accept:_ `pnpm test` runs; CI green.
 
 **M1 — Data snapshot**
-Script builds `sets.json` from `@smogon/sets` (with `@pkmn/smogon` and Smogon usage stats as supplements) for gen4ou with 1–4 weighted sets per species. Includes the set-weight derivation from §5.1 and a short write-up of the method chosen. Also generates a role label and one-line description per set (§5.2). *Accept:* all sets pass the sim's validator; weights sum to 1 per species; documented source and refresh command; data redistribution/licensing question resolved or flagged in the README.
+Script builds `sets.json` from `@smogon/sets` (with `@pkmn/smogon` and Smogon usage stats as supplements) for gen4ou with 1–4 weighted sets per species. Includes the set-weight derivation from §5.1 and a short write-up of the method chosen. Also generates a role label and one-line description per set (§5.2). _Accept:_ all sets pass the sim's validator; weights sum to 1 per species; documented source and refresh command; data redistribution/licensing question resolved or flagged in the README.
 
 **M2 — Headless battle harness**
-First step: confirm `gen4ou` is available in `@pkmn/sim` (§7), and wire in `formats.ts` or vendor Showdown if not. Then run a full gen4ou battle in Node between two trivial policies (start from `RandomPlayerAI`), with side-specific views. *Accept:* 1,000 battles complete without errors; AI/policy code cannot access hidden info (test enforces it).
+First step: confirm `gen4ou` is available in `@pkmn/sim` (§7), and wire in `formats.ts` or vendor Showdown if not. Then run a full gen4ou battle in Node between two trivial policies (start from `RandomPlayerAI`), with side-specific views. _Accept:_ 1,000 battles complete without errors; AI/policy code cannot access hidden info (test enforces it).
 
 **M3 — Seeded generation**
-Weekly pool and daily opponent generators with constraints and `generatorVersion`. *Accept:* same key → identical output across runs; constraint tests pass over 10,000 seeds; no illegal teams.
+Weekly pool and daily opponent generators with constraints and `generatorVersion`. _Accept:_ same key → identical output across runs; constraint tests pass over 10,000 seeds; no illegal teams.
 
 **M4 — Opponent AI v1**
-Belief model, utility scoring, softmax choice, style presets. *Accept:* beats the naive bot clearly; behavior tests pass (takes available KO, doesn't use unrevealed info); win rate vs naive/mid/strong bots logged.
+Belief model, utility scoring, softmax choice, style presets. _Accept:_ beats the naive bot clearly; behavior tests pass (takes available KO, doesn't use unrevealed info); win rate vs naive/mid/strong bots logged.
 
 **M5 — Validation pipeline and schedule emitter**
-Pool and opponent validation, reports, schedule files for N weeks. *Accept:* produces schedule files with validation reports; rejects an intentionally bad opponent in a test.
+Pool and opponent validation, reports, schedule files for N weeks. _Accept:_ produces schedule files with validation reports; rejects an intentionally bad opponent in a test.
 
 **M6 — Web client: team building and state**
-Weekly pool UI, role-named set picker, suggested-teams row, lock, daily brief with lead picker and daily swap, Beginner hints toggle and settings, localStorage. See §12.2a and §12.2c. *Accept:* a team can be built and locked in under a minute; suggested teams are selectable and editable; state persists across reloads; swap limited to one per day; storage-unavailable path works; turning hints off removes all hint UI.
+Weekly pool UI, role-named set picker, suggested-teams row, lock, daily brief with lead picker and daily swap, Beginner hints toggle and settings, localStorage. See §12.2a and §12.2c. _Accept:_ a team can be built and locked in under a minute; suggested teams are selectable and editable; state persists across reloads; swap limited to one per day; storage-unavailable path works; turning hints off removes all hint UI.
 
 **M7 — Web client: battle UI**
-Worker-based battle, move/switch UI, protocol rendering, AI turns, win/loss detection, attempts recording, run it back. Uses the sprite interface and self-hosted sprites from M6 (§12.3a; brought forward so the team builder could show them). *Accept:* full playthrough on mobile and desktop; mid-battle reload handled per §7; no runtime requests to third-party image hosts; layout and flow follow §12.2b; speed control and tap-to-skip work; single-choice forced actions auto-submit; Animations off setting works.
+Worker-based battle, move/switch UI, protocol rendering, AI turns, win/loss detection, attempts recording, run it back. Uses the sprite interface and self-hosted sprites from M6 (§12.3a; brought forward so the team builder could show them). _Accept:_ full playthrough on mobile and desktop; mid-battle reload handled per §7; no runtime requests to third-party image hosts; layout and flow follow §12.2b; speed control and tap-to-skip work; single-choice forced actions auto-submit; Animations off setting works.
 
 **M8 — Result and share**
-Share text per §11, clipboard/Web Share; result card and daily-brief summary; derived streak and stats (§4.4); practice changes (§4.2). *Accept:* snapshot tests for share output: first-try win, won on try 3, not cleared in 3, practice clear, mid-day, and swap marker; never any opponent species. Streak logic tests: a win on try 1–3 extends, the 3rd loss (forfeits included) resets, a win on try 4+ does not extend, a missed day resets, and an unfinished today doesn't break yesterday's streak.
+Share text per §11, clipboard/Web Share; result card and daily-brief summary; derived streak and stats (§4.4); practice changes (§4.2). _Accept:_ snapshot tests for share output: first-try win, won on try 3, not cleared in 3, practice clear, mid-day, and swap marker; never any opponent species. Streak logic tests: a win on try 1–3 extends, the 3rd loss (forfeits included) resets, a win on try 4+ does not extend, a missed day resets, and an unfinished today doesn't break yesterday's streak.
 
 **M9 — Polish and calibration**
-Playtest, tune AI parameters and validation thresholds, accessibility pass, legal/disclaimer page. *Accept:* playtest notes incorporated; thresholds documented.
+Playtest, tune AI parameters and validation thresholds, accessibility pass, legal/disclaimer page. _Accept:_ playtest notes incorporated; thresholds documented.
 
 **M10 (later) — Puzzle mode**
 See §14.
@@ -433,13 +468,13 @@ See §14.
 
 ### Product decisions
 
-| # | Question | Status | Decision |
-|---|---|---|---|
-| D1 | Name and branding | Decided | **Daily Battle**, served from a subdomain of an existing domain (e.g. `battle.<yourdomain>`). Keep "Pokémon" out of the name and subdomain. The share header and credits page use the name. The format ("Gen 4 OU") is not part of the share text; it can appear elsewhere in the UI |
-| D2 | Target difficulty | Decided | About 50% first-attempt win rate for an average player; 2–3 attempts to clear. Validation bands in §9.3 |
-| D3 | Streak definition | Decided (revised in M8) | Consecutive days won within 3 tries; the 3rd loss or a missed day breaks it. A first-try win is the best result, marked with a ⭐ in the share and on the result card |
-| D4 | In-battle assistance | Decided | One "Beginner hints" toggle, on by default for new players, easy to turn off (§12.2c). Hints cover first-time explainers, type-effectiveness labels, speed range, and the team-builder checklist. With hints off, the battle mirrors classic Showdown. No damage ranges and no "usually runs" info |
-| D5 | Telemetry | Decided | None in v1 (static site). Calibrate difficulty with friends and manual feedback; consider an opt-in anonymous endpoint after launch |
+| #   | Question             | Status                  | Decision                                                                                                                                                                                                                                                                                           |
+| --- | -------------------- | ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| D1  | Name and branding    | Decided                 | **Daily Battle**, served from a subdomain of an existing domain (e.g. `battle.<yourdomain>`). Keep "Pokémon" out of the name and subdomain. The share header and credits page use the name. The format ("Gen 4 OU") is not part of the share text; it can appear elsewhere in the UI               |
+| D2  | Target difficulty    | Decided                 | About 50% first-attempt win rate for an average player; 2–3 attempts to clear. Validation bands in §9.3                                                                                                                                                                                            |
+| D3  | Streak definition    | Decided (revised in M8) | Consecutive days won within 3 tries; the 3rd loss or a missed day breaks it. A first-try win is the best result, marked with a ⭐ in the share and on the result card                                                                                                                              |
+| D4  | In-battle assistance | Decided                 | One "Beginner hints" toggle, on by default for new players, easy to turn off (§12.2c). Hints cover first-time explainers, type-effectiveness labels, speed range, and the team-builder checklist. With hints off, the battle mirrors classic Showdown. No damage ranges and no "usually runs" info |
+| D5  | Telemetry            | Decided                 | None in v1 (static site). Calibrate difficulty with friends and manual feedback; consider an opt-in anonymous endpoint after launch                                                                                                                                                                |
 
 ### Proposed defaults (change if you disagree)
 
@@ -458,7 +493,7 @@ See §14.
 Unofficial fan project, not affiliated with or endorsed by Nintendo, Creatures Inc., GAME FREAK inc., The Pokémon Company, or Smogon. Pokémon, Pokémon character names, and sprites are © Nintendo, Creatures Inc., and GAME FREAK inc.
 
 - Code: `@pkmn/*` packages and Pokémon Showdown code are MIT licensed. Keep license notices as required.
-- The Pokémon Showdown *client* (`smogon/pokemon-showdown-client`) is AGPL-3.0. Daily Battle uses none of its code: the battle layout, rendering, and animations are our own, and the battle text comes from `@pkmn/view`'s MIT-licensed `LogFormatter`. The battle backgrounds, hazard sprites, and weather overlays are from the client's `fx/` folder, which it dedicates to the public domain (CC0); they are self-hosted and credited.
+- The Pokémon Showdown _client_ (`smogon/pokemon-showdown-client`) is AGPL-3.0. Daily Battle uses none of its code: the battle layout, rendering, and animations are our own, and the battle text comes from `@pkmn/view`'s MIT-licensed `LogFormatter`. The battle backgrounds, hazard sprites, and weather overlays are from the client's `fx/` folder, which it dedicates to the public domain (CC0); they are self-hosted and credited.
 - Data: confirm redistribution terms for Smogon set and usage data; credit Smogon.
 - Sprites: see §12.3a. Credit Nintendo/Game Freak/Creatures and the Smogon sprite community on the credits page.
 - Keep the project free and non-commercial (no ads, paywalls, or merchandise). Revisit this section if that changes.

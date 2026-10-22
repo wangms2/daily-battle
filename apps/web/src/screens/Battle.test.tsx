@@ -455,8 +455,10 @@ describe('battle screen', () => {
   }
 
   it('ends on a result card with today’s tries, the streak, and Share', async () => {
+    // Even with a share sheet, the text goes straight to the clipboard.
     const share = vi.fn(async () => {});
-    vi.stubGlobal('navigator', { ...navigator, share });
+    const writeText = vi.fn(async () => {});
+    vi.stubGlobal('navigator', { ...navigator, share, clipboard: { writeText } });
     try {
       const { backend } = fakeBackend([TURN_1]);
       const props = renderBattle(backend, {
@@ -472,8 +474,9 @@ describe('battle screen', () => {
       expect(within(card).getByLabelText('Try 2: won, 3 of 6 left')).toBeInTheDocument();
       expect(card).toHaveTextContent('🔥 4-day streak');
       expect(props.onEnd).toHaveBeenCalledWith({ result: 'win', remaining: 3 });
-      await shareText(card, 'Share text');
-      expect(share).toHaveBeenCalledWith({ text: formatShareText(result.share) });
+      await shareText(card, 'Copy text');
+      expect(writeText).toHaveBeenCalledWith(formatShareText(result.share));
+      expect(share).not.toHaveBeenCalled();
       await userEvent.click(within(card).getByRole('button', { name: 'Play again' }));
       expect(props.onRunItBack).toHaveBeenCalled();
     } finally {
@@ -517,7 +520,7 @@ describe('battle screen', () => {
       expect(writeText).toHaveBeenCalledWith(
         formatShareText(dayResult([tried('loss', 1, 1)], 2).share),
       );
-      expect(await screen.findByRole('status')).toHaveTextContent('Copied to clipboard');
+      expect(await screen.findByRole('status')).toHaveTextContent('Text copied');
     } finally {
       vi.unstubAllGlobals();
     }

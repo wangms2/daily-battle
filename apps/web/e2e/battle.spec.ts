@@ -331,7 +331,7 @@ test('three lost tries break the streak, and the result copies to share', async 
   await noScroll(page, 'share choice');
   await page.screenshot({ path: `${dir}/30-share-choice.png` });
   await choice.getByRole('button', { name: 'Copy text' }).click();
-  await expect(page.getByRole('status')).toContainText('Copied');
+  await expect(page.getByRole('status')).toContainText('Text copied');
   const copied = await page.evaluate(() => (window as unknown as { copied: string }).copied);
   const lines = copied.split('\n');
   expect(lines.slice(0, 2)).toEqual(['Daily Battle · Oct 21', '❌ Not cleared in 3 tries']);

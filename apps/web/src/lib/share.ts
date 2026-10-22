@@ -147,6 +147,16 @@ export async function shareResult(text: string): Promise<ShareOutcome> {
   }
 }
 
+/** Copies to the clipboard, never the share sheet; 'manual' means show it to copy by hand. */
+export async function copyText(text: string): Promise<ShareOutcome> {
+  try {
+    await navigator.clipboard.writeText(text);
+    return 'copied';
+  } catch {
+    return 'manual';
+  }
+}
+
 export type ImageMode = 'share' | 'copy' | 'save';
 
 /** How this browser can pass on an image: the share sheet, the clipboard, or a download. */
