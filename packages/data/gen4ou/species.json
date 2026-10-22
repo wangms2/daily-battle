@@ -1474,6 +1474,22 @@
       "tier": "UU",
       "num": 34
     },
+    "Venusaur": {
+      "types": [
+        "Grass",
+        "Poison"
+      ],
+      "baseStats": {
+        "hp": 80,
+        "atk": 82,
+        "def": 83,
+        "spa": 100,
+        "spd": 100,
+        "spe": 80
+      },
+      "tier": "UU",
+      "num": 3
+    },
     "Exeggutor": {
       "types": [
         "Grass",

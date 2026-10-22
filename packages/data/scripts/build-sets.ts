@@ -1,9 +1,9 @@
 // Builds gen4ou/sets.json from the snapshots in sources/.
 //   pnpm --filter @daily-battle/data build-sets
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
-import { buildSets } from '../src/build';
+import { buildSets, type SetCuration } from '../src/build';
 import type { ChaosStats, CuratedSets, RoleOverrides, SourcesMeta } from '../src/types';
-import { OUTPUT, OVERRIDES, SOURCES } from './paths';
+import { CURATION, OUTPUT, OVERRIDES, SOURCES } from './paths';
 
 const readJson = <T>(path: string) => JSON.parse(readFileSync(path, 'utf8')) as T;
 
@@ -13,6 +13,7 @@ const { file, dropped } = buildSets({
   stats: readJson<ChaosStats>(SOURCES.stats),
   sources: readJson<SourcesMeta>(SOURCES.meta),
   overrides: existsSync(OVERRIDES) ? readJson<RoleOverrides>(OVERRIDES) : {},
+  curation: existsSync(CURATION) ? readJson<SetCuration>(CURATION) : {},
 });
 writeFileSync(OUTPUT, `${JSON.stringify(file, null, 2)}\n`);
 

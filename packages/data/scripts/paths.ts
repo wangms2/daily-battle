@@ -10,4 +10,5 @@ export const SOURCES = {
 };
 export const OUTPUT = root('gen4ou/sets.json');
 export const OVERRIDES = root('gen4ou/role-overrides.json');
+export const CURATION = root('gen4ou/set-curation.json');
 export const SPECIES = root('gen4ou/species.json');

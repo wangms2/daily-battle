@@ -48,6 +48,13 @@ describe('distinct sets', () => {
     );
   });
 
+  it('offers every species 2 to 4 sets', () => {
+    for (const [name, entry] of Object.entries(sets.species)) {
+      expect(entry.sets.length, name).toBeGreaterThanOrEqual(2);
+      expect(entry.sets.length, name).toBeLessThanOrEqual(4);
+    }
+  });
+
   it('ships no two sets of a species that do the same job', () => {
     for (const [name, entry] of Object.entries(sets.species)) {
       entry.sets.forEach((a, i) =>

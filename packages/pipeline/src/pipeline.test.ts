@@ -74,8 +74,10 @@ describe('opponent validation', () => {
       level: 100,
       gender: '',
     };
-    // Blissey's only attack, Seismic Toss, can't hit a Ghost.
-    expect(hardCounters([shedinja], poolSetsOf(['Blissey']), 0.3)).toEqual(['Shedinja']);
+    // A Blissey whose only attack, Seismic Toss, can't hit a Ghost.
+    const blissey = poolSetsOf(['Blissey']).filter((s) => s.moves.includes('Seismic Toss'));
+    expect(blissey.length).toBeGreaterThan(0);
+    expect(hardCounters([shedinja], blissey, 0.3)).toEqual(['Shedinja']);
     expect(hardCounters([shedinja], poolSetsOf(['Tyranitar']), 0.3)).toEqual([]);
   });
 });

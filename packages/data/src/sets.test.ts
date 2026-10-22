@@ -1,7 +1,14 @@
 import { readFileSync } from 'node:fs';
 import { TeamValidator } from '@pkmn/sim';
 import { describe, expect, it } from 'vitest';
-import { buildSets, FORMAT, SPECIES_COUNT, UU_MIN_USAGE, UU_TIERS } from './build';
+import {
+  buildSets,
+  FORMAT,
+  SPECIES_COUNT,
+  UU_MIN_USAGE,
+  UU_TIERS,
+  type SetCuration,
+} from './build';
 import { sets } from './index';
 import type { ChaosStats, CuratedSets, RoleOverrides, SourcesMeta } from './types';
 
@@ -68,6 +75,7 @@ describe('gen4ou/sets.json', () => {
         stats: readJson<ChaosStats>('../sources/gen4ou-stats.json'),
         sources: readJson<SourcesMeta>('../sources/sources.json'),
         overrides: readJson<RoleOverrides>('../gen4ou/role-overrides.json'),
+        curation: readJson<SetCuration>('../gen4ou/set-curation.json'),
       },
       { builtAt: sets.meta.builtAt },
     );

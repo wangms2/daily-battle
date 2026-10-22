@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { ResolvedSet } from './resolve';
 import { usageShares } from './resolve';
-import { MAX_SETS, scoreSet, selectAndWeight } from './weights';
+import { MAX_SETS, MIN_WEIGHT, scoreSet, selectAndWeight } from './weights';
 
 const usage = usageShares({
   'Raw count': 100,
@@ -46,11 +46,13 @@ describe('selectAndWeight', () => {
     expect(result.reduce((a, r) => a + r.weight, 0)).toBeCloseTo(1, 10);
   });
 
-  it('drops sets under the minimum weight but always keeps the top one', () => {
+  it('keeps rare sets, lifted to the minimum weight, with the top set first', () => {
     const result = selectAndWeight([
       { item: 'a', score: 100 },
       { item: 'b', score: 1 },
     ]);
-    expect(result).toEqual([{ item: 'a', weight: 1 }]);
+    expect(result.map((r) => r.item)).toEqual(['a', 'b']);
+    expect(result[1]!.weight).toBe(MIN_WEIGHT);
+    expect(result[0]!.weight).toBeCloseTo(1 - MIN_WEIGHT, 10);
   });
 });

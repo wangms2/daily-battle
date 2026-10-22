@@ -4,7 +4,7 @@
 import type { ScheduleFile } from '@daily-battle/gen/schedule';
 import clsx from 'clsx';
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
-import { CHECK_ITEMS, checklist, findSet, setsOf, topSet, type Slot } from '../lib/data';
+import { CHECK_ITEMS, checklist, findSet, topSet, type Slot } from '../lib/data';
 import { getSprite } from '../lib/sprites';
 import { ConfirmDialog, TeamCheckSheet } from '../sheets/misc';
 import { InfoSheet } from '../sheets/InfoSheet';
@@ -63,11 +63,9 @@ export function TeamBuilder({
       setTeam(team.filter((s) => s.species !== species));
     } else if (full) {
       setShake((n) => n + 1);
-    } else if (setsOf(species).length > 1) {
+    } else {
       // Prompt for the set, with the most used one ready to confirm.
       setPicker({ species, adding: true });
-    } else {
-      add(species, topSet(species).id);
     }
   };
 

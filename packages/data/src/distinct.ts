@@ -7,18 +7,19 @@ const STATS = ['hp', 'atk', 'def', 'spa', 'spd', 'spe'] as const;
 /** EV spreads closer than this (summed over stats) invest the same way. */
 export const SAME_SPREAD = 128;
 
-const SETUP = [
-  'Swords Dance',
-  'Dragon Dance',
-  'Nasty Plot',
-  'Calm Mind',
-  'Bulk Up',
-  'Agility',
-  'Rock Polish',
-  'Curse',
-  'Belly Drum',
-  'Tail Glow',
-];
+/** Setup moves by what they boost; two sets boosting the same way share a job. */
+const SETUP: Record<string, string> = {
+  'Swords Dance': 'physical',
+  'Dragon Dance': 'physical',
+  'Bulk Up': 'physical',
+  Curse: 'physical',
+  'Belly Drum': 'physical',
+  'Nasty Plot': 'special',
+  'Calm Mind': 'special',
+  'Tail Glow': 'special',
+  Agility: 'speed',
+  'Rock Polish': 'speed',
+};
 /** Moves that give a set its own job on a team. */
 const ROLE_MOVES = [
   'Stealth Rock',
@@ -44,11 +45,13 @@ function itemJob(item: string): string {
   return 'other';
 }
 
-/** What a set is for: whether it sets up, what its item does, and its role moves. */
+/** What a set is for: its setup move, else what its item does, and its role moves. */
 export function jobOf(set: Pick<ResolvedSet, 'moves' | 'item'>): string {
-  const setup = set.moves.some((m) => SETUP.includes(m)) ? 'setup' : '';
+  const setup = [...new Set(set.moves.map((m) => SETUP[m]).filter(Boolean))].sort().join('+');
   const roles = ROLE_MOVES.filter((m) => set.moves.includes(m)).join('+');
-  return `${setup}|${itemJob(set.item)}|${roles}`;
+  // A setup sweeper's item is flavour (Life Orb, Leftovers, a pinch berry): the
+  // setup move is its job. Without setup, the item says what the set is for.
+  return `${setup}|${setup ? '' : itemJob(set.item)}|${roles}`;
 }
 
 /** True if two sets of a species are the same set for a player's purposes. */

@@ -3,7 +3,7 @@
  * CONFIG, or a set data refresh. The version is part of every seed key, so
  * past days only change on purpose. The golden test fails until you do.
  */
-export const GENERATOR_VERSION = 3;
+export const GENERATOR_VERSION = 4;
 
 /** Tiers that count as OU for the pool's below-OU quota; everything else (UU, UUBL, NU, PU...) is below OU. */
 export const OU_TIERS = ['OU', '(OU)'];

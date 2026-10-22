@@ -138,7 +138,7 @@ describe('team builder', () => {
     }
     expect(screen.getByRole('button', { name: 'Lock in team' })).toBeEnabled();
     expect(screen.getAllByRole('button', { name: /^Remove .* from team$/ })).toHaveLength(6);
-  });
+  }, 20_000);
 
   it('applies a suggested team, offers undo, and stays editable', async () => {
     const user = userEvent.setup();

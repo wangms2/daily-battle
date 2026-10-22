@@ -34,6 +34,18 @@ export interface BuildInput {
   stats: ChaosStats;
   sources: SourcesMeta;
   overrides?: RoleOverrides;
+  /** Hand curation: sets added for variety, and curated sets left out. */
+  curation?: SetCuration;
+}
+
+/**
+ * `gen4ou/set-curation.json`. `add` sets are written like curated ones and
+ * compete on equal terms; `drop` names curated sets (by species and set name)
+ * that don't earn a place, such as a near-copy of a better set.
+ */
+export interface SetCuration {
+  add?: CuratedSets;
+  drop?: Record<string, string[]>;
 }
 
 export interface BuildReport {
@@ -97,11 +109,26 @@ export function buildSets(
   }
 
   for (const { name, setSource } of picks) {
-    const curated = (setSource === 'gen4ou' ? input.curated : input.curatedUU)[name]!;
     const usage = usageShares(input.stats.data[name]!);
+    const skip = new Set(input.curation?.drop?.[name] ?? []);
+    // Every set we know for the species: its own tier's analysis first, then
+    // the other tier's, then hand-added ones. Usage decides which make the cut.
+    const sources = (
+      setSource === 'gen4ou'
+        ? [input.curated[name], input.curatedUU[name]]
+        : [input.curatedUU[name], input.curated[name]]
+    ).concat(input.curation?.add?.[name]);
+    const ids = new Set<string>();
 
-    const candidates: { item: SetEntry; score: number; signature: string }[] = [];
-    for (const [setName, curatedSet] of Object.entries(curated)) {
+    const candidates: { item: SetEntry; score: number; signature: string; rank: number }[] = [];
+    const entries = sources.flatMap((src, rank) =>
+      Object.entries(src ?? {}).map(([setName, set]) => ({ setName, set, rank })),
+    );
+    for (const { setName, set: curatedSet, rank } of entries) {
+      if (skip.has(setName)) {
+        dropped.push({ species: name, set: setName, reason: 'dropped by curation' });
+        continue;
+      }
       const set = resolveSet(name, curatedSet, usage);
       if (!set) {
         dropped.push({ species: name, set: setName, reason: 'not enough distinct moves' });
@@ -127,10 +154,14 @@ export function buildSets(
         });
         continue;
       }
+      let id = `${toID(name)}-${slug(setName)}`;
+      for (let n = 2; ids.has(id); n++) id = `${toID(name)}-${slug(setName)}-${n}`;
+      ids.add(id);
       candidates.push({
         signature,
+        rank,
         item: {
-          id: `${toID(name)}-${slug(setName)}`,
+          id,
           sourceName: setName,
           label: '',
           description: '',
@@ -147,10 +178,17 @@ export function buildSets(
     }
     if (!candidates.length) continue;
 
-    // Sets that do the same job fold into the more used one, which keeps their usage.
+    // Sets that do the same job fold into one, which keeps their usage: the
+    // species' own analysis wins, then the more used. Extra sources only add
+    // variety, so they never replace a set (and published set ids stay put).
     const distinct: typeof candidates = [];
-    for (const c of [...candidates].sort((x, y) => y.score - x.score)) {
-      const same = distinct.find((d) => samePurpose(d.item, c.item));
+    for (const c of [...candidates].sort((x, y) => x.rank - y.rank || y.score - x.score)) {
+      // The same set name in two analyses is the same set, whatever the spread.
+      const same = distinct.find(
+        (d) =>
+          samePurpose(d.item, c.item) ||
+          (d.rank !== c.rank && d.item.sourceName === c.item.sourceName),
+      );
       if (same) {
         same.score += c.score;
         dropped.push({

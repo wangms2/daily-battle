@@ -1,5 +1,5 @@
 import { sets } from '@daily-battle/data';
-import { findSet, generatePool, rngFor } from '@daily-battle/gen';
+import { findSet, rngFor } from '@daily-battle/gen';
 import { describe, expect, it } from 'vitest';
 import { archetypeTeams, fitsArchetype, setRole } from './archetypes';
 
@@ -24,8 +24,21 @@ describe('set roles', () => {
 });
 
 describe('archetype teams', () => {
-  // A week whose pool can field all three (checked in the schedule build).
-  const pool = generatePool('2026-10-19', sets, 0).species;
+  // The week of 2026-10-19's published pool, which fields all three.
+  const pool = [
+    'Lucario',
+    'Roserade',
+    'Heatran',
+    'Celebi',
+    'Scizor',
+    'Jirachi',
+    'Hippowdon',
+    'Tyranitar',
+    'Suicune',
+    'Azelf',
+    'Clefable',
+    'Rhyperior',
+  ];
 
   it('builds each archetype to its rules', () => {
     for (const archetype of ['Offense', 'Balanced', 'Stall'] as const) {
