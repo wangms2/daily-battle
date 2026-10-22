@@ -22,7 +22,13 @@ export type Action =
   | { type: 'recordChoice'; day: string; choice: string }
   | { type: 'endAttempt'; day: string; result: 'win' | 'loss' | 'forfeit'; remaining: number }
   /** Unfinished attempts from past days, or from another engine version, become forfeits. */
-  | { type: 'expireAttempts'; today: string; engine: string };
+  | { type: 'expireAttempts'; today: string; engine: string }
+  /**
+   * The week's pool was regenerated and the locked team no longer fits it:
+   * unlock the week and drop today's unfinished battle and changes, which were
+   * for the old team. Finished tries stay.
+   */
+  | { type: 'resetWeek'; week: string; day: string };
 
 /** Today's attempt still being played, if any. */
 export function attemptInProgress(day: DayState | undefined): Attempt | undefined {
@@ -58,6 +64,20 @@ function updateLast(day: DayState, change: (a: Attempt) => Attempt): DayState {
 
 export function reducer(state: State, action: Action): State {
   switch (action.type) {
+    case 'resetWeek': {
+      const { [action.week]: _, ...weeks } = state.weeks;
+      const day = state.days[action.day];
+      const days = day
+        ? {
+            ...state.days,
+            [action.day]: {
+              swapUsed: false,
+              attempts: day.attempts.filter((a) => a.result !== 'inProgress'),
+            },
+          }
+        : state.days;
+      return { ...state, weeks, days };
+    }
     case 'lockTeam': {
       if (state.weeks[action.week]) return state; // locked for the week
       if (action.team.length !== 6) return state;

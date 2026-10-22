@@ -23,22 +23,28 @@ test('the game runs under the production CSP', async ({ page }) => {
       headers: { ...response.headers(), 'content-security-policy': CSP },
     });
   });
-  await page.addInitScript((team) => {
-    localStorage.setItem(
-      'daily-battle:state',
-      JSON.stringify({
-        version: 3,
-        weeks: { '2026-10-19': { team, poolId: '2026-10-19:c0' } },
-        days: {},
-        settings: {
-          beginnerHints: true,
-          battleSpeed: 'instant',
-          animations: true,
-          shownExplainers: ['welcome'],
-        },
-      }),
-    );
-  }, schedule.suggestedTeams[0]!.team);
+  await page.addInitScript(
+    ({ team, poolId }) => {
+      localStorage.setItem(
+        'daily-battle:state',
+        JSON.stringify({
+          version: 3,
+          weeks: { '2026-10-19': { team, poolId } },
+          days: {},
+          settings: {
+            beginnerHints: true,
+            battleSpeed: 'instant',
+            animations: true,
+            shownExplainers: ['welcome'],
+          },
+        }),
+      );
+    },
+    {
+      team: schedule.suggestedTeams[0]!.team,
+      poolId: `${schedule.week}:g${schedule.generatorVersion}:c${schedule.pool.candidate}`,
+    },
+  );
   await page.clock.setFixedTime(new Date('2026-10-21T10:00:00-04:00'));
   await page.goto('/');
   await page.getByRole('button', { name: /^Start · / }).click();

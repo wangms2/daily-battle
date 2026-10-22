@@ -41,7 +41,7 @@ function seeded({ hints = true, team }: { hints?: boolean; team?: { week: string
   if (team) {
     state.weeks[team.week] = {
       team: schedule.suggestedTeams[0]!.team,
-      poolId: `${team.week}:c0`,
+      poolId: `${team.week}:g${schedule.generatorVersion}:c${schedule.pool.candidate}`,
     };
   }
   return state;
@@ -99,6 +99,41 @@ describe('settings', () => {
 });
 
 describe('team builder', () => {
+  it('asks everyone to build again when the week was regenerated, keeping finished tries', async () => {
+    const state = seeded({ team: { week: WEEK } });
+    state.weeks[WEEK]!.poolId = `${WEEK}:c0`; // locked against an earlier version
+    const tried = (result: 'loss' | 'inProgress', ts: number) => ({
+      result,
+      remaining: 0,
+      ts,
+      lead: 'Heatran',
+      team: schedule.suggestedTeams[0]!.team,
+      battleSeed: '1',
+      aiSeed: '2',
+      choices: [],
+      engine: ENGINE_VERSION,
+    });
+    state.days['2026-10-21'] = {
+      swapUsed: false,
+      attempts: [tried('loss', 1), tried('inProgress', 2)],
+    };
+    const user = userEvent.setup();
+    renderApp(state);
+    expect(await screen.findByRole('status')).toHaveTextContent('Pick your team again');
+    expect(screen.getByRole('button', { name: /Pick 6 more/ })).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Dismiss' }));
+    expect(screen.queryByText(/Pick your team again/)).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: schedule.suggestedTeams[0]!.archetype }));
+    await user.click(screen.getByRole('button', { name: 'Lock in team' }));
+    const confirm = screen.queryByRole('dialog', { name: /Lock/ });
+    if (confirm) await user.click(within(confirm).getByRole('button', { name: /Lock/ }));
+    // The finished try still counts; the unfinished one (for the old team) is gone.
+    expect(await screen.findByRole('region', { name: 'Today’s result' })).toHaveTextContent(
+      '1 of 3 tries',
+    );
+  });
+
   it('prompts for a set with the most used one ready, and caps the team at 6', async () => {
     const user = userEvent.setup();
     renderApp(seeded());

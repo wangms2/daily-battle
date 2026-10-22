@@ -8,6 +8,7 @@ import { SettingsSheet, StatsSheet, WelcomeSheet } from './sheets/misc';
 import { reportText } from './lib/report';
 import { computeStats, dayHeadline, summarizeDay } from './lib/results';
 import { useSchedule } from './lib/schedule';
+import type { ScheduleFile } from '@daily-battle/gen/schedule';
 import { ENGINE_VERSION, randomSeed } from './lib/seed';
 import { shareModel } from './lib/share';
 import { attemptInProgress, dayDecided, withChange } from './state/reducer';
@@ -35,6 +36,11 @@ function useHashRoute(): [string, (r: string) => void] {
     return () => window.removeEventListener('hashchange', on);
   }, []);
   return [route, (r: string) => (window.location.hash = r)];
+}
+
+/** Identifies the version of a week's pool a team was locked against. */
+function poolIdOf(s: ScheduleFile): string {
+  return `${s.week}:g${s.generatorVersion}:c${s.pool.candidate}`;
 }
 
 export function App() {
@@ -71,6 +77,16 @@ export function App() {
   useEffect(() => {
     dispatch({ type: 'expireAttempts', today: day, engine: ENGINE_VERSION });
   }, [day, dispatch]);
+
+  // A team locked against an earlier version of the week (the schedule was
+  // regenerated): everyone builds this week's team again.
+  const [poolRefreshed, setPoolRefreshed] = useState(false);
+  const poolId = schedule.status === 'ready' ? poolIdOf(schedule.schedule) : null;
+  const staleTeam = !!poolId && !!weekState && weekState.poolId !== poolId;
+  if (staleTeam && !poolRefreshed) setPoolRefreshed(true);
+  useEffect(() => {
+    if (staleTeam) dispatch({ type: 'resetWeek', week, day });
+  }, [staleTeam, week, day, dispatch]);
 
   const inProgress = attemptInProgress(dayState);
   // After today's counted tries, runs are practice and may carry a one-off change.
@@ -135,9 +151,14 @@ export function App() {
         </div>
       </div>
     );
-  } else if (!weekState) {
+  } else if (!weekState || staleTeam) {
     screen = (
       <TeamBuilder
+        notice={
+          poolRefreshed
+            ? 'This week’s Pokémon and opponents were refreshed with new sets. Pick your team again.'
+            : undefined
+        }
         schedule={schedule.schedule}
         hints={settings.beginnerHints}
         topBar={renderTopBar(`Week of ${fmtDay(week, { month: 'short', day: 'numeric' })}`)()}
@@ -145,7 +166,7 @@ export function App() {
           dispatch({
             type: 'lockTeam',
             week,
-            poolId: `${week}:c${schedule.schedule.pool.candidate}`,
+            poolId: poolIdOf(schedule.schedule),
             team,
           });
           go('');

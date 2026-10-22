@@ -10,7 +10,7 @@ import { ConfirmDialog, TeamCheckSheet } from '../sheets/misc';
 import { InfoSheet } from '../sheets/InfoSheet';
 import { SetPicker } from '../sheets/SetPicker';
 import { Button, SectionLabel } from '../ui/bits';
-import { CheckIcon, ChevronIcon, PencilIcon } from '../ui/icons';
+import { CheckIcon, ChevronIcon, CloseIcon, PencilIcon } from '../ui/icons';
 import { PokemonTile, SlotBadge } from '../ui/PokemonTile';
 import { useWide } from '../ui/useWide';
 
@@ -26,13 +26,33 @@ export function TeamBuilder({
   hints,
   onLock,
   topBar,
+  notice,
 }: {
   schedule: ScheduleFile;
   hints: boolean;
   onLock: (team: Slot[]) => void;
   topBar: ReactNode;
+  /** A one-off message above the builder, e.g. that the week was refreshed. */
+  notice?: string;
 }) {
   const wide = useWide();
+  const [noticeShown, setNoticeShown] = useState(true);
+  const noticeBar = notice && noticeShown && (
+    <div
+      role="status"
+      className="flex shrink-0 items-start gap-2 rounded-chip bg-accent-soft px-3 py-2 text-[13px] leading-snug font-medium text-soft-ink"
+    >
+      <span className="flex-1">{notice}</span>
+      <button
+        type="button"
+        aria-label="Dismiss"
+        className="-m-1 grid size-7 shrink-0 place-items-center"
+        onClick={() => setNoticeShown(false)}
+      >
+        <CloseIcon width={14} height={14} />
+      </button>
+    </div>
+  );
   const [team, setTeam] = useState<Slot[]>([]);
   const [popped, setPopped] = useState<string | null>(null);
   const [shake, setShake] = useState(0);
@@ -207,6 +227,7 @@ export function TeamBuilder({
             {poolGrid}
           </section>
           <aside className="card flex min-h-0 flex-col gap-3 p-4">
+            {noticeBar}
             {suggestions}
             <SectionLabel
               right={<span className="text-[13px] font-semibold text-muted">{team.length}/6</span>}
@@ -251,6 +272,7 @@ export function TeamBuilder({
         </main>
       ) : (
         <main className="flex min-h-0 flex-1 flex-col gap-2 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+          {noticeBar}
           {suggestions}
           {poolGrid}
           {checklistRow}

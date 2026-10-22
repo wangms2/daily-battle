@@ -17,13 +17,13 @@ test.beforeEach(({}, info) => {
 
 async function seed(page: Page, { team = true, welcome = false } = {}) {
   await page.addInitScript(
-    ({ team, welcome, TEAM }) => {
+    ({ team, welcome, TEAM, poolId }) => {
       if (localStorage.getItem('daily-battle:state')) return;
       localStorage.setItem(
         'daily-battle:state',
         JSON.stringify({
           version: 3,
-          weeks: team ? { '2026-10-19': { team: TEAM, poolId: '2026-10-19:c0' } } : {},
+          weeks: team ? { '2026-10-19': { team: TEAM, poolId } } : {},
           days: {},
           settings: {
             beginnerHints: true,
@@ -34,7 +34,12 @@ async function seed(page: Page, { team = true, welcome = false } = {}) {
         }),
       );
     },
-    { team, welcome, TEAM },
+    {
+      team,
+      welcome,
+      TEAM,
+      poolId: `${schedule.week}:g${schedule.generatorVersion}:c${schedule.pool.candidate}`,
+    },
   );
   await page.clock.setFixedTime(new Date('2026-10-21T10:00:00-04:00'));
   await page.goto('/');

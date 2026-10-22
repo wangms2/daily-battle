@@ -85,6 +85,45 @@ export async function buildWeek(
   return { schedule, report };
 }
 
+/**
+ * Regenerates a published week's days from `fromDay` on, keeping its pool,
+ * suggested teams, and earlier days: for picking up a set data change in a
+ * week that's already being played (locked teams and played days stay valid).
+ */
+export async function rebuildDays(
+  schedule: ScheduleFile,
+  report: WeekReport,
+  fromDay: string,
+  sim: Simulator,
+  data: SetsFile = defaultSets,
+  log: (msg: string) => void = () => {},
+): Promise<{ schedule: ScheduleFile; report: WeekReport }> {
+  const { week } = schedule;
+  const species = schedule.pool.species;
+  const playerTeams = poolTeams(
+    species,
+    Math.ceil(PIPELINE.opponent.samples / 2),
+    rngFor(`pipeline:player-teams:${week}`),
+    data,
+  ).map((team) => teamSets(data, team));
+  const poolSets = poolSetsOf(species, data);
+
+  const days = [...schedule.days];
+  const reportDays = [...report.days];
+  for (const [i, day] of weekDays(week).entries()) {
+    if (day < fromDay) continue;
+    const result = await validateDay(day, playerTeams, poolSets, sim, data);
+    log(`  ${day} c${result.candidate} ${result.accepted} (rebuilt)`);
+    const { opponent, candidate, ...rest } = result;
+    days[i] = { day, style: opponent.style, team: opponent.team, candidate };
+    reportDays[i] = { ...rest, candidate, day, style: opponent.style };
+  }
+  return {
+    schedule: { ...schedule, dataBuiltAt: data.meta.builtAt, days },
+    report: { ...report, builtAt: new Date().toISOString(), days: reportDays },
+  };
+}
+
 export function reportMarkdown(r: WeekReport): string {
   const lines = [
     `# Week of ${r.week}`,

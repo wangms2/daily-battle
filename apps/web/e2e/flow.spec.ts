@@ -42,13 +42,16 @@ for (const scheme of ['light', 'dark'] as const) {
     // Builder: empty, then a suggested team, then info and set picker.
     await expect(page.getByRole('button', { name: /Pick 6 more/ })).toBeVisible();
     await shot(page, '02-builder-empty', project);
-    // Heatran (in this week's pool) has several sets, so adding it prompts for one.
-    await page.getByRole('button', { name: 'Add Heatran to team' }).click();
+    // Adding a Pokémon prompts for its set, with the most used one ready.
+    await page
+      .getByRole('button', { name: /^Add .* to team$/ })
+      .first()
+      .click();
     // A Pokémon with more than one set prompts for it, the most used one ready.
-    const prompt = page.getByRole('dialog', { name: 'Heatran · pick a set' });
+    const prompt = page.getByRole('dialog', { name: /pick a set/ });
     await expect(prompt.getByRole('tab', { selected: true })).toBeVisible();
     await shot(page, '03-add-prompt', project);
-    await prompt.getByRole('button', { name: 'Add Heatran' }).click();
+    await prompt.getByRole('button', { name: /^Add / }).click();
     await shot(page, '03-builder-one', project);
     await page
       .getByRole('button', { name: /^Remove .* from team$/ })

@@ -143,6 +143,7 @@ Weighted random draw by usage, with:
 - Prefer **pre-generating a published schedule** over generating at runtime: a build-time script emits `schedule/2026-W44.json` etc. containing the weekly pool and the 7 daily opponents. The client reads the file for the current date.
 - Benefits: one source of truth, validated content only, easy to roll back, no cross-browser divergence.
 - Pre-generate several weeks ahead. Fall back to runtime generation with the same seed only if a schedule file is missing (log it).
+- **Regenerating a published week** (e.g. after a set data change) is allowed but deliberate: `schedule --force` rebuilds whole weeks, and `schedule --from-day <date>` rebuilds only a week's later days, keeping its pool, suggestions, and earlier days. A locked team records the pool it was built against as `<week>:g<generatorVersion>:c<candidate>`; when the current schedule's id differs, the app unlocks the week, drops today's unfinished battle and change, keeps finished tries, and reopens the team builder with a note that the week was refreshed.
 
 ## 7. Battle engine
 
