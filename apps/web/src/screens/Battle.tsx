@@ -241,9 +241,11 @@ export function Battle({
     [backend, play],
   );
 
-  // A request with a single legal choice is sent for you after a short beat.
+  // A request with a single legal choice is sent for you after a short beat
+  // (a recharge turn, a locked move), except sending in your last Pokémon:
+  // you do that yourself, so it never appears out of nowhere.
   useEffect(() => {
-    if (playing || !controls?.only) return;
+    if (playing || !controls?.only || controls.only.startsWith('switch')) return;
     const id = setTimeout(
       () => choose(controls.only!),
       settings.battleSpeed === 'instant' ? 0 : 500,

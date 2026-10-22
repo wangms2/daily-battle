@@ -79,7 +79,7 @@ async function waitForChoice(page: Page): Promise<State> {
       if (document.querySelector(moves!)) return 'moves';
       if (
         document.querySelector(switches!) &&
-        document.body.textContent?.includes('Who comes in?')
+        /Who comes in\?|Send in your last Pokémon/.test(document.body.textContent ?? '')
       ) {
         return 'switch';
       }
@@ -178,7 +178,7 @@ test('a run after the day is won is practice, and shares as practice', async ({ 
     .click();
   const copied = await page.evaluate(() => (window as unknown as { copied: string }).copied);
   expect(copied).toContain('⭐ First try! 4/6 left');
-  expect(copied).toMatch(/🔁 Practice ❌ /);
+  expect(copied).toMatch(/🔁 (?:🟩|⬛|⬜){6} practice/u);
 });
 
 test('resumes a battle after a reload', async ({ page }) => {

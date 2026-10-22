@@ -139,6 +139,7 @@ function BenchButton({
   shown = false,
   big = false,
   off = false,
+  direct = false,
 }: {
   member: TeamMember;
   choice?: string;
@@ -151,6 +152,8 @@ function BenchButton({
   big?: boolean;
   /** The whole panel is disabled (a turn is playing). */
   off?: boolean;
+  /** A touch acts too, without the details card first (the only Pokémon left to send in). */
+  direct?: boolean;
 }) {
   const disabled = !choice || off;
   const press = usePressInfo(
@@ -159,7 +162,7 @@ function BenchButton({
     // A mouse click (which already saw the details on hover) or the keyboard
     // switches; a touch opens the details first, and their button switches.
     (type) => {
-      if (type === 'mouse' || type === '') {
+      if (type === 'mouse' || type === '' || direct) {
         if (!disabled && choice) onChoose(choice);
       } else onPin(shown ? null : member);
     },
@@ -314,10 +317,13 @@ export function ControlPanel({
   );
 
   if (controls?.kind === 'switch') {
+    const last = controls.switches.length === 1;
     return (
       <div ref={panel} className="relative flex shrink-0 flex-col gap-2">
         {tooltip}
-        <p className="display text-[14px]">Who comes in?</p>
+        <p className="display text-[14px]">
+          {last ? 'Send in your last Pokémon' : 'Who comes in?'}
+        </p>
         <div className={clsx('grid grid-cols-3 gap-2', disabled && 'opacity-50')}>
           {bench.map((m) => (
             <BenchButton
@@ -329,6 +335,7 @@ export function ControlPanel({
               onPin={setPinned}
               shown={pinnedSlot === m.slot}
               off={disabled}
+              direct={last}
               big
             />
           ))}

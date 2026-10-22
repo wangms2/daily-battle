@@ -25,7 +25,7 @@ async function tabTo(page: Page, matches: (el: Element) => boolean, max = 80): P
 const isMove = (el: Element) =>
   el.matches('main button[aria-label*=" PP"]:enabled') ||
   (el.matches('main button[aria-label^="Switch to"]:not([aria-disabled="true"])') &&
-    !!document.body.textContent?.includes('Who comes in?'));
+    !!/Who comes in\?|Send in your last Pokémon/.test(document.body.textContent ?? ''));
 
 test('plays a whole battle with only the keyboard', async ({ page }) => {
   await page.addInitScript(

@@ -105,16 +105,15 @@ export function shareText(args: ShareArgs): string {
 
 export function formatShareText(m: ShareModel): string {
   const lines = [`Daily Battle · ${m.date}`];
-  if (m.status === 'firstTry') {
-    lines.push(`⭐ ${m.headline}`, squares(m.rows[0]!));
-  } else {
-    const icon = m.cleared ? '✅ ' : m.status === 'failed' ? '❌ ' : '';
-    lines.push(`${icon}${m.headline}`);
-    for (const r of m.rows) lines.push(`${mark(r)} ${squares(r)}`);
-  }
+  const icon =
+    m.status === 'firstTry' ? '⭐ ' : m.cleared ? '✅ ' : m.status === 'failed' ? '❌ ' : '';
+  lines.push(`${icon}${m.headline}`);
+  // One row per try, each led by one emoji so the squares line up; a practice
+  // run is 🔁 with a short tag after its squares.
+  for (const r of m.rows) lines.push(`${mark(r)} ${squares(r)}`);
   if (m.practice) {
-    const note = m.practice.with ? ` · with ${m.practice.with}` : '';
-    lines.push(`🔁 Practice ${mark(m.practice)} ${squares(m.practice)}${note}`);
+    const tag = m.practice.with ? `practice, with ${m.practice.with}` : 'practice';
+    lines.push(`🔁 ${squares(m.practice)} ${tag}`);
   }
   if (m.team.length) {
     lines.push(m.team.map((s) => (s.swapped ? `${s.species}*` : s.species)).join(', '));
@@ -172,19 +171,15 @@ export function imageMode(): ImageMode {
 
 export type ImageOutcome = 'shared' | 'copied' | 'saved' | 'failed';
 
-/**
- * Passes on the share image the best way this browser can. On the share sheet
- * the link goes along as text, since a picture alone can't be tapped through.
- */
-export async function shareImage(
-  blob: Blob,
-  { name, url }: { name: string; url?: string },
-): Promise<ImageOutcome> {
+/** Passes on the share image the best way this browser can. */
+export async function shareImage(blob: Blob, { name }: { name: string }): Promise<ImageOutcome> {
   const mode = imageMode();
   if (mode === 'share') {
     try {
       const file = new File([blob], name, { type: 'image/png' });
-      await navigator.share({ files: [file], ...(url && { text: url }) });
+      // The image alone: with text alongside, iOS's Copy and some apps keep only
+      // the text. The card already shows where to play.
+      await navigator.share({ files: [file] });
       return 'shared';
     } catch (e) {
       if (e instanceof DOMException && e.name === 'AbortError') return 'shared';

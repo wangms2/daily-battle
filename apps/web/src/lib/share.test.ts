@@ -2,7 +2,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import schedule from '../../public/schedule/2026-10-19.json';
 import type { Attempt, DayChange, DayState, Slot } from '../state/schema';
 import { summarizeDay } from './results';
-import { imageMode, shareResult, shareText } from './share';
+import headers from '../../public/_headers?raw';
+import { imageMode, shareImage, shareResult, shareText } from './share';
 
 const DAY = '2026-10-21';
 const TEAM: Slot[] = ['Hippowdon', 'Azelf', 'Celebi', 'Heatran', 'Jirachi', 'Lucario'].map(
@@ -46,7 +47,7 @@ describe('share text', () => {
       [
         'Daily Battle · Oct 21',
         '⭐ First try! 4/6 left',
-        '🟩🟩🟩🟩⬛⬛',
+        '✅ 🟩🟩🟩🟩⬛⬛',
         'Hippowdon, Azelf, Celebi, Heatran, Jirachi, Lucario',
         '🔥 5-day streak',
       ].join('\n'),
@@ -112,16 +113,16 @@ describe('share text', () => {
       [
         'Daily Battle · Oct 21',
         '⭐ First try! 4/6 left',
-        '🟩🟩🟩🟩⬛⬛',
-        '🔁 Practice ✅ 🟩🟩🟩🟩🟩🟩 · with Heatran',
+        '✅ 🟩🟩🟩🟩⬛⬛',
+        '🔁 🟩🟩🟩🟩🟩🟩 practice, with Heatran',
         'Hippowdon, Azelf, Celebi, Heatran, Jirachi, Lucario',
         '🔥 5-day streak',
       ].join('\n'),
     );
     // A try that counted, or the day's late win, isn't repeated as practice.
-    expect(text(tries, 5, { run: tries[0] })).not.toContain('Practice');
+    expect(text(tries, 5, { run: tries[0] })).not.toContain('practice');
     const late = [a('loss', 0), a('loss', 0), a('loss', 0), a('win', 2)];
-    expect(text(late, 0, { run: late[3] })).not.toContain('Practice');
+    expect(text(late, 0, { run: late[3] })).not.toContain('practice');
   });
 
   it('ends with the link to play', () => {
@@ -189,5 +190,23 @@ describe('imageMode', () => {
     vi.stubGlobal('ClipboardItem', undefined);
     vi.stubGlobal('navigator', {});
     expect(imageMode()).toBe('save');
+  });
+});
+
+describe('shareImage', () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it('shares the image alone, so Copy in the share sheet copies the picture', async () => {
+    const share = vi.fn(async (_data: ShareData) => {});
+    vi.stubGlobal('navigator', { share, canShare: () => true });
+    const blob = new Blob([new Uint8Array(4)], { type: 'image/png' });
+    expect(await shareImage(blob, { name: 'card.png' })).toBe('shared');
+    const data = share.mock.calls[0]![0];
+    expect(Object.keys(data)).toEqual(['files']);
+    expect(data.files![0]!.name).toBe('card.png');
+  });
+
+  it('is allowed to show its preview (a blob: image) by the deployed CSP', () => {
+    expect(headers).toMatch(/img-src [^;]* blob:/);
   });
 });

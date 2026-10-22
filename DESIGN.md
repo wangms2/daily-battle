@@ -267,7 +267,7 @@ First-try win:
 ```
 Daily Battle · Oct 21
 ⭐ First try! 4/6 left
-🟩🟩🟩🟩⬛⬛
+✅ 🟩🟩🟩🟩⬛⬛
 Hippowdon, Azelf, Celebi, Heatran*, Jirachi, Lucario
 🔥 5-day streak
 ```
@@ -286,11 +286,11 @@ Hippowdon, Azelf, Celebi, Heatran*, Jirachi, Lucario
 Other headlines: `❌ Not cleared in 3 tries` (with `🔥 Streak reset`), `✅ Won on try 5` for a practice clear (rows still show the first 3 tries, with `🔥 Streak reset`), and `Not cleared yet · 1 of 3 tries` mid-day.
 
 - The last line is the link to play (the site's own address), so friends can tap through.
-- Each row shows that try's result and your Pokémon left out of 6 (green = alive; grey ⬜ = still standing on a try that was given up). At most 7 lines.
+- Each row shows that try's result and your Pokémon left out of 6 (green = alive; grey ⬜ = still standing on a try that was given up), led by one emoji (✅/❌, a first try too) so the squares line up. A practice run shared from its end card adds `🔁 🟩🟩🟩⬛⬛⬛ practice` (`practice, with Gengar` if it swapped one in). At most 7 lines plus the link.
 - Team: species only, lead first, from the deciding try (the win, or the latest try that counted); `*` marks a species swapped in that day.
 - **Share opens a choice: image or text.** Both say the same thing, built from one model (`lib/share.ts`).
   - **Text:** plain text that pastes anywhere: Web Share API where available, else the clipboard, else it's shown to copy.
-  - **Image:** a 1200×630 card in the app's light theme (`lib/shareCard.ts`), drawn on a canvas in the browser: the date, the headline (gold "⭐ First try" badge), the try rows as squares, a practice row when sharing one, the team as sprites with names (`*` and gold for the day's swap), the streak, and the site address. The sheet previews it; it goes to the share sheet with the link as text where files can be shared (phones), else the clipboard, else a download.
+  - **Image:** a 1200×630 card in the app's light theme (`lib/shareCard.ts`), drawn on a canvas in the browser: the date, the headline (gold "⭐ First try" badge), the try rows as squares, a practice row when sharing one, the team as sprites with names (`*` and gold for the day's swap), the streak, and the site address. The sheet previews it; it goes to the share sheet as the image alone where files can be shared (phones; with text alongside, iOS's Copy and some apps keep only the text, and the card shows the address anyway), else the clipboard, else a download. The preview is a `blob:` image, which the CSP allows (`img-src 'self' data: blob:`).
 - Never include opponent species, sets, or turn counts.
 
 ## 12. UI and tech
@@ -338,7 +338,7 @@ Mirror Pokémon Showdown's battle layout and flow, simplified where it makes sen
 - **Pacing (quick, like Showdown):**
   - Speeds are Slow / Normal / Fast (about 1150 / 800 / 450 ms per line), Normal by default, always reachable from the top bar. (An instant mode exists for automated tests only.)
   - Tap anywhere to skip the rest of the current turn's animation and text.
-  - Forced actions with a single legal choice are submitted automatically (for example, switching in the last Pokémon).
+  - Forced actions with a single legal choice are submitted automatically (a recharge turn, a locked move), except sending in your last Pokémon: the prompt says "Send in your last Pokémon" and one tap sends it, so it never appears unannounced.
   - The next turn's choices appear as soon as the previous turn ends; no extra confirmation steps.
 
 ### 12.2c Beginner hints

@@ -117,7 +117,7 @@ export interface Controls {
   moves: MoveOption[];
   /** Legal switch choices (`switch N`), by team slot. */
   switches: { choice: string; slot: number }[];
-  /** The only legal choice, if there is exactly one: submitted automatically. */
+  /** The only legal choice, if there is exactly one: submitted automatically unless it's a switch. */
   only: string | null;
 }
 

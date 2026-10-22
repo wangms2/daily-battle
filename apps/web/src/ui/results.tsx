@@ -250,7 +250,6 @@ export function ShareButton({
                 finish(
                   await shareImage(ready.blob, {
                     name: `daily-battle-${share.date.replace(/\s+/g, '-').toLowerCase()}.png`,
-                    url: share.url,
                   }),
                 )
               }

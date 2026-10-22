@@ -252,6 +252,24 @@ describe('battle screen', () => {
     expect(calls).toEqual(['move 1', 'switch 3']);
   });
 
+  it('waits for you to send in your last Pokémon, then takes one tap', async () => {
+    const last = { choice: 'switch 3', slot: 3 };
+    const forced = pkg({
+      controls: { kind: 'switch', moves: [], switches: [last], only: last.choice },
+    });
+    const { backend, calls } = fakeBackend([forced]);
+    renderBattle(backend);
+    await userEvent.click(await thunderbolt());
+    expect(await screen.findByText('Send in your last Pokémon')).toBeInTheDocument();
+    await new Promise((r) => setTimeout(r, 700));
+    expect(calls).toEqual(['move 1']);
+    const celebi = screen.getAllByRole('button', { name: /^Switch to Celebi/ }).at(-1)!;
+    fireEvent.pointerDown(celebi, { pointerType: 'touch' });
+    fireEvent.pointerUp(celebi, { pointerType: 'touch' });
+    fireEvent.click(celebi);
+    expect(calls).toEqual(['move 1', 'switch 3']);
+  });
+
   it('shows move details on a long press without choosing the move', async () => {
     const { backend, calls } = fakeBackend([]);
     renderBattle(backend);
