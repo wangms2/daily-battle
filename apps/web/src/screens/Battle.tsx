@@ -1,5 +1,5 @@
-// The battle screen (DESIGN.md §12.2b): field, ticker, and controls on one
-// screen; turns play back line by line at the chosen speed, tap to skip.
+// The battle screen (DESIGN.md §12.2b): field, this-turn log, and controls on
+// one screen; turns play back line by line at the chosen speed, tap to skip.
 import clsx from 'clsx';
 import {
   useCallback,
@@ -21,13 +21,13 @@ import type {
   Who,
 } from '../battle/frames';
 import { ControlPanel } from '../battle/ui/Controls';
-import { Field, type Anim } from '../battle/ui/Field';
-import { GiveUpDialog, LogList, LogSheet, MenuSheet, MonSheet } from '../battle/ui/sheets';
+import { Field, type Anim, type Float } from '../battle/ui/Field';
 import { EXPLAINERS, textLines } from '../battle/ui/labels';
-import { BattleText } from '../battle/ui/text';
+import { MonPopover } from '../battle/ui/MonPopover';
+import { GiveUpDialog, LogList, LogSheet, MenuSheet } from '../battle/ui/sheets';
 import type { Settings } from '../state/schema';
 import { Button } from '../ui/bits';
-import { CloseIcon, InfoIcon } from '../ui/icons';
+import { CloseIcon, ExpandIcon, InfoIcon } from '../ui/icons';
 import { useWide } from '../ui/useWide';
 
 const DELAY: Record<Settings['battleSpeed'], number> = { normal: 850, fast: 320, instant: 0 };
@@ -49,8 +49,11 @@ export function Battle({
   onExit,
   onRunItBack,
   topBarRight,
+  background,
 }: {
   start: EngineStart;
+  /** The day's battle background image URL. */
+  background: string;
   /** 1 for the day's first (scored) try. */
   tryNumber: number;
   settings: Settings;
@@ -88,6 +91,7 @@ export function Battle({
   const [menuOpen, setMenuOpen] = useState(false);
   const [giveUpOpen, setGiveUpOpen] = useState(false);
   const [monFor, setMonFor] = useState<Who | null>(null);
+  const [floats, setFloats] = useState<Float[]>([]);
 
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pending = useRef<{ frames: Frame[]; index: number; pkg: TurnPackage } | null>(null);
@@ -96,10 +100,12 @@ export function Battle({
   // Latest props, read from callbacks so they never need to re-create (which
   // would restart the battle effect below).
   const settingsRef = useRef(settings);
+  const animateRef = useRef(animate);
   const onEndRef = useRef(onEnd);
   const onChoiceRef = useRef(onChoice);
   useLayoutEffect(() => {
     settingsRef.current = settings;
+    animateRef.current = animate;
     onEndRef.current = onEnd;
     onChoiceRef.current = onChoice;
   });
@@ -111,7 +117,16 @@ export function Battle({
     if (lines.length) setLog((l) => [...l, ...lines]);
     if (withAnim && f.event)
       setAnim({ kind: f.event.kind, who: f.event.who, key: ++animKey.current });
+    if (withAnim && animateRef.current && (f.label || f.popup)) {
+      const float = { id: ++animKey.current, label: f.label, popup: f.popup };
+      // A few at a time is plenty; drop the oldest if animations stall.
+      setFloats((fs) => [...fs.slice(-5), float]);
+    }
   }, []);
+  const floatDone = useCallback(
+    (id: number) => setFloats((fs) => fs.filter((f) => f.id !== id)),
+    [],
+  );
 
   const finish = useCallback((pkg: TurnPackage) => {
     pending.current = null;
@@ -141,6 +156,7 @@ export function Battle({
     const p = pending.current;
     if (!p) return;
     if (timer.current) clearTimeout(timer.current);
+    setFloats([]); // labels from a skipped turn shouldn't linger
     for (let i = p.index; i < p.frames.length; i++) applyFrame(p.frames[i]!, false);
     finish(p.pkg);
   }, [applyFrame, finish]);
@@ -239,31 +255,72 @@ export function Battle({
   const cycleSpeed = () =>
     onSetting('battleSpeed', SPEEDS[(SPEEDS.indexOf(settings.battleSpeed) + 1) % SPEEDS.length]!);
 
-  // The top bar shows the turn, so the ticker skips turn banners.
-  const tickerLines = log.filter((l) => !l.startsWith('== Turn')).slice(-2);
   const showExplainer = explainer && settings.beginnerHints && !end;
   const active = team.find((m) => m.active);
 
-  const ticker = (
-    <button
-      type="button"
-      onClick={() => (playing ? skip() : setLogOpen(true))}
-      className="card flex h-12 shrink-0 flex-col justify-center px-3 text-left text-[13px] leading-snug"
-      aria-label={playing ? 'Skip to the end of the turn' : 'Open the battle log'}
-    >
-      {tickerLines.length ? (
-        tickerLines.map((l, i) => (
-          <span
-            key={`${log.length}-${i}`}
-            className={clsx('truncate', i === 0 && tickerLines.length > 1 && 'text-muted')}
-          >
-            <BattleText text={l} />
-          </span>
-        ))
-      ) : (
-        <span className="text-muted">The battle is starting…</span>
+  // The log, newest at the bottom: a few lines on phones (the current turn), a
+  // full-height panel on wide screens. During playback a tap skips.
+  const turnLog = (
+    <div
+      role="log"
+      aria-label="Battle log"
+      onClick={() => (playing ? skip() : !wide && setLogOpen(true))}
+      className={clsx(
+        'card relative flex min-h-0 flex-col',
+        wide ? 'p-4' : 'min-h-[5.75rem] flex-1 basis-0 py-1.5 pr-9 pl-3',
       )}
-    </button>
+    >
+      {wide && (
+        <p className="display mb-2 text-[12px] tracking-wider text-muted uppercase">Battle log</p>
+      )}
+      {log.length ? (
+        <LogList lines={log} className="min-h-0 flex-1 text-[13px] leading-[1.45]" />
+      ) : (
+        <span className="text-[13px] text-muted">The battle is starting…</span>
+      )}
+      {!wide && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            setLogOpen(true);
+          }}
+          className="absolute top-1 right-1 grid size-8 place-items-center rounded-full text-muted hover:bg-surface-2"
+          aria-label="Open the battle log"
+        >
+          <ExpandIcon width={16} height={16} />
+        </button>
+      )}
+    </div>
+  );
+
+  const popover =
+    monFor === 'foe' && view?.foe ? (
+      <MonPopover
+        foe
+        mon={view.foe}
+        revealed={view.revealed[view.foe.species]}
+        hints={settings.beginnerHints}
+      />
+    ) : monFor === 'you' && active ? (
+      <MonPopover foe={false} member={active} mon={view?.you} />
+    ) : null;
+
+  const field = (
+    <Field
+      // Phones keep the scene's own shape so it never zooms in; the log gets the spare height.
+      className={wide ? 'flex-1' : 'aspect-[440/295] w-full shrink'}
+      view={view}
+      anim={anim}
+      animate={animate}
+      background={background}
+      floats={floats}
+      onFloatDone={floatDone}
+      onTap={skip}
+      info={monFor}
+      onInfo={setMonFor}
+      popover={popover}
+    />
   );
 
   const explainerNote = showExplainer && (
@@ -387,38 +444,24 @@ export function Battle({
       {wide ? (
         <main className="relative grid min-h-0 flex-1 grid-cols-[1fr_360px] gap-4 px-6 pb-6">
           <section className="flex min-h-0 flex-col gap-2">
-            <Field view={view} anim={anim} animate={animate} onTap={skip} onInfo={setMonFor} />
+            {field}
             {explainerNote}
             {panel}
           </section>
-          <aside className="card flex min-h-0 flex-col p-4" onClick={skip} role="presentation">
-            <p className="display mb-2 text-[12px] tracking-wider text-muted uppercase">
-              Battle log
-            </p>
-            <LogList lines={log} className="min-h-0 flex-1" />
-          </aside>
+          {turnLog}
           {endCard}
         </main>
       ) : (
         <main className="relative flex min-h-0 flex-1 flex-col gap-2 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
-          <Field view={view} anim={anim} animate={animate} onTap={skip} onInfo={setMonFor} />
+          {field}
           {explainerNote}
-          {ticker}
+          {turnLog}
           {panel}
           {endCard}
         </main>
       )}
 
       <LogSheet open={logOpen} onOpenChange={setLogOpen} lines={log} />
-      <MonSheet
-        open={!!monFor}
-        onOpenChange={(o) => !o && setMonFor(null)}
-        foe={monFor === 'foe'}
-        mon={monFor === 'foe' ? (view?.foe ?? null) : (view?.you ?? null)}
-        revealed={view?.foe ? view.revealed[view.foe.species] : undefined}
-        member={monFor === 'you' ? active : undefined}
-        hints={settings.beginnerHints}
-      />
       <MenuSheet
         open={menuOpen}
         onOpenChange={setMenuOpen}

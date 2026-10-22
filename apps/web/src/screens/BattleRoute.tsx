@@ -1,5 +1,6 @@
 // Connects the battle screen to today's attempt: builds the engine input from
 // the saved attempt (seeds, team, recorded choices) and records progress.
+import { backgroundFor } from '../lib/fx';
 import type { ScheduleFile } from '@daily-battle/gen/schedule';
 import { useState } from 'react';
 import type { EngineStart } from '../battle/frames';
@@ -42,6 +43,7 @@ export function BattleRoute({
   return (
     <Battle
       start={start}
+      background={backgroundFor(day)}
       tryNumber={tryNumber}
       settings={settings}
       onSetting={(key, value) => dispatch({ type: 'setSetting', key, value })}

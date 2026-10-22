@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "sprites": "tsx scripts/sprites.ts",
+    "fx": "tsx scripts/fx.ts",
     "e2e": "playwright test"
   },
   "dependencies": {

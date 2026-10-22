@@ -39,7 +39,16 @@ const view = (turn: number, foeHp = 100): View => ({
   yourSide: side,
   foeSide: side,
   weather: '',
-  revealed: { Gyarados: { moves: [], item: '', ability: '' } },
+  revealed: { Gyarados: { moves: ['Waterfall'], item: '', ability: 'Intimidate' } },
+  yourTeam: ['Heatran', 'Scizor', 'Celebi', 'Azelf', 'Jirachi', 'Lucario'].map((species, i) => ({
+    species,
+    fainted: i === 5,
+    status: '',
+  })),
+  foeTeam: [
+    { species: 'Gyarados', fainted: false, status: '' },
+    ...Array.from({ length: 5 }, () => ({ fainted: false, status: '' })),
+  ],
 });
 const frame = (text: string, v: View, kind?: NonNullable<Frame['event']>['kind']): Frame => ({
   text,
@@ -157,7 +166,13 @@ function renderBattle(
   };
   render(
     <BattleBackendContext.Provider value={() => backend}>
-      <Battle start={START} tryNumber={tryNumber} settings={settings} {...props} />
+      <Battle
+        start={START}
+        background="/fx/bg-gen4.png"
+        tryNumber={tryNumber}
+        settings={settings}
+        {...props}
+      />
     </BattleBackendContext.Provider>,
   );
   return props;
@@ -169,27 +184,26 @@ describe('battle screen', () => {
   it('keeps the controls off while a turn plays, and a tap skips to the end', async () => {
     const { backend } = fakeBackend([]);
     renderBattle(backend, { speed: 'normal' });
-    expect(
-      await screen.findByRole('button', { name: 'Skip to the end of the turn' }),
-    ).toBeInTheDocument();
+    await screen.findByText('Heatran', { selector: 'strong' });
     expect(screen.queryByRole('button', { name: /^Thunderbolt, / })).not.toBeInTheDocument();
-    await userEvent.click(screen.getByRole('button', { name: 'Skip to the end of the turn' }));
+    await userEvent.click(screen.getByRole('log', { name: 'Battle log' }));
     expect(await thunderbolt()).toBeEnabled();
-    expect(screen.getByRole('button', { name: /^Switch to Scizor/ })).toBeEnabled();
-    expect(screen.getByText('Turn 1')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Open the battle log' })).toHaveTextContent(
-      'Gyarados appeared!',
+    expect(screen.getByRole('button', { name: /^Switch to Scizor/ })).toHaveAttribute(
+      'aria-disabled',
+      'false',
     );
+    expect(within(screen.getByRole('banner')).getByText('Turn 1')).toBeInTheDocument();
+    expect(screen.getByRole('log', { name: 'Battle log' })).toHaveTextContent('Gyarados appeared!');
   });
 
   it('sends a chosen move, saves it, and plays the answer', async () => {
     const { backend, calls } = fakeBackend([TURN_1]);
     const props = renderBattle(backend);
     await userEvent.click(await thunderbolt());
-    await screen.findByText('Turn 2');
+    await within(screen.getByRole('banner')).findByText('Turn 2');
     expect(calls).toEqual(['move 1']);
     expect(props.onChoice).toHaveBeenCalledWith('move 1');
-    expect(screen.getByRole('button', { name: 'Open the battle log' })).toHaveTextContent(
+    expect(screen.getByRole('log', { name: 'Battle log' })).toHaveTextContent(
       'It’s super effective!',
     );
   });
@@ -245,6 +259,64 @@ describe('battle screen', () => {
     expect(screen.queryByText(/Super effective/)).not.toBeInTheDocument();
   });
 
+  it('asks what your Pokémon will do, with its HP', async () => {
+    const { backend } = fakeBackend([]);
+    renderBattle(backend);
+    await thunderbolt();
+    expect(screen.getByText(/What will/)).toHaveTextContent('What will Heatran do?');
+    expect(screen.getByText('HP 300/300')).toBeInTheDocument();
+  });
+
+  it('shows how many Pokémon each side has left', async () => {
+    const { backend } = fakeBackend([]);
+    renderBattle(backend);
+    await thunderbolt();
+    expect(
+      screen.getByRole('button', { name: /^Foe Gyarados, 100% HP, 6 of 6 left/ }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /^Your Heatran, 100% HP, 5 of 6 left/ }),
+    ).toBeInTheDocument();
+  });
+
+  it('opens a compact details card from a stat bar, and closes it on a tap elsewhere', async () => {
+    const { backend } = fakeBackend([]);
+    renderBattle(backend);
+    await thunderbolt();
+    await userEvent.click(screen.getByRole('button', { name: /^Foe Gyarados/ }));
+    const card = screen.getByRole('tooltip');
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(card).toHaveTextContent('Gyarados');
+    expect(card).toHaveTextContent('Intimidate');
+    expect(card).toHaveTextContent('Waterfall');
+    // Only what's been revealed: no placeholder for the unknown item.
+    expect(card).not.toHaveTextContent('Unknown');
+    await userEvent.click(screen.getByText(/What will/));
+    expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: /^Your Heatran/ }));
+    expect(screen.getByRole('tooltip')).toHaveTextContent('Leftovers · Flash Fire');
+  });
+
+  it('shows a benched Pokémon’s details on a long press without switching', async () => {
+    const { backend, calls } = fakeBackend([]);
+    renderBattle(backend);
+    await thunderbolt();
+    const scizor = screen.getByRole('button', { name: /^Switch to Scizor/ });
+    vi.useFakeTimers();
+    try {
+      fireEvent.pointerDown(scizor, { pointerType: 'touch' });
+      act(() => vi.advanceTimersByTime(500));
+      expect(screen.getByRole('tooltip')).toHaveTextContent('Scizor');
+      fireEvent.pointerUp(scizor, { pointerType: 'touch' });
+      fireEvent.click(scizor);
+    } finally {
+      vi.useRealTimers();
+    }
+    expect(calls).toEqual([]);
+    expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
+  });
+
   it('confirms before giving up, then records a forfeit', async () => {
     const { backend } = fakeBackend([]);
     const props = renderBattle(backend);
@@ -265,7 +337,7 @@ describe('battle screen', () => {
     const { backend } = fakeBackend([TURN_1]);
     const props = renderBattle(backend, { tryNumber: 2 });
     await userEvent.click(await thunderbolt());
-    await screen.findByText('Turn 2');
+    await within(screen.getByRole('banner')).findByText('Turn 2');
     await userEvent.click(await thunderbolt());
     const card = await screen.findByRole('dialog', { name: 'Battle over' });
     expect(card).toHaveTextContent('You won');

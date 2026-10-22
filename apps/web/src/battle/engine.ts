@@ -23,6 +23,7 @@ import type {
   MoveOption,
   Revealed,
   SideConds,
+  TeamMark,
   TeamMember,
   TurnPackage,
   View,
@@ -72,6 +73,68 @@ function eventOf(args: readonly string[]): Frame['event'] {
   return { kind, who: whoOf(a) };
 }
 
+const STATUS_NAME: Record<string, string> = {
+  brn: 'Burned',
+  par: 'Paralyzed',
+  psn: 'Poisoned',
+  tox: 'Badly poisoned',
+  slp: 'Asleep',
+  frz: 'Frozen',
+};
+const STAT_NAME: Record<string, string> = {
+  atk: 'Atk',
+  def: 'Def',
+  spa: 'SpA',
+  spd: 'SpD',
+  spe: 'Spe',
+  accuracy: 'Accuracy',
+  evasion: 'Evasion',
+};
+
+/** Floating text for a line, given the views before and after it. */
+function labelOf(
+  args: readonly string[],
+  kwArgs: Record<string, unknown>,
+  before: View,
+  after: View,
+): Frame['label'] {
+  const [cmd, a, b, c] = args;
+  const who = whoOf(a);
+  if (!who) return undefined;
+  if (cmd === '-damage' || cmd === '-heal') {
+    const prev = before[who];
+    const next = after[who];
+    if (!prev || !next || prev.species !== next.species) return undefined;
+    const d = next.hp - prev.hp;
+    if (!d) return undefined;
+    return { who, text: `${d < 0 ? '−' : '+'}${Math.abs(d)}%`, tone: d < 0 ? 'damage' : 'heal' };
+  }
+  if (cmd === '-status' && b && STATUS_NAME[b]) return { who, text: STATUS_NAME[b], tone: 'info' };
+  if ((cmd === '-boost' || cmd === '-unboost') && b) {
+    const n = Number(c) || 0;
+    if (!n) return undefined;
+    return { who, text: `${STAT_NAME[b] ?? b} ${cmd === '-boost' ? '+' : '−'}${n}`, tone: 'info' };
+  }
+  if (cmd === '-crit') return { who, text: 'Critical hit!', tone: 'damage' };
+  if (cmd === '-miss') return { who: whoOf(b) ?? who, text: 'Missed!', tone: 'info' };
+  if (cmd === '-enditem' && String(kwArgs.from ?? '').includes('Knock Off')) {
+    return { who, text: 'Item knocked off', tone: 'info' };
+  }
+  return undefined;
+}
+
+/** An ability or item revealing itself on this line, and whose it is. */
+function popupOf(args: readonly string[], kwArgs: Record<string, unknown>): Frame['popup'] {
+  const [cmd, a, b] = args;
+  const from = typeof kwArgs.from === 'string' ? kwArgs.from : '';
+  const holder = whoOf(kwArgs.of) ?? whoOf(a);
+  if (!holder) return undefined;
+  if ((cmd === '-ability' || cmd === '-item') && b) return { who: whoOf(a)!, text: b };
+  if (cmd === '-enditem' && b && !from.includes('Knock Off')) return { who: whoOf(a)!, text: b };
+  const m = /^(?:ability|item): (.+)$/.exec(from);
+  return m ? { who: holder, text: m[1]! } : undefined;
+}
+
 /** First-time explainer ids for a line, if it introduces a mechanic. */
 function explainersOf(args: readonly string[]): string[] {
   const [cmd, a, b] = args;
@@ -115,12 +178,18 @@ function monView(p: ClientPokemon | undefined, own: boolean): MonView | null {
   };
 }
 
+/** A revealed item's name. The client can hold ids like `itemleftovers` from `[from] item: Leftovers`. */
+function itemName(id: string): string {
+  const item = dex.items.get(id);
+  return item.exists ? item.name : dex.items.get(id.replace(/^item/, '')).name;
+}
+
 function revealedOf(side: ClientSide): Record<string, Revealed> {
   const out: Record<string, Revealed> = {};
   for (const p of side.team) {
     out[p.speciesForme] = {
       moves: p.moveSlots.map((m) => dex.moves.get(m.id).name),
-      item: p.item ? dex.items.get(p.item).name : '',
+      item: p.item ? itemName(p.item) : '',
       ability: p.ability || p.baseAbility ? dex.abilities.get(p.ability || p.baseAbility).name : '',
     };
   }
@@ -135,7 +204,26 @@ const WEATHER: Record<string, string> = {
   hail: 'Hail',
 };
 
-function viewOf(b: ClientBattle): View {
+/** Your marks follow your team order; the foe's show revealed Pokémon, then balls. */
+function teamMarks(side: ClientSide, order?: string[]): TeamMark[] {
+  const mark = (p: ClientPokemon | undefined, species?: string): TeamMark => ({
+    species: species ?? p?.speciesForme,
+    fainted: !!p?.fainted,
+    status: p?.status ?? '',
+  });
+  const marks = order
+    ? order.map((s) =>
+        mark(
+          side.team.find((p) => p.speciesForme === s),
+          s,
+        ),
+      )
+    : side.team.map((p) => mark(p));
+  while (marks.length < Math.max(6, side.totalPokemon || 0)) marks.push(mark(undefined));
+  return marks.slice(0, 6);
+}
+
+function viewOf(b: ClientBattle, yourOrder: string[]): View {
   return {
     turn: b.turn,
     you: monView(b.p1.active[0] ?? undefined, true),
@@ -144,6 +232,8 @@ function viewOf(b: ClientBattle): View {
     foeSide: sideConds(b.p2),
     weather: WEATHER[b.field.weatherState.id] ?? '',
     revealed: revealedOf(b.p2),
+    yourTeam: teamMarks(b.p1, yourOrder),
+    foeTeam: teamMarks(b.p2),
   };
 }
 
@@ -220,15 +310,23 @@ export class BattleEngine {
   private package(resumed: boolean): TurnPackage {
     const frames: Frame[] = [];
     const explainers = new Set<string>();
+    const order = this.sets.map((s) => s.species);
+    let before = viewOf(this.presenter, order);
     for (const line of this.session.drain('p1')) {
       for (const { args, kwArgs } of Protocol.parse(line)) {
         const text = cleanText(this.formatter.formatText(args, kwArgs));
         this.presenter.add(args, kwArgs);
-        for (const e of explainersOf(args as readonly string[])) if (e) explainers.add(e);
-        const event = eventOf(args as readonly string[]);
-        if (!text && !event) continue;
+        const a = args as readonly string[];
+        const kw = kwArgs as Record<string, unknown>;
+        for (const e of explainersOf(a)) if (e) explainers.add(e);
+        const event = eventOf(a);
+        const popup = popupOf(a, kw);
+        if (!text && !event && !popup) continue;
         if (text.startsWith('Battle started between')) continue;
-        frames.push({ text, event, view: viewOf(this.presenter) });
+        const view = viewOf(this.presenter, order);
+        const label = labelOf(a, kw, before, view);
+        frames.push({ text, event, view, ...(label && { label }), ...(popup && { popup }) });
+        before = view;
       }
     }
     const team = this.team();
@@ -250,7 +348,7 @@ export class BattleEngine {
       end: ended
         ? {
             winner: winner === 'p1' ? 'you' : winner === 'p2' ? 'foe' : null,
-            youLeft: team.filter((m) => !m.fainted).length,
+            youLeft: this.sets.length - this.presenter.p1.team.filter((p) => p.fainted).length,
             foeLeft: 6 - this.presenter.p2.team.filter((p) => p.fainted).length,
           }
         : null,
@@ -272,7 +370,8 @@ export class BattleEngine {
       const set = this.sets.find((s) => s.species === name);
       const req = order[i];
       // Your request has exact HP for every team member; the client only tracks those seen.
-      const hp = req ? req.hp : (p?.hp ?? 0);
+      // After the last request (e.g. the final faint), the client is more current.
+      const hp = p?.fainted ? 0 : req ? req.hp : (p?.hp ?? 0);
       const max = req ? req.maxhp : (p?.maxhp ?? 1);
       return {
         slot: i + 1,
@@ -280,7 +379,7 @@ export class BattleEngine {
         hp: hp > 0 ? Math.max(1, Math.round((100 * hp) / max)) : 0,
         hpExact: { hp, max },
         status: (req ? req.status : p?.status) ?? '',
-        fainted: req ? !!req.fainted || hp <= 0 : (p?.fainted ?? hp <= 0),
+        fainted: !!p?.fainted || (req ? !!req.fainted || hp <= 0 : hp <= 0),
         active: !!req?.active || (!req && client.p1.active[0]?.speciesForme === name),
         item: set?.item ?? '',
         ability: set?.ability ?? '',

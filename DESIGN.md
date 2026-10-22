@@ -319,6 +319,7 @@ Goals: fast, tactile, and clear to someone new to competitive Pokémon. The whol
 Mirror Pokémon Showdown's battle layout and flow, simplified where it makes sense. With Beginner hints off, the experience should feel like classic Showdown with nothing extra.
 
 - **Layout (Showdown-style):** field with both active Pokémon, HP bars (name, level, HP %, status and stat-boost badges), weather and hazard indicators, a move grid (name, type color, PP), a switch row with team icons, and Showdown's text battle log visible beside or below the field (stacked on mobile).
+- **Improved for mobile (M7.1):** the field keeps the Gen 4 scene's shape on phones, and the log takes the spare height below it (newest at the bottom, the whole battle scrollable inside it, expandable to a full sheet) instead of Showdown's chat-sidebar log and one-line message box. Floating result labels ("−24%", "Paralyzed", "Item knocked off") and ability/item pop-ups replace the in-field message box. The foe's HP bar carries six team marks: revealed Pokémon as icons, unrevealed as Poké Balls, fainted greyed. Your own team shows on the bench row, so your bar has none. Details open as a small card, not a full sheet.
 - **Simplified vs Showdown:** no timer, chat, user list, ladder rating, or spectators. No team preview screen. Forfeit is a "Give up" item in a menu.
 - **Tooltips:** tap (or hover on desktop) a Pokémon for Showdown-style details. For the opponent, show only revealed information: types, HP %, status, boosts, revealed moves, and the item or ability if revealed. No "usually runs" or usage hints. Own Pokémon show full info.
 - **Pacing (quick, like Showdown):**
@@ -444,7 +445,7 @@ See §14.
 Unofficial fan project, not affiliated with or endorsed by Nintendo, Creatures Inc., GAME FREAK inc., The Pokémon Company, or Smogon. Pokémon, Pokémon character names, and sprites are © Nintendo, Creatures Inc., and GAME FREAK inc.
 
 - Code: `@pkmn/*` packages and Pokémon Showdown code are MIT licensed. Keep license notices as required.
-- The Pokémon Showdown *client* (`smogon/pokemon-showdown-client`) is AGPL-3.0. Daily Battle uses none of its code: the battle layout, rendering, and animations are our own, and the battle text comes from `@pkmn/view`'s MIT-licensed `LogFormatter`.
+- The Pokémon Showdown *client* (`smogon/pokemon-showdown-client`) is AGPL-3.0. Daily Battle uses none of its code: the battle layout, rendering, and animations are our own, and the battle text comes from `@pkmn/view`'s MIT-licensed `LogFormatter`. The battle backgrounds, hazard sprites, and weather overlays are from the client's `fx/` folder, which it dedicates to the public domain (CC0); they are self-hosted and credited.
 - Data: confirm redistribution terms for Smogon set and usage data; credit Smogon.
 - Sprites: see §12.3a. Credit Nintendo/Game Freak/Creatures and the Smogon sprite community on the credits page.
 - Keep the project free and non-commercial (no ads, paywalls, or merchandise). Revisit this section if that changes.

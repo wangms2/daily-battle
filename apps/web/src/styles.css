@@ -242,55 +242,175 @@ body {
 }
 
 /* ---- Battle field ---- */
+/* The field is a size container; --s scales the background image so its scene
+   (x 150–590, y 90–385 of 753×500) covers the field, anchored at the bottom.
+   Children place things in image coordinates with it (see Field.tsx). */
 .battle-field {
-  background:
-    radial-gradient(
-      120% 70% at 70% 0%,
-      color-mix(in srgb, var(--accent) 10%, transparent),
-      transparent 70%
-    ),
-    linear-gradient(
-      to bottom,
-      color-mix(in srgb, var(--accent-soft) 70%, var(--surface)),
-      var(--surface-2)
-    );
+  container-type: size;
+  --s: max(calc(100cqw / 440), calc(100cqh / 295));
+  background: #4d6b3a;
 }
-.battle-field.weather-sunnyday {
-  background-color: color-mix(in srgb, var(--gold) 14%, var(--surface));
-  background-image: linear-gradient(
+.battle-bg {
+  background-repeat: no-repeat;
+  background-size: calc(var(--s) * 753) calc(var(--s) * 500);
+  background-position: calc(50cqw - var(--s) * 370) calc(100cqh - var(--s) * 385);
+  image-rendering: pixelated;
+}
+:root[data-theme='dark'] .battle-bg {
+  filter: brightness(0.85);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .battle-bg {
+    filter: brightness(0.85);
+  }
+}
+
+/* Stat bars: Showdown's dark text with a light halo, readable on any background. */
+.statbar {
+  color: #15161c;
+  text-shadow:
+    0 0 2px #fff,
+    0 0 3px #fff,
+    0 0 4px rgb(255 255 255 / 0.8);
+}
+.statbar-hp {
+  background: rgb(255 255 255 / 0.85);
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.55);
+}
+.statbar-pill {
+  background: rgb(255 255 255 / 0.85);
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.35);
+  text-shadow: none;
+}
+
+/* Reflect and Light Screen as tinted glass in front of the side. */
+.screen-reflect,
+.screen-light {
+  border-radius: 6px;
+  border: 1px solid rgb(255 255 255 / 0.55);
+}
+.screen-reflect {
+  background: rgb(232 160 80 / 0.18);
+}
+.screen-light {
+  background: rgb(240 140 200 / 0.16);
+}
+
+/* Weather overlays drift slowly; static with animations off or reduced motion. */
+.weather-fx {
+  background-size: calc(var(--s) * 700) calc(var(--s) * 500);
+  background-repeat: repeat;
+  opacity: 0.3;
+}
+.weather-fx-sunnyday {
+  mix-blend-mode: soft-light;
+  opacity: 0.5;
+}
+.weather-fx-animate.weather-fx-sandstorm,
+.weather-fx-animate.weather-fx-hail {
+  animation: weather-drift 18s linear infinite;
+}
+.weather-fx-animate.weather-fx-raindance {
+  animation: weather-rain 2.4s linear infinite;
+}
+.weather-fx-animate.weather-fx-sunnyday {
+  animation: weather-pulse 4s ease-in-out infinite;
+}
+@keyframes weather-drift {
+  to {
+    background-position: calc(var(--s) * -700) calc(var(--s) * 60);
+  }
+}
+@keyframes weather-rain {
+  to {
+    background-position: calc(var(--s) * -140) calc(var(--s) * 500);
+  }
+}
+@keyframes weather-pulse {
+  50% {
+    opacity: 0.3;
+  }
+}
+
+/* Move buttons: Showdown's soft type-tinted gradient, muted to our palette. */
+.move-btn {
+  color: var(--text);
+  border: 1px solid color-mix(in srgb, var(--type) 45%, var(--border));
+  background: linear-gradient(
     to bottom,
-    color-mix(in srgb, var(--gold) 18%, transparent),
-    transparent
+    color-mix(in srgb, var(--type) 5%, var(--surface)),
+    color-mix(in srgb, var(--type) 20%, var(--surface))
   );
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.35),
+    var(--card-shadow);
 }
-.battle-field.weather-raindance {
-  background-image: linear-gradient(
+.move-btn:not(:disabled):hover {
+  background: linear-gradient(
     to bottom,
-    color-mix(in srgb, var(--accent) 22%, transparent),
-    var(--surface-2)
+    color-mix(in srgb, var(--type) 9%, var(--surface)),
+    color-mix(in srgb, var(--type) 28%, var(--surface))
   );
 }
-.battle-field.weather-sandstorm {
-  background-image: linear-gradient(
-    to bottom,
-    color-mix(in srgb, #b8873a 22%, transparent),
-    var(--surface-2)
-  );
+
+/* Floating result labels and ability/item pop-ups. */
+.float-label {
+  font-size: 13px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 4px;
+  color: #fff;
+  animation: float-up 1000ms ease-out forwards;
 }
-.battle-field.weather-hail {
-  background-image: linear-gradient(
-    to bottom,
-    color-mix(in srgb, #9fd4e3 28%, transparent),
-    var(--surface-2)
-  );
+.float-damage {
+  background: rgb(163 58 70 / 0.92);
 }
-.platform {
-  border-radius: 50%;
-  background: radial-gradient(
-    closest-side,
-    color-mix(in srgb, var(--text) 14%, transparent),
-    transparent
-  );
+.float-heal {
+  background: rgb(61 122 90 / 0.92);
+}
+.float-info {
+  background: rgb(27 29 38 / 0.82);
+}
+.float-popup {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+  color: #fff;
+  background: rgb(63 95 138 / 0.94);
+  border: 1px solid rgb(255 255 255 / 0.35);
+  animation: popup-in-out 1500ms ease-out forwards;
+}
+@keyframes float-up {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 6px);
+  }
+  15% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -40px);
+  }
+}
+@keyframes popup-in-out {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 4px) scale(0.92);
+  }
+  12%,
+  80% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, 0) scale(1);
+  }
 }
 
 @keyframes hit {
@@ -389,7 +509,8 @@ body {
   .anim-in-left,
   .anim-in-right,
   .anim-lunge-right,
-  .anim-lunge-left {
-    animation: none;
+  .anim-lunge-left,
+  .weather-fx {
+    animation: none !important;
   }
 }

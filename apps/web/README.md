@@ -8,6 +8,7 @@ pnpm --filter web build      # production build
 pnpm test                    # unit tests (from the repo root)
 pnpm --filter web e2e        # Playwright on the production build: flow and battles at six sizes, light and dark
 pnpm --filter web sprites    # (re)download sprites for every species in the set data
+pnpm --filter web fx         # (re)download the battle backgrounds and effects
 ```
 
 ## Design
@@ -33,9 +34,10 @@ The full spec is in DESIGN.md §12 and the M6 and M7 plans.
 ## Battle
 
 - **Engine:** the simulator and the opponent AI run in a Web Worker (`src/battle/battle.worker.ts`), warmed up when the daily brief opens. The worker turns each turn into frames: Showdown battle text from `@pkmn/view`, an animation event, and a snapshot of what your side can see. Hidden opponent info never reaches the UI.
-- **Screen:** the field (foe top-right, you bottom-left), a two-line ticker that opens the full log, then moves and bench together. A forced switch replaces the controls with "Who comes in?". From 900px wide, the log becomes a side panel.
-- **Playback:** Normal, Fast, or Instant, from the top bar. Tap the field or ticker to skip to the end of the turn. When only one choice is legal, it's sent for you.
-- **Move info:** long-press a move (hover on desktop). Tap a Pokémon's HP card for its info sheet.
+- **Field:** Showdown-style, on a Gen 4 background picked per day. Each Pokémon has a floating name, HP bar, and the foe's bar also carries six team marks (icons once revealed, Poké Balls until then; fainted ones grey out). Your own team is on the bench row. Hazards are drawn on the ground, screens show as tinted glass, and weather drifts over the scene. Damage, status, and boosts float up as labels, and ability or item reveals pop up as banners. Everything is placed in the background image's coordinates, scaled by one CSS factor (`--s`), so sprites stay on their platforms at any size. On phones the field keeps the scene's shape and the log takes the spare height.
+- **Screen:** the field, then the log (newest at the bottom; ⤢ opens it full-screen), then a "What will X do?" prompt, type-tinted move buttons, and the bench. A forced switch replaces the controls with "Who comes in?". From 900px wide, the log becomes a side panel.
+- **Playback:** Normal, Fast, or Instant, from the top bar. Tap the field or log to skip to the end of the turn. When only one choice is legal, it's sent for you.
+- **Details:** tap a Pokémon's name and HP bar (hover on desktop) for a small card with the essentials: for foes, only what's been revealed. Long-press a move or a benched Pokémon for its details.
 - **Resume:** each attempt saves its seeds, team, and your choices as you go, so a reload replays them back to the same turn. An unfinished attempt from a past day, or from an older engine version, counts as a forfeit. Today's change is locked while a battle is in progress.
 - **Licensing:** the Showdown client is AGPL-3.0, so none of its code is used. The layout, rendering, and animations here are our own.
 
@@ -65,3 +67,5 @@ The full spec is in DESIGN.md §12 and the M6 and M7 plans.
 ## Sprites
 
 The sprites are Showdown-style animated GIFs and Gen 7 box icons from [PokeAPI/sprites](https://github.com/PokeAPI/sprites), downloaded by `scripts/sprites.ts` for exactly the species in the set data and committed here. Nothing is hotlinked. Pokémon and sprites © Nintendo, Creatures Inc., GAME FREAK inc. The animated sprites are by the Smogon sprite community. Daily Battle is an unofficial, free fan project.
+
+The battle backgrounds (Gen 4), hazard sprites, weather overlays, and Poké Ball mark come from Pokémon Showdown's `fx/` folder, which Showdown dedicates to the public domain (CC0). `scripts/fx.ts` downloads them from a pinned commit into `public/fx/`.

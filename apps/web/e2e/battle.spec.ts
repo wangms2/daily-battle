@@ -7,7 +7,7 @@ import schedule from '../public/schedule/2026-10-19.json' with { type: 'json' };
 
 const TODAY = new Date('2026-10-21T10:00:00-04:00');
 const MOVES = 'main button[aria-label*=" PP"]:enabled';
-const SWITCHES = 'main button[aria-label^="Switch to"]:enabled';
+const SWITCHES = 'main button[aria-label^="Switch to"]:not([aria-disabled="true"])';
 
 function seededState(speed: 'normal' | 'fast' | 'instant') {
   return {
@@ -114,10 +114,7 @@ test('resumes a battle after a reload', async ({ page }) => {
   await page.getByRole('button', { name: /^Start · / }).click();
   for (let i = 0; i < 4; i++) if ((await act(page)) === 'end') break;
   if ((await waitForChoice(page)) === 'end') return; // the battle ended early; nothing to resume
-  // Phones show the last lines in the ticker; wide screens show the full log in a side panel.
-  const log = page
-    .getByRole('button', { name: 'Open the battle log' })
-    .or(page.locator('aside').filter({ hasText: 'Battle log' }));
+  const log = page.getByRole('log', { name: 'Battle log' });
   const turn = await page
     .locator('header')
     .getByText(/^Turn \d+$/)
@@ -137,6 +134,8 @@ for (const scheme of ['light', 'dark'] as const) {
     await page.getByRole('button', { name: /^Start · / }).click();
 
     let state = await waitForChoice(page);
+    // Park the mouse off the controls so no hover card shows in the shots.
+    await page.mouse.move(1, 1);
     await noScroll(page, 'first choice');
     await page.screenshot({ path: `${dir}/20-battle.png` });
 
@@ -151,6 +150,7 @@ for (const scheme of ['light', 'dark'] as const) {
         .locator(state === 'moves' ? MOVES : SWITCHES)
         .first()
         .click();
+      await page.mouse.move(1, 1);
       if (!caughtPlayback) {
         await page.waitForTimeout(400);
         await noScroll(page, 'playback');
@@ -165,18 +165,26 @@ for (const scheme of ['light', 'dark'] as const) {
       ['Your', '22-battle-you'],
       ['Foe', '23-battle-foe'],
     ] as const) {
-      const card = page.getByRole('button', { name: new RegExp(`^${who} .* Details$`) });
-      if (await card.isVisible()) {
-        await card.click();
-        await page.waitForTimeout(250);
+      const bar = page.getByRole('button', { name: new RegExp(`^${who} .* Details$`) });
+      if (await bar.isVisible()) {
+        await bar.click();
+        await expect(page.getByRole('tooltip')).toBeVisible();
+        await page.waitForTimeout(250); // let it fade in
+        expect(await page.getByRole('dialog').count(), 'details are a card, not a sheet').toBe(0);
         await noScroll(page, `${who} info`);
         await page.screenshot({ path: `${dir}/${file}.png` });
-        await page.keyboard.press('Escape');
+        // A tap anywhere else closes it.
+        await page
+          .locator('header')
+          .getByText(/^Turn \d+$/)
+          .click();
+        await expect(page.getByRole('tooltip')).toBeHidden();
       }
     }
 
-    if (await page.getByRole('button', { name: 'Open the battle log' }).isVisible()) {
-      await page.getByRole('button', { name: 'Open the battle log' }).click();
+    const expand = page.getByRole('button', { name: 'Open the battle log' });
+    if (await expand.isVisible()) {
+      await expand.click();
       await page.waitForTimeout(250);
       await noScroll(page, 'log');
       await page.screenshot({ path: `${dir}/24-battle-log.png` });

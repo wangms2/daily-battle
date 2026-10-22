@@ -1,3 +1,4 @@
+import { Dex } from '@pkmn/sim';
 import { deriveSeed, makeRng, randomTeam } from '@daily-battle/sim-bridge';
 import { describe, expect, it } from 'vitest';
 import { BattleEngine, cleanText, effectiveness } from './engine';
@@ -143,11 +144,71 @@ describe('BattleEngine', () => {
           for (const [species, r] of Object.entries(f.view.revealed)) {
             expect(text, `battle ${i}: ${species}`).toContain(species);
             for (const m of r.moves) expect(text, `battle ${i}: ${species} ${m}`).toContain(m);
+            if (r.item) expect(Dex.items.get(r.item).exists, `item ${r.item}`).toBe(true);
           }
           if (f.view.foe) expect(text).toContain(f.view.foe.species);
+          for (const m of f.view.foeTeam) if (m.species) expect(text).toContain(m.species);
         }
       }
     }
+  }, 60_000);
+});
+
+describe('field effects', () => {
+  const frames = (i: number, extra?: Partial<EngineStart>) =>
+    play(start(i, extra)).packages.flatMap((p) => p.frames);
+
+  it('floats the HP change over whoever took damage or healed', () => {
+    let labelled = 0;
+    for (let i = 0; i < 4; i++) {
+      let prev: TurnPackage['frames'][number] | undefined;
+      for (const f of frames(60 + i)) {
+        if (
+          f.label &&
+          (f.label.tone === 'damage' || f.label.tone === 'heal') &&
+          f.label.text.endsWith('%')
+        ) {
+          const who = f.label.who;
+          const d = f.view[who]!.hp - prev!.view[who]!.hp;
+          expect(f.label.text).toBe(`${d < 0 ? '−' : '+'}${Math.abs(d)}%`);
+          labelled++;
+        }
+        prev = f;
+      }
+    }
+    expect(labelled).toBeGreaterThan(10);
+  }, 60_000);
+
+  it('pops up abilities and items as they reveal themselves', () => {
+    const s = start(70);
+    const team = s.playerTeam as {
+      species: string;
+      ability: string;
+      item: string;
+      moves: string[];
+    }[];
+    team[0] = {
+      ...team[0]!,
+      species: 'Hippowdon',
+      ability: 'Sand Stream',
+      item: 'Leftovers',
+      moves: ['Slack Off', 'Stealth Rock', 'Roar', 'Earthquake'],
+    };
+    const popups = play(s, 6)
+      .packages.flatMap((p) => p.frames)
+      .flatMap((f) => (f.popup ? [f.popup] : []));
+    expect(popups).toContainEqual({ who: 'you', text: 'Sand Stream' });
+  });
+
+  it('keeps six team marks per side, greying out the fainted', () => {
+    const { packages } = play(start(80));
+    const last = packages.at(-1)!;
+    const view = last.frames.at(-1)!.view;
+    expect(view.yourTeam).toHaveLength(6);
+    expect(view.foeTeam).toHaveLength(6);
+    expect(view.yourTeam.filter((m) => !m.fainted)).toHaveLength(last.end!.youLeft);
+    expect(view.foeTeam.filter((m) => !m.fainted)).toHaveLength(last.end!.foeLeft);
+    expect(view.yourTeam.every((m) => m.species)).toBe(true);
   }, 60_000);
 });
 

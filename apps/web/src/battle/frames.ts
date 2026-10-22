@@ -24,6 +24,14 @@ export interface SideConds {
   lightScreen: boolean;
 }
 
+/** One of a side's six team marks under its HP bar. */
+export interface TeamMark {
+  /** Unset for foe Pokémon not yet revealed. */
+  species?: string;
+  fainted: boolean;
+  status: string;
+}
+
 /** What the player knows about a foe Pokémon from what it has done so far. */
 export interface Revealed {
   moves: string[];
@@ -41,6 +49,9 @@ export interface View {
   weather: string;
   /** Revealed info for each foe Pokémon seen so far, by species. */
   revealed: Record<string, Revealed>;
+  /** Six marks per side: your team in order, then the foe's revealed Pokémon and unrevealed balls. */
+  yourTeam: TeamMark[];
+  foeTeam: TeamMark[];
 }
 
 export type EventKind =
@@ -63,6 +74,10 @@ export interface Frame {
   /** Showdown-style battle text for this line ('' for silent lines). `**x**` marks bold. */
   text: string;
   event?: { kind: EventKind; who?: Who };
+  /** Text that floats up over a Pokémon and fades: "−24%", "Paralyzed", "Atk +2". */
+  label?: { who: Who; text: string; tone: 'damage' | 'heal' | 'info' };
+  /** An ability or item revealing itself, shown as a banner by its holder. */
+  popup?: { who: Who; text: string };
   /** The battle as it looks after this line. */
   view: View;
 }

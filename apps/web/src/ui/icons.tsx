@@ -62,3 +62,9 @@ export const PencilIcon = (p: SVGProps<SVGSVGElement>) => (
     <path d="M4 20h4L19 9l-4-4L4 16z" />
   </svg>
 );
+
+export const ExpandIcon = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}>
+    <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
+  </svg>
+);

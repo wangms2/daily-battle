@@ -1,13 +1,21 @@
-// The player's choices: a 2×2 move grid plus the bench, or a "who comes in?"
-// grid on a forced switch. Long-press (or hover) a move to see what it does.
+// The player's choices, Showdown-style: a "What will X do?" prompt, a 2×2
+// grid of type-tinted move buttons, and the bench; or a "who comes in?" grid
+// on a forced switch. Long-press (or hover) a move or a benched Pokémon to see
+// what it is.
 import clsx from 'clsx';
-import { useRef, useState } from 'react';
+import {
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent as ReactPointerEvent,
+} from 'react';
 import { getSprite } from '../../lib/sprites';
 import { TYPE_COLORS } from '../../lib/types';
 import { TypeBadge } from '../../ui/bits';
 import type { Controls, MoveOption, TeamMember } from '../frames';
 import { HpBar } from './Field';
 import { STATUS_COLOR } from './labels';
+import { MonPopover } from './MonPopover';
 
 function effectivenessTag(e: number | null): { label: string; tone: string } | null {
   if (e === null) return null;
@@ -15,6 +23,48 @@ function effectivenessTag(e: number | null): { label: string; tone: string } | n
   if (e > 1) return { label: e >= 4 ? 'Super effective ×4' : 'Super effective', tone: 'text-good' };
   if (e < 1) return { label: 'Not very effective', tone: 'text-muted' };
   return { label: 'Effective', tone: 'text-muted' };
+}
+
+/**
+ * Long-press (touch) or hover (mouse) shows info; a plain tap acts. A tap that
+ * ends a long-press only closes the info.
+ */
+function usePressInfo(show: () => void, hide: () => void, act: () => void) {
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const longPressed = useRef(false);
+  const clear = () => {
+    if (timer.current) clearTimeout(timer.current);
+    timer.current = null;
+  };
+  return {
+    onPointerDown: (e: ReactPointerEvent) => {
+      longPressed.current = false;
+      if (e.pointerType === 'mouse') return;
+      timer.current = setTimeout(() => {
+        longPressed.current = true;
+        show();
+      }, 420);
+    },
+    onPointerUp: clear,
+    onPointerLeave: (e: ReactPointerEvent) => {
+      clear();
+      if (e.pointerType === 'mouse' || longPressed.current) hide();
+    },
+    onPointerCancel: clear,
+    onPointerEnter: (e: ReactPointerEvent) => {
+      if (e.pointerType === 'mouse') show();
+    },
+    onContextMenu: (e: { preventDefault: () => void }) => e.preventDefault(),
+    onClick: () => {
+      if (longPressed.current) {
+        longPressed.current = false;
+        hide();
+        return;
+      }
+      hide();
+      act();
+    },
+  };
 }
 
 function MoveButton({
@@ -28,57 +78,32 @@ function MoveButton({
   onChoose: () => void;
   onInfo: (move: MoveOption | null) => void;
 }) {
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const longPressed = useRef(false);
   const color = TYPE_COLORS[move.type]?.bg ?? '#888';
   const tag = hints ? effectivenessTag(move.effectiveness) : null;
-  const clear = () => {
-    if (timer.current) clearTimeout(timer.current);
-    timer.current = null;
-  };
+  const press = usePressInfo(
+    () => onInfo(move),
+    () => onInfo(null),
+    onChoose,
+  );
   return (
     <button
       type="button"
       disabled={move.disabled}
       aria-label={`${move.name}, ${move.type}, ${move.pp} of ${move.maxpp} PP${tag ? `, ${tag.label}` : ''}`}
-      onPointerDown={(e) => {
-        longPressed.current = false;
-        if (e.pointerType === 'mouse') return;
-        timer.current = setTimeout(() => {
-          longPressed.current = true;
-          onInfo(move);
-        }, 420);
-      }}
-      onPointerUp={clear}
-      onPointerLeave={() => {
-        clear();
-        if (longPressed.current) onInfo(null);
-      }}
-      onPointerCancel={clear}
-      onMouseEnter={() => onInfo(move)}
-      onMouseLeave={() => onInfo(null)}
-      onContextMenu={(e) => e.preventDefault()}
-      onClick={() => {
-        if (longPressed.current) {
-          longPressed.current = false;
-          onInfo(null);
-          return;
-        }
-        onInfo(null);
-        onChoose();
-      }}
-      className="relative flex h-full min-h-12 flex-col justify-center overflow-hidden rounded-btn border border-line bg-surface pr-2 pl-3 text-left shadow-card select-none active:translate-y-px disabled:opacity-40"
-      style={{ background: `color-mix(in srgb, ${color} 9%, var(--surface))` }}
+      {...press}
+      className="move-btn flex h-full min-h-[3.25rem] flex-col justify-between overflow-hidden rounded-btn px-2 pt-1.5 pb-1 select-none active:translate-y-px disabled:opacity-40"
+      style={{ '--type': color } as CSSProperties}
     >
-      <span className="absolute inset-y-0 left-0 w-1" style={{ background: color }} aria-hidden />
-      <span className="flex items-baseline justify-between gap-1">
-        <span className="truncate text-[14px] font-semibold">{move.name}</span>
-        <span className="shrink-0 text-[11px] text-muted tabular-nums">
+      <span className="truncate text-center text-[14.5px] leading-5 font-semibold">
+        {move.name}
+      </span>
+      <span className="flex items-baseline justify-between gap-1 text-[11px] leading-4">
+        <span className={clsx('truncate font-medium', tag ? tag.tone : 'text-muted')}>
+          {tag ? tag.label : move.type}
+        </span>
+        <span className="shrink-0 text-muted tabular-nums">
           {move.pp}/{move.maxpp}
         </span>
-      </span>
-      <span className={clsx('truncate text-[11.5px] font-medium', tag ? tag.tone : 'text-muted')}>
-        {tag ? tag.label : move.type}
       </span>
     </button>
   );
@@ -88,31 +113,41 @@ function BenchButton({
   member,
   choice,
   onChoose,
+  onInfo,
   big = false,
   off = false,
 }: {
   member: TeamMember;
   choice?: string;
   onChoose: (c: string) => void;
+  onInfo: (m: TeamMember | null) => void;
   big?: boolean;
   /** The whole panel is disabled (a turn is playing). */
   off?: boolean;
 }) {
   const disabled = !choice || off;
+  const press = usePressInfo(
+    () => onInfo(member),
+    () => onInfo(null),
+    () => !disabled && choice && onChoose(choice),
+  );
   return (
     <button
       type="button"
-      disabled={disabled}
-      onClick={() => choice && onChoose(choice)}
+      // Fainted or locked-in Pokémon still show their details on a long-press.
+      aria-disabled={disabled}
+      {...press}
       aria-label={`Switch to ${member.species}, ${member.hp}% HP${member.fainted ? ', fainted' : ''}`}
       className={clsx(
-        'card flex min-w-0 flex-1 flex-col items-center justify-center gap-0.5 px-1 disabled:opacity-40',
+        'card flex min-w-0 flex-1 flex-col items-center justify-center gap-0.5 px-1 select-none',
         big ? 'py-2' : 'py-1',
+        disabled && 'opacity-40',
       )}
     >
       <img
         src={getSprite(member.species, big ? 'front' : 'icon')}
         alt=""
+        draggable={false}
         className={clsx('pixelated object-contain', big ? 'h-12 w-14' : 'h-7 w-9')}
       />
       {big && (
@@ -133,6 +168,8 @@ function BenchButton({
   );
 }
 
+type Info = { move: MoveOption } | { member: TeamMember } | null;
+
 export function ControlPanel({
   controls,
   team,
@@ -147,26 +184,49 @@ export function ControlPanel({
   disabled: boolean;
   onChoose: (choice: string) => void;
 }) {
-  const [info, setInfo] = useState<MoveOption | null>(null);
+  const [info, setInfo] = useState<Info>(null);
+  const active = team.find((m) => m.active);
   const bench = team.filter((m) => !m.active);
   const switchFor = (m: TeamMember) => controls?.switches.find((s) => s.slot === m.slot)?.choice;
+  const off = disabled || !controls;
+  const memberInfo = (m: TeamMember | null) => setInfo(m && { member: m });
+
+  const tooltip =
+    info &&
+    ('move' in info ? (
+      <div
+        className="card animate-fade-in pointer-events-none absolute inset-x-0 bottom-full z-10 mb-2 p-3"
+        role="tooltip"
+      >
+        <div className="flex items-center gap-2">
+          <span className="text-[15px] font-semibold">{info.move.name}</span>
+          <TypeBadge type={info.move.type} />
+          <span className="text-[12px] text-muted">{info.move.category}</span>
+        </div>
+        <p className="mt-1 text-[12px] text-muted tabular-nums">
+          {info.move.power ? `Power ${info.move.power}` : 'No damage'} · Accuracy{' '}
+          {info.move.accuracy === true ? '—' : `${info.move.accuracy}%`} · PP {info.move.pp}/
+          {info.move.maxpp}
+        </p>
+        {info.move.desc && <p className="mt-1 text-[13px]">{info.move.desc}</p>}
+      </div>
+    ) : (
+      <MonPopover foe={false} member={info.member} className="absolute bottom-full left-0 mb-2" />
+    ));
 
   if (controls?.kind === 'switch') {
     return (
-      <div
-        className={clsx(
-          'flex shrink-0 flex-col gap-2',
-          disabled && 'pointer-events-none opacity-50',
-        )}
-      >
+      <div className="relative flex shrink-0 flex-col gap-2">
+        {tooltip}
         <p className="display text-[14px]">Who comes in?</p>
-        <div className="grid grid-cols-3 gap-2">
+        <div className={clsx('grid grid-cols-3 gap-2', disabled && 'opacity-50')}>
           {bench.map((m) => (
             <BenchButton
               key={m.species}
               member={m}
               choice={switchFor(m)}
               onChoose={onChoose}
+              onInfo={memberInfo}
               off={disabled}
               big
             />
@@ -178,30 +238,35 @@ export function ControlPanel({
 
   const moves = controls?.moves ?? [];
   return (
-    <div
-      className={clsx(
-        'relative flex shrink-0 flex-col gap-2',
-        (disabled || !controls) && 'pointer-events-none opacity-50',
-      )}
-    >
-      {info && (
-        <div
-          className="card animate-fade-in pointer-events-none absolute inset-x-0 bottom-full z-10 mb-2 p-3"
-          role="tooltip"
-        >
-          <div className="flex items-center gap-2">
-            <span className="text-[15px] font-semibold">{info.name}</span>
-            <TypeBadge type={info.type} />
-            <span className="text-[12px] text-muted">{info.category}</span>
-          </div>
-          <p className="mt-1 text-[12px] text-muted tabular-nums">
-            {info.power ? `Power ${info.power}` : 'No damage'} · Accuracy{' '}
-            {info.accuracy === true ? '—' : `${info.accuracy}%`} · PP {info.pp}/{info.maxpp}
-          </p>
-          {info.desc && <p className="mt-1 text-[13px]">{info.desc}</p>}
-        </div>
-      )}
-      <div className="grid grid-cols-2 grid-rows-2 gap-2">
+    <div className="relative flex shrink-0 flex-col gap-1.5">
+      {tooltip}
+      <p
+        className={clsx(
+          'flex h-5 items-center justify-between gap-2 text-[13.5px]',
+          off && 'opacity-50',
+        )}
+      >
+        <span className="truncate">
+          {!off && active && !active.fainted ? (
+            <>
+              What will <strong>{active.species}</strong> do?
+            </>
+          ) : (
+            ' '
+          )}
+        </span>
+        {!off && active && !active.fainted && (
+          <span className="shrink-0 rounded-badge border border-line px-1.5 text-[11.5px] leading-[18px] text-muted tabular-nums">
+            HP {active.hpExact.hp}/{active.hpExact.max}
+          </span>
+        )}
+      </p>
+      <div
+        className={clsx(
+          'grid grid-cols-2 grid-rows-2 gap-2',
+          off && 'pointer-events-none opacity-50',
+        )}
+      >
         {(moves.length ? moves : Array.from({ length: 4 }, () => null)).map((m, i) =>
           m ? (
             <MoveButton
@@ -209,12 +274,12 @@ export function ControlPanel({
               move={disabled ? { ...m, disabled: true } : m}
               hints={hints}
               onChoose={() => onChoose(m.choice)}
-              onInfo={setInfo}
+              onInfo={(move) => setInfo(move && { move })}
             />
           ) : (
             <div
               key={i}
-              className="min-h-12 rounded-btn border border-dashed border-line"
+              className="min-h-[3.25rem] rounded-btn border border-dashed border-line"
               aria-hidden
             />
           ),
@@ -227,7 +292,8 @@ export function ControlPanel({
             member={m}
             choice={switchFor(m)}
             onChoose={onChoose}
-            off={disabled || !controls}
+            onInfo={memberInfo}
+            off={off}
           />
         ))}
       </div>
