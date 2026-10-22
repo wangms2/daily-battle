@@ -9,6 +9,7 @@ export {
 } from './opponent';
 export { generatePool, poolProblems, type WeeklyPool } from './pool';
 export { rngFor, type Rng } from './rng';
+export { isBulky } from './traits';
 export { findSet, teamSets, toPokemonSet, type TeamSlot } from './sets';
 export { parseSchedule, type Archetype, type ScheduleFile } from './schedule';
 export { generateWeek, type GeneratedWeek } from './week';

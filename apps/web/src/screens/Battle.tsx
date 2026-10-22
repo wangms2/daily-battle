@@ -28,6 +28,7 @@ import { GiveUpDialog, LogList, LogSheet, MenuSheet } from '../battle/ui/sheets'
 import type { Settings } from '../state/schema';
 import { streakLine, type DaySummary } from '../lib/results';
 import { Button } from '../ui/bits';
+import type { ShareModel } from '../lib/share';
 import { ShareButton, TryRows } from '../ui/results';
 import { CloseIcon, ExpandIcon, InfoIcon } from '../ui/icons';
 import { useWide } from '../ui/useWide';
@@ -45,8 +46,8 @@ const SPEEDS: Settings['battleSpeed'][] = ['slow', 'normal', 'fast'];
 export interface DayResult {
   summary: DaySummary;
   streak: number;
-  /** The share text for today. */
-  share: string;
+  /** What sharing today says (as text or the image card). */
+  share: ShareModel;
   /** This battle's attempt. */
   ts: number;
 }
@@ -423,7 +424,7 @@ export function Battle({
         </div>
         {streakText && <p className="mt-2 text-[14px] font-semibold">{streakText}</p>}
         <div className="mt-4 grid gap-2">
-          <ShareButton text={result.share} />
+          <ShareButton share={result.share} />
           <div className="grid grid-cols-2 gap-2">
             <Button variant="secondary" onClick={onRunItBack}>
               {result.summary.status === 'pending'

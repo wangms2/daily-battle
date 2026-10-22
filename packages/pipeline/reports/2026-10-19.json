@@ -1,8 +1,8 @@
 {
   "week": "2026-10-19",
   "generatorVersion": 3,
-  "builtAt": "2026-10-21T21:07:51.395Z",
-  "seconds": 189,
+  "builtAt": "2026-10-22T12:01:21.296Z",
+  "seconds": 374,
   "pool": {
     "stats": {
       "teams": 60,
@@ -10,18 +10,11 @@
       "bestWinRate": 0.85,
       "medianWinRate": 0.5625
     },
+    "problems": [],
     "suggested": [
       {
         "archetype": "Balanced",
         "team": [
-          {
-            "species": "Hippowdon",
-            "setId": "hippowdon-physically-defensive"
-          },
-          {
-            "species": "Azelf",
-            "setId": "azelf-standard-lead"
-          },
           {
             "species": "Celebi",
             "setId": "celebi-utility"
@@ -31,22 +24,38 @@
             "setId": "lucario-swords-dance"
           },
           {
-            "species": "Heatran",
-            "setId": "heatran-choice-scarf"
+            "species": "Hippowdon",
+            "setId": "hippowdon-physically-defensive"
           },
           {
-            "species": "Jirachi",
-            "setId": "jirachi-offensive"
+            "species": "Scizor",
+            "setId": "scizor-choice-band"
+          },
+          {
+            "species": "Suicune",
+            "setId": "suicune-supercune-offensive-calm-mind"
+          },
+          {
+            "species": "Heatran",
+            "setId": "heatran-utility"
           }
         ],
-        "winRate": 0.7875
+        "winRate": 0.7375
       },
       {
         "archetype": "Offense",
         "team": [
           {
             "species": "Rhyperior",
-            "setId": "rhyperior-choice-band"
+            "setId": "rhyperior-substitute"
+          },
+          {
+            "species": "Scizor",
+            "setId": "scizor-choice-band"
+          },
+          {
+            "species": "Heatran",
+            "setId": "heatran-utility"
           },
           {
             "species": "Celebi",
@@ -54,41 +63,33 @@
           },
           {
             "species": "Jirachi",
-            "setId": "jirachi-choice-scarf"
+            "setId": "jirachi-offensive"
           },
           {
-            "species": "Suicune",
-            "setId": "suicune-supercune-offensive-calm-mind"
-          },
-          {
-            "species": "Scizor",
-            "setId": "scizor-choice-band"
-          },
-          {
-            "species": "Tyranitar",
-            "setId": "tyranitar-all-purpose"
+            "species": "Azelf",
+            "setId": "azelf-standard-lead"
           }
         ],
-        "winRate": 0.85
+        "winRate": 0.8
       },
       {
         "archetype": "Stall",
         "team": [
           {
-            "species": "Lucario",
-            "setId": "lucario-swords-dance"
+            "species": "Suicune",
+            "setId": "suicune-crocune-defensive-calm-mind-resttalk"
+          },
+          {
+            "species": "Heatran",
+            "setId": "heatran-utility"
+          },
+          {
+            "species": "Hippowdon",
+            "setId": "hippowdon-physically-defensive"
           },
           {
             "species": "Tyranitar",
-            "setId": "tyranitar-choice-scarf"
-          },
-          {
-            "species": "Suicune",
-            "setId": "suicune-subcune"
-          },
-          {
-            "species": "Scizor",
-            "setId": "scizor-bulky-swords-dance"
+            "setId": "tyranitar-all-purpose"
           },
           {
             "species": "Celebi",
@@ -99,10 +100,9 @@
             "setId": "roserade-spikes"
           }
         ],
-        "winRate": 0.75
+        "winRate": 0.5875
       }
     ],
-    "problems": [],
     "candidate": 0,
     "accepted": "pass",
     "rejected": [],

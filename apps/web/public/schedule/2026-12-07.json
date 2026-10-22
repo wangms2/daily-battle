@@ -29,8 +29,12 @@
           "setId": "zapdos-physically-defensive"
         },
         {
-          "species": "Exeggutor",
-          "setId": "exeggutor-sunny-day"
+          "species": "Skarmory",
+          "setId": "skarmory-physically-defensive"
+        },
+        {
+          "species": "Flygon",
+          "setId": "flygon-choice-scarf"
         },
         {
           "species": "Magnezone",
@@ -38,11 +42,7 @@
         },
         {
           "species": "Tyranitar",
-          "setId": "tyranitar-choice-band"
-        },
-        {
-          "species": "Forretress",
-          "setId": "forretress-specially-defensive"
+          "setId": "tyranitar-all-purpose"
         },
         {
           "species": "Ludicolo",
@@ -54,28 +54,28 @@
       "archetype": "Offense",
       "team": [
         {
+          "species": "Suicune",
+          "setId": "suicune-supercune-offensive-calm-mind"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-choice-scarf"
+        },
+        {
+          "species": "Magnezone",
+          "setId": "magnezone-choice-scarf"
+        },
+        {
           "species": "Zapdos",
-          "setId": "zapdos-subroost"
-        },
-        {
-          "species": "Exeggutor",
-          "setId": "exeggutor-sunny-day"
-        },
-        {
-          "species": "Aerodactyl",
-          "setId": "aerodactyl-lead"
-        },
-        {
-          "species": "Metagross",
-          "setId": "metagross-agility"
+          "setId": "zapdos-agility"
         },
         {
           "species": "Flygon",
           "setId": "flygon-choice-scarf"
         },
         {
-          "species": "Magnezone",
-          "setId": "magnezone-choice-scarf"
+          "species": "Metagross",
+          "setId": "metagross-utility"
         }
       ]
     },
@@ -83,28 +83,28 @@
       "archetype": "Stall",
       "team": [
         {
-          "species": "Hitmontop",
-          "setId": "hitmontop-rapid-spin"
+          "species": "Suicune",
+          "setId": "suicune-crocune-defensive-calm-mind-resttalk"
+        },
+        {
+          "species": "Skarmory",
+          "setId": "skarmory-physically-defensive"
         },
         {
           "species": "Zapdos",
           "setId": "zapdos-physically-defensive"
         },
         {
-          "species": "Skarmory",
-          "setId": "skarmory-specially-defensive"
-        },
-        {
-          "species": "Suicune",
-          "setId": "suicune-subcune"
+          "species": "Hitmontop",
+          "setId": "hitmontop-rapid-spin"
         },
         {
           "species": "Forretress",
           "setId": "forretress-physically-defensive"
         },
         {
-          "species": "Aerodactyl",
-          "setId": "aerodactyl-life-orb"
+          "species": "Tyranitar",
+          "setId": "tyranitar-all-purpose"
         }
       ]
     }

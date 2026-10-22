@@ -1,8 +1,8 @@
 {
   "week": "2026-12-07",
   "generatorVersion": 3,
-  "builtAt": "2026-10-21T21:41:36.325Z",
-  "seconds": 295,
+  "builtAt": "2026-10-22T12:43:21.121Z",
+  "seconds": 215,
   "pool": {
     "stats": {
       "teams": 60,
@@ -10,6 +10,7 @@
       "bestWinRate": 0.65,
       "medianWinRate": 0.4375
     },
+    "problems": [],
     "suggested": [
       {
         "archetype": "Balanced",
@@ -19,46 +20,8 @@
             "setId": "zapdos-physically-defensive"
           },
           {
-            "species": "Exeggutor",
-            "setId": "exeggutor-sunny-day"
-          },
-          {
-            "species": "Magnezone",
-            "setId": "magnezone-choice-scarf"
-          },
-          {
-            "species": "Tyranitar",
-            "setId": "tyranitar-choice-band"
-          },
-          {
-            "species": "Forretress",
-            "setId": "forretress-specially-defensive"
-          },
-          {
-            "species": "Ludicolo",
-            "setId": "ludicolo-rain-dance-special-attacker"
-          }
-        ],
-        "winRate": 0.6875
-      },
-      {
-        "archetype": "Offense",
-        "team": [
-          {
-            "species": "Zapdos",
-            "setId": "zapdos-subroost"
-          },
-          {
-            "species": "Exeggutor",
-            "setId": "exeggutor-sunny-day"
-          },
-          {
-            "species": "Aerodactyl",
-            "setId": "aerodactyl-lead"
-          },
-          {
-            "species": "Metagross",
-            "setId": "metagross-agility"
+            "species": "Skarmory",
+            "setId": "skarmory-physically-defensive"
           },
           {
             "species": "Flygon",
@@ -67,42 +30,79 @@
           {
             "species": "Magnezone",
             "setId": "magnezone-choice-scarf"
+          },
+          {
+            "species": "Tyranitar",
+            "setId": "tyranitar-all-purpose"
+          },
+          {
+            "species": "Ludicolo",
+            "setId": "ludicolo-rain-dance-special-attacker"
           }
         ],
-        "winRate": 0.625
+        "winRate": 0.6
+      },
+      {
+        "archetype": "Offense",
+        "team": [
+          {
+            "species": "Suicune",
+            "setId": "suicune-supercune-offensive-calm-mind"
+          },
+          {
+            "species": "Tyranitar",
+            "setId": "tyranitar-choice-scarf"
+          },
+          {
+            "species": "Magnezone",
+            "setId": "magnezone-choice-scarf"
+          },
+          {
+            "species": "Zapdos",
+            "setId": "zapdos-agility"
+          },
+          {
+            "species": "Flygon",
+            "setId": "flygon-choice-scarf"
+          },
+          {
+            "species": "Metagross",
+            "setId": "metagross-utility"
+          }
+        ],
+        "winRate": 0.7375
       },
       {
         "archetype": "Stall",
         "team": [
           {
-            "species": "Hitmontop",
-            "setId": "hitmontop-rapid-spin"
+            "species": "Suicune",
+            "setId": "suicune-crocune-defensive-calm-mind-resttalk"
+          },
+          {
+            "species": "Skarmory",
+            "setId": "skarmory-physically-defensive"
           },
           {
             "species": "Zapdos",
             "setId": "zapdos-physically-defensive"
           },
           {
-            "species": "Skarmory",
-            "setId": "skarmory-specially-defensive"
-          },
-          {
-            "species": "Suicune",
-            "setId": "suicune-subcune"
+            "species": "Hitmontop",
+            "setId": "hitmontop-rapid-spin"
           },
           {
             "species": "Forretress",
             "setId": "forretress-physically-defensive"
           },
           {
-            "species": "Aerodactyl",
-            "setId": "aerodactyl-life-orb"
+            "species": "Tyranitar",
+            "setId": "tyranitar-all-purpose"
           }
         ],
-        "winRate": 0.625
+        "winRate": 0.5
       }
     ],
-    "problems": [],
     "candidate": 0,
     "accepted": "pass",
     "rejected": [],

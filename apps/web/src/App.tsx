@@ -9,7 +9,7 @@ import { reportText } from './lib/report';
 import { computeStats, dayHeadline, summarizeDay } from './lib/results';
 import { useSchedule } from './lib/schedule';
 import { ENGINE_VERSION, randomSeed } from './lib/seed';
-import { shareText } from './lib/share';
+import { shareModel } from './lib/share';
 import { attemptInProgress, dayDecided, withChange } from './state/reducer';
 import { emptyDay, type Settings } from './state/schema';
 import { useNow, useStore } from './state/context';
@@ -56,7 +56,7 @@ export function App() {
   // Streaks and stats come from the saved attempts (lib/results.ts).
   const stats = useMemo(() => computeStats(state.days, day), [state.days, day]);
   const summary = useMemo(() => summarizeDay(state.days[day], true), [state.days, day]);
-  const share = shareText({
+  const share = shareModel({
     day,
     summary,
     streak: stats.streak,
@@ -171,7 +171,7 @@ export function App() {
           summary,
           streak: stats.streak,
           // From the end card, share this run (a practice run adds its own line).
-          share: shareText({
+          share: shareModel({
             day,
             summary,
             streak: stats.streak,

@@ -1,8 +1,8 @@
 {
   "week": "2026-11-09",
   "generatorVersion": 3,
-  "builtAt": "2026-10-21T21:26:47.609Z",
-  "seconds": 151,
+  "builtAt": "2026-10-22T12:21:17.173Z",
+  "seconds": 296,
   "pool": {
     "stats": {
       "teams": 60,
@@ -10,99 +10,69 @@
       "bestWinRate": 0.525,
       "medianWinRate": 0.4375
     },
+    "problems": [],
     "suggested": [
       {
         "archetype": "Balanced",
         "team": [
           {
-            "species": "Blissey",
-            "setId": "blissey-standard"
-          },
-          {
-            "species": "Magnezone",
-            "setId": "magnezone-magnet-rise"
-          },
-          {
-            "species": "Mamoswine",
-            "setId": "mamoswine-physical-attacker"
-          },
-          {
             "species": "Heracross",
             "setId": "heracross-choice-scarf"
           },
           {
-            "species": "Donphan",
-            "setId": "donphan-standard"
-          },
-          {
-            "species": "Kabutops",
-            "setId": "kabutops-swords-dance"
-          }
-        ],
-        "winRate": 0.625
-      },
-      {
-        "archetype": "Offense",
-        "team": [
-          {
-            "species": "Starmie",
-            "setId": "starmie-defensive-rapid-spin"
-          },
-          {
-            "species": "Heracross",
-            "setId": "heracross-swords-dance"
-          },
-          {
-            "species": "Staraptor",
-            "setId": "staraptor-choice-band"
-          },
-          {
-            "species": "Breloom",
-            "setId": "breloom-swords-dance"
-          },
-          {
-            "species": "Gengar",
-            "setId": "gengar-utility"
-          },
-          {
             "species": "Magnezone",
             "setId": "magnezone-choice-scarf"
-          }
-        ],
-        "winRate": 0.53125
-      },
-      {
-        "archetype": "Stall",
-        "team": [
-          {
-            "species": "Mamoswine",
-            "setId": "mamoswine-physical-attacker"
           },
           {
             "species": "Breloom",
             "setId": "breloom-defensive"
           },
           {
+            "species": "Gengar",
+            "setId": "gengar-offensive"
+          },
+          {
             "species": "Donphan",
             "setId": "donphan-standard"
           },
           {
             "species": "Blissey",
             "setId": "blissey-standard"
+          }
+        ],
+        "winRate": 0.5
+      },
+      {
+        "archetype": "Offense",
+        "team": [
+          {
+            "species": "Mamoswine",
+            "setId": "mamoswine-physical-attacker"
           },
           {
-            "species": "Bronzong",
-            "setId": "bronzong-offensive-stealth-rock"
+            "species": "Breloom",
+            "setId": "breloom-swords-dance"
+          },
+          {
+            "species": "Heracross",
+            "setId": "heracross-choice-scarf"
           },
           {
             "species": "Azelf",
             "setId": "azelf-standard-lead"
+          },
+          {
+            "species": "Magnezone",
+            "setId": "magnezone-choice-scarf"
+          },
+          {
+            "species": "Bronzong",
+            "setId": "bronzong-offensive-stealth-rock"
           }
         ],
-        "winRate": 0.5625
+        "winRate": 0.6
       }
     ],
-    "problems": [],
     "candidate": 0,
     "accepted": "pass",
     "rejected": [],

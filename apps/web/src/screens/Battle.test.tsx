@@ -12,6 +12,7 @@ import type {
   View,
 } from '../battle/frames';
 import { summarizeDay } from '../lib/results';
+import { formatShareText, shareModel } from '../lib/share';
 import { initialState, type Attempt, type Settings } from '../state/schema';
 import { Battle, type DayResult } from './Battle';
 
@@ -150,7 +151,12 @@ function renderBattle(
     speed = 'instant',
     hints = true,
     tryNumber = 1,
-    result = { summary: summarizeDay(undefined, true), streak: 0, share: '', ts: 1 },
+    result = {
+      summary: summarizeDay(undefined, true),
+      streak: 0,
+      share: shareModel({ day: '2026-10-21', summary: summarizeDay(undefined, true), streak: 0 }),
+      ts: 1,
+    },
   }: {
     speed?: Settings['battleSpeed'];
     hints?: boolean;
@@ -407,12 +413,22 @@ describe('battle screen', () => {
     choices: [],
     engine: 'e',
   });
-  const dayResult = (attempts: Attempt[], streak: number): DayResult => ({
-    summary: summarizeDay({ swapUsed: false, attempts }, true),
-    streak,
-    share: 'SHARE TEXT',
-    ts: attempts.at(-1)!.ts,
-  });
+  const dayResult = (attempts: Attempt[], streak: number): DayResult => {
+    const summary = summarizeDay({ swapUsed: false, attempts }, true);
+    return {
+      summary,
+      streak,
+      share: shareModel({ day: '2026-10-21', summary, streak }),
+      ts: attempts.at(-1)!.ts,
+    };
+  };
+  /** Share opens a choice of image or text; picks the text. */
+  async function shareText(card: HTMLElement, label: string) {
+    await userEvent.click(within(card).getByRole('button', { name: 'Share' }));
+    const choice = await screen.findByRole('dialog', { name: 'Share your result' });
+    expect(within(choice).getByRole('button', { name: /image$/ })).toBeInTheDocument();
+    await userEvent.click(within(choice).getByRole('button', { name: label }));
+  }
   async function winBattle() {
     await userEvent.click(await thunderbolt());
     await within(screen.getByRole('banner')).findByText('Turn 2');
@@ -430,6 +446,7 @@ describe('battle screen', () => {
         result: dayResult([tried('loss', 0, 1), tried('win', 3, 2)], 4),
       });
       const card = await winBattle();
+      const result = dayResult([tried('loss', 0, 1), tried('win', 3, 2)], 4);
       expect(card).toHaveTextContent('You won');
       expect(card).toHaveTextContent('Try 2 of 3');
       expect(card).not.toHaveTextContent('First try');
@@ -437,8 +454,8 @@ describe('battle screen', () => {
       expect(within(card).getByLabelText('Try 2: won, 3 of 6 left')).toBeInTheDocument();
       expect(card).toHaveTextContent('🔥 4-day streak');
       expect(props.onEnd).toHaveBeenCalledWith({ result: 'win', remaining: 3 });
-      await userEvent.click(within(card).getByRole('button', { name: 'Share' }));
-      expect(share).toHaveBeenCalledWith({ text: 'SHARE TEXT' });
+      await shareText(card, 'Share text');
+      expect(share).toHaveBeenCalledWith({ text: formatShareText(result.share) });
       await userEvent.click(within(card).getByRole('button', { name: 'Play again' }));
       expect(props.onRunItBack).toHaveBeenCalled();
     } finally {
@@ -478,8 +495,10 @@ describe('battle screen', () => {
       expect(card).toHaveTextContent('Try 1 of 3');
       expect(card).toHaveTextContent('🔥 2-day streak · 2 tries left to keep it');
       expect(within(card).getByRole('button', { name: 'Try again · 2 left' })).toBeInTheDocument();
-      await userEvent.click(within(card).getByRole('button', { name: 'Share' }));
-      expect(writeText).toHaveBeenCalledWith('SHARE TEXT');
+      await shareText(card, 'Copy text');
+      expect(writeText).toHaveBeenCalledWith(
+        formatShareText(dayResult([tried('loss', 1, 1)], 2).share),
+      );
       expect(await screen.findByRole('status')).toHaveTextContent('Copied to clipboard');
     } finally {
       vi.unstubAllGlobals();

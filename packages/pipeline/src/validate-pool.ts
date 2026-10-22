@@ -11,6 +11,7 @@ import {
   type TeamSlot,
   type WeeklyPool,
 } from '@daily-battle/gen';
+import { archetypeTeams } from './archetypes';
 import { PIPELINE } from './config';
 import type { Job } from './job';
 import { poolTeams } from './sample';
@@ -34,24 +35,10 @@ export interface PoolResult {
   rejected: { candidate: number; stats: PoolStats; problems: string[] }[];
 }
 
-const ARCHETYPE = { balance: 'Balanced', offense: 'Offense', stall: 'Stall' } as const;
-
 type Config = typeof PIPELINE.pool;
 
-async function checkPool(
-  week: string,
-  candidate: number,
-  sim: Simulator,
-  data: SetsFile,
-  cfg: Config,
-) {
-  const pool = generatePool(week, data, candidate);
-  const teams = poolTeams(
-    pool.species,
-    cfg.teams,
-    rngFor(`pipeline:pool-teams:${week}:c${candidate}`),
-    data,
-  );
+/** Win rates of teams against the week's off-schedule probe opponents (mid bot). */
+function rater(week: string, candidate: number, sim: Simulator, data: SetsFile, cfg: Config) {
   const probes = Array.from({ length: Math.max(cfg.opponents, cfg.retestOpponents) }, (_, k) =>
     generateOpponent(week, data, cfg.probeCandidateBase + k),
   );
@@ -82,7 +69,24 @@ async function checkPool(
           .reduce((a, r) => a + (r.outcome === 'win' ? 1 : r.outcome === 'tie' ? 0.5 : 0), 0) / per,
     );
   };
+  return winRates;
+}
 
+async function checkPool(
+  week: string,
+  candidate: number,
+  sim: Simulator,
+  data: SetsFile,
+  cfg: Config,
+) {
+  const pool = generatePool(week, data, candidate);
+  const teams = poolTeams(
+    pool.species,
+    cfg.teams,
+    rngFor(`pipeline:pool-teams:${week}:c${candidate}`),
+    data,
+  );
+  const winRates = rater(week, candidate, sim, data, cfg);
   const rates = await winRates(teams, cfg.opponents, cfg.seeds, 'screen');
   const order = teams.map((team, t) => ({ team, rate: rates[t]! })).sort((a, b) => b.rate - a.rate);
   // A team's best-of-60 rate over few battles is mostly luck; re-test the leaders properly.
@@ -104,17 +108,11 @@ async function checkPool(
     medianWinRate: sorted[Math.floor(sorted.length / 2)]!,
   };
 
-  // The best viable team of each archetype.
-  const suggested: PoolResult['suggested'] = [];
-  for (const { team, rate } of order) {
-    if (rate < cfg.viableWinRate) break;
-    const archetype = ARCHETYPE[styleOf(team.map((slot) => findSet(data, slot)))];
-    if (!suggested.some((s) => s.archetype === archetype))
-      suggested.push({ archetype, team, winRate: rate });
-  }
-  const archetypeOrder: Archetype[] = ['Balanced', 'Offense', 'Stall'];
-  suggested.sort(
-    (a, b) => archetypeOrder.indexOf(a.archetype) - archetypeOrder.indexOf(b.archetype),
+  // Pool diversity: viable random teams should come in more than one style.
+  const styles = new Set(
+    order
+      .filter((x) => x.rate >= cfg.viableWinRate)
+      .map((x) => styleOf(x.team.map((slot) => findSet(data, slot)))),
   );
 
   const problems: string[] = [];
@@ -124,10 +122,56 @@ async function checkPool(
   if (stats.bestWinRate > cfg.maxBestWinRate) {
     problems.push(`one team dominates: ${pct(stats.bestWinRate)}`);
   }
-  if (suggested.length < cfg.minSuggested) {
-    problems.push(`only ${suggested.length} distinct suggested archetype(s)`);
+  if (styles.size < cfg.minSuggested) {
+    problems.push(`only ${styles.size} distinct suggested archetype(s)`);
   }
-  return { pool, stats, suggested, problems };
+  return { pool, stats, problems };
+}
+
+const ARCHETYPES: Archetype[] = ['Balanced', 'Offense', 'Stall'];
+
+/**
+ * The strongest viable team of each archetype, built to that archetype's rules
+ * (archetypes.ts) rather than labelled after the fact, so "Stall" is walls and
+ * "Offense" is attackers. An archetype the pool can't field is left out.
+ */
+async function suggestTeams(
+  week: string,
+  candidate: number,
+  pool: WeeklyPool,
+  sim: Simulator,
+  data: SetsFile,
+  cfg: Config,
+): Promise<PoolResult['suggested']> {
+  const winRates = rater(week, candidate, sim, data, cfg);
+  const suggested: PoolResult['suggested'] = [];
+  for (const archetype of ARCHETYPES) {
+    const teams = archetypeTeams(
+      pool.species,
+      archetype,
+      cfg.suggestTeams,
+      rngFor(`pipeline:suggest:${week}:c${candidate}:${archetype}`),
+      data,
+    );
+    if (!teams.length) continue;
+    const tag = `suggest-${archetype}`;
+    const rates = await winRates(teams, cfg.opponents, cfg.seeds, tag);
+    const top = teams
+      .map((team, t) => ({ team, rate: rates[t]! }))
+      .sort((a, b) => b.rate - a.rate)
+      .slice(0, cfg.suggestRetestTop);
+    const retested = await winRates(
+      top.map((x) => x.team),
+      cfg.retestOpponents,
+      cfg.retestSeeds,
+      `${tag}-retest`,
+    );
+    top.forEach((x, i) => (x.rate = retested[i]!));
+    top.sort((a, b) => b.rate - a.rate);
+    const best = top[0]!;
+    if (best.rate >= cfg.viableWinRate) suggested.push({ archetype, ...best, winRate: best.rate });
+  }
+  return suggested.map(({ archetype, team, winRate }) => ({ archetype, team, winRate }));
 }
 
 /** Tries pool candidates for a week until one passes; otherwise keeps the closest. */
@@ -141,9 +185,13 @@ export async function validatePool(
   let best: (Awaited<ReturnType<typeof checkPool>> & { candidate: number }) | undefined;
   for (let candidate = 0; candidate < cfg.maxCandidates; candidate++) {
     const result = await checkPool(week, candidate, sim, data, cfg);
-    if (!result.problems.length) return { ...result, candidate, accepted: 'pass', rejected };
+    if (!result.problems.length) {
+      const suggested = await suggestTeams(week, candidate, result.pool, sim, data, cfg);
+      return { ...result, suggested, candidate, accepted: 'pass', rejected };
+    }
     rejected.push({ candidate, stats: result.stats, problems: result.problems });
     if (!best || result.problems.length < best.problems.length) best = { ...result, candidate };
   }
-  return { ...best!, accepted: 'closest', rejected };
+  const suggested = await suggestTeams(week, best!.candidate, best!.pool, sim, data, cfg);
+  return { ...best!, suggested, accepted: 'closest', rejected };
 }

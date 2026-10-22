@@ -25,28 +25,28 @@
       "archetype": "Balanced",
       "team": [
         {
-          "species": "Milotic",
-          "setId": "milotic-physically-defensive"
-        },
-        {
-          "species": "Registeel",
-          "setId": "registeel-tank"
-        },
-        {
-          "species": "Heatran",
-          "setId": "heatran-trapper"
-        },
-        {
-          "species": "Infernape",
-          "setId": "infernape-nasty-plot"
+          "species": "Electivire",
+          "setId": "electivire-mixed-attacker"
         },
         {
           "species": "Jolteon",
           "setId": "jolteon-choice-specs"
         },
         {
+          "species": "Registeel",
+          "setId": "registeel-tank"
+        },
+        {
+          "species": "Milotic",
+          "setId": "milotic-physically-defensive"
+        },
+        {
           "species": "Zapdos",
-          "setId": "zapdos-subroost"
+          "setId": "zapdos-specially-defensive"
+        },
+        {
+          "species": "Heatran",
+          "setId": "heatran-choice-scarf"
         }
       ]
     },
@@ -54,28 +54,28 @@
       "archetype": "Offense",
       "team": [
         {
-          "species": "Azelf",
-          "setId": "azelf-standard-lead"
-        },
-        {
-          "species": "Jolteon",
-          "setId": "jolteon-choice-specs"
+          "species": "Registeel",
+          "setId": "registeel-tank"
         },
         {
           "species": "Infernape",
           "setId": "infernape-mixed-attacker"
         },
         {
-          "species": "Electivire",
-          "setId": "electivire-mixed-attacker"
-        },
-        {
-          "species": "Heatran",
-          "setId": "heatran-substitute"
+          "species": "Celebi",
+          "setId": "celebi-nasty-plot"
         },
         {
           "species": "Tyranitar",
           "setId": "tyranitar-choice-scarf"
+        },
+        {
+          "species": "Zapdos",
+          "setId": "zapdos-subroost"
+        },
+        {
+          "species": "Electivire",
+          "setId": "electivire-mixed-attacker"
         }
       ]
     },
@@ -83,16 +83,8 @@
       "archetype": "Stall",
       "team": [
         {
-          "species": "Infernape",
-          "setId": "infernape-nasty-plot"
-        },
-        {
-          "species": "Milotic",
-          "setId": "milotic-physically-defensive"
-        },
-        {
-          "species": "Azelf",
-          "setId": "azelf-standard-lead"
+          "species": "Hippowdon",
+          "setId": "hippowdon-physically-defensive"
         },
         {
           "species": "Celebi",
@@ -100,11 +92,19 @@
         },
         {
           "species": "Zapdos",
-          "setId": "zapdos-physically-defensive"
+          "setId": "zapdos-specially-defensive"
+        },
+        {
+          "species": "Milotic",
+          "setId": "milotic-physically-defensive"
         },
         {
           "species": "Heatran",
-          "setId": "heatran-choice-scarf"
+          "setId": "heatran-utility"
+        },
+        {
+          "species": "Registeel",
+          "setId": "registeel-tank"
         }
       ]
     }

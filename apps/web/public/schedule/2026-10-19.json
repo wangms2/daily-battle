@@ -25,14 +25,6 @@
       "archetype": "Balanced",
       "team": [
         {
-          "species": "Hippowdon",
-          "setId": "hippowdon-physically-defensive"
-        },
-        {
-          "species": "Azelf",
-          "setId": "azelf-standard-lead"
-        },
-        {
           "species": "Celebi",
           "setId": "celebi-utility"
         },
@@ -41,12 +33,20 @@
           "setId": "lucario-swords-dance"
         },
         {
-          "species": "Heatran",
-          "setId": "heatran-choice-scarf"
+          "species": "Hippowdon",
+          "setId": "hippowdon-physically-defensive"
         },
         {
-          "species": "Jirachi",
-          "setId": "jirachi-offensive"
+          "species": "Scizor",
+          "setId": "scizor-choice-band"
+        },
+        {
+          "species": "Suicune",
+          "setId": "suicune-supercune-offensive-calm-mind"
+        },
+        {
+          "species": "Heatran",
+          "setId": "heatran-utility"
         }
       ]
     },
@@ -55,7 +55,15 @@
       "team": [
         {
           "species": "Rhyperior",
-          "setId": "rhyperior-choice-band"
+          "setId": "rhyperior-substitute"
+        },
+        {
+          "species": "Scizor",
+          "setId": "scizor-choice-band"
+        },
+        {
+          "species": "Heatran",
+          "setId": "heatran-utility"
         },
         {
           "species": "Celebi",
@@ -63,19 +71,11 @@
         },
         {
           "species": "Jirachi",
-          "setId": "jirachi-choice-scarf"
+          "setId": "jirachi-offensive"
         },
         {
-          "species": "Suicune",
-          "setId": "suicune-supercune-offensive-calm-mind"
-        },
-        {
-          "species": "Scizor",
-          "setId": "scizor-choice-band"
-        },
-        {
-          "species": "Tyranitar",
-          "setId": "tyranitar-all-purpose"
+          "species": "Azelf",
+          "setId": "azelf-standard-lead"
         }
       ]
     },
@@ -83,20 +83,20 @@
       "archetype": "Stall",
       "team": [
         {
-          "species": "Lucario",
-          "setId": "lucario-swords-dance"
+          "species": "Suicune",
+          "setId": "suicune-crocune-defensive-calm-mind-resttalk"
+        },
+        {
+          "species": "Heatran",
+          "setId": "heatran-utility"
+        },
+        {
+          "species": "Hippowdon",
+          "setId": "hippowdon-physically-defensive"
         },
         {
           "species": "Tyranitar",
-          "setId": "tyranitar-choice-scarf"
-        },
-        {
-          "species": "Suicune",
-          "setId": "suicune-subcune"
-        },
-        {
-          "species": "Scizor",
-          "setId": "scizor-bulky-swords-dance"
+          "setId": "tyranitar-all-purpose"
         },
         {
           "species": "Celebi",

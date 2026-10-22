@@ -167,6 +167,10 @@ test('a run after the day is won is practice, and shares as practice', async ({ 
   await expect(card).toContainText('Practice');
   await expect(card).not.toContainText('of 3');
   await card.getByRole('button', { name: 'Share' }).click();
+  await page
+    .getByRole('dialog', { name: 'Share your result' })
+    .getByRole('button', { name: 'Copy text' })
+    .click();
   const copied = await page.evaluate(() => (window as unknown as { copied: string }).copied);
   expect(copied).toContain('⭐ First try! 4/6 left');
   expect(copied).toMatch(/🔁 Practice ❌ /);
@@ -314,6 +318,14 @@ test('three lost tries break the streak, and the result copies to share', async 
   await page.screenshot({ path: `${dir}/29-brief-result.png` });
 
   await strip.getByRole('button', { name: 'Share' }).click();
+  const choice = page.getByRole('dialog', { name: 'Share your result' });
+  // The card image is drawn for the preview; the image button waits for it.
+  await expect(choice.getByRole('img')).toBeVisible();
+  await expect(choice.getByRole('button', { name: /^(Share|Copy|Save) image$/ })).toBeEnabled();
+  await page.waitForTimeout(300);
+  await noScroll(page, 'share choice');
+  await page.screenshot({ path: `${dir}/30-share-choice.png` });
+  await choice.getByRole('button', { name: 'Copy text' }).click();
   await expect(page.getByRole('status')).toContainText('Copied');
   const copied = await page.evaluate(() => (window as unknown as { copied: string }).copied);
   const lines = copied.split('\n');

@@ -37,6 +37,9 @@ export const PIPELINE = {
     retestSeeds: 4,
     maxBestWinRate: 0.85,
     minSuggested: 2,
+    /** Candidate teams built per archetype for the suggestions, and how many are re-tested. */
+    suggestTeams: 16,
+    suggestRetestTop: 3,
     maxCandidates: 8,
     /** Off-schedule opponent candidates start here so they never match a scheduled day's. */
     probeCandidateBase: 100,

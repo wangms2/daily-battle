@@ -3,7 +3,7 @@ import { CHECK_ITEMS, sharedWeaknesses, type Checklist } from '../lib/data';
 import { getSprite } from '../lib/sprites';
 import type { Stats } from '../lib/results';
 import type { Settings } from '../state/schema';
-import { ShareButton } from '../ui/results';
+import { TextShareButton } from '../ui/results';
 import { Sheet } from '../ui/Sheet';
 import { Button, Switch, TypeBadge } from '../ui/bits';
 import { CheckIcon, CloseIcon } from '../ui/icons';
@@ -168,9 +168,9 @@ export function SettingsSheet({
         />
       </div>
       <div className="mt-3 grid grid-cols-2 gap-2">
-        <ShareButton text={report} variant="secondary">
+        <TextShareButton text={report} variant="secondary">
           Copy playtest report
-        </ShareButton>
+        </TextShareButton>
         <Button variant="secondary" onClick={onAbout}>
           About and credits
         </Button>

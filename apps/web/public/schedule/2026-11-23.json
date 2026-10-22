@@ -25,20 +25,8 @@
       "archetype": "Balanced",
       "team": [
         {
-          "species": "Kingdra",
-          "setId": "kingdra-dragon-dance"
-        },
-        {
-          "species": "Ludicolo",
-          "setId": "ludicolo-rain-dance-special-attacker"
-        },
-        {
           "species": "Scizor",
-          "setId": "scizor-choice-band"
-        },
-        {
-          "species": "Suicune",
-          "setId": "suicune-supercune-offensive-calm-mind"
+          "setId": "scizor-bulky-swords-dance"
         },
         {
           "species": "Milotic",
@@ -47,6 +35,18 @@
         {
           "species": "Hippowdon",
           "setId": "hippowdon-physically-defensive"
+        },
+        {
+          "species": "Empoleon",
+          "setId": "empoleon-agility"
+        },
+        {
+          "species": "Suicune",
+          "setId": "suicune-subcune"
+        },
+        {
+          "species": "Dragonite",
+          "setId": "dragonite-choice-band"
         }
       ]
     },
@@ -54,53 +54,24 @@
       "archetype": "Offense",
       "team": [
         {
-          "species": "Forretress",
-          "setId": "forretress-physically-defensive"
-        },
-        {
-          "species": "Suicune",
-          "setId": "suicune-subcune"
-        },
-        {
-          "species": "Scizor",
-          "setId": "scizor-choice-band"
-        },
-        {
           "species": "Dragonite",
-          "setId": "dragonite-offensive-dragon-dance"
+          "setId": "dragonite-mixed"
+        },
+        {
+          "species": "Vaporeon",
+          "setId": "vaporeon-offensive-substitute-pass"
         },
         {
           "species": "Kingdra",
-          "setId": "kingdra-dragon-dance"
-        },
-        {
-          "species": "Jolteon",
-          "setId": "jolteon-choice-specs"
-        }
-      ]
-    },
-    {
-      "archetype": "Stall",
-      "team": [
-        {
-          "species": "Hippowdon",
-          "setId": "hippowdon-specially-defensive"
+          "setId": "kingdra-choice-specs"
         },
         {
           "species": "Scizor",
           "setId": "scizor-choice-band"
         },
         {
-          "species": "Jolteon",
-          "setId": "jolteon-choice-specs"
-        },
-        {
-          "species": "Milotic",
-          "setId": "milotic-physically-defensive"
-        },
-        {
-          "species": "Suicune",
-          "setId": "suicune-crocune-defensive-calm-mind-resttalk"
+          "species": "Forretress",
+          "setId": "forretress-physically-defensive"
         },
         {
           "species": "Ludicolo",

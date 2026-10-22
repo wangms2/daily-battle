@@ -219,6 +219,10 @@ Weights are parameters (§8.5).
 - Sample many legal 6-of-12 teams from the pool with random set choices. Simulate against several random daily opponents.
 - Require: sufficient viable teams (win rate above a floor for the mid bot), and no single dominating team (cap on the best team's win rate).
 - Also emit 2–3 **suggested teams** per week with distinct archetypes (e.g. Balanced, Offense, Stall) that pass validation, for the team builder's suggestion row (§12.2a).
+  - Suggested teams are **built to their archetype**, not labelled after the fact (`packages/pipeline/src/archetypes.ts`). Each set gets a role: an **attacker** (Choice item, Life Orb, Expert Belt, Focus Sash, a sweeping setup move such as Swords Dance or Dragon Dance, or a frail set with a full attacking stat), a **wall** (bulky, with recovery, Leftovers/Black Sludge, status or phazing; bulky Calm Mind or Curse counts), or **support** (the rest).
+  - **Offense:** 4–6 attackers, no walls. **Stall:** 4–6 walls, no attackers. **Balanced:** 2–3 of each. All three need a hazard setter.
+  - Per archetype, 16 candidate teams are drawn to those rules and simulated against the week's probe opponents; the top 3 are re-tested and the best is suggested if it clears the viability floor. A pool that can't field an archetype (too few walls for stall, say) simply offers fewer suggestions.
+  - Pool acceptance is unaffected: it still checks that viable random teams come in more than one style.
 
 ### 9.3 Opponent validation (daily)
 - Simulate each candidate daily opponent against sampled teams from that week's pool using the bots.
@@ -281,7 +285,9 @@ Other headlines: `❌ Not cleared in 3 tries` (with `🔥 Streak reset`), `✅ W
 - The last line is the link to play (the site's own address), so friends can tap through.
 - Each row shows that try's result and your Pokémon left out of 6 (green = alive; grey ⬜ = still standing on a try that was given up). At most 7 lines.
 - Team: species only, lead first, from the deciding try (the win, or the latest try that counted); `*` marks a species swapped in that day.
-- Plain text by default (pastes anywhere): Web Share API where available, else the clipboard, else the text is shown to copy.
+- **Share opens a choice: image or text.** Both say the same thing, built from one model (`lib/share.ts`).
+  - **Text:** plain text that pastes anywhere: Web Share API where available, else the clipboard, else it's shown to copy.
+  - **Image:** a 1200×630 card in the app's light theme (`lib/shareCard.ts`), drawn on a canvas in the browser: the date, the headline (gold "⭐ First try" badge), the try rows as squares, a practice row when sharing one, the team as sprites with names (`*` and gold for the day's swap), the streak, and the site address. The sheet previews it; it goes to the share sheet with the link as text where files can be shared (phones), else the clipboard, else a download.
 - Never include opponent species, sets, or turn counts.
 
 ## 12. UI and tech

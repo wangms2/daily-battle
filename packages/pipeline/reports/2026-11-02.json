@@ -1,8 +1,8 @@
 {
   "week": "2026-11-02",
   "generatorVersion": 3,
-  "builtAt": "2026-10-21T21:24:16.299Z",
-  "seconds": 267,
+  "builtAt": "2026-10-22T12:16:21.086Z",
+  "seconds": 430,
   "pool": {
     "stats": {
       "teams": 60,
@@ -10,6 +10,7 @@
       "bestWinRate": 0.8,
       "medianWinRate": 0.59375
     },
+    "problems": [],
     "suggested": [
       {
         "archetype": "Balanced",
@@ -19,27 +20,27 @@
             "setId": "donphan-standard"
           },
           {
-            "species": "Latias",
-            "setId": "latias-choice-specs"
-          },
-          {
-            "species": "Magneton",
-            "setId": "magneton-choice-scarf"
-          },
-          {
-            "species": "Flygon",
-            "setId": "flygon-mixed-attacker"
-          },
-          {
             "species": "Heatran",
-            "setId": "heatran-utility"
+            "setId": "heatran-choice-scarf"
           },
           {
             "species": "Gyarados",
             "setId": "gyarados-offensive-dragon-dance"
+          },
+          {
+            "species": "Quagsire",
+            "setId": "quagsire-specially-defensive"
+          },
+          {
+            "species": "Suicune",
+            "setId": "suicune-subcune"
+          },
+          {
+            "species": "Latias",
+            "setId": "latias-choice-scarf"
           }
         ],
-        "winRate": 0.75
+        "winRate": 0.7
       },
       {
         "archetype": "Offense",
@@ -53,26 +54,55 @@
             "setId": "gyarados-offensive-dragon-dance"
           },
           {
-            "species": "Suicune",
-            "setId": "suicune-subcune"
-          },
-          {
-            "species": "Shaymin",
-            "setId": "shaymin-rest-sleep-talk"
-          },
-          {
-            "species": "Flygon",
-            "setId": "flygon-choice-scarf"
+            "species": "Mamoswine",
+            "setId": "mamoswine-physical-attacker"
           },
           {
             "species": "Electivire",
             "setId": "electivire-mixed-attacker"
+          },
+          {
+            "species": "Arcanine",
+            "setId": "arcanine-morning-glory-physical-attacker"
+          },
+          {
+            "species": "Heatran",
+            "setId": "heatran-utility"
           }
         ],
-        "winRate": 0.8
+        "winRate": 0.875
+      },
+      {
+        "archetype": "Stall",
+        "team": [
+          {
+            "species": "Heatran",
+            "setId": "heatran-utility"
+          },
+          {
+            "species": "Arcanine",
+            "setId": "arcanine-physically-defensive"
+          },
+          {
+            "species": "Suicune",
+            "setId": "suicune-crocune-defensive-calm-mind-resttalk"
+          },
+          {
+            "species": "Donphan",
+            "setId": "donphan-standard"
+          },
+          {
+            "species": "Latias",
+            "setId": "latias-calm-mind-2-attacks"
+          },
+          {
+            "species": "Quagsire",
+            "setId": "quagsire-specially-defensive"
+          }
+        ],
+        "winRate": 0.6
       }
     ],
-    "problems": [],
     "candidate": 0,
     "accepted": "pass",
     "rejected": [],

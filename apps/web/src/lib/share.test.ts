@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import schedule from '../../public/schedule/2026-10-19.json';
 import type { Attempt, DayChange, DayState, Slot } from '../state/schema';
 import { summarizeDay } from './results';
-import { shareResult, shareText } from './share';
+import { imageMode, shareResult, shareText } from './share';
 
 const DAY = '2026-10-21';
 const TEAM: Slot[] = ['Hippowdon', 'Azelf', 'Celebi', 'Heatran', 'Jirachi', 'Lucario'].map(
@@ -164,5 +164,30 @@ describe('shareResult', () => {
       clipboard: { writeText: vi.fn(async () => Promise.reject(new Error('no'))) },
     });
     expect(await shareResult('hi')).toBe('manual');
+  });
+});
+
+describe('imageMode', () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it('prefers the system share sheet when it takes files (phones)', () => {
+    vi.stubGlobal('navigator', { share: vi.fn(), canShare: () => true });
+    expect(imageMode()).toBe('share');
+    // Older share sheets with no canShare still get to try.
+    vi.stubGlobal('navigator', { share: vi.fn() });
+    expect(imageMode()).toBe('share');
+  });
+
+  it('copies on desktops whose share sheet refuses files, else saves', () => {
+    vi.stubGlobal('ClipboardItem', class {});
+    vi.stubGlobal('navigator', {
+      share: vi.fn(),
+      canShare: () => false,
+      clipboard: { write: vi.fn() },
+    });
+    expect(imageMode()).toBe('copy');
+    vi.stubGlobal('ClipboardItem', undefined);
+    vi.stubGlobal('navigator', {});
+    expect(imageMode()).toBe('save');
   });
 });

@@ -25,28 +25,28 @@
       "archetype": "Balanced",
       "team": [
         {
-          "species": "Blissey",
-          "setId": "blissey-standard"
+          "species": "Heracross",
+          "setId": "heracross-choice-scarf"
         },
         {
           "species": "Magnezone",
-          "setId": "magnezone-magnet-rise"
+          "setId": "magnezone-choice-scarf"
         },
         {
-          "species": "Mamoswine",
-          "setId": "mamoswine-physical-attacker"
+          "species": "Breloom",
+          "setId": "breloom-defensive"
         },
         {
-          "species": "Heracross",
-          "setId": "heracross-choice-scarf"
+          "species": "Gengar",
+          "setId": "gengar-offensive"
         },
         {
           "species": "Donphan",
           "setId": "donphan-standard"
         },
         {
-          "species": "Kabutops",
-          "setId": "kabutops-swords-dance"
+          "species": "Blissey",
+          "setId": "blissey-standard"
         }
       ]
     },
@@ -54,57 +54,28 @@
       "archetype": "Offense",
       "team": [
         {
-          "species": "Starmie",
-          "setId": "starmie-defensive-rapid-spin"
-        },
-        {
-          "species": "Heracross",
-          "setId": "heracross-swords-dance"
-        },
-        {
-          "species": "Staraptor",
-          "setId": "staraptor-choice-band"
+          "species": "Mamoswine",
+          "setId": "mamoswine-physical-attacker"
         },
         {
           "species": "Breloom",
           "setId": "breloom-swords-dance"
         },
         {
-          "species": "Gengar",
-          "setId": "gengar-utility"
-        },
-        {
-          "species": "Magnezone",
-          "setId": "magnezone-choice-scarf"
-        }
-      ]
-    },
-    {
-      "archetype": "Stall",
-      "team": [
-        {
-          "species": "Mamoswine",
-          "setId": "mamoswine-physical-attacker"
-        },
-        {
-          "species": "Breloom",
-          "setId": "breloom-defensive"
-        },
-        {
-          "species": "Donphan",
-          "setId": "donphan-standard"
-        },
-        {
-          "species": "Blissey",
-          "setId": "blissey-standard"
-        },
-        {
-          "species": "Bronzong",
-          "setId": "bronzong-offensive-stealth-rock"
+          "species": "Heracross",
+          "setId": "heracross-choice-scarf"
         },
         {
           "species": "Azelf",
           "setId": "azelf-standard-lead"
+        },
+        {
+          "species": "Magnezone",
+          "setId": "magnezone-choice-scarf"
+        },
+        {
+          "species": "Bronzong",
+          "setId": "bronzong-offensive-stealth-rock"
         }
       ]
     }

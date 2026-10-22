@@ -1,8 +1,8 @@
 {
   "week": "2026-11-30",
   "generatorVersion": 3,
-  "builtAt": "2026-10-21T21:36:41.399Z",
-  "seconds": 203,
+  "builtAt": "2026-10-22T12:39:46.110Z",
+  "seconds": 344,
   "pool": {
     "stats": {
       "teams": 60,
@@ -10,69 +10,39 @@
       "bestWinRate": 0.675,
       "medianWinRate": 0.4375
     },
+    "problems": [],
     "suggested": [
-      {
-        "archetype": "Balanced",
-        "team": [
-          {
-            "species": "Tyranitar",
-            "setId": "tyranitar-dragon-dance"
-          },
-          {
-            "species": "Shaymin",
-            "setId": "shaymin-rest-sleep-talk"
-          },
-          {
-            "species": "Scizor",
-            "setId": "scizor-bulky-swords-dance"
-          },
-          {
-            "species": "Sceptile",
-            "setId": "sceptile-swords-dance"
-          },
-          {
-            "species": "Magnezone",
-            "setId": "magnezone-choice-scarf"
-          },
-          {
-            "species": "Aerodactyl",
-            "setId": "aerodactyl-lead"
-          }
-        ],
-        "winRate": 0.59375
-      },
       {
         "archetype": "Offense",
         "team": [
-          {
-            "species": "Aerodactyl",
-            "setId": "aerodactyl-lead"
-          },
-          {
-            "species": "Tyranitar",
-            "setId": "tyranitar-choice-scarf"
-          },
-          {
-            "species": "Electivire",
-            "setId": "electivire-mixed-attacker"
-          },
           {
             "species": "Scizor",
             "setId": "scizor-choice-band"
           },
           {
-            "species": "Starmie",
-            "setId": "starmie-defensive-rapid-spin"
+            "species": "Aerodactyl",
+            "setId": "aerodactyl-lead"
           },
           {
-            "species": "Shaymin",
-            "setId": "shaymin-rest-sleep-talk"
+            "species": "Tyranitar",
+            "setId": "tyranitar-choice-band"
+          },
+          {
+            "species": "Breloom",
+            "setId": "breloom-swords-dance"
+          },
+          {
+            "species": "Metagross",
+            "setId": "metagross-trick-iron-ball"
+          },
+          {
+            "species": "Sceptile",
+            "setId": "sceptile-swords-dance"
           }
         ],
-        "winRate": 0.675
+        "winRate": 0.5875
       }
     ],
-    "problems": [],
     "candidate": 0,
     "accepted": "pass",
     "rejected": [],

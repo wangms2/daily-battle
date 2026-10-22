@@ -14,6 +14,7 @@ import type { DayChange, DayState } from '../state/schema';
 import { Button, SectionLabel } from '../ui/bits';
 import { StarIcon } from '../ui/icons';
 import { PokemonTile } from '../ui/PokemonTile';
+import type { ShareModel } from '../lib/share';
 import { ShareButton } from '../ui/results';
 import { useWide } from '../ui/useWide';
 
@@ -43,7 +44,7 @@ export function DailyBrief({
    */
   practice?: boolean;
   /** Today's result so far, the share text, and time to the next opponent. */
-  result: { summary: DaySummary; streak: number; share: string; countdown: string };
+  result: { summary: DaySummary; streak: number; share: ShareModel; countdown: string };
   schedule: ScheduleFile;
   day: string;
   team: Slot[];
@@ -248,7 +249,7 @@ export function DailyBrief({
             .join(' · ')}
         </p>
       </div>
-      <ShareButton text={result.share} variant="secondary" className="h-9 shrink-0 px-4" />
+      <ShareButton share={result.share} variant="secondary" className="h-9 shrink-0 px-4" />
     </section>
   );
 

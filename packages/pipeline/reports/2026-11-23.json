@@ -1,8 +1,8 @@
 {
   "week": "2026-11-23",
   "generatorVersion": 3,
-  "builtAt": "2026-10-21T21:33:18.578Z",
-  "seconds": 157,
+  "builtAt": "2026-10-22T12:34:01.898Z",
+  "seconds": 298,
   "pool": {
     "stats": {
       "teams": 60,
@@ -10,25 +10,14 @@
       "bestWinRate": 0.8,
       "medianWinRate": 0.5625
     },
+    "problems": [],
     "suggested": [
       {
         "archetype": "Balanced",
         "team": [
           {
-            "species": "Kingdra",
-            "setId": "kingdra-dragon-dance"
-          },
-          {
-            "species": "Ludicolo",
-            "setId": "ludicolo-rain-dance-special-attacker"
-          },
-          {
             "species": "Scizor",
-            "setId": "scizor-choice-band"
-          },
-          {
-            "species": "Suicune",
-            "setId": "suicune-supercune-offensive-calm-mind"
+            "setId": "scizor-bulky-swords-dance"
           },
           {
             "species": "Milotic",
@@ -37,72 +26,53 @@
           {
             "species": "Hippowdon",
             "setId": "hippowdon-physically-defensive"
-          }
-        ],
-        "winRate": 0.6875
-      },
-      {
-        "archetype": "Offense",
-        "team": [
+          },
           {
-            "species": "Forretress",
-            "setId": "forretress-physically-defensive"
+            "species": "Empoleon",
+            "setId": "empoleon-agility"
           },
           {
             "species": "Suicune",
             "setId": "suicune-subcune"
           },
           {
-            "species": "Scizor",
-            "setId": "scizor-choice-band"
-          },
+            "species": "Dragonite",
+            "setId": "dragonite-choice-band"
+          }
+        ],
+        "winRate": 0.65
+      },
+      {
+        "archetype": "Offense",
+        "team": [
           {
             "species": "Dragonite",
-            "setId": "dragonite-offensive-dragon-dance"
+            "setId": "dragonite-mixed"
+          },
+          {
+            "species": "Vaporeon",
+            "setId": "vaporeon-offensive-substitute-pass"
           },
           {
             "species": "Kingdra",
-            "setId": "kingdra-dragon-dance"
-          },
-          {
-            "species": "Jolteon",
-            "setId": "jolteon-choice-specs"
-          }
-        ],
-        "winRate": 0.8
-      },
-      {
-        "archetype": "Stall",
-        "team": [
-          {
-            "species": "Hippowdon",
-            "setId": "hippowdon-specially-defensive"
+            "setId": "kingdra-choice-specs"
           },
           {
             "species": "Scizor",
             "setId": "scizor-choice-band"
           },
           {
-            "species": "Jolteon",
-            "setId": "jolteon-choice-specs"
-          },
-          {
-            "species": "Milotic",
-            "setId": "milotic-physically-defensive"
-          },
-          {
-            "species": "Suicune",
-            "setId": "suicune-crocune-defensive-calm-mind-resttalk"
+            "species": "Forretress",
+            "setId": "forretress-physically-defensive"
           },
           {
             "species": "Ludicolo",
             "setId": "ludicolo-rain-dance-special-attacker"
           }
         ],
-        "winRate": 0.5625
+        "winRate": 0.575
       }
     ],
-    "problems": [],
     "candidate": 0,
     "accepted": "pass",
     "rejected": [],

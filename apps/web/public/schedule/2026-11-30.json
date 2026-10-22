@@ -22,60 +22,31 @@
   },
   "suggestedTeams": [
     {
-      "archetype": "Balanced",
-      "team": [
-        {
-          "species": "Tyranitar",
-          "setId": "tyranitar-dragon-dance"
-        },
-        {
-          "species": "Shaymin",
-          "setId": "shaymin-rest-sleep-talk"
-        },
-        {
-          "species": "Scizor",
-          "setId": "scizor-bulky-swords-dance"
-        },
-        {
-          "species": "Sceptile",
-          "setId": "sceptile-swords-dance"
-        },
-        {
-          "species": "Magnezone",
-          "setId": "magnezone-choice-scarf"
-        },
-        {
-          "species": "Aerodactyl",
-          "setId": "aerodactyl-lead"
-        }
-      ]
-    },
-    {
       "archetype": "Offense",
       "team": [
-        {
-          "species": "Aerodactyl",
-          "setId": "aerodactyl-lead"
-        },
-        {
-          "species": "Tyranitar",
-          "setId": "tyranitar-choice-scarf"
-        },
-        {
-          "species": "Electivire",
-          "setId": "electivire-mixed-attacker"
-        },
         {
           "species": "Scizor",
           "setId": "scizor-choice-band"
         },
         {
-          "species": "Starmie",
-          "setId": "starmie-defensive-rapid-spin"
+          "species": "Aerodactyl",
+          "setId": "aerodactyl-lead"
         },
         {
-          "species": "Shaymin",
-          "setId": "shaymin-rest-sleep-talk"
+          "species": "Tyranitar",
+          "setId": "tyranitar-choice-band"
+        },
+        {
+          "species": "Breloom",
+          "setId": "breloom-swords-dance"
+        },
+        {
+          "species": "Metagross",
+          "setId": "metagross-trick-iron-ball"
+        },
+        {
+          "species": "Sceptile",
+          "setId": "sceptile-swords-dance"
         }
       ]
     }
