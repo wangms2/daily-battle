@@ -3,7 +3,7 @@
     "format": "gen4ou",
     "method": "curated-usage-weighted-v1",
     "simVersion": "0.10.11",
-    "builtAt": "2026-10-22T13:34:45.150Z",
+    "builtAt": "2026-10-22T23:36:16.092Z",
     "sources": {
       "sets": {
         "url": "https://data.pkmn.cc/sets/gen4ou.json",
@@ -2104,11 +2104,11 @@
           "sourceName": "Choice Scarf",
           "label": "Choice Scarf attacker",
           "description": "Outspeeds most threats and hits hard, but is locked into one move until it switches out.",
-          "weight": 0.6847,
+          "weight": 0.6348,
           "moves": [
             "Thunderbolt",
             "Hidden Power Fire",
-            "Thunder Wave",
+            "Flash Cannon",
             "Explosion"
           ],
           "item": "Choice Scarf",
@@ -2136,7 +2136,7 @@
           "sourceName": "Magnet Rise",
           "label": "Fast attacker (Leftovers)",
           "description": "Hits fast and hard with wide move coverage.",
-          "weight": 0.2647,
+          "weight": 0.3066,
           "moves": [
             "Magnet Rise",
             "Thunderbolt",
@@ -2168,7 +2168,7 @@
           "sourceName": "Endure",
           "label": "Fast attacker (Custap Berry)",
           "description": "Hits fast and hard with wide move coverage.",
-          "weight": 0.0506,
+          "weight": 0.0586,
           "moves": [
             "Endure",
             "Thunderbolt",

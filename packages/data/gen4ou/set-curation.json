@@ -1,4 +1,11 @@
 {
+  "swap": {
+    "Magnezone": {
+      "Choice Scarf": {
+        "Thunder Wave": "Flash Cannon"
+      }
+    }
+  },
   "drop": {
     "Azelf": [
       "Utility Rain Lead"

@@ -67,6 +67,12 @@ describe('gen4ou/sets.json', () => {
     expect(Object.keys(overrides).filter((id) => !ids.has(id))).toEqual([]);
   });
 
+  it('applies curation move swaps (Scarf Magnezone: Flash Cannon over Thunder Wave)', () => {
+    const scarf = sets.species['Magnezone']!.sets.find((s) => s.sourceName === 'Choice Scarf')!;
+    expect(scarf.moves).toContain('Flash Cannon');
+    expect(scarf.moves).not.toContain('Thunder Wave');
+  });
+
   it('is up to date with sources/ (run `pnpm build-sets` if this fails)', () => {
     const { file } = buildSets(
       {

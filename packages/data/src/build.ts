@@ -41,11 +41,13 @@ export interface BuildInput {
 /**
  * `gen4ou/set-curation.json`. `add` sets are written like curated ones and
  * compete on equal terms; `drop` names curated sets (by species and set name)
- * that don't earn a place, such as a near-copy of a better set.
+ * that don't earn a place, such as a near-copy of a better set; `swap`
+ * replaces moves one for one in a named set (species → set → old → new).
  */
 export interface SetCuration {
   add?: CuratedSets;
   drop?: Record<string, string[]>;
+  swap?: Record<string, Record<string, Record<string, string>>>;
 }
 
 export interface BuildReport {
@@ -124,11 +126,20 @@ export function buildSets(
     const entries = sources.flatMap((src, rank) =>
       Object.entries(src ?? {}).map(([setName, set]) => ({ setName, set, rank })),
     );
-    for (const { setName, set: curatedSet, rank } of entries) {
+    for (const { setName, set: original, rank } of entries) {
       if (skip.has(setName)) {
         dropped.push({ species: name, set: setName, reason: 'dropped by curation' });
         continue;
       }
+      const swap = input.curation?.swap?.[name]?.[setName];
+      const curatedSet = swap
+        ? {
+            ...original,
+            moves: original.moves.map((slot) =>
+              Array.isArray(slot) ? slot.map((m) => swap[m] ?? m) : (swap[slot] ?? slot),
+            ),
+          }
+        : original;
       const set = resolveSet(name, curatedSet, usage);
       if (!set) {
         dropped.push({ species: name, set: setName, reason: 'not enough distinct moves' });
