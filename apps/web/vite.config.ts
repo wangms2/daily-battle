@@ -4,7 +4,11 @@ import tailwindcss from '@tailwindcss/vite';
 
 // The deployed origin, for absolute link-preview URLs in index.html. Set
 // VITE_SITE_URL for production; Cloudflare Pages previews fall back to their own URL.
-process.env.VITE_SITE_URL ??= process.env.CF_PAGES_URL ?? '';
+{
+  const site = (process.env.VITE_SITE_URL || process.env.CF_PAGES_URL || '').replace(/\/+$/, '');
+  // Accept a bare host ("battle.example.com"); link previews need an absolute URL.
+  process.env.VITE_SITE_URL = site && !/^https?:\/\//.test(site) ? `https://${site}` : site;
+}
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
