@@ -127,7 +127,7 @@ export function SettingsSheet({
   report: string;
   onAbout: () => void;
 }) {
-  const speeds: Settings['battleSpeed'][] = ['normal', 'fast', 'instant'];
+  const speeds: Settings['battleSpeed'][] = ['slow', 'normal', 'fast'];
   return (
     <Sheet open={open} onOpenChange={onOpenChange} title="Settings">
       <div className="divide-y divide-line">

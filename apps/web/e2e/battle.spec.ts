@@ -25,7 +25,7 @@ const tried = (result: 'win' | 'loss', remaining: number) => ({
 
 function seededState(speed: 'normal' | 'fast' | 'instant', days: Record<string, unknown> = {}) {
   return {
-    version: 2,
+    version: 3,
     weeks: { '2026-10-19': { team: TEAM, poolId: '2026-10-19:c0' } },
     days,
     settings: {

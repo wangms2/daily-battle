@@ -32,7 +32,7 @@ test('plays a whole battle with only the keyboard', async ({ page }) => {
     localStorage.setItem(
       'daily-battle:state',
       JSON.stringify({
-        version: 2,
+        version: 3,
         weeks: { '2026-10-19': { team, poolId: '2026-10-19:c0' } },
         days: {},
         settings: {

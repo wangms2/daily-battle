@@ -278,6 +278,7 @@ Hippowdon, Azelf, Celebi, Heatran*, Jirachi, Lucario
 
 Other headlines: `❌ Not cleared in 3 tries` (with `🔥 Streak reset`), `✅ Won on try 5` for a practice clear (rows still show the first 3 tries, with `🔥 Streak reset`), and `Not cleared yet · 1 of 3 tries` mid-day.
 
+- The last line is the link to play (the site's own address), so friends can tap through.
 - Each row shows that try's result and your Pokémon left out of 6 (green = alive; grey ⬜ = still standing on a try that was given up). At most 7 lines.
 - Team: species only, lead first, from the deciding try (the win, or the latest try that counted); `*` marks a species swapped in that day.
 - Plain text by default (pastes anywhere): Web Share API where available, else the clipboard, else the text is shown to copy.
@@ -326,7 +327,7 @@ Mirror Pokémon Showdown's battle layout and flow, simplified where it makes sen
 - **Simplified vs Showdown:** no timer, chat, user list, ladder rating, or spectators. No team preview screen. Forfeit is a "Give up" item in a menu.
 - **Tooltips:** tap (or hover on desktop) a Pokémon for Showdown-style details. For the opponent, show only revealed information: types, HP %, status, boosts, revealed moves, and the item or ability if revealed. No "usually runs" or usage hints. Own Pokémon show full info.
 - **Pacing (quick, like Showdown):**
-  - Default speed is fast. A speed control (Normal / Fast / Instant) is always reachable.
+  - Speeds are Slow / Normal / Fast (about 1150 / 800 / 450 ms per line), Normal by default, always reachable from the top bar. (An instant mode exists for automated tests only.)
   - Tap anywhere to skip the rest of the current turn's animation and text.
   - Forced actions with a single legal choice are submitted automatically (for example, switching in the last Pokémon).
   - The next turn's choices appear as soon as the previous turn ends; no extra confirmation steps.

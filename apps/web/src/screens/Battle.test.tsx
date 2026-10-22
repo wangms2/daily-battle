@@ -204,6 +204,15 @@ describe('battle screen', () => {
     expect(screen.getByRole('log', { name: 'Battle log' })).toHaveTextContent('Gyarados appeared!');
   });
 
+  it('skips playback from the keyboard too', async () => {
+    const { backend } = fakeBackend([]);
+    renderBattle(backend, { speed: 'slow' });
+    await screen.findByText('Heatran', { selector: 'strong' });
+    expect(screen.queryByRole('button', { name: /^Thunderbolt, / })).not.toBeInTheDocument();
+    fireEvent.keyDown(document.body, { key: ' ' });
+    expect(await thunderbolt()).toBeEnabled();
+  });
+
   it('sends a chosen move, saves it, and plays the answer', async () => {
     const { backend, calls } = fakeBackend([TURN_1]);
     const props = renderBattle(backend);

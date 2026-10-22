@@ -9,7 +9,7 @@ export function migrate(raw: unknown): State {
   const fresh = initialState();
   if (!raw || typeof raw !== 'object') return fresh;
   const saved = raw as Partial<Omit<State, 'version'>> & { version?: number; stats?: unknown };
-  if (saved.version === 1 || saved.version === 2) {
+  if (saved.version === 1 || saved.version === 2 || saved.version === 3) {
     // v1: attempts saved before M7 lack the team and engine fields, and the
     // stored stats block is gone (streaks and stats are derived since M8).
     const days = Object.fromEntries(
@@ -21,12 +21,11 @@ export function migrate(raw: unknown): State {
         },
       ]),
     );
-    return {
-      version: 2,
-      weeks: saved.weeks ?? fresh.weeks,
-      days,
-      settings: { ...fresh.settings, ...saved.settings },
-    };
+    const settings = { ...fresh.settings, ...saved.settings };
+    // v3: the speeds became slow / normal / fast with new timings (and no instant),
+    // so older saves start on the new default.
+    if (saved.version !== 3) settings.battleSpeed = fresh.settings.battleSpeed;
+    return { version: 3, weeks: saved.weeks ?? fresh.weeks, days, settings };
   }
   // Unknown or future version: start fresh rather than misread it.
   return fresh;

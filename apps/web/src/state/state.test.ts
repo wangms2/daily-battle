@@ -67,7 +67,7 @@ describe('storage', () => {
       settings: { beginnerHints: false },
     });
     expect(migrated.settings).toEqual({ ...initialState().settings, beginnerHints: false });
-    expect(migrated.version).toBe(2);
+    expect(migrated.version).toBe(3);
   });
 
   it('drops the stored stats of a v1 save and keeps everything else', () => {
@@ -80,7 +80,21 @@ describe('storage', () => {
     };
     const migrated = migrate(v1);
     expect(migrated).not.toHaveProperty('stats');
-    expect(migrated).toEqual({ version: 2, weeks: v1.weeks, days: v1.days, settings: v1.settings });
+    expect(migrated).toEqual({ version: 3, weeks: v1.weeks, days: v1.days, settings: v1.settings });
+  });
+});
+
+describe('speed settings (v3)', () => {
+  it('moves older saves to the new default speed and keeps v3 choices', () => {
+    const settings = { ...initialState().settings, battleSpeed: 'instant' as const };
+    expect(migrate({ version: 2, weeks: {}, days: {}, settings }).settings.battleSpeed).toBe(
+      'normal',
+    );
+    expect(
+      migrate({ version: 3, weeks: {}, days: {}, settings: { ...settings, battleSpeed: 'slow' } })
+        .settings.battleSpeed,
+    ).toBe('slow');
+    expect(initialState().settings.battleSpeed).toBe('normal');
   });
 });
 

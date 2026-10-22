@@ -13,12 +13,15 @@ export function shareText({
   summary,
   streak,
   change,
+  url,
 }: {
   /** `YYYY-MM-DD` */
   day: string;
   summary: DaySummary;
   streak: number;
   change?: DayChange;
+  /** Where to play, added as the last line so friends can tap through. */
+  url?: string;
 }): string {
   const { status, counted, tries, winTry } = summary;
   const date = new Date(`${day}T12:00:00`).toLocaleDateString('en-US', {
@@ -46,6 +49,7 @@ export function shareText({
 
   if (status === 'failed') lines.push('🔥 Streak reset');
   else if (streak > 0) lines.push(`🔥 ${streak}-day streak`);
+  if (url) lines.push(url);
   return lines.join('\n');
 }
 

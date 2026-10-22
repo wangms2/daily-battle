@@ -22,7 +22,7 @@ async function seed(page: Page, { team = true, welcome = false } = {}) {
       localStorage.setItem(
         'daily-battle:state',
         JSON.stringify({
-          version: 2,
+          version: 3,
           weeks: team ? { '2026-10-19': { team: TEAM, poolId: '2026-10-19:c0' } } : {},
           days: {},
           settings: {

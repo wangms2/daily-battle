@@ -28,10 +28,10 @@ const swap: DayChange = {
 function text(
   attempts: Attempt[],
   streak: number,
-  { isToday = true, change }: { isToday?: boolean; change?: DayChange } = {},
+  { isToday = true, change, url }: { isToday?: boolean; change?: DayChange; url?: string } = {},
 ) {
   const day: DayState = { swapUsed: !!change, change, attempts };
-  return shareText({ day: DAY, summary: summarizeDay(day, isToday), streak, change });
+  return shareText({ day: DAY, summary: summarizeDay(day, isToday), streak, change, url });
 }
 
 describe('share text', () => {
@@ -99,15 +99,21 @@ describe('share text', () => {
     expect(text([a('loss', 1)], 0)).not.toContain('🔥');
   });
 
+  it('ends with the link to play', () => {
+    const t = text([a('win', 4)], 5, { url: 'https://battle.peanutbuilds.com' });
+    expect(t.split('\n').slice(-2)).toEqual(['🔥 5-day streak', 'https://battle.peanutbuilds.com']);
+  });
+
   it('stays short and never names the opponent', () => {
     const opponents = schedule.days.find((d) => d.day === DAY)!.team.map((s) => s.species);
     const ours = new Set(TEAM.map((s) => s.species));
+    const url = 'https://battle.peanutbuilds.com';
     for (const t of [
-      text([a('win', 4)], 5),
-      text([a('loss', 0), a('loss', 0), a('win', 1), a('win', 6)], 1),
-      text([a('loss', 0), a('loss', 0), a('loss', 0), a('win', 1)], 0),
+      text([a('win', 4)], 5, { url }),
+      text([a('loss', 0), a('loss', 0), a('win', 1), a('win', 6)], 1, { url }),
+      text([a('loss', 0), a('loss', 0), a('loss', 0), a('win', 1)], 0, { url }),
     ]) {
-      expect(t.split('\n').length).toBeLessThanOrEqual(7);
+      expect(t.split('\n').length).toBeLessThanOrEqual(8); // 7 plus the link
       for (const s of opponents) if (!ours.has(s)) expect(t).not.toContain(s);
       expect(t).not.toMatch(/turn/i);
     }

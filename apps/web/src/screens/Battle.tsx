@@ -32,8 +32,14 @@ import { ShareButton, TryRows } from '../ui/results';
 import { CloseIcon, ExpandIcon, InfoIcon } from '../ui/icons';
 import { useWide } from '../ui/useWide';
 
-const DELAY: Record<Settings['battleSpeed'], number> = { normal: 1000, fast: 500, instant: 0 };
-const SPEEDS: Settings['battleSpeed'][] = ['normal', 'fast', 'instant'];
+/** Milliseconds per battle line ('instant' is for automated tests only). */
+const DELAY: Record<Settings['battleSpeed'], number> = {
+  slow: 1150,
+  normal: 800,
+  fast: 450,
+  instant: 0,
+};
+const SPEEDS: Settings['battleSpeed'][] = ['slow', 'normal', 'fast'];
 
 /** Today's result, recomputed from saved attempts as each battle ends. */
 export interface DayResult {
@@ -273,6 +279,17 @@ export function Battle({
 
   const cycleSpeed = () =>
     onSetting('battleSpeed', SPEEDS[(SPEEDS.indexOf(settings.battleSpeed) + 1) % SPEEDS.length]!);
+  // Keyboard users skip playback with Space, Enter, or Escape (the tap-to-skip).
+  useEffect(() => {
+    if (!playing) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== ' ' && e.key !== 'Enter' && e.key !== 'Escape') return;
+      if ((e.target as Element | null)?.closest?.('[role="dialog"]')) return;
+      skip();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [playing, skip]);
 
   const showExplainer = explainer && settings.beginnerHints && !end;
   const active = team.find((m) => m.active);

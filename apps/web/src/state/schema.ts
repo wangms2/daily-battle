@@ -53,7 +53,8 @@ export interface WeekState {
 
 export interface Settings {
   beginnerHints: boolean;
-  battleSpeed: 'normal' | 'fast' | 'instant';
+  /** 'instant' is for automated tests only; the UI offers slow, normal, and fast. */
+  battleSpeed: 'slow' | 'normal' | 'fast' | 'instant';
   animations: boolean;
   /** One-time explainers already shown; includes 'welcome' after first run. */
   shownExplainers: string[];
@@ -61,7 +62,7 @@ export interface Settings {
 
 /** Streaks and stats are derived from `days` (lib/results.ts), not stored. */
 export interface State {
-  version: 2;
+  version: 3;
   weeks: Record<string, WeekState>;
   days: Record<string, DayState>;
   settings: Settings;
@@ -69,10 +70,10 @@ export interface State {
 
 export function initialState(): State {
   return {
-    version: 2,
+    version: 3,
     weeks: {},
     days: {},
-    settings: { beginnerHints: true, battleSpeed: 'fast', animations: true, shownExplainers: [] },
+    settings: { beginnerHints: true, battleSpeed: 'normal', animations: true, shownExplainers: [] },
   };
 }
 

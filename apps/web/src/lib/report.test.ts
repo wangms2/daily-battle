@@ -32,7 +32,7 @@ describe('playtest report', () => {
       v: 1,
       engine: 'sim 1 ai 1',
       hints: true,
-      speed: 'fast',
+      speed: 'normal',
       days: [
         {
           d: '2026-10-20',

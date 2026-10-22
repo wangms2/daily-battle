@@ -56,7 +56,13 @@ export function App() {
   // Streaks and stats come from the saved attempts (lib/results.ts).
   const stats = useMemo(() => computeStats(state.days, day), [state.days, day]);
   const summary = useMemo(() => summarizeDay(state.days[day], true), [state.days, day]);
-  const share = shareText({ day, summary, streak: stats.streak, change: dayState.change });
+  const share = shareText({
+    day,
+    summary,
+    streak: stats.streak,
+    change: dayState.change,
+    url: window.location.origin,
+  });
   const countdown = countdownTo(now, addDays(day, 1));
   const setSetting = <K extends keyof Settings>(key: K, value: Settings[K]) =>
     dispatch({ type: 'setSetting', key, value });
