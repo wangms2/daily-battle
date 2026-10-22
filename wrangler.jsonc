@@ -1,0 +1,10 @@
+// Cloudflare Workers static-assets deploy of the web app (no server code).
+// Build: `pnpm --filter web build`; deploy: `npx wrangler deploy`.
+// public/_headers (caching and CSP) applies here as on Pages.
+{
+  "name": "daily-battle",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./apps/web/dist",
+  },
+}
