@@ -1,22 +1,22 @@
 {
   "version": 1,
-  "generatorVersion": 3,
-  "dataBuiltAt": "2026-10-21T19:36:58.404Z",
+  "generatorVersion": 4,
+  "dataBuiltAt": "2026-10-22T13:34:45.150Z",
   "week": "2026-12-07",
   "pool": {
     "species": [
-      "Skarmory",
-      "Metagross",
-      "Magnezone",
-      "Forretress",
-      "Aerodactyl",
-      "Zapdos",
+      "Bronzong",
+      "Azelf",
+      "Breloom",
       "Flygon",
-      "Suicune",
+      "Zapdos",
+      "Rotom-Heat",
+      "Mamoswine",
       "Tyranitar",
-      "Ludicolo",
-      "Exeggutor",
-      "Hitmontop"
+      "Empoleon",
+      "Clefable",
+      "Blastoise",
+      "Alakazam"
     ],
     "candidate": 0
   },
@@ -25,28 +25,28 @@
       "archetype": "Balanced",
       "team": [
         {
-          "species": "Zapdos",
-          "setId": "zapdos-physically-defensive"
+          "species": "Clefable",
+          "setId": "clefable-support"
         },
         {
-          "species": "Skarmory",
-          "setId": "skarmory-physically-defensive"
+          "species": "Azelf",
+          "setId": "azelf-standard-lead"
         },
         {
-          "species": "Flygon",
-          "setId": "flygon-choice-scarf"
-        },
-        {
-          "species": "Magnezone",
-          "setId": "magnezone-choice-scarf"
+          "species": "Bronzong",
+          "setId": "bronzong-offensive-trick-room"
         },
         {
           "species": "Tyranitar",
-          "setId": "tyranitar-all-purpose"
+          "setId": "tyranitar-choice-band"
         },
         {
-          "species": "Ludicolo",
-          "setId": "ludicolo-rain-dance-special-attacker"
+          "species": "Rotom-Heat",
+          "setId": "rotomheat-utility"
+        },
+        {
+          "species": "Breloom",
+          "setId": "breloom-defensive"
         }
       ]
     },
@@ -54,28 +54,28 @@
       "archetype": "Offense",
       "team": [
         {
-          "species": "Suicune",
-          "setId": "suicune-supercune-offensive-calm-mind"
+          "species": "Rotom-Heat",
+          "setId": "rotomheat-choice-scarf"
+        },
+        {
+          "species": "Blastoise",
+          "setId": "blastoise-tortoise-of-choice"
+        },
+        {
+          "species": "Breloom",
+          "setId": "breloom-swords-dance"
         },
         {
           "species": "Tyranitar",
-          "setId": "tyranitar-choice-scarf"
-        },
-        {
-          "species": "Magnezone",
-          "setId": "magnezone-choice-scarf"
+          "setId": "tyranitar-choice-band"
         },
         {
           "species": "Zapdos",
-          "setId": "zapdos-agility"
+          "setId": "zapdos-subroost"
         },
         {
-          "species": "Flygon",
-          "setId": "flygon-choice-scarf"
-        },
-        {
-          "species": "Metagross",
-          "setId": "metagross-utility"
+          "species": "Bronzong",
+          "setId": "bronzong-offensive-stealth-rock"
         }
       ]
     },
@@ -83,28 +83,28 @@
       "archetype": "Stall",
       "team": [
         {
-          "species": "Suicune",
-          "setId": "suicune-crocune-defensive-calm-mind-resttalk"
+          "species": "Breloom",
+          "setId": "breloom-defensive"
         },
         {
-          "species": "Skarmory",
-          "setId": "skarmory-physically-defensive"
+          "species": "Bronzong",
+          "setId": "bronzong-tank"
+        },
+        {
+          "species": "Empoleon",
+          "setId": "empoleon-specially-defensive"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-all-purpose"
         },
         {
           "species": "Zapdos",
           "setId": "zapdos-physically-defensive"
         },
         {
-          "species": "Hitmontop",
-          "setId": "hitmontop-rapid-spin"
-        },
-        {
-          "species": "Forretress",
-          "setId": "forretress-physically-defensive"
-        },
-        {
-          "species": "Tyranitar",
-          "setId": "tyranitar-all-purpose"
+          "species": "Clefable",
+          "setId": "clefable-support"
         }
       ]
     }
@@ -115,121 +115,121 @@
       "style": "balance",
       "team": [
         {
-          "species": "Flygon",
-          "setId": "flygon-choice-scarf"
-        },
-        {
-          "species": "Porygon-Z",
-          "setId": "porygonz-offensive-lead"
-        },
-        {
-          "species": "Spiritomb",
-          "setId": "spiritomb-curse"
-        },
-        {
-          "species": "Gliscor",
-          "setId": "gliscor-stallbreaker"
-        },
-        {
-          "species": "Lucario",
-          "setId": "lucario-swords-dance"
-        },
-        {
-          "species": "Hitmontop",
-          "setId": "hitmontop-rapid-spin"
-        }
-      ],
-      "candidate": 10
-    },
-    {
-      "day": "2026-12-08",
-      "style": "offense",
-      "team": [
-        {
-          "species": "Scyther",
-          "setId": "scyther-choice-band"
-        },
-        {
-          "species": "Tyranitar",
-          "setId": "tyranitar-choice-scarf"
-        },
-        {
-          "species": "Lucario",
-          "setId": "lucario-swords-dance"
+          "species": "Qwilfish",
+          "setId": "qwilfish-swords-dance"
         },
         {
           "species": "Infernape",
-          "setId": "infernape-nasty-plot"
+          "setId": "infernape-physical-attacker"
         },
         {
           "species": "Starmie",
           "setId": "starmie-offensive-rapid-spin"
         },
         {
-          "species": "Vaporeon",
-          "setId": "vaporeon-offensive-substitute-pass"
+          "species": "Scizor",
+          "setId": "scizor-bulky-swords-dance"
+        },
+        {
+          "species": "Metagross",
+          "setId": "metagross-agility"
+        },
+        {
+          "species": "Zapdos",
+          "setId": "zapdos-physically-defensive"
         }
       ],
-      "candidate": 6
+      "candidate": 0
     },
     {
-      "day": "2026-12-09",
+      "day": "2026-12-08",
       "style": "balance",
       "team": [
         {
-          "species": "Hitmontop",
-          "setId": "hitmontop-rapid-spin"
+          "species": "Venusaur",
+          "setId": "venusaur-subseed"
         },
         {
-          "species": "Weavile",
-          "setId": "weavile-standard"
+          "species": "Aggron",
+          "setId": "aggron-rock-polish"
         },
         {
-          "species": "Gallade",
-          "setId": "gallade-attacking-lead"
+          "species": "Starmie",
+          "setId": "starmie-offensive-rapid-spin"
         },
         {
-          "species": "Crobat",
-          "setId": "crobat-stallbreaker"
+          "species": "Skarmory",
+          "setId": "skarmory-specially-defensive"
         },
         {
-          "species": "Steelix",
-          "setId": "steelix-curse"
+          "species": "Jirachi",
+          "setId": "jirachi-utility"
         },
         {
-          "species": "Rotom-Heat",
-          "setId": "rotomheat-utility"
+          "species": "Rhyperior",
+          "setId": "rhyperior-choice-band"
         }
       ],
-      "candidate": 7
+      "candidate": 5
+    },
+    {
+      "day": "2026-12-09",
+      "style": "stall",
+      "team": [
+        {
+          "species": "Rhyperior",
+          "setId": "rhyperior-substitute"
+        },
+        {
+          "species": "Cloyster",
+          "setId": "cloyster-support"
+        },
+        {
+          "species": "Metagross",
+          "setId": "metagross-agility"
+        },
+        {
+          "species": "Donphan",
+          "setId": "donphan-standard"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-dragon-dance"
+        },
+        {
+          "species": "Zapdos",
+          "setId": "zapdos-specially-defensive"
+        }
+      ],
+      "candidate": 2
     },
     {
       "day": "2026-12-10",
       "style": "balance",
       "team": [
         {
-          "species": "Metagross",
-          "setId": "metagross-agility"
+          "species": "Gengar",
+          "setId": "gengar-offensive"
         },
         {
-          "species": "Porygon-Z",
-          "setId": "porygonz-offensive-lead"
+          "species": "Azumarill",
+          "setId": "azumarill-choice-band"
         },
         {
-          "species": "Dragonite",
-          "setId": "dragonite-offensive-dragon-dance"
+          "species": "Donphan",
+          "setId": "donphan-standard"
         },
         {
-          "species": "Heatran",
-          "setId": "heatran-utility"
+          "species": "Magneton",
+          "setId": "magneton-choice-scarf"
         },
         {
-          "species": "Weavile",
-          "setId": "weavile-standard"
+          "species": "Aerodactyl",
+          "setId": "aerodactyl-lead"
         },
         {
-          "species": "Cloyster",
-          "setId": "cloyster-support"
+          "species": "Zapdos",
+          "setId": "zapdos-agility"
         }
       ],
       "candidate": 1
@@ -239,93 +239,93 @@
       "style": "balance",
       "team": [
         {
-          "species": "Magneton",
-          "setId": "magneton-choice-scarf"
+          "species": "Empoleon",
+          "setId": "empoleon-lead"
         },
         {
-          "species": "Suicune",
-          "setId": "suicune-supercune-offensive-calm-mind"
+          "species": "Flygon",
+          "setId": "flygon-choice-scarf"
         },
         {
-          "species": "Starmie",
-          "setId": "starmie-offensive-rapid-spin"
+          "species": "Mamoswine",
+          "setId": "mamoswine-physical-attacker"
         },
         {
-          "species": "Forretress",
-          "setId": "forretress-specially-defensive"
+          "species": "Nidoqueen",
+          "setId": "nidoqueen-physically-defensive-toxic-spikes"
         },
         {
-          "species": "Scizor",
-          "setId": "scizor-choice-band"
+          "species": "Tyranitar",
+          "setId": "tyranitar-choice-scarf"
+        },
+        {
+          "species": "Slowbro",
+          "setId": "slowbro-trick-room"
+        }
+      ],
+      "candidate": 1
+    },
+    {
+      "day": "2026-12-12",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-choice-band"
         },
         {
           "species": "Bronzong",
           "setId": "bronzong-offensive-stealth-rock"
-        }
-      ],
-      "candidate": 3
-    },
-    {
-      "day": "2026-12-12",
-      "style": "offense",
-      "team": [
+        },
         {
-          "species": "Azumarill",
-          "setId": "azumarill-subpunch"
+          "species": "Ludicolo",
+          "setId": "ludicolo-rain-dance-special-attacker"
+        },
+        {
+          "species": "Cresselia",
+          "setId": "cresselia-defensive"
+        },
+        {
+          "species": "Magnezone",
+          "setId": "magnezone-choice-scarf"
         },
         {
           "species": "Porygon-Z",
           "setId": "porygonz-offensive-lead"
-        },
-        {
-          "species": "Bronzong",
-          "setId": "bronzong-offensive-trick-room"
-        },
-        {
-          "species": "Hariyama",
-          "setId": "hariyama-attacking-lead"
-        },
-        {
-          "species": "Dragonite",
-          "setId": "dragonite-offensive-dragon-dance"
-        },
-        {
-          "species": "Vaporeon",
-          "setId": "vaporeon-offensive-substitute-pass"
         }
       ],
-      "candidate": 11
+      "candidate": 2
     },
     {
       "day": "2026-12-13",
       "style": "balance",
       "team": [
         {
-          "species": "Lucario",
-          "setId": "lucario-swords-dance"
+          "species": "Celebi",
+          "setId": "celebi-utility"
         },
         {
-          "species": "Moltres",
-          "setId": "moltres-subroost"
+          "species": "Dragonite",
+          "setId": "dragonite-offensive-dragon-dance"
         },
         {
-          "species": "Forretress",
-          "setId": "forretress-physically-defensive"
+          "species": "Donphan",
+          "setId": "donphan-standard"
         },
         {
-          "species": "Electivire",
-          "setId": "electivire-mixed-attacker"
+          "species": "Yanmega",
+          "setId": "yanmega-attacking-lead"
         },
         {
-          "species": "Metagross",
-          "setId": "metagross-utility"
+          "species": "Heatran",
+          "setId": "heatran-trapper"
         },
         {
-          "species": "Ludicolo",
-          "setId": "ludicolo-rain-dance-special-attacker"
+          "species": "Gengar",
+          "setId": "gengar-offensive"
         }
       ],
-      "candidate": 1
+      "candidate": 0
     }
   ]
 }
