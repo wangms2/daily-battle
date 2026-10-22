@@ -50,6 +50,30 @@ function foeBarLeft(size: { w: number; h: number } | null): string {
   const beside = `max(6px, calc(${X(SPOT.foe.x)} - var(--s) * ${size.w / 2} - ${BAR_W} - 6px))`;
   return `calc(${over} - clamp(0px, ${overlap} * 1000, calc(${over} - ${beside})))`;
 }
+/** Your stat bar's usual top, just above your sprite's platform, and its height. */
+const YOU_BAR_TOP = `calc(${Y(262)} - 42px)`;
+const YOU_BAR_H = '36px';
+/** Your back sprite is drawn this much larger (as in the games). */
+const BACK_SCALE = 1.2;
+
+/**
+ * Where your stat bar goes: above your platform's left side, unless your
+ * sprite reaches up into it (Staraptor, Moltres, ...); then the empty bottom
+ * right of the field, beside the sprite, where the games put your HP box.
+ * The same clamp(0, overlap × 1000, shift) switch as foeBarLeft.
+ */
+function youBarPos(size: { w: number; h: number } | null): { left: string; top: string } {
+  const left = `max(8px, calc(${X(SPOT.you.x)} - 4.875rem))`;
+  if (!size) return { left, top: YOU_BAR_TOP };
+  const spriteTop = Y(SPOT.you.feet - size.h * BACK_SCALE);
+  const overlap = `(${YOU_BAR_TOP} + ${YOU_BAR_H} + 2px - ${spriteTop})`;
+  const asideLeft = `min(calc(100cqw - ${BAR_W} - 8px), calc(${X(SPOT.you.x)} + var(--s) * ${(size.w * BACK_SCALE) / 2} + 8px))`;
+  const asideTop = `calc(100cqh - ${YOU_BAR_H} - 8px)`;
+  const shift = (from: string, to: string) =>
+    `calc(${from} + clamp(0px, ${overlap} * 1000, calc(${to} - ${from})))`;
+  return { left: shift(left, asideLeft), top: shift(YOU_BAR_TOP, asideTop) };
+}
+
 /** Where things sit for each side, in image coordinates. */
 const SPOT = {
   foe: { x: 480, feet: 255, label: 190, popup: 165 },
@@ -310,7 +334,7 @@ function FieldSprite({
       : '';
   const spot = SPOT[who];
   // Near-side (back) sprites are drawn a little larger, as in the games.
-  const scale = who === 'you' ? 1.2 : 1;
+  const scale = who === 'you' ? BACK_SCALE : 1;
   return (
     <div
       data-mon
@@ -389,6 +413,9 @@ export function Field({
   const [foeSize, setFoeSize] = useState<{ species: string; w: number; h: number } | null>(null);
   const foeSpecies = view?.foe?.species;
   const foeLeft = foeBarLeft(foeSize?.species === foeSpecies ? foeSize : null);
+  const [youSize, setYouSize] = useState<{ species: string; w: number; h: number } | null>(null);
+  const youSpecies = view?.you?.species;
+  const youBar = youBarPos(youSize?.species === youSpecies ? youSize : null);
 
   // A tap anywhere outside the stat bars closes the details card.
   useEffect(() => {
@@ -452,6 +479,7 @@ export function Field({
         anim={anim}
         animate={animate}
         onTap={() => (busy ? onTap() : handleInfo('you', 'tap'))}
+        onSize={(size) => youSpecies && setYouSize({ species: youSpecies, ...size })}
       />
 
       {view?.foe && (
@@ -483,11 +511,7 @@ export function Field({
           marks={view.yourTeam}
           animate={animate}
           onInfo={handleInfo}
-          style={{
-            left: `max(8px, calc(${X(SPOT.you.x)} - 4.875rem))`,
-            // Without team marks, your bar is shorter, so it sits a little lower.
-            top: `calc(${Y(262)} - 42px)`,
-          }}
+          style={youBar}
         />
       )}
 
