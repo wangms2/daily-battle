@@ -174,11 +174,15 @@ function BenchButton({
         draggable={false}
         className={clsx('pixelated object-contain', big ? 'h-12 w-14' : 'h-7 w-9')}
       />
-      {big && (
-        <span className="w-full truncate text-center text-[12px] font-semibold">
-          {member.species}
-        </span>
-      )}
+      {/* Names always on the forced-switch cards; on the bench row only where there's room. */}
+      <span
+        className={clsx(
+          'w-full truncate text-center text-[12px] font-semibold',
+          !big && 'hidden wide:block',
+        )}
+      >
+        {member.species}
+      </span>
       <span className="flex w-full items-center gap-1 px-0.5">
         <HpBar hp={member.hp} animate={false} className="h-1.5 flex-1" />
         {member.status && (

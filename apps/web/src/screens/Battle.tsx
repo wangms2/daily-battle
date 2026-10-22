@@ -303,7 +303,7 @@ export function Battle({
       onClick={() => (playing ? skip() : !wide && setLogOpen(true))}
       className={clsx(
         'card relative flex min-h-0 flex-col',
-        wide ? 'p-4' : 'min-h-[5.75rem] flex-1 basis-0 py-1.5 pr-9 pl-3',
+        wide ? 'min-h-0 flex-1 basis-0 p-4' : 'min-h-[5.75rem] flex-1 basis-0 py-1.5 pr-9 pl-3',
       )}
     >
       {wide && (
@@ -345,7 +345,9 @@ export function Battle({
   const field = (
     <Field
       // Phones keep the scene's own shape so it never zooms in; the log gets the spare height.
-      className={wide ? 'flex-1' : 'aspect-[440/295] w-full shrink'}
+      // The field always keeps the scene's shape, so nothing gets cropped. On phones
+      // the log takes the spare height; on wide screens the column sizes it.
+      className={wide ? 'aspect-[440/295] w-full shrink-0' : 'aspect-[440/295] w-full shrink'}
       view={view}
       anim={anim}
       animate={animate}
@@ -487,13 +489,18 @@ export function Battle({
     <div className="flex h-full flex-col">
       {topBar}
       {wide ? (
-        <main className="relative grid min-h-0 flex-1 grid-cols-[1fr_360px] gap-4 px-6 pb-6">
-          <section className="flex min-h-0 flex-col gap-2">
-            {field}
-            {explainerNote}
-            {panel}
-          </section>
-          {turnLog}
+        // A size container: the stage (field + controls) and the log sit side by side,
+        // the stage as wide as fits (up to a comfortable 960px) with room for the
+        // controls below, and the log matching its height.
+        <main className="battle-main relative flex min-h-0 flex-1 justify-center px-6 pb-6">
+          <div className="flex min-h-0 items-stretch gap-5 self-start">
+            <section className="battle-stage flex min-h-0 shrink-0 flex-col gap-2">
+              {field}
+              {explainerNote}
+              {panel}
+            </section>
+            <div className="flex w-[380px] shrink-0 flex-col">{turnLog}</div>
+          </div>
           {endCard}
         </main>
       ) : (

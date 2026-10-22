@@ -195,7 +195,9 @@ export function App() {
   }
 
   return (
-    <div className="mx-auto h-dvh max-w-[1280px] overflow-hidden">
+    <div
+      className={`mx-auto h-dvh overflow-hidden ${route === 'battle' ? 'max-w-[1440px]' : 'max-w-[1280px]'}`}
+    >
       {!storageAvailable && !storageNoticeDismissed && (
         <div
           role="alert"

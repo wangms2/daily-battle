@@ -272,6 +272,16 @@ body {
   }
 }
 
+/* Wide battle layout: the field and controls share the largest width that fits
+   beside the 380px log, leaves room for the controls (~270px) below, and stays
+   at a comfortable size (960px) on big monitors. */
+.battle-main {
+  container-type: size;
+}
+.battle-stage {
+  width: min(960px, calc(100cqw - 380px - 1.25rem), calc((100cqh - 270px) * 440 / 295));
+}
+
 /* Stat bars: Showdown's dark text with a light halo, readable on any background. */
 .statbar {
   color: #15161c;
