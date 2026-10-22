@@ -5,7 +5,12 @@ on:
     branches: [main]
   pull_request:
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
+  # Lint, types, unit tests, and the production build (shared with e2e).
   check:
     runs-on: ubuntu-latest
     steps:
@@ -20,9 +25,49 @@ jobs:
       - run: pnpm format:check
       - run: pnpm typecheck
       - run: pnpm test
+      - run: pnpm --filter web build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: web-dist
+          path: apps/web/dist
+          retention-days: 1
+
+  # Long-running simulations, in parallel with everything else.
+  sims:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @daily-battle/sim-bridge soak --n 1000
       - run: pnpm --filter @daily-battle/gen check --n 10000
       - run: pnpm --filter @daily-battle/ai eval --n 100 --assert
-      - run: pnpm --filter web build
+
+  # Playwright on the shared build, split across shards.
+  e2e:
+    needs: check
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@v4
+        with:
+          name: web-dist
+          path: apps/web/dist
       - run: pnpm --filter web exec playwright install --with-deps chromium
-      - run: pnpm --filter web e2e
+      - run: pnpm --filter web e2e --shard=${{ matrix.shard }}/3
+        env:
+          E2E_PREBUILT: '1'

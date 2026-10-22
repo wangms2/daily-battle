@@ -13,7 +13,10 @@ export function Sheet({
   children,
   wide = false,
   hideTitle = false,
+  scroll = false,
 }: {
+  /** Let the body scroll inside the sheet (long reading content only). */
+  scroll?: boolean;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title: string;
@@ -59,7 +62,16 @@ export function Sheet({
             </Dialog.Close>
           </div>
           {!description && <Dialog.Description className="sr-only">{title}</Dialog.Description>}
-          <div className="min-h-0 px-5 pt-3">{children}</div>
+          <div
+            className={clsx(
+              'min-h-0 px-5 pt-3',
+              scroll && 'overflow-y-auto overscroll-contain pb-2',
+            )}
+            // Scrollable content must be reachable by keyboard.
+            tabIndex={scroll ? 0 : undefined}
+          >
+            {children}
+          </div>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>

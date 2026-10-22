@@ -249,6 +249,7 @@ export function TeamBuilder({
           <div
             key={shake}
             className={clsx('grid h-16 shrink-0 grid-cols-6 gap-1.5', shake > 0 && 'animate-shake')}
+            role="group"
             aria-label={`Your team, ${team.length} of 6`}
           >
             {traySlots.map((slot, i) =>

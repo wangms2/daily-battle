@@ -4,6 +4,7 @@
 // what it is.
 import clsx from 'clsx';
 import {
+  useEffect,
   useRef,
   useState,
   type CSSProperties,
@@ -55,6 +56,11 @@ function usePressInfo(show: () => void, hide: () => void, act: () => void) {
       if (e.pointerType === 'mouse') show();
     },
     onContextMenu: (e: { preventDefault: () => void }) => e.preventDefault(),
+    // Keyboard users get the details on focus (their long-press).
+    onFocus: (e: { currentTarget: Element }) => {
+      if (e.currentTarget.matches(':focus-visible')) show();
+    },
+    onBlur: hide,
     onClick: () => {
       if (longPressed.current) {
         longPressed.current = false;
@@ -170,6 +176,14 @@ function BenchButton({
 
 type Info = { move: MoveOption } | { member: TeamMember } | null;
 
+// Whether the player is driving with the keyboard, so focus can follow the
+// choices from turn to turn without moving it for pointer users.
+let usingKeyboard = false;
+if (typeof window !== 'undefined') {
+  window.addEventListener('keydown', () => (usingKeyboard = true), true);
+  window.addEventListener('pointerdown', () => (usingKeyboard = false), true);
+}
+
 export function ControlPanel({
   controls,
   team,
@@ -190,6 +204,16 @@ export function ControlPanel({
   const switchFor = (m: TeamMember) => controls?.switches.find((s) => s.slot === m.slot)?.choice;
   const off = disabled || !controls;
   const memberInfo = (m: TeamMember | null) => setInfo(m && { member: m });
+  const panel = useRef<HTMLDivElement>(null);
+  // When choices come back after a turn and focus was lost, put it on the first one.
+  useEffect(() => {
+    if (off || !usingKeyboard) return;
+    const lost = !document.activeElement || document.activeElement === document.body;
+    if (!lost) return;
+    panel.current
+      ?.querySelector<HTMLElement>('button:enabled:not([aria-disabled="true"])')
+      ?.focus();
+  }, [off, controls]);
 
   const tooltip =
     info &&
@@ -216,7 +240,7 @@ export function ControlPanel({
 
   if (controls?.kind === 'switch') {
     return (
-      <div className="relative flex shrink-0 flex-col gap-2">
+      <div ref={panel} className="relative flex shrink-0 flex-col gap-2">
         {tooltip}
         <p className="display text-[14px]">Who comes in?</p>
         <div className={clsx('grid grid-cols-3 gap-2', disabled && 'opacity-50')}>
@@ -238,7 +262,7 @@ export function ControlPanel({
 
   const moves = controls?.moves ?? [];
   return (
-    <div className="relative flex shrink-0 flex-col gap-1.5">
+    <div ref={panel} className="relative flex shrink-0 flex-col gap-1.5">
       {tooltip}
       <p
         className={clsx(
@@ -285,7 +309,7 @@ export function ControlPanel({
           ),
         )}
       </div>
-      <div className="flex gap-1.5" aria-label="Switch">
+      <div className="flex gap-1.5" role="group" aria-label="Switch">
         {bench.map((m) => (
           <BenchButton
             key={m.species}

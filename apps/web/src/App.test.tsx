@@ -72,6 +72,30 @@ describe('first run', () => {
     await user.click(await screen.findByRole('button', { name: 'Let’s go' }));
     expect(await screen.findByRole('button', { name: /Pick 6 more/ })).toBeDisabled();
   });
+
+  it('links to the disclaimer and credits from the welcome sheet', async () => {
+    const user = userEvent.setup();
+    renderApp();
+    await user.click(await screen.findByRole('button', { name: 'About and credits' }));
+    const about = await screen.findByRole('dialog', { name: 'About Daily Battle' });
+    expect(about).toHaveTextContent('not affiliated with or endorsed by Nintendo');
+    expect(about).toHaveTextContent('Smogon, used with permission');
+    expect(about).toHaveTextContent('No accounts and no tracking');
+  });
+});
+
+describe('settings', () => {
+  it('copies a playtest report and opens About', async () => {
+    const user = userEvent.setup();
+    const writeText = vi.fn(async (_text: string) => {});
+    vi.stubGlobal('navigator', { ...navigator, share: undefined, clipboard: { writeText } });
+    renderApp(seeded({ team: { week: WEEK } }));
+    await user.click(await screen.findByRole('button', { name: 'Settings' }));
+    await user.click(screen.getByRole('button', { name: 'Copy playtest report' }));
+    expect(writeText.mock.calls[0]![0]).toMatch(/^#daily-battle-report v1\n\{"v":1,/);
+    await user.click(screen.getByRole('button', { name: 'About and credits' }));
+    expect(await screen.findByRole('dialog', { name: 'About Daily Battle' })).toBeInTheDocument();
+  });
 });
 
 describe('team builder', () => {

@@ -3,7 +3,9 @@ import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { BattleRoute } from './screens/BattleRoute';
 import { DailyBrief } from './screens/DailyBrief';
 import { TeamBuilder } from './screens/TeamBuilder';
+import { AboutSheet } from './sheets/About';
 import { SettingsSheet, StatsSheet, WelcomeSheet } from './sheets/misc';
+import { reportText } from './lib/report';
 import { computeStats, dayHeadline, summarizeDay } from './lib/results';
 import { useSchedule } from './lib/schedule';
 import { ENGINE_VERSION, randomSeed } from './lib/seed';
@@ -45,6 +47,7 @@ export function App() {
   const [route, go] = useHashRoute();
   const [statsOpen, setStatsOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
   const [storageNoticeDismissed, setStorageNoticeDismissed] = useState(false);
 
   const { settings } = state;
@@ -208,6 +211,7 @@ export function App() {
         hints={settings.beginnerHints}
         onHints={(v) => setSetting('beginnerHints', v)}
         onDone={() => dispatch({ type: 'markExplainer', id: 'welcome' })}
+        onAbout={() => setAboutOpen(true)}
       />
       <StatsSheet
         open={statsOpen}
@@ -221,7 +225,10 @@ export function App() {
         onOpenChange={setSettingsOpen}
         settings={settings}
         onChange={setSetting}
+        report={reportText(state, ENGINE_VERSION)}
+        onAbout={() => setAboutOpen(true)}
       />
+      <AboutSheet open={aboutOpen} onOpenChange={setAboutOpen} />
     </div>
   );
 }

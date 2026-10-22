@@ -7,6 +7,7 @@ allowBuilds:
 
 # Engine and protocol packages, pinned exactly: resume depends on the sim being deterministic (DESIGN.md §15).
 catalog:
+  '@axe-core/playwright': 4.13.0
   '@pkmn/client': 0.7.3
   '@pkmn/data': 0.10.11
   '@pkmn/protocol': 0.7.3

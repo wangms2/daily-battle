@@ -1,5 +1,5 @@
 // Plays the AI against comparison bots on generated content (DESIGN.md §13 M4).
-//   pnpm --filter @daily-battle/ai eval [--n 200] [--assert] [--debug]
+//   pnpm --filter @daily-battle/ai eval [--n 200] [--assert] [--debug] [--styles]
 // Each matchup pairs a team drawn from a weekly pool with that week's daily
 // opponent, and is played twice with the policies swapped between the teams.
 import { sets } from '@daily-battle/data';
@@ -13,7 +13,14 @@ import {
 } from '@daily-battle/gen';
 import { deriveSeed, RandomPolicy, runBattle, type Policy } from '@daily-battle/sim-bridge';
 type PokemonSet = ReturnType<typeof toPokemonSet>;
-import { midBot, NaivePolicy, strongBot, UtilityPolicy, type PolicyStats } from '../src/index';
+import {
+  aiForStyle,
+  midBot,
+  NaivePolicy,
+  strongBot,
+  UtilityPolicy,
+  type PolicyStats,
+} from '../src/index';
 
 const arg = (name: string) => {
   const i = process.argv.indexOf(`--${name}`);
@@ -22,6 +29,8 @@ const arg = (name: string) => {
 const N = Number(arg('n') ?? 200);
 const ASSERT = process.argv.includes('--assert');
 const DEBUG = process.argv.includes('--debug');
+/** Also report the opponent AI's behavior per style preset (slower; M9). */
+const STYLES = process.argv.includes('--styles');
 const START = '2026-01-05';
 
 /** A pool team: 6 of the week's 12, sets drawn by weight. */
@@ -165,5 +174,35 @@ console.log(
     `first on turn ${(hazardTurns.reduce((a, b) => a + b, 0) / Math.max(1, hazardTurns.length)).toFixed(1)} on average`,
 );
 console.log(`  ${(mid.ms / mid.decisions).toFixed(1)} ms per decision`);
+
+// The opponent AI's style presets against hand-set mid-ladder targets (DESIGN.md §8.5).
+// Reported, not asserted: they're estimates to tune toward, not hard limits.
+// Stall teams spend more turns on status and recovery, so they click max damage less.
+const MAX_DAMAGE = { offense: [0.6, 0.8], balance: [0.55, 0.75], stall: [0.45, 0.65] } as const;
+const SWITCHES = [0.08, 0.3] as const;
+const within = (x: number, [lo, hi]: readonly [number, number]) =>
+  x >= lo && x <= hi ? 'ok' : 'off';
+if (STYLES) console.log('Opponent AI by style (vs mid):');
+for (const style of STYLES ? (['offense', 'balance', 'stall'] as const) : []) {
+  const t = play(
+    `style-${style}`,
+    () => aiForStyle(style),
+    () => midBot(),
+  );
+  const total = (f: (s: PolicyStats) => number) => t.stats.reduce((a, s) => a + f(s), 0);
+  const moves = total((s) => s.moveDecisions);
+  const switches = total((s) => s.switches);
+  const maxDamage = total((s) => s.maxDamage) / Math.max(1, moves);
+  const switchShare = switches / Math.max(1, moves + switches);
+  const hazards = t.stats.map((s) => s.firstHazardTurn).filter((x): x is number => x !== null);
+  const firstHazard = hazards.reduce((a, b) => a + b, 0) / Math.max(1, hazards.length);
+  // Hazard timing is reported only: it mostly reflects when the setter comes in.
+  console.log(
+    `  ${style.padEnd(8)} win ${pct(rate(t)).padStart(6)}` +
+      `  max-damage ${pct(maxDamage)} [${within(maxDamage, MAX_DAMAGE[style])}]` +
+      `  switches ${pct(switchShare)} [${within(switchShare, SWITCHES)}]` +
+      `  hazards in ${pct(hazards.length / t.stats.length)} of battles, first on turn ${firstHazard.toFixed(1)}`,
+  );
+}
 
 if (ASSERT && failed) process.exit(1);

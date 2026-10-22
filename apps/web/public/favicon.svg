@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4a6c99"/>
+      <stop offset="1" stop-color="#2f4a6e"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#bg)"/>
+  <!-- Two crossed strokes: a clash, in Giratina gold over Palkia pearl. -->
+  <path d="M18 18 L46 46" stroke="#ece7f2" stroke-width="8" stroke-linecap="round"/>
+  <path d="M46 18 L18 46" stroke="#2f4a6e" stroke-width="13" stroke-linecap="round"/>
+  <path d="M46 18 L18 46" stroke="#d2ae63" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="32" cy="32" r="3.2" fill="#2f4a6e"/>
+</svg>

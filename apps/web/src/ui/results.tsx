@@ -18,6 +18,7 @@ export function TryRows({ summary, current }: { summary: DaySummary; current?: n
             'flex items-center gap-1.5 rounded-badge px-1.5 py-0.5',
             current === a.ts && 'bg-surface-2',
           )}
+          role="img"
           aria-label={`Try ${i + 1}: ${a.result === 'win' ? 'won' : a.result === 'forfeit' ? 'gave up' : 'lost'}, ${a.remaining} of 6 left`}
         >
           <span

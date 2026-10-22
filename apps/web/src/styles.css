@@ -24,7 +24,7 @@
   --accent-soft-text: #6b5482;
   --gold: #a9842f;
   --gold-soft: #f3ead6;
-  --gold-text: #ffffff;
+  --gold-text: #1b1408; /* dark on gold meets AA (5.2:1); white doesn't */
   --good: #3d7a5a;
   --bad: #a33a46;
 
@@ -146,9 +146,16 @@ body {
 .btn:active:not(:disabled) {
   transform: translateY(1px) scale(0.99);
 }
-.btn:focus-visible {
+.btn:focus-visible,
+:where(a, button, input, textarea, [tabindex], [role='button']):focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
+}
+/* On the battle background, a light halo keeps the ring visible. */
+.statbar:focus-visible {
+  outline-color: #fff;
+  box-shadow: 0 0 0 4px var(--accent);
+  border-radius: 4px;
 }
 .btn:disabled {
   cursor: not-allowed;

@@ -22,7 +22,10 @@ export default defineConfig({
   webServer: {
     // The production build: realistic, and the worker loads as one bundle instead of
     // hundreds of dev modules.
-    command: 'pnpm exec vite build && pnpm exec vite preview --port 5179 --strictPort',
+    // CI builds once and shares dist/ with the e2e shards (E2E_PREBUILT=1).
+    command: process.env.E2E_PREBUILT
+      ? 'pnpm exec vite preview --port 5179 --strictPort'
+      : 'pnpm exec vite build && pnpm exec vite preview --port 5179 --strictPort',
     url: 'http://localhost:5179',
     reuseExistingServer: false,
     timeout: 120_000,

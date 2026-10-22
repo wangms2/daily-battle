@@ -124,6 +124,11 @@ export function Battle({
     onChoiceRef.current = onChoice;
   });
   const ended = useRef(false);
+  const endRef = useRef<HTMLDivElement>(null);
+  // Move focus to the result so keyboard and screen-reader users land on it.
+  useEffect(() => {
+    if (end) endRef.current?.focus();
+  }, [end]);
 
   const applyFrame = useCallback((f: Frame, withAnim: boolean) => {
     setView(f.view);
@@ -373,7 +378,9 @@ export function Battle({
   const endCard = end && (
     <div className="animate-fade-in absolute inset-0 z-20 grid place-items-center bg-black/35 p-4">
       <div
-        className="card animate-sheet-in w-full max-w-sm p-5 text-center"
+        ref={endRef}
+        tabIndex={-1}
+        className="card animate-sheet-in w-full max-w-sm p-5 text-center outline-none"
         role="dialog"
         aria-label="Battle over"
       >

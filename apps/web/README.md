@@ -72,3 +72,12 @@ The full spec is in DESIGN.md §12 and the M6 and M7 plans.
 The sprites are Showdown-style animated GIFs and Gen 7 box icons from [PokeAPI/sprites](https://github.com/PokeAPI/sprites), downloaded by `scripts/sprites.ts` for exactly the species in the set data and committed here. Nothing is hotlinked. Pokémon and sprites © Nintendo, Creatures Inc., GAME FREAK inc. The animated sprites are by the Smogon sprite community. Daily Battle is an unofficial, free fan project.
 
 The battle backgrounds (Gen 4), hazard sprites, weather overlays, and Poké Ball mark come from Pokémon Showdown's `fx/` folder, which Showdown dedicates to the public domain (CC0). `scripts/fx.ts` downloads them from a pinned commit into `public/fx/`.
+
+## Deploy (Cloudflare Pages)
+
+1. Cloudflare dashboard → Workers & Pages → Create → Pages → Connect to Git → pick `daily-battle`.
+2. Build command `pnpm --filter web build`, output directory `apps/web/dist`, root `/`.
+3. Environment variables: `NODE_VERSION=24`, and `VITE_SITE_URL=https://<your production URL>` (for link previews; previews fall back to their own URL).
+4. Every push to `main` deploys; branches get preview URLs. `public/_headers` sets caching and a self-only CSP (covered by `e2e/deploy.spec.ts`).
+
+New weeks: `pnpm --filter @daily-battle/pipeline schedule --from <monday>`. Playtest reports: testers use Settings → Copy playtest report; compare with `pnpm --filter @daily-battle/pipeline calibrate <files…>`.

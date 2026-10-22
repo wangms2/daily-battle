@@ -3,6 +3,7 @@ import { CHECK_ITEMS, sharedWeaknesses, type Checklist } from '../lib/data';
 import { getSprite } from '../lib/sprites';
 import type { Stats } from '../lib/results';
 import type { Settings } from '../state/schema';
+import { ShareButton } from '../ui/results';
 import { Sheet } from '../ui/Sheet';
 import { Button, Switch, TypeBadge } from '../ui/bits';
 import { CheckIcon, CloseIcon } from '../ui/icons';
@@ -12,11 +13,13 @@ export function WelcomeSheet({
   hints,
   onHints,
   onDone,
+  onAbout,
 }: {
   open: boolean;
   hints: boolean;
   onHints: (v: boolean) => void;
   onDone: () => void;
+  onAbout: () => void;
 }) {
   const rules = [
     ['Build a team', "Pick 6 of this week's 12 Pokémon. Your team carries over all week."],
@@ -52,6 +55,12 @@ export function WelcomeSheet({
       <Button className="mt-4 w-full" onClick={onDone}>
         Let’s go
       </Button>
+      <p className="mt-3 text-center text-[12px] text-muted">
+        An unofficial fan project.{' '}
+        <button type="button" onClick={onAbout} className="font-semibold text-accent underline">
+          About and credits
+        </button>
+      </p>
     </Sheet>
   );
 }
@@ -107,11 +116,16 @@ export function SettingsSheet({
   onOpenChange,
   settings,
   onChange,
+  report,
+  onAbout,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   settings: Settings;
   onChange: <K extends keyof Settings>(key: K, value: Settings[K]) => void;
+  /** The playtest report text, copied by the button. */
+  report: string;
+  onAbout: () => void;
 }) {
   const speeds: Settings['battleSpeed'][] = ['normal', 'fast', 'instant'];
   return (
@@ -153,11 +167,17 @@ export function SettingsSheet({
           hint="Battle effects and animated sprites"
         />
       </div>
-      <p className="mt-4 text-[12px] leading-relaxed text-muted">
-        Daily Battle is an unofficial, free fan project, not affiliated with Nintendo, Creatures
-        Inc., GAME FREAK inc., The Pokémon Company, or Smogon. Pokémon and sprites © Nintendo,
-        Creatures Inc., GAME FREAK inc. Sprites by the Smogon sprite community; sets and usage data
-        from Smogon, used with permission.
+      <div className="mt-3 grid grid-cols-2 gap-2">
+        <ShareButton text={report} variant="secondary">
+          Copy playtest report
+        </ShareButton>
+        <Button variant="secondary" onClick={onAbout}>
+          About and credits
+        </Button>
+      </div>
+      <p className="mt-3 text-[12px] leading-relaxed text-muted">
+        An unofficial, free fan project, not affiliated with Nintendo or Smogon. The playtest report
+        lists your days, team, and results, nothing else.
       </p>
     </Sheet>
   );
