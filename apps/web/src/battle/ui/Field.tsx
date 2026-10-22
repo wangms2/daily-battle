@@ -31,6 +31,25 @@ const X = (x: number) => `calc(50cqw + var(--s) * ${x - 370})`;
 const Y = (y: number) => `calc(100cqh - var(--s) * ${385 - y})`;
 /** Top of the foe's stat bar; its details card opens just below it. */
 const FOE_BAR_TOP = `max(6px, calc(${Y(150)} - 58px))`;
+/** The stat bar's height with team marks, and its width (w-[9.75rem]). */
+const FOE_BAR_H = '48px';
+const BAR_W = '9.75rem';
+
+/**
+ * Where the foe's stat bar goes: over its platform, unless the sprite there
+ * would reach up into it (a tall sprite like Aerodactyl, or any sizeable one
+ * on a short phone field), and then beside the sprite on the left. CSS can't
+ * branch, so the shift is clamp(0, overlap × 1000, full shift): zero while
+ * the sprite stays clear, all the way over as soon as it doesn't.
+ */
+function foeBarLeft(size: { w: number; h: number } | null): string {
+  const over = `min(calc(${X(SPOT.foe.x)} - 4.875rem), calc(100cqw - 10.5rem))`;
+  if (!size) return over;
+  const spriteTop = Y(SPOT.foe.feet - size.h);
+  const overlap = `(${FOE_BAR_TOP} + ${FOE_BAR_H} + 2px - ${spriteTop})`;
+  const beside = `max(6px, calc(${X(SPOT.foe.x)} - var(--s) * ${size.w / 2} - ${BAR_W} - 6px))`;
+  return `calc(${over} - clamp(0px, ${overlap} * 1000, calc(${over} - ${beside})))`;
+}
 /** Where things sit for each side, in image coordinates. */
 const SPOT = {
   foe: { x: 480, feet: 255, label: 190, popup: 165 },
@@ -259,6 +278,7 @@ function FieldSprite({
   anim,
   animate,
   onTap,
+  onSize,
 }: {
   mon: MonView | null;
   who: Who;
@@ -266,6 +286,8 @@ function FieldSprite({
   animate: boolean;
   /** Tapping the Pokémon itself: details (the stat bar is the accessible control). */
   onTap: () => void;
+  /** The sprite's natural size once it loads. */
+  onSize?: (size: { w: number; h: number }) => void;
 }) {
   const [natural, setNatural] = useState<{ w: number; h: number } | null>(null);
   if (!mon) return null;
@@ -305,9 +327,11 @@ function FieldSprite({
         src={getSprite(mon.species, who === 'you' ? 'back' : 'front')}
         alt=""
         draggable={false}
-        onLoad={(e) =>
-          setNatural({ w: e.currentTarget.naturalWidth, h: e.currentTarget.naturalHeight })
-        }
+        onLoad={(e) => {
+          const size = { w: e.currentTarget.naturalWidth, h: e.currentTarget.naturalHeight };
+          setNatural(size);
+          onSize?.(size);
+        }}
         style={
           natural
             ? {
@@ -362,6 +386,9 @@ export function Field({
 }) {
   const weather = view?.weather ?? '';
   const [hovered, setHovered] = useState(false);
+  const [foeSize, setFoeSize] = useState<{ species: string; w: number; h: number } | null>(null);
+  const foeSpecies = view?.foe?.species;
+  const foeLeft = foeBarLeft(foeSize?.species === foeSpecies ? foeSize : null);
 
   // A tap anywhere outside the stat bars closes the details card.
   useEffect(() => {
@@ -416,6 +443,7 @@ export function Field({
         anim={anim}
         animate={animate}
         onTap={() => (busy ? onTap() : handleInfo('foe', 'tap'))}
+        onSize={(size) => foeSpecies && setFoeSize({ species: foeSpecies, ...size })}
       />
       {view && <SideEffects side={view.yourSide} who="you" />}
       <FieldSprite
@@ -433,11 +461,20 @@ export function Field({
           marks={view.foeTeam}
           animate={animate}
           onInfo={handleInfo}
-          style={{
-            left: `min(calc(${X(SPOT.foe.x)} - 4.875rem), calc(100cqw - 10.5rem))`,
-            top: FOE_BAR_TOP,
-          }}
+          style={{ left: foeLeft, top: FOE_BAR_TOP }}
         />
+      )}
+      {/* Between a faint and the next switch-in (both sides choosing after a double
+          faint), the foe's team still shows, so you can see what they have left. */}
+      {view && !view.foe && (
+        <span
+          className="statbar absolute z-10 rounded-[4px] px-1 py-0.5"
+          style={{ left: foeBarLeft(null), top: FOE_BAR_TOP }}
+          role="img"
+          aria-label={`Foe has ${view.foeTeam.filter((m) => !m.fainted).length} of 6 left`}
+        >
+          <TeamMarks marks={view.foeTeam} />
+        </span>
       )}
       {view?.you && (
         <StatBar

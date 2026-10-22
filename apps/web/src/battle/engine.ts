@@ -400,11 +400,12 @@ export class BattleEngine {
     let moves: MoveOption[] = [];
     if (request.requestType === 'move') {
       moves = (request.active[0]?.moves ?? []).map((m, i) => {
-        const move = dex.moves.get(m.name);
+        // Requests name some moves with their power ("Return 102"); the id is clean.
+        const move = dex.moves.get(m.id);
         const choice = `move ${i + 1}`;
         return {
           choice,
-          name: m.name,
+          name: move.exists ? move.name : m.name,
           type: move.exists ? move.type : 'Normal',
           category: (move.exists ? move.category : 'Physical') as MoveOption['category'],
           power: move.exists ? move.basePower : 0,
@@ -413,7 +414,7 @@ export class BattleEngine {
           pp: 'pp' in m ? m.pp : 0,
           maxpp: 'maxpp' in m ? m.maxpp : 0,
           disabled: !legal.includes(choice),
-          effectiveness: effectiveness(m.name, foe),
+          effectiveness: effectiveness(move.name, foe),
         };
       });
     }
