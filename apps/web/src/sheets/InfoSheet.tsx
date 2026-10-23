@@ -15,6 +15,7 @@ import { getSprite } from '../lib/sprites';
 import { Sheet } from '../ui/Sheet';
 import { Button, TypeBadge } from '../ui/bits';
 import { Term } from '../ui/DetailCard';
+import { ItemIcon } from '../ui/ItemIcon';
 import { MoveList } from '../ui/MoveList';
 import { StatLines } from '../ui/StatLines';
 
@@ -155,7 +156,12 @@ function PossibleSets({ species }: { species: string }) {
       <div role="tabpanel" aria-label={set.label} className="mt-2">
         <MoveList moves={set.moves} />
         <p className="mt-1.5 text-[13px] text-muted">
-          {set.item && <Term name={set.item} desc={itemInfo(set.item)} kind="Item" />}
+          {set.item && (
+            <>
+              <ItemIcon name={set.item} className="size-5" />
+              <Term name={set.item} desc={itemInfo(set.item)} kind="Item" />
+            </>
+          )}
           {set.item && ' · '}
           <Term name={set.ability} desc={abilityInfo(set.ability)} kind="Ability" right />
         </p>

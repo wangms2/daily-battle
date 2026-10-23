@@ -14,6 +14,7 @@ import { SetPicker } from '../sheets/SetPicker';
 import type { DayChange, DayState } from '../state/schema';
 import { Button, SectionLabel } from '../ui/bits';
 import { StarIcon } from '../ui/icons';
+import { ItemIcon } from '../ui/ItemIcon';
 import { MoveChips } from '../ui/MoveList';
 import { PokemonTile } from '../ui/PokemonTile';
 import type { ShareModel } from '../lib/share';
@@ -176,7 +177,8 @@ export function DailyBrief({
         {set && (
           <>
             <p className="text-[12px] text-muted">
-              {set.label} · {set.item} · {set.ability}
+              {set.label} · {set.item && <ItemIcon name={set.item} className="size-5" />}
+              {set.item} · {set.ability}
             </p>
             <MoveChips moves={set.moves} />
           </>

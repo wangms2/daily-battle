@@ -5,6 +5,7 @@ import type { ReactNode } from 'react';
 import { abilityInfo, itemInfo, possibleSets, shortLabel, speciesInfo } from '../../lib/data';
 import { TypeBadge } from '../../ui/bits';
 import { Term } from '../../ui/DetailCard';
+import { ItemIcon } from '../../ui/ItemIcon';
 import { MoveChips } from '../../ui/MoveList';
 import type { MonView, Revealed, TeamMember } from '../frames';
 import { boostLabels, STATUS_LABEL } from './labels';
@@ -58,6 +59,15 @@ export function MonPopover(props: Props) {
     ) : (
       name
     );
+  const withIcon = (name: string, kind: 'Item' | 'Ability') =>
+    kind === 'Item' ? (
+      <>
+        <ItemIcon name={name} className="size-5" />
+        {term(name, kind)}
+      </>
+    ) : (
+      term(name, kind)
+    );
 
   return (
     <div
@@ -81,7 +91,7 @@ export function MonPopover(props: Props) {
       <p className="mt-1 text-[12.5px] tabular-nums">{first.join(' · ')}</p>
       {(item || ability) && (
         <p className="mt-0.5 text-[12.5px] text-muted">
-          {item && term(item, 'Item')}
+          {item && withIcon(item, 'Item')}
           {item && ability && ' · '}
           {ability && term(ability, 'Ability')}
         </p>

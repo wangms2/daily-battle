@@ -19,6 +19,7 @@ import { getSprite } from '../lib/sprites';
 import { Sheet } from '../ui/Sheet';
 import { MoveList } from '../ui/MoveList';
 import { Button, TypeBadge } from '../ui/bits';
+import { ItemIcon } from '../ui/ItemIcon';
 import { FinalStatsRow } from '../ui/StatLines';
 
 /**
@@ -87,7 +88,14 @@ function SetCard({
       <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-4 gap-y-0.5 text-[13px]">
         <dt className="text-muted">Item</dt>
         <dd className="font-medium">
-          {set.item ? <Term name={set.item} desc={itemInfo(set.item)} kind="Item" /> : 'None'}
+          {set.item ? (
+            <>
+              <ItemIcon name={set.item} />
+              <Term name={set.item} desc={itemInfo(set.item)} kind="Item" />
+            </>
+          ) : (
+            'None'
+          )}
         </dd>
         <dt className="text-muted">Ability</dt>
         <dd className="font-medium">

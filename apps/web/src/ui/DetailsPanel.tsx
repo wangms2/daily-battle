@@ -15,6 +15,7 @@ import {
 } from '../lib/data';
 import { getSprite } from '../lib/sprites';
 import { MatchupRow } from '../sheets/InfoSheet';
+import { ItemIcon } from './ItemIcon';
 import { StatLines } from './StatLines';
 import { Term } from './DetailCard';
 import { MoveList } from './MoveList';
@@ -141,7 +142,14 @@ export function DetailsPanel({
           <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-[13px]">
             <dt className="text-muted">Item</dt>
             <dd className="min-w-0 font-medium">
-              {set.item ? <Term name={set.item} desc={itemInfo(set.item)} kind="Item" /> : 'None'}
+              {set.item ? (
+                <>
+                  <ItemIcon name={set.item} />
+                  <Term name={set.item} desc={itemInfo(set.item)} kind="Item" />
+                </>
+              ) : (
+                'None'
+              )}
             </dd>
             <dt className="text-muted">Ability</dt>
             <dd className="min-w-0 font-medium">
