@@ -1,0 +1,331 @@
+{
+  "version": 1,
+  "generatorVersion": 4,
+  "dataBuiltAt": "2026-10-23T13:58:33.422Z",
+  "week": "2026-10-19",
+  "pool": {
+    "species": [
+      "Jellicent",
+      "Hippowdon",
+      "Magnezone",
+      "Donphan",
+      "Tyranitar",
+      "Gyarados",
+      "Latias",
+      "Jirachi",
+      "Scizor",
+      "Mew",
+      "Cofagrigus",
+      "Nidoking"
+    ],
+    "candidate": 0
+  },
+  "suggestedTeams": [
+    {
+      "archetype": "Balanced",
+      "team": [
+        {
+          "species": "Jirachi",
+          "setId": "jirachi-choice-scarf"
+        },
+        {
+          "species": "Hippowdon",
+          "setId": "hippowdon-mixed-wall"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-bulky-pursuit-trapper"
+        },
+        {
+          "species": "Scizor",
+          "setId": "scizor-offensive-swords-dance"
+        },
+        {
+          "species": "Gyarados",
+          "setId": "gyarados-offensive-dragon-dance"
+        },
+        {
+          "species": "Jellicent",
+          "setId": "jellicent-standard"
+        }
+      ]
+    },
+    {
+      "archetype": "Offense",
+      "team": [
+        {
+          "species": "Donphan",
+          "setId": "donphan-life-orb"
+        },
+        {
+          "species": "Nidoking",
+          "setId": "nidoking-special-attacker"
+        },
+        {
+          "species": "Mew",
+          "setId": "mew-swords-dance"
+        },
+        {
+          "species": "Latias",
+          "setId": "latias-choice-scarf"
+        },
+        {
+          "species": "Scizor",
+          "setId": "scizor-choice-band"
+        },
+        {
+          "species": "Cofagrigus",
+          "setId": "cofagrigus-offensive-trick-room"
+        }
+      ]
+    },
+    {
+      "archetype": "Stall",
+      "team": [
+        {
+          "species": "Jirachi",
+          "setId": "jirachi-utility"
+        },
+        {
+          "species": "Donphan",
+          "setId": "donphan-support"
+        },
+        {
+          "species": "Cofagrigus",
+          "setId": "cofagrigus-defensive"
+        },
+        {
+          "species": "Mew",
+          "setId": "mew-defensive"
+        },
+        {
+          "species": "Jellicent",
+          "setId": "jellicent-specially-defensive"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-bulky-pursuit-trapper"
+        }
+      ]
+    }
+  ],
+  "days": [
+    {
+      "day": "2026-10-19",
+      "style": "stall",
+      "team": [
+        {
+          "species": "Celebi",
+          "setId": "celebi-bulky-pivot"
+        },
+        {
+          "species": "Dragonite",
+          "setId": "dragonite-3-attacks-dragon-dance"
+        },
+        {
+          "species": "Abomasnow",
+          "setId": "abomasnow-hail-setter"
+        },
+        {
+          "species": "Alakazam",
+          "setId": "alakazam-attacker"
+        },
+        {
+          "species": "Sableye",
+          "setId": "sableye-lagging-tail-trick"
+        },
+        {
+          "species": "Roserade",
+          "setId": "roserade-spikes"
+        }
+      ],
+      "candidate": 17
+    },
+    {
+      "day": "2026-10-20",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Latios",
+          "setId": "latios-choice-specs"
+        },
+        {
+          "species": "Hitmontop",
+          "setId": "hitmontop-rapid-spin"
+        },
+        {
+          "species": "Honchkrow",
+          "setId": "honchkrow-life-orb"
+        },
+        {
+          "species": "Ninetales",
+          "setId": "ninetales-defensive"
+        },
+        {
+          "species": "Landorus-Therian",
+          "setId": "landorustherian-swords-dance"
+        },
+        {
+          "species": "Clefable",
+          "setId": "clefable-support"
+        }
+      ],
+      "candidate": 4
+    },
+    {
+      "day": "2026-10-21",
+      "style": "stall",
+      "team": [
+        {
+          "species": "Politoed",
+          "setId": "politoed-defensive"
+        },
+        {
+          "species": "Abomasnow",
+          "setId": "abomasnow-subseed"
+        },
+        {
+          "species": "Hitmontop",
+          "setId": "hitmontop-rapid-spin"
+        },
+        {
+          "species": "Metagross",
+          "setId": "metagross-stealth-rock"
+        },
+        {
+          "species": "Rotom-Wash",
+          "setId": "rotomwash-defensive"
+        },
+        {
+          "species": "Scizor",
+          "setId": "scizor-offensive-swords-dance"
+        }
+      ],
+      "candidate": 2
+    },
+    {
+      "day": "2026-10-22",
+      "style": "stall",
+      "team": [
+        {
+          "species": "Excadrill",
+          "setId": "excadrill-offensive"
+        },
+        {
+          "species": "Salamence",
+          "setId": "salamence-choice-scarf"
+        },
+        {
+          "species": "Keldeo",
+          "setId": "keldeo-choice-specs"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-bulky-pursuit-trapper"
+        },
+        {
+          "species": "Heatran",
+          "setId": "heatran-specially-defensive"
+        },
+        {
+          "species": "Registeel",
+          "setId": "registeel-utility"
+        }
+      ],
+      "candidate": 3
+    },
+    {
+      "day": "2026-10-23",
+      "style": "stall",
+      "team": [
+        {
+          "species": "Xatu",
+          "setId": "xatu-utility"
+        },
+        {
+          "species": "Infernape",
+          "setId": "infernape-life-orb"
+        },
+        {
+          "species": "Gengar",
+          "setId": "gengar-substitute-will-o-wisp"
+        },
+        {
+          "species": "Hippowdon",
+          "setId": "hippowdon-mixed-wall"
+        },
+        {
+          "species": "Jirachi",
+          "setId": "jirachi-utility"
+        },
+        {
+          "species": "Latios",
+          "setId": "latios-choice-scarf"
+        }
+      ],
+      "candidate": 8
+    },
+    {
+      "day": "2026-10-24",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Keldeo",
+          "setId": "keldeo-choice-specs"
+        },
+        {
+          "species": "Tornadus",
+          "setId": "tornadus-mixed-attacker"
+        },
+        {
+          "species": "Metagross",
+          "setId": "metagross-stealth-rock"
+        },
+        {
+          "species": "Breloom",
+          "setId": "breloom-technician"
+        },
+        {
+          "species": "Tentacruel",
+          "setId": "tentacruel-utility"
+        },
+        {
+          "species": "Latios",
+          "setId": "latios-calm-mind"
+        }
+      ],
+      "candidate": 4
+    },
+    {
+      "day": "2026-10-25",
+      "style": "stall",
+      "team": [
+        {
+          "species": "Gliscor",
+          "setId": "gliscor-stealth-rock"
+        },
+        {
+          "species": "Starmie",
+          "setId": "starmie-rapid-spin"
+        },
+        {
+          "species": "Salamence",
+          "setId": "salamence-choice-scarf"
+        },
+        {
+          "species": "Cofagrigus",
+          "setId": "cofagrigus-offensive-trick-room"
+        },
+        {
+          "species": "Hippowdon",
+          "setId": "hippowdon-mixed-wall"
+        },
+        {
+          "species": "Clefable",
+          "setId": "clefable-support"
+        }
+      ],
+      "candidate": 1
+    }
+  ]
+}
