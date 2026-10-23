@@ -12,6 +12,7 @@
     "fx": "tsx scripts/fx.ts",
     "anims": "tsx scripts/anims.ts",
     "items": "tsx scripts/items.ts",
+    "flavor": "tsx scripts/flavor.ts",
     "icons": "tsx scripts/icons.ts",
     "e2e": "playwright test"
   },

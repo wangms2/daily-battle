@@ -17,7 +17,7 @@ import {
   type ReactNode,
   type RefObject,
 } from 'react';
-import { HAZARD_FX, WEATHER_FX } from '../../lib/fx';
+import { HAZARD_FX, SUBSTITUTE_FX, WEATHER_FX } from '../../lib/fx';
 import { getSprite } from '../../lib/sprites';
 import type { SceneInit } from '../anim/scene';
 import type { Frame, MonView, SideConds, TeamMark, View, Who } from '../frames';
@@ -374,7 +374,11 @@ function FieldSprite({
         ref={imgRef}
         // A new key restarts the CSS animation; the ported ones must keep this element.
         key={`${mon.species}-${mine && !(ported && (anim.kind === 'move' || anim.kind === 'status')) ? anim.key : 0}`}
-        src={getSprite(mon.species, who === 'you' ? 'back' : 'front')}
+        // Behind a substitute, the doll stands in for the Pokémon.
+        src={
+          mon.substitute ? SUBSTITUTE_FX : getSprite(mon.species, who === 'you' ? 'back' : 'front')
+        }
+        data-substitute={mon.substitute || undefined}
         alt=""
         draggable={false}
         onLoad={(e) => {
@@ -390,12 +394,7 @@ function FieldSprite({
               }
             : { visibility: 'hidden' }
         }
-        className={clsx(
-          'pixelated max-w-none',
-          cls,
-          mon.fainted && 'opacity-0',
-          mon.substitute && 'opacity-60',
-        )}
+        className={clsx('pixelated max-w-none', cls, mon.fainted && 'opacity-0')}
       />
     </div>
   );

@@ -13,6 +13,7 @@ import {
   speciesInfo,
   topSet,
 } from '../lib/data';
+import { useFlavor } from '../lib/flavor';
 import { getSprite } from '../lib/sprites';
 import { MatchupRow } from '../sheets/InfoSheet';
 import { ItemIcon } from './ItemIcon';
@@ -38,6 +39,7 @@ export function DetailsPanel({
   onToggle: () => void;
 }) {
   const tabs = useRef<(HTMLButtonElement | null)[]>([]);
+  const flavor = useFlavor(species);
 
   if (!species) {
     return (
@@ -91,6 +93,7 @@ export function DetailsPanel({
           {inTeam ? 'Remove from team' : full ? 'Team is full' : 'Add to team'}
         </Button>
       </header>
+      {flavor && <p className="text-[13px] text-muted italic">{flavor}</p>}
 
       {sets.length > 1 && (
         <div

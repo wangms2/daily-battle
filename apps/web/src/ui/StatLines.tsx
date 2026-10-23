@@ -77,12 +77,12 @@ export function FinalStatsRow({ species, set }: { species: string; set: SetEntry
   const final = finalStats(speciesInfo(species).baseStats, set);
   return (
     <dl
-      className="mt-2 flex justify-between gap-1 rounded-chip bg-surface-2 px-2 py-1 text-[12px] whitespace-nowrap"
+      className="mt-2 flex justify-between gap-0.5 rounded-chip bg-surface-2 px-1.5 py-1 text-[12px] whitespace-nowrap"
       aria-label="Final stats at level 100"
     >
       {STAT_IDS.map((k) => (
-        <div key={k} className="flex gap-1">
-          <dt className="text-muted">{STAT_LABEL[k]}</dt>
+        <div key={k} className="flex gap-[3px]">
+          <dt className="text-[10.5px] leading-[18px] text-muted">{STAT_LABEL[k]}</dt>
           <dd className="font-bold tabular-nums">{final[k]}</dd>
         </div>
       ))}

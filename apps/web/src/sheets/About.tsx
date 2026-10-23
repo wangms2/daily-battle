@@ -6,7 +6,10 @@ import { Sheet } from '../ui/Sheet';
 const CREDITS: [string, string][] = [
   ['Sets and usage data', 'Smogon, used with permission.'],
   ['Battle simulator and text', '@pkmn (Pokémon Showdown’s simulator), MIT licensed.'],
-  ['Sprites and item icons', 'PokeAPI/sprites; animated sprites by the Smogon sprite community.'],
+  [
+    'Sprites, item icons, Pokédex text',
+    'PokeAPI; animated sprites by the Smogon sprite community.',
+  ],
   [
     'Move animations',
     'Pokémon Showdown’s battle animations (public domain, CC0, and MIT), adapted to this field.',

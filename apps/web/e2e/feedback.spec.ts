@@ -133,3 +133,29 @@ test('with animations off, sprites are still images on the builder and in battle
   expect(await gifs()).toBe(0);
   expect(await page.locator('img[src*="-still/"]').count()).toBeGreaterThan(0);
 });
+
+test('wide screens show a Pokédex entry, final stats and item icons; phones keep it lean', async ({
+  page,
+}, info) => {
+  await open(page, state());
+  await page.getByRole('button', { name: 'Balanced' }).click();
+  await page.waitForLoadState('networkidle');
+  if (info.project.use.isMobile) {
+    await page
+      .getByRole('button', { name: /Change set$/ })
+      .first()
+      .click();
+    const sheet = page.getByRole('dialog', { name: /pick a set/ });
+    // Final stats on one line, an item icon, and no Pokédex text.
+    await expect(sheet.getByLabel('Final stats at level 100')).toBeVisible();
+    await expect(sheet.locator('img[src*="/items/"]').first()).toBeAttached();
+    await noScroll(page, 'set picker with final stats');
+  } else {
+    await page.locator('aside ul li > div > button').first().click();
+    const panel = page.getByRole('region', { name: / details$/ });
+    await expect(panel.getByLabel('Base and final stats')).toBeVisible();
+    await expect(panel.locator('img[src*="/items/"]').first()).toBeAttached();
+    // The Pokédex entry loads on demand.
+    await expect(panel.locator('p.italic')).not.toBeEmpty();
+  }
+});
