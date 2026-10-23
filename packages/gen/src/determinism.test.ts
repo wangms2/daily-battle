@@ -1,12 +1,11 @@
 import { readFileSync } from 'node:fs';
+import { FORMATS, setsFor } from '@daily-battle/data';
 import { describe, expect, it } from 'vitest';
-import { GOLDEN_WEEKS } from './__fixtures__/golden-weeks';
+import { GOLDEN_WEEKS, goldenFile } from './__fixtures__/golden-weeks';
 import { GENERATOR_VERSION } from './config';
 import { generateOpponent } from './opponent';
 import { generatePool } from './pool';
 import { generateWeek } from './week';
-
-const goldenPath = new URL('./__fixtures__/golden.json', import.meta.url);
 
 describe('determinism', () => {
   it('gives the same output for the same key, in any order', () => {
@@ -33,15 +32,20 @@ describe('determinism', () => {
     expect(generateOpponent('2026-10-21').team).not.toEqual(generateOpponent('2026-10-22').team);
   });
 
-  it('matches the golden file (bump GENERATOR_VERSION, or regenerate on purpose)', () => {
-    // Regenerate with: pnpm --filter @daily-battle/gen golden
-    const golden = JSON.parse(readFileSync(goldenPath, 'utf8')) as {
-      generatorVersion: number;
-      weeks: Record<string, unknown>;
-    };
-    expect(golden.generatorVersion).toBe(GENERATOR_VERSION);
-    for (const week of GOLDEN_WEEKS) {
-      expect(generateWeek(week), `week ${week}`).toEqual(golden.weeks[week]);
-    }
-  });
+  it.each(Object.keys(FORMATS))(
+    'matches the %s golden file (bump GENERATOR_VERSION, or regenerate on purpose)',
+    (format) => {
+      // Regenerate with: pnpm --filter @daily-battle/gen golden --format <id>
+      const data = setsFor(format);
+      const path = new URL(`./__fixtures__/${goldenFile(format)}`, import.meta.url);
+      const golden = JSON.parse(readFileSync(path, 'utf8')) as {
+        generatorVersion: number;
+        weeks: Record<string, unknown>;
+      };
+      expect(golden.generatorVersion).toBe(GENERATOR_VERSION);
+      for (const week of GOLDEN_WEEKS) {
+        expect(generateWeek(week, data), `week ${week}`).toEqual(golden.weeks[week]);
+      }
+    },
+  );
 });
