@@ -66,11 +66,7 @@ export function PokemonTile({
         <span
           className={clsx(
             'w-full truncate text-center leading-tight font-semibold',
-            species.length >= 10
-              ? 'text-[9.5px] tracking-tighter'
-              : species.length >= 8
-                ? 'text-[10.5px] tracking-tight'
-                : 'text-[12px]',
+            species.length >= 9 ? 'text-[11.5px] tracking-tight' : 'text-[12.5px]',
           )}
         >
           {species}

@@ -200,7 +200,8 @@ describe('battle screen', () => {
   it('keeps the controls off while a turn plays, and a tap skips to the end', async () => {
     const { backend } = fakeBackend([]);
     renderBattle(backend, { speed: 'normal' });
-    await screen.findByText('Heatran', { selector: 'strong' });
+    // The text is on the field and, for screen readers, in the log.
+    await screen.findAllByText('Heatran', { selector: 'strong' });
     expect(screen.queryByRole('button', { name: /^Thunderbolt, / })).not.toBeInTheDocument();
     await userEvent.click(screen.getByRole('log', { name: 'Battle log' }));
     expect(await thunderbolt()).toBeEnabled();
@@ -215,7 +216,8 @@ describe('battle screen', () => {
   it('skips playback from the keyboard too', async () => {
     const { backend } = fakeBackend([]);
     renderBattle(backend, { speed: 'slow' });
-    await screen.findByText('Heatran', { selector: 'strong' });
+    // The text is on the field and, for screen readers, in the log.
+    await screen.findAllByText('Heatran', { selector: 'strong' });
     expect(screen.queryByRole('button', { name: /^Thunderbolt, / })).not.toBeInTheDocument();
     fireEvent.keyDown(document.body, { key: ' ' });
     expect(await thunderbolt()).toBeEnabled();

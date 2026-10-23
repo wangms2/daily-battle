@@ -61,15 +61,15 @@ export function WelcomeSheet({
       onOpenChange={(o) => !o && onDone()}
       title={review ? 'How to play' : 'Welcome to Daily Battle'}
     >
-      <ol className="space-y-2">
+      <ol className="space-y-3">
         {rules.map(([title, body], i) => (
           <li key={title} className="flex gap-3">
             <span className="grid size-7 shrink-0 place-items-center rounded-full bg-accent-soft text-[14px] font-bold text-soft-ink">
               {i + 1}
             </span>
             <span>
-              <span className="block text-[14px] font-semibold">{title}</span>
-              <span className="block text-[13px] leading-snug text-muted">{body}</span>
+              <span className="block text-[15px] font-semibold">{title}</span>
+              <span className="block text-[14px] text-muted">{body}</span>
             </span>
           </li>
         ))}

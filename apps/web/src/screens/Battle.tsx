@@ -25,6 +25,7 @@ import { Field, type Anim, type Float } from '../battle/ui/Field';
 import { EXPLAINERS, textLines } from '../battle/ui/labels';
 import { MonPopover } from '../battle/ui/MonPopover';
 import { GiveUpDialog, LogList, LogSheet, MenuSheet } from '../battle/ui/sheets';
+import { BattleText } from '../battle/ui/text';
 import type { Settings } from '../state/schema';
 import { streakLine, type DaySummary } from '../lib/results';
 import { Button } from '../ui/bits';
@@ -287,36 +288,61 @@ export function Battle({
 
   // The log, newest at the bottom: a few lines on phones (the current turn), a
   // full-height panel on wide screens. During playback a tap skips.
+  // Wide screens keep a full log column beside the field.
   const turnLog = (
     <div
       role="log"
       aria-label="Battle log"
-      onClick={() => (playing ? skip() : !wide && setLogOpen(true))}
-      className={clsx(
-        'card relative flex min-h-0 flex-col',
-        wide ? 'min-h-0 flex-1 basis-0 p-4' : 'min-h-[5.75rem] flex-1 basis-0 py-1.5 pr-9 pl-3',
-      )}
+      onClick={() => playing && skip()}
+      className="card relative flex min-h-0 flex-1 basis-0 flex-col p-4"
     >
-      {wide && (
-        <p className="display mb-2 text-[12px] tracking-wider text-muted uppercase">Battle log</p>
-      )}
+      <p className="display mb-2 text-[12px] tracking-wider text-muted uppercase">Battle log</p>
       {log.length ? (
         <LogList lines={log} className="min-h-0 flex-1 text-[13px] leading-[1.45]" />
       ) : (
         <span className="text-[13px] text-muted">The battle is starting…</span>
       )}
+    </div>
+  );
+
+  // The newest line of the battle text, shown over the field.
+  const latest =
+    [...log].reverse().find((l) => l.trim() && !l.startsWith('== Turn')) ??
+    'The battle is starting…';
+  const overlay = (
+    <div
+      // On phones it is the log (the full history is read out, and a tap opens it);
+      // on wide screens the log column is, so this is just decoration.
+      role={wide ? undefined : 'log'}
+      aria-label={wide ? undefined : 'Battle log'}
+      aria-hidden={wide || undefined}
+      onClick={() => (playing ? skip() : !wide && setLogOpen(true))}
+      className="battle-overlay absolute inset-x-0 bottom-0 z-10"
+    >
+      <p key={log.length} className="animate-fade-in line-clamp-2" aria-hidden>
+        <BattleText text={latest} />
+      </p>
       {!wide && (
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            setLogOpen(true);
-          }}
-          className="absolute top-1 right-1 grid size-8 place-items-center rounded-full text-muted hover:bg-surface-2"
-          aria-label="Open the battle log"
-        >
-          <ExpandIcon width={16} height={16} />
-        </button>
+        <>
+          <div className="sr-only">
+            {log.map((l, i) => (
+              <p key={i}>
+                <BattleText text={l} />
+              </p>
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setLogOpen(true);
+            }}
+            className="absolute top-1/2 right-1 grid size-8 -translate-y-1/2 place-items-center rounded-full text-white/80 hover:bg-white/15"
+            aria-label="Open the battle log"
+          >
+            <ExpandIcon width={16} height={16} />
+          </button>
+        </>
       )}
     </div>
   );
@@ -334,23 +360,26 @@ export function Battle({
     ) : null;
 
   const field = (
-    <Field
-      // Phones keep the scene's own shape so it never zooms in; the log gets the spare height.
-      // The field always keeps the scene's shape, so nothing gets cropped. On phones
-      // the log takes the spare height; on wide screens the column sizes it.
-      className={wide ? 'aspect-[440/295] w-full shrink-0' : 'aspect-[440/295] w-full shrink'}
-      view={view}
-      anim={anim}
-      animate={animate}
-      background={background}
-      floats={floats}
-      onFloatDone={floatDone}
-      onTap={skip}
-      info={monFor}
-      onInfo={setMonFor}
-      busy={playing}
-      popover={popover}
-    />
+    <div className={clsx('relative w-full', wide ? 'shrink-0' : 'shrink')}>
+      <Field
+        // Phones keep the scene's own shape so it never zooms in; the log gets the spare height.
+        // The field always keeps the scene's shape, so nothing gets cropped. On phones
+        // the log takes the spare height; on wide screens the column sizes it.
+        className="aspect-[440/295] w-full"
+        view={view}
+        anim={anim}
+        animate={animate}
+        background={background}
+        floats={floats}
+        onFloatDone={floatDone}
+        onTap={skip}
+        info={monFor}
+        onInfo={setMonFor}
+        busy={playing}
+        popover={popover}
+      />
+      {overlay}
+    </div>
   );
 
   const explainerNote = showExplainer && (
@@ -496,7 +525,6 @@ export function Battle({
         <main className="relative flex min-h-0 flex-1 flex-col gap-2 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
           {field}
           {explainerNote}
-          {turnLog}
           {panel}
           {endCard}
         </main>
