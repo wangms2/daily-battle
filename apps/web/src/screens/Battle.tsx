@@ -1,5 +1,6 @@
 // The battle screen (DESIGN.md §12.2b): field, this-turn log, and controls on
 // one screen; turns play back line by line at the chosen speed, tap to skip.
+import { DEFAULT_FORMAT, formatInfo } from '@daily-battle/data/formats';
 import clsx from 'clsx';
 import {
   useCallback,
@@ -284,6 +285,17 @@ export function Battle({
   }, [playing, skip]);
 
   const showExplainer = explainer && settings.beginnerHints && !end;
+
+  // The hint leaves on its own after a few seconds (and slides back up next time).
+  const dismissRef = useRef(dismissExplainer);
+  useEffect(() => {
+    dismissRef.current = dismissExplainer;
+  });
+  useEffect(() => {
+    if (!showExplainer) return;
+    const id = setTimeout(() => dismissRef.current(), 7000);
+    return () => clearTimeout(id);
+  }, [explainer, showExplainer]);
   const active = team.find((m) => m.active);
 
   // The log, newest at the bottom: a few lines on phones (the current turn), a
@@ -307,33 +319,31 @@ export function Battle({
 
   // The battle text on phones: the latest lines in a pixel-font box under the field,
   // taking the spare height. Older lines fade.
-  const recent = log.filter((l) => l.trim() && !l.startsWith('== Turn')).slice(-6);
+  const recent = log.filter((l) => l.trim() && !l.startsWith('== Turn')).slice(-8);
+  const gen = formatInfo(start.format ?? DEFAULT_FORMAT).gen;
   const textbox = (
     <div
       // It is the log on phones: the full history is read out, and a tap opens it.
       role="log"
       aria-label="Battle log"
       onClick={() => (playing ? skip() : setLogOpen(true))}
+      data-gen={gen}
       className="battle-textbox relative min-h-[3.25rem] flex-1 basis-0"
     >
+      {/* Newest first, laid out from the bottom up: a line that doesn't fit wraps into a
+          second column that is clipped, so only whole lines show (no half-cut text). */}
       <div
-        className="flex min-h-0 flex-col justify-end gap-0.5 overflow-hidden"
-        // The oldest visible line fades out instead of being cut mid-letter.
-        style={{ maskImage: 'linear-gradient(to bottom, transparent, #000 45%)' }}
+        className="flex min-h-0 flex-1 flex-col-reverse flex-wrap content-start gap-1 overflow-hidden"
         aria-hidden
       >
         {recent.length ? (
-          recent.map((l, i) => (
-            <p
-              key={log.length - recent.length + i}
-              className={i === recent.length - 1 ? 'animate-fade-in' : undefined}
-              style={{ opacity: Math.max(0.3, 1 - (recent.length - 1 - i) * 0.2) }}
-            >
+          [...recent].reverse().map((l, i) => (
+            <p key={log.length - i} className="w-full shrink-0">
               <BattleText text={l} />
             </p>
           ))
         ) : (
-          <p>The battle is starting…</p>
+          <p className="w-full">The battle is starting…</p>
         )}
       </div>
       <div className="sr-only">
@@ -369,13 +379,32 @@ export function Battle({
       <MonPopover foe={false} member={active} mon={view?.you} />
     ) : null;
 
+  const explainerNote = showExplainer && (
+    <div
+      role="note"
+      // Slides up over the bottom of the field when a mechanic first appears, then
+      // leaves; it takes no room of its own.
+      className="animate-sheet-in absolute inset-x-2 bottom-2 z-20 flex items-start gap-2 rounded-card bg-accent-soft px-3 py-2 text-[13px] shadow-card"
+    >
+      <InfoIcon width={16} height={16} className="mt-0.5 shrink-0 text-soft-ink" />
+      <span className="flex-1">{EXPLAINERS[explainer!]}</span>
+      <button
+        type="button"
+        onClick={dismissExplainer}
+        aria-label="Got it"
+        className="-m-1 p-1 text-soft-ink"
+      >
+        <CloseIcon width={16} height={16} />
+      </button>
+    </div>
+  );
+
   const field = (
-    <div className={clsx('w-full', wide ? 'shrink-0' : 'shrink')}>
+    <div className={clsx('relative w-full', wide ? 'shrink-0' : 'shrink')}>
       <Field
-        // Phones keep the scene's own shape so it never zooms in; the log gets the spare height.
-        // The field always keeps the scene's shape, so nothing gets cropped. On phones
-        // the log takes the spare height; on wide screens the column sizes it.
-        className="aspect-[440/295] w-full"
+        // Wide screens keep the scene's own shape. Phones get a taller field, which zooms
+        // the scene a little (--s covers it) so it reads bigger.
+        className={clsx('w-full', wide ? 'aspect-[440/295]' : 'aspect-[440/335]')}
         view={view}
         anim={anim}
         animate={animate}
@@ -388,24 +417,7 @@ export function Battle({
         busy={playing}
         popover={popover}
       />
-    </div>
-  );
-
-  const explainerNote = showExplainer && (
-    <div
-      role="note"
-      className="flex shrink-0 items-start gap-2 rounded-card bg-accent-soft px-3 py-2 text-[13px]"
-    >
-      <InfoIcon width={16} height={16} className="mt-0.5 shrink-0 text-soft-ink" />
-      <span className="flex-1">{EXPLAINERS[explainer!]}</span>
-      <button
-        type="button"
-        onClick={dismissExplainer}
-        aria-label="Got it"
-        className="-m-1 p-1 text-soft-ink"
-      >
-        <CloseIcon width={16} height={16} />
-      </button>
+      {explainerNote}
     </div>
   );
 
@@ -523,7 +535,6 @@ export function Battle({
           <div className="flex min-h-0 items-stretch gap-5 self-start">
             <section className="battle-stage flex min-h-0 shrink-0 flex-col gap-2">
               {field}
-              {explainerNote}
               {panel}
             </section>
             <div className="flex w-[380px] shrink-0 flex-col">{turnLog}</div>
@@ -531,9 +542,8 @@ export function Battle({
           {endCard}
         </main>
       ) : (
-        <main className="relative flex min-h-0 flex-1 flex-col gap-2 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+        <main className="relative flex min-h-0 flex-1 flex-col gap-2 px-2 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
           {field}
-          {explainerNote}
           {textbox}
           {panel}
           {endCard}
