@@ -50,7 +50,7 @@ await page.setContent(`
     p { font-size: 40px; margin: 22px 0 0; color: #d2ae63; font-weight: 700; }
   </style>
   <img src="${svgUri}" width="260" height="260">
-  <div><h1>Daily Battle</h1><p>A new Gen 4 OU opponent every day</p></div>
+  <div><h1>Daily Battle</h1><p>A new Gen 4 or Gen 5 OU opponent every day</p></div>
 `);
 await page.screenshot({ path: pub('og.png') });
 console.log('og.png');

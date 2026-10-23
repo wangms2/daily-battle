@@ -1,3 +1,4 @@
+import type { FormatId } from '@daily-battle/data/formats';
 import { mondayOf } from '@daily-battle/gen/dates';
 import { summarizeDay } from '../lib/results';
 import {
@@ -5,19 +6,19 @@ import {
   type Attempt,
   type DayChange,
   type DayState,
+  type GameState,
   type Settings,
   type Slot,
   type State,
 } from './schema';
 
-export type Action =
+/** Actions on one format's game. */
+export type GameAction =
   | { type: 'lockTeam'; week: string; poolId: string; team: Slot[] }
   | { type: 'setLead'; day: string; species: string }
   | { type: 'applyChange'; day: string; week: string; change: DayChange }
   /** A change for the next practice run only (after today's counted tries). */
   | { type: 'setPracticeChange'; day: string; week: string; change: DayChange | null }
-  | { type: 'setSetting'; key: keyof Settings; value: Settings[keyof Settings] }
-  | { type: 'markExplainer'; id: string }
   | { type: 'startAttempt'; day: string; attempt: Attempt }
   | { type: 'recordChoice'; day: string; choice: string }
   | { type: 'endAttempt'; day: string; result: 'win' | 'loss' | 'forfeit'; remaining: number }
@@ -29,6 +30,14 @@ export type Action =
    * for the old team. Finished tries stay.
    */
   | { type: 'resetWeek'; week: string; day: string };
+
+export type Action =
+  /** A game action, for the game of `format`. */
+  | (GameAction & { format: FormatId })
+  | { type: 'setSetting'; key: keyof Settings; value: Settings[keyof Settings] }
+  | { type: 'markExplainer'; id: string }
+  /** Expires unfinished attempts in every game. */
+  | { type: 'expireAll'; today: string; engine: string };
 
 /** Today's attempt still being played, if any. */
 export function attemptInProgress(day: DayState | undefined): Attempt | undefined {
@@ -63,6 +72,36 @@ function updateLast(day: DayState, change: (a: Attempt) => Attempt): DayState {
 }
 
 export function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case 'setSetting':
+      return { ...state, settings: { ...state.settings, [action.key]: action.value } };
+    case 'markExplainer':
+      if (state.settings.shownExplainers.includes(action.id)) return state;
+      return {
+        ...state,
+        settings: {
+          ...state.settings,
+          shownExplainers: [...state.settings.shownExplainers, action.id],
+        },
+      };
+    case 'expireAll': {
+      let games = state.games;
+      for (const [format, game] of Object.entries(state.games) as [FormatId, GameState][]) {
+        const next = gameReducer(game, { ...action, type: 'expireAttempts' });
+        if (next !== game) games = { ...games, [format]: next };
+      }
+      return games === state.games ? state : { ...state, games };
+    }
+    default: {
+      const game = state.games[action.format];
+      const next = gameReducer(game, action);
+      return next === game ? state : { ...state, games: { ...state.games, [action.format]: next } };
+    }
+  }
+}
+
+/** One game's state under a game action. */
+export function gameReducer(state: GameState, action: GameAction): GameState {
   switch (action.type) {
     case 'resetWeek': {
       const { [action.week]: _, ...weeks } = state.weeks;
@@ -124,8 +163,6 @@ export function reducer(state: State, action: Action): State {
         },
       };
     }
-    case 'setSetting':
-      return { ...state, settings: { ...state.settings, [action.key]: action.value } };
     case 'startAttempt': {
       const day = state.days[action.day] ?? emptyDay();
       if (attemptInProgress(day)) return state;
@@ -185,14 +222,5 @@ export function reducer(state: State, action: Action): State {
       }
       return days === state.days ? state : { ...state, days };
     }
-    case 'markExplainer':
-      if (state.settings.shownExplainers.includes(action.id)) return state;
-      return {
-        ...state,
-        settings: {
-          ...state.settings,
-          shownExplainers: [...state.settings.shownExplainers, action.id],
-        },
-      };
   }
 }

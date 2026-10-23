@@ -42,6 +42,19 @@ function text(
 }
 
 describe('share text', () => {
+  it('names the game after Daily Battle, with the link to that game', () => {
+    const day: DayState = { swapUsed: false, attempts: [a('win', 4)] };
+    const out = shareText({
+      day: DAY,
+      summary: summarizeDay(day, true),
+      streak: 1,
+      game: 'Gen 5',
+      url: 'https://battle.example/#gen5',
+    }).split('\n');
+    expect(out[0]).toBe('Daily Battle · Gen 5 · Oct 21');
+    expect(out.at(-1)).toBe('https://battle.example/#gen5');
+  });
+
   it('celebrates a first-try win', () => {
     expect(text([a('win', 4)], 5)).toBe(
       [

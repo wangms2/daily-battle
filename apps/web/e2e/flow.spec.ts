@@ -37,7 +37,8 @@ for (const scheme of ['light', 'dark'] as const) {
     // First run: welcome sheet.
     await expect(page.getByRole('dialog', { name: 'Welcome to Daily Battle' })).toBeVisible();
     await shot(page, '01-welcome', project);
-    await page.getByRole('button', { name: 'Let’s go' }).click();
+    await page.getByRole('radio', { name: /Gen 4 OU/ }).click();
+    await page.getByRole('button', { name: 'Play Gen 4 OU' }).click();
 
     // Builder: empty, then a suggested team, then info and set picker.
     await expect(page.getByRole('button', { name: /Pick 6 more/ })).toBeVisible();

@@ -1,10 +1,10 @@
 // Downloads the sprites the client ships (DESIGN.md §12.3a): animated
-// Showdown-style front and back GIFs plus a box icon for every species in the
-// set data. Files are committed and self-hosted; nothing is hotlinked.
+// Showdown-style front and back GIFs plus a box icon for every species in
+// every format's set data (one shared folder: a species looks the same in each). Files are committed and self-hosted; nothing is hotlinked.
 //   pnpm --filter web sprites [--force]
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { sets } from '@daily-battle/data';
+import { FORMATS, setsFor } from '@daily-battle/data';
 
 const RAW = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon';
 const SOURCES = {
@@ -53,7 +53,10 @@ async function download(urls: string[], file: string): Promise<boolean> {
 
 for (const dir of Object.keys(SOURCES)) mkdirSync(out(dir), { recursive: true });
 const missing: string[] = [];
-for (const species of Object.keys(sets.species)) {
+const allSpecies = [
+  ...new Set(Object.keys(FORMATS).flatMap((f) => Object.keys(setsFor(f).species))),
+];
+for (const species of allSpecies) {
   const kinds = (Object.keys(SOURCES) as (keyof typeof SOURCES)[]).filter(
     (k) => force || !existsSync(`${out(k)}${toId(species)}.${EXT[k]}`),
   );

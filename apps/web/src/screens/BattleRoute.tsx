@@ -5,6 +5,7 @@ import type { ScheduleFile } from '@daily-battle/gen/schedule';
 import { useState } from 'react';
 import type { EngineStart } from '../battle/frames';
 import { toBattleSet } from '../lib/data';
+import type { FormatId } from '@daily-battle/data/formats';
 import type { Action } from '../state/reducer';
 import type { Attempt, Settings } from '../state/schema';
 import { Battle, type DayResult } from './Battle';
@@ -16,6 +17,7 @@ export function BattleRoute({
   tryNumber,
   settings,
   dispatch,
+  format,
   onExit,
   onRunItBack,
   result,
@@ -28,6 +30,7 @@ export function BattleRoute({
   tryNumber: number;
   settings: Settings;
   dispatch: (a: Action) => void;
+  format: FormatId;
   onExit: () => void;
   onRunItBack: () => void;
 }) {
@@ -35,6 +38,7 @@ export function BattleRoute({
   const [start] = useState<EngineStart>(() => {
     const opponent = schedule.days.find((d) => d.day === day)!;
     return {
+      format,
       playerTeam: attempt.team.map(toBattleSet),
       opponentTeam: opponent.team.map(toBattleSet),
       style: opponent.style,
@@ -46,13 +50,15 @@ export function BattleRoute({
   return (
     <Battle
       start={start}
-      background={backgroundFor(day)}
+      background={backgroundFor(day, format)}
       tryNumber={tryNumber}
       settings={settings}
       onSetting={(key, value) => dispatch({ type: 'setSetting', key, value })}
       onExplainerSeen={(id) => dispatch({ type: 'markExplainer', id })}
-      onChoice={(choice) => dispatch({ type: 'recordChoice', day, choice })}
-      onEnd={({ result, remaining }) => dispatch({ type: 'endAttempt', day, result, remaining })}
+      onChoice={(choice) => dispatch({ type: 'recordChoice', day, choice, format })}
+      onEnd={({ result, remaining }) =>
+        dispatch({ type: 'endAttempt', day, result, remaining, format })
+      }
       onExit={onExit}
       onRunItBack={onRunItBack}
       result={{ ...result, ts: attempt.ts }}

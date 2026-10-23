@@ -19,7 +19,7 @@ const a = (result: Attempt['result'], remaining: number, choices: number): Attem
 });
 
 function state() {
-  const s = initialState();
+  const s = { days: initialState().games.gen4ou.days, settings: initialState().settings };
   s.days['2026-10-21'] = { swapUsed: false, attempts: [a('loss', 0, 20), a('win', 3, 31)] };
   s.days['2026-10-20'] = { swapUsed: false, attempts: [a('forfeit', 6, 2)] };
   s.days['2026-10-22'] = { swapUsed: false, attempts: [a('inProgress', 6, 4)] };

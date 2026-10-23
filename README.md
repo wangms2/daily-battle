@@ -1,6 +1,6 @@
 # Daily Battle
 
-A daily Pokémon battle game on Gen 4 OU. Build a team each week, then face a new generated opponent every day. Fully client-side, built on [`@pkmn/sim`](https://github.com/pkmn/ps).
+A daily Pokémon battle game on Gen 4 OU and Gen 5 OU, two daily games with their own teams and streaks. Build a team each week, then face a new generated opponent every day. Fully client-side, built on [`@pkmn/sim`](https://github.com/pkmn/ps).
 
 See [DESIGN.md](DESIGN.md) for the full design and milestone plan.
 

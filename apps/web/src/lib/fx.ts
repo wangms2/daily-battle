@@ -1,22 +1,24 @@
 // Battle effects from Pokémon Showdown's fx/ folder (CC0), self-hosted under
 // /fx by scripts/fx.ts. All fx paths go through here.
 
+import { BACKGROUNDS } from './backgrounds';
+
 const fx = (file: string) => `${import.meta.env.BASE_URL}fx/${file}`;
 
-/** The Gen 4 battle backgrounds, one per day. */
-export const BACKGROUNDS = [
-  'bg-gen4.png',
-  'bg-gen4-cave.png',
-  'bg-gen4-snow.png',
-  'bg-gen4-indoors.png',
-  'bg-gen4-water.png',
-] as const;
+export { BACKGROUNDS };
 
 /** The background for a day (`YYYY-MM-DD`): the same for every try, and on resume. */
-export function backgroundFor(day: string): string {
+export function backgroundFor(day: string, format = 'gen4ou'): string {
+  const list = BACKGROUNDS[format] ?? BACKGROUNDS.gen4ou!;
   let h = 0;
   for (const ch of day) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
-  return fx(BACKGROUNDS[h % BACKGROUNDS.length]!);
+  // Gen 4 keeps the plain hash it launched with. With 15 backgrounds that hash
+  // clumps, so other formats mix it first to spread days evenly.
+  if (format !== 'gen4ou') {
+    h = Math.imul(h ^ (h >>> 16), 0x45d9f3b) >>> 0;
+    h = (h ^ (h >>> 16)) >>> 0;
+  }
+  return fx(list[h % list.length]!);
 }
 
 /** Overlay image for each weather, by the condition names `View.weather` uses. */

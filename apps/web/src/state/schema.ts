@@ -1,5 +1,6 @@
 // Client state, versioned (DESIGN.md §10). Bump `version` and add a migration
 // in storage.ts for any breaking change.
+import { FORMATS, type FormatId } from '@daily-battle/data/formats';
 import type { Slot } from '../lib/data';
 
 export type { Slot };
@@ -58,21 +59,35 @@ export interface Settings {
   animations: boolean;
   /** One-time explainers already shown; includes 'welcome' after first run. */
   shownExplainers: string[];
+  /** The game to show (Gen 4 OU or Gen 5 OU); unset until the player picks one. */
+  format?: FormatId;
 }
 
-/** Streaks and stats are derived from `days` (lib/results.ts), not stored. */
-export interface State {
-  version: 3;
+/**
+ * One format's game: its weekly teams and daily tries. Streaks and stats are
+ * derived from `days` (lib/results.ts), not stored.
+ */
+export interface GameState {
   weeks: Record<string, WeekState>;
   days: Record<string, DayState>;
+}
+
+/** v4: a game per format (Gen 4 OU, Gen 5 OU), sharing one set of settings. */
+export interface State {
+  version: 4;
+  games: Record<FormatId, GameState>;
   settings: Settings;
 }
 
+export const emptyGame = (): GameState => ({ weeks: {}, days: {} });
+
 export function initialState(): State {
   return {
-    version: 3,
-    weeks: {},
-    days: {},
+    version: 4,
+    games: Object.fromEntries(Object.keys(FORMATS).map((f) => [f, emptyGame()])) as Record<
+      FormatId,
+      GameState
+    >,
     settings: { beginnerHints: true, battleSpeed: 'normal', animations: true, shownExplainers: [] },
   };
 }

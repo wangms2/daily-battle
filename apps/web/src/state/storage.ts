@@ -1,6 +1,6 @@
 // localStorage with a safety net (DESIGN.md §10): every access is guarded, and
 // if storage is unavailable the game keeps working in memory.
-import { initialState, type State } from './schema';
+import { initialState, type GameState, type State } from './schema';
 
 export const STORAGE_KEY = 'daily-battle:state';
 
@@ -8,7 +8,20 @@ export const STORAGE_KEY = 'daily-battle:state';
 export function migrate(raw: unknown): State {
   const fresh = initialState();
   if (!raw || typeof raw !== 'object') return fresh;
-  const saved = raw as Partial<Omit<State, 'version'>> & { version?: number; stats?: unknown };
+  const saved = raw as Partial<Omit<State, 'version'>> & {
+    version?: number;
+    stats?: unknown;
+    weeks?: GameState['weeks'];
+    days?: GameState['days'];
+  };
+  if (saved.version === 4) {
+    // Formats added since the save get an empty game.
+    return {
+      version: 4,
+      games: { ...fresh.games, ...saved.games },
+      settings: { ...fresh.settings, ...saved.settings },
+    };
+  }
   if (saved.version === 1 || saved.version === 2 || saved.version === 3) {
     // v1: attempts saved before M7 lack the team and engine fields, and the
     // stored stats block is gone (streaks and stats are derived since M8).
@@ -25,7 +38,13 @@ export function migrate(raw: unknown): State {
     // v3: the speeds became slow / normal / fast with new timings (and no instant),
     // so older saves start on the new default.
     if (saved.version !== 3) settings.battleSpeed = fresh.settings.battleSpeed;
-    return { version: 3, weeks: saved.weeks ?? fresh.weeks, days, settings };
+    // v4: a game per format. Everything so far was Gen 4 OU, which these
+    // players picked by playing it, so they stay on it.
+    return {
+      version: 4,
+      games: { ...fresh.games, gen4ou: { weeks: saved.weeks ?? {}, days } },
+      settings: { ...settings, format: settings.format ?? 'gen4ou' },
+    };
   }
   // Unknown or future version: start fresh rather than misread it.
   return fresh;

@@ -1,6 +1,35 @@
-// Read-only helpers over the set data and species facts. No simulator code here.
-import { sets, type SetEntry } from '@daily-battle/data';
-import { speciesData, type MoveInfo, type SpeciesInfo } from '@daily-battle/data/species';
+// Read-only helpers over the set data and species facts of the game being
+// shown (Gen 4 OU or Gen 5 OU). No simulator code here.
+import {
+  DEFAULT_FORMAT,
+  formatInfo,
+  setsFor,
+  type SetEntry,
+  type SetsFile,
+} from '@daily-battle/data';
+import {
+  speciesDataFor,
+  type MoveInfo,
+  type SpeciesFile,
+  type SpeciesInfo,
+} from '@daily-battle/data/species';
+
+let format: string = DEFAULT_FORMAT;
+let sets: SetsFile = setsFor(format);
+let speciesData: SpeciesFile = speciesDataFor(format);
+
+/**
+ * Points every helper here at a format's data. The app calls it before
+ * rendering a game, and remounts the game when the format changes.
+ */
+export function setActiveFormat(id: string): void {
+  if (id === format) return;
+  format = id;
+  sets = setsFor(id);
+  speciesData = speciesDataFor(id);
+}
+
+export const activeFormat = () => format;
 
 export interface Slot {
   species: string;
@@ -40,7 +69,8 @@ export function multiplier(attacking: string, species: string): number {
   );
 }
 
-export const ALL_TYPES = Object.keys(speciesData.typeChart);
+/** Every type in the chart (the same 17 in Gens 4 and 5). */
+export const allTypes = () => Object.keys(speciesData.typeChart);
 
 export interface Matchups {
   weak: { type: string; mult: number }[];
@@ -58,10 +88,16 @@ export function matchups(species: string): Matchups {
     'Dry Skin': 'Water',
     'Volt Absorb': 'Electric',
     'Motor Drive': 'Electric',
+    // From Gen 5 these also make their user immune.
+    ...(formatInfo(format).gen >= 5 && {
+      'Sap Sipper': 'Grass',
+      'Storm Drain': 'Water',
+      'Lightning Rod': 'Electric',
+    }),
   };
   const immuneByAbility = new Set([...abilities].map((a) => abilityImmune[a]).filter(Boolean));
   const out: Matchups = { weak: [], resist: [], immune: [] };
-  for (const type of ALL_TYPES) {
+  for (const type of allTypes()) {
     const mult = immuneByAbility.has(type) ? 0 : multiplier(type, species);
     if (mult === 0) out.immune.push(type);
     else if (mult > 1) out.weak.push({ type, mult });
@@ -74,10 +110,11 @@ export function matchups(species: string): Matchups {
 
 /** Types that two or more team members are weak to, most shared first. */
 export function sharedWeaknesses(team: string[]): { type: string; species: string[] }[] {
-  return ALL_TYPES.map((type) => ({
-    type,
-    species: team.filter((s) => matchups(s).weak.some((w) => w.type === type)),
-  }))
+  return allTypes()
+    .map((type) => ({
+      type,
+      species: team.filter((s) => matchups(s).weak.some((w) => w.type === type)),
+    }))
     .filter((x) => x.species.length >= 2)
     .sort((a, b) => b.species.length - a.species.length);
 }

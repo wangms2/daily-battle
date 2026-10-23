@@ -1,3 +1,4 @@
+import { setsFor } from '@daily-battle/data';
 import { Dex } from '@pkmn/sim';
 import { deriveSeed, makeRng, randomTeam } from '@daily-battle/sim-bridge';
 import { describe, expect, it } from 'vitest';
@@ -223,9 +224,13 @@ describe('cleanText', () => {
 describe('move details', () => {
   const gen4 = Dex.forGen(4);
   it('reads the full text when it is short, else the summary', () => {
-    expect(moveDesc(gen4.moves.get('Flare Blitz'))).toMatch(/recoil damage equal to 1\/3/);
-    expect(moveDesc(gen4.moves.get('Substitute'))).toBe(gen4.moves.get('Substitute').shortDesc);
-    expect(moveDesc(gen4.moves.get('Hidden Power Ice'))).toMatch(/Power varies between 30 and 70/);
+    expect(moveDesc(gen4, gen4.moves.get('Flare Blitz'))).toMatch(/recoil damage equal to 1\/3/);
+    expect(moveDesc(gen4, gen4.moves.get('Substitute'))).toBe(
+      gen4.moves.get('Substitute').shortDesc,
+    );
+    expect(moveDesc(gen4, gen4.moves.get('Hidden Power Ice'))).toMatch(
+      /Power varies between 30 and 70/,
+    );
   });
 
   it('names moves cleanly and carries priority and contact', () => {
@@ -241,12 +246,63 @@ describe('move details', () => {
 });
 
 describe('effectiveness', () => {
+  const gen4 = Dex.forGen(4);
   it('reads the Gen 4 type chart', () => {
-    expect(effectiveness('Thunderbolt', 'Gyarados')).toBe(4);
-    expect(effectiveness('Earthquake', 'Skarmory')).toBe(0);
-    expect(effectiveness('Surf', 'Heatran')).toBe(2);
-    expect(effectiveness('Fire Blast', 'Swampert')).toBe(0.5);
-    expect(effectiveness('Hidden Power Ice', 'Dragonite')).toBe(4);
-    expect(effectiveness('Stealth Rock', 'Gyarados')).toBeNull();
+    expect(effectiveness(gen4, 'Thunderbolt', 'Gyarados')).toBe(4);
+    expect(effectiveness(gen4, 'Earthquake', 'Skarmory')).toBe(0);
+    expect(effectiveness(gen4, 'Surf', 'Heatran')).toBe(2);
+    expect(effectiveness(gen4, 'Fire Blast', 'Swampert')).toBe(0.5);
+    expect(effectiveness(gen4, 'Hidden Power Ice', 'Dragonite')).toBe(4);
+    expect(effectiveness(gen4, 'Stealth Rock', 'Gyarados')).toBeNull();
+  });
+
+  it('reads the Gen 5 typings (Rotom-Wash is Electric/Water)', () => {
+    const gen5 = Dex.forGen(5);
+    expect(effectiveness(gen4, 'Grass Knot', 'Rotom-Wash')).toBe(1);
+    expect(effectiveness(gen5, 'Grass Knot', 'Rotom-Wash')).toBe(2);
+  });
+});
+
+describe('BattleEngine on Gen 5 OU (Team Preview)', () => {
+  const data = setsFor('gen5ou');
+  const start5 = (i: number): EngineStart => {
+    const rng = makeRng(deriveSeed('engine:gen5:teams', i));
+    return {
+      format: 'gen5ou',
+      playerTeam: randomTeam(rng, data),
+      opponentTeam: randomTeam(rng, data),
+      style: 'balance',
+      battleSeed: deriveSeed('engine:gen5:battle', i),
+      aiSeed: deriveSeed('engine:gen5:ai', i),
+      choices: [],
+    };
+  };
+
+  it('answers Team Preview with your lead and shows the foe six from the start', () => {
+    const s = start5(0);
+    const pkg = new BattleEngine(s).begin();
+    const view = pkg.frames.at(-1)!.view;
+    expect(view.you?.species).toBe((s.playerTeam[0] as { species: string }).species);
+    const foeSpecies = (s.opponentTeam as { species: string }[]).map((p) => p.species).sort();
+    expect(view.foeTeam.map((m) => m.species).sort()).toEqual(foeSpecies);
+    expect(view.foeTeam.every((m) => !m.fainted)).toBe(true);
+    expect(pkg.controls?.kind).toBe('move');
+  });
+
+  it('plays whole battles to an end', () => {
+    for (let i = 0; i < 3; i++) {
+      const { packages } = play(start5(10 + i));
+      expect(packages.at(-1)!.end, `battle ${i}`).not.toBeNull();
+    }
+  });
+
+  it('resumes to exactly the state reached live', () => {
+    const s = start5(20);
+    const live = play(s, 30);
+    const resumed = new BattleEngine({ ...s, choices: live.choices }).begin();
+    const last = live.packages.at(-1)!;
+    expect(resumed.frames.at(-1)!.view).toEqual(last.frames.at(-1)!.view);
+    expect(resumed.controls).toEqual(last.controls);
+    expect(resumed.team).toEqual(last.team);
   });
 });

@@ -1,14 +1,17 @@
 import type { ReactNode } from 'react';
-import { FlameIcon, GearIcon } from './icons';
+import { ChevronIcon, FlameIcon, GearIcon } from './icons';
 
 export function TopBar({
   title,
   streak,
   onStats,
   onSettings,
+  onTitle,
   left,
 }: {
   title: ReactNode;
+  /** Makes the title a button (it opens the game picker). */
+  onTitle?: () => void;
   streak: number;
   onStats: () => void;
   onSettings: () => void;
@@ -17,7 +20,19 @@ export function TopBar({
 }) {
   return (
     <header className="flex h-12 shrink-0 items-center justify-between gap-2 px-3 pt-[env(safe-area-inset-top)] wide:px-6">
-      <div className="display min-w-0 truncate text-[16px]">{left ?? title}</div>
+      {left || !onTitle ? (
+        <div className="display min-w-0 truncate text-[16px]">{left ?? title}</div>
+      ) : (
+        <button
+          type="button"
+          onClick={onTitle}
+          className="display -ml-2 flex h-10 min-w-0 items-center gap-1 rounded-full px-2 text-[16px] hover:bg-surface-2"
+          aria-haspopup="dialog"
+        >
+          <span className="truncate">{title}</span>
+          <ChevronIcon className="size-4 shrink-0 rotate-90 text-muted" aria-hidden />
+        </button>
+      )}
       <div className="flex items-center gap-1">
         <button
           type="button"

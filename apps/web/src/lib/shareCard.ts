@@ -154,7 +154,7 @@ export async function drawShareCard(m: ShareModel): Promise<HTMLCanvasElement> {
   const nameW = ctx.measureText('Daily Battle').width;
   ctx.fillStyle = C.muted;
   ctx.font = font(500, 30);
-  ctx.fillText(`· ${m.date}`, left + 60 + nameW + 12, 107);
+  ctx.fillText(`· ${m.game ? `${m.game} · ` : ''}${m.date}`, left + 60 + nameW + 12, 107);
   if (m.streak) {
     const reset = m.streak === 'Streak reset';
     const text = reset ? m.streak : `🔥 ${m.streak}`;

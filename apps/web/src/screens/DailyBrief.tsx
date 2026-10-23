@@ -37,7 +37,10 @@ export function DailyBrief({
   renderTopBar,
   result,
   practice = false,
+  teamPreview = false,
 }: {
+  /** Gen 5 on: the opponent sees your six before the battle, as you see theirs. */
+  teamPreview?: boolean;
   /**
    * Today's counted tries are done: the change applies to the next practice run
    * only (and carries over if that run is won). `onChange(null)` undoes it.
@@ -304,7 +307,9 @@ export function DailyBrief({
           {teamSection}
           {hints && !editing && !strip && (
             <p className="shrink-0 text-center text-[13px] text-muted">
-              Tap a Pokémon to lead · ⓘ shows its set
+              {teamPreview
+                ? 'Tap to lead · ⓘ shows sets · They see your six too'
+                : 'Tap a Pokémon to lead · ⓘ shows its set'}
             </p>
           )}
           {strip}

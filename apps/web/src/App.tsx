@@ -1,21 +1,30 @@
+import { DEFAULT_FORMAT, FORMATS, formatInfo, type FormatId } from '@daily-battle/data/formats';
 import { addDays, dayKey, weekKey } from '@daily-battle/gen/dates';
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { Fragment, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { BattleRoute } from './screens/BattleRoute';
 import { DailyBrief } from './screens/DailyBrief';
 import { TeamBuilder } from './screens/TeamBuilder';
 import { AboutSheet } from './sheets/About';
+import { GamePicker } from './sheets/GamePicker';
 import { SettingsSheet, StatsSheet, WelcomeSheet } from './sheets/misc';
+import { setActiveFormat } from './lib/data';
 import { reportText } from './lib/report';
 import { computeStats, dayHeadline, summarizeDay } from './lib/results';
 import { useSchedule } from './lib/schedule';
 import type { ScheduleFile } from '@daily-battle/gen/schedule';
 import { ENGINE_VERSION, randomSeed } from './lib/seed';
 import { shareModel } from './lib/share';
-import { attemptInProgress, dayDecided, withChange } from './state/reducer';
+import { attemptInProgress, dayDecided, withChange, type GameAction } from './state/reducer';
 import { emptyDay, type Settings } from './state/schema';
 import { useNow, useStore } from './state/context';
 import { Button } from './ui/bits';
 import { TopBar } from './ui/TopBar';
+
+/** The site's address, with the game for anything but Gen 4 OU (`…/#gen5`). */
+const shareUrl = (format: FormatId) =>
+  format === DEFAULT_FORMAT
+    ? window.location.origin
+    : `${window.location.origin}/#${format.replace(/ou$/, '')}`;
 
 const fmtDay = (key: string, opts: Intl.DateTimeFormatOptions) =>
   new Date(`${key}T12:00:00`).toLocaleDateString(undefined, opts);
@@ -38,45 +47,65 @@ function useHashRoute(): [string, (r: string) => void] {
   return [route, (r: string) => (window.location.hash = r)];
 }
 
+/** A share link's `#gen5` (or `#gen4`): the game it was shared from. */
+const formatFromHash = (hash: string): FormatId | undefined =>
+  (Object.keys(FORMATS) as FormatId[]).find((f) => f === `${hash}ou`);
+
 /** Identifies the version of a week's pool a team was locked against. */
 function poolIdOf(s: ScheduleFile): string {
   return `${s.week}:g${s.generatorVersion}:c${s.pool.candidate}`;
 }
 
 export function App() {
-  const { state, dispatch, storageAvailable } = useStore();
+  const { state, dispatch: dispatchAny, storageAvailable } = useStore();
   const now = useNow(1000);
   const day = dayKey(now);
   const week = weekKey(now);
-  const [retry, setRetry] = useState(0);
-  const schedule = useSchedule(week, retry);
   const [route, go] = useHashRoute();
+  // Until a player picks a game (on the welcome sheet), Gen 4 OU is shown behind it.
+  const format = state.settings.format ?? DEFAULT_FORMAT;
+  const game = formatInfo(format);
+  setActiveFormat(format);
+  const dispatch = (action: GameAction) => dispatchAny({ ...action, format });
+  const [retry, setRetry] = useState(0);
+  const schedule = useSchedule(week, format, retry);
+  const [pickerOpen, setPickerOpen] = useState(false);
+
+  // A shared link (`…/#gen5`) opens the game it came from.
+  const linked = formatFromHash(route);
+  useEffect(() => {
+    if (!linked) return;
+    dispatchAny({ type: 'setSetting', key: 'format', value: linked });
+    go('');
+  }, [linked, dispatchAny, go]);
   const [statsOpen, setStatsOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [storageNoticeDismissed, setStorageNoticeDismissed] = useState(false);
 
   const { settings } = state;
-  const weekState = state.weeks[week];
-  const dayState = state.days[day] ?? emptyDay();
+  const { weeks, days } = state.games[format];
+  const weekState = weeks[week];
+  const dayState = days[day] ?? emptyDay();
   // Streaks and stats come from the saved attempts (lib/results.ts).
-  const stats = useMemo(() => computeStats(state.days, day), [state.days, day]);
-  const summary = useMemo(() => summarizeDay(state.days[day], true), [state.days, day]);
+  const stats = useMemo(() => computeStats(days, day), [days, day]);
+  const summary = useMemo(() => summarizeDay(days[day], true), [days, day]);
   const share = shareModel({
     day,
     summary,
     streak: stats.streak,
     change: dayState.change,
-    url: window.location.origin,
+    url: shareUrl(format),
+    game: game.name,
   });
   const countdown = countdownTo(now, addDays(day, 1));
   const setSetting = <K extends keyof Settings>(key: K, value: Settings[K]) =>
-    dispatch({ type: 'setSetting', key, value });
+    dispatchAny({ type: 'setSetting', key, value });
 
   // An unfinished battle from an earlier day, or from an older engine, counts as a loss.
   useEffect(() => {
-    dispatch({ type: 'expireAttempts', today: day, engine: ENGINE_VERSION });
-  }, [day, dispatch]);
+    dispatchAny({ type: 'expireAll', today: day, engine: ENGINE_VERSION });
+  }, [day, dispatchAny]);
 
   // A team locked against an earlier version of the week (the schedule was
   // regenerated): everyone builds this week's team again.
@@ -85,8 +114,8 @@ export function App() {
   const staleTeam = !!poolId && !!weekState && weekState.poolId !== poolId;
   if (staleTeam && !poolRefreshed) setPoolRefreshed(true);
   useEffect(() => {
-    if (staleTeam) dispatch({ type: 'resetWeek', week, day });
-  }, [staleTeam, week, day, dispatch]);
+    if (staleTeam) dispatchAny({ type: 'resetWeek', week, day, format });
+  }, [staleTeam, week, day, format, dispatchAny]);
 
   const inProgress = attemptInProgress(dayState);
   // After today's counted tries, runs are practice and may carry a one-off change.
@@ -131,7 +160,8 @@ export function App() {
 
   const renderTopBar = (title: string) => (left?: ReactNode) => (
     <TopBar
-      title={title}
+      title={`${game.name} · ${title}`}
+      onTitle={() => setPickerOpen(true)}
       left={left}
       streak={stats.streak}
       onStats={() => setStatsOpen(true)}
@@ -182,7 +212,8 @@ export function App() {
         attempt={shownAttempt}
         tryNumber={dayState.attempts.indexOf(shownAttempt) + 1}
         settings={settings}
-        dispatch={dispatch}
+        dispatch={dispatchAny}
+        format={format}
         onExit={() => {
           setBattleTs(null);
           go('');
@@ -198,7 +229,8 @@ export function App() {
             streak: stats.streak,
             change: dayState.change,
             run: shownAttempt,
-            url: window.location.origin,
+            url: shareUrl(format),
+            game: game.name,
           }),
         }}
       />
@@ -212,8 +244,9 @@ export function App() {
         dayState={dayState}
         practice={practice}
         hints={settings.beginnerHints}
+        teamPreview={game.teamPreview}
         renderTopBar={renderTopBar(
-          `Today · ${fmtDay(day, { weekday: 'short', month: 'short', day: 'numeric' })}`,
+          fmtDay(day, { weekday: 'short', month: 'short', day: 'numeric' }),
         )}
         onLead={(species) => dispatch({ type: 'setLead', day, species })}
         onChange={(change) => {
@@ -246,18 +279,25 @@ export function App() {
           </button>
         </div>
       )}
-      {screen}
+      <Fragment key={format}>{screen}</Fragment>
       <WelcomeSheet
         open={!settings.shownExplainers.includes('welcome')}
         hints={settings.beginnerHints}
         onHints={(v) => setSetting('beginnerHints', v)}
-        onDone={() => dispatch({ type: 'markExplainer', id: 'welcome' })}
+        format={state.settings.format}
+        onFormat={(value) => dispatchAny({ type: 'setSetting', key: 'format', value })}
+        onDone={() => {
+          if (!state.settings.format)
+            dispatchAny({ type: 'setSetting', key: 'format', value: format });
+          dispatchAny({ type: 'markExplainer', id: 'welcome' });
+        }}
         onAbout={() => setAboutOpen(true)}
       />
       <StatsSheet
         open={statsOpen}
         onOpenChange={setStatsOpen}
         stats={stats}
+        game={`${game.name} OU`}
         todayLabel={dayHeadline(summary)}
         countdown={countdown}
       />
@@ -266,10 +306,25 @@ export function App() {
         onOpenChange={setSettingsOpen}
         settings={settings}
         onChange={setSetting}
-        report={reportText(state, ENGINE_VERSION)}
+        report={reportText({ days, settings }, ENGINE_VERSION)}
         onAbout={() => setAboutOpen(true)}
       />
       <AboutSheet open={aboutOpen} onOpenChange={setAboutOpen} />
+      <GamePicker
+        open={pickerOpen}
+        onOpenChange={setPickerOpen}
+        current={format}
+        games={(Object.keys(FORMATS) as FormatId[]).map((id) => ({
+          id,
+          name: `${formatInfo(id).name} OU`,
+          streak: computeStats(state.games[id].days, day).streak,
+          today: dayHeadline(summarizeDay(state.games[id].days[day], true)),
+        }))}
+        onPick={(id) => {
+          setPickerOpen(false);
+          if (id !== format) dispatchAny({ type: 'setSetting', key: 'format', value: id });
+        }}
+      />
     </div>
   );
 }

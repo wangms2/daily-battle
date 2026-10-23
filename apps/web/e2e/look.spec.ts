@@ -16,7 +16,8 @@ for (const scheme of ['light', 'dark'] as const) {
       await page.goto('/');
       await page.screenshot({ path: `${dir}/welcome.png` });
       if (!hints) await page.getByRole('switch').click();
-      await page.getByRole('button', { name: 'Let’s go' }).click();
+      await page.getByRole('radio', { name: /Gen 4 OU/ }).click();
+      await page.getByRole('button', { name: 'Play Gen 4 OU' }).click();
       await page.screenshot({ path: `${dir}/builder-empty.png` });
 
       await page.getByRole('button', { name: 'Balanced' }).click();

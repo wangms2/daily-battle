@@ -1,3 +1,5 @@
+import { FORMATS, type FormatId } from '@daily-battle/data/formats';
+import clsx from 'clsx';
 import type { ReactNode } from 'react';
 import { CHECK_ITEMS, sharedWeaknesses, type Checklist } from '../lib/data';
 import { getSprite } from '../lib/sprites';
@@ -8,16 +10,27 @@ import { Sheet } from '../ui/Sheet';
 import { Button, Switch, TypeBadge } from '../ui/bits';
 import { CheckIcon, CloseIcon } from '../ui/icons';
 
+/** What sets each game apart, for the welcome sheet's choice. */
+const GAME_BLURB: Record<FormatId, string> = {
+  gen4ou: 'Diamond and Pearl',
+  gen5ou: 'Black and White, with Team Preview',
+};
+
 export function WelcomeSheet({
   open,
   hints,
   onHints,
+  format,
+  onFormat,
   onDone,
   onAbout,
 }: {
   open: boolean;
   hints: boolean;
   onHints: (v: boolean) => void;
+  /** The game picked so far; unset until the player picks one. */
+  format: FormatId | undefined;
+  onFormat: (format: FormatId) => void;
   onDone: () => void;
   onAbout: () => void;
 }) {
@@ -47,7 +60,30 @@ export function WelcomeSheet({
           </li>
         ))}
       </ol>
-      <div className="mt-4 rounded-card bg-surface-2 px-4 py-2">
+      <fieldset className="mt-3">
+        <legend className="mb-2 text-[15px] font-semibold">
+          Pick your game <span className="font-normal text-muted">· you can switch later</span>
+        </legend>
+        <div role="radiogroup" aria-label="Game" className="grid grid-cols-2 gap-2">
+          {(Object.keys(FORMATS) as FormatId[]).map((id) => (
+            <button
+              key={id}
+              type="button"
+              role="radio"
+              aria-checked={format === id}
+              onClick={() => onFormat(id)}
+              className={clsx(
+                'card px-3 py-1.5 text-left',
+                format === id ? 'is-selected' : 'hover:bg-surface-2',
+              )}
+            >
+              <span className="block text-[15px] font-semibold">{FORMATS[id].name} OU</span>
+              <span className="block text-[12px] leading-snug text-muted">{GAME_BLURB[id]}</span>
+            </button>
+          ))}
+        </div>
+      </fieldset>
+      <div className="mt-3 rounded-card bg-surface-2 px-4 py-2">
         <Switch
           checked={hints}
           onCheckedChange={onHints}
@@ -55,8 +91,8 @@ export function WelcomeSheet({
           hint="Checklists and tips. You can turn these off in Settings."
         />
       </div>
-      <Button className="mt-4 w-full" onClick={onDone}>
-        Let’s go
+      <Button className="mt-4 w-full" onClick={onDone} disabled={!format}>
+        {format ? `Play ${FORMATS[format].name} OU` : 'Pick a game to start'}
       </Button>
       <p className="mt-3 text-center text-[12px] text-muted">
         An unofficial fan project.{' '}
@@ -81,17 +117,24 @@ export function StatsSheet({
   open,
   onOpenChange,
   stats,
+  game,
   todayLabel,
   countdown,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   stats: Stats;
+  /** "Gen 5 OU": the game these stats are for. */
+  game?: string;
   todayLabel: string;
   countdown: string;
 }) {
   return (
-    <Sheet open={open} onOpenChange={onOpenChange} title="Your stats">
+    <Sheet
+      open={open}
+      onOpenChange={onOpenChange}
+      title={game ? `Your ${game} stats` : 'Your stats'}
+    >
       <div className="card px-4 py-3">
         <div className="text-[13px] text-muted">Today</div>
         <div className="text-[16px] font-semibold">{todayLabel}</div>

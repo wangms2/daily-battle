@@ -38,8 +38,9 @@ function seeded({ hints = true, team }: { hints?: boolean; team?: { week: string
   const state = initialState();
   state.settings.shownExplainers = ['welcome'];
   state.settings.beginnerHints = hints;
+  state.settings.format = 'gen4ou';
   if (team) {
-    state.weeks[team.week] = {
+    state.games.gen4ou.weeks[team.week] = {
       team: schedule.suggestedTeams[0]!.team,
       poolId: `${team.week}:g${schedule.generatorVersion}:c${schedule.pool.candidate}`,
     };
@@ -69,7 +70,8 @@ describe('first run', () => {
   it('shows the welcome sheet, then the team builder', async () => {
     const user = userEvent.setup();
     renderApp();
-    await user.click(await screen.findByRole('button', { name: 'Let’s go' }));
+    await user.click(await screen.findByRole('radio', { name: /Gen 4 OU/ }));
+    await user.click(screen.getByRole('button', { name: 'Play Gen 4 OU' }));
     expect(await screen.findByRole('button', { name: /Pick 6 more/ })).toBeDisabled();
   });
 
@@ -101,7 +103,7 @@ describe('settings', () => {
 describe('team builder', () => {
   it('asks everyone to build again when the week was regenerated, keeping finished tries', async () => {
     const state = seeded({ team: { week: WEEK } });
-    state.weeks[WEEK]!.poolId = `${WEEK}:c0`; // locked against an earlier version
+    state.games.gen4ou.weeks[WEEK]!.poolId = `${WEEK}:c0`; // locked against an earlier version
     const tried = (result: 'loss' | 'inProgress', ts: number) => ({
       result,
       remaining: 0,
@@ -113,7 +115,7 @@ describe('team builder', () => {
       choices: [],
       engine: ENGINE_VERSION,
     });
-    state.days['2026-10-21'] = {
+    state.games.gen4ou.days['2026-10-21'] = {
       swapUsed: false,
       attempts: [tried('loss', 1), tried('inProgress', 2)],
     };
@@ -259,7 +261,7 @@ describe('daily brief', () => {
   it('resumes a battle in progress and locks the change until it ends', async () => {
     const state = seeded({ team: { week: WEEK } });
     const team = schedule.suggestedTeams[0]!.team;
-    state.days['2026-10-21'] = {
+    state.games.gen4ou.days['2026-10-21'] = {
       swapUsed: false,
       attempts: [
         {
@@ -284,7 +286,7 @@ describe('daily brief', () => {
   it('records an unfinished battle from another engine version as a forfeit', async () => {
     const state = seeded({ team: { week: WEEK } });
     const team = schedule.suggestedTeams[0]!.team;
-    state.days['2026-10-21'] = {
+    state.games.gen4ou.days['2026-10-21'] = {
       swapUsed: false,
       attempts: [
         {
@@ -325,8 +327,8 @@ describe('results and streak', () => {
 
   it('shows today’s result, the streak, and Share after a first-try win', async () => {
     const state = seeded({ team: { week: WEEK } });
-    state.days['2026-10-20'] = { swapUsed: false, attempts: [finished('win', 2, 1)] };
-    state.days['2026-10-21'] = { swapUsed: false, attempts: [finished('win', 4, 3)] };
+    state.games.gen4ou.days['2026-10-20'] = { swapUsed: false, attempts: [finished('win', 2, 1)] };
+    state.games.gen4ou.days['2026-10-21'] = { swapUsed: false, attempts: [finished('win', 4, 3)] };
     renderApp(state);
     const strip = await screen.findByRole('region', { name: 'Today’s result' });
     expect(strip).toHaveTextContent('⭐ First try! · 4/6 left');
@@ -339,8 +341,8 @@ describe('results and streak', () => {
 
   it('resets the streak when today isn’t won on the first try, and says so', async () => {
     const state = seeded({ team: { week: WEEK } });
-    state.days['2026-10-20'] = { swapUsed: false, attempts: [finished('win', 2, 1)] };
-    state.days['2026-10-21'] = {
+    state.games.gen4ou.days['2026-10-20'] = { swapUsed: false, attempts: [finished('win', 2, 1)] };
+    state.games.gen4ou.days['2026-10-21'] = {
       swapUsed: false,
       attempts: [finished('loss', 0, 2), finished('win', 1, 3)],
     };
@@ -354,7 +356,7 @@ describe('results and streak', () => {
   it('offers a practice change once the counted tries are done, leaving the weekly team alone', async () => {
     const user = userEvent.setup();
     const state = seeded({ team: { week: WEEK } });
-    state.days['2026-10-21'] = {
+    state.games.gen4ou.days['2026-10-21'] = {
       swapUsed: false,
       attempts: [finished('loss', 0, 1), finished('loss', 0, 2), finished('loss', 0, 3)],
     };
@@ -399,7 +401,8 @@ describe('edge cases', () => {
     const user = userEvent.setup();
     renderApp(undefined, { broken: true });
     // Nothing can remember the welcome was seen, so it shows; dismiss it first.
-    await user.click(await screen.findByRole('button', { name: 'Let’s go' }));
+    await user.click(await screen.findByRole('radio', { name: /Gen 4 OU/ }));
+    await user.click(screen.getByRole('button', { name: 'Play Gen 4 OU' }));
     expect(await screen.findByRole('alert')).toHaveTextContent('Progress won’t be saved');
   });
 

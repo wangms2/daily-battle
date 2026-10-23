@@ -13,6 +13,8 @@ export interface ShareArgs {
   run?: Attempt;
   /** Where to play, added as the last line so friends can tap through. */
   url?: string;
+  /** The game's name, "Gen 4" or "Gen 5", shown after "Daily Battle". */
+  game?: string;
 }
 
 export interface ShareRow {
@@ -23,6 +25,8 @@ export interface ShareRow {
 
 /** What a share says, whether as text or as the image card (lib/shareCard.ts). */
 export interface ShareModel {
+  /** "Gen 5", or nothing. */
+  game?: string;
   date: string;
   status: DaySummary['status'];
   /** "First try! 4/6 left", "Won on try 2 · 3/6 left", … (no emoji). */
@@ -45,7 +49,15 @@ const row = (a: Attempt): ShareRow => ({
   remaining: a.remaining,
 });
 
-export function shareModel({ day, summary, streak, change, run, url }: ShareArgs): ShareModel {
+export function shareModel({
+  day,
+  summary,
+  streak,
+  change,
+  run,
+  url,
+  game,
+}: ShareArgs): ShareModel {
   const { status, counted, tries, winTry } = summary;
   const date = new Date(`${day}T12:00:00`).toLocaleDateString('en-US', {
     month: 'short',
@@ -79,6 +91,7 @@ export function shareModel({ day, summary, streak, change, run, url }: ShareArgs
   }));
 
   return {
+    ...(game && { game }),
     date,
     status,
     headline,
@@ -104,7 +117,7 @@ export function shareText(args: ShareArgs): string {
 }
 
 export function formatShareText(m: ShareModel): string {
-  const lines = [`Daily Battle · ${m.date}`];
+  const lines = [`Daily Battle · ${m.game ? `${m.game} · ` : ''}${m.date}`];
   const icon =
     m.status === 'firstTry' ? '⭐ ' : m.cleared ? '✅ ' : m.status === 'failed' ? '❌ ' : '';
   lines.push(`${icon}${m.headline}`);

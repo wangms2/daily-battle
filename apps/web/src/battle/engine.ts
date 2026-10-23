@@ -2,6 +2,7 @@
 // opponent AI, and a presenter that turns the player's protocol lines into
 // frames (text, animation event, and a snapshot of what the player can see).
 import { aiForStyle } from '@daily-battle/ai';
+import { DEFAULT_FORMAT, genOf, setsFor } from '@daily-battle/data';
 import {
   BattleSession,
   legalChoices,
@@ -30,7 +31,7 @@ import type {
   Who,
 } from './frames';
 
-const dex = Dex.forGen(4);
+type ModdedDex = ReturnType<typeof Dex.forGen>;
 const gens = new Generations(Dex as unknown as ConstructorParameters<typeof Generations>[0]);
 
 type ClientPokemon = ClientBattle['p1']['team'][number];
@@ -179,17 +180,17 @@ function monView(p: ClientPokemon | undefined, own: boolean): MonView | null {
 }
 
 /** A revealed item's name. The client can hold ids like `itemleftovers` from `[from] item: Leftovers`. */
-function itemName(id: string): string {
+function itemName(dex: ModdedDex, id: string): string {
   const item = dex.items.get(id);
   return item.exists ? item.name : dex.items.get(id.replace(/^item/, '')).name;
 }
 
-function revealedOf(side: ClientSide): Record<string, Revealed> {
+function revealedOf(dex: ModdedDex, side: ClientSide): Record<string, Revealed> {
   const out: Record<string, Revealed> = {};
   for (const p of side.team) {
     out[p.speciesForme] = {
       moves: p.moveSlots.map((m) => dex.moves.get(m.id).name),
-      item: p.item ? itemName(p.item) : '',
+      item: p.item ? itemName(dex, p.item) : '',
       ability: p.ability || p.baseAbility ? dex.abilities.get(p.ability || p.baseAbility).name : '',
     };
   }
@@ -223,7 +224,7 @@ function teamMarks(side: ClientSide, order?: string[]): TeamMark[] {
   return marks.slice(0, 6);
 }
 
-function viewOf(b: ClientBattle, yourOrder: string[]): View {
+function viewOf(dex: ModdedDex, b: ClientBattle, yourOrder: string[]): View {
   return {
     turn: b.turn,
     you: monView(b.p1.active[0] ?? undefined, true),
@@ -231,14 +232,18 @@ function viewOf(b: ClientBattle, yourOrder: string[]): View {
     yourSide: sideConds(b.p1),
     foeSide: sideConds(b.p2),
     weather: WEATHER[b.field.weatherState.id] ?? '',
-    revealed: revealedOf(b.p2),
+    revealed: revealedOf(dex, b.p2),
     yourTeam: teamMarks(b.p1, yourOrder),
     foeTeam: teamMarks(b.p2),
   };
 }
 
 /** Damage multiplier of a move's type against a species by typing; null for status moves. */
-export function effectiveness(moveName: string, species: string | undefined): number | null {
+export function effectiveness(
+  dex: ModdedDex,
+  moveName: string,
+  species: string | undefined,
+): number | null {
   const move = dex.moves.get(moveName);
   if (!move.exists || move.category === 'Status' || !species) return null;
   const types = dex.species.get(species).types;
@@ -250,7 +255,7 @@ export function effectiveness(moveName: string, species: string | undefined): nu
 const DESC_MAX = 280;
 
 /** A move's description for its details card; Hidden Power's typed forms have none of their own. */
-export function moveDesc(move: ReturnType<typeof dex.moves.get>): string {
+export function moveDesc(dex: ModdedDex, move: ReturnType<ModdedDex['moves']['get']>): string {
   const m =
     move.exists && !move.desc && move.id.startsWith('hiddenpower')
       ? dex.moves.get('hiddenpower')
@@ -258,6 +263,9 @@ export function moveDesc(move: ReturnType<typeof dex.moves.get>): string {
   if (!m.exists) return '';
   return m.desc && m.desc.length <= DESC_MAX ? m.desc : m.shortDesc || m.desc;
 }
+
+/** Shown when the move you picked turns out to be blocked (by Imprison, say). */
+const BLOCKED = 'That move can’t be used right now. Choose another.';
 
 /**
  * Showdown marks some numbers with `||exact||shown||` (e.g. your own HP lost as
@@ -274,15 +282,19 @@ export class BattleEngine {
   private readonly presenter = new ClientBattle(gens);
   private readonly formatter: LogFormatter;
   private readonly sets: PokemonSet[];
+  private readonly dex: ModdedDex;
 
   constructor(readonly start: EngineStart) {
+    const format = start.format ?? DEFAULT_FORMAT;
+    this.dex = Dex.forGen(genOf(format));
     this.sets = start.playerTeam as PokemonSet[];
     this.session = new BattleSession({
+      format,
       seed: start.battleSeed as PRNGSeed,
       p1: { team: start.playerTeam as PokemonSet[], name: 'You' },
       p2: { team: start.opponentTeam as PokemonSet[], name: 'The opponent' },
     });
-    this.ai = aiForStyle(start.style);
+    this.ai = aiForStyle(start.style, { data: setsFor(format) });
     this.aiRng = makeRng(start.aiSeed as PRNGSeed);
     this.formatter = new LogFormatter('p1', this.presenter);
   }
@@ -290,6 +302,13 @@ export class BattleEngine {
   /** Starts (or resumes, replaying recorded choices) and returns the first package. */
   begin(): TurnPackage {
     this.advanceAi();
+    // Team Preview (Gen 5 on): the lead was picked on the brief, and your team
+    // comes in lead first, so keep that order. It's the same on every resume,
+    // so it isn't one of the recorded choices.
+    if (this.session.request('p1')?.requestType === 'team') {
+      this.session.choose('p1', `team ${this.sets.map((_, i) => i + 1).join('')}`);
+      this.advanceAi();
+    }
     for (const choice of this.start.choices) {
       if (this.session.ended) break;
       this.session.choose('p1', choice);
@@ -299,7 +318,9 @@ export class BattleEngine {
   }
 
   choose(choice: string): TurnPackage {
-    this.session.choose('p1', choice);
+    // A move hidden information blocks (the foe's Imprison) comes back as
+    // unavailable: the controls update to show it disabled, and you choose again.
+    if (!this.session.choose('p1', choice)) return this.package(false, BLOCKED);
     this.advanceAi();
     return this.package(false);
   }
@@ -320,11 +341,11 @@ export class BattleEngine {
     }
   }
 
-  private package(resumed: boolean): TurnPackage {
+  private package(resumed: boolean, note?: string): TurnPackage {
     const frames: Frame[] = [];
     const explainers = new Set<string>();
     const order = this.sets.map((s) => s.species);
-    let before = viewOf(this.presenter, order);
+    let before = viewOf(this.dex, this.presenter, order);
     for (const line of this.session.drain('p1')) {
       for (const { args, kwArgs } of Protocol.parse(line)) {
         const text = cleanText(this.formatter.formatText(args, kwArgs));
@@ -336,12 +357,13 @@ export class BattleEngine {
         const popup = popupOf(a, kw);
         if (!text && !event && !popup) continue;
         if (text.startsWith('Battle started between')) continue;
-        const view = viewOf(this.presenter, order);
+        const view = viewOf(this.dex, this.presenter, order);
         const label = labelOf(a, kw, before, view);
         frames.push({ text, event, view, ...(label && { label }), ...(popup && { popup }) });
         before = view;
       }
     }
+    if (note) frames.push({ text: note, view: before });
     const team = this.team();
     const controls = this.controls();
     if (controls?.kind === 'move') {
@@ -414,7 +436,7 @@ export class BattleEngine {
     if (request.requestType === 'move') {
       moves = (request.active[0]?.moves ?? []).map((m, i) => {
         // Requests tack the power onto some moves ("Return 102", id return102).
-        const move = dex.moves.get(m.id.replace(/\d+$/, ''));
+        const move = this.dex.moves.get(m.id.replace(/\d+$/, ''));
         const choice = `move ${i + 1}`;
         return {
           choice,
@@ -425,11 +447,11 @@ export class BattleEngine {
           accuracy: move.exists ? move.accuracy : true,
           priority: move.exists ? move.priority : 0,
           contact: move.exists && !!move.flags.contact,
-          desc: moveDesc(move),
+          desc: moveDesc(this.dex, move),
           pp: 'pp' in m ? m.pp : 0,
           maxpp: 'maxpp' in m ? m.maxpp : 0,
           disabled: !legal.includes(choice),
-          effectiveness: effectiveness(move.name, foe),
+          effectiveness: effectiveness(this.dex, move.name, foe),
         };
       });
     }

@@ -140,6 +140,8 @@ export interface TurnPackage {
 }
 
 export interface EngineStart {
+  /** The sim format, e.g. `gen5ou`; Gen 4 OU if left out (attempts saved before Gen 5). */
+  format?: string;
   /** Your team, lead first, as PokemonSet-like objects. */
   playerTeam: unknown[];
   opponentTeam: unknown[];

@@ -1,6 +1,6 @@
 # Daily Battle — Design Doc
 
-Name: **Daily Battle**, hosted on a subdomain of an existing domain, so the name does not need to be unique or separately registrable. A daily Pokémon battle game built on Gen 4 OU, inspired by daily-red.com but with competitive Smogon sets, a player-built weekly team, a generated opponent each day, and a realistic ladder-style AI.
+Name: **Daily Battle**, hosted on a subdomain of an existing domain, so the name does not need to be unique or separately registrable. A daily Pokémon battle game built on Gen 4 OU and Gen 5 OU (two daily games, added in that order), inspired by daily-red.com but with competitive Smogon sets, a player-built weekly team, a generated opponent each day, and a realistic ladder-style AI.
 
 This doc is written to be split into implementation chunks. Section 13 lists milestones with acceptance criteria. Verify package APIs and licenses against current docs before relying on them; names below are from memory.
 
@@ -21,7 +21,7 @@ This doc is written to be split into implementation chunks. Section 13 lists mil
 
 | Area                | Decision                                                                                                                                                                                               |
 | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Format              | Gen 4 OU, singles, 6v6, Showdown mechanics                                                                                                                                                             |
+| Format              | Gen 4 OU and Gen 5 OU as two daily games (each its own team, opponents, tries, and streak), singles, 6v6, Showdown mechanics                                                                                                                                                             |
 | Engine              | `@pkmn/sim` (standalone Showdown simulator), self-hosted, no Showdown server                                                                                                                           |
 | Set data            | Smogon data (usage-weighted). 1–4 most common sets per species, weighted by usage                                                                                                                      |
 | Player team         | Weekly. Pick 6 of 12, choose a role-named set for each, lock for the week. Optional suggested teams are a selection, not a default. No lineup ordering; the lead is picked on the daily brief          |
@@ -43,7 +43,7 @@ This doc is written to be split into implementation chunks. Section 13 lists mil
 
 - No accounts, server-side storage, or leaderboards in v1.
 - No multiplayer or PvP.
-- No other generations or formats in v1 (keep the format configurable internally).
+- No formats beyond Gen 4 OU and Gen 5 OU for now. The format is a parameter throughout (`packages/data/src/formats.ts`), so another one is mostly data, sets, and a schedule run (§17).
 - No minimizing-turns scoring.
 - No Showdown server, websockets, or ladder integration.
 
@@ -75,7 +75,7 @@ Daily swap (done on the daily brief screen, shown as "1 change left"):
 2. Player picks which Pokémon **leads** for this attempt (free, not a swap). After a faint, the player chooses the next Pokémon as in any singles battle.
 3. Battle runs turn by turn. Win = all opponent Pokémon fainted.
 4. On finish, record the attempt (result + player's Pokémon remaining) and offer "Run it back" or share. The first attempt of the day is the scored result; later attempts are recorded as retries.
-5. Gen 4 has no team preview in the simulator; the brief is a UI screen, not a sim feature.
+5. Gen 4 has no team preview in the simulator; the brief is a UI screen, not a sim feature. Gen 5 has Team Preview: the lead picked on the brief is sent as the preview choice (no extra screen), the AI picks its own lead after seeing your six species, and the foe's six icons show from turn 1 (§17).
 
 ### 4.4 Stats
 
@@ -268,7 +268,7 @@ Weights are parameters (§8.5).
 
 ## 10. Client state (localStorage)
 
-Versioned schema, now `version: 2` (v2 dropped the stored `stats` block; streaks and stats are derived from `days`, §4.4):
+Versioned schema, now `version: 4`. v2 dropped the stored `stats` block (streaks and stats are derived from `days`, §4.4); v3 changed the speeds; v4 gives each format its own game (`games.gen4ou`, `games.gen5ou`, each `{ weeks, days }`), and a v1–v3 save moves into Gen 4 OU with `settings.format` set to it. The shape before v4, which is now one game's:
 
 ```ts
 {
@@ -294,7 +294,7 @@ Attempt = { result: 'win'|'loss'|'forfeit'|'inProgress', remaining: number, ts: 
 First-try win:
 
 ```
-Daily Battle · Oct 21
+Daily Battle · Gen 4 · Oct 21
 ⭐ First try! 4/6 left
 ✅ 🟩🟩🟩🟩⬛⬛
 Hippowdon, Azelf, Celebi, Heatran*, Jirachi, Lucario
@@ -304,7 +304,7 @@ Hippowdon, Azelf, Celebi, Heatran*, Jirachi, Lucario
 Won on a later try (one row per try that counts, up to 3):
 
 ```
-Daily Battle · Oct 21
+Daily Battle · Gen 4 · Oct 21
 ✅ Won on try 3 · 2/6 left
 ❌ 🟩⬛⬛⬛⬛⬛
 ❌ ⬜⬜⬛⬛⬛⬛
@@ -472,7 +472,7 @@ See §14.
 
 | #   | Question             | Status                  | Decision                                                                                                                                                                                                                                                                                           |
 | --- | -------------------- | ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| D1  | Name and branding    | Decided                 | **Daily Battle**, served from a subdomain of an existing domain (e.g. `battle.<yourdomain>`). Keep "Pokémon" out of the name and subdomain. The share header and credits page use the name. The format ("Gen 4 OU") is not part of the share text; it can appear elsewhere in the UI               |
+| D1  | Name and branding    | Decided                 | **Daily Battle**, served from a subdomain of an existing domain (e.g. `battle.<yourdomain>`). Keep "Pokémon" out of the name and subdomain. The share header and credits page use the name. Revised for Gen 5: the share header names the game (`Daily Battle · Gen 5 · Oct 21`), since a friend can't otherwise tell the two apart, and the link opens that game (`…/#gen5`)              |
 | D2  | Target difficulty    | Decided                 | About 50% first-attempt win rate for an average player; 2–3 attempts to clear. Validation bands in §9.3                                                                                                                                                                                            |
 | D3  | Streak definition    | Decided (revised again) | Consecutive days won on the first try; a lost first try or a missed day breaks it. A first-try win is marked with a ⭐ in the share and on the result card; tries 2–3 still clear the day                                                                                                         |
 | D4  | In-battle assistance | Decided                 | One "Beginner hints" toggle, on by default for new players, easy to turn off (§12.2c). Hints cover first-time explainers, type-effectiveness labels, speed range, and the team-builder checklist. With hints off, the battle mirrors classic Showdown. No damage ranges and no "usually runs" info |
@@ -499,3 +499,14 @@ Unofficial fan project, not affiliated with or endorsed by Nintendo, Creatures I
 - Data: confirm redistribution terms for Smogon set and usage data; credit Smogon.
 - Sprites: see §12.3a. Credit Nintendo/Game Freak/Creatures and the Smogon sprite community on the credits page.
 - Keep the project free and non-commercial (no ads, paywalls, or merchandise). Revisit this section if that changes.
+
+## 17. Gen 5 OU (added Oct 2026)
+
+A second daily game beside Gen 4 OU, built in phases G1–G6 on the `gen5` branch. Each phase kept Gen 4's published content byte-for-byte: its seed keys, golden fixtures, set ids, and AI choices.
+
+- **Format as a parameter.** `packages/data/src/formats.ts` lists each format (sim id, dex generation, name, lower tier, Team Preview). Set data records its format (`meta.format`), and the generator, AI calc, sim bridge, and pipeline jobs all take it from there. Gen 4 OU keeps its bare seed keys; other formats prefix theirs (`gen5ou:gen4:week:…`).
+- **Data** (`gen5ou/`, see `packages/data/README.md`): 108 species with 2–4 sets each. Hidden abilities are legal. Ditto and Zoroark are left out, since Imposter and Illusion break "species visible, sets hidden". No set uses Swift Swim or Chlorophyll, so no pool can hold a team that breaks Drizzle ++ Swift Swim or Drought ++ Chlorophyll. 40 hand-written sets fill out species whose Gen 5 analyses had a single distinct set, and the labels were reviewed by hand.
+- **Team Preview.** The sim asks each side for `team N…` before turn 1. The AI scores each of its six as the lead by its average matchup against the foe's six (sets by prior), plus part of a hazard's early value, and samples with its usual noise; the player's lead comes from the brief. Foes seen only in preview count as healthy. The AI also weighs Magic Bounce and Regenerator.
+- **Hidden blocks.** Imprison blocks moves without the request saying so. The sim rejects the choice as unavailable and sends an updated request, and the side chooses again. The rejected choice isn't recorded, and the player sees "That move can't be used right now. Choose another."
+- **Schedules** live in `schedule/gen5ou/` and `reports/gen5ou/`, built with `schedule --format gen5ou`. A trial week met the existing bands with no AI retuning. Gen 5 opponents come out too hard more often (the resampling absorbs it), and its pools are weaker against random probes (about 60% of sampled teams viable, against Gen 4's 85%).
+- **Web.** The title (`Gen 5 · Wed, Oct 28 ▾`) opens a picker with each game's streak and today's status. A first-time player picks a game on the welcome sheet; returning players land on the last one played. Gen 5 battles use Showdown's 15 Gen 5 backgrounds, and the sprites are shared. With hints on, the brief notes that the opponent sees your six too.

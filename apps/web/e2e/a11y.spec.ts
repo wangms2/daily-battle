@@ -73,7 +73,8 @@ for (const scheme of ['light', 'dark'] as const) {
       await page.getByRole('button', { name: 'About and credits' }).click();
       await check(page, 'about sheet');
       await page.keyboard.press('Escape');
-      await page.getByRole('button', { name: 'Let’s go' }).click();
+      await page.getByRole('radio', { name: /Gen 4 OU/ }).click();
+      await page.getByRole('button', { name: 'Play Gen 4 OU' }).click();
       await check(page, 'team builder');
       await page
         .getByRole('button', { name: /info|About/i })

@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { attemptInProgress, reducer } from './reducer';
-import { initialState, type Attempt, type DayChange, type Slot, type State } from './schema';
+import { attemptInProgress, gameReducer, reducer } from './reducer';
+import {
+  emptyGame,
+  initialState,
+  type Attempt,
+  type DayChange,
+  type GameState,
+  type Slot,
+  type State,
+} from './schema';
 import { createStorage, migrate, STORAGE_KEY } from './storage';
 
 const TEAM: Slot[] = [
@@ -34,13 +42,19 @@ function fakeBackend(broken = false): globalThis.Storage {
 }
 
 const locked = () =>
-  reducer(initialState(), { type: 'lockTeam', week: WEEK, poolId: `${WEEK}:c0`, team: TEAM });
+  gameReducer(emptyGame(), { type: 'lockTeam', week: WEEK, poolId: `${WEEK}:c0`, team: TEAM });
+
+/** A whole saved state with a locked Gen 4 OU week. */
+const lockedState = (): State => ({
+  ...initialState(),
+  games: { ...initialState().games, gen4ou: locked() },
+});
 
 describe('storage', () => {
   it('round-trips state', () => {
     const backend = fakeBackend();
     const storage = createStorage(backend);
-    const state = locked();
+    const state = lockedState();
     storage.save(state);
     expect(createStorage(backend).load()).toEqual(state);
   });
@@ -49,7 +63,7 @@ describe('storage', () => {
     const storage = createStorage(fakeBackend(true));
     expect(storage.available).toBe(false);
     expect(storage.load()).toEqual(initialState());
-    expect(() => storage.save(locked())).not.toThrow();
+    expect(() => storage.save(lockedState())).not.toThrow();
   });
 
   it('starts fresh on corrupt or unknown saved data', () => {
@@ -66,8 +80,12 @@ describe('storage', () => {
       days: {},
       settings: { beginnerHints: false },
     });
-    expect(migrated.settings).toEqual({ ...initialState().settings, beginnerHints: false });
-    expect(migrated.version).toBe(3);
+    expect(migrated.settings).toEqual({
+      ...initialState().settings,
+      beginnerHints: false,
+      format: 'gen4ou',
+    });
+    expect(migrated.version).toBe(4);
   });
 
   it('drops the stored stats of a v1 save and keeps everything else', () => {
@@ -80,7 +98,72 @@ describe('storage', () => {
     };
     const migrated = migrate(v1);
     expect(migrated).not.toHaveProperty('stats');
-    expect(migrated).toEqual({ version: 3, weeks: v1.weeks, days: v1.days, settings: v1.settings });
+    expect(migrated).toEqual({
+      version: 4,
+      games: { ...initialState().games, gen4ou: { weeks: v1.weeks, days: v1.days } },
+      settings: { ...v1.settings, format: 'gen4ou' },
+    });
+  });
+});
+
+describe('a game per format (v4)', () => {
+  it('moves a v3 save into Gen 4 OU and keeps the player on it', () => {
+    const v3 = {
+      version: 3,
+      weeks: { [WEEK]: { team: TEAM, poolId: `${WEEK}:c0` } },
+      days: { [DAY]: { swapUsed: true, attempts: [] } },
+      settings: initialState().settings,
+    };
+    const migrated = migrate(v3);
+    expect(migrated.games.gen4ou).toEqual({ weeks: v3.weeks, days: v3.days });
+    expect(migrated.games.gen5ou).toEqual(emptyGame());
+    expect(migrated.settings.format).toBe('gen4ou');
+  });
+
+  it('starts a new player with no game picked', () => {
+    expect(initialState().settings.format).toBeUndefined();
+    expect(migrate(null).settings.format).toBeUndefined();
+  });
+
+  it('adds an empty game for a format a v4 save predates', () => {
+    const { gen5ou: _, ...games } = lockedState().games;
+    const migrated = migrate({ ...lockedState(), games });
+    expect(migrated.games.gen5ou).toEqual(emptyGame());
+    expect(migrated.games.gen4ou).toEqual(locked());
+  });
+
+  it('applies game actions to their own format only', () => {
+    const state = reducer(initialState(), {
+      type: 'lockTeam',
+      week: WEEK,
+      poolId: 'x',
+      team: TEAM,
+      format: 'gen5ou',
+    });
+    expect(state.games.gen5ou.weeks[WEEK]!.team).toEqual(TEAM);
+    expect(state.games.gen4ou).toEqual(emptyGame());
+  });
+
+  it('expires unfinished attempts in every game', () => {
+    const attempt = {
+      result: 'inProgress' as const,
+      remaining: 6,
+      ts: 1,
+      lead: 'Heatran',
+      team: TEAM,
+      battleSeed: '1',
+      aiSeed: '2',
+      choices: [],
+      engine: 'e',
+    };
+    let state = lockedState();
+    for (const format of ['gen4ou', 'gen5ou'] as const) {
+      state = reducer(state, { type: 'startAttempt', day: DAY, attempt, format });
+    }
+    const next = reducer(state, { type: 'expireAll', today: '2026-10-22', engine: 'e' });
+    expect(next.games.gen4ou.days[DAY]!.attempts[0]!.result).toBe('forfeit');
+    expect(next.games.gen5ou.days[DAY]!.attempts[0]!.result).toBe('forfeit');
+    expect(reducer(next, { type: 'expireAll', today: '2026-10-22', engine: 'e' })).toBe(next);
   });
 });
 
@@ -102,7 +185,7 @@ describe('weekly team', () => {
   it('locks once per week', () => {
     const state = locked();
     expect(state.weeks[WEEK]!.team).toEqual(TEAM);
-    const again = reducer(state, {
+    const again = gameReducer(state, {
       type: 'lockTeam',
       week: WEEK,
       poolId: 'x',
@@ -112,7 +195,7 @@ describe('weekly team', () => {
   });
 
   it('needs exactly 6 Pokémon', () => {
-    const state = reducer(initialState(), {
+    const state = gameReducer(emptyGame(), {
       type: 'lockTeam',
       week: WEEK,
       poolId: 'x',
@@ -141,21 +224,36 @@ describe('daily change', () => {
   };
 
   it('replaces a Pokémon for the rest of the week and marks the day', () => {
-    const state = reducer(locked(), { type: 'applyChange', day: DAY, week: WEEK, change: replace });
+    const state = gameReducer(locked(), {
+      type: 'applyChange',
+      day: DAY,
+      week: WEEK,
+      change: replace,
+    });
     expect(state.weeks[WEEK]!.team[1]).toEqual(replace.to);
     expect(state.days[DAY]).toMatchObject({ swapUsed: true, change: replace });
   });
 
   it('allows one change per day: a swap and a set change are mutually exclusive', () => {
-    const once = reducer(locked(), { type: 'applyChange', day: DAY, week: WEEK, change: replace });
-    expect(reducer(once, { type: 'applyChange', day: DAY, week: WEEK, change: changeSet })).toBe(
-      once,
-    );
+    const once = gameReducer(locked(), {
+      type: 'applyChange',
+      day: DAY,
+      week: WEEK,
+      change: replace,
+    });
+    expect(
+      gameReducer(once, { type: 'applyChange', day: DAY, week: WEEK, change: changeSet }),
+    ).toBe(once);
   });
 
   it('resets the next day', () => {
-    const once = reducer(locked(), { type: 'applyChange', day: DAY, week: WEEK, change: replace });
-    const tomorrow = reducer(once, {
+    const once = gameReducer(locked(), {
+      type: 'applyChange',
+      day: DAY,
+      week: WEEK,
+      change: replace,
+    });
+    const tomorrow = gameReducer(once, {
       type: 'applyChange',
       day: '2026-10-22',
       week: WEEK,
@@ -167,22 +265,22 @@ describe('daily change', () => {
   it('rejects stale or invalid changes', () => {
     const state = locked();
     const wrongFrom = { ...replace, from: { species: 'Blissey', setId: 'blissey-standard' } };
-    expect(reducer(state, { type: 'applyChange', day: DAY, week: WEEK, change: wrongFrom })).toBe(
-      state,
-    );
+    expect(
+      gameReducer(state, { type: 'applyChange', day: DAY, week: WEEK, change: wrongFrom }),
+    ).toBe(state);
     const duplicate = { ...replace, to: TEAM[2]! };
-    expect(reducer(state, { type: 'applyChange', day: DAY, week: WEEK, change: duplicate })).toBe(
-      state,
-    );
+    expect(
+      gameReducer(state, { type: 'applyChange', day: DAY, week: WEEK, change: duplicate }),
+    ).toBe(state);
     const setToOtherSpecies = { ...changeSet, to: replace.to };
     expect(
-      reducer(state, { type: 'applyChange', day: DAY, week: WEEK, change: setToOtherSpecies }),
+      gameReducer(state, { type: 'applyChange', day: DAY, week: WEEK, change: setToOtherSpecies }),
     ).toBe(state);
   });
 
   it('hands the lead to whoever replaces it', () => {
-    const led = reducer(locked(), { type: 'setLead', day: DAY, species: 'Scizor' });
-    const state = reducer(led, { type: 'applyChange', day: DAY, week: WEEK, change: replace });
+    const led = gameReducer(locked(), { type: 'setLead', day: DAY, species: 'Scizor' });
+    const state = gameReducer(led, { type: 'applyChange', day: DAY, week: WEEK, change: replace });
     expect(state.days[DAY]!.lead).toBe('Gyarados');
   });
 });
@@ -211,41 +309,50 @@ describe('attempts', () => {
     engine: ENGINE,
     ...over,
   });
-  const started = () => reducer(locked(), { type: 'startAttempt', day: DAY, attempt: attempt() });
+  const started = () =>
+    gameReducer(locked(), { type: 'startAttempt', day: DAY, attempt: attempt() });
 
   it('records choices and the result of the battle in progress', () => {
     let state = started();
     expect(attemptInProgress(state.days[DAY])).toBeDefined();
-    state = reducer(state, { type: 'recordChoice', day: DAY, choice: 'move 1' });
-    state = reducer(state, { type: 'recordChoice', day: DAY, choice: 'switch 3' });
-    state = reducer(state, { type: 'endAttempt', day: DAY, result: 'win', remaining: 2 });
+    state = gameReducer(state, { type: 'recordChoice', day: DAY, choice: 'move 1' });
+    state = gameReducer(state, { type: 'recordChoice', day: DAY, choice: 'switch 3' });
+    state = gameReducer(state, { type: 'endAttempt', day: DAY, result: 'win', remaining: 2 });
     expect(state.days[DAY]!.attempts).toEqual([
       attempt({ choices: ['move 1', 'switch 3'], result: 'win', remaining: 2 }),
     ]);
     expect(attemptInProgress(state.days[DAY])).toBeUndefined();
     // Nothing to record into once it is over.
-    expect(reducer(state, { type: 'recordChoice', day: DAY, choice: 'move 2' })).toBe(state);
-    expect(reducer(state, { type: 'endAttempt', day: DAY, result: 'loss', remaining: 0 })).toBe(
+    expect(gameReducer(state, { type: 'recordChoice', day: DAY, choice: 'move 2' })).toBe(state);
+    expect(gameReducer(state, { type: 'endAttempt', day: DAY, result: 'loss', remaining: 0 })).toBe(
       state,
     );
   });
 
   it('runs one attempt at a time; a finished one can be run back', () => {
     const state = started();
-    expect(reducer(state, { type: 'startAttempt', day: DAY, attempt: attempt({ ts: 2 }) })).toBe(
-      state,
-    );
-    const over = reducer(state, { type: 'endAttempt', day: DAY, result: 'loss', remaining: 0 });
-    const again = reducer(over, { type: 'startAttempt', day: DAY, attempt: attempt({ ts: 2 }) });
+    expect(
+      gameReducer(state, { type: 'startAttempt', day: DAY, attempt: attempt({ ts: 2 }) }),
+    ).toBe(state);
+    const over = gameReducer(state, { type: 'endAttempt', day: DAY, result: 'loss', remaining: 0 });
+    const again = gameReducer(over, {
+      type: 'startAttempt',
+      day: DAY,
+      attempt: attempt({ ts: 2 }),
+    });
     expect(again.days[DAY]!.attempts.map((a) => a.result)).toEqual(['loss', 'inProgress']);
   });
 
   it('turns unfinished attempts from past days or another engine into forfeits', () => {
     const state = started();
-    expect(reducer(state, { type: 'expireAttempts', today: DAY, engine: ENGINE })).toBe(state);
-    const nextDay = reducer(state, { type: 'expireAttempts', today: '2026-10-22', engine: ENGINE });
+    expect(gameReducer(state, { type: 'expireAttempts', today: DAY, engine: ENGINE })).toBe(state);
+    const nextDay = gameReducer(state, {
+      type: 'expireAttempts',
+      today: '2026-10-22',
+      engine: ENGINE,
+    });
     expect(nextDay.days[DAY]!.attempts[0]!.result).toBe('forfeit');
-    const upgraded = reducer(state, {
+    const upgraded = gameReducer(state, {
       type: 'expireAttempts',
       today: DAY,
       engine: 'sim 0.10.12 ai 1',
@@ -261,10 +368,10 @@ describe('attempts', () => {
       to: { species: 'Gyarados', setId: 'gyarados-offensive-dragon-dance' },
     };
     const state = started();
-    expect(reducer(state, { type: 'applyChange', day: DAY, week: WEEK, change })).toBe(state);
-    const over = reducer(state, { type: 'endAttempt', day: DAY, result: 'loss', remaining: 0 });
+    expect(gameReducer(state, { type: 'applyChange', day: DAY, week: WEEK, change })).toBe(state);
+    const over = gameReducer(state, { type: 'endAttempt', day: DAY, result: 'loss', remaining: 0 });
     expect(
-      reducer(over, { type: 'applyChange', day: DAY, week: WEEK, change }).days[DAY]!.swapUsed,
+      gameReducer(over, { type: 'applyChange', day: DAY, week: WEEK, change }).days[DAY]!.swapUsed,
     ).toBe(true);
   });
 });
@@ -290,36 +397,41 @@ describe('practice runs', () => {
   };
   /** Plays a try to the end. */
   const play = (
-    state: State,
+    state: GameState,
     ts: number,
     result: 'win' | 'loss',
     over: Partial<Attempt> = {},
-  ): State =>
-    reducer(reducer(state, { type: 'startAttempt', day: DAY, attempt: attempt(ts, over) }), {
-      type: 'endAttempt',
-      day: DAY,
-      result,
-      remaining: result === 'win' ? 2 : 0,
-    });
+  ): GameState =>
+    gameReducer(
+      gameReducer(state, { type: 'startAttempt', day: DAY, attempt: attempt(ts, over) }),
+      {
+        type: 'endAttempt',
+        day: DAY,
+        result,
+        remaining: result === 'win' ? 2 : 0,
+      },
+    );
   const decided = () => [1, 2, 3].reduce((s, ts) => play(s, ts, 'loss'), locked());
 
   it('only offers practice changes once the counted tries are done, and never the daily change', () => {
     const fresh = play(locked(), 1, 'loss');
     const practice = { type: 'setPracticeChange', day: DAY, week: WEEK, change: swap } as const;
-    expect(reducer(fresh, practice)).toBe(fresh);
+    expect(gameReducer(fresh, practice)).toBe(fresh);
     const done = decided();
-    expect(reducer(done, { type: 'applyChange', day: DAY, week: WEEK, change: swap })).toBe(done);
-    const changed = reducer(done, practice);
+    expect(gameReducer(done, { type: 'applyChange', day: DAY, week: WEEK, change: swap })).toBe(
+      done,
+    );
+    const changed = gameReducer(done, practice);
     expect(changed.days[DAY]!.practiceChange).toEqual(swap);
     expect(changed.weeks[WEEK]!.team).toEqual(TEAM); // the weekly team is untouched
     expect(changed.days[DAY]!.swapUsed).toBe(false);
     // Undo, and decide again.
-    const undone = reducer(changed, { ...practice, change: null });
+    const undone = gameReducer(changed, { ...practice, change: null });
     expect(undone.days[DAY]!.practiceChange).toBeUndefined();
   });
 
   it('decides afresh for each run: starting one clears the practice change', () => {
-    const changed = reducer(decided(), {
+    const changed = gameReducer(decided(), {
       type: 'setPracticeChange',
       day: DAY,
       week: WEEK,
@@ -335,7 +447,7 @@ describe('practice runs', () => {
     expect(won.weeks[WEEK]!.team[1]).toEqual(swap.to);
     const tomorrow = '2026-10-22';
     expect(
-      reducer(won, { type: 'setLead', day: tomorrow, species: 'Gyarados' }).weeks[WEEK]!.team,
+      gameReducer(won, { type: 'setLead', day: tomorrow, species: 'Gyarados' }).weeks[WEEK]!.team,
     ).toContainEqual(swap.to);
   });
 });
