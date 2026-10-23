@@ -1,0 +1,331 @@
+{
+  "version": 1,
+  "generatorVersion": 4,
+  "dataBuiltAt": "2026-10-23T13:58:33.422Z",
+  "week": "2027-02-01",
+  "pool": {
+    "species": [
+      "Landorus-Therian",
+      "Excadrill",
+      "Garchomp",
+      "Kyurem-Black",
+      "Politoed",
+      "Heatran",
+      "Espeon",
+      "Haxorus",
+      "Gastrodon",
+      "Seismitoad",
+      "Bronzong",
+      "Chansey"
+    ],
+    "candidate": 0
+  },
+  "suggestedTeams": [
+    {
+      "archetype": "Balanced",
+      "team": [
+        {
+          "species": "Haxorus",
+          "setId": "haxorus-choice-band"
+        },
+        {
+          "species": "Gastrodon",
+          "setId": "gastrodon-physically-defensive"
+        },
+        {
+          "species": "Seismitoad",
+          "setId": "seismitoad-utility"
+        },
+        {
+          "species": "Espeon",
+          "setId": "espeon-screens-setter"
+        },
+        {
+          "species": "Excadrill",
+          "setId": "excadrill-swords-dance"
+        },
+        {
+          "species": "Garchomp",
+          "setId": "garchomp-choice-scarf"
+        }
+      ]
+    },
+    {
+      "archetype": "Offense",
+      "team": [
+        {
+          "species": "Landorus-Therian",
+          "setId": "landorustherian-choice-scarf"
+        },
+        {
+          "species": "Garchomp",
+          "setId": "garchomp-choice-scarf"
+        },
+        {
+          "species": "Chansey",
+          "setId": "chansey-cleric"
+        },
+        {
+          "species": "Politoed",
+          "setId": "politoed-choice-specs"
+        },
+        {
+          "species": "Kyurem-Black",
+          "setId": "kyuremblack-choice-band"
+        },
+        {
+          "species": "Bronzong",
+          "setId": "bronzong-dual-screen"
+        }
+      ]
+    },
+    {
+      "archetype": "Stall",
+      "team": [
+        {
+          "species": "Seismitoad",
+          "setId": "seismitoad-utility"
+        },
+        {
+          "species": "Politoed",
+          "setId": "politoed-defensive"
+        },
+        {
+          "species": "Espeon",
+          "setId": "espeon-screens-setter"
+        },
+        {
+          "species": "Bronzong",
+          "setId": "bronzong-tank"
+        },
+        {
+          "species": "Gastrodon",
+          "setId": "gastrodon-physically-defensive"
+        },
+        {
+          "species": "Landorus-Therian",
+          "setId": "landorustherian-defensive"
+        }
+      ]
+    }
+  ],
+  "days": [
+    {
+      "day": "2027-02-01",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Chansey",
+          "setId": "chansey-cleric"
+        },
+        {
+          "species": "Scrafty",
+          "setId": "scrafty-bulk-up"
+        },
+        {
+          "species": "Kyurem-Black",
+          "setId": "kyuremblack-choice-band"
+        },
+        {
+          "species": "Xatu",
+          "setId": "xatu-utility"
+        },
+        {
+          "species": "Haxorus",
+          "setId": "haxorus-dragon-dance"
+        },
+        {
+          "species": "Heatran",
+          "setId": "heatran-sunny-day-trapper"
+        }
+      ],
+      "candidate": 2
+    },
+    {
+      "day": "2027-02-02",
+      "style": "stall",
+      "team": [
+        {
+          "species": "Jellicent",
+          "setId": "jellicent-standard"
+        },
+        {
+          "species": "Volcarona",
+          "setId": "volcarona-lum-berry-quiver-dance"
+        },
+        {
+          "species": "Gastrodon",
+          "setId": "gastrodon-physically-defensive"
+        },
+        {
+          "species": "Suicune",
+          "setId": "suicune-crocune"
+        },
+        {
+          "species": "Slowking",
+          "setId": "slowking-special-wall"
+        },
+        {
+          "species": "Dragonite",
+          "setId": "dragonite-3-attacks-dragon-dance"
+        }
+      ],
+      "candidate": 2
+    },
+    {
+      "day": "2027-02-03",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Tornadus",
+          "setId": "tornadus-offensive"
+        },
+        {
+          "species": "Slowbro",
+          "setId": "slowbro-calm-mind"
+        },
+        {
+          "species": "Politoed",
+          "setId": "politoed-defensive"
+        },
+        {
+          "species": "Landorus-Therian",
+          "setId": "landorustherian-choice-scarf"
+        },
+        {
+          "species": "Scizor",
+          "setId": "scizor-choice-band"
+        },
+        {
+          "species": "Chandelure",
+          "setId": "chandelure-spinblocker"
+        }
+      ],
+      "candidate": 16
+    },
+    {
+      "day": "2027-02-04",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Gliscor",
+          "setId": "gliscor-stealth-rock"
+        },
+        {
+          "species": "Salamence",
+          "setId": "salamence-choice-scarf"
+        },
+        {
+          "species": "Abomasnow",
+          "setId": "abomasnow-mixed"
+        },
+        {
+          "species": "Heatran",
+          "setId": "heatran-offensive"
+        },
+        {
+          "species": "Slowbro",
+          "setId": "slowbro-defensive"
+        },
+        {
+          "species": "Garchomp",
+          "setId": "garchomp-swords-dance"
+        }
+      ],
+      "candidate": 2
+    },
+    {
+      "day": "2027-02-05",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Ferrothorn",
+          "setId": "ferrothorn-standard"
+        },
+        {
+          "species": "Volcarona",
+          "setId": "volcarona-lum-berry-quiver-dance"
+        },
+        {
+          "species": "Ninetales",
+          "setId": "ninetales-defensive"
+        },
+        {
+          "species": "Infernape",
+          "setId": "infernape-life-orb"
+        },
+        {
+          "species": "Dragonite",
+          "setId": "dragonite-3-attacks-dragon-dance"
+        },
+        {
+          "species": "Mamoswine",
+          "setId": "mamoswine-substitute"
+        }
+      ],
+      "candidate": 8
+    },
+    {
+      "day": "2027-02-06",
+      "style": "offense",
+      "team": [
+        {
+          "species": "Terrakion",
+          "setId": "terrakion-stealth-rock"
+        },
+        {
+          "species": "Abomasnow",
+          "setId": "abomasnow-mixed"
+        },
+        {
+          "species": "Gengar",
+          "setId": "gengar-offensive"
+        },
+        {
+          "species": "Machamp",
+          "setId": "machamp-subchamp"
+        },
+        {
+          "species": "Hydreigon",
+          "setId": "hydreigon-attacker"
+        },
+        {
+          "species": "Mamoswine",
+          "setId": "mamoswine-substitute"
+        }
+      ],
+      "candidate": 1
+    },
+    {
+      "day": "2027-02-07",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Heatran",
+          "setId": "heatran-substitute-protect"
+        },
+        {
+          "species": "Venusaur",
+          "setId": "venusaur-bulky-attacker"
+        },
+        {
+          "species": "Celebi",
+          "setId": "celebi-nasty-plot"
+        },
+        {
+          "species": "Breloom",
+          "setId": "breloom-technician"
+        },
+        {
+          "species": "Latias",
+          "setId": "latias-choice-scarf"
+        },
+        {
+          "species": "Garchomp",
+          "setId": "garchomp-choice-scarf"
+        }
+      ],
+      "candidate": 0
+    }
+  ]
+}

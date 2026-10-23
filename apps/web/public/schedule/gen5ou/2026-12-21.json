@@ -1,0 +1,331 @@
+{
+  "version": 1,
+  "generatorVersion": 4,
+  "dataBuiltAt": "2026-10-23T13:58:33.422Z",
+  "week": "2026-12-21",
+  "pool": {
+    "species": [
+      "Landorus-Therian",
+      "Thundurus-Therian",
+      "Jirachi",
+      "Keldeo",
+      "Skarmory",
+      "Alakazam",
+      "Venusaur",
+      "Heatran",
+      "Lucario",
+      "Donphan",
+      "Kingdra",
+      "Weavile"
+    ],
+    "candidate": 1
+  },
+  "suggestedTeams": [
+    {
+      "archetype": "Balanced",
+      "team": [
+        {
+          "species": "Venusaur",
+          "setId": "venusaur-bulky-attacker"
+        },
+        {
+          "species": "Donphan",
+          "setId": "donphan-support"
+        },
+        {
+          "species": "Kingdra",
+          "setId": "kingdra-choice-specs"
+        },
+        {
+          "species": "Lucario",
+          "setId": "lucario-swords-dance"
+        },
+        {
+          "species": "Keldeo",
+          "setId": "keldeo-leftovers-attacker"
+        },
+        {
+          "species": "Landorus-Therian",
+          "setId": "landorustherian-defensive"
+        }
+      ]
+    },
+    {
+      "archetype": "Offense",
+      "team": [
+        {
+          "species": "Heatran",
+          "setId": "heatran-offensive"
+        },
+        {
+          "species": "Donphan",
+          "setId": "donphan-life-orb"
+        },
+        {
+          "species": "Skarmory",
+          "setId": "skarmory-lead"
+        },
+        {
+          "species": "Jirachi",
+          "setId": "jirachi-choice-scarf"
+        },
+        {
+          "species": "Lucario",
+          "setId": "lucario-swords-dance"
+        },
+        {
+          "species": "Kingdra",
+          "setId": "kingdra-rain-dance"
+        }
+      ]
+    },
+    {
+      "archetype": "Stall",
+      "team": [
+        {
+          "species": "Thundurus-Therian",
+          "setId": "thundurustherian-substhundy"
+        },
+        {
+          "species": "Venusaur",
+          "setId": "venusaur-bulky-attacker"
+        },
+        {
+          "species": "Landorus-Therian",
+          "setId": "landorustherian-defensive"
+        },
+        {
+          "species": "Heatran",
+          "setId": "heatran-specially-defensive"
+        },
+        {
+          "species": "Jirachi",
+          "setId": "jirachi-utility"
+        },
+        {
+          "species": "Donphan",
+          "setId": "donphan-support"
+        }
+      ]
+    }
+  ],
+  "days": [
+    {
+      "day": "2026-12-21",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Ferrothorn",
+          "setId": "ferrothorn-standard"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-choice-band"
+        },
+        {
+          "species": "Heatran",
+          "setId": "heatran-offensive"
+        },
+        {
+          "species": "Weavile",
+          "setId": "weavile-physical-attacker"
+        },
+        {
+          "species": "Yanmega",
+          "setId": "yanmega-life-orb"
+        },
+        {
+          "species": "Rotom-Wash",
+          "setId": "rotomwash-defensive"
+        }
+      ],
+      "candidate": 4
+    },
+    {
+      "day": "2026-12-22",
+      "style": "offense",
+      "team": [
+        {
+          "species": "Jellicent",
+          "setId": "jellicent-standard"
+        },
+        {
+          "species": "Scizor",
+          "setId": "scizor-choice-band"
+        },
+        {
+          "species": "Garchomp",
+          "setId": "garchomp-choice-scarf"
+        },
+        {
+          "species": "Kingdra",
+          "setId": "kingdra-rain-dance"
+        },
+        {
+          "species": "Victini",
+          "setId": "victini-choice-band"
+        },
+        {
+          "species": "Terrakion",
+          "setId": "terrakion-choice-scarf"
+        }
+      ],
+      "candidate": 1
+    },
+    {
+      "day": "2026-12-23",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Gyarados",
+          "setId": "gyarados-substitute-dragon-dance"
+        },
+        {
+          "species": "Flygon",
+          "setId": "flygon-choice-scarf"
+        },
+        {
+          "species": "Kyurem-Black",
+          "setId": "kyuremblack-choice-band"
+        },
+        {
+          "species": "Aerodactyl",
+          "setId": "aerodactyl-suicide-lead"
+        },
+        {
+          "species": "Thundurus-Therian",
+          "setId": "thundurustherian-offensive"
+        },
+        {
+          "species": "Clefable",
+          "setId": "clefable-support"
+        }
+      ],
+      "candidate": 0
+    },
+    {
+      "day": "2026-12-24",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Conkeldurr",
+          "setId": "conkeldurr-bulk-up"
+        },
+        {
+          "species": "Terrakion",
+          "setId": "terrakion-stealth-rock"
+        },
+        {
+          "species": "Latios",
+          "setId": "latios-choice-specs"
+        },
+        {
+          "species": "Magnezone",
+          "setId": "magnezone-sunny-day"
+        },
+        {
+          "species": "Froslass",
+          "setId": "froslass-suicide-lead"
+        },
+        {
+          "species": "Thundurus-Therian",
+          "setId": "thundurustherian-substhundy"
+        }
+      ],
+      "candidate": 1
+    },
+    {
+      "day": "2026-12-25",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Chandelure",
+          "setId": "chandelure-spinblocker"
+        },
+        {
+          "species": "Hippowdon",
+          "setId": "hippowdon-physically-defensive"
+        },
+        {
+          "species": "Salamence",
+          "setId": "salamence-dragon-dance"
+        },
+        {
+          "species": "Politoed",
+          "setId": "politoed-defensive"
+        },
+        {
+          "species": "Victini",
+          "setId": "victini-choice-band"
+        },
+        {
+          "species": "Porygon2",
+          "setId": "porygon2-trick-room"
+        }
+      ],
+      "candidate": 11
+    },
+    {
+      "day": "2026-12-26",
+      "style": "stall",
+      "team": [
+        {
+          "species": "Cofagrigus",
+          "setId": "cofagrigus-defensive"
+        },
+        {
+          "species": "Reuniclus",
+          "setId": "reuniclus-calm-mind"
+        },
+        {
+          "species": "Gyarados",
+          "setId": "gyarados-substitute-dragon-dance"
+        },
+        {
+          "species": "Gliscor",
+          "setId": "gliscor-swords-dance"
+        },
+        {
+          "species": "Celebi",
+          "setId": "celebi-bulky-pivot"
+        },
+        {
+          "species": "Garchomp",
+          "setId": "garchomp-choice-scarf"
+        }
+      ],
+      "candidate": 3
+    },
+    {
+      "day": "2026-12-27",
+      "style": "stall",
+      "team": [
+        {
+          "species": "Magnezone",
+          "setId": "magnezone-sunny-day"
+        },
+        {
+          "species": "Politoed",
+          "setId": "politoed-defensive"
+        },
+        {
+          "species": "Metagross",
+          "setId": "metagross-stealth-rock"
+        },
+        {
+          "species": "Gliscor",
+          "setId": "gliscor-swords-dance"
+        },
+        {
+          "species": "Haxorus",
+          "setId": "haxorus-dragon-dance"
+        },
+        {
+          "species": "Blissey",
+          "setId": "blissey-special-wall"
+        }
+      ],
+      "candidate": 2
+    }
+  ]
+}

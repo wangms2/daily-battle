@@ -1,0 +1,331 @@
+{
+  "version": 1,
+  "generatorVersion": 4,
+  "dataBuiltAt": "2026-10-23T13:58:33.422Z",
+  "week": "2027-02-22",
+  "pool": {
+    "species": [
+      "Toxicroak",
+      "Espeon",
+      "Volcarona",
+      "Tyranitar",
+      "Skarmory",
+      "Reuniclus",
+      "Heatran",
+      "Dragonite",
+      "Latias",
+      "Cobalion",
+      "Hitmontop",
+      "Raikou"
+    ],
+    "candidate": 0
+  },
+  "suggestedTeams": [
+    {
+      "archetype": "Balanced",
+      "team": [
+        {
+          "species": "Heatran",
+          "setId": "heatran-offensive"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-bulky-pursuit-trapper"
+        },
+        {
+          "species": "Reuniclus",
+          "setId": "reuniclus-calm-mind"
+        },
+        {
+          "species": "Toxicroak",
+          "setId": "toxicroak-swords-dance"
+        },
+        {
+          "species": "Dragonite",
+          "setId": "dragonite-3-attacks-dragon-dance"
+        },
+        {
+          "species": "Skarmory",
+          "setId": "skarmory-defensive"
+        }
+      ]
+    },
+    {
+      "archetype": "Offense",
+      "team": [
+        {
+          "species": "Raikou",
+          "setId": "raikou-substitute-calm-mind"
+        },
+        {
+          "species": "Latias",
+          "setId": "latias-choice-scarf"
+        },
+        {
+          "species": "Reuniclus",
+          "setId": "reuniclus-3-attacks"
+        },
+        {
+          "species": "Cobalion",
+          "setId": "cobalion-utility"
+        },
+        {
+          "species": "Dragonite",
+          "setId": "dragonite-3-attacks-dragon-dance"
+        },
+        {
+          "species": "Toxicroak",
+          "setId": "toxicroak-swords-dance"
+        }
+      ]
+    },
+    {
+      "archetype": "Stall",
+      "team": [
+        {
+          "species": "Hitmontop",
+          "setId": "hitmontop-rapid-spin"
+        },
+        {
+          "species": "Cobalion",
+          "setId": "cobalion-utility"
+        },
+        {
+          "species": "Reuniclus",
+          "setId": "reuniclus-calm-mind"
+        },
+        {
+          "species": "Heatran",
+          "setId": "heatran-specially-defensive"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-bulky-pursuit-trapper"
+        },
+        {
+          "species": "Espeon",
+          "setId": "espeon-screens-setter"
+        }
+      ]
+    }
+  ],
+  "days": [
+    {
+      "day": "2027-02-22",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Toxicroak",
+          "setId": "toxicroak-swords-dance"
+        },
+        {
+          "species": "Keldeo",
+          "setId": "keldeo-calm-mind"
+        },
+        {
+          "species": "Landorus-Therian",
+          "setId": "landorustherian-defensive"
+        },
+        {
+          "species": "Swampert",
+          "setId": "swampert-offensive-tank"
+        },
+        {
+          "species": "Jellicent",
+          "setId": "jellicent-standard"
+        },
+        {
+          "species": "Celebi",
+          "setId": "celebi-nasty-plot"
+        }
+      ],
+      "candidate": 1
+    },
+    {
+      "day": "2027-02-23",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Ninetales",
+          "setId": "ninetales-nasty-plot"
+        },
+        {
+          "species": "Conkeldurr",
+          "setId": "conkeldurr-bulk-up"
+        },
+        {
+          "species": "Terrakion",
+          "setId": "terrakion-choice-band"
+        },
+        {
+          "species": "Alakazam",
+          "setId": "alakazam-attacker"
+        },
+        {
+          "species": "Forretress",
+          "setId": "forretress-entry-hazard-control"
+        },
+        {
+          "species": "Magnezone",
+          "setId": "magnezone-choice-scarf"
+        }
+      ],
+      "candidate": 1
+    },
+    {
+      "day": "2027-02-24",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Conkeldurr",
+          "setId": "conkeldurr-bulk-up"
+        },
+        {
+          "species": "Bronzong",
+          "setId": "bronzong-tank"
+        },
+        {
+          "species": "Magnezone",
+          "setId": "magnezone-sunny-day"
+        },
+        {
+          "species": "Celebi",
+          "setId": "celebi-nasty-plot"
+        },
+        {
+          "species": "Salamence",
+          "setId": "salamence-choice-scarf"
+        },
+        {
+          "species": "Excadrill",
+          "setId": "excadrill-offensive"
+        }
+      ],
+      "candidate": 0
+    },
+    {
+      "day": "2027-02-25",
+      "style": "stall",
+      "team": [
+        {
+          "species": "Cresselia",
+          "setId": "cresselia-defensive"
+        },
+        {
+          "species": "Toxicroak",
+          "setId": "toxicroak-swords-dance"
+        },
+        {
+          "species": "Ferrothorn",
+          "setId": "ferrothorn-standard"
+        },
+        {
+          "species": "Keldeo",
+          "setId": "keldeo-leftovers-attacker"
+        },
+        {
+          "species": "Raikou",
+          "setId": "raikou-substitute-calm-mind"
+        },
+        {
+          "species": "Skarmory",
+          "setId": "skarmory-defensive"
+        }
+      ],
+      "candidate": 17
+    },
+    {
+      "day": "2027-02-26",
+      "style": "stall",
+      "team": [
+        {
+          "species": "Magnezone",
+          "setId": "magnezone-sunny-day"
+        },
+        {
+          "species": "Scrafty",
+          "setId": "scrafty-bulk-up"
+        },
+        {
+          "species": "Blastoise",
+          "setId": "blastoise-utility"
+        },
+        {
+          "species": "Blissey",
+          "setId": "blissey-special-wall"
+        },
+        {
+          "species": "Politoed",
+          "setId": "politoed-choice-scarf"
+        },
+        {
+          "species": "Kyurem-Black",
+          "setId": "kyuremblack-choice-band"
+        }
+      ],
+      "candidate": 0
+    },
+    {
+      "day": "2027-02-27",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Scizor",
+          "setId": "scizor-offensive-swords-dance"
+        },
+        {
+          "species": "Skarmory",
+          "setId": "skarmory-defensive"
+        },
+        {
+          "species": "Conkeldurr",
+          "setId": "conkeldurr-bulk-up"
+        },
+        {
+          "species": "Flygon",
+          "setId": "flygon-choice-scarf"
+        },
+        {
+          "species": "Latias",
+          "setId": "latias-choice-scarf"
+        },
+        {
+          "species": "Volcarona",
+          "setId": "volcarona-quiver-dance"
+        }
+      ],
+      "candidate": 3
+    },
+    {
+      "day": "2027-02-28",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Scizor",
+          "setId": "scizor-choice-band"
+        },
+        {
+          "species": "Xatu",
+          "setId": "xatu-support"
+        },
+        {
+          "species": "Heatran",
+          "setId": "heatran-sunny-day-trapper"
+        },
+        {
+          "species": "Celebi",
+          "setId": "celebi-nasty-plot"
+        },
+        {
+          "species": "Keldeo",
+          "setId": "keldeo-leftovers-attacker"
+        },
+        {
+          "species": "Landorus-Therian",
+          "setId": "landorustherian-choice-scarf"
+        }
+      ],
+      "candidate": 1
+    }
+  ]
+}

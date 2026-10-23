@@ -1,0 +1,331 @@
+{
+  "version": 1,
+  "generatorVersion": 4,
+  "dataBuiltAt": "2026-10-23T13:58:33.422Z",
+  "week": "2026-12-14",
+  "pool": {
+    "species": [
+      "Landorus-Therian",
+      "Forretress",
+      "Heatran",
+      "Jellicent",
+      "Tentacruel",
+      "Gliscor",
+      "Gengar",
+      "Haxorus",
+      "Tyranitar",
+      "Flygon",
+      "Seismitoad",
+      "Victini"
+    ],
+    "candidate": 0
+  },
+  "suggestedTeams": [
+    {
+      "archetype": "Balanced",
+      "team": [
+        {
+          "species": "Landorus-Therian",
+          "setId": "landorustherian-defensive"
+        },
+        {
+          "species": "Gliscor",
+          "setId": "gliscor-swords-dance"
+        },
+        {
+          "species": "Gengar",
+          "setId": "gengar-substitute-will-o-wisp"
+        },
+        {
+          "species": "Seismitoad",
+          "setId": "seismitoad-utility"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-bulky-pursuit-trapper"
+        },
+        {
+          "species": "Haxorus",
+          "setId": "haxorus-choice-band"
+        }
+      ]
+    },
+    {
+      "archetype": "Offense",
+      "team": [
+        {
+          "species": "Landorus-Therian",
+          "setId": "landorustherian-choice-scarf"
+        },
+        {
+          "species": "Gliscor",
+          "setId": "gliscor-swords-dance"
+        },
+        {
+          "species": "Haxorus",
+          "setId": "haxorus-choice-band"
+        },
+        {
+          "species": "Jellicent",
+          "setId": "jellicent-standard"
+        },
+        {
+          "species": "Tentacruel",
+          "setId": "tentacruel-utility"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-choice-scarf"
+        }
+      ]
+    },
+    {
+      "archetype": "Stall",
+      "team": [
+        {
+          "species": "Jellicent",
+          "setId": "jellicent-standard"
+        },
+        {
+          "species": "Seismitoad",
+          "setId": "seismitoad-bulky-attacker"
+        },
+        {
+          "species": "Gliscor",
+          "setId": "gliscor-stealth-rock"
+        },
+        {
+          "species": "Forretress",
+          "setId": "forretress-entry-hazard-control"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-bulky-pursuit-trapper"
+        },
+        {
+          "species": "Landorus-Therian",
+          "setId": "landorustherian-defensive"
+        }
+      ]
+    }
+  ],
+  "days": [
+    {
+      "day": "2026-12-14",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Latias",
+          "setId": "latias-choice-scarf"
+        },
+        {
+          "species": "Froslass",
+          "setId": "froslass-suicide-lead"
+        },
+        {
+          "species": "Excadrill",
+          "setId": "excadrill-offensive"
+        },
+        {
+          "species": "Latios",
+          "setId": "latios-calm-mind"
+        },
+        {
+          "species": "Yanmega",
+          "setId": "yanmega-life-orb"
+        },
+        {
+          "species": "Rotom-Wash",
+          "setId": "rotomwash-defensive"
+        }
+      ],
+      "candidate": 15
+    },
+    {
+      "day": "2026-12-15",
+      "style": "stall",
+      "team": [
+        {
+          "species": "Hitmontop",
+          "setId": "hitmontop-rapid-spin"
+        },
+        {
+          "species": "Mamoswine",
+          "setId": "mamoswine-choice-band"
+        },
+        {
+          "species": "Reuniclus",
+          "setId": "reuniclus-calm-mind"
+        },
+        {
+          "species": "Abomasnow",
+          "setId": "abomasnow-mixed"
+        },
+        {
+          "species": "Cresselia",
+          "setId": "cresselia-defensive"
+        },
+        {
+          "species": "Mienshao",
+          "setId": "mienshao-choice-scarf"
+        }
+      ],
+      "candidate": 9
+    },
+    {
+      "day": "2026-12-16",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Donphan",
+          "setId": "donphan-life-orb"
+        },
+        {
+          "species": "Rhyperior",
+          "setId": "rhyperior-tank"
+        },
+        {
+          "species": "Chansey",
+          "setId": "chansey-cleric"
+        },
+        {
+          "species": "Skarmory",
+          "setId": "skarmory-defensive"
+        },
+        {
+          "species": "Heatran",
+          "setId": "heatran-offensive"
+        },
+        {
+          "species": "Jirachi",
+          "setId": "jirachi-choice-scarf"
+        }
+      ],
+      "candidate": 2
+    },
+    {
+      "day": "2026-12-17",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Toxicroak",
+          "setId": "toxicroak-swords-dance"
+        },
+        {
+          "species": "Politoed",
+          "setId": "politoed-choice-specs"
+        },
+        {
+          "species": "Starmie",
+          "setId": "starmie-rapid-spin"
+        },
+        {
+          "species": "Reuniclus",
+          "setId": "reuniclus-calm-mind"
+        },
+        {
+          "species": "Magnezone",
+          "setId": "magnezone-sunny-day"
+        },
+        {
+          "species": "Dusclops",
+          "setId": "dusclops-curse"
+        }
+      ],
+      "candidate": 4
+    },
+    {
+      "day": "2026-12-18",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Rotom-Wash",
+          "setId": "rotomwash-defensive"
+        },
+        {
+          "species": "Ambipom",
+          "setId": "ambipom-all-out-attacker"
+        },
+        {
+          "species": "Terrakion",
+          "setId": "terrakion-choice-scarf"
+        },
+        {
+          "species": "Reuniclus",
+          "setId": "reuniclus-calm-mind"
+        },
+        {
+          "species": "Garchomp",
+          "setId": "garchomp-choice-scarf"
+        },
+        {
+          "species": "Jirachi",
+          "setId": "jirachi-choice-scarf"
+        }
+      ],
+      "candidate": 3
+    },
+    {
+      "day": "2026-12-19",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Skarmory",
+          "setId": "skarmory-defensive"
+        },
+        {
+          "species": "Heracross",
+          "setId": "heracross-choice-scarf"
+        },
+        {
+          "species": "Breloom",
+          "setId": "breloom-technician"
+        },
+        {
+          "species": "Excadrill",
+          "setId": "excadrill-swords-dance"
+        },
+        {
+          "species": "Hitmontop",
+          "setId": "hitmontop-rapid-spin"
+        },
+        {
+          "species": "Mamoswine",
+          "setId": "mamoswine-choice-band"
+        }
+      ],
+      "candidate": 3
+    },
+    {
+      "day": "2026-12-20",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Xatu",
+          "setId": "xatu-utility"
+        },
+        {
+          "species": "Celebi",
+          "setId": "celebi-bulky-pivot"
+        },
+        {
+          "species": "Scizor",
+          "setId": "scizor-choice-band"
+        },
+        {
+          "species": "Amoonguss",
+          "setId": "amoonguss-choice-specs"
+        },
+        {
+          "species": "Thundurus-Therian",
+          "setId": "thundurustherian-offensive"
+        },
+        {
+          "species": "Bisharp",
+          "setId": "bisharp-air-balloon-attacker"
+        }
+      ],
+      "candidate": 3
+    }
+  ]
+}

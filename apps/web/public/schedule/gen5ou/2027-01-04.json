@@ -1,0 +1,331 @@
+{
+  "version": 1,
+  "generatorVersion": 4,
+  "dataBuiltAt": "2026-10-23T13:58:33.422Z",
+  "week": "2027-01-04",
+  "pool": {
+    "species": [
+      "Excadrill",
+      "Tentacruel",
+      "Gyarados",
+      "Blissey",
+      "Starmie",
+      "Rotom-Wash",
+      "Gastrodon",
+      "Hydreigon",
+      "Jirachi",
+      "Weavile",
+      "Abomasnow",
+      "Clefable"
+    ],
+    "candidate": 0
+  },
+  "suggestedTeams": [
+    {
+      "archetype": "Balanced",
+      "team": [
+        {
+          "species": "Rotom-Wash",
+          "setId": "rotomwash-defensive"
+        },
+        {
+          "species": "Jirachi",
+          "setId": "jirachi-choice-scarf"
+        },
+        {
+          "species": "Gastrodon",
+          "setId": "gastrodon-physically-defensive"
+        },
+        {
+          "species": "Starmie",
+          "setId": "starmie-rapid-spin"
+        },
+        {
+          "species": "Blissey",
+          "setId": "blissey-special-wall"
+        },
+        {
+          "species": "Abomasnow",
+          "setId": "abomasnow-hail-setter"
+        }
+      ]
+    },
+    {
+      "archetype": "Offense",
+      "team": [
+        {
+          "species": "Starmie",
+          "setId": "starmie-rapid-spin"
+        },
+        {
+          "species": "Tentacruel",
+          "setId": "tentacruel-toxic-spikes"
+        },
+        {
+          "species": "Hydreigon",
+          "setId": "hydreigon-choice-scarf"
+        },
+        {
+          "species": "Rotom-Wash",
+          "setId": "rotomwash-choice-scarf"
+        },
+        {
+          "species": "Weavile",
+          "setId": "weavile-physical-attacker"
+        },
+        {
+          "species": "Jirachi",
+          "setId": "jirachi-choice-scarf"
+        }
+      ]
+    },
+    {
+      "archetype": "Stall",
+      "team": [
+        {
+          "species": "Rotom-Wash",
+          "setId": "rotomwash-defensive"
+        },
+        {
+          "species": "Abomasnow",
+          "setId": "abomasnow-hail-setter"
+        },
+        {
+          "species": "Clefable",
+          "setId": "clefable-support"
+        },
+        {
+          "species": "Jirachi",
+          "setId": "jirachi-utility"
+        },
+        {
+          "species": "Gastrodon",
+          "setId": "gastrodon-physically-defensive"
+        },
+        {
+          "species": "Tentacruel",
+          "setId": "tentacruel-utility"
+        }
+      ]
+    }
+  ],
+  "days": [
+    {
+      "day": "2027-01-04",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Kyurem",
+          "setId": "kyurem-subroost"
+        },
+        {
+          "species": "Mamoswine",
+          "setId": "mamoswine-choice-band"
+        },
+        {
+          "species": "Xatu",
+          "setId": "xatu-utility"
+        },
+        {
+          "species": "Donphan",
+          "setId": "donphan-support"
+        },
+        {
+          "species": "Breloom",
+          "setId": "breloom-technician"
+        },
+        {
+          "species": "Latias",
+          "setId": "latias-colbur-berry"
+        }
+      ],
+      "candidate": 17
+    },
+    {
+      "day": "2027-01-05",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Landorus-Therian",
+          "setId": "landorustherian-swords-dance"
+        },
+        {
+          "species": "Toxicroak",
+          "setId": "toxicroak-swords-dance"
+        },
+        {
+          "species": "Politoed",
+          "setId": "politoed-defensive"
+        },
+        {
+          "species": "Heatran",
+          "setId": "heatran-offensive"
+        },
+        {
+          "species": "Slowbro",
+          "setId": "slowbro-defensive"
+        },
+        {
+          "species": "Keldeo",
+          "setId": "keldeo-leftovers-attacker"
+        }
+      ],
+      "candidate": 3
+    },
+    {
+      "day": "2027-01-06",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Magnezone",
+          "setId": "magnezone-sunny-day"
+        },
+        {
+          "species": "Garchomp",
+          "setId": "garchomp-choice-scarf"
+        },
+        {
+          "species": "Clefable",
+          "setId": "clefable-support"
+        },
+        {
+          "species": "Chansey",
+          "setId": "chansey-cleric"
+        },
+        {
+          "species": "Hippowdon",
+          "setId": "hippowdon-mixed-wall"
+        },
+        {
+          "species": "Latias",
+          "setId": "latias-colbur-berry"
+        }
+      ],
+      "candidate": 3
+    },
+    {
+      "day": "2027-01-07",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Jellicent",
+          "setId": "jellicent-standard"
+        },
+        {
+          "species": "Amoonguss",
+          "setId": "amoonguss-defensive-pivot"
+        },
+        {
+          "species": "Honchkrow",
+          "setId": "honchkrow-life-orb"
+        },
+        {
+          "species": "Scizor",
+          "setId": "scizor-choice-band"
+        },
+        {
+          "species": "Cresselia",
+          "setId": "cresselia-defensive"
+        },
+        {
+          "species": "Latios",
+          "setId": "latios-choice-specs"
+        }
+      ],
+      "candidate": 11
+    },
+    {
+      "day": "2027-01-08",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Donphan",
+          "setId": "donphan-support"
+        },
+        {
+          "species": "Latios",
+          "setId": "latios-choice-scarf"
+        },
+        {
+          "species": "Metagross",
+          "setId": "metagross-shuca-berry-attacker"
+        },
+        {
+          "species": "Mamoswine",
+          "setId": "mamoswine-choice-band"
+        },
+        {
+          "species": "Dragonite",
+          "setId": "dragonite-3-attacks-dragon-dance"
+        },
+        {
+          "species": "Blastoise",
+          "setId": "blastoise-utility"
+        }
+      ],
+      "candidate": 6
+    },
+    {
+      "day": "2027-01-09",
+      "style": "stall",
+      "team": [
+        {
+          "species": "Gastrodon",
+          "setId": "gastrodon-physically-defensive"
+        },
+        {
+          "species": "Celebi",
+          "setId": "celebi-bulky-pivot"
+        },
+        {
+          "species": "Garchomp",
+          "setId": "garchomp-swords-dance"
+        },
+        {
+          "species": "Volcarona",
+          "setId": "volcarona-quiver-dance"
+        },
+        {
+          "species": "Flygon",
+          "setId": "flygon-choice-scarf"
+        },
+        {
+          "species": "Togekiss",
+          "setId": "togekiss-specially-defensive"
+        }
+      ],
+      "candidate": 5
+    },
+    {
+      "day": "2027-01-10",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Chandelure",
+          "setId": "chandelure-substitute-calm-mind"
+        },
+        {
+          "species": "Latias",
+          "setId": "latias-colbur-berry"
+        },
+        {
+          "species": "Dragonite",
+          "setId": "dragonite-3-attacks-dragon-dance"
+        },
+        {
+          "species": "Slowbro",
+          "setId": "slowbro-calm-mind"
+        },
+        {
+          "species": "Donphan",
+          "setId": "donphan-support"
+        },
+        {
+          "species": "Kyurem-Black",
+          "setId": "kyuremblack-choice-band"
+        }
+      ],
+      "candidate": 1
+    }
+  ]
+}

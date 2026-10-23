@@ -1,0 +1,331 @@
+{
+  "version": 1,
+  "generatorVersion": 4,
+  "dataBuiltAt": "2026-10-23T13:58:33.422Z",
+  "week": "2027-02-08",
+  "pool": {
+    "species": [
+      "Scizor",
+      "Haxorus",
+      "Latias",
+      "Dragonite",
+      "Jellicent",
+      "Blissey",
+      "Tyranitar",
+      "Keldeo",
+      "Amoonguss",
+      "Porygon2",
+      "Blastoise",
+      "Azelf"
+    ],
+    "candidate": 0
+  },
+  "suggestedTeams": [
+    {
+      "archetype": "Balanced",
+      "team": [
+        {
+          "species": "Haxorus",
+          "setId": "haxorus-dragon-dance"
+        },
+        {
+          "species": "Latias",
+          "setId": "latias-colbur-berry"
+        },
+        {
+          "species": "Dragonite",
+          "setId": "dragonite-3-attacks-dragon-dance"
+        },
+        {
+          "species": "Blissey",
+          "setId": "blissey-special-wall"
+        },
+        {
+          "species": "Amoonguss",
+          "setId": "amoonguss-defensive-pivot"
+        },
+        {
+          "species": "Jellicent",
+          "setId": "jellicent-standard"
+        }
+      ]
+    },
+    {
+      "archetype": "Offense",
+      "team": [
+        {
+          "species": "Dragonite",
+          "setId": "dragonite-3-attacks-dragon-dance"
+        },
+        {
+          "species": "Scizor",
+          "setId": "scizor-choice-band"
+        },
+        {
+          "species": "Amoonguss",
+          "setId": "amoonguss-choice-specs"
+        },
+        {
+          "species": "Latias",
+          "setId": "latias-choice-scarf"
+        },
+        {
+          "species": "Azelf",
+          "setId": "azelf-all-out-attacker"
+        },
+        {
+          "species": "Porygon2",
+          "setId": "porygon2-duck-tank"
+        }
+      ]
+    },
+    {
+      "archetype": "Stall",
+      "team": [
+        {
+          "species": "Blastoise",
+          "setId": "blastoise-utility"
+        },
+        {
+          "species": "Jellicent",
+          "setId": "jellicent-specially-defensive"
+        },
+        {
+          "species": "Porygon2",
+          "setId": "porygon2-defensive-duck"
+        },
+        {
+          "species": "Amoonguss",
+          "setId": "amoonguss-defensive-pivot"
+        },
+        {
+          "species": "Blissey",
+          "setId": "blissey-special-wall"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-bulky-pursuit-trapper"
+        }
+      ]
+    }
+  ],
+  "days": [
+    {
+      "day": "2027-02-08",
+      "style": "stall",
+      "team": [
+        {
+          "species": "Blastoise",
+          "setId": "blastoise-utility"
+        },
+        {
+          "species": "Xatu",
+          "setId": "xatu-utility"
+        },
+        {
+          "species": "Salamence",
+          "setId": "salamence-choice-scarf"
+        },
+        {
+          "species": "Volcarona",
+          "setId": "volcarona-quiver-dance"
+        },
+        {
+          "species": "Haxorus",
+          "setId": "haxorus-dragon-dance"
+        },
+        {
+          "species": "Bronzong",
+          "setId": "bronzong-tank"
+        }
+      ],
+      "candidate": 0
+    },
+    {
+      "day": "2027-02-09",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Landorus-Therian",
+          "setId": "landorustherian-defensive"
+        },
+        {
+          "species": "Kyurem-Black",
+          "setId": "kyuremblack-substitute-attacker"
+        },
+        {
+          "species": "Victini",
+          "setId": "victini-choice-band"
+        },
+        {
+          "species": "Claydol",
+          "setId": "claydol-support"
+        },
+        {
+          "species": "Machamp",
+          "setId": "machamp-bulk-up"
+        },
+        {
+          "species": "Clefable",
+          "setId": "clefable-support"
+        }
+      ],
+      "candidate": 3
+    },
+    {
+      "day": "2027-02-10",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Kyurem-Black",
+          "setId": "kyuremblack-choice-band"
+        },
+        {
+          "species": "Starmie",
+          "setId": "starmie-rapid-spin"
+        },
+        {
+          "species": "Mew",
+          "setId": "mew-nasty-plot"
+        },
+        {
+          "species": "Froslass",
+          "setId": "froslass-suicide-lead"
+        },
+        {
+          "species": "Gyarados",
+          "setId": "gyarados-substitute-dragon-dance"
+        },
+        {
+          "species": "Rotom-Wash",
+          "setId": "rotomwash-defensive"
+        }
+      ],
+      "candidate": 0
+    },
+    {
+      "day": "2027-02-11",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Scizor",
+          "setId": "scizor-offensive-swords-dance"
+        },
+        {
+          "species": "Politoed",
+          "setId": "politoed-defensive"
+        },
+        {
+          "species": "Weavile",
+          "setId": "weavile-physical-attacker"
+        },
+        {
+          "species": "Registeel",
+          "setId": "registeel-utility"
+        },
+        {
+          "species": "Mew",
+          "setId": "mew-swords-dance"
+        },
+        {
+          "species": "Latios",
+          "setId": "latios-choice-specs"
+        }
+      ],
+      "candidate": 0
+    },
+    {
+      "day": "2027-02-12",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Scizor",
+          "setId": "scizor-offensive-swords-dance"
+        },
+        {
+          "species": "Heracross",
+          "setId": "heracross-choice-scarf"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-bulky-pursuit-trapper"
+        },
+        {
+          "species": "Landorus-Therian",
+          "setId": "landorustherian-choice-scarf"
+        },
+        {
+          "species": "Milotic",
+          "setId": "milotic-flame-orb"
+        },
+        {
+          "species": "Lucario",
+          "setId": "lucario-swords-dance"
+        }
+      ],
+      "candidate": 5
+    },
+    {
+      "day": "2027-02-13",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Gastrodon",
+          "setId": "gastrodon-specially-defensive"
+        },
+        {
+          "species": "Landorus-Therian",
+          "setId": "landorustherian-swords-dance"
+        },
+        {
+          "species": "Excadrill",
+          "setId": "excadrill-swords-dance"
+        },
+        {
+          "species": "Tentacruel",
+          "setId": "tentacruel-utility"
+        },
+        {
+          "species": "Magnezone",
+          "setId": "magnezone-sunny-day"
+        },
+        {
+          "species": "Clefable",
+          "setId": "clefable-support"
+        }
+      ],
+      "candidate": 2
+    },
+    {
+      "day": "2027-02-14",
+      "style": "stall",
+      "team": [
+        {
+          "species": "Garchomp",
+          "setId": "garchomp-choice-scarf"
+        },
+        {
+          "species": "Cofagrigus",
+          "setId": "cofagrigus-defensive"
+        },
+        {
+          "species": "Politoed",
+          "setId": "politoed-defensive"
+        },
+        {
+          "species": "Reuniclus",
+          "setId": "reuniclus-calm-mind"
+        },
+        {
+          "species": "Dragonite",
+          "setId": "dragonite-3-attacks-dragon-dance"
+        },
+        {
+          "species": "Suicune",
+          "setId": "suicune-resttalk"
+        }
+      ],
+      "candidate": 0
+    }
+  ]
+}

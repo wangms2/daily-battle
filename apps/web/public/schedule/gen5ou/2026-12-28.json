@@ -1,0 +1,273 @@
+{
+  "version": 1,
+  "generatorVersion": 4,
+  "dataBuiltAt": "2026-10-23T13:58:33.422Z",
+  "week": "2026-12-28",
+  "pool": {
+    "species": [
+      "Salamence",
+      "Mamoswine",
+      "Latios",
+      "Ninetales",
+      "Forretress",
+      "Dragonite",
+      "Toxicroak",
+      "Tentacruel",
+      "Machamp",
+      "Kyurem",
+      "Azelf",
+      "Togekiss"
+    ],
+    "candidate": 0
+  },
+  "suggestedTeams": [
+    {
+      "archetype": "Offense",
+      "team": [
+        {
+          "species": "Tentacruel",
+          "setId": "tentacruel-toxic-spikes"
+        },
+        {
+          "species": "Dragonite",
+          "setId": "dragonite-3-attacks-dragon-dance"
+        },
+        {
+          "species": "Kyurem",
+          "setId": "kyurem-subroost"
+        },
+        {
+          "species": "Toxicroak",
+          "setId": "toxicroak-swords-dance"
+        },
+        {
+          "species": "Mamoswine",
+          "setId": "mamoswine-choice-band"
+        },
+        {
+          "species": "Salamence",
+          "setId": "salamence-choice-scarf"
+        }
+      ]
+    }
+  ],
+  "days": [
+    {
+      "day": "2026-12-28",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Dragonite",
+          "setId": "dragonite-3-attacks-dragon-dance"
+        },
+        {
+          "species": "Suicune",
+          "setId": "suicune-crocune"
+        },
+        {
+          "species": "Magnezone",
+          "setId": "magnezone-substitute-charge-beam"
+        },
+        {
+          "species": "Porygon-Z",
+          "setId": "porygonz-nasty-plot"
+        },
+        {
+          "species": "Reuniclus",
+          "setId": "reuniclus-calm-mind"
+        },
+        {
+          "species": "Darmanitan",
+          "setId": "darmanitan-choice-scarf"
+        }
+      ],
+      "candidate": 1
+    },
+    {
+      "day": "2026-12-29",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Gyarados",
+          "setId": "gyarados-substitute-dragon-dance"
+        },
+        {
+          "species": "Heracross",
+          "setId": "heracross-choice-scarf"
+        },
+        {
+          "species": "Donphan",
+          "setId": "donphan-support"
+        },
+        {
+          "species": "Latios",
+          "setId": "latios-choice-scarf"
+        },
+        {
+          "species": "Roserade",
+          "setId": "roserade-offensive"
+        },
+        {
+          "species": "Jellicent",
+          "setId": "jellicent-specially-defensive"
+        }
+      ],
+      "candidate": 2
+    },
+    {
+      "day": "2026-12-30",
+      "style": "stall",
+      "team": [
+        {
+          "species": "Hippowdon",
+          "setId": "hippowdon-mixed-wall"
+        },
+        {
+          "species": "Ferrothorn",
+          "setId": "ferrothorn-standard"
+        },
+        {
+          "species": "Politoed",
+          "setId": "politoed-choice-specs"
+        },
+        {
+          "species": "Rotom-Wash",
+          "setId": "rotomwash-defensive"
+        },
+        {
+          "species": "Kingdra",
+          "setId": "kingdra-rain-dance"
+        },
+        {
+          "species": "Latios",
+          "setId": "latios-choice-scarf"
+        }
+      ],
+      "candidate": 7
+    },
+    {
+      "day": "2026-12-31",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Latios",
+          "setId": "latios-choice-specs"
+        },
+        {
+          "species": "Registeel",
+          "setId": "registeel-utility"
+        },
+        {
+          "species": "Breloom",
+          "setId": "breloom-technician"
+        },
+        {
+          "species": "Starmie",
+          "setId": "starmie-wallbreaker"
+        },
+        {
+          "species": "Alakazam",
+          "setId": "alakazam-life-orb"
+        },
+        {
+          "species": "Mamoswine",
+          "setId": "mamoswine-substitute"
+        }
+      ],
+      "candidate": 8
+    },
+    {
+      "day": "2027-01-01",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Tornadus",
+          "setId": "tornadus-substitute-protect"
+        },
+        {
+          "species": "Breloom",
+          "setId": "breloom-technician"
+        },
+        {
+          "species": "Heatran",
+          "setId": "heatran-specially-defensive"
+        },
+        {
+          "species": "Terrakion",
+          "setId": "terrakion-choice-band"
+        },
+        {
+          "species": "Alakazam",
+          "setId": "alakazam-attacker"
+        },
+        {
+          "species": "Gliscor",
+          "setId": "gliscor-swords-dance"
+        }
+      ],
+      "candidate": 6
+    },
+    {
+      "day": "2027-01-02",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Scizor",
+          "setId": "scizor-offensive-swords-dance"
+        },
+        {
+          "species": "Keldeo",
+          "setId": "keldeo-choice-scarf"
+        },
+        {
+          "species": "Gengar",
+          "setId": "gengar-substitute-will-o-wisp"
+        },
+        {
+          "species": "Dragonite",
+          "setId": "dragonite-3-attacks-dragon-dance"
+        },
+        {
+          "species": "Togekiss",
+          "setId": "togekiss-physically-defensive"
+        },
+        {
+          "species": "Abomasnow",
+          "setId": "abomasnow-mixed"
+        }
+      ],
+      "candidate": 2
+    },
+    {
+      "day": "2027-01-03",
+      "style": "offense",
+      "team": [
+        {
+          "species": "Bisharp",
+          "setId": "bisharp-air-balloon-attacker"
+        },
+        {
+          "species": "Latias",
+          "setId": "latias-colbur-berry"
+        },
+        {
+          "species": "Gengar",
+          "setId": "gengar-substitute-will-o-wisp"
+        },
+        {
+          "species": "Gyarados",
+          "setId": "gyarados-substitute-dragon-dance"
+        },
+        {
+          "species": "Excadrill",
+          "setId": "excadrill-swords-dance"
+        },
+        {
+          "species": "Magneton",
+          "setId": "magneton-choice-scarf"
+        }
+      ],
+      "candidate": 1
+    }
+  ]
+}
