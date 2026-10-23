@@ -5,6 +5,7 @@
 import type { SetEntry } from '@daily-battle/data';
 import clsx from 'clsx';
 import { useLayoutEffect, useRef, useState, type KeyboardEvent } from 'react';
+import { useDetailCards } from '../ui/useDetailCards';
 import {
   abilityInfo,
   formatEvs,
@@ -23,44 +24,41 @@ import { ItemIcon } from '../ui/ItemIcon';
 import { FinalStatsRow } from '../ui/StatLines';
 
 /**
- * A set's description: two lines, and the rest on a tap (or on hover, in the
- * tooltip) when it's longer, so no sheet has to scroll.
+ * A set's description: two lines, and when it's longer, a tap (or a mouse
+ * hover) floats the whole text over it. It never changes the layout, so the
+ * sheet never has to scroll.
  */
 function Description({ text }: { text: string }) {
-  const [open, setOpen] = useState(false);
+  const { container, isOpen, trigger } = useDetailCards<HTMLDivElement>();
   const [clamped, setClamped] = useState(false);
   const el = useRef<HTMLParagraphElement>(null);
   useLayoutEffect(() => {
     const p = el.current;
-    if (p && !open) setClamped(p.scrollHeight > p.clientHeight + 1);
-  }, [text, open]);
-  const tall = clamped || open;
+    if (p) setClamped(p.scrollHeight > p.clientHeight + 1);
+  }, [text]);
+  const shown = clamped && isOpen(0);
   return (
-    <p
-      ref={el}
-      title={tall ? text : undefined}
-      role={tall ? 'button' : undefined}
-      tabIndex={tall ? 0 : undefined}
-      aria-expanded={tall ? open : undefined}
-      onClick={tall ? () => setOpen(!open) : undefined}
-      onKeyDown={
-        tall
-          ? (e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                setOpen(!open);
-              }
-            }
-          : undefined
-      }
-      className={clsx(
-        'mt-1.5 text-[14px] leading-snug text-muted',
-        !open && 'line-clamp-2',
-        tall && 'cursor-pointer',
+    <div ref={container} className="relative mt-1.5">
+      <p
+        ref={el}
+        {...(clamped ? { ...trigger(0), role: 'button', tabIndex: 0, 'aria-label': text } : {})}
+        className={clsx(
+          'line-clamp-2 text-[14px] leading-snug text-muted',
+          clamped && 'cursor-pointer',
+        )}
+      >
+        {text}
+        {clamped && <span aria-hidden> …</span>}
+      </p>
+      {shown && (
+        <p
+          role="tooltip"
+          className="card absolute inset-x-0 -top-1 z-20 p-2.5 text-[14px] leading-snug shadow-lg"
+        >
+          {text}
+        </p>
       )}
-    >
-      {text}
-    </p>
+    </div>
   );
 }
 
@@ -156,12 +154,7 @@ export function SetPicker({
   };
 
   return (
-    <Sheet
-      open={open}
-      onOpenChange={onOpenChange}
-      title={title ?? `${species} · pick a set`}
-      scroll
-    >
+    <Sheet open={open} onOpenChange={onOpenChange} title={title ?? `${species} · pick a set`}>
       <div className="mb-2 flex items-center gap-2">
         <img
           src={getSprite(species, 'icon')}

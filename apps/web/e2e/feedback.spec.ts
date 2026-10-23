@@ -2,6 +2,7 @@
 // sheets, still sprites with animations off, item and ability details, team
 // coverage in the checklist, and an opponent's possible sets with hints on.
 import { expect, test, type Page } from '@playwright/test';
+import sets from '../../../packages/data/gen4ou/sets.json' with { type: 'json' };
 import schedule from '../public/schedule/2026-10-19.json' with { type: 'json' };
 
 const TODAY = new Date('2026-10-21T10:00:00-04:00');
@@ -158,4 +159,28 @@ test('wide screens show a Pokédex entry, final stats and item icons; phones kee
     // The Pokédex entry loads on demand.
     await expect(panel.locator('p.italic')).not.toBeEmpty();
   }
+});
+
+test('a long set description floats over the card on tap, and nothing scrolls', async ({
+  page,
+}, info) => {
+  test.skip(!info.project.name.startsWith('phone'), 'phones only');
+  // The set with the longest description in the data, as the first member of the team.
+  const long = Object.entries(sets.species)
+    .flatMap(([species, e]) => e.sets.map((set) => ({ species, set })))
+    .sort((x, y) => y.set.description.length - x.set.description.length)[0]!;
+  const s = state({ team: true });
+  s.games.gen4ou.weeks[schedule.week]!.team = [
+    { species: long.species, setId: long.set.id },
+    ...TEAM.slice(1),
+  ];
+  await open(page, s);
+  await page.getByRole('button', { name: `${long.species}'s set` }).click();
+  const sheet = page.getByRole('dialog', { name: /your set/ });
+  const text = sheet.locator('p[role="button"]');
+  await expect(text).toBeVisible();
+  await text.click();
+  await expect(sheet.getByRole('tooltip')).toContainText(long.set.description);
+  await noScroll(page, 'set view with the full description');
+  await shot(page, '08-description-open', info.project.name);
 });

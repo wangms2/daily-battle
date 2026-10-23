@@ -1,7 +1,7 @@
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { BACKGROUNDS, backgroundFor, HAZARD_FX, SUBSTITUTE_FX, WEATHER_FX } from './fx';
+import { BACKGROUNDS, backgroundFor, HAZARD_FX, WEATHER_FX } from './fx';
 
 const onDisk = (url: string) => existsSync(resolve(import.meta.dirname, '../../public', `.${url}`));
 
@@ -28,7 +28,6 @@ describe('fx', () => {
     const urls = [
       ...Object.values(BACKGROUNDS).flatMap((list) => list.map((b) => `/fx/${b}`)),
       ...Object.values(WEATHER_FX),
-      SUBSTITUTE_FX,
       ...HAZARD_FX.rocks,
       HAZARD_FX.spikes,
       HAZARD_FX.toxicSpikes,

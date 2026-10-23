@@ -22,6 +22,12 @@ const EXT = { front: 'gif', back: 'gif', icons: 'png' } as const;
 /** Where each animated kind's still first frames go. */
 const STILL = { front: 'front-still', back: 'back-still' } as const;
 
+/** Showdown's substitute doll, which stands in for a Pokémon behind a substitute. */
+const SUBSTITUTE = {
+  front: 'https://play.pokemonshowdown.com/sprites/ani/substitute.gif',
+  back: 'https://play.pokemonshowdown.com/sprites/ani-back/substitute.gif',
+};
+
 const force = process.argv.includes('--force');
 const out = (dir: string) => fileURLToPath(new URL(`../public/sprites/${dir}/`, import.meta.url));
 const toId = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -60,8 +66,14 @@ for (const dir of Object.keys(SOURCES)) mkdirSync(out(dir), { recursive: true })
 const missing: string[] = [];
 const allSpecies = [
   ...new Set(Object.keys(FORMATS).flatMap((f) => Object.keys(setsFor(f).species))),
+  'Substitute',
 ];
-for (const species of allSpecies) {
+for (const kind of ['front', 'back'] as const) {
+  const file = `${out(kind)}substitute.gif`;
+  if (!force && existsSync(file)) continue;
+  if (!(await download([SUBSTITUTE[kind]], file))) missing.push(`Substitute ${kind}`);
+}
+for (const species of allSpecies.filter((s) => s !== 'Substitute')) {
   const kinds = (Object.keys(SOURCES) as (keyof typeof SOURCES)[]).filter(
     (k) => force || !existsSync(`${out(k)}${toId(species)}.${EXT[k]}`),
   );

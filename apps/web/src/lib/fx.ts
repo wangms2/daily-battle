@@ -29,9 +29,6 @@ export const WEATHER_FX: Record<string, string> = {
   Hail: fx('weather-hail.png'),
 };
 
-/** The doll that stands in for a Pokémon behind a substitute (our own drawing). */
-export const SUBSTITUTE_FX = fx('substitute.svg');
-
 export const HAZARD_FX = {
   rocks: [fx('rock1.png'), fx('rock2.png')],
   spikes: fx('caltrop.png'),
