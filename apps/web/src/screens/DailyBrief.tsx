@@ -136,11 +136,17 @@ export function DailyBrief({
     </button>
   );
 
+  // Six tiles: 3×2 on phones, one row of six on wide screens, where the teams stack.
+  const sixGrid = clsx(
+    'grid min-h-0 flex-1 gap-2',
+    wide ? 'grid-cols-6 grid-rows-1' : 'grid-cols-3 grid-rows-2',
+  );
+
   const opponentSection =
     mode.kind === 'replace' ? (
       <section className="flex min-h-0 flex-1 flex-col gap-2">
         <SectionLabel>Who comes in for {team[mode.slot]!.species}?</SectionLabel>
-        <div className="grid min-h-0 flex-1 grid-cols-3 grid-rows-2 gap-2">
+        <div className={sixGrid}>
           {bench.map((species) => (
             <PokemonTile
               key={species}
@@ -155,7 +161,7 @@ export function DailyBrief({
     ) : (
       <section className="flex min-h-0 flex-1 flex-col gap-2">
         <SectionLabel>Opponent</SectionLabel>
-        <div className="grid min-h-0 flex-1 grid-cols-3 grid-rows-2 gap-2">
+        <div className={sixGrid}>
           {opponent.team.map(({ species }) => (
             <PokemonTile
               key={species}
@@ -173,7 +179,7 @@ export function DailyBrief({
       <SectionLabel right={changeChip}>
         {editing ? 'Pick a Pokémon to change' : 'Your team'}
       </SectionLabel>
-      <div className="grid min-h-0 flex-1 grid-cols-3 grid-rows-2 gap-2">
+      <div className={sixGrid}>
         {team.map((slot, i) => {
           const isLead = slot.species === lead;
           return (
@@ -264,15 +270,10 @@ export function DailyBrief({
   );
 
   const vs = (
-    <div
-      className={clsx(
-        'flex shrink-0 items-center gap-3 text-[12px] font-bold tracking-[0.2em] text-muted',
-        wide && 'flex-col',
-      )}
-    >
-      <span className={clsx('bg-line', wide ? 'w-px flex-1' : 'h-px flex-1')} />
+    <div className="flex shrink-0 items-center gap-3 text-[12px] font-bold tracking-[0.2em] text-muted">
+      <span className="h-px flex-1 bg-line" />
       VS
-      <span className={clsx('bg-line', wide ? 'w-px flex-1' : 'h-px flex-1')} />
+      <span className="h-px flex-1 bg-line" />
     </div>
   );
 
@@ -286,7 +287,8 @@ export function DailyBrief({
       {topBar}
       {wide ? (
         <main className="flex min-h-0 flex-1 flex-col gap-4 px-6 pb-6">
-          <div className="grid min-h-0 flex-1 grid-cols-[1fr_auto_1fr] gap-6">
+          {/* Stacked as on phones: the opponent on top, your team nearer you. */}
+          <div className="mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col gap-3">
             {opponentSection}
             {vs}
             {teamSection}

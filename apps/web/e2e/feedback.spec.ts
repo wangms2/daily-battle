@@ -84,6 +84,9 @@ test('the checklist sheet shows coverage gaps without overflowing', async ({ pag
 
 test('an opponent’s possible sets show with hints on, and fit', async ({ page }, info) => {
   await open(page, state({ team: true }));
+  await page.getByRole('button', { name: /^Start · / }).waitFor();
+  await page.waitForLoadState('networkidle');
+  await shot(page, '00-brief', info.project.name);
   const foe = schedule.days.find((d) => d.day === '2026-10-21')!.team[0]!.species;
   await page.getByRole('button', { name: `About ${foe}` }).click();
   const sheet = page.getByRole('dialog', { name: foe });
