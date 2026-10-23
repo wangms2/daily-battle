@@ -47,7 +47,11 @@ const whoOf = (ident: unknown): Who | undefined =>
     : undefined;
 
 /** Animation event for a protocol line. */
-function eventOf(args: readonly string[]): Frame['event'] {
+function eventOf(
+  args: readonly string[],
+  kw: Record<string, unknown>,
+  dex: ModdedDex,
+): Frame['event'] {
   const [cmd, a] = args;
   const map: Record<string, EventKind> = {
     move: 'move',
@@ -71,6 +75,16 @@ function eventOf(args: readonly string[]): Frame['event'] {
   if (!kind) return undefined;
   if (kind === 'hazard')
     return { kind, who: typeof a === 'string' && a.startsWith('p1') ? 'you' : 'foe' };
+  if (kind === 'move')
+    return {
+      kind,
+      who: whoOf(a),
+      move: args[2],
+      target: whoOf(args[3]),
+      ...(kw.still ? { still: true } : {}),
+      ...(dex.moves.get(args[2] ?? '').category === 'Special' && { special: true }),
+    };
+  if (kind === 'status') return { kind, who: whoOf(a), status: args[2] };
   return { kind, who: whoOf(a) };
 }
 
@@ -353,7 +367,7 @@ export class BattleEngine {
         const a = args as readonly string[];
         const kw = kwArgs as Record<string, unknown>;
         for (const e of explainersOf(a)) if (e) explainers.add(e);
-        const event = eventOf(a);
+        const event = eventOf(a, kw, this.dex);
         const popup = popupOf(a, kw);
         if (!text && !event && !popup) continue;
         if (text.startsWith('Battle started between')) continue;

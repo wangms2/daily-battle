@@ -381,3 +381,33 @@ test('a lost first try breaks the streak, and the result copies to share', async
     if (!TEAM.some((t) => t.species === s.species)) expect(copied).not.toContain(s.species);
   }
 });
+
+test('a move draws its Showdown animation on the field, and a tap skips it', async ({ page }) => {
+  await open(page, 'normal');
+  await page.getByRole('button', { name: /^Start · / }).click();
+  const fx = page.locator('.battle-field img[style*="position: absolute"]');
+  await page.locator(MOVES).first().click({ timeout: 20_000 });
+  // The effect images appear while the move plays…
+  await expect(fx.first()).toBeAttached({ timeout: 5_000 });
+  // …and tapping the field skips the turn and clears them.
+  await page.locator('.battle-field').click({ position: { x: 5, y: 5 } });
+  await expect(fx).toHaveCount(0);
+  await expect(page.locator(MOVES).first()).toBeEnabled({ timeout: 10_000 });
+});
+
+test('with animations off, no effect images are drawn', async ({ page }) => {
+  await page.addInitScript(
+    (s) => localStorage.setItem('daily-battle:state', s),
+    JSON.stringify({
+      ...seededState('normal'),
+      settings: { ...seededState('normal').settings, animations: false },
+    }),
+  );
+  await page.clock.setFixedTime(TODAY);
+  await page.goto('/');
+  await page.getByRole('button', { name: /^Start · / }).click();
+  const fx = page.locator('.battle-field img[style*="position: absolute"]');
+  await page.locator(MOVES).first().click({ timeout: 20_000 });
+  await page.waitForTimeout(1_500);
+  await expect(fx).toHaveCount(0);
+});

@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit",
     "sprites": "tsx scripts/sprites.ts",
     "fx": "tsx scripts/fx.ts",
+    "anims": "tsx scripts/anims.ts",
     "icons": "tsx scripts/icons.ts",
     "e2e": "playwright test"
   },

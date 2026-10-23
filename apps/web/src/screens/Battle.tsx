@@ -11,6 +11,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
+import type * as AnimPlay from '../battle/anim/play';
 import { useBattleBackend } from '../battle/backend';
 import type {
   Controls,
@@ -22,7 +23,7 @@ import type {
   Who,
 } from '../battle/frames';
 import { ControlPanel } from '../battle/ui/Controls';
-import { Field, type Anim, type Float } from '../battle/ui/Field';
+import { Field, type Anim, type Float, type Stage } from '../battle/ui/Field';
 import { EXPLAINERS, textLines } from '../battle/ui/labels';
 import { MonPopover } from '../battle/ui/MonPopover';
 import { GiveUpDialog, LogList, LogSheet, MenuSheet } from '../battle/ui/sheets';
@@ -43,6 +44,13 @@ const DELAY: Record<Settings['battleSpeed'], number> = {
   instant: 0,
 };
 const SPEEDS: Settings['battleSpeed'][] = ['slow', 'normal', 'fast'];
+/** How much faster than Showdown's own pace its move animations run at each speed. */
+const ACCEL: Record<Settings['battleSpeed'], number> = {
+  slow: 1,
+  normal: 1.4,
+  fast: 3,
+  instant: 3,
+};
 
 /** Today's result, recomputed from saved attempts as each battle ends. */
 export interface DayResult {
@@ -115,10 +123,15 @@ export function Battle({
   const [giveUpOpen, setGiveUpOpen] = useState(false);
   const [monFor, setMonFor] = useState<Who | null>(null);
   const [floats, setFloats] = useState<Float[]>([]);
+  // Showdown's move animations, loaded on demand when animations are on.
+  const [anims, setAnims] = useState<typeof AnimPlay | null>(null);
 
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pending = useRef<{ frames: Frame[]; index: number; pkg: TurnPackage } | null>(null);
   const animKey = useRef(0);
+  const stageRef = useRef<Stage | null>(null);
+  const animsRef = useRef<typeof AnimPlay | null>(null);
+  const running = useRef<AnimPlay.Running | null>(null);
   const explainerQueue = useRef<string[]>([]);
   // Latest props, read from callbacks so they never need to re-create (which
   // would restart the battle effect below).
@@ -139,6 +152,7 @@ export function Battle({
     if (end) endRef.current?.focus();
   }, [end]);
 
+  /** Applies a frame; returns how long its move animation needs (0 if none). */
   const applyFrame = useCallback((f: Frame, withAnim: boolean) => {
     setView(f.view);
     const lines = textLines(f.text);
@@ -150,6 +164,14 @@ export function Battle({
       // A few at a time is plenty; drop the oldest if animations stall.
       setFloats((fs) => [...fs.slice(-5), float]);
     }
+    const init = withAnim && f.event && animateRef.current ? stageRef.current?.() : null;
+    const play = animsRef.current;
+    if (!init || !play || !f.event) return 0;
+    const full = { ...init, accel: ACCEL[settingsRef.current.battleSpeed] };
+    const run = play.playMove(full, f.event) ?? play.playStatus(full, f.event);
+    if (!run) return 0;
+    running.current = run;
+    return run.duration;
   }, []);
   const floatDone = useCallback(
     (id: number) => setFloats((fs) => fs.filter((f) => f.id !== id)),
@@ -158,6 +180,7 @@ export function Battle({
 
   const finish = useCallback((pkg: TurnPackage) => {
     pending.current = null;
+    running.current?.cancel();
     setTeam(pkg.team);
     setControls(pkg.controls);
     setPlaying(false);
@@ -184,6 +207,7 @@ export function Battle({
     const p = pending.current;
     if (!p) return;
     if (timer.current) clearTimeout(timer.current);
+    running.current?.cancel();
     setFloats([]); // labels from a skipped turn shouldn't linger
     for (let i = p.index; i < p.frames.length; i++) applyFrame(p.frames[i]!, false);
     finish(p.pkg);
@@ -205,10 +229,11 @@ export function Battle({
         if (!p) return;
         if (p.index >= p.frames.length) return finish(p.pkg);
         const f = p.frames[p.index++]!;
-        applyFrame(f, true);
+        running.current?.cancel();
+        const extra = applyFrame(f, true);
         // Silent lines (no text) pass quickly; the new-turn banner gets a short beat.
         const d = !f.text ? delay / 4 : f.event?.kind === 'turn' ? delay / 2 : delay;
-        timer.current = setTimeout(step, d);
+        timer.current = setTimeout(step, Math.max(d, extra ? extra + 80 : 0));
       };
       step();
     },
@@ -218,13 +243,22 @@ export function Battle({
   // Start (or resume) the battle once.
   useEffect(() => {
     let cancelled = false;
-    backend.start(start).then(
-      (pkg) => !cancelled && play(pkg),
+    const loaded = animateRef.current
+      ? import('../battle/anim/play').catch(() => null)
+      : Promise.resolve(null);
+    Promise.all([backend.start(start), loaded]).then(
+      ([pkg, mod]) => {
+        if (cancelled) return;
+        animsRef.current = mod;
+        setAnims(mod);
+        play(pkg);
+      },
       (e: unknown) => !cancelled && setError(String(e)),
     );
     return () => {
       cancelled = true;
       if (timer.current) clearTimeout(timer.current);
+      running.current?.cancel();
     };
   }, [backend, start, play]);
 
@@ -407,6 +441,8 @@ export function Battle({
         view={view}
         anim={anim}
         animate={animate}
+        stageRef={stageRef}
+        ported={anims !== null && animate}
         background={background}
         floats={floats}
         onFloatDone={floatDone}

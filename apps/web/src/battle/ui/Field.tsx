@@ -8,9 +8,18 @@
 // the factor that makes the scene cover the field (see .battle-field in
 // styles.css). So sprites stay on their platforms at any size.
 import clsx from 'clsx';
-import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+  type RefObject,
+} from 'react';
 import { HAZARD_FX, WEATHER_FX } from '../../lib/fx';
 import { getSprite } from '../../lib/sprites';
+import type { SceneInit } from '../anim/scene';
 import type { Frame, MonView, SideConds, TeamMark, View, Who } from '../frames';
 import { boostLabels, STATUS_COLOR, STATUS_LABEL } from './labels';
 
@@ -19,6 +28,9 @@ export interface Anim {
   who?: Who;
   key: number;
 }
+
+/** What the move animations need from the field: its layers and the two sprites. */
+export type Stage = () => Omit<SceneInit, 'accel'> | null;
 
 /** A label or pop-up floating over the field until its animation ends. */
 export interface Float {
@@ -303,6 +315,8 @@ function FieldSprite({
   who,
   anim,
   animate,
+  ported,
+  imgRef,
   onTap,
   onHover,
   onSize,
@@ -311,6 +325,9 @@ function FieldSprite({
   who: Who;
   anim: Anim | null;
   animate: boolean;
+  /** Showdown's move animations drive this sprite, so no lunge of our own. */
+  ported: boolean;
+  imgRef: RefObject<HTMLImageElement | null>;
   /** Tapping the Pokémon itself: details (the stat bar is the accessible control). */
   onTap: () => void;
   /** A mouse over the Pokémon: its card shows while it's there (desktop). */
@@ -331,7 +348,7 @@ function FieldSprite({
             : 'anim-in-right'
           : anim.kind === 'faint'
             ? 'anim-faint'
-            : anim.kind === 'move'
+            : anim.kind === 'move' && !ported
               ? who === 'you'
                 ? 'anim-lunge-right'
                 : 'anim-lunge-left'
@@ -354,7 +371,9 @@ function FieldSprite({
       style={{ left: X(spot.x), bottom: `calc(100cqh - ${Y(spot.feet)})` }}
     >
       <img
-        key={`${mon.species}-${mine ? anim.key : 0}`}
+        ref={imgRef}
+        // A new key restarts the CSS animation; the ported ones must keep this element.
+        key={`${mon.species}-${mine && !(ported && (anim.kind === 'move' || anim.kind === 'status')) ? anim.key : 0}`}
         src={getSprite(mon.species, who === 'you' ? 'back' : 'front')}
         alt=""
         draggable={false}
@@ -395,7 +414,13 @@ export function Field({
   popover,
   className,
   busy = false,
+  stageRef,
+  ported = false,
 }: {
+  /** Set to a function that hands the move animations this field's layers and sprites. */
+  stageRef?: RefObject<Stage | null>;
+  /** The move animations are loaded and drive the sprites. */
+  ported?: boolean;
   /** A turn is playing: tapping a Pokémon skips instead of opening details. */
   busy?: boolean;
   /** Sizing from the layout (fixed shape on phones, fill on wide screens). */
@@ -416,6 +441,12 @@ export function Field({
   popover: ReactNode;
 }) {
   const weather = view?.weather ?? '';
+  const fieldEl = useRef<HTMLDivElement>(null);
+  const fxEl = useRef<HTMLDivElement>(null);
+  const bgFxEl = useRef<HTMLDivElement>(null);
+  const bgEl = useRef<HTMLDivElement>(null);
+  const youImg = useRef<HTMLImageElement>(null);
+  const foeImg = useRef<HTMLImageElement>(null);
   const [hovered, setHovered] = useState(false);
   const [foeSize, setFoeSize] = useState<{ species: string; w: number; h: number } | null>(null);
   const foeSpecies = view?.foe?.species;
@@ -423,6 +454,33 @@ export function Field({
   const [youSize, setYouSize] = useState<{ species: string; w: number; h: number } | null>(null);
   const youSpecies = view?.you?.species;
   const youBar = youBarPos(youSize?.species === youSpecies ? youSize : null);
+
+  // Hand the move animations the field, its two layers, and both sprites as they are now.
+  useLayoutEffect(() => {
+    if (!stageRef) return;
+    stageRef.current = () => {
+      const field = fieldEl.current;
+      const layer = fxEl.current;
+      const bgLayer = bgFxEl.current;
+      const bg = bgEl.current;
+      const you = youImg.current;
+      const foe = foeImg.current;
+      if (!field || !layer || !bgLayer || !bg || !you || !foe) return null;
+      if (!youSize || !foeSize) return null;
+      if (youSize.species !== youSpecies || foeSize.species !== foeSpecies) return null;
+      return {
+        field,
+        bg,
+        layer,
+        bgLayer,
+        you: { el: you, w: youSize.w, h: youSize.h, url: you.src },
+        foe: { el: foe, w: foeSize.w, h: foeSize.h, url: foe.src },
+      };
+    };
+    return () => {
+      stageRef.current = null;
+    };
+  });
 
   // A tap anywhere outside the stat bars closes the details card.
   useEffect(() => {
@@ -446,6 +504,7 @@ export function Field({
 
   return (
     <div
+      ref={fieldEl}
       className={clsx(
         'battle-field relative min-h-0 overflow-hidden rounded-card border border-line',
         className,
@@ -454,10 +513,12 @@ export function Field({
       role="presentation"
     >
       <div
+        ref={bgEl}
         className="battle-bg absolute inset-0"
         style={{ backgroundImage: `url(${background})` }}
         aria-hidden
       />
+      <div ref={bgFxEl} className="pointer-events-none absolute inset-0" aria-hidden />
       {weather && WEATHER_FX[weather] && (
         <div
           className={clsx(
@@ -476,6 +537,8 @@ export function Field({
         who="foe"
         anim={anim}
         animate={animate}
+        ported={ported}
+        imgRef={foeImg}
         onTap={() => (busy ? onTap() : handleInfo('foe', 'tap'))}
         onHover={(on) => handleInfo(on ? 'foe' : null, 'hover')}
         onSize={(size) => foeSpecies && setFoeSize({ species: foeSpecies, ...size })}
@@ -486,10 +549,14 @@ export function Field({
         who="you"
         anim={anim}
         animate={animate}
+        ported={ported}
+        imgRef={youImg}
         onTap={() => (busy ? onTap() : handleInfo('you', 'tap'))}
         onHover={(on) => handleInfo(on ? 'you' : null, 'hover')}
         onSize={(size) => youSpecies && setYouSize({ species: youSpecies, ...size })}
       />
+
+      <div ref={fxEl} className="pointer-events-none absolute inset-0 z-[5]" aria-hidden />
 
       {view?.foe && (
         <StatBar

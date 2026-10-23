@@ -73,7 +73,18 @@ export type EventKind =
 export interface Frame {
   /** Showdown-style battle text for this line ('' for silent lines). `**x**` marks bold. */
   text: string;
-  event?: { kind: EventKind; who?: Who };
+  event?: {
+    kind: EventKind;
+    who?: Who;
+    /** A move event: the move's name, who it was aimed at, and `[still]` (no animation). */
+    move?: string;
+    target?: Who;
+    still?: boolean;
+    /** A special move (picks the quick animation at Fast speed). */
+    special?: boolean;
+    /** A status event: the status that was inflicted ('brn', 'tox', …). */
+    status?: string;
+  };
   /** Text that floats up over a Pokémon and fades: "−24%", "Paralyzed", "Atk +2". */
   label?: { who: Who; text: string; tone: 'damage' | 'heal' | 'info' };
   /** An ability or item revealing itself, shown as a banner by its holder. */

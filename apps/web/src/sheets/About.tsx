@@ -8,9 +8,18 @@ const CREDITS: [string, string][] = [
   ['Battle simulator and text', '@pkmn (Pokémon Showdown’s simulator), MIT licensed.'],
   ['Sprites', 'PokeAPI/sprites; animated sprites by the Smogon sprite community.'],
   [
-    'Backgrounds and effects',
-    'Pokémon Showdown’s fx images, dedicated to the public domain (CC0).',
+    'Move animations',
+    'Pokémon Showdown’s battle animations (public domain, CC0, and MIT), adapted to this field.',
   ],
+  [
+    'Backgrounds and effects',
+    'Pokémon Showdown’s fx images, dedicated to the public domain (CC0), except the ones below.',
+  ],
+  [
+    'Icicle and lightning effects',
+    'By Clint Bellanger, via OpenGameArt: GPLv2, GPLv3, or CC-BY-SA 3.0.',
+  ],
+  ['Rock effects', 'By “Gilad” for Pokémon Online, GPLv3.'],
   ['Damage calculations', '@smogon/calc, MIT licensed.'],
 ];
 

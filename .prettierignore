@@ -11,3 +11,4 @@ packages/pipeline/reports
 apps/web/e2e/screens
 apps/web/e2e/look
 apps/web/e2e/.results
+apps/web/src/battle/anim/vendor
