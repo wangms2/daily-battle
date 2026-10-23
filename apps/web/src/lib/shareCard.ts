@@ -26,7 +26,7 @@ const C = {
   bad: '#a33a46',
   forfeit: '#b2b3bc', // muted at about half strength, as on the result card
 };
-const FONT = '"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif';
+const FONT = 'Verdana, Tahoma, "DejaVu Sans", ui-sans-serif, system-ui, sans-serif';
 const EMOJI = '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji"';
 const font = (weight: number, size: number) => `${weight} ${size}px ${FONT}, ${EMOJI}`;
 
@@ -121,9 +121,6 @@ function pill(
 }
 
 export async function drawShareCard(m: ShareModel): Promise<HTMLCanvasElement> {
-  await Promise.all(
-    [500, 600, 700].map((w) => document.fonts?.load(`${w} 24px "IBM Plex Sans"`)),
-  ).catch(() => {});
   const [logo, ...sprites] = await Promise.all([
     loadImage(`${import.meta.env.BASE_URL}favicon.svg`),
     ...m.team.map((s) => loadImage(getSprite(s.species, 'front'))),

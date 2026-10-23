@@ -26,7 +26,7 @@ export function TopBar({
         <button
           type="button"
           onClick={onTitle}
-          className="display -ml-2 flex h-10 min-w-0 items-center gap-1 rounded-full px-2 text-[16px] hover:bg-surface-2"
+          className="display -ml-2 flex h-10 min-w-0 items-center gap-1 rounded-full px-2 text-[14px] hover:bg-surface-2"
           aria-haspopup="dialog"
         >
           <span className="truncate">{title}</span>
