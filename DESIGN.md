@@ -80,7 +80,7 @@ Daily swap (done on the daily brief screen, shown as "1 change left"):
 ### 4.4 Stats
 
 - Per day: attempts, result of each, and whether the day has been cleared.
-- **Streak (decided in M8):** consecutive days won **within the first 3 tries**. The 3rd lost try breaks it at once (a forfeit or an abandoned try counts as a loss; reload resumes, §7, so a reload can't dodge one), and so does a missed day. Tries after the 3rd are practice: they can clear the day but don't count. No streak freezes.
+- **Streak (revised after M9a):** consecutive days won **on the first try**. A lost first try breaks it at once (a forfeit or an abandoned try counts as a loss; reload resumes, §7, so a reload can't dodge one), and so does a missed day. Tries 2–3 still count for the day's result (won on try N) and the win rate; tries after the 3rd are practice: they can clear the day but don't count. No streak freezes.
 - **First-try wins are the best result.** They're celebrated simply: a ⭐ "First try!" headline in the share and a gold badge on the result card, plus a first-try count in stats.
 - Also track: best streak, win rate within 3 tries, days played, clears (days eventually won), average tries per clear.
 - A day shows one of: not played, first-try win, won on try 2–3, not cleared yet (fewer than 3 tries today), or not cleared in 3 tries.
@@ -438,7 +438,7 @@ Weekly pool UI, role-named set picker, suggested-teams row, lock, daily brief wi
 Worker-based battle, move/switch UI, protocol rendering, AI turns, win/loss detection, attempts recording, run it back. Uses the sprite interface and self-hosted sprites from M6 (§12.3a; brought forward so the team builder could show them). _Accept:_ full playthrough on mobile and desktop; mid-battle reload handled per §7; no runtime requests to third-party image hosts; layout and flow follow §12.2b; speed control and tap-to-skip work; single-choice turns wait for your tap; Animations off setting works.
 
 **M8 — Result and share**
-Share text per §11, clipboard/Web Share; result card and daily-brief summary; derived streak and stats (§4.4); practice changes (§4.2). _Accept:_ snapshot tests for share output: first-try win, won on try 3, not cleared in 3, practice clear, mid-day, and swap marker; never any opponent species. Streak logic tests: a win on try 1–3 extends, the 3rd loss (forfeits included) resets, a win on try 4+ does not extend, a missed day resets, and an unfinished today doesn't break yesterday's streak.
+Share text per §11, clipboard/Web Share; result card and daily-brief summary; derived streak and stats (§4.4); practice changes (§4.2). _Accept:_ snapshot tests for share output: first-try win, won on try 3, not cleared in 3, practice clear, mid-day, and swap marker; never any opponent species. Streak logic tests: only a first-try win extends, a lost first try (forfeits included) resets at once, a win on try 2+ does not extend, a missed day resets, and an unfinished today doesn't break yesterday's streak.
 
 **M9 — Polish and calibration**
 Playtest, tune AI parameters and validation thresholds, accessibility pass, legal/disclaimer page. _Accept:_ playtest notes incorporated; thresholds documented.
@@ -462,9 +462,9 @@ See §14.
 - **Difficulty with hidden info and variance:** some losses come from wrong guesses and RNG; thresholds need real-player data.
 - **Mid-battle persistence:** resolved by seed + choice-log replay (§7). Risk: any nondeterminism in the sim, AI, or a dependency upgrade breaks resume. Pin `@pkmn/sim` per release, and if a stored in-progress attempt was made under a different engine version, record it as a forfeit rather than resuming.
 - **Assets and IP:** this is an unofficial fan project. Include a clear disclaimer, and resolve sprite and name licensing.
-- **Streak fragility:** addressed in M8 by counting a day won within 3 tries, so one unlucky first attempt (crit, miss, or a wrong read) no longer breaks the streak; the first try is still rewarded with a ⭐. Retries do leak the opponent's sets, which makes tries 2–3 easier; watch in playtests whether 3 is the right number. No streak freezes in v1.
+- **Streak fragility:** M8 counted a day won within 3 tries, but retries leak the opponent's sets and made the streak too easy to keep, so it now counts first-try wins only. One unlucky first attempt (crit, miss, or a wrong read) breaks it; that's the point of a streak. Tries 2–3 still clear the day. No streak freezes in v1.
 - **Time zones:** local-date keyed content means players in different zones see different days at the same moment. Accepted for v1.
-- **Retries leak sets:** intentional. Retries help the clear and can keep the streak within 3 tries, but cannot earn the ⭐, and the share shows every try that counted.
+- **Retries leak sets:** intentional. Retries help the clear, but cannot keep the streak or earn the ⭐, and the share shows every try that counted.
 
 ## 15a. Open decisions
 
@@ -474,7 +474,7 @@ See §14.
 | --- | -------------------- | ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | D1  | Name and branding    | Decided                 | **Daily Battle**, served from a subdomain of an existing domain (e.g. `battle.<yourdomain>`). Keep "Pokémon" out of the name and subdomain. The share header and credits page use the name. The format ("Gen 4 OU") is not part of the share text; it can appear elsewhere in the UI               |
 | D2  | Target difficulty    | Decided                 | About 50% first-attempt win rate for an average player; 2–3 attempts to clear. Validation bands in §9.3                                                                                                                                                                                            |
-| D3  | Streak definition    | Decided (revised in M8) | Consecutive days won within 3 tries; the 3rd loss or a missed day breaks it. A first-try win is the best result, marked with a ⭐ in the share and on the result card                                                                                                                              |
+| D3  | Streak definition    | Decided (revised again) | Consecutive days won on the first try; a lost first try or a missed day breaks it. A first-try win is marked with a ⭐ in the share and on the result card; tries 2–3 still clear the day                                                                                                         |
 | D4  | In-battle assistance | Decided                 | One "Beginner hints" toggle, on by default for new players, easy to turn off (§12.2c). Hints cover first-time explainers, type-effectiveness labels, speed range, and the team-builder checklist. With hints off, the battle mirrors classic Showdown. No damage ranges and no "usually runs" info |
 | D5  | Telemetry            | Decided                 | None in v1 (static site). Calibrate difficulty with friends and manual feedback; consider an opt-in anonymous endpoint after launch                                                                                                                                                                |
 

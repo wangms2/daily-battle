@@ -1,7 +1,7 @@
 // The share text (DESIGN.md §11) and the share action. Plain text that pastes
 // anywhere; never opponent species, sets, or turn counts.
 import type { Attempt, DayChange } from '../state/schema';
-import type { DaySummary } from './results';
+import { streakBroken, type DaySummary } from './results';
 
 export interface ShareArgs {
   /** `YYYY-MM-DD` */
@@ -88,7 +88,7 @@ export function shareModel({ day, summary, streak, change, run, url }: ShareArgs
       practice: { ...row(practice), ...(swap?.kind === 'replace' && { with: swap.to.species }) },
     }),
     team,
-    streak: status === 'failed' ? 'Streak reset' : streak > 0 ? `${streak}-day streak` : null,
+    streak: streakBroken(summary) ? 'Streak reset' : streak > 0 ? `${streak}-day streak` : null,
     url,
   };
 }

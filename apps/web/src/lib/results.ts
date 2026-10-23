@@ -1,13 +1,13 @@
 // Day results, streaks, and stats (DESIGN.md §4.4), derived from the saved
 // attempts rather than stored, so they can't drift out of sync.
 //
-// A day counts toward the streak if it's won within the first 3 tries; the 3rd
-// loss (giving up counts) breaks it straight away, and so does a missed day.
-// Tries after that are practice. A first-try win is the best result.
+// The streak counts days won on the first try: a first-try loss (giving up
+// counts) breaks it straight away, and so does a missed day. Tries 2–3 can still
+// clear the day and count toward the win rate; tries after that are practice.
 import { addDays } from '@daily-battle/gen/dates';
 import type { Attempt, DayState } from '../state/schema';
 
-/** Tries that count toward the streak each day. */
+/** Tries that count toward the day's result (and the win rate). */
 export const COUNTED_TRIES = 3;
 
 export type DayStatus =
@@ -55,7 +55,9 @@ export function summarizeDay(day: DayState | undefined, isToday: boolean): DaySu
   };
 }
 
-const keeps = (s: DayStatus) => s === 'firstTry' || s === 'won';
+const cleared = (s: DayStatus) => s === 'firstTry' || s === 'won';
+/** Played but not won on the first try: the streak is over. */
+const breaks = (s: DayStatus) => s !== 'none' && s !== 'firstTry';
 
 export interface Stats {
   streak: number;
@@ -74,13 +76,12 @@ export interface Stats {
 export function computeStats(days: Record<string, DayState>, today: string): Stats {
   const status = (key: string) => summarizeDay(days[key], key === today).status;
 
-  // Streak: back from today. Today only counts once it's decided; a day not yet
-  // played (or still in its 3 tries) doesn't break yesterday's streak.
+  // Streak: back from today. A day not played yet doesn't break yesterday's.
   let streak = 0;
   const t = status(today);
-  if (t !== 'failed') {
-    let d = keeps(t) ? today : addDays(today, -1);
-    while (keeps(status(d))) {
+  if (!breaks(t)) {
+    let d = t === 'firstTry' ? today : addDays(today, -1);
+    while (status(d) === 'firstTry') {
       streak++;
       d = addDays(d, -1);
     }
@@ -104,16 +105,16 @@ export function computeStats(days: Record<string, DayState>, today: string): Sta
     daysPlayed++;
     if (s.status === 'firstTry') firstTryWins++;
     if (s.status !== 'pending') decided++;
-    if (keeps(s.status)) wins++;
+    if (cleared(s.status)) wins++;
     if (s.winTry !== null) {
       clears++;
       triesToClear += s.winTry;
     }
-    if (keeps(s.status)) {
+    if (s.status === 'firstTry') {
       run = prev !== null && addDays(prev, 1) === key ? run + 1 : 1;
       prev = key;
       bestStreak = Math.max(bestStreak, run);
-    } else if (s.status === 'failed') {
+    } else {
       run = 0;
       prev = null;
     }
@@ -140,14 +141,11 @@ export function dayHeadline(s: DaySummary): string {
   return 'Not played yet';
 }
 
-/** "🔥 5-day streak", "Streak reset", or a nudge while today's tries still count. */
+/** "🔥 5-day streak", "Streak reset" once today's first try is lost, or nothing. */
 export function streakLine(s: DaySummary, streak: number): string {
-  if (s.status === 'failed') return 'Streak reset';
-  if (s.status === 'pending') {
-    const left = `${s.triesLeft} ${s.triesLeft === 1 ? 'try' : 'tries'} left`;
-    return streak > 0
-      ? `🔥 ${streak}-day streak · ${left} to keep it`
-      : `${left} to start a streak`;
-  }
+  if (breaks(s.status)) return 'Streak reset';
   return streak > 0 ? `🔥 ${streak}-day streak` : '';
 }
+
+/** Whether today's play has ended the streak (any day not won on the first try). */
+export const streakBroken = (s: DaySummary) => breaks(s.status);

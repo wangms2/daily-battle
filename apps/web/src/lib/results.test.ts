@@ -44,25 +44,23 @@ describe('day status', () => {
   });
 });
 
-describe('streak (3 tries)', () => {
+describe('streak (first tries)', () => {
   it('counts tries only up to the first win; the rest are practice', () => {
     expect(summarizeDay(day(W, L, W), true).counted).toHaveLength(1);
     expect(summarizeDay(day(L, W, L), true).counted).toHaveLength(2);
     expect(summarizeDay(day(L, L, L, W), true).counted).toHaveLength(3);
   });
 
-  it('extends with a win on try 1, 2, or 3', () => {
-    expect(streak(day(W), day(L, W), day(L, L, W))).toBe(3);
+  it('extends only with a first-try win', () => {
+    expect(streak(day(W), day(W), day(W))).toBe(3);
+    expect(streak(day(W), day(L, W), day(W))).toBe(1);
+    expect(streak(day(W), day(L, L, W))).toBe(0);
   });
 
-  it('resets on the 3rd loss, giving up included, as soon as it happens', () => {
-    expect(streak(day(W), day(W), day(L, L, L))).toBe(0);
-    expect(streak(day(W), day(W), day(L, L, F))).toBe(0);
-  });
-
-  it('does not extend with a win on try 4', () => {
-    expect(streak(day(W), day(L, L, L, W))).toBe(0);
-    expect(streak(day(L, L, L, W), day(W))).toBe(1);
+  it('resets on a first-try loss, giving up included, as soon as it happens', () => {
+    expect(streak(day(W), day(W), day(L))).toBe(0);
+    expect(streak(day(W), day(W), day(F))).toBe(0);
+    expect(streak(day(W), day(W), day(L, W))).toBe(0);
   });
 
   it('resets after a missed day', () => {
@@ -71,17 +69,14 @@ describe('streak (3 tries)', () => {
     expect(streak(day(W), day(W), null, null)).toBe(0);
   });
 
-  it('keeps yesterday’s streak while today is unplayed or still in its 3 tries', () => {
-    expect(streak(day(W), day(W), null)).toBe(2); // today not played yet
-    expect(streak(day(W), day(W))).toBe(2);
+  it('keeps yesterday’s streak while today is unplayed', () => {
+    expect(streak(day(W), day(W), null)).toBe(2);
     const h = history(day(W), day(W));
-    expect(computeStats(h, '2026-10-22').streak).toBe(2); // today not played yet
-    expect(streak(day(W), day(W), day(L))).toBe(2);
-    expect(streak(day(W), day(W), day(L, F))).toBe(2);
+    expect(computeStats(h, '2026-10-22').streak).toBe(2);
   });
 
   it('ignores a battle still in progress', () => {
-    expect(streak(day(W), day(L, L, attempt('inProgress')))).toBe(1);
+    expect(streak(day(W), day(attempt('inProgress')))).toBe(1);
   });
 });
 
@@ -92,8 +87,8 @@ describe('stats', () => {
       TODAY,
     );
     expect(stats).toEqual({
-      streak: 1,
-      bestStreak: 3,
+      streak: 0, // today's first try was lost
+      bestStreak: 1, // no two first-try wins on consecutive days
       firstTryWins: 3,
       daysPlayed: 6,
       winRate: 80, // 4 of 5 decided days (today is still pending)

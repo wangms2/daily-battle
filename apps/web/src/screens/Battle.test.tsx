@@ -501,16 +501,16 @@ describe('battle screen', () => {
       const { backend } = fakeBackend([TURN_1]);
       const props = renderBattle(backend, {
         tryNumber: 2,
-        result: dayResult([tried('loss', 0, 1), tried('win', 3, 2)], 4),
+        result: dayResult([tried('loss', 0, 1), tried('win', 3, 2)], 0),
       });
       const card = await winBattle();
-      const result = dayResult([tried('loss', 0, 1), tried('win', 3, 2)], 4);
+      const result = dayResult([tried('loss', 0, 1), tried('win', 3, 2)], 0);
       expect(card).toHaveTextContent('You won');
       expect(card).toHaveTextContent('Try 2 of 3');
       expect(card).not.toHaveTextContent('First try');
       expect(within(card).getByLabelText('Try 1: lost, 0 of 6 left')).toBeInTheDocument();
       expect(within(card).getByLabelText('Try 2: won, 3 of 6 left')).toBeInTheDocument();
-      expect(card).toHaveTextContent('🔥 4-day streak');
+      expect(card).toHaveTextContent('Streak reset'); // won, but not on the first try
       expect(props.onEnd).toHaveBeenCalledWith({ result: 'win', remaining: 3 });
       await shareText(card, 'Copy text');
       expect(writeText).toHaveBeenCalledWith(formatShareText(result.share));
@@ -549,14 +549,14 @@ describe('battle screen', () => {
     vi.stubGlobal('navigator', { ...navigator, share: undefined, clipboard: { writeText } });
     try {
       const { backend } = fakeBackend([TURN_1]);
-      renderBattle(backend, { result: dayResult([tried('loss', 1, 1)], 2) });
+      renderBattle(backend, { result: dayResult([tried('loss', 1, 1)], 0) });
       const card = await winBattle();
       expect(card).toHaveTextContent('Try 1 of 3');
-      expect(card).toHaveTextContent('🔥 2-day streak · 2 tries left to keep it');
+      expect(card).toHaveTextContent('Streak reset');
       expect(within(card).getByRole('button', { name: 'Try again · 2 left' })).toBeInTheDocument();
       await shareText(card, 'Copy text');
       expect(writeText).toHaveBeenCalledWith(
-        formatShareText(dayResult([tried('loss', 1, 1)], 2).share),
+        formatShareText(dayResult([tried('loss', 1, 1)], 0).share),
       );
       expect(await screen.findByRole('status')).toHaveTextContent('Text copied');
     } finally {

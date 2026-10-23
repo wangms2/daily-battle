@@ -325,10 +325,7 @@ describe('results and streak', () => {
 
   it('shows today’s result, the streak, and Share after a first-try win', async () => {
     const state = seeded({ team: { week: WEEK } });
-    state.days['2026-10-20'] = {
-      swapUsed: false,
-      attempts: [finished('loss', 0, 1), finished('win', 2, 2)],
-    };
+    state.days['2026-10-20'] = { swapUsed: false, attempts: [finished('win', 2, 1)] };
     state.days['2026-10-21'] = { swapUsed: false, attempts: [finished('win', 4, 3)] };
     renderApp(state);
     const strip = await screen.findByRole('region', { name: 'Today’s result' });
@@ -340,16 +337,16 @@ describe('results and streak', () => {
     expect(screen.getByRole('button', { name: 'Stats. Streak 2' })).toBeInTheDocument();
   });
 
-  it('resets the streak on the 3rd loss and says so', async () => {
+  it('resets the streak when today isn’t won on the first try, and says so', async () => {
     const state = seeded({ team: { week: WEEK } });
     state.days['2026-10-20'] = { swapUsed: false, attempts: [finished('win', 2, 1)] };
     state.days['2026-10-21'] = {
       swapUsed: false,
-      attempts: [finished('loss', 0, 2), finished('loss', 1, 3), finished('loss', 0, 4)],
+      attempts: [finished('loss', 0, 2), finished('win', 1, 3)],
     };
     renderApp(state);
     const strip = await screen.findByRole('region', { name: 'Today’s result' });
-    expect(strip).toHaveTextContent('❌ Not cleared in 3 tries');
+    expect(strip).toHaveTextContent('✅ Won on try 2');
     expect(strip).toHaveTextContent('Streak reset');
     expect(screen.getByRole('button', { name: 'Stats. Streak 0' })).toBeInTheDocument();
   });

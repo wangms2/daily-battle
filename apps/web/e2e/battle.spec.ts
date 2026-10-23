@@ -311,7 +311,7 @@ for (const scheme of ['light', 'dark'] as const) {
   });
 }
 
-test('three lost tries break the streak, and the result copies to share', async ({
+test('a lost first try breaks the streak, and the result copies to share', async ({
   page,
 }, info) => {
   const dir = `e2e/screens/${info.project.name}/light`;
@@ -338,9 +338,9 @@ test('three lost tries break the streak, and the result copies to share', async 
     const card = page.getByRole('dialog', { name: 'Battle over' });
     await expect(card).toContainText('You gave up');
     await expect(card).toContainText(`Try ${i} of 3`);
-    if (i < 3) await expect(card).toContainText(`${3 - i} ${i === 2 ? 'try' : 'tries'} left`);
+    await expect(card).toContainText('Streak reset');
+    if (i < 3) await expect(card).toContainText(`Try again · ${3 - i} left`);
     else {
-      await expect(card).toContainText('Streak reset');
       await page.waitForTimeout(300);
       await noScroll(page, 'end card, 3 tries');
       await page.screenshot({ path: `${dir}/28-end-tries.png` });

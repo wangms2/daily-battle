@@ -55,7 +55,7 @@ describe('share text', () => {
   });
 
   it('shows each try that counted when won on try 3, with the swap marked', () => {
-    expect(text([a('loss', 0), a('forfeit', 1), a('win', 2)], 6, { change: swap })).toBe(
+    expect(text([a('loss', 0), a('forfeit', 1), a('win', 2)], 0, { change: swap })).toBe(
       [
         'Daily Battle · Oct 21',
         '✅ Won on try 3 · 2/6 left',
@@ -63,7 +63,7 @@ describe('share text', () => {
         '❌ ⬜⬛⬛⬛⬛⬛', // given up: grey
         '✅ 🟩🟩⬛⬛⬛⬛',
         'Hippowdon, Azelf, Celebi, Heatran*, Jirachi, Lucario',
-        '🔥 6-day streak',
+        '🔥 Streak reset', // only first-try wins keep it
       ].join('\n'),
     );
   });
@@ -93,17 +93,16 @@ describe('share text', () => {
     expect(t).toContain('🔥 Streak reset');
   });
 
-  it('shares a day still in progress, keeping the streak line', () => {
-    expect(text([a('loss', 1)], 4)).toBe(
+  it('shares a day still in progress, the streak already reset', () => {
+    expect(text([a('loss', 1)], 0)).toBe(
       [
         'Daily Battle · Oct 21',
         'Not cleared yet · 1 of 3 tries',
         '❌ 🟩⬛⬛⬛⬛⬛',
         'Hippowdon, Azelf, Celebi, Heatran, Jirachi, Lucario',
-        '🔥 4-day streak',
+        '🔥 Streak reset',
       ].join('\n'),
     );
-    expect(text([a('loss', 1)], 0)).not.toContain('🔥');
   });
 
   it('adds a practice run shared from its end card, without counting it as a try', () => {

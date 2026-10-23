@@ -27,7 +27,10 @@ export function WelcomeSheet({
       'Beat today’s opponent',
       'A new opponent every day. You can see its Pokémon, but not their sets.',
     ],
-    ['Win within 3 tries', 'That keeps your streak going. Winning on your first try earns a ⭐.'],
+    [
+      'Win on your first try',
+      'That earns a ⭐ and keeps your streak going. Tries 2 and 3 can still clear the day.',
+    ],
   ];
   return (
     <Sheet open={open} onOpenChange={(o) => !o && onDone()} title="Welcome to Daily Battle">
