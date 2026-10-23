@@ -1,5 +1,6 @@
 import type { FormatId } from '@daily-battle/data/formats';
 import { mondayOf } from '@daily-battle/gen/dates';
+import { sameSpecies } from '../lib/data';
 import { summarizeDay } from '../lib/results';
 import {
   emptyDay,
@@ -50,13 +51,18 @@ export function withChange(team: Slot[], change: DayChange | undefined): Slot[] 
   return change ? team.map((s, i) => (i === change.slot ? change.to : s)) : team;
 }
 
-/** Whether a change still fits the team: the slot holds `from`, and no species twice. */
+/**
+ * Whether a change still fits the team: the slot holds `from`, and no species
+ * twice (Species Clause: forms like Rotom-Wash and Rotom-Frost count as one).
+ */
 function changeFits(team: Slot[], change: DayChange): boolean {
   const { slot, from, to } = change;
   const current = team[slot];
   if (!current || current.species !== from.species || current.setId !== from.setId) return false;
   if (change.kind === 'set') return to.species === from.species;
-  return !team.some((s) => s.species === to.species);
+  return !team.some((s, i) =>
+    i === slot ? s.species === to.species : sameSpecies(s.species, to.species),
+  );
 }
 
 /** Today's counted tries are over (won, or 3 lost): further runs are practice. */
@@ -120,6 +126,10 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
     case 'lockTeam': {
       if (state.weeks[action.week]) return state; // locked for the week
       if (action.team.length !== 6) return state;
+      const clash = action.team.some((s, i) =>
+        action.team.slice(i + 1).some((t) => sameSpecies(s.species, t.species)),
+      );
+      if (clash) return state; // Species Clause
       return {
         ...state,
         weeks: { ...state.weeks, [action.week]: { team: action.team, poolId: action.poolId } },

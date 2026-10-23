@@ -204,6 +204,42 @@ describe('weekly team', () => {
     expect(state.weeks[WEEK]).toBeUndefined();
   });
 
+  it('keeps Species Clause: no two forms of a Pokémon (Rotom-Wash, Rotom-Frost)', () => {
+    const twoRotoms = [...TEAM.slice(0, 5), { species: 'Rotom-Wash', setId: 'x' }].map((s, i) =>
+      i === 0 ? { species: 'Rotom-Frost', setId: 'y' } : s,
+    );
+    const state = gameReducer(emptyGame(), {
+      type: 'lockTeam',
+      week: WEEK,
+      poolId: 'x',
+      team: twoRotoms,
+    });
+    expect(state.weeks[WEEK]).toBeUndefined();
+    // A daily swap can't bring in a second form either, but can replace one with the other.
+    const withWash = gameReducer(emptyGame(), {
+      type: 'lockTeam',
+      week: WEEK,
+      poolId: 'x',
+      team: TEAM.map((s, i) => (i === 5 ? { species: 'Rotom-Wash', setId: 'x' } : s)),
+    });
+    const frost = { species: 'Rotom-Frost', setId: 'y' };
+    const intoOther = { kind: 'replace' as const, slot: 1, from: TEAM[1]!, to: frost };
+    expect(
+      gameReducer(withWash, { type: 'applyChange', day: DAY, week: WEEK, change: intoOther }),
+    ).toBe(withWash);
+    const intoWash = {
+      kind: 'replace' as const,
+      slot: 5,
+      from: withWash.weeks[WEEK]!.team[5]!,
+      to: frost,
+    };
+    expect(
+      gameReducer(withWash, { type: 'applyChange', day: DAY, week: WEEK, change: intoWash }).weeks[
+        WEEK
+      ]!.team[5],
+    ).toEqual(frost);
+  });
+
   it('starts empty in a new week', () => {
     expect(locked().weeks['2026-10-26']).toBeUndefined();
   });

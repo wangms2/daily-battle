@@ -3,7 +3,7 @@
     "format": "gen4ou",
     "method": "curated-usage-weighted-v1",
     "simVersion": "0.10.11",
-    "builtAt": "2026-10-23T02:03:23.826Z",
+    "builtAt": "2026-10-23T16:22:56.393Z",
     "sources": {
       "sets": {
         "url": "https://data.pkmn.cc/sets/gen4ou.json",
@@ -8687,9 +8687,9 @@
         {
           "id": "scyther-swords-dance",
           "sourceName": "Swords Dance",
-          "label": "Swords Dance sweeper (Life Orb)",
+          "label": "Swords Dance sweeper",
           "description": "Boosts itself with Swords Dance, then tries to sweep through the opposing team.",
-          "weight": 0.5612,
+          "weight": 0.5907,
           "moves": [
             "Swords Dance",
             "Aerial Ace",
@@ -8721,7 +8721,7 @@
           "sourceName": "Choice Band",
           "label": "Choice Band attacker",
           "description": "Hits extremely hard with physical moves, but is locked into one move until it switches out.",
-          "weight": 0.3888,
+          "weight": 0.4093,
           "moves": [
             "Aerial Ace",
             "U-turn",
@@ -8738,38 +8738,6 @@
             "spa": 0,
             "spd": 4,
             "spe": 252
-          },
-          "ivs": {
-            "hp": 31,
-            "atk": 31,
-            "def": 31,
-            "spa": 31,
-            "spd": 31,
-            "spe": 31
-          }
-        },
-        {
-          "id": "scyther-baton-pass",
-          "sourceName": "Baton Pass",
-          "label": "Swords Dance sweeper (Salac Berry)",
-          "description": "Boosts itself with Swords Dance, then tries to sweep through the opposing team.",
-          "weight": 0.05,
-          "moves": [
-            "Swords Dance",
-            "Baton Pass",
-            "Aerial Ace",
-            "Roost"
-          ],
-          "item": "Salac Berry",
-          "ability": "Technician",
-          "nature": "Jolly",
-          "evs": {
-            "hp": 224,
-            "atk": 0,
-            "def": 68,
-            "spa": 0,
-            "spd": 0,
-            "spe": 216
           },
           "ivs": {
             "hp": 31,

@@ -5,6 +5,7 @@ import { BattleRoute } from './screens/BattleRoute';
 import { DailyBrief } from './screens/DailyBrief';
 import { TeamBuilder } from './screens/TeamBuilder';
 import { AboutSheet } from './sheets/About';
+import { GameNewsSheet, GEN5_NEWS } from './sheets/GameNews';
 import { GamePicker } from './sheets/GamePicker';
 import { SettingsSheet, StatsSheet, WelcomeSheet } from './sheets/misc';
 import { setActiveFormat } from './lib/data';
@@ -290,6 +291,8 @@ export function App() {
           if (!state.settings.format)
             dispatchAny({ type: 'setSetting', key: 'format', value: format });
           dispatchAny({ type: 'markExplainer', id: 'welcome' });
+          // They just picked a game, so the Gen 5 news is old news.
+          dispatchAny({ type: 'markExplainer', id: GEN5_NEWS });
         }}
         onAbout={() => setAboutOpen(true)}
       />
@@ -310,6 +313,18 @@ export function App() {
         onAbout={() => setAboutOpen(true)}
       />
       <AboutSheet open={aboutOpen} onOpenChange={setAboutOpen} />
+      <GameNewsSheet
+        open={
+          route !== 'battle' &&
+          settings.shownExplainers.includes('welcome') &&
+          !settings.shownExplainers.includes(GEN5_NEWS)
+        }
+        onTry={() => {
+          dispatchAny({ type: 'markExplainer', id: GEN5_NEWS });
+          dispatchAny({ type: 'setSetting', key: 'format', value: 'gen5ou' });
+        }}
+        onStay={() => dispatchAny({ type: 'markExplainer', id: GEN5_NEWS })}
+      />
       <GamePicker
         open={pickerOpen}
         onOpenChange={setPickerOpen}

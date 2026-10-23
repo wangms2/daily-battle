@@ -18,14 +18,6 @@ const readJson = <T>(rel: string) =>
 
 const FORMAT_IDS = Object.keys(FORMATS) as FormatId[];
 
-/**
- * Published sets that break a team-only rule, kept until it's decided how to
- * retire them without changing published days. Gen 4's Swords Dance + Baton
- * Pass Scyther breaks Baton Pass Stat Trap Clause; the pipeline already never
- * puts it on an opponent or a suggested team.
- */
-const KNOWN_TEAM_ILLEGAL = ['scyther-baton-pass'];
-
 describe.each(FORMAT_IDS)('%s/sets.json', (format) => {
   const sets = setsFor(format);
   const entries = Object.entries(sets.species);
@@ -60,13 +52,11 @@ describe.each(FORMAT_IDS)('%s/sets.json', (format) => {
     // Some clauses only run on whole teams, so validateSet above can't see them.
     const validator = TeamValidator.get(format);
     const problems = entries.flatMap(([species, { sets: speciesSets }]) =>
-      speciesSets
-        .filter((s) => !KNOWN_TEAM_ILLEGAL.includes(s.id))
-        .flatMap((s) => {
-          const team = [{ name: species, species, gender: '', level: 100, ...structuredClone(s) }];
-          const errors = validator.validateTeam(team);
-          return errors ? [`${s.id}: ${errors.join(' ')}`] : [];
-        }),
+      speciesSets.flatMap((s) => {
+        const team = [{ name: species, species, gender: '', level: 100, ...structuredClone(s) }];
+        const errors = validator.validateTeam(team);
+        return errors ? [`${s.id}: ${errors.join(' ')}`] : [];
+      }),
     );
     expect(problems).toEqual([]);
   });

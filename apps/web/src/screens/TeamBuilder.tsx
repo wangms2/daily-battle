@@ -4,7 +4,7 @@
 import type { ScheduleFile } from '@daily-battle/gen/schedule';
 import clsx from 'clsx';
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
-import { CHECK_ITEMS, checklist, findSet, topSet, type Slot } from '../lib/data';
+import { CHECK_ITEMS, checklist, findSet, sameSpecies, topSet, type Slot } from '../lib/data';
 import { getSprite } from '../lib/sprites';
 import { ConfirmDialog, TeamCheckSheet } from '../sheets/misc';
 import { InfoSheet } from '../sheets/InfoSheet';
@@ -64,7 +64,7 @@ export function TeamBuilder({
     setPicker(species ? { species, adding: false } : null);
   const [checklistOpen, setChecklistOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
-  const [snack, setSnack] = useState<{ message: string; undo: Slot[] } | null>(null);
+  const [snack, setSnack] = useState<{ message: string; undo?: Slot[] } | null>(null);
   // Wide: the Pokémon in the details panel, and the set previewed for it.
   const [viewing, setViewing] = useState<string | null>(null);
   const [preview, setPreview] = useState<string | undefined>();
@@ -76,6 +76,9 @@ export function TeamBuilder({
   const pool = schedule.pool.species;
   const index = (species: string) => team.findIndex((s) => s.species === species);
   const full = team.length === 6;
+  /** A form of a species already on the team (Species Clause allows one Rotom). */
+  const clashOf = (species: string) =>
+    index(species) < 0 ? team.find((s) => sameSpecies(s.species, species))?.species : undefined;
   const checks = useMemo(() => checklist(team.map((s) => findSet(s)!).filter(Boolean)), [team]);
 
   // The undo offer lasts a few seconds, and any manual edit makes it stale.
@@ -87,8 +90,11 @@ export function TeamBuilder({
 
   const toggle = (species: string) => {
     setSnack(null);
+    const clash = clashOf(species);
     if (team.some((s) => s.species === species)) {
       setTeam(team.filter((s) => s.species !== species));
+    } else if (clash) {
+      setSnack({ message: `One per team: ${clash} is a form of the same Pokémon` });
     } else if (full) {
       setShake((n) => n + 1);
     } else {
@@ -105,7 +111,7 @@ export function TeamBuilder({
   // Wide: a click adds with the previewed (or most used) set; the panel can change it.
   const toggleWide = (species: string) => {
     view(species);
-    if (index(species) >= 0 || full) return toggle(species);
+    if (index(species) >= 0 || full || clashOf(species)) return toggle(species);
     setSnack(null);
     add(species, (species === viewing && preview) || topSet(species).id);
   };
@@ -131,18 +137,20 @@ export function TeamBuilder({
           role="status"
           className="flex h-10 items-center gap-2 rounded-chip bg-accent-soft px-4"
         >
-          <CheckIcon width={16} height={16} className="text-soft-ink" />
-          <span className="flex-1 text-[14px] font-semibold">{snack.message}</span>
-          <button
-            type="button"
-            className="h-9 px-2 text-[14px] font-bold text-soft-ink"
-            onClick={() => {
-              setTeam(snack.undo);
-              setSnack(null);
-            }}
-          >
-            Undo
-          </button>
+          {snack.undo && <CheckIcon width={16} height={16} className="text-soft-ink" />}
+          <span className="min-w-0 flex-1 truncate text-[14px] font-semibold">{snack.message}</span>
+          {snack.undo && (
+            <button
+              type="button"
+              className="h-9 px-2 text-[14px] font-bold text-soft-ink"
+              onClick={() => {
+                setTeam(snack.undo!);
+                setSnack(null);
+              }}
+            >
+              Undo
+            </button>
+          )}
         </div>
       ) : (
         <div className="flex h-10 items-center gap-2 overflow-hidden">
@@ -212,12 +220,18 @@ export function TeamBuilder({
             key={species}
             species={species}
             selected={i >= 0}
-            dimmed={full && i < 0}
+            dimmed={(full && i < 0) || !!clashOf(species)}
             pop={popped === species}
             badge={i >= 0 ? <SlotBadge n={i + 1} /> : undefined}
             onTap={() => toggleWide(species)}
             onInfo={() => view(species)}
-            label={i >= 0 ? `Remove ${species} from team` : `Add ${species} to team`}
+            label={
+              i >= 0
+                ? `Remove ${species} from team`
+                : clashOf(species)
+                  ? `${species}: one per team with ${clashOf(species)}`
+                  : `Add ${species} to team`
+            }
             role={topSet(species).label}
             active={viewing === species}
           />
@@ -233,12 +247,18 @@ export function TeamBuilder({
             key={species}
             species={species}
             selected={i >= 0}
-            dimmed={full && i < 0}
+            dimmed={(full && i < 0) || !!clashOf(species)}
             pop={popped === species}
             badge={i >= 0 ? <SlotBadge n={i + 1} /> : undefined}
             onTap={() => toggle(species)}
             onInfo={() => setInfoFor(species)}
-            label={i >= 0 ? `Remove ${species} from team` : `Add ${species} to team`}
+            label={
+              i >= 0
+                ? `Remove ${species} from team`
+                : clashOf(species)
+                  ? `${species}: one per team with ${clashOf(species)}`
+                  : `Add ${species} to team`
+            }
           />
         );
       })}
@@ -365,8 +385,12 @@ export function TeamBuilder({
             ? index(infoFor) >= 0
               ? { label: 'Remove from team', onClick: () => (toggle(infoFor), setInfoFor(null)) }
               : {
-                  label: full ? 'Team is full' : 'Add to team',
-                  disabled: full,
+                  label: clashOf(infoFor)
+                    ? `One per team: ${clashOf(infoFor)} is in`
+                    : full
+                      ? 'Team is full'
+                      : 'Add to team',
+                  disabled: full || !!clashOf(infoFor),
                   onClick: () => (toggle(infoFor), setInfoFor(null)),
                 }
             : undefined

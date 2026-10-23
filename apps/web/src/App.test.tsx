@@ -4,6 +4,7 @@ import { act, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import scheduleJson from '../public/schedule/2026-10-19.json';
+import gen5Schedule from '../public/schedule/gen5ou/2026-10-26.json';
 import { App } from './App';
 import { ENGINE_VERSION } from './lib/seed';
 import { initialState, type State } from './state/schema';
@@ -36,7 +37,7 @@ function memoryBackend(seed?: State, broken = false): globalThis.Storage {
 /** State after the welcome sheet, optionally with hints off and a team locked. */
 function seeded({ hints = true, team }: { hints?: boolean; team?: { week: string } } = {}): State {
   const state = initialState();
-  state.settings.shownExplainers = ['welcome'];
+  state.settings.shownExplainers = ['welcome', 'gen5-news'];
   state.settings.beginnerHints = hints;
   state.settings.format = 'gen4ou';
   if (team) {
@@ -418,5 +419,73 @@ describe('edge cases', () => {
     await act(async () => {});
     expect(await screen.findByRole('button', { name: 'Try again' })).toBeInTheDocument();
     vi.doUnmock('@daily-battle/gen');
+  });
+});
+
+describe('Species Clause', () => {
+  it('allows only one form of a Pokémon on a team (Rotom-Wash or Rotom-Frost)', async () => {
+    // This week's pool has both Rotom forms.
+    expect(schedule.pool.species).toEqual(expect.arrayContaining(['Rotom-Wash', 'Rotom-Frost']));
+    const user = userEvent.setup();
+    renderApp(seeded());
+    await user.click(await screen.findByRole('button', { name: 'Add Rotom-Wash to team' }));
+    await user.click(await screen.findByRole('button', { name: 'Add Rotom-Wash' }));
+    const frost = screen.getByRole('button', { name: 'Rotom-Frost: one per team with Rotom-Wash' });
+    await user.click(frost);
+    expect(await screen.findByRole('status')).toHaveTextContent(
+      'One per team: Rotom-Wash is a form of the same Pokémon',
+    );
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    // Taking Rotom-Wash off frees Rotom-Frost.
+    await user.click(screen.getByRole('button', { name: 'Remove Rotom-Wash from team' }));
+    expect(screen.getByRole('button', { name: 'Add Rotom-Frost to team' })).toBeEnabled();
+  });
+});
+
+describe('Gen 5 news', () => {
+  /** A player from before Gen 5: welcome seen, on Gen 4 (as a migrated save is). */
+  const veteran = () => {
+    const state = seeded();
+    state.settings.shownExplainers = ['welcome'];
+    return state;
+  };
+
+  beforeEach(() => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string) =>
+        // Gen 5's builder needs a Gen 5 pool; any published week will do.
+        String(url).includes('gen5ou/')
+          ? new Response(JSON.stringify(gen5Schedule), { status: 200 })
+          : new Response(JSON.stringify(schedule), { status: 200 }),
+      ),
+    );
+  });
+
+  it('tells a player from before Gen 5 once, and Try switches to it', async () => {
+    const user = userEvent.setup();
+    renderApp(veteran());
+    const news = await screen.findByRole('dialog', { name: 'New: Gen 5 OU' });
+    await user.click(within(news).getByRole('button', { name: 'Try Gen 5 OU' }));
+    expect(await screen.findByRole('button', { name: /^Gen 5 · Week of/ })).toBeInTheDocument();
+    expect(screen.queryByRole('dialog', { name: 'New: Gen 5 OU' })).not.toBeInTheDocument();
+  });
+
+  it('keeps the player on Gen 4 if they stay', async () => {
+    const user = userEvent.setup();
+    renderApp(veteran());
+    const news = await screen.findByRole('dialog', { name: 'New: Gen 5 OU' });
+    await user.click(within(news).getByRole('button', { name: 'Stay on Gen 4' }));
+    expect(await screen.findByRole('button', { name: /^Gen 4 · Week of/ })).toBeInTheDocument();
+    expect(screen.queryByRole('dialog', { name: 'New: Gen 5 OU' })).not.toBeInTheDocument();
+  });
+
+  it('never shows it to a new player, who picks a game on the welcome sheet', async () => {
+    const user = userEvent.setup();
+    renderApp();
+    await user.click(await screen.findByRole('radio', { name: /Gen 4 OU/ }));
+    await user.click(screen.getByRole('button', { name: 'Play Gen 4 OU' }));
+    expect(await screen.findByRole('button', { name: /Pick 6 more/ })).toBeInTheDocument();
+    expect(screen.queryByRole('dialog', { name: 'New: Gen 5 OU' })).not.toBeInTheDocument();
   });
 });

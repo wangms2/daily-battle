@@ -55,9 +55,7 @@ describe.each(Object.keys(FORMATS) as FormatId[])('generated %s content', (forma
           const name = left.splice(Math.floor(rng() * left.length), 1)[0]!;
           for (let j = left.length - 1; j >= 0; j--)
             if (base(left[j]!) === base(name)) left.splice(j, 1);
-          // Gen 4's Baton Pass Scyther is illegal on any team (see KNOWN_TEAM_ILLEGAL
-          // in data's sets.test.ts).
-          const options = sets.species[name]!.sets.filter((s) => s.id !== 'scyther-baton-pass');
+          const options = sets.species[name]!.sets;
           return toPokemonSet(name, options[Math.floor(rng() * options.length)]!);
         });
         const problems = validator.validateTeam(team);

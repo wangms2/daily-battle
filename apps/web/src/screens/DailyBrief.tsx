@@ -4,7 +4,7 @@ import type { ScheduleFile } from '@daily-battle/gen/schedule';
 import clsx from 'clsx';
 import { useEffect, useState, type ReactNode } from 'react';
 import { warmBattleWorker } from '../battle/backend';
-import { findSet, type Slot } from '../lib/data';
+import { findSet, sameSpecies, type Slot } from '../lib/data';
 import { dayHeadline, streakLine, type DaySummary } from '../lib/results';
 import { getSprite, preloadSprites } from '../lib/sprites';
 import { InfoSheet } from '../sheets/InfoSheet';
@@ -85,7 +85,14 @@ export function DailyBrief({
   }, []);
 
   const editing = mode.kind !== 'view';
-  const bench = schedule.pool.species.filter((s) => !team.some((t) => t.species === s));
+  // Pool Pokémon not on the team. Bringing one in must keep Species Clause:
+  // no second form of a Pokémon that stays on the team.
+  const bench = schedule.pool.species.filter(
+    (s) =>
+      !team.some((t, i) =>
+        mode.kind === 'replace' && i === mode.slot ? t.species === s : sameSpecies(t.species, s),
+      ),
+  );
 
   const describe = (c: DayChange) =>
     c.kind === 'replace'

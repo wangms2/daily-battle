@@ -21,7 +21,7 @@ function gen5State() {
       beginnerHints: true,
       battleSpeed: 'instant',
       animations: true,
-      shownExplainers: ['welcome'],
+      shownExplainers: ['welcome', 'gen5-news'],
       format: 'gen5ou',
     },
   };
@@ -139,4 +139,28 @@ test('a Gen 5 battle shows the foe six from the start, and resumes', async ({ pa
     .first()
     .waitFor();
   await noScroll(page, 'resumed');
+});
+
+test('a player from before Gen 5 gets the news once, and can try it', async ({ page }, info) => {
+  // A Gen 4 save from before Gen 5 (v3), as most players have.
+  await open(page, {
+    version: 3,
+    weeks: {},
+    days: {},
+    settings: {
+      beginnerHints: true,
+      battleSpeed: 'instant',
+      animations: true,
+      shownExplainers: ['welcome'],
+    },
+  });
+  const news = page.getByRole('dialog', { name: 'New: Gen 5 OU' });
+  await expect(news).toBeVisible();
+  await noScroll(page, 'gen 5 news');
+  await shot(page, '07-news', info.project.name);
+  await news.getByRole('button', { name: 'Try Gen 5 OU' }).click();
+  await expect(page.getByRole('button', { name: /^Gen 5 · / })).toBeVisible();
+  await page.reload();
+  await expect(page.getByRole('button', { name: /^Gen 5 · / })).toBeVisible();
+  await expect(news).toBeHidden();
 });

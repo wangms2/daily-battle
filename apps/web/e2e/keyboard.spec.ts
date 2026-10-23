@@ -40,7 +40,7 @@ test('plays a whole battle with only the keyboard', async ({ page }) => {
             beginnerHints: true,
             battleSpeed: 'instant',
             animations: true,
-            shownExplainers: ['welcome'],
+            shownExplainers: ['welcome', 'gen5-news'],
           },
         }),
       );

@@ -2,6 +2,7 @@
 // shown (Gen 4 OU or Gen 5 OU). No simulator code here.
 import {
   DEFAULT_FORMAT,
+  FORMATS,
   formatInfo,
   setsFor,
   type SetEntry,
@@ -56,6 +57,22 @@ export function findSet(slot: Slot): SetEntry | undefined {
 export function topSet(species: string): SetEntry {
   return [...setsOf(species)].sort((a, b) => b.weight - a.weight)[0]!;
 }
+
+/**
+ * National Dex number. It's the same in every format, and forms share it
+ * (Rotom-Wash and Rotom-Frost are both #479).
+ */
+export function dexNum(species: string): number | undefined {
+  for (const f of Object.keys(FORMATS)) {
+    const info = speciesDataFor(f).species[species];
+    if (info) return info.num;
+  }
+  return undefined;
+}
+
+/** Species Clause: two forms of one Pokémon count as the same species on a team. */
+export const sameSpecies = (a: string, b: string) =>
+  a === b || (dexNum(a) !== undefined && dexNum(a) === dexNum(b));
 
 export function speciesInfo(species: string): SpeciesInfo {
   return speciesData.species[species]!;
