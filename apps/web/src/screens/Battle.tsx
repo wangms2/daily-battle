@@ -327,7 +327,6 @@ export function Battle({
       role="log"
       aria-label="Battle log"
       onClick={() => (playing ? skip() : setLogOpen(true))}
-      data-gen={gen}
       className="battle-textbox relative min-h-[3.25rem] flex-1 basis-0"
     >
       {/* Newest first, laid out from the bottom up: a line that doesn't fit wraps into a
@@ -525,7 +524,7 @@ export function Battle({
   }
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full flex-col" data-gen={gen}>
       {topBar}
       {wide ? (
         // A size container: the stage (field + controls) and the log sit side by side,

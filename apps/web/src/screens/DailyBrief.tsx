@@ -4,7 +4,7 @@ import type { ScheduleFile } from '@daily-battle/gen/schedule';
 import clsx from 'clsx';
 import { useEffect, useState, type ReactNode } from 'react';
 import { warmBattleWorker } from '../battle/backend';
-import { findSet, sameSpecies, type Slot } from '../lib/data';
+import { findSet, sameSpecies, speciesInfo, STAT_LABEL, type Slot } from '../lib/data';
 import { dayHeadline, streakLine, type DaySummary } from '../lib/results';
 import { getSprite, preloadSprites } from '../lib/sprites';
 import { InfoSheet } from '../sheets/InfoSheet';
@@ -13,6 +13,7 @@ import { SetPicker } from '../sheets/SetPicker';
 import type { DayChange, DayState } from '../state/schema';
 import { Button, SectionLabel } from '../ui/bits';
 import { StarIcon } from '../ui/icons';
+import { MoveChips } from '../ui/MoveList';
 import { PokemonTile } from '../ui/PokemonTile';
 import type { ShareModel } from '../lib/share';
 import { ShareButton } from '../ui/results';
@@ -137,10 +138,39 @@ export function DailyBrief({
   );
 
   // Six tiles: 3×2 on phones, one row of six on wide screens, where the teams stack.
+  // On wide screens the rows are a fixed, shorter height (the page centers them),
+  // instead of stretching tall tiles over the whole window.
   const sixGrid = clsx(
-    'grid min-h-0 flex-1 gap-2',
-    wide ? 'grid-cols-6 grid-rows-1' : 'grid-cols-3 grid-rows-2',
+    'grid gap-2',
+    wide ? 'h-52 shrink-0 grid-cols-6 grid-rows-1' : 'min-h-0 flex-1 grid-cols-3 grid-rows-2',
   );
+
+  /** What hovering a tile shows on desktop: base stats, and for your own, its set. */
+  const hoverOf = (species: string, setId?: string) => {
+    const info = speciesInfo(species);
+    const set = setId ? findSet({ species, setId }) : undefined;
+    return (
+      <div className="space-y-1.5">
+        <p className="text-[13px] font-semibold">{species}</p>
+        <dl className="grid grid-cols-3 gap-x-2 gap-y-0.5 text-[12px] tabular-nums">
+          {(['hp', 'atk', 'def', 'spa', 'spd', 'spe'] as const).map((k) => (
+            <div key={k} className="flex justify-between gap-1">
+              <dt className="text-muted">{STAT_LABEL[k]}</dt>
+              <dd className="font-semibold">{info.baseStats[k]}</dd>
+            </div>
+          ))}
+        </dl>
+        {set && (
+          <>
+            <p className="text-[12px] text-muted">
+              {set.label} · {set.item} · {set.ability}
+            </p>
+            <MoveChips moves={set.moves} />
+          </>
+        )}
+      </div>
+    );
+  };
 
   const opponentSection =
     mode.kind === 'replace' ? (
@@ -159,7 +189,7 @@ export function DailyBrief({
         </div>
       </section>
     ) : (
-      <section className="flex min-h-0 flex-1 flex-col gap-2">
+      <section className={clsx('flex flex-col gap-2', wide ? 'shrink-0' : 'min-h-0 flex-1')}>
         <SectionLabel>Opponent</SectionLabel>
         <div className={sixGrid}>
           {opponent.team.map(({ species }) => (
@@ -168,6 +198,7 @@ export function DailyBrief({
               species={species}
               label={`About ${species}`}
               onTap={() => setInfoFor({ species, foe: true })}
+              hoverCard={wide ? hoverOf(species) : undefined}
             />
           ))}
         </div>
@@ -175,7 +206,7 @@ export function DailyBrief({
     );
 
   const teamSection = (
-    <section className="flex min-h-0 flex-1 flex-col gap-2">
+    <section className={clsx('flex flex-col gap-2', wide ? 'shrink-0' : 'min-h-0 flex-1')}>
       <SectionLabel right={changeChip}>
         {editing ? 'Pick a Pokémon to change' : 'Your team'}
       </SectionLabel>
@@ -187,6 +218,7 @@ export function DailyBrief({
               key={slot.species}
               species={slot.species}
               showTypes={!editing}
+              hoverCard={wide && !editing ? hoverOf(slot.species, slot.setId) : undefined}
               selected={!editing && isLead}
               badge={
                 !editing && isLead ? (
@@ -288,14 +320,14 @@ export function DailyBrief({
       {wide ? (
         <main className="flex min-h-0 flex-1 flex-col gap-4 px-6 pb-6">
           {/* Stacked as on phones: the opponent on top, your team nearer you. */}
-          <div className="mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col gap-3">
+          <div className="mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col justify-center gap-3">
             {opponentSection}
             {vs}
             {teamSection}
-          </div>
-          <div className="mx-auto flex w-full max-w-md flex-col gap-2">
-            {strip}
-            {start}
+            <div className="mx-auto mt-2 flex w-full max-w-md flex-col gap-2">
+              {strip}
+              {start}
+            </div>
           </div>
         </main>
       ) : (

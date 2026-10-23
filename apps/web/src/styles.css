@@ -359,14 +359,15 @@ body {
 /* Move buttons: Showdown's soft type-tinted gradient, muted to our palette. */
 .move-btn {
   color: var(--text);
-  border: 1px solid color-mix(in srgb, var(--type) 45%, var(--border));
+  border: 2px solid color-mix(in srgb, var(--type) 60%, var(--text) 15%);
   background: linear-gradient(
     to bottom,
     color-mix(in srgb, var(--type) 5%, var(--surface)),
     color-mix(in srgb, var(--type) 20%, var(--surface))
   );
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.35),
+    inset 0 0 0 2px var(--surface),
+    inset 0 0 0 3px color-mix(in srgb, var(--type) 40%, var(--surface)),
     var(--card-shadow);
 }
 .move-btn:not(:disabled):hover {
@@ -375,6 +376,23 @@ body {
     color-mix(in srgb, var(--type) 9%, var(--surface)),
     color-mix(in srgb, var(--type) 28%, var(--surface))
   );
+}
+
+/* The generation's pixel font, for the battle text and the move names. */
+[data-gen='4'] {
+  --font-pixel: var(--font-pixel-4);
+}
+[data-gen='5'] {
+  --font-pixel: var(--font-pixel-5);
+}
+.battle-pixel {
+  font-family: var(--font-pixel);
+  font-weight: 400;
+  font-size: 17px;
+}
+[data-gen='5'] .battle-pixel,
+[data-gen='5'] .battle-textbox {
+  font-size: 14px;
 }
 
 /* Move chips outside the move buttons (sets, details, battle cards): tinted by
@@ -389,9 +407,9 @@ button.move-chip:hover,
   background: color-mix(in srgb, var(--type) 28%, var(--surface));
 }
 
-/* The battle text: a game-style box under the field (double border, pixel font).
-   It takes the spare height on phones, showing the latest lines with the older
-   ones fading. */
+/* The battle text: a card with a subtle double border (a thin line and a softer
+   ring inside, like a game text box) and the generation's pixel font. It takes
+   the spare height on phones, showing the latest whole lines. */
 .battle-textbox {
   display: flex;
   flex-direction: column;
@@ -401,19 +419,17 @@ button.move-chip:hover,
   padding: 10px 40px 10px 14px;
   background: var(--surface);
   color: var(--text);
-  border: 3px solid var(--text);
+  border: 2px solid color-mix(in srgb, var(--text) 55%, var(--surface));
   box-shadow:
-    inset 0 0 0 3px var(--surface),
-    inset 0 0 0 5px var(--accent);
+    inset 0 0 0 2px var(--surface),
+    inset 0 0 0 3px color-mix(in srgb, var(--accent) 40%, var(--surface));
   border-radius: 10px;
-  font-family: var(--font-pixel-4);
+  font-family: var(--font-pixel);
   font-size: 17px;
   line-height: 1.3;
   cursor: pointer;
 }
-.battle-textbox[data-gen='5'] {
-  font-family: var(--font-pixel-5);
-  font-size: 14px;
+[data-gen='5'] .battle-textbox {
   line-height: 1.45;
 }
 .battle-textbox strong {

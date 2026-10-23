@@ -304,6 +304,7 @@ function FieldSprite({
   anim,
   animate,
   onTap,
+  onHover,
   onSize,
 }: {
   mon: MonView | null;
@@ -312,6 +313,8 @@ function FieldSprite({
   animate: boolean;
   /** Tapping the Pokémon itself: details (the stat bar is the accessible control). */
   onTap: () => void;
+  /** A mouse over the Pokémon: its card shows while it's there (desktop). */
+  onHover?: (on: boolean) => void;
   /** The sprite's natural size once it loads. */
   onSize?: (size: { w: number; h: number }) => void;
 }) {
@@ -345,6 +348,8 @@ function FieldSprite({
         e.stopPropagation();
         onTap();
       }}
+      onPointerEnter={(e) => e.pointerType === 'mouse' && onHover?.(true)}
+      onPointerLeave={(e) => e.pointerType === 'mouse' && onHover?.(false)}
       className="absolute flex -translate-x-1/2 cursor-pointer items-end justify-center"
       style={{ left: X(spot.x), bottom: `calc(100cqh - ${Y(spot.feet)})` }}
     >
@@ -472,6 +477,7 @@ export function Field({
         anim={anim}
         animate={animate}
         onTap={() => (busy ? onTap() : handleInfo('foe', 'tap'))}
+        onHover={(on) => handleInfo(on ? 'foe' : null, 'hover')}
         onSize={(size) => foeSpecies && setFoeSize({ species: foeSpecies, ...size })}
       />
       {view && <SideEffects side={view.yourSide} who="you" />}
@@ -481,6 +487,7 @@ export function Field({
         anim={anim}
         animate={animate}
         onTap={() => (busy ? onTap() : handleInfo('you', 'tap'))}
+        onHover={(on) => handleInfo(on ? 'you' : null, 'hover')}
         onSize={(size) => youSpecies && setYouSize({ species: youSpecies, ...size })}
       />
 

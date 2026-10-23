@@ -86,6 +86,27 @@ export function MonPopover(props: Props) {
           {ability && term(ability, 'Ability')}
         </p>
       )}
+      {/* Your own Pokémon: every stat, as the request has them. */}
+      {!props.foe && Object.keys(props.member.stats).length > 0 && (
+        <dl
+          className="mt-1.5 grid grid-cols-3 gap-x-2 gap-y-0.5 text-[12px] tabular-nums"
+          aria-label="Stats"
+        >
+          {[
+            ['HP', props.member.hpExact.max],
+            ['Atk', props.member.stats.atk],
+            ['Def', props.member.stats.def],
+            ['SpA', props.member.stats.spa],
+            ['SpD', props.member.stats.spd],
+            ['Spe', props.member.stats.spe],
+          ].map(([k, v]) => (
+            <div key={k} className="flex justify-between gap-1">
+              <dt className="text-muted">{k}</dt>
+              <dd className="font-semibold">{v}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
       {moves.length > 0 && <MoveChips moves={moves} className="mt-1.5" />}
       {speed && <p className="mt-1 text-[12.5px] text-muted">{speed}</p>}
       {could.length > 0 && (

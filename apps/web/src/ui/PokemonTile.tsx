@@ -24,6 +24,7 @@ export function PokemonTile({
   infoLabel,
   onEdit,
   editLabel,
+  hoverCard,
 }: {
   species: string;
   onTap?: () => void;
@@ -42,10 +43,15 @@ export function PokemonTile({
   /** A pencil in the corner instead of ⓘ (e.g. change a picked Pokémon's set). */
   onEdit?: () => void;
   editLabel?: string;
+  /** A card shown while a mouse is over the tile (desktop); touch ignores it. */
+  hoverCard?: ReactNode;
 }) {
   const { types } = speciesInfo(species);
+  const [hovered, setHovered] = useState(false);
   return (
     <div
+      onPointerEnter={(e) => e.pointerType === 'mouse' && setHovered(true)}
+      onPointerLeave={(e) => e.pointerType === 'mouse' && setHovered(false)}
       className={clsx(
         'card relative flex min-h-0 min-w-0 flex-col transition-[opacity,box-shadow]',
         selected && 'is-selected',
@@ -81,6 +87,14 @@ export function PokemonTile({
       </button>
       {footer}
       {badge && <span className="pointer-events-none absolute top-1 left-1">{badge}</span>}
+      {hoverCard && hovered && (
+        <div
+          role="tooltip"
+          className="card pointer-events-none absolute top-full left-1/2 z-30 mt-1 w-56 -translate-x-1/2 p-2.5 text-left shadow-lg"
+        >
+          {hoverCard}
+        </div>
+      )}
       {onEdit ? (
         <button
           type="button"

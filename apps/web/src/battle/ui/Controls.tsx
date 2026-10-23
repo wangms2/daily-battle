@@ -147,9 +147,7 @@ function MoveButton({
       className="move-btn flex h-full min-h-[3.25rem] flex-col justify-between overflow-hidden rounded-btn px-2 pt-1.5 pb-1 select-none active:translate-y-px disabled:opacity-40"
       style={{ '--type': color } as CSSProperties}
     >
-      <span className="truncate text-center text-[14.5px] leading-5 font-semibold">
-        {move.name}
-      </span>
+      <span className="battle-pixel truncate text-center leading-5">{move.name}</span>
       {/* Type on the left; with hints, a short effectiveness tag beside the PP. */}
       <span className="flex items-baseline justify-between gap-1 text-[11px] leading-4">
         <span className="truncate font-medium text-muted">{move.type}</span>
