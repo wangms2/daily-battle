@@ -1,7 +1,7 @@
 {
   "version": 1,
   "generatorVersion": 4,
-  "dataBuiltAt": "2026-10-22T13:34:45.150Z",
+  "dataBuiltAt": "2026-10-23T02:03:23.826Z",
   "week": "2027-03-08",
   "pool": {
     "species": [
@@ -229,7 +229,7 @@
         },
         {
           "species": "Rhyperior",
-          "setId": "rhyperior-physical-attacker"
+          "setId": "rhyperior-substitute"
         }
       ],
       "candidate": 0

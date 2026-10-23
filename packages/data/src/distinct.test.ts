@@ -27,6 +27,20 @@ describe('distinct sets', () => {
     expect(samePurpose(np, cm)).toBe(true);
   });
 
+  it('merges sets that only shuffle EVs a little (Rhyperior Substitute vs Physical Attacker)', () => {
+    const sub = {
+      moves: ['Substitute', 'Earthquake', 'Stone Edge', 'Ice Punch'],
+      item: 'Leftovers',
+      evs: evs({ hp: 136, atk: 208, spe: 164 }),
+    };
+    const physical = {
+      moves: ['Earthquake', 'Stone Edge', 'Megahorn', 'Substitute'],
+      item: 'Leftovers',
+      evs: evs({ hp: 140, atk: 252, def: 32, spe: 84 }),
+    };
+    expect(samePurpose(sub, physical)).toBe(true);
+  });
+
   it('keeps sets apart when the item, setup, role moves, or EV spread change the job', () => {
     const scarf = {
       moves: ['Earthquake', 'Outrage', 'U-turn', 'Thunder Punch'],

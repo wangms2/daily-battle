@@ -3,7 +3,7 @@
     "format": "gen4ou",
     "method": "curated-usage-weighted-v1",
     "simVersion": "0.10.11",
-    "builtAt": "2026-10-22T23:36:16.092Z",
+    "builtAt": "2026-10-23T02:03:23.826Z",
     "sources": {
       "sets": {
         "url": "https://data.pkmn.cc/sets/gen4ou.json",
@@ -4137,9 +4137,9 @@
         {
           "id": "rhyperior-substitute",
           "sourceName": "Substitute",
-          "label": "Substitute attacker (Substitute)",
+          "label": "Substitute attacker",
           "description": "Uses Substitute to block status and scout its counters while it attacks.",
-          "weight": 0.5012,
+          "weight": 0.6845,
           "moves": [
             "Substitute",
             "Earthquake",
@@ -4167,43 +4167,11 @@
           }
         },
         {
-          "id": "rhyperior-physical-attacker",
-          "sourceName": "Physical Attacker",
-          "label": "Substitute attacker (Physical Attacker)",
-          "description": "Uses Substitute to block status and scout its counters while it attacks.",
-          "weight": 0.2193,
-          "moves": [
-            "Earthquake",
-            "Stone Edge",
-            "Megahorn",
-            "Substitute"
-          ],
-          "item": "Leftovers",
-          "ability": "Solid Rock",
-          "nature": "Adamant",
-          "evs": {
-            "hp": 140,
-            "atk": 252,
-            "def": 32,
-            "spa": 0,
-            "spd": 0,
-            "spe": 84
-          },
-          "ivs": {
-            "hp": 31,
-            "atk": 31,
-            "def": 31,
-            "spa": 31,
-            "spd": 31,
-            "spe": 31
-          }
-        },
-        {
           "id": "rhyperior-tank",
           "sourceName": "Tank",
           "label": "Stealth Rock setter",
           "description": "Sets Stealth Rock to wear down every Pokémon the opponent switches in.",
-          "weight": 0.1512,
+          "weight": 0.1436,
           "moves": [
             "Earthquake",
             "Stone Edge",
@@ -4235,7 +4203,7 @@
           "sourceName": "Choice Band",
           "label": "Choice Band attacker",
           "description": "Hits extremely hard with physical moves, but is locked into one move until it switches out.",
-          "weight": 0.1283,
+          "weight": 0.1219,
           "moves": [
             "Earthquake",
             "Stone Edge",
@@ -4260,6 +4228,38 @@
             "spa": 31,
             "spd": 31,
             "spe": 31
+          }
+        },
+        {
+          "id": "rhyperior-trick-room",
+          "sourceName": "Trick Room",
+          "label": "Swords Dance sweeper",
+          "description": "Boosts itself with Swords Dance, then tries to sweep through the opposing team.",
+          "weight": 0.05,
+          "moves": [
+            "Earthquake",
+            "Stone Edge",
+            "Megahorn",
+            "Swords Dance"
+          ],
+          "item": "Life Orb",
+          "ability": "Solid Rock",
+          "nature": "Brave",
+          "evs": {
+            "hp": 248,
+            "atk": 252,
+            "def": 8,
+            "spa": 0,
+            "spd": 0,
+            "spe": 0
+          },
+          "ivs": {
+            "hp": 31,
+            "atk": 31,
+            "def": 31,
+            "spa": 31,
+            "spd": 31,
+            "spe": 0
           }
         }
       ]
@@ -7666,7 +7666,7 @@
           "sourceName": "Swords Dance",
           "label": "Swords Dance sweeper",
           "description": "Boosts itself with Swords Dance, then tries to sweep through the opposing team.",
-          "weight": 0.5508,
+          "weight": 0.5491,
           "moves": [
             "Swords Dance",
             "Leaf Blade",
@@ -7698,7 +7698,7 @@
           "sourceName": "Mixed Attacker",
           "label": "Mixed attacker",
           "description": "Mixes physical and special attacks to break through walls of either kind.",
-          "weight": 0.2305,
+          "weight": 0.2298,
           "moves": [
             "Leaf Storm",
             "Hidden Power Ice",
@@ -7730,7 +7730,7 @@
           "sourceName": "SubSeed",
           "label": "Substitute attacker",
           "description": "Uses Substitute to block status and scout its counters while it attacks.",
-          "weight": 0.1269,
+          "weight": 0.1266,
           "moves": [
             "Substitute",
             "Leech Seed",
@@ -7762,7 +7762,7 @@
           "sourceName": "Choice Specs",
           "label": "Choice Specs attacker",
           "description": "Hits extremely hard with special moves, but is locked into one move until it switches out.",
-          "weight": 0.0918,
+          "weight": 0.0945,
           "moves": [
             "Leaf Storm",
             "Focus Blast",
@@ -9197,7 +9197,7 @@
           "sourceName": "Swords Dance",
           "label": "Swords Dance sweeper",
           "description": "Boosts itself with Swords Dance, then tries to sweep through the opposing team.",
-          "weight": 0.3765,
+          "weight": 0.3954,
           "moves": [
             "Swords Dance",
             "Waterfall",
@@ -9229,7 +9229,7 @@
           "sourceName": "Dragon Dance",
           "label": "Dragon Dance sweeper (Life Orb)",
           "description": "Boosts itself with Dragon Dance, then tries to sweep through the opposing team.",
-          "weight": 0.3566,
+          "weight": 0.3768,
           "moves": [
             "Dragon Dance",
             "Waterfall",
@@ -9261,7 +9261,7 @@
           "sourceName": "Substitute + Dragon Dance",
           "label": "Dragon Dance sweeper (Leftovers)",
           "description": "Boosts itself with Dragon Dance, then tries to sweep through the opposing team.",
-          "weight": 0.2169,
+          "weight": 0.2278,
           "moves": [
             "Substitute",
             "Dragon Dance",
@@ -9278,38 +9278,6 @@
             "spa": 0,
             "spd": 0,
             "spe": 152
-          },
-          "ivs": {
-            "hp": 31,
-            "atk": 31,
-            "def": 31,
-            "spa": 31,
-            "spd": 31,
-            "spe": 31
-          }
-        },
-        {
-          "id": "feraligatr-chestorest",
-          "sourceName": "ChestoRest",
-          "label": "Dragon Dance sweeper (Chesto Berry)",
-          "description": "Boosts itself with Dragon Dance, then tries to sweep through the opposing team.",
-          "weight": 0.05,
-          "moves": [
-            "Dragon Dance",
-            "Rest",
-            "Waterfall",
-            "Earthquake"
-          ],
-          "item": "Chesto Berry",
-          "ability": "Torrent",
-          "nature": "Adamant",
-          "evs": {
-            "hp": 116,
-            "atk": 252,
-            "def": 0,
-            "spa": 0,
-            "spd": 0,
-            "spe": 140
           },
           "ivs": {
             "hp": 31,

@@ -5,7 +5,7 @@ import type { ResolvedSet } from './resolve';
 
 const STATS = ['hp', 'atk', 'def', 'spa', 'spd', 'spe'] as const;
 /** EV spreads closer than this (summed over stats) invest the same way. */
-export const SAME_SPREAD = 128;
+export const SAME_SPREAD = 192;
 
 /** Setup moves by what they boost; two sets boosting the same way share a job. */
 const SETUP: Record<string, string> = {

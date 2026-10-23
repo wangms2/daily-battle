@@ -1,7 +1,7 @@
 {
   "version": 1,
   "generatorVersion": 4,
-  "dataBuiltAt": "2026-10-22T13:34:45.150Z",
+  "dataBuiltAt": "2026-10-23T02:03:23.826Z",
   "week": "2027-01-25",
   "pool": {
     "species": [
@@ -25,28 +25,28 @@
       "archetype": "Balanced",
       "team": [
         {
-          "species": "Rhyperior",
-          "setId": "rhyperior-physical-attacker"
+          "species": "Rotom-Wash",
+          "setId": "rotomwash-utility"
         },
         {
           "species": "Skarmory",
           "setId": "skarmory-physically-defensive"
         },
         {
-          "species": "Donphan",
-          "setId": "donphan-standard"
+          "species": "Dragonite",
+          "setId": "dragonite-choice-band"
         },
         {
           "species": "Milotic",
           "setId": "milotic-physically-defensive"
         },
         {
-          "species": "Gengar",
-          "setId": "gengar-offensive"
+          "species": "Blissey",
+          "setId": "blissey-calm-mind"
         },
         {
-          "species": "Rotom-Wash",
-          "setId": "rotomwash-choice-scarf"
+          "species": "Rhyperior",
+          "setId": "rhyperior-choice-band"
         }
       ]
     },
@@ -58,8 +58,8 @@
           "setId": "skarmory-offensive-spiker"
         },
         {
-          "species": "Magnezone",
-          "setId": "magnezone-magnet-rise"
+          "species": "Jirachi",
+          "setId": "jirachi-offensive"
         },
         {
           "species": "Rotom-Wash",
@@ -70,12 +70,12 @@
           "setId": "dragonite-offensive-dragon-dance"
         },
         {
-          "species": "Milotic",
-          "setId": "milotic-special-attacker"
+          "species": "Slowbro",
+          "setId": "slowbro-choice-specs"
         },
         {
-          "species": "Gengar",
-          "setId": "gengar-utility"
+          "species": "Milotic",
+          "setId": "milotic-special-attacker"
         }
       ]
     },
@@ -143,34 +143,34 @@
     },
     {
       "day": "2027-01-26",
-      "style": "offense",
+      "style": "balance",
       "team": [
         {
-          "species": "Lucario",
-          "setId": "lucario-swords-dance"
+          "species": "Heracross",
+          "setId": "heracross-choice-scarf"
         },
         {
-          "species": "Snorlax",
-          "setId": "snorlax-utility"
-        },
-        {
-          "species": "Magneton",
-          "setId": "magneton-choice-scarf"
-        },
-        {
-          "species": "Heatran",
-          "setId": "heatran-utility"
-        },
-        {
-          "species": "Infernape",
-          "setId": "infernape-physical-attacker"
+          "species": "Bronzong",
+          "setId": "bronzong-offensive-stealth-rock"
         },
         {
           "species": "Rotom-Frost",
-          "setId": "rotomfrost-utility"
+          "setId": "rotomfrost-choice-scarf"
+        },
+        {
+          "species": "Nidoqueen",
+          "setId": "nidoqueen-physically-defensive-toxic-spikes"
+        },
+        {
+          "species": "Celebi",
+          "setId": "celebi-utility"
+        },
+        {
+          "species": "Donphan",
+          "setId": "donphan-rapid-spin"
         }
       ],
-      "candidate": 8
+      "candidate": 11
     },
     {
       "day": "2027-01-27",
@@ -267,34 +267,34 @@
     },
     {
       "day": "2027-01-30",
-      "style": "balance",
+      "style": "offense",
       "team": [
         {
-          "species": "Metagross",
-          "setId": "metagross-agility"
+          "species": "Empoleon",
+          "setId": "empoleon-lead"
         },
         {
-          "species": "Rotom-Wash",
-          "setId": "rotomwash-choice-scarf"
+          "species": "Magnezone",
+          "setId": "magnezone-magnet-rise"
         },
         {
-          "species": "Hitmontop",
-          "setId": "hitmontop-bulk-up"
+          "species": "Tyranitar",
+          "setId": "tyranitar-choice-scarf"
         },
         {
-          "species": "Quagsire",
-          "setId": "quagsire-specially-defensive"
+          "species": "Suicune",
+          "setId": "suicune-supercune-offensive-calm-mind"
         },
         {
-          "species": "Zapdos",
-          "setId": "zapdos-physically-defensive"
+          "species": "Cresselia",
+          "setId": "cresselia-calm-mind"
         },
         {
-          "species": "Starmie",
-          "setId": "starmie-defensive-rapid-spin"
+          "species": "Gengar",
+          "setId": "gengar-offensive"
         }
       ],
-      "candidate": 1
+      "candidate": 16
     },
     {
       "day": "2027-01-31",
