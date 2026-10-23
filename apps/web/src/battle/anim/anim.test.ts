@@ -121,7 +121,7 @@ describe('Showdown move animations', () => {
 });
 
 describe('Showdown effect images', () => {
-  const root = resolve(process.cwd(), 'public/fx') + '/';
+  const root = resolve(import.meta.dirname, '../../../public/fx') + '/';
 
   it('ships every image the animations draw with', () => {
     const missing = Object.values(BattleEffects)
