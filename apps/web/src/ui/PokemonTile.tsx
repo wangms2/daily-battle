@@ -143,14 +143,6 @@ function Sprite({ species }: { species: string }) {
   );
 }
 
-export function SlotBadge({ n }: { n: number }) {
-  return (
-    <span className="grid size-5 place-items-center rounded-badge bg-accent text-[11px] font-bold text-on-accent">
-      {n}
-    </span>
-  );
-}
-
 /**
  * A compact horizontal Pokémon card for wide screens: sprite on the left,
  * name, types and role on the right, so a whole pool scans like a list.

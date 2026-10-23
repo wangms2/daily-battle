@@ -77,10 +77,13 @@ for (const scheme of ['light', 'dark'] as const) {
     await shot(page, '05-info', project);
     if (!wide) await page.keyboard.press('Escape');
 
-    await page
-      .getByRole('button', { name: /Change set|Change$/ })
-      .first()
-      .click();
+    // On wide screens the team panel's row opens that member's details; on phones, its pencil.
+    if (wide) await page.locator('aside ul li > div > button').first().click();
+    else
+      await page
+        .getByRole('button', { name: /Change set/ })
+        .first()
+        .click();
     if (wide) await expect(page.getByRole('region', { name: / details$/ })).toBeVisible();
     else await expect(page.getByRole('dialog', { name: /pick a set/ })).toBeVisible();
     await shot(page, '06-set-picker', project);

@@ -85,6 +85,8 @@ export function App() {
     go('');
   }, [linked, dispatchAny, go]);
   const [statsOpen, setStatsOpen] = useState(false);
+  // After a loss, the end card's "Change team" opens the brief with the team editable.
+  const [openEdit, setOpenEdit] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [howToPlayOpen, setHowToPlayOpen] = useState(false);
@@ -133,6 +135,7 @@ export function App() {
   const [battleTs, setBattleTs] = useState<number | null>(null);
 
   const startBattle = () => {
+    setOpenEdit(false);
     if (!weekState) return;
     if (inProgress) {
       setBattleTs(inProgress.ts);
@@ -226,6 +229,11 @@ export function App() {
           go('');
         }}
         onRunItBack={startBattle}
+        onChangeTeam={() => {
+          setOpenEdit(true);
+          setBattleTs(null);
+          go('');
+        }}
         result={{
           summary,
           streak: stats.streak,
@@ -247,6 +255,11 @@ export function App() {
         renderTopBar={renderTopBar(
           fmtDay(day, { weekday: 'short', month: 'short', day: 'numeric' }),
         )}
+        initialEdit={openEdit}
+        onDitch={() => {
+          dispatch({ type: 'ditchTeam', week, day });
+          setOpenEdit(false);
+        }}
         onLead={(species) => dispatch({ type: 'setLead', day, species })}
         onChange={(change) => {
           if (practice) dispatch({ type: 'setPracticeChange', day, week, change });

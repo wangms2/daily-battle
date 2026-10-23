@@ -411,3 +411,50 @@ test('with animations off, no effect images are drawn', async ({ page }) => {
   await page.waitForTimeout(1_500);
   await expect(fx).toHaveCount(0);
 });
+
+/** Loses the day's first try quickly, by giving up. */
+async function loseFirstTry(page: Page) {
+  await page.getByRole('button', { name: /^Start · / }).click();
+  await waitForChoice(page);
+  await page.getByRole('button', { name: 'Battle menu' }).click();
+  await page.getByRole('button', { name: 'Give up' }).click();
+  await page.getByRole('button', { name: 'Give up' }).last().click();
+  return page.getByRole('dialog', { name: 'Battle over' });
+}
+
+/** Swaps team slot `n` for the first Pokémon on the bench, through the brief's edit mode. */
+async function swapOne(page: Page, n: number) {
+  await page.getByRole('button', { name: 'Swap' }).nth(n).click();
+  await page
+    .getByRole('button', { name: /^Bring in / })
+    .first()
+    .click();
+  await page.getByRole('button', { name: 'Bring in' }).first().click();
+  await page.getByRole('button', { name: 'Make change' }).click();
+}
+
+test('after a first-try loss the team changes freely and the changes stay', async ({ page }) => {
+  await open(page, 'instant');
+  const card = await loseFirstTry(page);
+  await expect(card).toContainText('Streak reset');
+  // The end card offers the team, already open for changes.
+  await card.getByRole('button', { name: 'Change team' }).click();
+  await expect(page.getByRole('button', { name: 'Swap' }).first()).toBeVisible();
+  await noScroll(page, 'brief, editing after a loss');
+  await swapOne(page, 0);
+  // The daily change isn't spent: swap again right away.
+  await expect(page.getByRole('button', { name: 'Edit team' })).toBeVisible();
+  await expect(page.getByText('Change used')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Edit team' }).click();
+  await swapOne(page, 1);
+  await expect(page.getByRole('button', { name: /^Try again · / })).toBeVisible();
+});
+
+test('ditching the team goes back to the builder and ends the streak', async ({ page }) => {
+  await open(page, 'instant');
+  const card = await loseFirstTry(page);
+  await card.getByRole('button', { name: 'Change team' }).click();
+  await page.getByRole('button', { name: 'Ditch team and rebuild' }).click();
+  await page.getByRole('button', { name: 'Ditch team' }).last().click();
+  await expect(page.getByRole('button', { name: /^Pick \d more$/ })).toBeVisible();
+});

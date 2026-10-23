@@ -178,6 +178,7 @@ function renderBattle(
     onEnd: vi.fn(),
     onExit: vi.fn(),
     onRunItBack: vi.fn(),
+    onChangeTeam: vi.fn(),
   };
   render(
     <BattleBackendContext.Provider value={() => backend}>

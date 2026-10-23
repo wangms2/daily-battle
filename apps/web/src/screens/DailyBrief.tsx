@@ -39,7 +39,13 @@ export function DailyBrief({
   result,
   practice = false,
   teamPreview = false,
+  initialEdit = false,
+  onDitch,
 }: {
+  /** Open with the team ready to change (after a loss). */
+  initialEdit?: boolean;
+  /** Throw the weekly team away and build a new one (ends the streak). */
+  onDitch: () => void;
   /** Gen 5 on: the opponent sees your six before the battle, as you see theirs. */
   teamPreview?: boolean;
   /**
@@ -67,7 +73,8 @@ export function DailyBrief({
     dayState.lead && team.some((s) => s.species === dayState.lead)
       ? dayState.lead
       : team[0]!.species;
-  const [mode, setMode] = useState<Mode>({ kind: 'view' });
+  const [mode, setMode] = useState<Mode>({ kind: initialEdit && !practice ? 'edit' : 'view' });
+  const [ditchOpen, setDitchOpen] = useState(false);
   const [infoFor, setInfoFor] = useState<{ species: string; foe: boolean } | null>(null);
   const [setView, setSetView] = useState<Slot | null>(null);
   const [picker, setPicker] = useState<{
@@ -101,6 +108,8 @@ export function DailyBrief({
       : `${c.from.species}: ${findSet(c.from)?.label} → ${findSet(c.to)?.label}`;
 
   const practiceChange = practice ? dayState.practiceChange : undefined;
+  // Tried today and not won: the streak is over, so the team can change freely.
+  const lost = result.summary.status === 'pending';
   const changeChip = inProgress ? (
     <span className="rounded-chip bg-surface-2 px-3 py-1.5 text-[13px] font-semibold text-muted">
       Battle in progress
@@ -122,7 +131,7 @@ export function DailyBrief({
     >
       {editing ? 'Cancel' : 'Practice change'}
     </button>
-  ) : dayState.swapUsed ? (
+  ) : dayState.swapUsed && !lost ? (
     <span className="rounded-chip bg-surface-2 px-3 py-1.5 text-[13px] font-semibold text-muted">
       Change used
     </span>
@@ -133,7 +142,7 @@ export function DailyBrief({
       className="rounded-chip bg-accent-soft px-3 py-1.5 text-[13px] font-semibold text-soft-ink"
       aria-pressed={editing}
     >
-      {editing ? 'Cancel' : '1 change left'}
+      {editing ? 'Cancel' : lost ? 'Edit team' : '1 change left'}
     </button>
   );
 
@@ -270,8 +279,12 @@ export function DailyBrief({
   );
 
   const { summary } = result;
-  const start = (
-    <Button className="h-12 w-full shrink-0" onClick={onStart} disabled={editing}>
+  const start = editing ? (
+    <Button variant="secondary" className="h-12 w-full shrink-0" onClick={() => setDitchOpen(true)}>
+      Ditch team and rebuild
+    </Button>
+  ) : (
+    <Button className="h-12 w-full shrink-0" onClick={onStart}>
       {inProgress
         ? 'Resume battle'
         : summary.status === 'none'
@@ -391,12 +404,20 @@ export function DailyBrief({
       <ConfirmDialog
         open={!!pending}
         onOpenChange={(o) => !o && setPending(null)}
-        title={practice ? 'Change for this practice run?' : 'Use today’s change?'}
+        title={
+          practice
+            ? 'Change for this practice run?'
+            : lost
+              ? 'Change your team?'
+              : 'Use today’s change?'
+        }
         body={
           pending
             ? practice
               ? `${describe(pending)}. Just for your next practice run; win it and the change stays on your team.`
-              : `${describe(pending)}. This sticks for the rest of the week.`
+              : lost
+                ? `${describe(pending)}. Your streak is over for today, so change as much as you like; it sticks for the rest of the week.`
+                : `${describe(pending)}. This sticks for the rest of the week.`
             : ''
         }
         confirm="Make change"
@@ -422,6 +443,22 @@ export function DailyBrief({
           </div>
         )}
       </ConfirmDialog>
+      <ConfirmDialog
+        open={ditchOpen}
+        onOpenChange={setDitchOpen}
+        title="Ditch this team?"
+        body={
+          result.streak > 0
+            ? `You’ll build a new team from this week’s pool, and your ${result.streak}-day streak ends.`
+            : 'You’ll build a new team from this week’s pool.'
+        }
+        confirm="Ditch team"
+        cancel="Keep my team"
+        onConfirm={() => {
+          setDitchOpen(false);
+          onDitch();
+        }}
+      />
     </div>
   );
 }

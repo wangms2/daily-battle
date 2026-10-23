@@ -20,6 +20,7 @@ export function BattleRoute({
   format,
   onExit,
   onRunItBack,
+  onChangeTeam,
   result,
 }: {
   /** Today's result so far, for the end card. */
@@ -33,6 +34,7 @@ export function BattleRoute({
   format: FormatId;
   onExit: () => void;
   onRunItBack: () => void;
+  onChangeTeam: () => void;
 }) {
   // Built once per attempt, with the choices saved so far (for resume).
   const [start] = useState<EngineStart>(() => {
@@ -61,6 +63,7 @@ export function BattleRoute({
       }
       onExit={onExit}
       onRunItBack={onRunItBack}
+      onChangeTeam={onChangeTeam}
       result={{ ...result, ts: attempt.ts }}
     />
   );

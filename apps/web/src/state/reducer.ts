@@ -30,7 +30,9 @@ export type GameAction =
    * unlock the week and drop today's unfinished battle and changes, which were
    * for the old team. Finished tries stay.
    */
-  | { type: 'resetWeek'; week: string; day: string };
+  | { type: 'resetWeek'; week: string; day: string }
+  /** Throws the weekly team away to build a new one: ends the streak. */
+  | { type: 'ditchTeam'; week: string; day: string };
 
 export type Action =
   /** A game action, for the game of `format`. */
@@ -65,7 +67,12 @@ function changeFits(team: Slot[], change: DayChange): boolean {
   );
 }
 
-/** Today's counted tries are over (won, or 3 lost): further runs are practice. */
+/** Tried today and not won yet: the streak is over for today, so the team may change freely. */
+export function dayLost(day: DayState | undefined): boolean {
+  return summarizeDay(day, true).status === 'pending';
+}
+
+/** Today's counted tries are over (won, or a past day never won): further runs are practice. */
 export function dayDecided(day: DayState | undefined): boolean {
   const status = summarizeDay(day, true).status;
   return status === 'firstTry' || status === 'won' || status === 'failed';
@@ -123,6 +130,17 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         : state.days;
       return { ...state, weeks, days };
     }
+    case 'ditchTeam': {
+      if (attemptInProgress(state.days[action.day])) return state;
+      const { [action.week]: _, ...weeks } = state.weeks;
+      const day = state.days[action.day] ?? emptyDay();
+      const { change: _c, lead: _l, practiceChange: _p, ...rest } = day;
+      return {
+        ...state,
+        weeks,
+        days: { ...state.days, [action.day]: { ...rest, swapUsed: false, ditched: true } },
+      };
+    }
     case 'lockTeam': {
       if (state.weeks[action.week]) return state; // locked for the week
       if (action.team.length !== 6) return state;
@@ -142,7 +160,8 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
     case 'applyChange': {
       const day = state.days[action.day] ?? emptyDay();
       const week = state.weeks[action.week];
-      if (day.swapUsed || !week) return state; // one change per day
+      const lost = dayLost(day); // after a loss the streak is gone: swap as much as you like
+      if ((day.swapUsed && !lost) || !week) return state; // otherwise one change per day
       if (attemptInProgress(day)) return state; // not mid-battle
       if (dayDecided(day)) return state; // after the counted tries, changes are practice only
       if (!changeFits(week.team, action.change)) return state;
@@ -155,7 +174,9 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         weeks: { ...state.weeks, [action.week]: { ...week, team } },
         days: {
           ...state.days,
-          [action.day]: { ...day, swapUsed: true, change: action.change, lead },
+          [action.day]: lost
+            ? { ...day, lead }
+            : { ...day, swapUsed: true, change: action.change, lead },
         },
       };
     }

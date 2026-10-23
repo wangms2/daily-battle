@@ -62,7 +62,12 @@ export interface Stats {
 }
 
 export function computeStats(days: Record<string, DayState>, today: string): Stats {
-  const status = (key: string) => summarizeDay(days[key], key === today).status;
+  // A ditched team ends the streak, even on a first-try win or before any try.
+  const status = (key: string): DayStatus => {
+    const s = summarizeDay(days[key], key === today).status;
+    if (!days[key]?.ditched) return s;
+    return s === 'none' || s === 'firstTry' ? 'pending' : s;
+  };
 
   // Streak: back from today. A day not played yet doesn't break yesterday's.
   let streak = 0;
@@ -87,14 +92,20 @@ export function computeStats(days: Record<string, DayState>, today: string): Sta
   let triesToClear = 0;
   for (const key of keys) {
     const s = summarizeDay(days[key], key === today);
-    if (s.status === 'none') continue;
+    if (s.status === 'none') {
+      if (days[key]?.ditched) {
+        run = 0;
+        prev = null;
+      }
+      continue;
+    }
     daysPlayed++;
     if (s.status === 'firstTry') firstTryWins++;
     if (s.winTry !== null) {
       clears++;
       triesToClear += s.winTry;
     }
-    if (s.status === 'firstTry') {
+    if (status(key) === 'firstTry') {
       run = prev !== null && addDays(prev, 1) === key ? run + 1 : 1;
       prev = key;
       bestStreak = Math.max(bestStreak, run);

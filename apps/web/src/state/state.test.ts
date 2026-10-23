@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { computeStats } from '../lib/results';
 import { attemptInProgress, gameReducer, reducer } from './reducer';
 import {
   emptyGame,
@@ -406,9 +407,107 @@ describe('attempts', () => {
     const state = started();
     expect(gameReducer(state, { type: 'applyChange', day: DAY, week: WEEK, change })).toBe(state);
     const over = gameReducer(state, { type: 'endAttempt', day: DAY, result: 'loss', remaining: 0 });
-    expect(
-      gameReducer(over, { type: 'applyChange', day: DAY, week: WEEK, change }).days[DAY]!.swapUsed,
-    ).toBe(true);
+    // After a loss the streak is gone: changes are free and don't use up the daily one.
+    const after = gameReducer(over, { type: 'applyChange', day: DAY, week: WEEK, change });
+    expect(after.weeks[WEEK]!.team[1]).toEqual(change.to);
+    expect(after.days[DAY]!.swapUsed).toBe(false);
+  });
+});
+
+describe('after a first-try loss', () => {
+  const lost = () => {
+    const game = locked();
+    const day = {
+      swapUsed: false,
+      attempts: [
+        {
+          result: 'loss' as const,
+          remaining: 0,
+          ts: 1,
+          lead: 'Heatran',
+          team: TEAM,
+          battleSeed: '1',
+          aiSeed: '2',
+          choices: [],
+          engine: '',
+        },
+      ],
+    };
+    return { ...game, days: { [DAY]: day } };
+  };
+  const swap = (slot: number, species: string, setId: string): DayChange => ({
+    kind: 'replace',
+    slot,
+    from: TEAM[slot]!,
+    to: { species, setId },
+  });
+
+  it('allows any number of swaps, and the swapped team stays for the week', () => {
+    let state = gameReducer(lost(), {
+      type: 'applyChange',
+      day: DAY,
+      week: WEEK,
+      change: swap(1, 'Gyarados', 'gyarados-offensive-dragon-dance'),
+    });
+    state = gameReducer(state, {
+      type: 'applyChange',
+      day: DAY,
+      week: WEEK,
+      change: {
+        kind: 'replace',
+        slot: 2,
+        from: TEAM[2]!,
+        to: { species: 'Tyranitar', setId: 'tyranitar-utility' },
+      },
+    });
+    expect(state.weeks[WEEK]!.team[1]!.species).toBe('Gyarados');
+    expect(state.weeks[WEEK]!.team[2]!.species).toBe('Tyranitar');
+    // Tomorrow starts from the swapped team.
+    const tomorrow = gameReducer(state, { type: 'setLead', day: '2026-10-22', species: 'Heatran' });
+    expect(tomorrow.weeks[WEEK]!.team[1]!.species).toBe('Gyarados');
+  });
+
+  it('ditching the team unlocks the week and ends a live streak', () => {
+    const won = (ts: number) => ({
+      result: 'win' as const,
+      remaining: 3,
+      ts,
+      lead: 'Heatran',
+      team: TEAM,
+      battleSeed: '1',
+      aiSeed: '2',
+      choices: [],
+      engine: '',
+    });
+    const game = {
+      ...locked(),
+      days: {
+        '2026-10-20': { swapUsed: false, attempts: [won(1)] },
+      },
+    };
+    expect(computeStats(game.days, DAY).streak).toBe(1);
+    const ditched = gameReducer(game, { type: 'ditchTeam', week: WEEK, day: DAY });
+    expect(ditched.weeks[WEEK]).toBeUndefined();
+    expect(ditched.days[DAY]).toMatchObject({ ditched: true, swapUsed: false });
+    expect(computeStats(ditched.days, DAY).streak).toBe(0);
+    // A first-try win later the same day doesn't bring it back.
+    const again = {
+      ...ditched,
+      days: { ...ditched.days, [DAY]: { ...ditched.days[DAY]!, attempts: [won(2)] } },
+    };
+    expect(computeStats(again.days, DAY).streak).toBe(0);
+    // Tomorrow can start a new one.
+    const tomorrow = { ...again.days, '2026-10-22': { swapUsed: false, attempts: [won(3)] } };
+    expect(computeStats(tomorrow, '2026-10-22').streak).toBe(1);
+  });
+
+  it('cannot ditch mid-battle', () => {
+    const state = gameReducer(lost(), {
+      type: 'startAttempt',
+      day: DAY,
+      attempt: { ...lost().days[DAY]!.attempts[0]!, result: 'inProgress', ts: 2 },
+    });
+    expect(gameReducer(state, { type: 'ditchTeam', week: WEEK, day: DAY })).toBe(state);
   });
 });
 

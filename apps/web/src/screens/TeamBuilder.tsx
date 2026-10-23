@@ -11,7 +11,7 @@ import { InfoSheet } from '../sheets/InfoSheet';
 import { SetPicker } from '../sheets/SetPicker';
 import { Button, SectionLabel } from '../ui/bits';
 import { CheckIcon, ChevronIcon, CloseIcon } from '../ui/icons';
-import { PokemonRow, PokemonTile, SlotBadge } from '../ui/PokemonTile';
+import { PokemonRow, PokemonTile } from '../ui/PokemonTile';
 import { DetailsPanel } from '../ui/DetailsPanel';
 import { useWide } from '../ui/useWide';
 
@@ -222,7 +222,6 @@ export function TeamBuilder({
             selected={i >= 0}
             dimmed={(full && i < 0) || !!clashOf(species)}
             pop={popped === species}
-            badge={i >= 0 ? <SlotBadge n={i + 1} /> : undefined}
             onTap={() => toggleWide(species)}
             onInfo={() => view(species)}
             label={
@@ -249,7 +248,6 @@ export function TeamBuilder({
             selected={i >= 0}
             dimmed={(full && i < 0) || !!clashOf(species)}
             pop={popped === species}
-            badge={i >= 0 ? <SlotBadge n={i + 1} /> : undefined}
             onTap={() => toggle(species)}
             onInfo={i < 0 ? () => setInfoFor(species) : undefined}
             onEdit={i >= 0 ? () => setPickerFor(species) : undefined}
@@ -303,26 +301,40 @@ export function TeamBuilder({
               {traySlots.map((slot, i) => (
                 <li key={i} className="h-14">
                   {slot ? (
-                    <button
-                      type="button"
-                      onClick={() => view(slot.species)}
-                      className="flex h-full w-full items-center gap-3 rounded-card bg-surface-2 px-3 text-left"
+                    <div
+                      className={clsx(
+                        'flex h-full w-full items-center gap-1 rounded-card bg-surface-2 pr-1.5 pl-3',
+                        viewing === slot.species && 'ring-2 ring-accent',
+                      )}
                     >
-                      <img
-                        src={getSprite(slot.species, 'icon')}
-                        alt=""
-                        className="pixelated h-8 w-10 object-contain"
-                      />
-                      <span className="min-w-0 flex-1">
-                        <span className="block truncate text-[14px] font-semibold">
-                          {slot.species}
+                      <button
+                        type="button"
+                        onClick={() => view(slot.species)}
+                        className="flex h-full min-w-0 flex-1 items-center gap-3 text-left"
+                      >
+                        <img
+                          src={getSprite(slot.species, 'icon')}
+                          alt=""
+                          className="pixelated h-8 w-10 object-contain"
+                        />
+                        <span className="min-w-0 flex-1">
+                          <span className="block truncate text-[14px] font-semibold">
+                            {slot.species}
+                          </span>
+                          <span className="block truncate text-[13px] text-muted">
+                            {findSet(slot)?.label}
+                          </span>
                         </span>
-                        <span className="block truncate text-[13px] text-muted">
-                          {findSet(slot)?.label}
-                        </span>
-                      </span>
-                      <span className="text-[13px] font-semibold text-accent">Change</span>
-                    </button>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => toggle(slot.species)}
+                        aria-label={`Remove ${slot.species} from team`}
+                        className="grid size-9 shrink-0 place-items-center rounded-full text-muted hover:bg-line hover:text-text"
+                      >
+                        <CloseIcon width={16} height={16} />
+                      </button>
+                    </div>
                   ) : (
                     <div className="flex h-full items-center rounded-card border-2 border-dashed border-line px-3 text-[13px] text-muted">
                       Empty slot

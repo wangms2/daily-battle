@@ -33,7 +33,10 @@ export interface DayChange {
 }
 
 export interface DayState {
+  /** Today's one change (before the first try) is used. Free swaps after a loss don't count. */
   swapUsed: boolean;
+  /** The player ditched their team today: the streak is over, whatever today's tries say. */
+  ditched?: boolean;
   change?: DayChange;
   /** Species chosen to lead today. */
   lead?: string;

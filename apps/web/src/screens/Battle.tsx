@@ -77,6 +77,7 @@ export function Battle({
   onEnd,
   onExit,
   onRunItBack,
+  onChangeTeam,
   topBarRight,
   background,
   result,
@@ -95,6 +96,8 @@ export function Battle({
   onEnd: (outcome: BattleOutcome) => void;
   onExit: () => void;
   onRunItBack: () => void;
+  /** After a loss: back to the brief with the team open for changes. */
+  onChangeTeam: () => void;
   topBarRight?: ReactNode;
 }) {
   const wide = useWide();
@@ -504,10 +507,25 @@ export function Battle({
             <Button variant="secondary" onClick={onRunItBack}>
               {result.summary.status === 'pending' ? 'Try again' : 'Play again'}
             </Button>
-            <Button variant="secondary" onClick={onExit}>
-              Back to today
-            </Button>
+            {result.summary.status === 'pending' ? (
+              <Button variant="secondary" onClick={onChangeTeam}>
+                Change team
+              </Button>
+            ) : (
+              <Button variant="secondary" onClick={onExit}>
+                Back to today
+              </Button>
+            )}
           </div>
+          {result.summary.status === 'pending' && (
+            <button
+              type="button"
+              onClick={onExit}
+              className="min-h-9 text-[13px] font-semibold text-muted"
+            >
+              Back to today
+            </button>
+          )}
         </div>
       </div>
     </div>
