@@ -4,7 +4,7 @@ import { leadChoice, RandomPolicy } from './policies/random';
 import { deriveSeed, makeRng } from './rng';
 import { BattleError, replayBattle, runBattle } from './run';
 import { soak } from './soak';
-import { randomTeam } from './teams';
+import { randomTeam, toPokemonSet } from './teams';
 import type { Policy, RunBattleInput } from './types';
 
 function input(i: number, overrides: Partial<RunBattleInput> = {}): RunBattleInput {
@@ -129,5 +129,64 @@ describe('leadChoice', () => {
     expect(leadChoice(1, 6)).toBe('team 123456');
     expect(leadChoice(4, 6)).toBe('team 412356');
     expect(leadChoice(2, 3)).toBe('team 213');
+  });
+});
+
+describe('unavailable choices', () => {
+  it('lets a side choose again when Imprison turns out to block its move', () => {
+    const data = setsFor('gen5ou');
+    const set = (species: string, id: string) =>
+      toPokemonSet(
+        species,
+        data.species[species]!.sets.find((s) => s.id === id)!,
+      );
+    // Landorus-T's lead set has Imprison (move 3) and Earthquake; Hippowdon
+    // keeps trying Earthquake (move 2), which Imprison blocks without telling it.
+    const imprison: Policy = {
+      choose: (view, rng) =>
+        view.request.requestType === 'move' && view.battle.turn === 1
+          ? 'move 3'
+          : new RandomPolicy().choose(view, rng),
+    };
+    let rejected = 0;
+    const earthquake: Policy = {
+      choose: (view, rng) => {
+        const req = view.request;
+        if (req.requestType !== 'move') return new RandomPolicy().choose(view, rng);
+        const blocked = req.active[0]!.moves[1]!;
+        if ('disabled' in blocked && blocked.disabled) {
+          rejected++;
+          return new RandomPolicy().choose(view, rng);
+        }
+        return 'move 2';
+      },
+    };
+    const input = {
+      format: 'gen5ou',
+      seed: '1,2,3,4' as const,
+      maxTurns: 4,
+      p1: {
+        team: [set('Landorus-Therian', 'landorustherian-lead')],
+        policy: imprison,
+        seed: '1,1,1,1' as const,
+      },
+      p2: {
+        team: [set('Hippowdon', 'hippowdon-mixed-wall')],
+        policy: earthquake,
+        seed: '2,2,2,2' as const,
+      },
+    };
+    const result = runBattle(input);
+    // The sim marked Earthquake disabled after the blocked try, and the battle went on.
+    expect(rejected).toBeGreaterThan(0);
+    expect(result.turns).toBeGreaterThan(2);
+    // The rejected choice isn't recorded, so a replay matches.
+    const replayed = replayBattle(
+      { ...input, p1: { team: input.p1.team }, p2: { team: input.p2.team } },
+      result.choices,
+    );
+    expect(withoutTimestamps(replayed.spectatorLog)).toEqual(
+      withoutTimestamps(result.spectatorLog),
+    );
   });
 });

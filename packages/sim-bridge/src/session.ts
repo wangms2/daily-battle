@@ -95,8 +95,14 @@ export class BattleSession {
     return this.sides[side].choices;
   }
 
-  /** Makes a choice for a side. Throws BattleError if the sim rejects it. */
-  choose(side: SideID, choice: string): void {
+  /**
+   * Makes a choice for a side. Throws BattleError if the sim rejects it, except
+   * for a choice that hidden information made unavailable (a move the foe's
+   * Imprison blocks, say): the sim then sends an updated request, the side
+   * chooses again, and the rejected choice stays out of the record. Returns
+   * false in that case.
+   */
+  choose(side: SideID, choice: string): boolean {
     const s = this.sides[side];
     if (!this.request(side)) {
       throw new BattleError(`No pending request for ${side}`, {
@@ -111,6 +117,12 @@ export class BattleSession {
     s.choices.push(choice);
     const ok = this.battle.choose(side, choice);
     this.battle.sendUpdates();
+    // `receive` set these during battle.choose, which TypeScript can't see.
+    const error = s.error as string | null;
+    if (error?.startsWith('|error|[Unavailable choice]') && s.request) {
+      s.choices.pop();
+      return false;
+    }
     if (!ok || s.error) {
       throw new BattleError(`Invalid choice "${choice}": ${s.error ?? 'rejected'}`, {
         seed: this.input.seed,
@@ -124,6 +136,7 @@ export class BattleSession {
       this.battle.sendUpdates();
       this.turnCapped = true;
     }
+    return true;
   }
 
   /** Ends the battle with `side` losing (giving up). */
