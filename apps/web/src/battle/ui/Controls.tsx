@@ -414,8 +414,7 @@ export function ControlPanel({
 
   const moves = controls?.moves ?? [];
   return (
-    // On phones the buttons use the height the battle text no longer takes.
-    <div ref={panel} className="relative flex min-h-0 flex-1 flex-col justify-end gap-1.5">
+    <div ref={panel} className="relative flex shrink-0 flex-col gap-1.5">
       {tooltip}
       <p
         className={clsx(
@@ -440,7 +439,7 @@ export function ControlPanel({
       </p>
       <div
         className={clsx(
-          'grid max-h-[15rem] min-h-0 flex-1 grid-cols-2 grid-rows-2 gap-2',
+          'grid grid-cols-2 grid-rows-2 gap-2',
           off && 'pointer-events-none opacity-50',
         )}
       >

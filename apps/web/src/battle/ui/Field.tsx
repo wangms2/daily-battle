@@ -54,7 +54,7 @@ function foeBarLeft(size: { w: number; h: number } | null): string {
 const YOU_BAR_TOP = `calc(${Y(262)} - 42px)`;
 const YOU_BAR_H = '36px';
 /** Your back sprite is drawn this much larger (as in the games). */
-const BACK_SCALE = 1.2;
+const BACK_SCALE = 1.4;
 
 /**
  * Where your stat bar goes: above your platform's left side, unless your
@@ -166,6 +166,8 @@ function StatBar({
     >
       <span className="flex items-center gap-1">
         <span className="truncate text-[13px] leading-4 font-bold">{mon.species}</span>
+        {/* Every Pokémon here is level 100, as on Showdown's ladder. */}
+        <span className="shrink-0 text-[10px] leading-4 font-semibold text-muted">L100</span>
         {mon.status && (
           <span
             className="rounded-[3px] px-1 text-[9.5px] leading-[14px] font-bold text-white"

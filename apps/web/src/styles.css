@@ -385,24 +385,27 @@ button.move-chip:hover,
   background: color-mix(in srgb, var(--type) 28%, var(--surface));
 }
 
-/* The battle text: a translucent black bar over the bottom of the field, in the
-   pixel font, like Showdown's. The newest line fades in over the last. */
-.battle-overlay {
+/* The battle text: a dark box under the field, in the pixel font. It takes the
+   spare height on phones, showing the latest lines with the older ones fading. */
+.battle-textbox {
   display: flex;
-  align-items: center;
-  min-height: 2.5rem;
-  padding: 6px 42px 6px 10px;
-  background: rgb(0 0 0 / 0.74);
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 2px;
+  overflow: hidden;
+  padding: 8px 40px 8px 12px;
+  background: #0d0f14;
   color: #fff;
+  border: 1px solid #2a2f3a;
+  border-radius: var(--r-card);
   font-family: var(--font-pixel);
   font-size: 12px;
-  line-height: 1.5;
+  line-height: 1.55;
   letter-spacing: 0.02em;
   text-transform: uppercase;
-  border-radius: 0 0 var(--r-card) var(--r-card);
   cursor: pointer;
 }
-.battle-overlay strong {
+.battle-textbox strong {
   font-weight: 400;
   color: #ffd36b;
 }

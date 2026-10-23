@@ -305,45 +305,55 @@ export function Battle({
     </div>
   );
 
-  // The newest line of the battle text, shown over the field.
-  const latest =
-    [...log].reverse().find((l) => l.trim() && !l.startsWith('== Turn')) ??
-    'The battle is starting…';
-  const overlay = (
+  // The battle text on phones: the latest lines in a pixel-font box under the field,
+  // taking the spare height. Older lines fade.
+  const recent = log.filter((l) => l.trim() && !l.startsWith('== Turn')).slice(-6);
+  const textbox = (
     <div
-      // On phones it is the log (the full history is read out, and a tap opens it);
-      // on wide screens the log column is, so this is just decoration.
-      role={wide ? undefined : 'log'}
-      aria-label={wide ? undefined : 'Battle log'}
-      aria-hidden={wide || undefined}
-      onClick={() => (playing ? skip() : !wide && setLogOpen(true))}
-      className="battle-overlay absolute inset-x-0 bottom-0 z-10"
+      // It is the log on phones: the full history is read out, and a tap opens it.
+      role="log"
+      aria-label="Battle log"
+      onClick={() => (playing ? skip() : setLogOpen(true))}
+      className="battle-textbox relative min-h-[3.25rem] flex-1 basis-0"
     >
-      <p key={log.length} className="animate-fade-in line-clamp-2" aria-hidden>
-        <BattleText text={latest} />
-      </p>
-      {!wide && (
-        <>
-          <div className="sr-only">
-            {log.map((l, i) => (
-              <p key={i}>
-                <BattleText text={l} />
-              </p>
-            ))}
-          </div>
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              setLogOpen(true);
-            }}
-            className="absolute top-1/2 right-1 grid size-8 -translate-y-1/2 place-items-center rounded-full text-white/80 hover:bg-white/15"
-            aria-label="Open the battle log"
-          >
-            <ExpandIcon width={16} height={16} />
-          </button>
-        </>
-      )}
+      <div
+        className="flex min-h-0 flex-col justify-end gap-0.5 overflow-hidden"
+        // The oldest visible line fades out instead of being cut mid-letter.
+        style={{ maskImage: 'linear-gradient(to bottom, transparent, #000 45%)' }}
+        aria-hidden
+      >
+        {recent.length ? (
+          recent.map((l, i) => (
+            <p
+              key={log.length - recent.length + i}
+              className={i === recent.length - 1 ? 'animate-fade-in' : undefined}
+              style={{ opacity: Math.max(0.3, 1 - (recent.length - 1 - i) * 0.2) }}
+            >
+              <BattleText text={l} />
+            </p>
+          ))
+        ) : (
+          <p>The battle is starting…</p>
+        )}
+      </div>
+      <div className="sr-only">
+        {log.map((l, i) => (
+          <p key={i}>
+            <BattleText text={l} />
+          </p>
+        ))}
+      </div>
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          setLogOpen(true);
+        }}
+        className="absolute top-1 right-1 grid size-8 place-items-center rounded-full text-white/80 hover:bg-white/15"
+        aria-label="Open the battle log"
+      >
+        <ExpandIcon width={16} height={16} />
+      </button>
     </div>
   );
 
@@ -360,7 +370,7 @@ export function Battle({
     ) : null;
 
   const field = (
-    <div className={clsx('relative w-full', wide ? 'shrink-0' : 'shrink')}>
+    <div className={clsx('w-full', wide ? 'shrink-0' : 'shrink')}>
       <Field
         // Phones keep the scene's own shape so it never zooms in; the log gets the spare height.
         // The field always keeps the scene's shape, so nothing gets cropped. On phones
@@ -378,7 +388,6 @@ export function Battle({
         busy={playing}
         popover={popover}
       />
-      {overlay}
     </div>
   );
 
@@ -525,6 +534,7 @@ export function Battle({
         <main className="relative flex min-h-0 flex-1 flex-col gap-2 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
           {field}
           {explainerNote}
+          {textbox}
           {panel}
           {endCard}
         </main>
