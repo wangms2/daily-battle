@@ -9,15 +9,14 @@ import {
   setsOf,
   shortLabel,
   speciesInfo,
-  STAT_LABEL,
+  topSet,
 } from '../lib/data';
 import { getSprite } from '../lib/sprites';
 import { Sheet } from '../ui/Sheet';
 import { Button, TypeBadge } from '../ui/bits';
 import { Term } from '../ui/DetailCard';
 import { MoveList } from '../ui/MoveList';
-
-export const MAX_STAT = 160;
+import { StatLines } from '../ui/StatLines';
 
 export function InfoSheet({
   species,
@@ -56,23 +55,12 @@ export function InfoSheet({
         </div>
       </div>
 
-      <dl className="mt-4 space-y-1">
-        {Object.entries(info.baseStats).map(([k, v]) => (
-          <div key={k} className="grid grid-cols-[2.5rem_2rem_1fr] items-center gap-2 text-[13px]">
-            <dt className="text-muted">{STAT_LABEL[k]}</dt>
-            <dd className="text-right font-semibold tabular-nums">{v}</dd>
-            <dd className="h-2 overflow-hidden rounded-full bg-surface-2" aria-hidden>
-              <div
-                className="h-full rounded-full"
-                style={{
-                  width: `${Math.min(100, (100 * v) / MAX_STAT)}%`,
-                  background: v >= 100 ? 'var(--gold)' : v >= 70 ? 'var(--accent)' : 'var(--muted)',
-                }}
-              />
-            </dd>
-          </div>
-        ))}
-      </dl>
+      <StatLines species={species} set={showRoles ? topSet(species) : undefined} />
+      {showRoles && (
+        <p className="mt-1 text-[11px] text-muted">
+          Final stats are for the most used set ({topSet(species).label}).
+        </p>
+      )}
 
       {showPossibleSets && <PossibleSets key={species} species={species} />}
 

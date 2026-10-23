@@ -5,6 +5,7 @@ import clsx from 'clsx';
 import { useEffect, useState, type ReactNode } from 'react';
 import { warmBattleWorker } from '../battle/backend';
 import { findSet, sameSpecies, speciesInfo, STAT_LABEL, type Slot } from '../lib/data';
+import { finalStats } from '../lib/stats';
 import { dayHeadline, streakLine, type DaySummary } from '../lib/results';
 import { getSprite, preloadSprites } from '../lib/sprites';
 import { InfoSheet } from '../sheets/InfoSheet';
@@ -158,14 +159,17 @@ export function DailyBrief({
   const hoverOf = (species: string, setId?: string) => {
     const info = speciesInfo(species);
     const set = setId ? findSet({ species, setId }) : undefined;
+    // Your own Pokémon show the stats their set really has; the opponent's, its base stats.
+    const shown = set ? finalStats(info.baseStats, set) : info.baseStats;
     return (
       <div className="space-y-1.5">
         <p className="text-[13px] font-semibold">{species}</p>
+        <p className="text-[11px] text-muted">{set ? 'Final stats' : 'Base stats'}</p>
         <dl className="grid grid-cols-3 gap-x-2 gap-y-0.5 text-[12px] tabular-nums">
           {(['hp', 'atk', 'def', 'spa', 'spd', 'spe'] as const).map((k) => (
             <div key={k} className="flex justify-between gap-1">
               <dt className="text-muted">{STAT_LABEL[k]}</dt>
-              <dd className="font-semibold">{info.baseStats[k]}</dd>
+              <dd className="font-semibold">{shown[k]}</dd>
             </div>
           ))}
         </dl>

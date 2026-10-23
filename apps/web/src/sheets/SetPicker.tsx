@@ -4,7 +4,7 @@
 // one, starts selected, so a single tap confirms it. Nothing scrolls.
 import type { SetEntry } from '@daily-battle/data';
 import clsx from 'clsx';
-import { useRef, useState, type KeyboardEvent } from 'react';
+import { useLayoutEffect, useRef, useState, type KeyboardEvent } from 'react';
 import {
   abilityInfo,
   formatEvs,
@@ -19,10 +19,61 @@ import { getSprite } from '../lib/sprites';
 import { Sheet } from '../ui/Sheet';
 import { MoveList } from '../ui/MoveList';
 import { Button, TypeBadge } from '../ui/bits';
+import { FinalStatsRow } from '../ui/StatLines';
 
-function SetCard({ set, badge }: { set: SetEntry; badge: string | null }) {
+/**
+ * A set's description: two lines, and the rest on a tap (or on hover, in the
+ * tooltip) when it's longer, so no sheet has to scroll.
+ */
+function Description({ text }: { text: string }) {
+  const [open, setOpen] = useState(false);
+  const [clamped, setClamped] = useState(false);
+  const el = useRef<HTMLParagraphElement>(null);
+  useLayoutEffect(() => {
+    const p = el.current;
+    if (p && !open) setClamped(p.scrollHeight > p.clientHeight + 1);
+  }, [text, open]);
+  const tall = clamped || open;
   return (
-    <article className="card flex flex-col p-4" aria-label={set.label}>
+    <p
+      ref={el}
+      title={tall ? text : undefined}
+      role={tall ? 'button' : undefined}
+      tabIndex={tall ? 0 : undefined}
+      aria-expanded={tall ? open : undefined}
+      onClick={tall ? () => setOpen(!open) : undefined}
+      onKeyDown={
+        tall
+          ? (e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                setOpen(!open);
+              }
+            }
+          : undefined
+      }
+      className={clsx(
+        'mt-1.5 text-[14px] leading-snug text-muted',
+        !open && 'line-clamp-2',
+        tall && 'cursor-pointer',
+      )}
+    >
+      {text}
+    </p>
+  );
+}
+
+function SetCard({
+  species,
+  set,
+  badge,
+}: {
+  species: string;
+  set: SetEntry;
+  badge: string | null;
+}) {
+  return (
+    <article className="card flex flex-col p-3.5" aria-label={set.label}>
       <div className="flex items-start justify-between gap-2">
         <h3 className="display text-[16px] leading-tight">{set.label}</h3>
         {badge && (
@@ -31,9 +82,9 @@ function SetCard({ set, badge }: { set: SetEntry; badge: string | null }) {
           </span>
         )}
       </div>
-      <p className="mt-1.5 line-clamp-2 text-[14px] leading-snug text-muted">{set.description}</p>
-      <MoveList moves={set.moves} className="mt-3" />
-      <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-[13px]">
+      <Description key={set.id} text={set.description} />
+      <MoveList moves={set.moves} className="mt-2" />
+      <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-4 gap-y-0.5 text-[13px]">
         <dt className="text-muted">Item</dt>
         <dd className="font-medium">
           {set.item ? <Term name={set.item} desc={itemInfo(set.item)} kind="Item" /> : 'None'}
@@ -43,10 +94,11 @@ function SetCard({ set, badge }: { set: SetEntry; badge: string | null }) {
           <Term name={set.ability} desc={abilityInfo(set.ability)} kind="Ability" />
         </dd>
         <dt className="text-muted">Nature</dt>
-        <dd className="font-medium">{set.nature}</dd>
-        <dt className="text-muted">EVs</dt>
-        <dd className="font-medium">{formatEvs(set.evs)}</dd>
+        <dd className="font-medium">
+          {set.nature} · {formatEvs(set.evs)}
+        </dd>
       </dl>
+      <FinalStatsRow species={species} set={set} />
     </article>
   );
 }
@@ -96,8 +148,13 @@ export function SetPicker({
   };
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange} title={title ?? `${species} · pick a set`}>
-      <div className="mb-3 flex items-center gap-2">
+    <Sheet
+      open={open}
+      onOpenChange={onOpenChange}
+      title={title ?? `${species} · pick a set`}
+      scroll
+    >
+      <div className="mb-2 flex items-center gap-2">
         <img
           src={getSprite(species, 'icon')}
           alt=""
@@ -114,7 +171,7 @@ export function SetPicker({
         <div
           role="tablist"
           aria-label="Sets"
-          className="mb-3 grid gap-1 rounded-btn bg-surface-2 p-1"
+          className="mb-2 grid gap-1 rounded-btn bg-surface-2 p-1"
           style={{ gridTemplateColumns: `repeat(${sets.length}, minmax(0, 1fr))` }}
         >
           {sets.map((s, i) => (
@@ -137,7 +194,9 @@ export function SetPicker({
                 s.id === set.id ? 'bg-surface text-ink shadow-card' : 'text-muted',
               )}
             >
-              <span className="line-clamp-2">{shortLabel(s.label)}</span>
+              <span className="line-clamp-2" title={s.label}>
+                {shortLabel(s.label)}
+              </span>
             </button>
           ))}
         </div>
@@ -147,10 +206,10 @@ export function SetPicker({
         id="set-panel"
         aria-labelledby={sets.length > 1 ? `set-tab-${set.id}` : undefined}
       >
-        <SetCard set={set} badge={badge} />
+        <SetCard species={species} set={set} badge={badge} />
       </div>
       {onChoose && (
-        <Button className="mt-3 h-12 w-full" disabled={unchanged} onClick={() => onChoose(set.id)}>
+        <Button className="mt-2 h-12 w-full" disabled={unchanged} onClick={() => onChoose(set.id)}>
           {unchanged ? 'Current set' : chooseLabel}
         </Button>
       )}

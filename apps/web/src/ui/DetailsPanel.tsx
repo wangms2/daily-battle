@@ -11,11 +11,11 @@ import {
   setsOf,
   shortLabel,
   speciesInfo,
-  STAT_LABEL,
   topSet,
 } from '../lib/data';
 import { getSprite } from '../lib/sprites';
-import { MatchupRow, MAX_STAT } from '../sheets/InfoSheet';
+import { MatchupRow } from '../sheets/InfoSheet';
+import { StatLines } from './StatLines';
 import { Term } from './DetailCard';
 import { MoveList } from './MoveList';
 import { Button, TypeBadge } from './bits';
@@ -154,27 +154,7 @@ export function DetailsPanel({
           </dl>
         </div>
 
-        <dl className="space-y-1" aria-label="Base stats">
-          {Object.entries(info.baseStats).map(([k, v]) => (
-            <div
-              key={k}
-              className="grid grid-cols-[2.25rem_1.75rem_1fr] items-center gap-2 text-[13px]"
-            >
-              <dt className="text-muted">{STAT_LABEL[k]}</dt>
-              <dd className="text-right font-semibold tabular-nums">{v}</dd>
-              <dd className="h-1.5 overflow-hidden rounded-full bg-surface-2" aria-hidden>
-                <div
-                  className="h-full rounded-full"
-                  style={{
-                    width: `${Math.min(100, (100 * v) / MAX_STAT)}%`,
-                    background:
-                      v >= 100 ? 'var(--gold)' : v >= 70 ? 'var(--accent)' : 'var(--muted)',
-                  }}
-                />
-              </dd>
-            </div>
-          ))}
-        </dl>
+        <StatLines species={species} set={set} compact label="Base and final stats" />
 
         <div className="grid content-start gap-2 text-[13px]">
           <MatchupRow
