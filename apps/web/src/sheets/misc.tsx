@@ -1,7 +1,14 @@
 import { FORMATS, type FormatId } from '@daily-battle/data/formats';
 import clsx from 'clsx';
 import type { ReactNode } from 'react';
-import { CHECK_ITEMS, sharedWeaknesses, type Checklist } from '../lib/data';
+import type { SetEntry } from '@daily-battle/data';
+import {
+  CHECK_ITEMS,
+  defenseGaps,
+  offenseGaps,
+  sharedWeaknesses,
+  type Checklist,
+} from '../lib/data';
 import { getSprite } from '../lib/sprites';
 import type { Stats } from '../lib/results';
 import type { Settings } from '../state/schema';
@@ -24,6 +31,7 @@ export function WelcomeSheet({
   onFormat,
   onDone,
   onAbout,
+  review = false,
 }: {
   open: boolean;
   hints: boolean;
@@ -33,6 +41,8 @@ export function WelcomeSheet({
   onFormat: (format: FormatId) => void;
   onDone: () => void;
   onAbout: () => void;
+  /** Reopened from Settings as "How to play": the rules only, no game pick or hints switch. */
+  review?: boolean;
 }) {
   const rules = [
     ['Build a team', "Pick 6 of this week's 12 Pokémon. Your team carries over all week."],
@@ -46,7 +56,11 @@ export function WelcomeSheet({
     ],
   ];
   return (
-    <Sheet open={open} onOpenChange={(o) => !o && onDone()} title="Welcome to Daily Battle">
+    <Sheet
+      open={open}
+      onOpenChange={(o) => !o && onDone()}
+      title={review ? 'How to play' : 'Welcome to Daily Battle'}
+    >
       <ol className="space-y-3">
         {rules.map(([title, body], i) => (
           <li key={title} className="flex gap-3">
@@ -60,46 +74,56 @@ export function WelcomeSheet({
           </li>
         ))}
       </ol>
-      <fieldset className="mt-3">
-        <legend className="mb-2 text-[15px] font-semibold">
-          Pick your game <span className="font-normal text-muted">· you can switch later</span>
-        </legend>
-        <div role="radiogroup" aria-label="Game" className="grid grid-cols-2 gap-2">
-          {(Object.keys(FORMATS) as FormatId[]).map((id) => (
-            <button
-              key={id}
-              type="button"
-              role="radio"
-              aria-checked={format === id}
-              onClick={() => onFormat(id)}
-              className={clsx(
-                'card px-3 py-1.5 text-left',
-                format === id ? 'is-selected' : 'hover:bg-surface-2',
-              )}
-            >
-              <span className="block text-[15px] font-semibold">{FORMATS[id].name} OU</span>
-              <span className="block text-[12px] leading-snug text-muted">{GAME_BLURB[id]}</span>
+      {review ? (
+        <Button className="mt-4 w-full" onClick={onDone}>
+          Got it
+        </Button>
+      ) : (
+        <>
+          <fieldset className="mt-3">
+            <legend className="mb-2 text-[15px] font-semibold">
+              Pick your game <span className="font-normal text-muted">· you can switch later</span>
+            </legend>
+            <div role="radiogroup" aria-label="Game" className="grid grid-cols-2 gap-2">
+              {(Object.keys(FORMATS) as FormatId[]).map((id) => (
+                <button
+                  key={id}
+                  type="button"
+                  role="radio"
+                  aria-checked={format === id}
+                  onClick={() => onFormat(id)}
+                  className={clsx(
+                    'card px-3 py-1.5 text-left',
+                    format === id ? 'is-selected' : 'hover:bg-surface-2',
+                  )}
+                >
+                  <span className="block text-[15px] font-semibold">{FORMATS[id].name} OU</span>
+                  <span className="block text-[12px] leading-snug text-muted">
+                    {GAME_BLURB[id]}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </fieldset>
+          <div className="mt-3 rounded-card bg-surface-2 px-4 py-2">
+            <Switch
+              checked={hints}
+              onCheckedChange={onHints}
+              label="Beginner hints"
+              hint="Checklists and tips. You can turn these off in Settings."
+            />
+          </div>
+          <Button className="mt-4 w-full" onClick={onDone} disabled={!format}>
+            {format ? `Play ${FORMATS[format].name} OU` : 'Pick a game to start'}
+          </Button>
+          <p className="mt-3 text-center text-[12px] text-muted">
+            An unofficial fan project.{' '}
+            <button type="button" onClick={onAbout} className="font-semibold text-accent underline">
+              About and credits
             </button>
-          ))}
-        </div>
-      </fieldset>
-      <div className="mt-3 rounded-card bg-surface-2 px-4 py-2">
-        <Switch
-          checked={hints}
-          onCheckedChange={onHints}
-          label="Beginner hints"
-          hint="Checklists and tips. You can turn these off in Settings."
-        />
-      </div>
-      <Button className="mt-4 w-full" onClick={onDone} disabled={!format}>
-        {format ? `Play ${FORMATS[format].name} OU` : 'Pick a game to start'}
-      </Button>
-      <p className="mt-3 text-center text-[12px] text-muted">
-        An unofficial fan project.{' '}
-        <button type="button" onClick={onAbout} className="font-semibold text-accent underline">
-          About and credits
-        </button>
-      </p>
+          </p>
+        </>
+      )}
     </Sheet>
   );
 }
@@ -164,6 +188,7 @@ export function SettingsSheet({
   onChange,
   report,
   onAbout,
+  onHowToPlay,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -172,6 +197,7 @@ export function SettingsSheet({
   /** The playtest report text, copied by the button. */
   report: string;
   onAbout: () => void;
+  onHowToPlay: () => void;
 }) {
   const speeds: Settings['battleSpeed'][] = ['slow', 'normal', 'fast'];
   return (
@@ -214,12 +240,15 @@ export function SettingsSheet({
         />
       </div>
       <div className="mt-3 grid grid-cols-2 gap-2">
-        <TextShareButton text={report} variant="secondary">
-          Copy playtest report
-        </TextShareButton>
+        <Button variant="secondary" onClick={onHowToPlay}>
+          How to play
+        </Button>
         <Button variant="secondary" onClick={onAbout}>
           About and credits
         </Button>
+        <TextShareButton text={report} variant="secondary" className="col-span-2">
+          Copy playtest report
+        </TextShareButton>
       </div>
       <p className="mt-3 text-[12px] leading-relaxed text-muted">
         An unofficial, free fan project, not affiliated with Nintendo or Smogon. The playtest report
@@ -233,14 +262,19 @@ export function TeamCheckSheet({
   open,
   onOpenChange,
   team,
+  sets,
   checks,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   team: string[];
+  /** The team's sets, for attack coverage. */
+  sets: SetEntry[];
   checks: Checklist;
 }) {
   const shared = sharedWeaknesses(team);
+  const noHit = team.length ? offenseGaps(sets) : [];
+  const exposed = defenseGaps(team);
   return (
     <Sheet open={open} onOpenChange={onOpenChange} title="Team checklist">
       <ul className="space-y-1.5">
@@ -264,6 +298,33 @@ export function TeamCheckSheet({
           </li>
         ))}
       </ul>
+      {noHit.length > 0 && (
+        <>
+          <h3 className="mt-4 mb-1.5 text-[13px] font-semibold text-muted">
+            No super-effective hit on
+          </h3>
+          <div className="flex flex-wrap gap-1">
+            {noHit.map((t) => (
+              <TypeBadge key={t} type={t} />
+            ))}
+          </div>
+        </>
+      )}
+      {exposed.length > 0 && (
+        <>
+          <h3 className="mt-4 mb-1.5 text-[13px] font-semibold text-muted">
+            Weak, and nothing resists
+          </h3>
+          <ul className="space-y-1">
+            {exposed.map(({ type, species }) => (
+              <li key={type} className="flex items-center gap-2 text-[13px]">
+                <TypeBadge type={type} />
+                <span className="truncate text-muted">{species.join(', ')}</span>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
       <h3 className="mt-4 mb-2 text-[13px] font-semibold text-muted">Shared weaknesses</h3>
       {shared.length ? (
         <ul className="space-y-2">

@@ -5,7 +5,16 @@
 import type { SetEntry } from '@daily-battle/data';
 import clsx from 'clsx';
 import { useRef, useState, type KeyboardEvent } from 'react';
-import { formatEvs, setsOf, shortLabel, speciesInfo, topSet } from '../lib/data';
+import {
+  abilityInfo,
+  formatEvs,
+  itemInfo,
+  setsOf,
+  shortLabel,
+  speciesInfo,
+  topSet,
+} from '../lib/data';
+import { Term } from '../ui/DetailCard';
 import { getSprite } from '../lib/sprites';
 import { Sheet } from '../ui/Sheet';
 import { MoveList } from '../ui/MoveList';
@@ -26,9 +35,13 @@ function SetCard({ set, badge }: { set: SetEntry; badge: string | null }) {
       <MoveList moves={set.moves} className="mt-3" />
       <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-[13px]">
         <dt className="text-muted">Item</dt>
-        <dd className="font-medium">{set.item || 'None'}</dd>
+        <dd className="font-medium">
+          {set.item ? <Term name={set.item} desc={itemInfo(set.item)} kind="Item" /> : 'None'}
+        </dd>
         <dt className="text-muted">Ability</dt>
-        <dd className="font-medium">{set.ability}</dd>
+        <dd className="font-medium">
+          <Term name={set.ability} desc={abilityInfo(set.ability)} kind="Ability" />
+        </dd>
         <dt className="text-muted">Nature</dt>
         <dd className="font-medium">{set.nature}</dd>
         <dt className="text-muted">EVs</dt>

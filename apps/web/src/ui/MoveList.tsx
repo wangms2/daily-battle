@@ -2,49 +2,27 @@
 // mouse) shows a small card above it: type, category, power, accuracy, PP,
 // and one line on what it does. A tap elsewhere or Escape closes it.
 import clsx from 'clsx';
-import { useEffect, useRef, useState } from 'react';
+import type { CSSProperties } from 'react';
 import { moveInfo } from '../lib/data';
+import { TYPE_COLORS } from '../lib/types';
 import { TypeBadge } from './bits';
+import { DetailCardBox } from './DetailCard';
+import { useDetailCards } from './useDetailCards';
 
 export function MoveList({ moves, className }: { moves: string[]; className?: string }) {
-  const [open, setOpen] = useState<{ i: number; pinned: boolean } | null>(null);
-  const list = useRef<HTMLUListElement>(null);
-
-  useEffect(() => {
-    if (!open?.pinned) return;
-    const away = (e: PointerEvent) => {
-      if (!list.current?.contains(e.target as Node)) setOpen(null);
-    };
-    document.addEventListener('pointerdown', away, true);
-    return () => document.removeEventListener('pointerdown', away, true);
-  }, [open?.pinned]);
-
+  const { container, isOpen, trigger } = useDetailCards<HTMLUListElement>();
   return (
-    <ul ref={list} className={clsx('grid grid-cols-2 gap-1.5', className)} aria-label="Moves">
+    <ul ref={container} className={clsx('grid grid-cols-2 gap-1.5', className)} aria-label="Moves">
       {moves.map((m, i) => {
-        const shown = open?.i === i;
+        const shown = isOpen(i);
         return (
           <li key={m} className="relative min-w-0">
             <button
               type="button"
-              aria-expanded={shown}
+              {...trigger(i)}
               aria-describedby={shown ? `move-info-${i}` : undefined}
-              onClick={() => setOpen(shown && open.pinned ? null : { i, pinned: true })}
-              onPointerEnter={(e) =>
-                e.pointerType === 'mouse' && !open?.pinned && setOpen({ i, pinned: false })
-              }
-              onPointerLeave={(e) => e.pointerType === 'mouse' && !open?.pinned && setOpen(null)}
-              onKeyDown={(e) => {
-                // Close the card, not the sheet around it.
-                if (e.key === 'Escape' && open) {
-                  e.stopPropagation();
-                  setOpen(null);
-                }
-              }}
-              className={clsx(
-                'w-full truncate rounded-badge px-2.5 py-1.5 text-left text-[13px] font-medium',
-                shown ? 'bg-accent-soft text-soft-ink' : 'bg-surface-2 hover:bg-accent-soft/60',
-              )}
+              className="move-chip w-full truncate rounded-badge px-2.5 py-1.5 text-left text-[13px] font-medium"
+              style={typeStyle(m)}
             >
               {m}
             </button>
@@ -52,6 +30,27 @@ export function MoveList({ moves, className }: { moves: string[]; className?: st
           </li>
         );
       })}
+    </ul>
+  );
+}
+
+/** A move's type color as the `--type` the chip styles read. */
+const typeStyle = (move: string) =>
+  ({ '--type': TYPE_COLORS[moveInfo(move)?.type ?? '']?.bg ?? '#9fa19f' }) as CSSProperties;
+
+/** Moves as small type-tinted chips, without details (battle cards). */
+export function MoveChips({ moves, className }: { moves: string[]; className?: string }) {
+  return (
+    <ul className={clsx('flex flex-wrap gap-1', className)} aria-label="Moves">
+      {moves.map((m) => (
+        <li
+          key={m}
+          className="move-chip rounded-badge px-1.5 py-0.5 text-[12px] leading-4 font-medium"
+          style={typeStyle(m)}
+        >
+          {m}
+        </li>
+      ))}
     </ul>
   );
 }
@@ -72,14 +71,7 @@ function MoveCard({ id, name, right }: { id: string; name: string; right: boolea
     move.contact && 'Contact',
   ].filter(Boolean);
   return (
-    <div
-      id={id}
-      role="tooltip"
-      className={clsx(
-        'card absolute bottom-full z-20 mb-1.5 w-64 max-w-[calc(200%+0.375rem)] p-2.5 text-left shadow-lg',
-        right ? 'right-0' : 'left-0',
-      )}
-    >
+    <DetailCardBox id={id} right={right} className="max-w-[calc(200%+0.375rem)]">
       <div className="flex items-center gap-1.5">
         <span className="truncate text-[14px] font-semibold">{name}</span>
         <TypeBadge type={move.type} size="sm" />
@@ -97,6 +89,6 @@ function MoveCard({ id, name, right }: { id: string; name: string; right: boolea
         {notes.length > 0 && <span className="text-muted">{notes.join(' · ')}</span>}
       </div>
       <p className="mt-1 text-[13px] leading-snug">{move.desc}</p>
-    </div>
+    </DetailCardBox>
   );
 }

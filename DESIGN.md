@@ -353,7 +353,7 @@ Other headlines: `❌ Not cleared in 3 tries` (with `🔥 Streak reset`), `✅ W
 
 Goals: fast, tactile, and clear to someone new to competitive Pokémon. The whole flow should take under a minute.
 
-- **Pool:** the 12 as large cards: sprite, name, type badges, and a role tag or two. Tap a card to add it to the next empty slot; tap again to remove. Six slots stay visible at the bottom with a "4/6" count. Interactions are instant and snappy; no heavy animation.
+- **Pool:** the 12 as large cards: sprite, name, type badges, and a role tag or two. Tap a card to add it; tap again to remove. Picked cards are highlighted with their slot number, and a pencil on them changes the set (there's no separate team row on phones: order doesn't matter, since the lead is picked each day). A second form of a Pokémon already on the team (Rotom-Wash with Rotom-Frost) is dimmed, per Species Clause. Interactions are instant and snappy; no heavy animation.
 - **Set picker:** adding a Pokémon opens the picker straight away; tapping a team member opens it to change the set. Short tabs across the top name each set ("Scarf", "Swords Dance"); below, the selected set's card shows the role name ("Choice Scarf attacker"), a one-line description, the four moves, and the item, ability, nature, and EVs, with nothing to flip or scroll. The current set, or else the most used one (badged "Most used"), starts selected, so one tap on "Add Heatran" / "Use this set" confirms it. Closing the prompt adds nothing. No usage numbers. Tapping a move (or hovering it with a mouse) shows a small card above it with its type, category, power, accuracy, PP, priority/contact, and one line on what it does; a tap elsewhere closes it. The move facts ship in `species.json` so the builder never loads the simulator.
 - **Wide screens (≥900px):** the pool is a 3×4 grid of compact row cards (sprite, name, types, role), with a details panel under it in place of the info sheet and set picker. Clicking a card adds it with the most used set (or the set previewed in the panel) and shows it in the panel; its ⓘ or the team panel's Change just shows it. The panel has the set tabs, the selected set's moves, item, ability, nature and EVs, base stats, matchups, and Add/Remove. For a team member, choosing a tab changes its set at once.
 - **Suggested teams:** a row of 2–3 suggested teams labeled by archetype (e.g. Balanced, Offense, Stall), under a "Suggested teams · Pick one to fill your team" heading so the chips explain themselves. Selecting one fills the slots, and the team stays fully editable. These come from simulation-validated candidates (§9.2); the player chooses to use one, it is never applied automatically.
@@ -367,7 +367,7 @@ Mirror Pokémon Showdown's battle layout and flow, simplified where it makes sen
 - **Layout (Showdown-style):** field with both active Pokémon, HP bars (name, level, HP %, status and stat-boost badges), weather and hazard indicators, a move grid (name, type color, PP), a switch row with team icons, and Showdown's text battle log visible beside or below the field (stacked on mobile).
 - **Improved for mobile (M7.1):** the field keeps the Gen 4 scene's shape on phones, and the log takes the spare height below it (newest at the bottom, the whole battle scrollable inside it, expandable to a full sheet) instead of Showdown's chat-sidebar log and one-line message box. Floating result labels ("−24%", "Paralyzed", "Item knocked off") and ability/item pop-ups replace the in-field message box. The foe's HP bar carries six team marks: revealed Pokémon as icons, unrevealed as Poké Balls, fainted greyed. Your own team shows on the bench row, so your bar has none. Details open as a small card, not a full sheet.
 - **Simplified vs Showdown:** no timer, chat, user list, ladder rating, or spectators. No team preview screen. Forfeit is a "Give up" item in a menu.
-- **Tooltips:** tap (or hover on desktop) a Pokémon for Showdown-style details. For the opponent, show only revealed information: types, HP %, status, boosts, revealed moves, and the item or ability if revealed. No "usually runs" or usage hints. Own Pokémon show full info.
+- **Tooltips:** tap (or hover on desktop) a Pokémon for Showdown-style details. For the opponent, show only revealed information: types, HP %, status, boosts, revealed moves, and the item or ability if revealed; with Beginner hints on, also its still-possible sets (§12.2c). No usage hints. Own Pokémon show full info, except the active one's moves, which the move buttons already show. Moves anywhere outside the move buttons are chips tinted by type, and items and abilities open a details card on tap, like moves.
 - **Move details:** hover (desktop) or press (touch) a move, Showdown-style. On touch the card shows about 150ms into a press: lift before ~450ms and the tap chooses the move (the card goes); hold past it and the card stays open without choosing, until the next tap anywhere. It shows type, category, power, accuracy, PP, the move's description (the full Gen 4 text up to ~280 characters, else the summary), priority, and contact; with hints on, its effectiveness against the opposing active Pokémon.
 - **Pacing (quick, like Showdown):**
   - Speeds are Slow / Normal / Fast (about 1150 / 800 / 450 ms per line), Normal by default, always reachable from the top bar. (An instant mode exists for automated tests only.)
@@ -387,7 +387,16 @@ When on:
 - **Speed range** line in Pokémon tooltips.
 - **Team-builder checklist** and shared-weakness list (§12.2a).
 
-Never included: damage ranges, or usage-based set hints for the opponent.
+- **Possible sets for the opponent:** an opponent's info on the brief lists the sets it might run (as tabs: moves, item, ability), and in battle its card lists the sets still possible given what it has revealed. No usage numbers or weights.
+- **Coverage** in the team checklist: types none of your attacks hits super effectively, and types three or more of your team are weak to with nothing resisting (immunity abilities like Levitate count).
+
+Never included: damage ranges, or usage numbers for the opponent's sets. With hints off, the opponent's sets stay hidden, as on Showdown.
+
+### 12.2d Sheets and settings
+
+- Bottom sheets close by swiping down from the handle or header (past 30% of their height, or a flick), as well as with ✕, a tap outside, or Back.
+- Settings has **How to play**, which reopens the welcome sheet's rules.
+- With **Animations** off (or the system asking for reduced motion), every sprite is a still image: the first frame of its GIF, from `sprites/front-still/` and `back-still/`.
 
 ### 12.3 Rendering the battle
 

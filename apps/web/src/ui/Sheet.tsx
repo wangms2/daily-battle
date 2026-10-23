@@ -4,6 +4,8 @@ import * as Dialog from '@radix-ui/react-dialog';
 import clsx from 'clsx';
 import type { ReactNode } from 'react';
 import { CloseIcon } from './icons';
+import { useSwipeToClose } from './useSwipeToClose';
+import { useWide } from './useWide';
 
 export function Sheet({
   open,
@@ -26,11 +28,15 @@ export function Sheet({
   wide?: boolean;
   hideTitle?: boolean;
 }) {
+  // Phones get a bottom sheet with a handle that drags it closed; wide screens a dialog.
+  const wideScreen = useWide();
+  const { sheet, handlers } = useSwipeToClose(() => onOpenChange(false), !wideScreen);
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay className="animate-fade-in fixed inset-0 z-40 bg-black/45" />
         <Dialog.Content
+          ref={sheet}
           aria-describedby={description ? undefined : undefined}
           className={clsx(
             'animate-sheet-in fixed z-50 flex flex-col bg-surface text-ink shadow-card outline-none',
@@ -39,27 +45,30 @@ export function Sheet({
             wide ? 'wide:w-[min(960px,92vw)]' : 'wide:w-[440px]',
           )}
         >
-          <div className="mx-auto mt-2 h-1.5 w-10 rounded-full bg-line wide:hidden" aria-hidden />
-          <div
-            className={clsx(
-              'flex items-start justify-between gap-3 px-5 pt-3',
-              hideTitle && 'sr-only',
-            )}
-          >
-            <div>
-              <Dialog.Title className="display text-[17px]">{title}</Dialog.Title>
-              {description && (
-                <Dialog.Description className="mt-0.5 text-[14px] text-muted">
-                  {description}
-                </Dialog.Description>
+          {/* The handle and header are the drag area for swiping the sheet closed. */}
+          <div {...handlers} className={clsx(!wideScreen && 'touch-none')}>
+            <div className="mx-auto mt-2 h-1.5 w-10 rounded-full bg-line wide:hidden" aria-hidden />
+            <div
+              className={clsx(
+                'flex items-start justify-between gap-3 px-5 pt-3',
+                hideTitle && 'sr-only',
               )}
-            </div>
-            <Dialog.Close
-              className="-mr-2 grid size-10 shrink-0 place-items-center rounded-full text-muted hover:bg-surface-2"
-              aria-label="Close"
             >
-              <CloseIcon />
-            </Dialog.Close>
+              <div>
+                <Dialog.Title className="display text-[17px]">{title}</Dialog.Title>
+                {description && (
+                  <Dialog.Description className="mt-0.5 text-[14px] text-muted">
+                    {description}
+                  </Dialog.Description>
+                )}
+              </div>
+              <Dialog.Close
+                className="-mr-2 grid size-10 shrink-0 place-items-center rounded-full text-muted hover:bg-surface-2"
+                aria-label="Close"
+              >
+                <CloseIcon />
+              </Dialog.Close>
+            </div>
           </div>
           {!description && <Dialog.Description className="sr-only">{title}</Dialog.Description>}
           <div

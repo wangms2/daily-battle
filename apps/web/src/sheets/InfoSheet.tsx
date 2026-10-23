@@ -1,9 +1,21 @@
 // What a Pokémon is good for, before you commit to it. For the opponent it
-// shows species facts only: never sets or usage.
-import { matchups, setsOf, speciesInfo, STAT_LABEL } from '../lib/data';
+// shows species facts, plus its possible sets with Beginner hints on; never usage.
+import { useState } from 'react';
+import {
+  abilityInfo,
+  itemInfo,
+  matchups,
+  possibleSets,
+  setsOf,
+  shortLabel,
+  speciesInfo,
+  STAT_LABEL,
+} from '../lib/data';
 import { getSprite } from '../lib/sprites';
 import { Sheet } from '../ui/Sheet';
 import { Button, TypeBadge } from '../ui/bits';
+import { Term } from '../ui/DetailCard';
+import { MoveList } from '../ui/MoveList';
 
 export const MAX_STAT = 160;
 
@@ -12,6 +24,7 @@ export function InfoSheet({
   open,
   onOpenChange,
   showRoles = true,
+  showPossibleSets = false,
   action,
 }: {
   species: string | null;
@@ -19,6 +32,8 @@ export function InfoSheet({
   onOpenChange: (open: boolean) => void;
   /** Off for opponents: their sets are hidden. */
   showRoles?: boolean;
+  /** An opponent with Beginner hints on: the sets it might be running. */
+  showPossibleSets?: boolean;
   action?: { label: string; onClick: () => void; disabled?: boolean };
 }) {
   if (!species) return null;
@@ -58,6 +73,8 @@ export function InfoSheet({
           </div>
         ))}
       </dl>
+
+      {showPossibleSets && <PossibleSets key={species} species={species} />}
 
       {showRoles && (
         <div className="mt-4">
@@ -117,6 +134,43 @@ export function MatchupRow({
         ) : (
           <span className="text-muted">None</span>
         )}
+      </div>
+    </div>
+  );
+}
+
+/** An opponent's possible sets as tabs, one shown at a time so the sheet stays short. */
+function PossibleSets({ species }: { species: string }) {
+  const sets = possibleSets(species);
+  const [i, setI] = useState(0);
+  const set = sets[i] ?? sets[0];
+  if (!set) return null;
+  return (
+    <div className="mt-4">
+      <h3 className="text-[13px] font-semibold text-muted">Possible sets</h3>
+      <div role="tablist" aria-label="Possible sets" className="mt-1.5 flex flex-wrap gap-1.5">
+        {sets.map((s, k) => (
+          <button
+            key={s.id}
+            type="button"
+            role="tab"
+            aria-selected={k === i}
+            onClick={() => setI(k)}
+            className={`rounded-full px-2.5 py-1 text-[13px] font-medium ${
+              k === i ? 'bg-accent text-on-accent' : 'bg-surface-2'
+            }`}
+          >
+            {shortLabel(s.label)}
+          </button>
+        ))}
+      </div>
+      <div role="tabpanel" aria-label={set.label} className="mt-2">
+        <MoveList moves={set.moves} />
+        <p className="mt-1.5 text-[13px] text-muted">
+          {set.item && <Term name={set.item} desc={itemInfo(set.item)} kind="Item" />}
+          {set.item && ' · '}
+          <Term name={set.ability} desc={abilityInfo(set.ability)} kind="Ability" right />
+        </p>
       </div>
     </div>
   );

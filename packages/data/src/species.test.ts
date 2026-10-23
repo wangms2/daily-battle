@@ -19,6 +19,15 @@ describe.each(Object.keys(FORMATS) as FormatId[])('%s/species.json', (format) =>
     expect(speciesData.typeChart['Ghost']!['Steel']).toBe(0.5);
   });
 
+  it('describes every item and ability the sets use', () => {
+    for (const entry of Object.values(setsFor(format).species)) {
+      for (const s of entry.sets) {
+        if (s.item) expect(speciesData.items[s.item], s.item).toBeTruthy();
+        expect(speciesData.abilities[s.ability], s.ability).toBeTruthy();
+      }
+    }
+  });
+
   it("has the generation's typings (Rotom's forms took their own types in Gen 5)", () => {
     const expected = { gen4ou: ['Electric', 'Ghost'], gen5ou: ['Electric', 'Water'] }[format];
     expect(speciesData.species['Rotom-Wash']!.types).toEqual(expected);

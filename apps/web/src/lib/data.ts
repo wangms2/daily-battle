@@ -53,6 +53,30 @@ export function findSet(slot: Slot): SetEntry | undefined {
   return sets.find((s) => s.id === slot.setId) ?? (sets.length ? topSet(slot.species) : undefined);
 }
 
+/**
+ * The species' sets that fit what a foe has shown: every revealed move, and
+ * its item and ability if revealed. For Beginner hints only, and never with
+ * usage. If nothing fits (an item was swapped by Trick, say), the item stops
+ * counting; past that, every set stays possible.
+ */
+export function possibleSets(
+  species: string,
+  revealed?: { moves: string[]; item: string; ability: string },
+): SetEntry[] {
+  const all = setsOf(species);
+  if (!revealed) return all;
+  // Hidden Power shows by type in some places and not others; any typed one matches.
+  const id = (m: string) => toId(m).replace(/^hiddenpower[a-z]*$/, 'hiddenpower');
+  const fits = (set: SetEntry, checkItem: boolean) =>
+    revealed.moves.every((m) => set.moves.some((x) => id(x) === id(m))) &&
+    (!checkItem || !revealed.item || toId(set.item) === toId(revealed.item)) &&
+    (!revealed.ability || toId(set.ability) === toId(revealed.ability));
+  const strict = all.filter((s) => fits(s, true));
+  if (strict.length) return strict;
+  const loose = all.filter((s) => fits(s, false));
+  return loose.length ? loose : all;
+}
+
 /** The most common set for a species (what a tap on a pool tile picks). */
 export function topSet(species: string): SetEntry {
   return [...setsOf(species)].sort((a, b) => b.weight - a.weight)[0]!;
@@ -136,6 +160,52 @@ export function sharedWeaknesses(team: string[]): { type: string; species: strin
     .sort((a, b) => b.species.length - a.species.length);
 }
 
+/** Damaging moves whose type doesn't change the damage (fixed or reflected). */
+const TYPELESS_DAMAGE = [
+  'Seismic Toss',
+  'Night Shade',
+  'Super Fang',
+  'Endeavor',
+  'Counter',
+  'Mirror Coat',
+  'Metal Burst',
+  'Psywave',
+  'Final Gambit',
+];
+
+/** Types none of the team's attacks hits super effectively. */
+export function offenseGaps(team: SetEntry[]): string[] {
+  const attacking = new Set<string>();
+  for (const set of team) {
+    for (const m of set.moves) {
+      const info = moveInfo(m);
+      if (info && info.category !== 'Status' && !TYPELESS_DAMAGE.includes(m))
+        attacking.add(info.type);
+    }
+  }
+  return allTypes().filter(
+    (def) => ![...attacking].some((atk) => (speciesData.typeChart[atk]?.[def] ?? 1) > 1),
+  );
+}
+
+/**
+ * Types three or more of the team are weak to with no one resisting or immune
+ * (immunity abilities like Levitate count, as in `matchups`).
+ */
+export function defenseGaps(team: string[]): { type: string; species: string[] }[] {
+  const all = team.map((s) => ({ s, m: matchups(s) }));
+  return allTypes()
+    .map((type) => ({
+      type,
+      species: all.filter(({ m }) => m.weak.some((w) => w.type === type)).map(({ s }) => s),
+      covered: all.some(
+        ({ m }) => m.immune.includes(type) || m.resist.some((r) => r.type === type),
+      ),
+    }))
+    .filter((g) => g.species.length >= 3 && !g.covered)
+    .map(({ type, species }) => ({ type, species }));
+}
+
 const HAZARDS = ['Stealth Rock', 'Spikes', 'Toxic Spikes'];
 const REMOVAL = ['Rapid Spin', 'Defog'];
 const isBulky = (s: SetEntry) => s.evs.hp >= 200 && Math.max(s.evs.def, s.evs.spd) >= 160;
@@ -193,6 +263,12 @@ export function shortLabel(label: string): string {
     .replace(/\(physically defensive\)/, '(Phys. def.)')
     .replace(/\(specially defensive\)/, '(Spec. def.)');
 }
+
+/** What an item does (any item a set holds). */
+export const itemInfo = (name: string): string | undefined => speciesData.items[name];
+
+/** What an ability does (any ability a set has). */
+export const abilityInfo = (name: string): string | undefined => speciesData.abilities[name];
 
 /** What a set's move does (any move a set uses). */
 export function moveInfo(name: string): MoveInfo | undefined {

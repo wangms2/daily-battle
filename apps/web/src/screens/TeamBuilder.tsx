@@ -10,7 +10,7 @@ import { ConfirmDialog, TeamCheckSheet } from '../sheets/misc';
 import { InfoSheet } from '../sheets/InfoSheet';
 import { SetPicker } from '../sheets/SetPicker';
 import { Button, SectionLabel } from '../ui/bits';
-import { CheckIcon, ChevronIcon, CloseIcon, PencilIcon } from '../ui/icons';
+import { CheckIcon, ChevronIcon, CloseIcon } from '../ui/icons';
 import { PokemonRow, PokemonTile, SlotBadge } from '../ui/PokemonTile';
 import { DetailsPanel } from '../ui/DetailsPanel';
 import { useWide } from '../ui/useWide';
@@ -251,7 +251,9 @@ export function TeamBuilder({
             pop={popped === species}
             badge={i >= 0 ? <SlotBadge n={i + 1} /> : undefined}
             onTap={() => toggle(species)}
-            onInfo={() => setInfoFor(species)}
+            onInfo={i < 0 ? () => setInfoFor(species) : undefined}
+            onEdit={i >= 0 ? () => setPickerFor(species) : undefined}
+            editLabel={i >= 0 ? `${species}, ${findSet(team[i]!)?.label}. Change set` : undefined}
             label={
               i >= 0
                 ? `Remove ${species} from team`
@@ -339,40 +341,10 @@ export function TeamBuilder({
           {suggestions}
           {poolGrid}
           {checklistRow}
-          <div
-            key={shake}
-            className={clsx('grid h-16 shrink-0 grid-cols-6 gap-1.5', shake > 0 && 'animate-shake')}
-            role="group"
-            aria-label={`Your team, ${team.length} of 6`}
-          >
-            {traySlots.map((slot, i) =>
-              slot ? (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => setPickerFor(slot.species)}
-                  aria-label={`${slot.species}, ${findSet(slot)?.label}. Change set`}
-                  className="card relative grid place-items-center"
-                >
-                  <img
-                    src={getSprite(slot.species, 'icon')}
-                    alt=""
-                    className="pixelated h-9 w-12 object-contain"
-                  />
-                  <span className="absolute right-0.5 bottom-0.5 grid size-4 place-items-center rounded-full bg-accent text-on-accent">
-                    <PencilIcon width={9} height={9} />
-                  </span>
-                </button>
-              ) : (
-                <div
-                  key={i}
-                  className="rounded-card border-2 border-dashed border-line"
-                  aria-hidden
-                />
-              ),
-            )}
+          {/* No team row here: picked tiles are highlighted, and their pencil changes the set. */}
+          <div key={shake} className={clsx('shrink-0', shake > 0 && 'animate-shake')}>
+            {lockButton}
           </div>
-          {lockButton}
         </main>
       )}
 
@@ -426,6 +398,7 @@ export function TeamBuilder({
         open={checklistOpen}
         onOpenChange={setChecklistOpen}
         team={team.map((s) => s.species)}
+        sets={team.map((s) => findSet(s)).filter((s) => !!s)}
         checks={checks}
       />
       <ConfirmDialog

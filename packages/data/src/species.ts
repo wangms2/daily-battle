@@ -31,6 +31,10 @@ export interface SpeciesFile {
   species: Record<string, SpeciesInfo>;
   /** Every move a set uses, by name as the sets spell it. */
   moves: Record<string, MoveInfo>;
+  /** Every item a set holds: one line on what it does, in the format's generation. */
+  items: Record<string, string>;
+  /** Every ability a set has: one line on what it does. */
+  abilities: Record<string, string>;
   /** typeChart[attacking][defending] = damage multiplier (17 types through Gen 5). */
   typeChart: Record<string, Record<string, number>>;
 }
@@ -67,6 +71,24 @@ export function buildSpecies(sets: SetsFile): SpeciesFile {
         text === m ? m.shortDesc || m.desc : `Type set by the user's IVs: ${m.type} on this set.`,
     };
   }
+  const all = Object.values(sets.species).flatMap((e) => e.sets);
+  const describe = (kind: 'items' | 'abilities', names: string[]) => {
+    const out: Record<string, string> = {};
+    for (const name of [...new Set(names.filter(Boolean))].sort()) {
+      const e = dex[kind].get(name);
+      if (!e.exists) throw new Error(`Unknown ${kind} in sets: ${name}`);
+      out[name] = e.shortDesc || e.desc;
+    }
+    return out;
+  };
+  const items = describe(
+    'items',
+    all.map((s) => s.item),
+  );
+  const abilities = describe(
+    'abilities',
+    all.map((s) => s.ability),
+  );
   const types = dex.types.names();
   const typeChart: SpeciesFile['typeChart'] = {};
   for (const attacking of types) {
@@ -77,5 +99,5 @@ export function buildSpecies(sets: SetsFile): SpeciesFile {
         : 2 ** dex.getEffectiveness(attacking, [defending]);
     }
   }
-  return { species, moves, typeChart };
+  return { species, moves, items, abilities, typeChart };
 }

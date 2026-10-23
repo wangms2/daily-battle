@@ -1,10 +1,13 @@
 // Downloads the sprites the client ships (DESIGN.md §12.3a): animated
 // Showdown-style front and back GIFs plus a box icon for every species in
 // every format's set data (one shared folder: a species looks the same in each). Files are committed and self-hosted; nothing is hotlinked.
+// Also writes a still first frame of each front and back GIF for when
+// animations are off.
 //   pnpm --filter web sprites [--force]
-import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { FORMATS, setsFor } from '@daily-battle/data';
+import { chromium } from '@playwright/test';
 
 const RAW = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon';
 const SOURCES = {
@@ -16,6 +19,8 @@ const SOURCES = {
   ],
 };
 const EXT = { front: 'gif', back: 'gif', icons: 'png' } as const;
+/** Where each animated kind's still first frames go. */
+const STILL = { front: 'front-still', back: 'back-still' } as const;
 
 const force = process.argv.includes('--force');
 const out = (dir: string) => fileURLToPath(new URL(`../public/sprites/${dir}/`, import.meta.url));
@@ -71,5 +76,34 @@ for (const species of allSpecies) {
 if (missing.length) {
   console.error(`Missing: ${missing.join(', ')}`);
   process.exit(1);
+}
+
+// Still versions (the first frame as a PNG) for when animations are off. A
+// browser draws an animated GIF's first frame to a canvas right after it loads.
+const stills = (Object.keys(STILL) as (keyof typeof STILL)[]).flatMap((kind) =>
+  allSpecies
+    .map((species) => ({ kind, id: toId(species) }))
+    .filter(({ kind, id }) => force || !existsSync(`${out(STILL[kind])}${id}.png`)),
+);
+if (stills.length) {
+  for (const dir of Object.values(STILL)) mkdirSync(out(dir), { recursive: true });
+  const browser = await chromium.launch();
+  const page = await browser.newPage();
+  for (const { kind, id } of stills) {
+    const gif = readFileSync(`${out(kind)}${id}.gif`).toString('base64');
+    const png = await page.evaluate(async (src) => {
+      const img = new Image();
+      img.src = src;
+      await img.decode();
+      const canvas = document.createElement('canvas');
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      canvas.getContext('2d')!.drawImage(img, 0, 0);
+      return canvas.toDataURL('image/png').split(',')[1]!;
+    }, `data:image/gif;base64,${gif}`);
+    writeFileSync(`${out(STILL[kind])}${id}.png`, Buffer.from(png, 'base64'));
+  }
+  await browser.close();
+  console.log(`Wrote ${stills.length} still sprites.`);
 }
 console.log('All sprites present.');

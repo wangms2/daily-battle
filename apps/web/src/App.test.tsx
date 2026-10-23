@@ -489,3 +489,54 @@ describe('Gen 5 news', () => {
     expect(screen.queryByRole('dialog', { name: 'New: Gen 5 OU' })).not.toBeInTheDocument();
   });
 });
+
+describe('playtest feedback', () => {
+  const foe = () => schedule.days.find((d) => d.day === '2026-10-21')!.team[0]!.species;
+
+  it('lists an opponent’s possible sets with Beginner hints on, and not with them off', async () => {
+    const user = userEvent.setup();
+    const { unmount } = renderApp(seeded({ team: { week: WEEK } }));
+    await user.click(await screen.findByRole('button', { name: `About ${foe()}` }));
+    const info = await screen.findByRole('dialog', { name: foe() });
+    const tabs = within(info).getAllByRole('tab');
+    expect(tabs.length).toBe(sets.species[foe()]!.sets.length);
+    unmount();
+
+    renderApp(seeded({ hints: false, team: { week: WEEK } }));
+    await user.click(await screen.findByRole('button', { name: `About ${foe()}` }));
+    const plain = await screen.findByRole('dialog', { name: foe() });
+    expect(within(plain).queryByRole('tab')).not.toBeInTheDocument();
+    expect(plain).not.toHaveTextContent('Possible sets');
+  });
+
+  it('puts Cancel on the change chip, next to the team, and nowhere else', async () => {
+    const user = userEvent.setup();
+    renderApp(seeded({ team: { week: WEEK } }));
+    await user.click(await screen.findByRole('button', { name: '1 change left' }));
+    expect(screen.getAllByRole('button', { name: 'Cancel' })).toHaveLength(1);
+    await user.click(screen.getByRole('button', { name: 'Cancel' }));
+    expect(screen.getByRole('button', { name: '1 change left' })).toBeInTheDocument();
+  });
+
+  it('reopens the rules from Settings as How to play', async () => {
+    const user = userEvent.setup();
+    renderApp(seeded());
+    await user.click(await screen.findByRole('button', { name: 'Settings' }));
+    await user.click(screen.getByRole('button', { name: 'How to play' }));
+    const how = await screen.findByRole('dialog', { name: 'How to play' });
+    expect(how).toHaveTextContent('Win on your first try');
+    expect(within(how).queryByRole('radio')).not.toBeInTheDocument();
+    await user.click(within(how).getByRole('button', { name: 'Got it' }));
+    expect(screen.queryByRole('dialog', { name: 'How to play' })).not.toBeInTheDocument();
+  });
+
+  it('changes a picked Pokémon’s set from the pencil on its tile', async () => {
+    const user = userEvent.setup();
+    renderApp(seeded());
+    const multi = schedule.pool.species.find((p) => sets.species[p]!.sets.length > 1)!;
+    await user.click(await screen.findByRole('button', { name: `Add ${multi} to team` }));
+    await user.click(await screen.findByRole('button', { name: `Add ${multi}` }));
+    await user.click(screen.getByRole('button', { name: /Change set$/ }));
+    expect(await screen.findByRole('dialog', { name: new RegExp(multi) })).toBeInTheDocument();
+  });
+});

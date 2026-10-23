@@ -370,6 +370,18 @@ body {
   );
 }
 
+/* Move chips outside the move buttons (sets, details, battle cards): tinted by
+   type like the battle buttons, a little lighter. */
+.move-chip {
+  color: var(--text);
+  border: 1px solid color-mix(in srgb, var(--type) 40%, var(--border));
+  background: color-mix(in srgb, var(--type) 14%, var(--surface));
+}
+button.move-chip:hover,
+.move-chip[aria-expanded='true'] {
+  background: color-mix(in srgb, var(--type) 28%, var(--surface));
+}
+
 /* Floating result labels and ability/item pop-ups. */
 .float-label {
   font-size: 13px;

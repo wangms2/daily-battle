@@ -9,6 +9,8 @@ import { GameNewsSheet, GEN5_NEWS } from './sheets/GameNews';
 import { GamePicker } from './sheets/GamePicker';
 import { SettingsSheet, StatsSheet, WelcomeSheet } from './sheets/misc';
 import { setActiveFormat } from './lib/data';
+import { setSpriteStyle } from './lib/sprites';
+import { useMediaQuery } from './ui/useWide';
 import { reportText } from './lib/report';
 import { computeStats, dayHeadline, summarizeDay } from './lib/results';
 import { useSchedule } from './lib/schedule';
@@ -67,6 +69,9 @@ export function App() {
   const format = state.settings.format ?? DEFAULT_FORMAT;
   const game = formatInfo(format);
   setActiveFormat(format);
+  // Animations off (or the system asking for less motion) means still sprites everywhere.
+  const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
+  setSpriteStyle(state.settings.animations && !reducedMotion ? 'animated' : 'still');
   const dispatch = (action: GameAction) => dispatchAny({ ...action, format });
   const [retry, setRetry] = useState(0);
   const schedule = useSchedule(week, format, retry);
@@ -82,6 +87,7 @@ export function App() {
   const [statsOpen, setStatsOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
+  const [howToPlayOpen, setHowToPlayOpen] = useState(false);
   const [storageNoticeDismissed, setStorageNoticeDismissed] = useState(false);
 
   const { settings } = state;
@@ -310,6 +316,20 @@ export function App() {
         settings={settings}
         onChange={setSetting}
         report={reportText({ days, settings }, ENGINE_VERSION)}
+        onAbout={() => setAboutOpen(true)}
+        onHowToPlay={() => {
+          setSettingsOpen(false);
+          setHowToPlayOpen(true);
+        }}
+      />
+      <WelcomeSheet
+        review
+        open={howToPlayOpen}
+        hints={settings.beginnerHints}
+        onHints={() => {}}
+        format={format}
+        onFormat={() => {}}
+        onDone={() => setHowToPlayOpen(false)}
         onAbout={() => setAboutOpen(true)}
       />
       <AboutSheet open={aboutOpen} onOpenChange={setAboutOpen} />

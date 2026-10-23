@@ -119,7 +119,7 @@ export function DailyBrief({
       className="rounded-chip bg-accent-soft px-3 py-1.5 text-[13px] font-semibold text-soft-ink"
       aria-pressed={editing}
     >
-      {editing ? 'Done' : 'Practice change'}
+      {editing ? 'Cancel' : 'Practice change'}
     </button>
   ) : dayState.swapUsed ? (
     <span className="rounded-chip bg-surface-2 px-3 py-1.5 text-[13px] font-semibold text-muted">
@@ -132,7 +132,7 @@ export function DailyBrief({
       className="rounded-chip bg-accent-soft px-3 py-1.5 text-[13px] font-semibold text-soft-ink"
       aria-pressed={editing}
     >
-      {editing ? 'Done' : '1 change left'}
+      {editing ? 'Cancel' : '1 change left'}
     </button>
   );
 
@@ -277,19 +277,8 @@ export function DailyBrief({
   );
 
   const topBar = renderTopBar(
-    editing ? (
-      <span className="flex items-center gap-2">
-        <button
-          type="button"
-          className="font-semibold text-accent"
-          onClick={() => setMode({ kind: 'view' })}
-        >
-          Cancel
-        </button>
-        <span className="text-muted">·</span>
-        <span>{practice ? 'Practice change' : 'Today’s change'}</span>
-      </span>
-    ) : undefined,
+    // Cancel sits on the change chip, next to the team being changed.
+    editing ? <span>{practice ? 'Practice change' : 'Today’s change'}</span> : undefined,
   );
 
   return (
@@ -329,6 +318,7 @@ export function DailyBrief({
         open={!!infoFor}
         onOpenChange={(o) => !o && setInfoFor(null)}
         showRoles={!infoFor?.foe}
+        showPossibleSets={!!infoFor?.foe && hints}
       />
       <SetPicker
         key={`view-${setView?.species}`}

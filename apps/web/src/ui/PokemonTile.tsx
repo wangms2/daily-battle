@@ -3,7 +3,7 @@ import { useState, type ReactNode } from 'react';
 import { speciesInfo } from '../lib/data';
 import { getSprite } from '../lib/sprites';
 import { TypeBadge } from './bits';
-import { InfoIcon } from './icons';
+import { InfoIcon, PencilIcon } from './icons';
 import { useMediaQuery } from './useWide';
 
 /**
@@ -22,6 +22,8 @@ export function PokemonTile({
   pop = false,
   showTypes = true,
   infoLabel,
+  onEdit,
+  editLabel,
 }: {
   species: string;
   onTap?: () => void;
@@ -37,6 +39,9 @@ export function PokemonTile({
   pop?: boolean;
   showTypes?: boolean;
   infoLabel?: string;
+  /** A pencil in the corner instead of ⓘ (e.g. change a picked Pokémon's set). */
+  onEdit?: () => void;
+  editLabel?: string;
 }) {
   const { types } = speciesInfo(species);
   return (
@@ -76,15 +81,26 @@ export function PokemonTile({
       </button>
       {footer}
       {badge && <span className="pointer-events-none absolute top-1 left-1">{badge}</span>}
-      {onInfo && (
+      {onEdit ? (
         <button
           type="button"
-          onClick={onInfo}
-          aria-label={infoLabel ?? `About ${species}`}
-          className="absolute top-0 right-0 grid size-8 place-items-center rounded-full text-muted hover:text-ink"
+          onClick={onEdit}
+          aria-label={editLabel ?? `Change ${species}'s set`}
+          className="absolute top-0 right-0 grid size-8 place-items-center rounded-full text-accent hover:text-ink"
         >
-          <InfoIcon width={16} height={16} />
+          <PencilIcon width={15} height={15} />
         </button>
+      ) : (
+        onInfo && (
+          <button
+            type="button"
+            onClick={onInfo}
+            aria-label={infoLabel ?? `About ${species}`}
+            className="absolute top-0 right-0 grid size-8 place-items-center rounded-full text-muted hover:text-ink"
+          >
+            <InfoIcon width={16} height={16} />
+          </button>
+        )
       )}
     </div>
   );

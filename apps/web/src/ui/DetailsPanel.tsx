@@ -4,7 +4,9 @@
 import clsx from 'clsx';
 import { useRef, type KeyboardEvent } from 'react';
 import {
+  abilityInfo,
   formatEvs,
+  itemInfo,
   matchups,
   setsOf,
   shortLabel,
@@ -14,6 +16,7 @@ import {
 } from '../lib/data';
 import { getSprite } from '../lib/sprites';
 import { MatchupRow, MAX_STAT } from '../sheets/InfoSheet';
+import { Term } from './DetailCard';
 import { MoveList } from './MoveList';
 import { Button, TypeBadge } from './bits';
 
@@ -137,9 +140,13 @@ export function DetailsPanel({
           <MoveList key={set.id} moves={set.moves} />
           <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-[13px]">
             <dt className="text-muted">Item</dt>
-            <dd className="truncate font-medium">{set.item || 'None'}</dd>
+            <dd className="min-w-0 font-medium">
+              {set.item ? <Term name={set.item} desc={itemInfo(set.item)} kind="Item" /> : 'None'}
+            </dd>
             <dt className="text-muted">Ability</dt>
-            <dd className="truncate font-medium">{set.ability}</dd>
+            <dd className="min-w-0 font-medium">
+              <Term name={set.ability} desc={abilityInfo(set.ability)} kind="Ability" />
+            </dd>
             <dt className="text-muted">Nature</dt>
             <dd className="truncate font-medium">
               {set.nature} · {formatEvs(set.evs)}

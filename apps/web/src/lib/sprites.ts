@@ -3,20 +3,38 @@
 import { toId } from './data';
 
 export type SpriteKind = 'front' | 'back' | 'icon';
-export type SpriteStyle = 'animated';
+/** 'animated' GIFs, or 'still' first frames (animations off, or reduced motion). */
+export type SpriteStyle = 'animated' | 'still';
 
-const DIRS: Record<SpriteKind, { dir: string; ext: string }> = {
-  front: { dir: 'front', ext: 'gif' },
-  back: { dir: 'back', ext: 'gif' },
-  icon: { dir: 'icons', ext: 'png' },
+const DIRS: Record<SpriteStyle, Record<SpriteKind, { dir: string; ext: string }>> = {
+  animated: {
+    front: { dir: 'front', ext: 'gif' },
+    back: { dir: 'back', ext: 'gif' },
+    icon: { dir: 'icons', ext: 'png' },
+  },
+  still: {
+    front: { dir: 'front-still', ext: 'png' },
+    back: { dir: 'back-still', ext: 'png' },
+    icon: { dir: 'icons', ext: 'png' },
+  },
 };
+
+let defaultStyle: SpriteStyle = 'animated';
+
+/**
+ * Sets the style sprites use unless asked otherwise. The app sets it from the
+ * Animations setting and the system's reduced-motion preference on each render.
+ */
+export function setSpriteStyle(style: SpriteStyle): void {
+  defaultStyle = style;
+}
 
 export function getSprite(
   species: string,
   kind: SpriteKind = 'front',
-  _style: SpriteStyle = 'animated',
+  style: SpriteStyle = defaultStyle,
 ): string {
-  const { dir, ext } = DIRS[kind];
+  const { dir, ext } = DIRS[style][kind];
   return `${import.meta.env.BASE_URL}sprites/${dir}/${toId(species)}.${ext}`;
 }
 
