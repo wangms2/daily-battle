@@ -47,7 +47,7 @@ export interface AIState {
   own: OwnMon[];
   ownActive?: OwnMon;
   ownSide: SideConds;
-  /** Foe Pokémon seen so far (Gen 4 has no team preview). */
+  /** Foe Pokémon seen so far: those sent out in Gen 4, all six from Team Preview in Gen 5. */
   foe: FoeMon[];
   foeActive?: FoeMon;
   foeSide: SideConds;
@@ -123,11 +123,13 @@ export function extractState(view: SideView, data: SetsFile = defaultSets): AISt
     };
   });
 
+  // With Team Preview (Gen 5 on), the foe's whole team is listed from the start;
+  // the ones not yet sent out have no HP reading, so they count as healthy.
   const foe: FoeMon[] = foeSide.team.map((p) => ({
     species: p.speciesForme,
     active: foeSide.active.includes(p),
     fainted: p.fainted,
-    hpFrac: p.maxhp ? p.hp / p.maxhp : 0,
+    hpFrac: p.maxhp ? p.hp / p.maxhp : p.fainted ? 0 : 1,
     status: p.status ?? '',
     boosts: { ...p.boosts },
     substitute: 'substitute' in p.volatiles,

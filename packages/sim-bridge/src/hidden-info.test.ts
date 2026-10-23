@@ -5,6 +5,7 @@
 // opponent's team must already have appeared in that side's own protocol log.
 // Abilities are left out: Gen 4 species data legitimately lists possible
 // abilities, so they can show up without being revealed.
+import { setsFor } from '@daily-battle/data';
 import { toID, type PokemonSet } from '@pkmn/sim';
 import { describe, expect, it } from 'vitest';
 import { RandomPolicy } from './policies/random';
@@ -79,13 +80,15 @@ function recordingPolicy(
   };
 }
 
-function playRecorded(i: number) {
+function playRecorded(i: number, format = 'gen4ou') {
+  const data = setsFor(format);
   const rng = makeRng(deriveSeed('hidden-info:teams', i));
-  const teams = { p1: randomTeam(rng), p2: randomTeam(rng) };
+  const teams = { p1: randomTeam(rng, data), p2: randomTeam(rng, data) };
   const snapshots: Snapshot[] = [];
   const logs: Partial<Record<SideID, readonly string[]>> = {};
   const policy = recordingPolicy(snapshots, logs);
   runBattle({
+    format,
     seed: deriveSeed('hidden-info:battle', i),
     p1: { team: teams.p1, policy, seed: deriveSeed('hidden-info:p1', i) },
     p2: { team: teams.p2, policy, seed: deriveSeed('hidden-info:p2', i) },
@@ -96,25 +99,30 @@ function playRecorded(i: number) {
 const opposite = (side: SideID): SideID => (side === 'p1' ? 'p2' : 'p1');
 
 describe('hidden information', () => {
-  it('never shows a policy unrevealed opponent species, moves, or items', () => {
-    const found: string[] = [];
-    let checked = 0;
-    let opponentFactsSeen = 0;
-    for (let i = 0; i < 20; i++) {
-      const { teams, snapshots, logs } = playRecorded(i);
-      for (const s of snapshots) {
-        checked++;
-        const opponent = teams[opposite(s.side)];
-        const leaked = leaks(s, logs[s.side]!, teams[s.side], opponent);
-        if (leaked.length) found.push(`battle ${i}, ${s.side}: ${leaked.join(', ')}`);
-        opponentFactsSeen += [...teamFacts(opponent)].filter((f) => s.tokens.has(f)).length;
+  // In Gen 5, Team Preview reveals all six species up front (in the log), never their sets.
+  it.each(['gen4ou', 'gen5ou'])(
+    'never shows a %s policy unrevealed opponent species, moves, or items',
+    (format) => {
+      const found: string[] = [];
+      let checked = 0;
+      let opponentFactsSeen = 0;
+      for (let i = 0; i < 20; i++) {
+        const { teams, snapshots, logs } = playRecorded(i, format);
+        for (const s of snapshots) {
+          checked++;
+          const opponent = teams[opposite(s.side)];
+          const leaked = leaks(s, logs[s.side]!, teams[s.side], opponent);
+          if (leaked.length) found.push(`battle ${i}, ${s.side}: ${leaked.join(', ')}`);
+          opponentFactsSeen += [...teamFacts(opponent)].filter((f) => s.tokens.has(f)).length;
+        }
       }
-    }
-    expect(checked).toBeGreaterThan(500);
-    // The views do carry opponent info once revealed, so the scan isn't vacuous.
-    expect(opponentFactsSeen).toBeGreaterThan(checked);
-    expect(found).toEqual([]);
-  }, 120_000);
+      expect(checked).toBeGreaterThan(500);
+      // The views do carry opponent info once revealed, so the scan isn't vacuous.
+      expect(opponentFactsSeen).toBeGreaterThan(checked);
+      expect(found).toEqual([]);
+    },
+    120_000,
+  );
 
   it('catches a leak (negative control)', () => {
     const { teams, snapshots, logs } = playRecorded(0);

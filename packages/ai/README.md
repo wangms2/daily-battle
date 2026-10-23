@@ -16,9 +16,9 @@ Each decision:
 2. **Belief** (`belief.ts`, §8.2): for each foe Pokémon it has seen:
    - It starts from that species' usage-weighted sets.
    - It drops sets that contradict anything revealed and renormalizes.
-   - It never models foes it hasn't seen (Gen 4 has no team preview).
+   - It never models foes it hasn't seen. In Gen 4 that's the ones not yet sent out; in Gen 5, Team Preview shows all six species from the start (with no HP reading, so they count as healthy), but never their sets.
    - In informed mode (`knownSets`, for M5's retry simulations), belief collapses to the real sets.
-3. **Scoring** (`score.ts`, §8.3): every legal action gets a utility in "fraction of a Pokémon's HP" units. Damage numbers come from `@smogon/calc` (Gen 4), averaged over the top candidate sets.
+3. **Scoring** (`score.ts`, §8.3): every legal action gets a utility in "fraction of a Pokémon's HP" units. Damage numbers come from `@smogon/calc` in the format's generation, averaged over the top candidate sets.
    - **Attacks:** expected damage plus KO chance, both weighted by the chance of landing the hit (moving first, or surviving to move), minus the damage expected in return.
    - **Status moves:**
      - Hazards: only when not already up, worth more early and when more foes remain.
@@ -28,7 +28,9 @@ Each decision:
      - Rapid Spin: when our side has hazards.
      - Roar/Whirlwind: against boosts or into hazards.
      - Self-KO moves: carry a cost.
-   - **Switches:** the matchup gain over staying in, minus the free hit and entry hazards, minus a fixed switching cost, plus a small bonus for resisting the foe's STABs. After a faint, the switch-in with the best matchup.
+     - Against Magic Bounce (Gen 5), hazards and status moves count against us in proportion to the chance the foe has it.
+   - **Switches:** the matchup gain over staying in, minus the free hit and entry hazards, minus a fixed switching cost, plus a small bonus for resisting the foe's STABs, plus Regenerator's heal on the way out (Gen 5). After a faint, the switch-in with the best matchup.
+   - **Team Preview** (Gen 5): `scoreLeads` rates each of ours as the lead by its average matchup against the foe's six, plus half a hazard's early value for a setter; the lead is then sampled with the usual softmax noise. The naive bot leads with its first Pokémon.
 4. **Choice** (`choose.ts`, §8.4): softmax over scores at the preset's temperature, sampled with the seeded `rng`. Soft biases:
    - A bonus for the highest-damage move.
    - Occasionally aiming at the foe's likely switch-in when it's threatened. This is often a wrong read, on purpose.

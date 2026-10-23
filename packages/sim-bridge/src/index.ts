@@ -1,4 +1,4 @@
-export { legalChoices, RandomPolicy } from './policies/random';
+export { leadChoice, legalChoices, RandomPolicy } from './policies/random';
 export { deriveSeed, makeRng, type Rng } from './rng';
 export { replayBattle, runBattle } from './run';
 export { BattleError, BattleSession, SIDES } from './session';

@@ -1,5 +1,5 @@
 // Runs many RandomPolicy vs RandomPolicy battles on random teams from the set snapshot.
-//   pnpm --filter @daily-battle/sim-bridge soak [--n 1000] [--seed soak]
+//   pnpm --filter @daily-battle/sim-bridge soak [--format gen4ou] [--n 1000] [--seed soak]
 // Exits non-zero if any battle errors; rerun a failure with the printed --seed and --only.
 import { soak } from '../src/soak';
 
@@ -11,9 +11,10 @@ function arg(name: string): string | undefined {
 const n = Number(arg('n') ?? 1000);
 const seed = arg('seed') ?? 'soak';
 const only = arg('only');
+const format = arg('format');
 
 const t0 = performance.now();
-const report = soak({ n, seed, only: only === undefined ? undefined : Number(only) });
+const report = soak({ n, seed, format, only: only === undefined ? undefined : Number(only) });
 const seconds = (performance.now() - t0) / 1000;
 
 const { results, errors } = report;

@@ -35,6 +35,7 @@ interface FoeCand {
   weight: number;
   moves: string[];
   physical: boolean;
+  ability: string;
 }
 
 interface Ctx {
@@ -122,6 +123,7 @@ export function foeCands(foe: FoeMon, data: SetsFile, known?: KnownSets): FoeCan
     weight: weight / total,
     moves: set.moves,
     physical: set.evs.atk >= 200,
+    ability: set.ability,
   }));
 }
 
@@ -250,12 +252,18 @@ export function scoreActions(
     if (forced) return matchup(ctx, mon, calc, foes) - entry;
     const active = state.ownActive!;
     const gain = matchup(ctx, mon, calc, foes) - matchup(ctx, active, calcFor(active), foes);
+    // Regenerator (Gen 5) heals a third of max HP on the way out.
+    const regen =
+      active.set.ability === 'Regenerator'
+        ? params.recover * Math.min(1 / 3, 1 - active.hpFrac)
+        : 0;
     const freeHit = theirHit(ctx, calc, `${slot}`, foes).frac;
     return (
       params.position * gain -
       params.risk * freeHit -
       entry -
       params.switchPenalty +
+      regen +
       (resists(gen, mon, foes) ? params.resistBias : 0)
     );
   };
@@ -327,6 +335,37 @@ export function scoreActions(
   return scored;
 }
 
+/**
+ * Team Preview (Gen 5 on): how good each of ours is as the lead, one score per
+ * own Pokémon in request order. It's the average matchup against the foe's six
+ * (all healthy, sets by prior), plus half a hazard's early value for a setter,
+ * which may not get the chance to set it.
+ */
+export function scoreLeads(
+  state: AIState,
+  params: Params,
+  data: SetsFile,
+  known?: KnownSets,
+): number[] {
+  const gen = genFor(data.meta.format);
+  const ctx: Ctx = {
+    gen,
+    state,
+    params,
+    cache: new Map(),
+    toFoe: makeField(state.weather, state.ownSide, state.foeSide),
+    toOwn: makeField(state.weather, state.foeSide, state.ownSide),
+  };
+  const foes = state.foe.map((f) => foeCands(f, data, known));
+  const leadHazard = 0.5 * params.hazard * (1 + params.earlyHazardBonus);
+  return state.own.map((mon) => {
+    const calc = ownCalc(gen, mon);
+    const vs = foes.reduce((a, cands) => a + matchup(ctx, mon, calc, cands), 0);
+    const setter = mon.set.moves.some((m) => moveId(m) in HAZARDS);
+    return (foes.length ? vs / foes.length : 0) + (setter ? leadHazard : 0);
+  });
+}
+
 function statusValue(
   id: string,
   ctx: Ctx,
@@ -337,13 +376,16 @@ function statusValue(
   foesLeft: number,
 ): number {
   const { params, state } = ctx;
+  // Magic Bounce (Gen 5) sends hazards and status moves back at the user: worth
+  // as much against us as they'd have been for us.
+  const bounce = foes.reduce((a, f) => a + f.weight * (f.ability === 'Magic Bounce' ? 1 : 0), 0);
   const hazard = HAZARDS[id];
   if (hazard) {
     const current = state.foeSide[hazard.key];
     if ((typeof current === 'boolean' ? (current ? 1 : 0) : current) >= hazard.max) return -0.05;
     const early = state.turn <= 3 ? 1 + params.earlyHazardBonus : 1;
     const layerDecay = typeof current === 'number' ? 1 / (1 + current) : 1;
-    return params.hazard * (foesLeft / 6) * early * layerDecay;
+    return params.hazard * (foesLeft / 6) * early * layerDecay * (1 - 2 * bounce);
   }
   if (SETUP.has(id)) {
     const boosted = Object.values(me.boosts).reduce((a, b) => a + Math.max(0, b), 0);
@@ -354,7 +396,7 @@ function statusValue(
     const types = typesOf(ctx.gen, foe.species);
     if (STATUS[id]!.some((t) => types.includes(t))) return -0.2;
     const physical = foes.reduce((a, f) => a + f.weight * (f.physical ? 1 : 0), 0);
-    return params.status * (id === 'willowisp' ? 0.6 + 0.6 * physical : 1);
+    return params.status * (id === 'willowisp' ? 0.6 + 0.6 * physical : 1) * (1 - 2 * bounce);
   }
   const missing = 1 - me.hpFrac;
   if (RECOVER.has(id)) return me.hpFrac < 0.75 ? params.recover * missing : -0.05;

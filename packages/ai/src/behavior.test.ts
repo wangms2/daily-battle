@@ -1,4 +1,4 @@
-import { sets } from '@daily-battle/data';
+import { sets, setsFor } from '@daily-battle/data';
 import { findSet, toPokemonSet } from '@daily-battle/gen';
 import {
   deriveSeed,
@@ -119,5 +119,93 @@ describe('AI behavior', () => {
     const actions = scoreActions(view!, state, params, () => 0.5, sets);
     const best = actions.reduce((a, b) => (b.score > a.score ? b : a));
     expect(best.move).toBe('recover');
+  });
+});
+
+describe('AI behavior with Team Preview (Gen 5)', () => {
+  const data = setsFor('gen5ou');
+  const team5 = (...ids: string[]) =>
+    ids.map((id) => {
+      const species = Object.keys(data.species).find((s) =>
+        data.species[s]!.sets.some((set) => set.id === id),
+      );
+      if (!species) throw new Error(`No set ${id}`);
+      return toPokemonSet(species, findSet(data, { species, setId: id }));
+    });
+  /** Leads with the first Pokémon, then moves at random. */
+  const leadFirst: Policy = {
+    choose: (view, rng) =>
+      view.request.requestType === 'team' ? 'default' : new RandomPolicy().choose(view, rng),
+  };
+  const FILLER5 = [
+    'latios-choice-scarf',
+    'tentacruel-utility',
+    'blissey-special-wall',
+    'politoed-defensive',
+    'chansey-support',
+  ];
+
+  it('leads with the Pokémon that matches up best against the foe six', () => {
+    // Against six Steel-types, Heatran (slot 6) walls them and hits them super effectively.
+    const steels = team5(
+      'ferrothorn-standard',
+      'scizor-choice-band',
+      'skarmory-defensive',
+      'forretress-entry-hazard-control',
+      'jirachi-utility',
+      'magnezone-choice-scarf',
+    );
+    for (let s = 0; s < 5; s++) {
+      const ai = new UtilityPolicy(
+        { ...PRESETS.balance, temperature: 0.01, predictionRate: 0 },
+        { data },
+      );
+      const result = runBattle({
+        format: 'gen5ou',
+        seed: deriveSeed('lead', s),
+        maxTurns: 1,
+        p1: { team: steels, policy: leadFirst, seed: deriveSeed('lead-p1', s) },
+        p2: {
+          team: team5(...FILLER5, 'heatran-offensive'),
+          policy: ai,
+          seed: deriveSeed('lead-p2', s),
+        },
+      });
+      expect(result.choices.p2[0]).toBe('team 612345');
+    }
+  });
+
+  it('does not set Stealth Rock into Magic Bounce', () => {
+    const srScore = (foeLead: string) => {
+      // Scored at the AI's first move decision: the view is live and keeps changing.
+      let score: number | undefined;
+      const params = { ...PRESETS.balance, predictionRate: 0 };
+      const capture: Policy = {
+        choose(v, rng) {
+          if (v.request.requestType === 'move' && score === undefined) {
+            const state = extractState(v, data);
+            score = scoreActions(v, state, params, () => 0.5, data).find(
+              (a) => a.move === 'stealthrock',
+            )!.score;
+          }
+          return leadFirst.choose(v, rng);
+        },
+      };
+      runBattle({
+        format: 'gen5ou',
+        seed: deriveSeed('bounce', 0),
+        maxTurns: 1,
+        p1: { team: team5(foeLead, ...FILLER5), policy: leadFirst, seed: '1,1,1,1' },
+        p2: {
+          team: team5('hippowdon-physically-defensive', ...FILLER5),
+          policy: capture,
+          seed: '2,2,2,2',
+        },
+      });
+      return score!;
+    };
+    // Espeon's sets all have Magic Bounce; Latias's don't.
+    expect(srScore('espeon-expert-belt')).toBeLessThan(0);
+    expect(srScore('latias-choice-scarf')).toBeGreaterThan(0);
   });
 });

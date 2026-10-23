@@ -34,7 +34,8 @@ export class NaivePolicy implements Policy {
 
   choose(view: SideView, rng: Rng): string {
     const legal = legalChoices(view.request);
-    if (legal.length <= 1) return legal[0] ?? 'default';
+    // At Team Preview it leads with its first Pokémon, as Gen 4 teams do.
+    if (legal.length <= 1 || view.request.requestType === 'team') return legal[0] ?? 'default';
     const state = extractState(view, this.data);
     const actions = scoreActions(view, state, DAMAGE_ONLY, rng, this.data);
     const moves = actions.filter((a) => a.kind === 'move');

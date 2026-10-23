@@ -4,7 +4,7 @@ import { legalChoices, type Policy, type Rng, type SideView } from '@daily-battl
 import type { KnownSets } from './belief';
 import { sample, softmax } from './choose';
 import { PRESETS, type Params } from './presets';
-import { scoreActions } from './score';
+import { scoreActions, scoreLeads } from './score';
 import { extractState } from './state';
 
 /** Running counts for tuning against ladder behavior (§8.5). */
@@ -51,6 +51,11 @@ export class UtilityPolicy implements Policy {
     const legal = legalChoices(view.request);
     if (legal.length <= 1) return legal[0] ?? 'default';
     const state = extractState(view, this.data);
+    if (view.request.requestType === 'team') {
+      // Team Preview: pick a lead with the same noise as any other choice.
+      const scores = scoreLeads(state, this.params, this.data, this.known);
+      return legal[sample(softmax(scores, this.params.temperature), rng)]!;
+    }
     const actions = scoreActions(view, state, this.params, rng, this.data, this.known);
     const pick =
       actions[

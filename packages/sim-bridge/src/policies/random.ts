@@ -3,9 +3,22 @@ import type { Policy, SideView } from '../types';
 
 const pick = <T>(options: T[], rng: Rng): T => options[Math.floor(rng() * options.length)]!;
 
-/** Lists the legal choices in a request. */
+/**
+ * Team Preview (Gen 5 on): `team N…` leads with Pokémon N and keeps the rest in
+ * their original order, e.g. `team 312456`.
+ */
+export function leadChoice(slot: number, size: number): string {
+  const rest = Array.from({ length: size }, (_, i) => i + 1).filter((n) => n !== slot);
+  return `team ${[slot, ...rest].join('')}`;
+}
+
+/** Lists the legal choices in a request; at Team Preview, one per possible lead. */
 export function legalChoices(request: SideView['request']): string[] {
-  if (request.requestType === 'wait' || request.requestType === 'team') return [];
+  if (request.requestType === 'wait') return [];
+  if (request.requestType === 'team') {
+    const size = request.side.pokemon.length;
+    return request.side.pokemon.map((_, i) => leadChoice(i + 1, size));
+  }
   const switches = request.side.pokemon.flatMap((p, i) =>
     !p.active && !p.condition.endsWith(' fnt') ? [`switch ${i + 1}`] : [],
   );
