@@ -287,7 +287,7 @@ export function DailyBrief({
   const { summary } = result;
   const start = editing ? (
     <Button variant="secondary" className="h-12 w-full shrink-0" onClick={() => setDitchOpen(true)}>
-      Ditch team and rebuild
+      Pick a whole new team
     </Button>
   ) : (
     <Button className="h-12 w-full shrink-0" onClick={onStart}>
@@ -452,13 +452,13 @@ export function DailyBrief({
       <ConfirmDialog
         open={ditchOpen}
         onOpenChange={setDitchOpen}
-        title="Ditch this team?"
+        title="Start over with a new team?"
         body={
           result.streak > 0
             ? `You’ll build a new team from this week’s pool, and your ${result.streak}-day streak ends.`
             : 'You’ll build a new team from this week’s pool.'
         }
-        confirm="Ditch team"
+        confirm="Pick new team"
         cancel="Keep my team"
         onConfirm={() => {
           setDitchOpen(false);

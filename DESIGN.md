@@ -67,7 +67,7 @@ Daily swap (done on the daily brief screen, shown as "1 change left"):
 - One per day, resets at local midnight.
 - Either replace one team member with another of the 12 (choosing a set), or change the set of one existing member.
 - Unused swaps do not accumulate.
-- **After a first-try loss** the streak is already over, so the team may change freely: any number of swaps and set changes, none using up the daily change, and they stay on the team for the rest of the week (the end card's "Change team" opens the brief ready to edit; the chip reads "Edit team"). **Ditch team** (in edit mode) throws the weekly team away to build a new one from the pool; it ends a live streak for that day (`DayState.ditched`), and the confirmation says so.
+- **After a first-try loss** the streak is already over, so the team may change freely: any number of swaps and set changes, none using up the daily change, and they stay on the team for the rest of the week (the end card's "Change team" opens the brief ready to edit; the chip reads "Edit team"). **Pick a whole new team** (in edit mode, the code calls it "ditching") throws the weekly team away to build a new one from the pool; it ends a live streak for that day (`DayState.ditched`), and the confirmation says so.
 - Once the day is won, the daily swap is no longer offered. Instead each practice run may make one **practice change** (a swap or a set change) for that run only; the weekly team is untouched, and the next run decides afresh. If a practice run is won, its change stays on the team from then on.
 
 ### 4.3 Daily battle

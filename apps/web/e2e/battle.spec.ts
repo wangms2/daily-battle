@@ -450,11 +450,11 @@ test('after a first-try loss the team changes freely and the changes stay', asyn
   await expect(page.getByRole('button', { name: /^Try again · / })).toBeVisible();
 });
 
-test('ditching the team goes back to the builder and ends the streak', async ({ page }) => {
+test('picking a whole new team goes back to the builder and ends the streak', async ({ page }) => {
   await open(page, 'instant');
   const card = await loseFirstTry(page);
   await card.getByRole('button', { name: 'Change team' }).click();
-  await page.getByRole('button', { name: 'Ditch team and rebuild' }).click();
-  await page.getByRole('button', { name: 'Ditch team' }).last().click();
+  await page.getByRole('button', { name: 'Pick a whole new team' }).click();
+  await page.getByRole('button', { name: 'Pick new team' }).last().click();
   await expect(page.getByRole('button', { name: /^Pick \d more$/ })).toBeVisible();
 });
