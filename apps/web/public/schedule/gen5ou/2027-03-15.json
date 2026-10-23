@@ -1,0 +1,331 @@
+{
+  "version": 1,
+  "generatorVersion": 4,
+  "dataBuiltAt": "2026-10-23T13:58:33.422Z",
+  "week": "2027-03-15",
+  "pool": {
+    "species": [
+      "Terrakion",
+      "Jellicent",
+      "Scizor",
+      "Tentacruel",
+      "Thundurus-Therian",
+      "Kyurem-Black",
+      "Keldeo",
+      "Skarmory",
+      "Jirachi",
+      "Starmie",
+      "Darmanitan",
+      "Bronzong"
+    ],
+    "candidate": 0
+  },
+  "suggestedTeams": [
+    {
+      "archetype": "Balanced",
+      "team": [
+        {
+          "species": "Keldeo",
+          "setId": "keldeo-choice-specs"
+        },
+        {
+          "species": "Bronzong",
+          "setId": "bronzong-tank"
+        },
+        {
+          "species": "Jellicent",
+          "setId": "jellicent-specially-defensive"
+        },
+        {
+          "species": "Kyurem-Black",
+          "setId": "kyuremblack-choice-band"
+        },
+        {
+          "species": "Tentacruel",
+          "setId": "tentacruel-toxic-spikes"
+        },
+        {
+          "species": "Terrakion",
+          "setId": "terrakion-choice-scarf"
+        }
+      ]
+    },
+    {
+      "archetype": "Offense",
+      "team": [
+        {
+          "species": "Starmie",
+          "setId": "starmie-rapid-spin"
+        },
+        {
+          "species": "Darmanitan",
+          "setId": "darmanitan-choice-scarf"
+        },
+        {
+          "species": "Skarmory",
+          "setId": "skarmory-lead"
+        },
+        {
+          "species": "Kyurem-Black",
+          "setId": "kyuremblack-choice-band"
+        },
+        {
+          "species": "Terrakion",
+          "setId": "terrakion-choice-scarf"
+        },
+        {
+          "species": "Keldeo",
+          "setId": "keldeo-calm-mind"
+        }
+      ]
+    },
+    {
+      "archetype": "Stall",
+      "team": [
+        {
+          "species": "Bronzong",
+          "setId": "bronzong-tank"
+        },
+        {
+          "species": "Jellicent",
+          "setId": "jellicent-specially-defensive"
+        },
+        {
+          "species": "Thundurus-Therian",
+          "setId": "thundurustherian-substhundy"
+        },
+        {
+          "species": "Skarmory",
+          "setId": "skarmory-defensive"
+        },
+        {
+          "species": "Tentacruel",
+          "setId": "tentacruel-toxic-spikes"
+        },
+        {
+          "species": "Jirachi",
+          "setId": "jirachi-utility"
+        }
+      ]
+    }
+  ],
+  "days": [
+    {
+      "day": "2027-03-15",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Jirachi",
+          "setId": "jirachi-choice-scarf"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-bulky-pursuit-trapper"
+        },
+        {
+          "species": "Breloom",
+          "setId": "breloom-technician"
+        },
+        {
+          "species": "Thundurus-Therian",
+          "setId": "thundurustherian-offensive"
+        },
+        {
+          "species": "Gyarados",
+          "setId": "gyarados-substitute-dragon-dance"
+        },
+        {
+          "species": "Starmie",
+          "setId": "starmie-rapid-spin"
+        }
+      ],
+      "candidate": 10
+    },
+    {
+      "day": "2027-03-16",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Suicune",
+          "setId": "suicune-offensive"
+        },
+        {
+          "species": "Cofagrigus",
+          "setId": "cofagrigus-defensive"
+        },
+        {
+          "species": "Seismitoad",
+          "setId": "seismitoad-utility"
+        },
+        {
+          "species": "Heatran",
+          "setId": "heatran-offensive"
+        },
+        {
+          "species": "Kyurem-Black",
+          "setId": "kyuremblack-choice-band"
+        },
+        {
+          "species": "Garchomp",
+          "setId": "garchomp-stealth-rock-lead"
+        }
+      ],
+      "candidate": 0
+    },
+    {
+      "day": "2027-03-17",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Hydreigon",
+          "setId": "hydreigon-choice-scarf"
+        },
+        {
+          "species": "Rhyperior",
+          "setId": "rhyperior-tank"
+        },
+        {
+          "species": "Dusclops",
+          "setId": "dusclops-curse"
+        },
+        {
+          "species": "Latios",
+          "setId": "latios-choice-specs"
+        },
+        {
+          "species": "Alakazam",
+          "setId": "alakazam-life-orb"
+        },
+        {
+          "species": "Mew",
+          "setId": "mew-swords-dance"
+        }
+      ],
+      "candidate": 5
+    },
+    {
+      "day": "2027-03-18",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Conkeldurr",
+          "setId": "conkeldurr-bulk-up"
+        },
+        {
+          "species": "Scizor",
+          "setId": "scizor-offensive-swords-dance"
+        },
+        {
+          "species": "Landorus-Therian",
+          "setId": "landorustherian-lead"
+        },
+        {
+          "species": "Porygon-Z",
+          "setId": "porygonz-nasty-plot"
+        },
+        {
+          "species": "Dragonite",
+          "setId": "dragonite-substitute-dragon-dance"
+        },
+        {
+          "species": "Kyurem",
+          "setId": "kyurem-subroost"
+        }
+      ],
+      "candidate": 10
+    },
+    {
+      "day": "2027-03-19",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Ninetales",
+          "setId": "ninetales-defensive"
+        },
+        {
+          "species": "Terrakion",
+          "setId": "terrakion-stealth-rock"
+        },
+        {
+          "species": "Breloom",
+          "setId": "breloom-technician"
+        },
+        {
+          "species": "Latias",
+          "setId": "latias-colbur-berry"
+        },
+        {
+          "species": "Conkeldurr",
+          "setId": "conkeldurr-bulk-up"
+        },
+        {
+          "species": "Reuniclus",
+          "setId": "reuniclus-calm-mind"
+        }
+      ],
+      "candidate": 6
+    },
+    {
+      "day": "2027-03-20",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Scizor",
+          "setId": "scizor-choice-band"
+        },
+        {
+          "species": "Latios",
+          "setId": "latios-choice-scarf"
+        },
+        {
+          "species": "Sharpedo",
+          "setId": "sharpedo-physical-attacker"
+        },
+        {
+          "species": "Gengar",
+          "setId": "gengar-offensive"
+        },
+        {
+          "species": "Starmie",
+          "setId": "starmie-rapid-spin"
+        },
+        {
+          "species": "Politoed",
+          "setId": "politoed-defensive"
+        }
+      ],
+      "candidate": 15
+    },
+    {
+      "day": "2027-03-21",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Ferrothorn",
+          "setId": "ferrothorn-offensive"
+        },
+        {
+          "species": "Celebi",
+          "setId": "celebi-bulky-pivot"
+        },
+        {
+          "species": "Toxicroak",
+          "setId": "toxicroak-substitute-bulk-up"
+        },
+        {
+          "species": "Landorus-Therian",
+          "setId": "landorustherian-defensive"
+        },
+        {
+          "species": "Jirachi",
+          "setId": "jirachi-choice-scarf"
+        },
+        {
+          "species": "Mamoswine",
+          "setId": "mamoswine-choice-band"
+        }
+      ],
+      "candidate": 0
+    }
+  ]
+}
