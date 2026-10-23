@@ -124,8 +124,9 @@ export async function drawShareCard(m: ShareModel): Promise<HTMLCanvasElement> {
   await Promise.all(
     [500, 600, 700].map((w) => document.fonts?.load(`${w} 24px "IBM Plex Sans"`)),
   ).catch(() => {});
-  const [logo, ...sprites] = await Promise.all([
+  const [logo, backdrop, ...sprites] = await Promise.all([
     loadImage(`${import.meta.env.BASE_URL}favicon.svg`),
+    m.backdrop ? loadImage(m.backdrop) : Promise.resolve(null),
     ...m.team.map((s) => loadImage(getSprite(s.species, 'front'))),
   ]);
 
@@ -141,8 +142,28 @@ export async function drawShareCard(m: ShareModel): Promise<HTMLCanvasElement> {
   roundRect(ctx, 40, 40, CARD_W - 80, CARD_H - 80, 16);
   ctx.fillStyle = C.surface;
   ctx.fill();
+  // The day's battle scene, faded into the card so the panels stay readable.
+  if (backdrop) {
+    ctx.save();
+    roundRect(ctx, 40, 40, CARD_W - 80, CARD_H - 80, 16);
+    ctx.clip();
+    const w = CARD_W - 80;
+    const h = CARD_H - 80;
+    const k = Math.max(w / backdrop.width, h / backdrop.height);
+    ctx.imageSmoothingEnabled = false;
+    ctx.globalAlpha = 0.2;
+    ctx.drawImage(
+      backdrop,
+      40 + (w - backdrop.width * k) / 2,
+      40 + h - backdrop.height * k,
+      backdrop.width * k,
+      backdrop.height * k,
+    );
+    ctx.restore();
+  }
   ctx.strokeStyle = C.border;
   ctx.lineWidth = 1.5;
+  roundRect(ctx, 40, 40, CARD_W - 80, CARD_H - 80, 16);
   ctx.stroke();
 
   const left = 96;
@@ -209,15 +230,18 @@ export async function drawShareCard(m: ShareModel): Promise<HTMLCanvasElement> {
   }
 
   // Team: two rows of three, sprites on a shared baseline, names under them.
-  const cellW = 150;
+  const cellW = 160;
   const gridX = right - cellW * 3;
   m.team.forEach((s, i) => {
     const cx = gridX + (i % 3) * cellW + cellW / 2;
-    const base = 260 + Math.floor(i / 3) * 150; // sprite baseline
+    const base = 272 + Math.floor(i / 3) * 160; // sprite baseline
     const img = sprites[i];
     if (img) {
-      // Whole-pixel scaling at the 2× canvas: 1× or 1.5× logical.
-      const k = Math.max(img.width, img.height) * 1.5 <= 116 ? 1.5 : 1;
+      // Half-pixel steps at the 2× canvas, as large as fits a 136px cell, 1× to 2×.
+      const k = Math.min(
+        2,
+        Math.max(1, Math.floor((136 / Math.max(img.width, img.height)) * 2) / 2),
+      );
       const w = img.width * k;
       const h = img.height * k;
       ctx.imageSmoothingEnabled = false;

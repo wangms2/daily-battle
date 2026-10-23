@@ -13,6 +13,7 @@ import { setSpriteStyle } from './lib/sprites';
 import { useMediaQuery } from './ui/useWide';
 import { reportText } from './lib/report';
 import { computeStats, dayHeadline, summarizeDay } from './lib/results';
+import { backgroundFor } from './lib/fx';
 import { useSchedule } from './lib/schedule';
 import type { ScheduleFile } from '@daily-battle/gen/schedule';
 import { ENGINE_VERSION, randomSeed } from './lib/seed';
@@ -104,6 +105,7 @@ export function App() {
     change: dayState.change,
     url: shareUrl(format),
     game: game.name,
+    backdrop: backgroundFor(day, format),
   });
   const countdown = countdownTo(now, addDays(day, 1));
   const setSetting = <K extends keyof Settings>(key: K, value: Settings[K]) =>
