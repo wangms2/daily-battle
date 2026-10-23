@@ -355,6 +355,11 @@ test('a lost first try breaks the streak, and the result copies to share', async
   // Still open, so the next run is a try, not practice, and the daily change stays.
   await expect(page.getByRole('button', { name: /^Try again · / })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Practice change' })).toHaveCount(0);
+  // After three losses the team can still be changed (the streak is already gone).
+  await page.getByRole('button', { name: 'Edit team' }).click();
+  await expect(page.getByRole('button', { name: 'Swap' }).first()).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Pick a whole new team' })).toBeVisible();
+  await page.getByRole('button', { name: 'Cancel' }).click();
   await noScroll(page, 'brief with result');
   await page.screenshot({ path: `${dir}/29-brief-result.png` });
 
