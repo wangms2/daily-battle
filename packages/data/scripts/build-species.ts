@@ -1,5 +1,5 @@
-// Builds gen4ou/species.json (types, base stats, tier, type chart) for the web client.
-//   pnpm --filter @daily-battle/data build-species
+// Builds <format>/species.json (types, base stats, tier, type chart) for the web client.
+//   pnpm --filter @daily-battle/data build-species [--format gen4ou]
 import { readFileSync, writeFileSync } from 'node:fs';
 import { buildSpecies } from '../src/species';
 import type { SetsFile } from '../src/types';

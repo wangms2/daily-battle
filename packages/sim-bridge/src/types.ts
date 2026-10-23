@@ -32,6 +32,7 @@ export interface PlayerInput {
 }
 
 export interface RunBattleInput {
+  /** Sim format id, e.g. `gen4ou` (the default). */
   format?: string;
   /** Battle seed: damage rolls, crits, accuracy, and so on. */
   seed: PRNGSeed;

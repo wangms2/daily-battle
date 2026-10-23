@@ -5,7 +5,18 @@ import type { SetsFile } from '@daily-battle/data';
 import { legalChoices, type Rng, type SideView } from '@daily-battle/sim-bridge';
 import type { Field, Pokemon } from '@smogon/calc';
 import { candidates, type KnownSets } from './belief';
-import { effectiveness, hit, makeField, makeMon, moveInfo, speed, typesOf, type Hit } from './calc';
+import {
+  effectiveness,
+  genFor,
+  hit,
+  makeField,
+  makeMon,
+  moveInfo,
+  speed,
+  typesOf,
+  type Gen,
+  type Hit,
+} from './calc';
 import type { Params } from './presets';
 import { moveId, type AIState, type FoeMon, type OwnMon } from './state';
 
@@ -27,6 +38,7 @@ interface FoeCand {
 }
 
 interface Ctx {
+  gen: Gen;
   state: AIState;
   params: Params;
   cache: Map<string, Hit>;
@@ -74,8 +86,8 @@ const STATUS: Record<string, string[]> = {
 };
 const SELF_KO = new Set(['explosion', 'selfdestruct', 'memento']);
 
-function ownCalc(m: OwnMon): Pokemon {
-  return makeMon({
+function ownCalc(gen: Gen, m: OwnMon): Pokemon {
+  return makeMon(gen, {
     species: m.species,
     item: m.set.item,
     ability: m.set.ability,
@@ -94,8 +106,9 @@ export function foeCands(foe: FoeMon, data: SetsFile, known?: KnownSets): FoeCan
     .sort((a, b) => b.weight - a.weight)
     .slice(0, 4);
   const total = top.reduce((a, c) => a + c.weight, 0);
+  const gen = genFor(data.meta.format);
   return top.map(({ set, weight }) => ({
-    mon: makeMon({
+    mon: makeMon(gen, {
       species: foe.species,
       item: set.item,
       ability: set.ability,
@@ -165,10 +178,10 @@ function probFirst(me: Pokemon, foes: FoeCand[], weather: string): number {
 }
 
 /** Entry hazard damage (fraction of max HP) for one of ours switching in. */
-function hazardCost(state: AIState, mon: OwnMon): number {
+function hazardCost(gen: Gen, state: AIState, mon: OwnMon): number {
   const s = state.ownSide;
-  let cost = s.sr ? 0.125 * effectiveness('Rock', mon.species) : 0;
-  const grounded = !typesOf(mon.species).includes('Flying') && mon.set.ability !== 'Levitate';
+  let cost = s.sr ? 0.125 * effectiveness(gen, 'Rock', mon.species) : 0;
+  const grounded = !typesOf(gen, mon.species).includes('Flying') && mon.set.ability !== 'Levitate';
   if (grounded) cost += [0, 1 / 8, 1 / 6, 1 / 4][Math.min(3, s.spikes)]!;
   return cost;
 }
@@ -190,9 +203,9 @@ function matchup(ctx: Ctx, mon: OwnMon, calc: Pokemon, foes: FoeCand[]): number 
   );
 }
 
-function resists(mon: OwnMon, foes: FoeCand[]): boolean {
-  const stab = new Set(foes.flatMap((f) => typesOf(f.mon.name)));
-  return [...stab].every((t) => effectiveness(t, mon.species) < 1);
+function resists(gen: Gen, mon: OwnMon, foes: FoeCand[]): boolean {
+  const stab = new Set(foes.flatMap((f) => typesOf(gen, f.mon.name)));
+  return [...stab].every((t) => effectiveness(gen, t, mon.species) < 1);
 }
 
 const hazardSeverity = (s: AIState['ownSide']) =>
@@ -211,7 +224,9 @@ export function scoreActions(
   known?: KnownSets,
 ): ScoredAction[] {
   const legal = legalChoices(view.request);
+  const gen = genFor(data.meta.format);
   const ctx: Ctx = {
+    gen,
     state,
     params,
     cache: new Map(),
@@ -223,7 +238,7 @@ export function scoreActions(
   const ownBySlot = new Map(state.own.map((m) => [m.slot, m]));
   const calcs = new Map<number, Pokemon>();
   const calcFor = (m: OwnMon) => {
-    if (!calcs.has(m.slot)) calcs.set(m.slot, ownCalc(m));
+    if (!calcs.has(m.slot)) calcs.set(m.slot, ownCalc(gen, m));
     return calcs.get(m.slot)!;
   };
 
@@ -231,7 +246,7 @@ export function scoreActions(
     const mon = ownBySlot.get(slot);
     if (!mon || !foes.length) return 0;
     const calc = calcFor(mon);
-    const entry = hazardCost(state, mon);
+    const entry = hazardCost(gen, state, mon);
     if (forced) return matchup(ctx, mon, calc, foes) - entry;
     const active = state.ownActive!;
     const gain = matchup(ctx, mon, calc, foes) - matchup(ctx, active, calcFor(active), foes);
@@ -241,7 +256,7 @@ export function scoreActions(
       params.risk * freeHit -
       entry -
       params.switchPenalty +
-      (resists(mon, foes) ? params.resistBias : 0)
+      (resists(gen, mon, foes) ? params.resistBias : 0)
     );
   };
 
@@ -282,7 +297,7 @@ export function scoreActions(
     const slot = request?.active[0]?.moves[Number(n) - 1];
     const name = slot?.name ?? me.set.moves[Number(n) - 1] ?? '';
     const id = moveId(name);
-    const info = moveInfo(name);
+    const info = moveInfo(gen, name);
     const dmg = foes.length ? ourHit(ctx, meCalc, `${me.slot}`, name, targets) : { frac: 0, ko: 0 };
     const goesFirst = info.priority > 0 ? 1 : info.priority < 0 ? 0 : first;
     const survive = 1 - taken.ko;
@@ -336,7 +351,7 @@ function statusValue(
   }
   if (id in STATUS) {
     if (!foe || foe.status || foe.substitute || foe.hpFrac < 0.4) return -0.05;
-    const types = typesOf(foe.species);
+    const types = typesOf(ctx.gen, foe.species);
     if (STATUS[id]!.some((t) => types.includes(t))) return -0.2;
     const physical = foes.reduce((a, f) => a + f.weight * (f.physical ? 1 : 0), 0);
     return params.status * (id === 'willowisp' ? 0.6 + 0.6 * physical : 1);

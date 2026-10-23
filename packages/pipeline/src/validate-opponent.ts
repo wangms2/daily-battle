@@ -1,5 +1,5 @@
 // Daily opponent validation (DESIGN.md §9.3).
-import { bestDamage, type SetLike } from '@daily-battle/ai';
+import { bestDamage, genFor, type SetLike } from '@daily-battle/ai';
 import { sets as defaultSets, type SetsFile } from '@daily-battle/data';
 import { generateOpponent, teamSets, type DailyOpponent, type Style } from '@daily-battle/gen';
 import type { PokemonSet } from '@pkmn/sim';
@@ -35,9 +35,15 @@ export interface OpponentCheck {
 type Config = typeof PIPELINE.opponent;
 
 /** Opponent Pokémon that no set in the pool can meaningfully damage. */
-export function hardCounters(opponent: PokemonSet[], poolSets: SetLike[], min: number): string[] {
+export function hardCounters(
+  opponent: PokemonSet[],
+  poolSets: SetLike[],
+  min: number,
+  data: SetsFile = defaultSets,
+): string[] {
+  const gen = genFor(data.meta.format);
   return opponent
-    .filter((foe) => Math.max(0, ...poolSets.map((s) => bestDamage(s, foe))) < min)
+    .filter((foe) => Math.max(0, ...poolSets.map((s) => bestDamage(gen, s, foe))) < min)
     .map((foe) => foe.species);
 }
 
@@ -57,13 +63,15 @@ export async function checkOpponent(
   sim: Simulator,
   seed: string,
   cfg: Config = PIPELINE.opponent,
+  data: SetsFile = defaultSets,
 ): Promise<OpponentCheck> {
   const metrics: OpponentMetrics = { turnCapRate: 0, hardCounters: [] };
   const problems: string[] = [];
   const all: JobResult[] = [];
-  const known = knownSetsOf(opponent);
+  const known = knownSetsOf(opponent, data);
   const play = async (bot: Bot, n: number, start = 0) => {
     const jobs: Job[] = Array.from({ length: n }, (_, k) => ({
+      format: data.meta.format,
       bot,
       player: playerTeams[(start + k) % playerTeams.length]!,
       opponent,
@@ -84,7 +92,7 @@ export async function checkOpponent(
     return { metrics, problems, distance };
   };
 
-  metrics.hardCounters = hardCounters(opponent, poolSets, cfg.hardCounterMinDamage);
+  metrics.hardCounters = hardCounters(opponent, poolSets, cfg.hardCounterMinDamage, data);
   if (metrics.hardCounters.length) {
     problems.push(`hard counter: nothing in the pool hurts ${metrics.hardCounters.join(', ')}`);
     return finish(1);
@@ -165,6 +173,7 @@ export async function validateDay(
       sim,
       `pipeline:${day}:c${candidate}`,
       cfg,
+      data,
     );
     if (!check.problems.length) return { opponent, candidate, accepted: 'pass', check, rejected };
     rejected.push({ candidate, check });

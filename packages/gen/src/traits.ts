@@ -1,8 +1,6 @@
-import { sets as defaultSets, type SetEntry, type SetsFile } from '@daily-battle/data';
+import { sets as defaultSets, genOf, type SetEntry, type SetsFile } from '@daily-battle/data';
 import { Dex } from '@pkmn/sim';
 import { CONFIG } from './config';
-
-const dex = Dex.forGen(4);
 
 export type Category = 'offense' | 'defense' | 'utility';
 
@@ -69,14 +67,21 @@ const IMMUNITY_ABILITIES: Record<string, string> = {
 };
 
 /** True if the species resists or is immune to `type` (by typing, or the ability its sets use). */
-export function checksType(species: string, entry: { sets: SetEntry[] }, type: string): boolean {
+export function checksType(
+  species: string,
+  entry: { sets: SetEntry[] },
+  type: string,
+  gen: number,
+): boolean {
   if (entry.sets.some((s) => IMMUNITY_ABILITIES[s.ability] === type)) return true;
+  const dex = Dex.forGen(gen);
   const { types } = dex.species.get(species);
   return !dex.getImmunity(type, types) || dex.getEffectiveness(type, types) < 0;
 }
 
 /** Types of a set's damaging same-type (STAB) moves. */
-export function stabTypes(species: string, set: SetEntry): string[] {
+export function stabTypes(species: string, set: SetEntry, gen: number): string[] {
+  const dex = Dex.forGen(gen);
   const { types } = dex.species.get(species);
   const out = new Set<string>();
   for (const name of set.moves) {
@@ -93,11 +98,12 @@ export function majorOffensiveTypes(
   data: SetsFile = defaultSets,
   minShare = CONFIG.majorTypeMinShare,
 ): string[] {
+  const gen = genOf(data.meta.format);
   const share = new Map<string, number>();
   let total = 0;
   for (const [species, entry] of Object.entries(data.species)) {
     for (const set of entry.sets) {
-      for (const type of stabTypes(species, set)) {
+      for (const type of stabTypes(species, set, gen)) {
         const w = entry.usage * set.weight;
         share.set(type, (share.get(type) ?? 0) + w);
         total += w;

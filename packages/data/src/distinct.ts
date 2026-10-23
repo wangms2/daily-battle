@@ -19,6 +19,13 @@ const SETUP: Record<string, string> = {
   'Tail Glow': 'special',
   Agility: 'speed',
   'Rock Polish': 'speed',
+  // Gen 5
+  'Quiver Dance': 'special',
+  Coil: 'physical',
+  'Hone Claws': 'physical',
+  'Shift Gear': 'physical',
+  'Shell Smash': 'mixed',
+  'Work Up': 'mixed',
 };
 /** Moves that give a set its own job on a team. */
 const ROLE_MOVES = [

@@ -53,6 +53,7 @@ describe('resolveSet', () => {
         evs: { hp: 252, spa: 4, spe: 252 },
       },
       usage,
+      4,
     );
     expect(set).toMatchObject({ item: 'Leftovers', nature: 'Timid', ability: 'Levitate' });
     expect(set?.evs).toEqual({ hp: 252, atk: 0, def: 0, spa: 4, spd: 0, spe: 252 });
@@ -64,6 +65,7 @@ describe('resolveSet', () => {
       'Starmie',
       { moves: ['Surf', 'Hidden Power Fire', 'Recover', 'Rapid Spin'] },
       usage,
+      4,
     );
     // Hidden Power Fire: Atk, SpA, and Spe IVs of 30.
     expect(set?.ivs).toMatchObject({ atk: 30, spa: 30, spe: 30 });
@@ -71,7 +73,12 @@ describe('resolveSet', () => {
 });
 
 describe('legalAbilities', () => {
-  it('uses Gen 4 abilities only', () => {
-    expect(legalAbilities('Gengar')).toEqual(['Levitate']);
+  it('uses only abilities that exist in the generation', () => {
+    expect(legalAbilities('Gengar', 4)).toEqual(['Levitate']);
+  });
+
+  it('allows hidden abilities from Gen 5 on', () => {
+    expect(legalAbilities('Politoed', 4)).not.toContain('Drizzle');
+    expect(legalAbilities('Politoed', 5)).toContain('Drizzle');
   });
 });

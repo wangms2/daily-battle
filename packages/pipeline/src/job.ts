@@ -1,6 +1,7 @@
 // One simulated battle: a player bot on a pool team (p1) against the opponent
 // AI on a daily opponent (p2). Plain data, so jobs can be sent to workers.
 import { aiForStyle, midBot, NaivePolicy, strongBot, type KnownSets } from '@daily-battle/ai';
+import { setsFor, type SetsFile } from '@daily-battle/data';
 import type { Style } from '@daily-battle/gen';
 import { deriveSeed, runBattle, type Policy } from '@daily-battle/sim-bridge';
 import type { PokemonSet } from '@pkmn/sim';
@@ -9,6 +10,8 @@ import { PIPELINE } from './config';
 export type Bot = 'mid' | 'informed' | 'naive' | 'strong';
 
 export interface Job {
+  /** The sim format, e.g. `gen4ou`; the AI and bots use that format's set data. */
+  format: string;
   bot: Bot;
   player: PokemonSet[];
   opponent: PokemonSet[];
@@ -31,31 +34,33 @@ export interface JobResult {
   opponentMisses: number;
 }
 
-function playerPolicy(job: Job): Policy {
+function playerPolicy(job: Job, data: SetsFile): Policy {
   switch (job.bot) {
     case 'mid':
-      return midBot();
+      return midBot({ data });
     case 'informed':
-      return midBot({ knownSets: job.known });
+      return midBot({ data, knownSets: job.known });
     case 'naive':
-      return new NaivePolicy();
+      return new NaivePolicy(data);
     case 'strong':
-      return strongBot();
+      return strongBot({ data });
   }
 }
 
 export function runJob(job: Job): JobResult {
+  const data = setsFor(job.format);
   const result = runBattle({
+    format: job.format,
     seed: deriveSeed(`${job.seed}:battle`, job.index),
     maxTurns: PIPELINE.maxTurns,
     p1: {
       team: job.player,
-      policy: playerPolicy(job),
+      policy: playerPolicy(job, data),
       seed: deriveSeed(`${job.seed}:p1`, job.index),
     },
     p2: {
       team: job.opponent,
-      policy: aiForStyle(job.style),
+      policy: aiForStyle(job.style, { data }),
       seed: deriveSeed(`${job.seed}:p2`, job.index),
     },
   });

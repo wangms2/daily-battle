@@ -2,14 +2,13 @@
 // Written separately from the generators' own predicates (pool.ts, opponent.ts,
 // traits.ts), scanning moves, EVs, and types directly, so a bug in one is
 // unlikely to hide in the other.
-import type { SetEntry, SetsFile } from '@daily-battle/data';
+import { genOf, type SetEntry, type SetsFile } from '@daily-battle/data';
 import { Dex, TeamValidator } from '@pkmn/sim';
 import { CONFIG } from './config';
 import type { DailyOpponent } from './opponent';
 import type { WeeklyPool } from './pool';
 import { teamSets } from './sets';
 
-const dex = Dex.forGen(4);
 const HAZARDS = ['Stealth Rock', 'Spikes', 'Toxic Spikes'];
 const usesAny = (set: SetEntry, moves: string[]) => set.moves.some((m) => moves.includes(m));
 const bulky = (s: SetEntry) => s.evs.hp >= 200 && Math.max(s.evs.def, s.evs.spd) >= 160;
@@ -42,6 +41,7 @@ export function verifyPool(pool: WeeklyPool, data: SetsFile, majorTypes: string[
     problems.push('too many top-tier');
   }
 
+  const dex = Dex.forGen(genOf(data.meta.format));
   for (const type of majorTypes) {
     const checked = species.some((s) => {
       const types = dex.species.get(s).types;
@@ -74,7 +74,7 @@ export function verifyOpponent(opponent: DailyOpponent, data: SetsFile): string[
   } catch {
     return [...problems, 'unknown set'];
   }
-  const invalid = TeamValidator.get(CONFIG.format).validateTeam(teamSets(data, team));
+  const invalid = TeamValidator.get(data.meta.format).validateTeam(teamSets(data, team));
   if (invalid) problems.push(`illegal: ${invalid.join(' ')}`);
   if (sets.filter((s) => usesAny(s, HAZARDS)).length > CONFIG.opponent.maxHazardSetters) {
     problems.push('too many hazard setters');

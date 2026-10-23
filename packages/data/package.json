@@ -2,11 +2,12 @@
   "name": "@daily-battle/data",
   "version": "0.0.0",
   "private": true,
-  "description": "Gen 4 OU set snapshot scripts and JSON (M1)",
+  "description": "Per-format set snapshots (Gen 4 OU first): scripts and JSON (M1)",
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./species": "./src/species-data.ts"
+    "./species": "./src/species-data.ts",
+    "./formats": "./src/formats.ts"
   },
   "scripts": {
     "refresh": "tsx scripts/refresh.ts",

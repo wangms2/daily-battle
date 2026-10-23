@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { jobOf, samePurpose } from './distinct';
-import { sets } from './index';
+import { FORMATS } from './formats';
+import { setsFor } from './index';
 
 const evs = (e: Partial<Record<'hp' | 'atk' | 'def' | 'spa' | 'spd' | 'spe', number>>) => ({
   hp: 0,
@@ -62,20 +63,23 @@ describe('distinct sets', () => {
     );
   });
 
-  it('offers every species 2 to 4 sets', () => {
-    for (const [name, entry] of Object.entries(sets.species)) {
+  it.each(Object.keys(FORMATS))('offers every %s species 2 to 4 sets', (format) => {
+    for (const [name, entry] of Object.entries(setsFor(format).species)) {
       expect(entry.sets.length, name).toBeGreaterThanOrEqual(2);
       expect(entry.sets.length, name).toBeLessThanOrEqual(4);
     }
   });
 
-  it('ships no two sets of a species that do the same job', () => {
-    for (const [name, entry] of Object.entries(sets.species)) {
-      entry.sets.forEach((a, i) =>
-        entry.sets.slice(i + 1).forEach((b) => {
-          expect(samePurpose(a, b), `${name}: ${a.sourceName} / ${b.sourceName}`).toBe(false);
-        }),
-      );
-    }
-  });
+  it.each(Object.keys(FORMATS))(
+    'ships no two %s sets of a species that do the same job',
+    (format) => {
+      for (const [name, entry] of Object.entries(setsFor(format).species)) {
+        entry.sets.forEach((a, i) =>
+          entry.sets.slice(i + 1).forEach((b) => {
+            expect(samePurpose(a, b), `${name}: ${a.sourceName} / ${b.sourceName}`).toBe(false);
+          }),
+        );
+      }
+    },
+  );
 });

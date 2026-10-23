@@ -50,6 +50,7 @@ function rater(week: string, candidate: number, sim: Simulator, data: SetsFile, 
       probes.slice(0, opponents).forEach((probe, p) => {
         for (let s = 0; s < seeds; s++) {
           jobs.push({
+            format: data.meta.format,
             bot: 'mid',
             player: teamSets(data, team),
             opponent: teamSets(data, probe.team),

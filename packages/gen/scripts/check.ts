@@ -1,7 +1,7 @@
 // Checks generator output over many keys (DESIGN.md §13 M3: 10,000 seeds).
-//   pnpm --filter @daily-battle/gen check [--n 10000]
+//   pnpm --filter @daily-battle/gen check [--format gen4ou] [--n 10000]
 // Exits non-zero on any constraint failure or illegal team.
-import { sets } from '@daily-battle/data';
+import { DEFAULT_FORMAT, setsFor } from '@daily-battle/data';
 import { addDays } from '../src/dates';
 import { generateOpponent } from '../src/opponent';
 import { generatePool } from '../src/pool';
@@ -10,6 +10,8 @@ import { verifyOpponent, verifyPool } from '../src/verify';
 
 const i = process.argv.indexOf('--n');
 const n = i > 0 ? Number(process.argv[i + 1]) : 10_000;
+const f = process.argv.indexOf('--format');
+const sets = setsFor(f > 0 ? process.argv[f + 1]! : DEFAULT_FORMAT);
 const START = '2026-01-05'; // a Monday
 const majorTypes = majorOffensiveTypes(sets);
 
@@ -36,7 +38,7 @@ let withSpikes = 0;
 let withRemover = 0;
 const belowOuCounts = new Map<number, number>();
 for (let k = 0; k < n; k++) {
-  const pool = generatePool(addDays(START, 7 * k));
+  const pool = generatePool(addDays(START, 7 * k), sets);
   poolAttempts.push(pool.attempts);
   for (const s of pool.species) poolCounts.set(s, (poolCounts.get(s) ?? 0) + 1);
   if (pool.species.some((s) => hasMove(s, ['Spikes', 'Toxic Spikes']))) withSpikes++;
@@ -51,7 +53,7 @@ const oppAttempts: number[] = [];
 const oppCounts = new Map<string, number>();
 const styles = new Map<string, number>();
 for (let k = 0; k < n; k++) {
-  const opponent = generateOpponent(addDays(START, k));
+  const opponent = generateOpponent(addDays(START, k), sets);
   oppAttempts.push(opponent.attempts);
   styles.set(opponent.style, (styles.get(opponent.style) ?? 0) + 1);
   for (const slot of opponent.team)

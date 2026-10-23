@@ -1,7 +1,7 @@
 export type StatID = 'hp' | 'atk' | 'def' | 'spa' | 'spd' | 'spe';
 export type Stats = Record<StatID, number>;
 
-/** One concrete, validator-clean set as shipped in `gen4ou/sets.json`. */
+/** One concrete, validator-clean set as shipped in `<format>/sets.json`. */
 export interface SetEntry {
   /** Stable id, e.g. `tyranitar-choice-band`. */
   id: string;
@@ -24,10 +24,13 @@ export interface SetEntry {
 export interface SpeciesEntry {
   /** Species-level weighted usage in OU, from the stats source (not normalized). */
   usage: number;
-  /** Current Gen 4 tier from the sim's data, e.g. `OU`, `UU`, `UUBL`, `NU`. */
+  /** Current tier in the format's generation, from the sim's data, e.g. `OU`, `UU`, `UUBL`, `NU`. */
   tier: string;
-  /** Which curated set list the sets came from. All sets are legal in gen4ou. */
-  setSource: 'gen4ou' | 'gen4uu';
+  /**
+   * Which curated set list the sets came from: the format itself (`gen4ou`) or
+   * its lower tier (`gen4uu`). All sets are legal in the format either way.
+   */
+  setSource: string;
   sets: SetEntry[];
 }
 

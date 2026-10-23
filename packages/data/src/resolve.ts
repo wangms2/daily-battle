@@ -1,8 +1,6 @@
 import { Dex, toID } from '@pkmn/sim';
 import type { ChaosSpecies, CuratedSet, Stats } from './types';
 
-const dex = Dex.forGen(4);
-
 /** Usage shares (0–1) keyed by id, e.g. `moves.get('earthquake')`. */
 export interface UsageShares {
   moves: Map<string, number>;
@@ -55,11 +53,17 @@ function fillStats(partial: Partial<Stats> | undefined, fill: number): Stats {
   return { hp: fill, atk: fill, def: fill, spa: fill, spd: fill, spe: fill, ...partial };
 }
 
-/** Gen 4 abilities the species can legally have. */
-export function legalAbilities(species: string): string[] {
+/**
+ * Abilities the species can legally have in a generation: ones introduced by
+ * then, and hidden abilities only from Gen 5 (the Dream World) on.
+ */
+export function legalAbilities(species: string, gen: number): string[] {
+  const dex = Dex.forGen(gen);
   const { abilities } = dex.species.get(species);
   return Object.entries(abilities)
-    .filter(([slot, name]) => slot !== 'H' && name && dex.abilities.get(name).gen <= 4)
+    .filter(
+      ([slot, name]) => (slot !== 'H' || gen >= 5) && name && dex.abilities.get(name).gen <= gen,
+    )
     .map(([, name]) => name);
 }
 
@@ -101,13 +105,18 @@ export function resolveSet(
   species: string,
   set: CuratedSet,
   usage: UsageShares,
+  gen: number,
+  /** Abilities never to pick, falling back to the species' others (see `BUILD_RULES` in build.ts). */
+  avoidAbilities: readonly string[] = [],
 ): ResolvedSet | null {
+  const dex = Dex.forGen(gen);
   const moves = pickMoves(set.moves.map(asArray), usage.moves);
   if (!moves) return null;
 
-  const abilityOptions = asArray(set.ability);
+  const allowed = (abilities: string[]) => abilities.filter((a) => !avoidAbilities.includes(a));
+  const abilityOptions = allowed(asArray(set.ability));
   const ability = pick(
-    abilityOptions.length ? abilityOptions : legalAbilities(species),
+    abilityOptions.length ? abilityOptions : allowed(legalAbilities(species, gen)),
     usage.abilities,
   );
 

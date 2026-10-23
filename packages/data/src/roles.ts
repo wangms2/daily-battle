@@ -21,6 +21,13 @@ const SETUP_MOVES = [
   'Curse',
   'Belly Drum',
   'Tail Glow',
+  // Gen 5
+  'Quiver Dance',
+  'Shell Smash',
+  'Coil',
+  'Shift Gear',
+  'Hone Claws',
+  'Work Up',
 ];
 const HAZARDS = ['Stealth Rock', 'Spikes', 'Toxic Spikes'];
 const RECOVERY = [
@@ -33,6 +40,14 @@ const RECOVERY = [
   'Wish',
   'Rest',
 ];
+
+/** Abilities that set weather on switch-in, which lasts indefinitely in Gens 3–5. */
+const WEATHER_ABILITIES: Record<string, { name: string; summons: string }> = {
+  Drizzle: { name: 'Rain', summons: 'rain' },
+  Drought: { name: 'Sun', summons: 'harsh sunlight' },
+  'Sand Stream': { name: 'Sandstorm', summons: 'a sandstorm' },
+  'Snow Warning': { name: 'Hail', summons: 'hail' },
+};
 
 const has = (set: RoleInput, move: string) => set.moves.includes(move);
 const isBulky = (s: RoleInput) => s.evs.hp >= 200 && (s.evs.def >= 160 || s.evs.spd >= 160);
@@ -163,6 +178,13 @@ const RULES: Rule[] = [
         };
   },
   (s) =>
+    s.item === 'Eviolite'
+      ? {
+          label: 'Eviolite tank',
+          description: 'Holds Eviolite to take hits far better than its stats suggest.',
+        }
+      : null,
+  (s) =>
     s.evs.atk >= 60 && s.evs.spa >= 60
       ? {
           label: 'Mixed attacker',
@@ -179,6 +201,24 @@ const RULES: Rule[] = [
   (s) =>
     s.evs.spe >= 200 && (s.evs.atk >= 200 || s.evs.spa >= 200)
       ? { label: 'Fast attacker', description: 'Hits fast and hard with wide move coverage.' }
+      : null,
+  // Last, so they only name sets that no rule above describes.
+  (s) => {
+    const weather = WEATHER_ABILITIES[s.ability];
+    if (!weather) return null;
+    return {
+      label: `${weather.name} setter`,
+      description: `Summons ${weather.summons} as it switches in, which lasts until another weather replaces it.`,
+    };
+  },
+  // Volt Switch only: U-turn sets already have labels from Gen 4.
+  (s) =>
+    has(s, 'Volt Switch')
+      ? {
+          label: 'Pivot',
+          description:
+            'Takes a hit, then switches out with Volt Switch to bring in the right teammate.',
+        }
       : null,
 ];
 

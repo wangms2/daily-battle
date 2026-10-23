@@ -3,7 +3,7 @@ import { deriveSeed, makeRng, randomTeam, runBattle } from '@daily-battle/sim-br
 import { describe, expect, it } from 'vitest';
 import { candidates } from './belief';
 import { midBot } from './bots';
-import { hit, makeField, makeMon } from './calc';
+import { genFor, hit, makeField, makeMon } from './calc';
 import { sample, softmax } from './choose';
 import type { FoeMon } from './state';
 
@@ -54,7 +54,7 @@ describe('calc wrapper', () => {
   const conds = { sr: false, spikes: 0, tspikes: 0, reflect: false, lightScreen: false };
   const mon = (species: string, setIndex = 0, hpFrac = 1) => {
     const s = sets.species[species]!.sets[setIndex]!;
-    return makeMon({ species, ...s, boosts: {}, status: '', hpFrac });
+    return makeMon(genFor('gen4ou'), { species, ...s, boosts: {}, status: '', hpFrac });
   };
 
   it('knows Fire Blast OHKOs Scizor', () => {

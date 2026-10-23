@@ -1,6 +1,6 @@
-import { sets as defaultSets, type SetsFile } from '@daily-battle/data';
+import { sets as defaultSets, genOf, type SetsFile } from '@daily-battle/data';
 import { TeamValidator } from '@pkmn/sim';
-import { CONFIG, GENERATOR_VERSION, OU_TIERS } from './config';
+import { CONFIG, GENERATOR_VERSION, OU_TIERS, seedPrefix } from './config';
 import { candidateKey, rngFor, weightedSample } from './rng';
 import { toPokemonSet } from './sets';
 import { checksType, majorOffensiveTypes, speciesTraits } from './traits';
@@ -44,8 +44,9 @@ export function poolProblems(species: string[], data: SetsFile = defaultSets): s
     problems.push('too few defensive');
   }
   if (count((t) => t.categories.has('utility')) < pool.minUtility) problems.push('too few utility');
+  const gen = genOf(data.meta.format);
   for (const type of majorOffensiveTypes(data)) {
-    if (!species.some((s) => checksType(s, data.species[s]!, type))) {
+    if (!species.some((s) => checksType(s, data.species[s]!, type, gen))) {
       problems.push(`no ${type} check`);
     }
   }
@@ -55,7 +56,7 @@ export function poolProblems(species: string[], data: SetsFile = defaultSets): s
       .sort((a, b) => data.species[b]!.usage - data.species[a]!.usage)
       .slice(0, 6)
       .map((s) => toPokemonSet(s, data.species[s]!.sets[0]!));
-    if (TeamValidator.get(CONFIG.format).validateTeam(team)) problems.push('no legal team');
+    if (TeamValidator.get(data.meta.format).validateTeam(team)) problems.push('no legal team');
   }
   return problems;
 }
@@ -74,7 +75,9 @@ export function generatePool(
   candidate = 0,
 ): WeeklyPool {
   const { pool } = CONFIG;
-  const rng = rngFor(candidateKey(`gen${GENERATOR_VERSION}:week:${week}`, candidate));
+  const rng = rngFor(
+    candidateKey(`${seedPrefix(data.meta.format)}gen${GENERATOR_VERSION}:week:${week}`, candidate),
+  );
   const names = Object.keys(data.species);
   const ou = names.filter((s) => !isBelowOu(data, s));
   const belowOu = names.filter((s) => isBelowOu(data, s));

@@ -1,0 +1,3665 @@
+{
+  "species": {
+    "Latios": {
+      "types": [
+        "Dragon",
+        "Psychic"
+      ],
+      "baseStats": {
+        "hp": 80,
+        "atk": 90,
+        "def": 80,
+        "spa": 130,
+        "spd": 110,
+        "spe": 110
+      },
+      "tier": "OU",
+      "num": 381
+    },
+    "Tyranitar": {
+      "types": [
+        "Rock",
+        "Dark"
+      ],
+      "baseStats": {
+        "hp": 100,
+        "atk": 134,
+        "def": 110,
+        "spa": 95,
+        "spd": 100,
+        "spe": 61
+      },
+      "tier": "OU",
+      "num": 248
+    },
+    "Starmie": {
+      "types": [
+        "Water",
+        "Psychic"
+      ],
+      "baseStats": {
+        "hp": 60,
+        "atk": 75,
+        "def": 85,
+        "spa": 100,
+        "spd": 85,
+        "spe": 115
+      },
+      "tier": "OU",
+      "num": 121
+    },
+    "Ferrothorn": {
+      "types": [
+        "Grass",
+        "Steel"
+      ],
+      "baseStats": {
+        "hp": 74,
+        "atk": 94,
+        "def": 131,
+        "spa": 54,
+        "spd": 116,
+        "spe": 20
+      },
+      "tier": "OU",
+      "num": 598
+    },
+    "Garchomp": {
+      "types": [
+        "Dragon",
+        "Ground"
+      ],
+      "baseStats": {
+        "hp": 108,
+        "atk": 130,
+        "def": 95,
+        "spa": 80,
+        "spd": 85,
+        "spe": 102
+      },
+      "tier": "OU",
+      "num": 445
+    },
+    "Jirachi": {
+      "types": [
+        "Steel",
+        "Psychic"
+      ],
+      "baseStats": {
+        "hp": 100,
+        "atk": 100,
+        "def": 100,
+        "spa": 100,
+        "spd": 100,
+        "spe": 100
+      },
+      "tier": "OU",
+      "num": 385
+    },
+    "Landorus-Therian": {
+      "types": [
+        "Ground",
+        "Flying"
+      ],
+      "baseStats": {
+        "hp": 89,
+        "atk": 145,
+        "def": 90,
+        "spa": 105,
+        "spd": 80,
+        "spe": 91
+      },
+      "tier": "OU",
+      "num": 645
+    },
+    "Scizor": {
+      "types": [
+        "Bug",
+        "Steel"
+      ],
+      "baseStats": {
+        "hp": 70,
+        "atk": 130,
+        "def": 100,
+        "spa": 55,
+        "spd": 80,
+        "spe": 65
+      },
+      "tier": "OU",
+      "num": 212
+    },
+    "Dragonite": {
+      "types": [
+        "Dragon",
+        "Flying"
+      ],
+      "baseStats": {
+        "hp": 91,
+        "atk": 134,
+        "def": 95,
+        "spa": 100,
+        "spd": 100,
+        "spe": 80
+      },
+      "tier": "OU",
+      "num": 149
+    },
+    "Politoed": {
+      "types": [
+        "Water"
+      ],
+      "baseStats": {
+        "hp": 90,
+        "atk": 75,
+        "def": 75,
+        "spa": 90,
+        "spd": 100,
+        "spe": 70
+      },
+      "tier": "OU",
+      "num": 186
+    },
+    "Keldeo": {
+      "types": [
+        "Water",
+        "Fighting"
+      ],
+      "baseStats": {
+        "hp": 91,
+        "atk": 72,
+        "def": 90,
+        "spa": 129,
+        "spd": 90,
+        "spe": 108
+      },
+      "tier": "OU",
+      "num": 647
+    },
+    "Alakazam": {
+      "types": [
+        "Psychic"
+      ],
+      "baseStats": {
+        "hp": 55,
+        "atk": 50,
+        "def": 45,
+        "spa": 135,
+        "spd": 85,
+        "spe": 120
+      },
+      "tier": "OU",
+      "num": 65
+    },
+    "Excadrill": {
+      "types": [
+        "Ground",
+        "Steel"
+      ],
+      "baseStats": {
+        "hp": 110,
+        "atk": 135,
+        "def": 60,
+        "spa": 50,
+        "spd": 65,
+        "spe": 88
+      },
+      "tier": "OU",
+      "num": 530
+    },
+    "Volcarona": {
+      "types": [
+        "Bug",
+        "Fire"
+      ],
+      "baseStats": {
+        "hp": 85,
+        "atk": 60,
+        "def": 65,
+        "spa": 135,
+        "spd": 105,
+        "spe": 100
+      },
+      "tier": "OU",
+      "num": 637
+    },
+    "Rotom-Wash": {
+      "types": [
+        "Electric",
+        "Water"
+      ],
+      "baseStats": {
+        "hp": 50,
+        "atk": 65,
+        "def": 107,
+        "spa": 105,
+        "spd": 107,
+        "spe": 86
+      },
+      "tier": "OU",
+      "num": 479
+    },
+    "Skarmory": {
+      "types": [
+        "Steel",
+        "Flying"
+      ],
+      "baseStats": {
+        "hp": 65,
+        "atk": 80,
+        "def": 140,
+        "spa": 40,
+        "spd": 70,
+        "spe": 70
+      },
+      "tier": "OU",
+      "num": 227
+    },
+    "Conkeldurr": {
+      "types": [
+        "Fighting"
+      ],
+      "baseStats": {
+        "hp": 105,
+        "atk": 140,
+        "def": 95,
+        "spa": 55,
+        "spd": 65,
+        "spe": 45
+      },
+      "tier": "OU",
+      "num": 534
+    },
+    "Thundurus-Therian": {
+      "types": [
+        "Electric",
+        "Flying"
+      ],
+      "baseStats": {
+        "hp": 79,
+        "atk": 105,
+        "def": 70,
+        "spa": 145,
+        "spd": 80,
+        "spe": 101
+      },
+      "tier": "OU",
+      "num": 642
+    },
+    "Jellicent": {
+      "types": [
+        "Water",
+        "Ghost"
+      ],
+      "baseStats": {
+        "hp": 100,
+        "atk": 60,
+        "def": 70,
+        "spa": 85,
+        "spd": 105,
+        "spe": 60
+      },
+      "tier": "OU",
+      "num": 593
+    },
+    "Tentacruel": {
+      "types": [
+        "Water",
+        "Poison"
+      ],
+      "baseStats": {
+        "hp": 80,
+        "atk": 70,
+        "def": 65,
+        "spa": 80,
+        "spd": 120,
+        "spe": 100
+      },
+      "tier": "OU",
+      "num": 73
+    },
+    "Heatran": {
+      "types": [
+        "Fire",
+        "Steel"
+      ],
+      "baseStats": {
+        "hp": 91,
+        "atk": 90,
+        "def": 106,
+        "spa": 130,
+        "spd": 106,
+        "spe": 77
+      },
+      "tier": "OU",
+      "num": 485
+    },
+    "Reuniclus": {
+      "types": [
+        "Psychic"
+      ],
+      "baseStats": {
+        "hp": 110,
+        "atk": 65,
+        "def": 75,
+        "spa": 125,
+        "spd": 85,
+        "spe": 30
+      },
+      "tier": "OU",
+      "num": 579
+    },
+    "Kyurem-Black": {
+      "types": [
+        "Dragon",
+        "Ice"
+      ],
+      "baseStats": {
+        "hp": 125,
+        "atk": 170,
+        "def": 100,
+        "spa": 120,
+        "spd": 90,
+        "spe": 95
+      },
+      "tier": "OU",
+      "num": 646
+    },
+    "Gliscor": {
+      "types": [
+        "Ground",
+        "Flying"
+      ],
+      "baseStats": {
+        "hp": 75,
+        "atk": 95,
+        "def": 125,
+        "spa": 45,
+        "spd": 75,
+        "spe": 95
+      },
+      "tier": "OU",
+      "num": 472
+    },
+    "Forretress": {
+      "types": [
+        "Bug",
+        "Steel"
+      ],
+      "baseStats": {
+        "hp": 75,
+        "atk": 90,
+        "def": 140,
+        "spa": 60,
+        "spd": 60,
+        "spe": 40
+      },
+      "tier": "OU",
+      "num": 205
+    },
+    "Breloom": {
+      "types": [
+        "Grass",
+        "Fighting"
+      ],
+      "baseStats": {
+        "hp": 60,
+        "atk": 130,
+        "def": 80,
+        "spa": 60,
+        "spd": 60,
+        "spe": 70
+      },
+      "tier": "OU",
+      "num": 286
+    },
+    "Terrakion": {
+      "types": [
+        "Rock",
+        "Fighting"
+      ],
+      "baseStats": {
+        "hp": 91,
+        "atk": 129,
+        "def": 90,
+        "spa": 72,
+        "spd": 90,
+        "spe": 108
+      },
+      "tier": "OU",
+      "num": 639
+    },
+    "Magnezone": {
+      "types": [
+        "Electric",
+        "Steel"
+      ],
+      "baseStats": {
+        "hp": 70,
+        "atk": 70,
+        "def": 115,
+        "spa": 130,
+        "spd": 90,
+        "spe": 60
+      },
+      "tier": "OU",
+      "num": 462
+    },
+    "Latias": {
+      "types": [
+        "Dragon",
+        "Psychic"
+      ],
+      "baseStats": {
+        "hp": 80,
+        "atk": 80,
+        "def": 90,
+        "spa": 110,
+        "spd": 130,
+        "spe": 110
+      },
+      "tier": "OU",
+      "num": 380
+    },
+    "Mamoswine": {
+      "types": [
+        "Ice",
+        "Ground"
+      ],
+      "baseStats": {
+        "hp": 110,
+        "atk": 130,
+        "def": 80,
+        "spa": 70,
+        "spd": 60,
+        "spe": 80
+      },
+      "tier": "OU",
+      "num": 473
+    },
+    "Blissey": {
+      "types": [
+        "Normal"
+      ],
+      "baseStats": {
+        "hp": 255,
+        "atk": 10,
+        "def": 10,
+        "spa": 75,
+        "spd": 135,
+        "spe": 55
+      },
+      "tier": "OU",
+      "num": 242
+    },
+    "Gyarados": {
+      "types": [
+        "Water",
+        "Flying"
+      ],
+      "baseStats": {
+        "hp": 95,
+        "atk": 125,
+        "def": 79,
+        "spa": 60,
+        "spd": 100,
+        "spe": 81
+      },
+      "tier": "OU",
+      "num": 130
+    },
+    "Gengar": {
+      "types": [
+        "Ghost",
+        "Poison"
+      ],
+      "baseStats": {
+        "hp": 60,
+        "atk": 65,
+        "def": 60,
+        "spa": 130,
+        "spd": 75,
+        "spe": 110
+      },
+      "tier": "OU",
+      "num": 94
+    },
+    "Xatu": {
+      "types": [
+        "Psychic",
+        "Flying"
+      ],
+      "baseStats": {
+        "hp": 65,
+        "atk": 75,
+        "def": 70,
+        "spa": 95,
+        "spd": 70,
+        "spe": 95
+      },
+      "tier": "UU",
+      "num": 178
+    },
+    "Ninetales": {
+      "types": [
+        "Fire"
+      ],
+      "baseStats": {
+        "hp": 73,
+        "atk": 76,
+        "def": 75,
+        "spa": 81,
+        "spd": 100,
+        "spe": 100
+      },
+      "tier": "OU",
+      "num": 38
+    },
+    "Hippowdon": {
+      "types": [
+        "Ground"
+      ],
+      "baseStats": {
+        "hp": 108,
+        "atk": 112,
+        "def": 118,
+        "spa": 68,
+        "spd": 72,
+        "spe": 47
+      },
+      "tier": "OU",
+      "num": 450
+    },
+    "Celebi": {
+      "types": [
+        "Psychic",
+        "Grass"
+      ],
+      "baseStats": {
+        "hp": 100,
+        "atk": 100,
+        "def": 100,
+        "spa": 100,
+        "spd": 100,
+        "spe": 100
+      },
+      "tier": "OU",
+      "num": 251
+    },
+    "Abomasnow": {
+      "types": [
+        "Grass",
+        "Ice"
+      ],
+      "baseStats": {
+        "hp": 90,
+        "atk": 92,
+        "def": 75,
+        "spa": 92,
+        "spd": 85,
+        "spe": 60
+      },
+      "tier": "UU",
+      "num": 460
+    },
+    "Salamence": {
+      "types": [
+        "Dragon",
+        "Flying"
+      ],
+      "baseStats": {
+        "hp": 95,
+        "atk": 135,
+        "def": 80,
+        "spa": 110,
+        "spd": 80,
+        "spe": 100
+      },
+      "tier": "OU",
+      "num": 373
+    },
+    "Clefable": {
+      "types": [
+        "Normal"
+      ],
+      "baseStats": {
+        "hp": 95,
+        "atk": 70,
+        "def": 73,
+        "spa": 85,
+        "spd": 90,
+        "spe": 60
+      },
+      "tier": "RU",
+      "num": 36
+    },
+    "Victini": {
+      "types": [
+        "Psychic",
+        "Fire"
+      ],
+      "baseStats": {
+        "hp": 100,
+        "atk": 100,
+        "def": 100,
+        "spa": 100,
+        "spd": 100,
+        "spe": 100
+      },
+      "tier": "UU",
+      "num": 494
+    },
+    "Tornadus": {
+      "types": [
+        "Flying"
+      ],
+      "baseStats": {
+        "hp": 79,
+        "atk": 115,
+        "def": 70,
+        "spa": 125,
+        "spd": 80,
+        "spe": 111
+      },
+      "tier": "UU",
+      "num": 641
+    },
+    "Chansey": {
+      "types": [
+        "Normal"
+      ],
+      "baseStats": {
+        "hp": 250,
+        "atk": 5,
+        "def": 5,
+        "spa": 35,
+        "spd": 105,
+        "spe": 50
+      },
+      "tier": "UUBL",
+      "num": 113
+    },
+    "Hydreigon": {
+      "types": [
+        "Dark",
+        "Dragon"
+      ],
+      "baseStats": {
+        "hp": 92,
+        "atk": 105,
+        "def": 90,
+        "spa": 125,
+        "spd": 90,
+        "spe": 98
+      },
+      "tier": "(OU)",
+      "num": 635
+    },
+    "Metagross": {
+      "types": [
+        "Steel",
+        "Psychic"
+      ],
+      "baseStats": {
+        "hp": 80,
+        "atk": 135,
+        "def": 130,
+        "spa": 95,
+        "spd": 90,
+        "spe": 70
+      },
+      "tier": "(OU)",
+      "num": 376
+    },
+    "Seismitoad": {
+      "types": [
+        "Water",
+        "Ground"
+      ],
+      "baseStats": {
+        "hp": 105,
+        "atk": 85,
+        "def": 75,
+        "spa": 85,
+        "spd": 75,
+        "spe": 74
+      },
+      "tier": "NU",
+      "num": 537
+    },
+    "Cresselia": {
+      "types": [
+        "Psychic"
+      ],
+      "baseStats": {
+        "hp": 120,
+        "atk": 70,
+        "def": 120,
+        "spa": 75,
+        "spd": 130,
+        "spe": 85
+      },
+      "tier": "RUBL",
+      "num": 488
+    },
+    "Bronzong": {
+      "types": [
+        "Steel",
+        "Psychic"
+      ],
+      "baseStats": {
+        "hp": 67,
+        "atk": 89,
+        "def": 116,
+        "spa": 79,
+        "spd": 116,
+        "spe": 33
+      },
+      "tier": "UU",
+      "num": 437
+    },
+    "Slowbro": {
+      "types": [
+        "Water",
+        "Psychic"
+      ],
+      "baseStats": {
+        "hp": 95,
+        "atk": 75,
+        "def": 110,
+        "spa": 100,
+        "spd": 80,
+        "spe": 30
+      },
+      "tier": "UU",
+      "num": 80
+    },
+    "Amoonguss": {
+      "types": [
+        "Grass",
+        "Poison"
+      ],
+      "baseStats": {
+        "hp": 114,
+        "atk": 85,
+        "def": 70,
+        "spa": 85,
+        "spd": 80,
+        "spe": 30
+      },
+      "tier": "RU",
+      "num": 591
+    },
+    "Weavile": {
+      "types": [
+        "Dark",
+        "Ice"
+      ],
+      "baseStats": {
+        "hp": 70,
+        "atk": 120,
+        "def": 65,
+        "spa": 45,
+        "spd": 85,
+        "spe": 125
+      },
+      "tier": "UU",
+      "num": 461
+    },
+    "Gastrodon": {
+      "types": [
+        "Water",
+        "Ground"
+      ],
+      "baseStats": {
+        "hp": 111,
+        "atk": 83,
+        "def": 68,
+        "spa": 92,
+        "spd": 82,
+        "spe": 39
+      },
+      "tier": "(OU)",
+      "num": 423
+    },
+    "Donphan": {
+      "types": [
+        "Ground"
+      ],
+      "baseStats": {
+        "hp": 90,
+        "atk": 120,
+        "def": 120,
+        "spa": 60,
+        "spd": 60,
+        "spe": 50
+      },
+      "tier": "(OU)",
+      "num": 232
+    },
+    "Lucario": {
+      "types": [
+        "Fighting",
+        "Steel"
+      ],
+      "baseStats": {
+        "hp": 70,
+        "atk": 110,
+        "def": 70,
+        "spa": 115,
+        "spd": 70,
+        "spe": 90
+      },
+      "tier": "OU",
+      "num": 448
+    },
+    "Infernape": {
+      "types": [
+        "Fire",
+        "Fighting"
+      ],
+      "baseStats": {
+        "hp": 76,
+        "atk": 104,
+        "def": 71,
+        "spa": 104,
+        "spd": 71,
+        "spe": 108
+      },
+      "tier": "(OU)",
+      "num": 392
+    },
+    "Toxicroak": {
+      "types": [
+        "Poison",
+        "Fighting"
+      ],
+      "baseStats": {
+        "hp": 83,
+        "atk": 106,
+        "def": 65,
+        "spa": 86,
+        "spd": 65,
+        "spe": 85
+      },
+      "tier": "(OU)",
+      "num": 454
+    },
+    "Haxorus": {
+      "types": [
+        "Dragon"
+      ],
+      "baseStats": {
+        "hp": 76,
+        "atk": 147,
+        "def": 90,
+        "spa": 60,
+        "spd": 70,
+        "spe": 97
+      },
+      "tier": "(OU)",
+      "num": 612
+    },
+    "Espeon": {
+      "types": [
+        "Psychic"
+      ],
+      "baseStats": {
+        "hp": 65,
+        "atk": 65,
+        "def": 60,
+        "spa": 130,
+        "spd": 95,
+        "spe": 110
+      },
+      "tier": "(OU)",
+      "num": 196
+    },
+    "Mienshao": {
+      "types": [
+        "Fighting"
+      ],
+      "baseStats": {
+        "hp": 65,
+        "atk": 125,
+        "def": 60,
+        "spa": 95,
+        "spd": 60,
+        "spe": 105
+      },
+      "tier": "UU",
+      "num": 620
+    },
+    "Chandelure": {
+      "types": [
+        "Ghost",
+        "Fire"
+      ],
+      "baseStats": {
+        "hp": 60,
+        "atk": 55,
+        "def": 90,
+        "spa": 145,
+        "spd": 90,
+        "spe": 80
+      },
+      "tier": "UUBL",
+      "num": 609
+    },
+    "Mew": {
+      "types": [
+        "Psychic"
+      ],
+      "baseStats": {
+        "hp": 100,
+        "atk": 100,
+        "def": 100,
+        "spa": 100,
+        "spd": 100,
+        "spe": 100
+      },
+      "tier": "UU",
+      "num": 151
+    },
+    "Kingdra": {
+      "types": [
+        "Water",
+        "Dragon"
+      ],
+      "baseStats": {
+        "hp": 75,
+        "atk": 95,
+        "def": 95,
+        "spa": 95,
+        "spd": 95,
+        "spe": 85
+      },
+      "tier": "UU",
+      "num": 230
+    },
+    "Venusaur": {
+      "types": [
+        "Grass",
+        "Poison"
+      ],
+      "baseStats": {
+        "hp": 80,
+        "atk": 82,
+        "def": 83,
+        "spa": 100,
+        "spd": 100,
+        "spe": 80
+      },
+      "tier": "(OU)",
+      "num": 3
+    },
+    "Slowking": {
+      "types": [
+        "Water",
+        "Psychic"
+      ],
+      "baseStats": {
+        "hp": 95,
+        "atk": 75,
+        "def": 80,
+        "spa": 100,
+        "spd": 110,
+        "spe": 30
+      },
+      "tier": "RU",
+      "num": 199
+    },
+    "Kyurem": {
+      "types": [
+        "Dragon",
+        "Ice"
+      ],
+      "baseStats": {
+        "hp": 125,
+        "atk": 130,
+        "def": 90,
+        "spa": 130,
+        "spd": 90,
+        "spe": 95
+      },
+      "tier": "UUBL",
+      "num": 646
+    },
+    "Magneton": {
+      "types": [
+        "Electric",
+        "Steel"
+      ],
+      "baseStats": {
+        "hp": 50,
+        "atk": 60,
+        "def": 95,
+        "spa": 120,
+        "spd": 70,
+        "spe": 70
+      },
+      "tier": "RU",
+      "num": 82
+    },
+    "Zapdos": {
+      "types": [
+        "Electric",
+        "Flying"
+      ],
+      "baseStats": {
+        "hp": 90,
+        "atk": 90,
+        "def": 85,
+        "spa": 125,
+        "spd": 90,
+        "spe": 100
+      },
+      "tier": "UU",
+      "num": 145
+    },
+    "Froslass": {
+      "types": [
+        "Ice",
+        "Ghost"
+      ],
+      "baseStats": {
+        "hp": 70,
+        "atk": 80,
+        "def": 70,
+        "spa": 80,
+        "spd": 70,
+        "spe": 110
+      },
+      "tier": "UUBL",
+      "num": 478
+    },
+    "Aerodactyl": {
+      "types": [
+        "Rock",
+        "Flying"
+      ],
+      "baseStats": {
+        "hp": 80,
+        "atk": 105,
+        "def": 65,
+        "spa": 60,
+        "spd": 75,
+        "spe": 130
+      },
+      "tier": "RU",
+      "num": 142
+    },
+    "Staraptor": {
+      "types": [
+        "Normal",
+        "Flying"
+      ],
+      "baseStats": {
+        "hp": 85,
+        "atk": 120,
+        "def": 70,
+        "spa": 50,
+        "spd": 50,
+        "spe": 100
+      },
+      "tier": "UUBL",
+      "num": 398
+    },
+    "Darmanitan": {
+      "types": [
+        "Fire"
+      ],
+      "baseStats": {
+        "hp": 105,
+        "atk": 140,
+        "def": 55,
+        "spa": 30,
+        "spd": 55,
+        "spe": 95
+      },
+      "tier": "UU",
+      "num": 555
+    },
+    "Suicune": {
+      "types": [
+        "Water"
+      ],
+      "baseStats": {
+        "hp": 100,
+        "atk": 75,
+        "def": 115,
+        "spa": 90,
+        "spd": 115,
+        "spe": 85
+      },
+      "tier": "UU",
+      "num": 245
+    },
+    "Azelf": {
+      "types": [
+        "Psychic"
+      ],
+      "baseStats": {
+        "hp": 75,
+        "atk": 125,
+        "def": 70,
+        "spa": 125,
+        "spd": 70,
+        "spe": 115
+      },
+      "tier": "UU",
+      "num": 482
+    },
+    "Nidoking": {
+      "types": [
+        "Poison",
+        "Ground"
+      ],
+      "baseStats": {
+        "hp": 81,
+        "atk": 92,
+        "def": 77,
+        "spa": 85,
+        "spd": 75,
+        "spe": 85
+      },
+      "tier": "UU",
+      "num": 34
+    },
+    "Sableye": {
+      "types": [
+        "Dark",
+        "Ghost"
+      ],
+      "baseStats": {
+        "hp": 50,
+        "atk": 75,
+        "def": 75,
+        "spa": 65,
+        "spd": 65,
+        "spe": 50
+      },
+      "tier": "UU",
+      "num": 302
+    },
+    "Ambipom": {
+      "types": [
+        "Normal"
+      ],
+      "baseStats": {
+        "hp": 75,
+        "atk": 100,
+        "def": 66,
+        "spa": 60,
+        "spd": 66,
+        "spe": 115
+      },
+      "tier": "UU",
+      "num": 424
+    },
+    "Bisharp": {
+      "types": [
+        "Dark",
+        "Steel"
+      ],
+      "baseStats": {
+        "hp": 65,
+        "atk": 125,
+        "def": 100,
+        "spa": 60,
+        "spd": 70,
+        "spe": 70
+      },
+      "tier": "UU",
+      "num": 625
+    },
+    "Heracross": {
+      "types": [
+        "Bug",
+        "Fighting"
+      ],
+      "baseStats": {
+        "hp": 80,
+        "atk": 125,
+        "def": 75,
+        "spa": 40,
+        "spd": 95,
+        "spe": 85
+      },
+      "tier": "UU",
+      "num": 214
+    },
+    "Togekiss": {
+      "types": [
+        "Normal",
+        "Flying"
+      ],
+      "baseStats": {
+        "hp": 85,
+        "atk": 50,
+        "def": 95,
+        "spa": 120,
+        "spd": 115,
+        "spe": 80
+      },
+      "tier": "UU",
+      "num": 468
+    },
+    "Crobat": {
+      "types": [
+        "Poison",
+        "Flying"
+      ],
+      "baseStats": {
+        "hp": 85,
+        "atk": 90,
+        "def": 80,
+        "spa": 70,
+        "spd": 80,
+        "spe": 130
+      },
+      "tier": "UU",
+      "num": 169
+    },
+    "Cofagrigus": {
+      "types": [
+        "Ghost"
+      ],
+      "baseStats": {
+        "hp": 58,
+        "atk": 50,
+        "def": 145,
+        "spa": 95,
+        "spd": 105,
+        "spe": 30
+      },
+      "tier": "UU",
+      "num": 563
+    },
+    "Empoleon": {
+      "types": [
+        "Water",
+        "Steel"
+      ],
+      "baseStats": {
+        "hp": 84,
+        "atk": 86,
+        "def": 88,
+        "spa": 111,
+        "spd": 101,
+        "spe": 60
+      },
+      "tier": "UU",
+      "num": 395
+    },
+    "Porygon2": {
+      "types": [
+        "Normal"
+      ],
+      "baseStats": {
+        "hp": 85,
+        "atk": 80,
+        "def": 90,
+        "spa": 105,
+        "spd": 95,
+        "spe": 60
+      },
+      "tier": "UU",
+      "num": 233
+    },
+    "Arcanine": {
+      "types": [
+        "Fire"
+      ],
+      "baseStats": {
+        "hp": 90,
+        "atk": 110,
+        "def": 80,
+        "spa": 100,
+        "spd": 80,
+        "spe": 95
+      },
+      "tier": "UU",
+      "num": 59
+    },
+    "Milotic": {
+      "types": [
+        "Water"
+      ],
+      "baseStats": {
+        "hp": 95,
+        "atk": 60,
+        "def": 79,
+        "spa": 100,
+        "spd": 125,
+        "spe": 81
+      },
+      "tier": "UU",
+      "num": 350
+    },
+    "Azumarill": {
+      "types": [
+        "Water"
+      ],
+      "baseStats": {
+        "hp": 100,
+        "atk": 50,
+        "def": 80,
+        "spa": 50,
+        "spd": 80,
+        "spe": 50
+      },
+      "tier": "UU",
+      "num": 184
+    },
+    "Umbreon": {
+      "types": [
+        "Dark"
+      ],
+      "baseStats": {
+        "hp": 95,
+        "atk": 65,
+        "def": 110,
+        "spa": 60,
+        "spd": 130,
+        "spe": 65
+      },
+      "tier": "UU",
+      "num": 197
+    },
+    "Raikou": {
+      "types": [
+        "Electric"
+      ],
+      "baseStats": {
+        "hp": 90,
+        "atk": 85,
+        "def": 75,
+        "spa": 115,
+        "spd": 100,
+        "spe": 115
+      },
+      "tier": "UU",
+      "num": 243
+    },
+    "Blastoise": {
+      "types": [
+        "Water"
+      ],
+      "baseStats": {
+        "hp": 79,
+        "atk": 83,
+        "def": 100,
+        "spa": 85,
+        "spd": 105,
+        "spe": 78
+      },
+      "tier": "UU",
+      "num": 9
+    },
+    "Machamp": {
+      "types": [
+        "Fighting"
+      ],
+      "baseStats": {
+        "hp": 90,
+        "atk": 130,
+        "def": 80,
+        "spa": 65,
+        "spd": 85,
+        "spe": 55
+      },
+      "tier": "UU",
+      "num": 68
+    },
+    "Scrafty": {
+      "types": [
+        "Dark",
+        "Fighting"
+      ],
+      "baseStats": {
+        "hp": 65,
+        "atk": 90,
+        "def": 115,
+        "spa": 45,
+        "spd": 115,
+        "spe": 58
+      },
+      "tier": "UU",
+      "num": 560
+    },
+    "Virizion": {
+      "types": [
+        "Grass",
+        "Fighting"
+      ],
+      "baseStats": {
+        "hp": 91,
+        "atk": 90,
+        "def": 72,
+        "spa": 90,
+        "spd": 129,
+        "spe": 108
+      },
+      "tier": "UU",
+      "num": 640
+    },
+    "Roserade": {
+      "types": [
+        "Grass",
+        "Poison"
+      ],
+      "baseStats": {
+        "hp": 60,
+        "atk": 70,
+        "def": 55,
+        "spa": 125,
+        "spd": 105,
+        "spe": 90
+      },
+      "tier": "UU",
+      "num": 407
+    },
+    "Honchkrow": {
+      "types": [
+        "Dark",
+        "Flying"
+      ],
+      "baseStats": {
+        "hp": 100,
+        "atk": 125,
+        "def": 52,
+        "spa": 105,
+        "spd": 52,
+        "spe": 71
+      },
+      "tier": "UU",
+      "num": 430
+    },
+    "Sharpedo": {
+      "types": [
+        "Water",
+        "Dark"
+      ],
+      "baseStats": {
+        "hp": 70,
+        "atk": 120,
+        "def": 40,
+        "spa": 95,
+        "spd": 40,
+        "spe": 95
+      },
+      "tier": "UU",
+      "num": 319
+    },
+    "Flygon": {
+      "types": [
+        "Ground",
+        "Dragon"
+      ],
+      "baseStats": {
+        "hp": 80,
+        "atk": 100,
+        "def": 80,
+        "spa": 80,
+        "spd": 80,
+        "spe": 100
+      },
+      "tier": "UU",
+      "num": 330
+    },
+    "Cobalion": {
+      "types": [
+        "Steel",
+        "Fighting"
+      ],
+      "baseStats": {
+        "hp": 91,
+        "atk": 90,
+        "def": 129,
+        "spa": 90,
+        "spd": 72,
+        "spe": 108
+      },
+      "tier": "UU",
+      "num": 638
+    },
+    "Hitmontop": {
+      "types": [
+        "Fighting"
+      ],
+      "baseStats": {
+        "hp": 50,
+        "atk": 95,
+        "def": 95,
+        "spa": 35,
+        "spd": 110,
+        "spe": 70
+      },
+      "tier": "UU",
+      "num": 237
+    },
+    "Claydol": {
+      "types": [
+        "Ground",
+        "Psychic"
+      ],
+      "baseStats": {
+        "hp": 60,
+        "atk": 70,
+        "def": 105,
+        "spa": 70,
+        "spd": 120,
+        "spe": 75
+      },
+      "tier": "UU",
+      "num": 344
+    },
+    "Dusclops": {
+      "types": [
+        "Ghost"
+      ],
+      "baseStats": {
+        "hp": 40,
+        "atk": 70,
+        "def": 130,
+        "spa": 60,
+        "spd": 130,
+        "spe": 25
+      },
+      "tier": "UU",
+      "num": 356
+    },
+    "Swampert": {
+      "types": [
+        "Water",
+        "Ground"
+      ],
+      "baseStats": {
+        "hp": 100,
+        "atk": 110,
+        "def": 90,
+        "spa": 85,
+        "spd": 90,
+        "spe": 60
+      },
+      "tier": "UU",
+      "num": 260
+    },
+    "Porygon-Z": {
+      "types": [
+        "Normal"
+      ],
+      "baseStats": {
+        "hp": 85,
+        "atk": 80,
+        "def": 70,
+        "spa": 135,
+        "spd": 75,
+        "spe": 90
+      },
+      "tier": "UU",
+      "num": 474
+    },
+    "Krookodile": {
+      "types": [
+        "Ground",
+        "Dark"
+      ],
+      "baseStats": {
+        "hp": 95,
+        "atk": 117,
+        "def": 70,
+        "spa": 65,
+        "spd": 70,
+        "spe": 92
+      },
+      "tier": "UU",
+      "num": 553
+    },
+    "Snorlax": {
+      "types": [
+        "Normal"
+      ],
+      "baseStats": {
+        "hp": 160,
+        "atk": 110,
+        "def": 65,
+        "spa": 65,
+        "spd": 110,
+        "spe": 30
+      },
+      "tier": "UU",
+      "num": 143
+    },
+    "Yanmega": {
+      "types": [
+        "Bug",
+        "Flying"
+      ],
+      "baseStats": {
+        "hp": 86,
+        "atk": 76,
+        "def": 86,
+        "spa": 116,
+        "spd": 56,
+        "spe": 95
+      },
+      "tier": "UU",
+      "num": 469
+    },
+    "Registeel": {
+      "types": [
+        "Steel"
+      ],
+      "baseStats": {
+        "hp": 80,
+        "atk": 75,
+        "def": 150,
+        "spa": 75,
+        "spd": 150,
+        "spe": 50
+      },
+      "tier": "UU",
+      "num": 379
+    },
+    "Meloetta": {
+      "types": [
+        "Normal",
+        "Psychic"
+      ],
+      "baseStats": {
+        "hp": 100,
+        "atk": 77,
+        "def": 77,
+        "spa": 128,
+        "spd": 128,
+        "spe": 90
+      },
+      "tier": "UU",
+      "num": 648
+    },
+    "Rhyperior": {
+      "types": [
+        "Ground",
+        "Rock"
+      ],
+      "baseStats": {
+        "hp": 115,
+        "atk": 140,
+        "def": 130,
+        "spa": 55,
+        "spd": 55,
+        "spe": 40
+      },
+      "tier": "UU",
+      "num": 464
+    }
+  },
+  "moves": {
+    "Agility": {
+      "type": "Psychic",
+      "category": "Status",
+      "power": 0,
+      "accuracy": true,
+      "pp": 30,
+      "priority": 0,
+      "contact": false,
+      "desc": "Raises the user's Speed by 2."
+    },
+    "Air Slash": {
+      "type": "Flying",
+      "category": "Special",
+      "power": 75,
+      "accuracy": 95,
+      "pp": 20,
+      "priority": 0,
+      "contact": false,
+      "desc": "30% chance to make the target flinch."
+    },
+    "Aqua Jet": {
+      "type": "Water",
+      "category": "Physical",
+      "power": 40,
+      "accuracy": 100,
+      "pp": 20,
+      "priority": 1,
+      "contact": true,
+      "desc": "Usually goes first."
+    },
+    "Aqua Tail": {
+      "type": "Water",
+      "category": "Physical",
+      "power": 90,
+      "accuracy": 90,
+      "pp": 10,
+      "priority": 0,
+      "contact": true,
+      "desc": "No additional effect."
+    },
+    "Aromatherapy": {
+      "type": "Grass",
+      "category": "Status",
+      "power": 0,
+      "accuracy": true,
+      "pp": 5,
+      "priority": 0,
+      "contact": false,
+      "desc": "Cures the user's party of all status conditions."
+    },
+    "Aura Sphere": {
+      "type": "Fighting",
+      "category": "Special",
+      "power": 90,
+      "accuracy": true,
+      "pp": 20,
+      "priority": 0,
+      "contact": false,
+      "desc": "This move does not check accuracy."
+    },
+    "Baton Pass": {
+      "type": "Normal",
+      "category": "Status",
+      "power": 0,
+      "accuracy": true,
+      "pp": 40,
+      "priority": 0,
+      "contact": false,
+      "desc": "User switches, passing stat changes and more."
+    },
+    "Beat Up": {
+      "type": "Dark",
+      "category": "Physical",
+      "power": 0,
+      "accuracy": 100,
+      "pp": 10,
+      "priority": 0,
+      "contact": false,
+      "desc": "All healthy allies aid in damaging the target."
+    },
+    "Blizzard": {
+      "type": "Ice",
+      "category": "Special",
+      "power": 120,
+      "accuracy": 70,
+      "pp": 5,
+      "priority": 0,
+      "contact": false,
+      "desc": "10% chance to freeze foe(s). Can't miss in Hail."
+    },
+    "Body Slam": {
+      "type": "Normal",
+      "category": "Physical",
+      "power": 85,
+      "accuracy": 100,
+      "pp": 15,
+      "priority": 0,
+      "contact": true,
+      "desc": "30% chance to paralyze the target."
+    },
+    "Bolt Strike": {
+      "type": "Electric",
+      "category": "Physical",
+      "power": 130,
+      "accuracy": 85,
+      "pp": 5,
+      "priority": 0,
+      "contact": true,
+      "desc": "20% chance to paralyze the target."
+    },
+    "Bounce": {
+      "type": "Flying",
+      "category": "Physical",
+      "power": 85,
+      "accuracy": 85,
+      "pp": 5,
+      "priority": 0,
+      "contact": true,
+      "desc": "Bounces turn 1. Hits turn 2. 30% paralyze."
+    },
+    "Brave Bird": {
+      "type": "Flying",
+      "category": "Physical",
+      "power": 120,
+      "accuracy": 100,
+      "pp": 15,
+      "priority": 0,
+      "contact": true,
+      "desc": "Has 33% recoil."
+    },
+    "Brick Break": {
+      "type": "Fighting",
+      "category": "Physical",
+      "power": 75,
+      "accuracy": 100,
+      "pp": 15,
+      "priority": 0,
+      "contact": true,
+      "desc": "Destroys screens, unless the target is immune."
+    },
+    "Bug Buzz": {
+      "type": "Bug",
+      "category": "Special",
+      "power": 90,
+      "accuracy": 100,
+      "pp": 10,
+      "priority": 0,
+      "contact": false,
+      "desc": "10% chance to lower the target's Sp. Def by 1."
+    },
+    "Bulk Up": {
+      "type": "Fighting",
+      "category": "Status",
+      "power": 0,
+      "accuracy": true,
+      "pp": 20,
+      "priority": 0,
+      "contact": false,
+      "desc": "Raises the user's Attack and Defense by 1."
+    },
+    "Bullet Punch": {
+      "type": "Steel",
+      "category": "Physical",
+      "power": 40,
+      "accuracy": 100,
+      "pp": 30,
+      "priority": 1,
+      "contact": true,
+      "desc": "Usually goes first."
+    },
+    "Bullet Seed": {
+      "type": "Grass",
+      "category": "Physical",
+      "power": 25,
+      "accuracy": 100,
+      "pp": 30,
+      "priority": 0,
+      "contact": false,
+      "desc": "Hits 2-5 times in one turn."
+    },
+    "Calm Mind": {
+      "type": "Psychic",
+      "category": "Status",
+      "power": 0,
+      "accuracy": true,
+      "pp": 20,
+      "priority": 0,
+      "contact": false,
+      "desc": "Raises the user's Sp. Atk and Sp. Def by 1."
+    },
+    "Charge Beam": {
+      "type": "Electric",
+      "category": "Special",
+      "power": 50,
+      "accuracy": 90,
+      "pp": 10,
+      "priority": 0,
+      "contact": false,
+      "desc": "70% chance to raise the user's Sp. Atk by 1."
+    },
+    "Clear Smog": {
+      "type": "Poison",
+      "category": "Special",
+      "power": 50,
+      "accuracy": true,
+      "pp": 15,
+      "priority": 0,
+      "contact": false,
+      "desc": "Resets all of the target's stat stages to 0."
+    },
+    "Close Combat": {
+      "type": "Fighting",
+      "category": "Physical",
+      "power": 120,
+      "accuracy": 100,
+      "pp": 5,
+      "priority": 0,
+      "contact": true,
+      "desc": "Lowers the user's Defense and Sp. Def by 1."
+    },
+    "Cross Poison": {
+      "type": "Poison",
+      "category": "Physical",
+      "power": 70,
+      "accuracy": 100,
+      "pp": 20,
+      "priority": 0,
+      "contact": true,
+      "desc": "High critical hit ratio. 10% chance to poison."
+    },
+    "Crunch": {
+      "type": "Dark",
+      "category": "Physical",
+      "power": 80,
+      "accuracy": 100,
+      "pp": 15,
+      "priority": 0,
+      "contact": true,
+      "desc": "20% chance to lower the target's Defense by 1."
+    },
+    "Curse": {
+      "type": "Ghost",
+      "category": "Status",
+      "power": 0,
+      "accuracy": true,
+      "pp": 10,
+      "priority": 0,
+      "contact": false,
+      "desc": "Curses if Ghost, else -1 Spe, +1 Atk, +1 Def."
+    },
+    "Dark Pulse": {
+      "type": "Dark",
+      "category": "Special",
+      "power": 80,
+      "accuracy": 100,
+      "pp": 15,
+      "priority": 0,
+      "contact": false,
+      "desc": "20% chance to make the target flinch."
+    },
+    "Destiny Bond": {
+      "type": "Ghost",
+      "category": "Status",
+      "power": 0,
+      "accuracy": true,
+      "pp": 5,
+      "priority": 0,
+      "contact": false,
+      "desc": "If an opponent knocks out the user, it also faints."
+    },
+    "Double-Edge": {
+      "type": "Normal",
+      "category": "Physical",
+      "power": 120,
+      "accuracy": 100,
+      "pp": 15,
+      "priority": 0,
+      "contact": true,
+      "desc": "Has 33% recoil."
+    },
+    "Draco Meteor": {
+      "type": "Dragon",
+      "category": "Special",
+      "power": 140,
+      "accuracy": 90,
+      "pp": 5,
+      "priority": 0,
+      "contact": false,
+      "desc": "Lowers the user's Sp. Atk by 2."
+    },
+    "Dragon Claw": {
+      "type": "Dragon",
+      "category": "Physical",
+      "power": 80,
+      "accuracy": 100,
+      "pp": 15,
+      "priority": 0,
+      "contact": true,
+      "desc": "No additional effect."
+    },
+    "Dragon Dance": {
+      "type": "Dragon",
+      "category": "Status",
+      "power": 0,
+      "accuracy": true,
+      "pp": 20,
+      "priority": 0,
+      "contact": false,
+      "desc": "Raises the user's Attack and Speed by 1."
+    },
+    "Dragon Pulse": {
+      "type": "Dragon",
+      "category": "Special",
+      "power": 90,
+      "accuracy": 100,
+      "pp": 10,
+      "priority": 0,
+      "contact": false,
+      "desc": "No additional effect."
+    },
+    "Dragon Tail": {
+      "type": "Dragon",
+      "category": "Physical",
+      "power": 60,
+      "accuracy": 90,
+      "pp": 10,
+      "priority": -6,
+      "contact": true,
+      "desc": "Forces the target to switch to a random ally."
+    },
+    "Drain Punch": {
+      "type": "Fighting",
+      "category": "Physical",
+      "power": 75,
+      "accuracy": 100,
+      "pp": 10,
+      "priority": 0,
+      "contact": true,
+      "desc": "User recovers 50% of the damage dealt."
+    },
+    "Dual Chop": {
+      "type": "Dragon",
+      "category": "Physical",
+      "power": 40,
+      "accuracy": 90,
+      "pp": 15,
+      "priority": 0,
+      "contact": true,
+      "desc": "Hits 2 times in one turn."
+    },
+    "Dynamic Punch": {
+      "type": "Fighting",
+      "category": "Physical",
+      "power": 100,
+      "accuracy": 50,
+      "pp": 5,
+      "priority": 0,
+      "contact": true,
+      "desc": "100% chance to confuse the target."
+    },
+    "Earth Power": {
+      "type": "Ground",
+      "category": "Special",
+      "power": 90,
+      "accuracy": 100,
+      "pp": 10,
+      "priority": 0,
+      "contact": false,
+      "desc": "10% chance to lower the target's Sp. Def by 1."
+    },
+    "Earthquake": {
+      "type": "Ground",
+      "category": "Physical",
+      "power": 100,
+      "accuracy": 100,
+      "pp": 10,
+      "priority": 0,
+      "contact": false,
+      "desc": "Hits adjacent Pokemon. Double damage on Dig."
+    },
+    "Encore": {
+      "type": "Normal",
+      "category": "Status",
+      "power": 0,
+      "accuracy": 100,
+      "pp": 5,
+      "priority": 0,
+      "contact": false,
+      "desc": "Target repeats its last move for its next 3 turns."
+    },
+    "Explosion": {
+      "type": "Normal",
+      "category": "Physical",
+      "power": 250,
+      "accuracy": 100,
+      "pp": 5,
+      "priority": 0,
+      "contact": false,
+      "desc": "Hits adjacent Pokemon. The user faints."
+    },
+    "Extrasensory": {
+      "type": "Psychic",
+      "category": "Special",
+      "power": 80,
+      "accuracy": 100,
+      "pp": 30,
+      "priority": 0,
+      "contact": false,
+      "desc": "10% chance to make the target flinch."
+    },
+    "Extreme Speed": {
+      "type": "Normal",
+      "category": "Physical",
+      "power": 80,
+      "accuracy": 100,
+      "pp": 5,
+      "priority": 2,
+      "contact": true,
+      "desc": "Nearly always goes first."
+    },
+    "Fake Out": {
+      "type": "Normal",
+      "category": "Physical",
+      "power": 40,
+      "accuracy": 100,
+      "pp": 10,
+      "priority": 3,
+      "contact": true,
+      "desc": "Hits first. First turn out only. 100% flinch chance."
+    },
+    "Fiery Dance": {
+      "type": "Fire",
+      "category": "Special",
+      "power": 80,
+      "accuracy": 100,
+      "pp": 10,
+      "priority": 0,
+      "contact": false,
+      "desc": "50% chance to raise the user's Sp. Atk by 1."
+    },
+    "Fire Blast": {
+      "type": "Fire",
+      "category": "Special",
+      "power": 120,
+      "accuracy": 85,
+      "pp": 5,
+      "priority": 0,
+      "contact": false,
+      "desc": "10% chance to burn the target."
+    },
+    "Fire Punch": {
+      "type": "Fire",
+      "category": "Physical",
+      "power": 75,
+      "accuracy": 100,
+      "pp": 15,
+      "priority": 0,
+      "contact": true,
+      "desc": "10% chance to burn the target."
+    },
+    "Flamethrower": {
+      "type": "Fire",
+      "category": "Special",
+      "power": 95,
+      "accuracy": 100,
+      "pp": 15,
+      "priority": 0,
+      "contact": false,
+      "desc": "10% chance to burn the target."
+    },
+    "Flare Blitz": {
+      "type": "Fire",
+      "category": "Physical",
+      "power": 120,
+      "accuracy": 100,
+      "pp": 15,
+      "priority": 0,
+      "contact": true,
+      "desc": "Has 33% recoil. 10% chance to burn. Thaws user."
+    },
+    "Flash Cannon": {
+      "type": "Steel",
+      "category": "Special",
+      "power": 80,
+      "accuracy": 100,
+      "pp": 10,
+      "priority": 0,
+      "contact": false,
+      "desc": "10% chance to lower the target's Sp. Def by 1."
+    },
+    "Focus Blast": {
+      "type": "Fighting",
+      "category": "Special",
+      "power": 120,
+      "accuracy": 70,
+      "pp": 5,
+      "priority": 0,
+      "contact": false,
+      "desc": "10% chance to lower the target's Sp. Def by 1."
+    },
+    "Focus Punch": {
+      "type": "Fighting",
+      "category": "Physical",
+      "power": 150,
+      "accuracy": 100,
+      "pp": 20,
+      "priority": -3,
+      "contact": true,
+      "desc": "Fails if the user takes damage before it hits."
+    },
+    "Foul Play": {
+      "type": "Dark",
+      "category": "Physical",
+      "power": 95,
+      "accuracy": 100,
+      "pp": 15,
+      "priority": 0,
+      "contact": true,
+      "desc": "Uses target's Attack stat in damage calculation."
+    },
+    "Fusion Bolt": {
+      "type": "Electric",
+      "category": "Physical",
+      "power": 100,
+      "accuracy": 100,
+      "pp": 5,
+      "priority": 0,
+      "contact": false,
+      "desc": "Power doubles if used after Fusion Flare this turn."
+    },
+    "Giga Drain": {
+      "type": "Grass",
+      "category": "Special",
+      "power": 75,
+      "accuracy": 100,
+      "pp": 10,
+      "priority": 0,
+      "contact": false,
+      "desc": "User recovers 50% of the damage dealt."
+    },
+    "Grass Knot": {
+      "type": "Grass",
+      "category": "Special",
+      "power": 0,
+      "accuracy": 100,
+      "pp": 20,
+      "priority": 0,
+      "contact": true,
+      "desc": "More power the heavier the target."
+    },
+    "Gyro Ball": {
+      "type": "Steel",
+      "category": "Physical",
+      "power": 0,
+      "accuracy": 100,
+      "pp": 5,
+      "priority": 0,
+      "contact": true,
+      "desc": "More power the slower the user than the target."
+    },
+    "Haze": {
+      "type": "Ice",
+      "category": "Status",
+      "power": 0,
+      "accuracy": true,
+      "pp": 30,
+      "priority": 0,
+      "contact": false,
+      "desc": "Eliminates all stat changes."
+    },
+    "Heal Bell": {
+      "type": "Normal",
+      "category": "Status",
+      "power": 0,
+      "accuracy": true,
+      "pp": 5,
+      "priority": 0,
+      "contact": false,
+      "desc": "Cures the user's party of all status conditions."
+    },
+    "Healing Wish": {
+      "type": "Psychic",
+      "category": "Status",
+      "power": 0,
+      "accuracy": true,
+      "pp": 10,
+      "priority": 0,
+      "contact": false,
+      "desc": "User faints. Replacement is fully healed."
+    },
+    "Heat Wave": {
+      "type": "Fire",
+      "category": "Special",
+      "power": 100,
+      "accuracy": 90,
+      "pp": 10,
+      "priority": 0,
+      "contact": false,
+      "desc": "10% chance to burn the foe(s)."
+    },
+    "Hidden Power Electric": {
+      "type": "Electric",
+      "category": "Special",
+      "power": 70,
+      "accuracy": 100,
+      "pp": 15,
+      "priority": 0,
+      "contact": false,
+      "desc": "Type set by the user's IVs: Electric on this set."
+    },
+    "Hidden Power Fighting": {
+      "type": "Fighting",
+      "category": "Special",
+      "power": 70,
+      "accuracy": 100,
+      "pp": 15,
+      "priority": 0,
+      "contact": false,
+      "desc": "Type set by the user's IVs: Fighting on this set."
+    },
+    "Hidden Power Fire": {
+      "type": "Fire",
+      "category": "Special",
+      "power": 70,
+      "accuracy": 100,
+      "pp": 15,
+      "priority": 0,
+      "contact": false,
+      "desc": "Type set by the user's IVs: Fire on this set."
+    },
+    "Hidden Power Ghost": {
+      "type": "Ghost",
+      "category": "Special",
+      "power": 70,
+      "accuracy": 100,
+      "pp": 15,
+      "priority": 0,
+      "contact": false,
+      "desc": "Type set by the user's IVs: Ghost on this set."
+    },
+    "Hidden Power Grass": {
+      "type": "Grass",
+      "category": "Special",
+      "power": 70,
+      "accuracy": 100,
+      "pp": 15,
+      "priority": 0,
+      "contact": false,
+      "desc": "Type set by the user's IVs: Grass on this set."
+    },
+    "Hidden Power Ice": {
+      "type": "Ice",
+      "category": "Special",
+      "power": 70,
+      "accuracy": 100,
+      "pp": 15,
+      "priority": 0,
+      "contact": false,
+      "desc": "Type set by the user's IVs: Ice on this set."
+    },
+    "High Jump Kick": {
+      "type": "Fighting",
+      "category": "Physical",
+      "power": 130,
+      "accuracy": 90,
+      "pp": 10,
+      "priority": 0,
+      "contact": true,
+      "desc": "User is hurt by 50% of its max HP if it misses."
+    },
+    "Hurricane": {
+      "type": "Flying",
+      "category": "Special",
+      "power": 120,
+      "accuracy": 70,
+      "pp": 10,
+      "priority": 0,
+      "contact": false,
+      "desc": "30% chance to confuse target. Can't miss in rain."
+    },
+    "Hydro Pump": {
+      "type": "Water",
+      "category": "Special",
+      "power": 120,
+      "accuracy": 80,
+      "pp": 5,
+      "priority": 0,
+      "contact": false,
+      "desc": "No additional effect."
+    },
+    "Ice Beam": {
+      "type": "Ice",
+      "category": "Special",
+      "power": 95,
+      "accuracy": 100,
+      "pp": 10,
+      "priority": 0,
+      "contact": false,
+      "desc": "10% chance to freeze the target."
+    },
+    "Ice Fang": {
+      "type": "Ice",
+      "category": "Physical",
+      "power": 65,
+      "accuracy": 95,
+      "pp": 15,
+      "priority": 0,
+      "contact": true,
+      "desc": "10% chance to freeze. 10% chance to flinch."
+    },
+    "Ice Punch": {
+      "type": "Ice",
+      "category": "Physical",
+      "power": 75,
+      "accuracy": 100,
+      "pp": 15,
+      "priority": 0,
+      "contact": true,
+      "desc": "10% chance to freeze the target."
+    },
+    "Ice Shard": {
+      "type": "Ice",
+      "category": "Physical",
+      "power": 40,
+      "accuracy": 100,
+      "pp": 30,
+      "priority": 1,
+      "contact": false,
+      "desc": "Usually goes first."
+    },
+    "Icicle Crash": {
+      "type": "Ice",
+      "category": "Physical",
+      "power": 85,
+      "accuracy": 90,
+      "pp": 10,
+      "priority": 0,
+      "contact": false,
+      "desc": "30% chance to make the target flinch."
+    },
+    "Icy Wind": {
+      "type": "Ice",
+      "category": "Special",
+      "power": 55,
+      "accuracy": 95,
+      "pp": 15,
+      "priority": 0,
+      "contact": false,
+      "desc": "100% chance to lower the foe(s) Speed by 1."
+    },
+    "Imprison": {
+      "type": "Psychic",
+      "category": "Status",
+      "power": 0,
+      "accuracy": true,
+      "pp": 10,
+      "priority": 0,
+      "contact": false,
+      "desc": "No foe can use any move known by the user."
+    },
+    "Iron Head": {
+      "type": "Steel",
+      "category": "Physical",
+      "power": 80,
+      "accuracy": 100,
+      "pp": 15,
+      "priority": 0,
+      "contact": true,
+      "desc": "30% chance to make the target flinch."
+    },
+    "Knock Off": {
+      "type": "Dark",
+      "category": "Physical",
+      "power": 20,
+      "accuracy": 100,
+      "pp": 20,
+      "priority": 0,
+      "contact": true,
+      "desc": "Removes the target's held item."
+    },
+    "Lava Plume": {
+      "type": "Fire",
+      "category": "Special",
+      "power": 80,
+      "accuracy": 100,
+      "pp": 15,
+      "priority": 0,
+      "contact": false,
+      "desc": "30% chance to burn adjacent Pokemon."
+    },
+    "Leaf Blade": {
+      "type": "Grass",
+      "category": "Physical",
+      "power": 90,
+      "accuracy": 100,
+      "pp": 15,
+      "priority": 0,
+      "contact": true,
+      "desc": "High critical hit ratio."
+    },
+    "Leaf Storm": {
+      "type": "Grass",
+      "category": "Special",
+      "power": 140,
+      "accuracy": 90,
+      "pp": 5,
+      "priority": 0,
+      "contact": false,
+      "desc": "Lowers the user's Sp. Atk by 2."
+    },
+    "Leech Seed": {
+      "type": "Grass",
+      "category": "Status",
+      "power": 0,
+      "accuracy": 90,
+      "pp": 10,
+      "priority": 0,
+      "contact": false,
+      "desc": "1/8 of target's HP is restored to user every turn."
+    },
+    "Light Screen": {
+      "type": "Psychic",
+      "category": "Status",
+      "power": 0,
+      "accuracy": true,
+      "pp": 30,
+      "priority": 0,
+      "contact": false,
+      "desc": "For 5 turns, special damage to allies is halved."
+    },
+    "Low Kick": {
+      "type": "Fighting",
+      "category": "Physical",
+      "power": 0,
+      "accuracy": 100,
+      "pp": 20,
+      "priority": 0,
+      "contact": true,
+      "desc": "More power the heavier the target."
+    },
+    "Low Sweep": {
+      "type": "Fighting",
+      "category": "Physical",
+      "power": 60,
+      "accuracy": 100,
+      "pp": 20,
+      "priority": 0,
+      "contact": true,
+      "desc": "100% chance to lower the target's Speed by 1."
+    },
+    "Lunar Dance": {
+      "type": "Psychic",
+      "category": "Status",
+      "power": 0,
+      "accuracy": true,
+      "pp": 10,
+      "priority": 0,
+      "contact": false,
+      "desc": "User faints. Replacement is fully healed, with PP."
+    },
+    "Mach Punch": {
+      "type": "Fighting",
+      "category": "Physical",
+      "power": 40,
+      "accuracy": 100,
+      "pp": 30,
+      "priority": 1,
+      "contact": true,
+      "desc": "Usually goes first."
+    },
+    "Magma Storm": {
+      "type": "Fire",
+      "category": "Special",
+      "power": 120,
+      "accuracy": 75,
+      "pp": 5,
+      "priority": 0,
+      "contact": false,
+      "desc": "Traps and damages the target for 4-5 turns."
+    },
+    "Magnet Rise": {
+      "type": "Electric",
+      "category": "Status",
+      "power": 0,
+      "accuracy": true,
+      "pp": 10,
+      "priority": 0,
+      "contact": false,
+      "desc": "For 5 turns, the user has immunity to Ground."
+    },
+    "Megahorn": {
+      "type": "Bug",
+      "category": "Physical",
+      "power": 120,
+      "accuracy": 85,
+      "pp": 10,
+      "priority": 0,
+      "contact": true,
+      "desc": "No additional effect."
+    },
+    "Meteor Mash": {
+      "type": "Steel",
+      "category": "Physical",
+      "power": 100,
+      "accuracy": 85,
+      "pp": 10,
+      "priority": 0,
+      "contact": true,
+      "desc": "20% chance to raise the user's Attack by 1."
+    },
+    "Moonlight": {
+      "type": "Normal",
+      "category": "Status",
+      "power": 0,
+      "accuracy": true,
+      "pp": 5,
+      "priority": 0,
+      "contact": false,
+      "desc": "Heals the user by a weather-dependent amount."
+    },
+    "Morning Sun": {
+      "type": "Normal",
+      "category": "Status",
+      "power": 0,
+      "accuracy": true,
+      "pp": 5,
+      "priority": 0,
+      "contact": false,
+      "desc": "Heals the user by a weather-dependent amount."
+    },
+    "Nasty Plot": {
+      "type": "Dark",
+      "category": "Status",
+      "power": 0,
+      "accuracy": true,
+      "pp": 20,
+      "priority": 0,
+      "contact": false,
+      "desc": "Raises the user's Sp. Atk by 2."
+    },
+    "Night Shade": {
+      "type": "Ghost",
+      "category": "Special",
+      "power": 0,
+      "accuracy": 100,
+      "pp": 15,
+      "priority": 0,
+      "contact": false,
+      "desc": "Does damage equal to the user's level."
+    },
+    "Night Slash": {
+      "type": "Dark",
+      "category": "Physical",
+      "power": 70,
+      "accuracy": 100,
+      "pp": 15,
+      "priority": 0,
+      "contact": true,
+      "desc": "High critical hit ratio."
+    },
+    "Outrage": {
+      "type": "Dragon",
+      "category": "Physical",
+      "power": 120,
+      "accuracy": 100,
+      "pp": 10,
+      "priority": 0,
+      "contact": true,
+      "desc": "Lasts 2-3 turns. Confuses the user afterwards."
+    },
+    "Overheat": {
+      "type": "Fire",
+      "category": "Special",
+      "power": 140,
+      "accuracy": 90,
+      "pp": 5,
+      "priority": 0,
+      "contact": false,
+      "desc": "Lowers the user's Sp. Atk by 2."
+    },
+    "Pain Split": {
+      "type": "Normal",
+      "category": "Status",
+      "power": 0,
+      "accuracy": true,
+      "pp": 20,
+      "priority": 0,
+      "contact": false,
+      "desc": "Shares HP of user and target equally."
+    },
+    "Power Whip": {
+      "type": "Grass",
+      "category": "Physical",
+      "power": 120,
+      "accuracy": 85,
+      "pp": 10,
+      "priority": 0,
+      "contact": true,
+      "desc": "No additional effect."
+    },
+    "Protect": {
+      "type": "Normal",
+      "category": "Status",
+      "power": 0,
+      "accuracy": true,
+      "pp": 10,
+      "priority": 4,
+      "contact": false,
+      "desc": "Prevents moves from affecting the user this turn."
+    },
+    "Psychic": {
+      "type": "Psychic",
+      "category": "Special",
+      "power": 90,
+      "accuracy": 100,
+      "pp": 10,
+      "priority": 0,
+      "contact": false,
+      "desc": "10% chance to lower the target's Sp. Def by 1."
+    },
+    "Psyshock": {
+      "type": "Psychic",
+      "category": "Special",
+      "power": 80,
+      "accuracy": 100,
+      "pp": 10,
+      "priority": 0,
+      "contact": false,
+      "desc": "Damages target based on Defense, not Sp. Def."
+    },
+    "Pursuit": {
+      "type": "Dark",
+      "category": "Physical",
+      "power": 40,
+      "accuracy": 100,
+      "pp": 20,
+      "priority": 0,
+      "contact": true,
+      "desc": "If a foe is switching out, hits it at 2x power."
+    },
+    "Quick Attack": {
+      "type": "Normal",
+      "category": "Physical",
+      "power": 40,
+      "accuracy": 100,
+      "pp": 30,
+      "priority": 1,
+      "contact": true,
+      "desc": "Usually goes first."
+    },
+    "Quiver Dance": {
+      "type": "Bug",
+      "category": "Status",
+      "power": 0,
+      "accuracy": true,
+      "pp": 20,
+      "priority": 0,
+      "contact": false,
+      "desc": "Raises the user's Sp. Atk, Sp. Def, Speed by 1."
+    },
+    "Rain Dance": {
+      "type": "Water",
+      "category": "Status",
+      "power": 0,
+      "accuracy": true,
+      "pp": 5,
+      "priority": 0,
+      "contact": false,
+      "desc": "For 5 turns, heavy rain powers Water moves."
+    },
+    "Rapid Spin": {
+      "type": "Normal",
+      "category": "Physical",
+      "power": 20,
+      "accuracy": 100,
+      "pp": 40,
+      "priority": 0,
+      "contact": true,
+      "desc": "Frees user from hazards, binding, Leech Seed."
+    },
+    "Recover": {
+      "type": "Normal",
+      "category": "Status",
+      "power": 0,
+      "accuracy": true,
+      "pp": 10,
+      "priority": 0,
+      "contact": false,
+      "desc": "Heals the user by 50% of its max HP."
+    },
+    "Reflect": {
+      "type": "Psychic",
+      "category": "Status",
+      "power": 0,
+      "accuracy": true,
+      "pp": 20,
+      "priority": 0,
+      "contact": false,
+      "desc": "For 5 turns, physical damage to allies is halved."
+    },
+    "Refresh": {
+      "type": "Normal",
+      "category": "Status",
+      "power": 0,
+      "accuracy": true,
+      "pp": 20,
+      "priority": 0,
+      "contact": false,
+      "desc": "User cures its burn, poison, or paralysis."
+    },
+    "Rest": {
+      "type": "Psychic",
+      "category": "Status",
+      "power": 0,
+      "accuracy": true,
+      "pp": 10,
+      "priority": 0,
+      "contact": false,
+      "desc": "User sleeps 2 turns and restores HP and status."
+    },
+    "Return": {
+      "type": "Normal",
+      "category": "Physical",
+      "power": 0,
+      "accuracy": 100,
+      "pp": 20,
+      "priority": 0,
+      "contact": true,
+      "desc": "Max 102 power at maximum Happiness."
+    },
+    "Roar": {
+      "type": "Normal",
+      "category": "Status",
+      "power": 0,
+      "accuracy": 100,
+      "pp": 20,
+      "priority": -6,
+      "contact": false,
+      "desc": "Forces the target to switch to a random ally."
+    },
+    "Rock Polish": {
+      "type": "Rock",
+      "category": "Status",
+      "power": 0,
+      "accuracy": true,
+      "pp": 20,
+      "priority": 0,
+      "contact": false,
+      "desc": "Raises the user's Speed by 2."
+    },
+    "Rock Slide": {
+      "type": "Rock",
+      "category": "Physical",
+      "power": 75,
+      "accuracy": 90,
+      "pp": 10,
+      "priority": 0,
+      "contact": false,
+      "desc": "30% chance to make the foe(s) flinch."
+    },
+    "Roost": {
+      "type": "Flying",
+      "category": "Status",
+      "power": 0,
+      "accuracy": true,
+      "pp": 10,
+      "priority": 0,
+      "contact": false,
+      "desc": "Heals 50% HP. Flying-type removed 'til turn ends."
+    },
+    "Scald": {
+      "type": "Water",
+      "category": "Special",
+      "power": 80,
+      "accuracy": 100,
+      "pp": 15,
+      "priority": 0,
+      "contact": false,
+      "desc": "30% chance to burn the target."
+    },
+    "Secret Sword": {
+      "type": "Fighting",
+      "category": "Special",
+      "power": 85,
+      "accuracy": 100,
+      "pp": 10,
+      "priority": 0,
+      "contact": false,
+      "desc": "Damages target based on Defense, not Sp. Def."
+    },
+    "Seed Bomb": {
+      "type": "Grass",
+      "category": "Physical",
+      "power": 80,
+      "accuracy": 100,
+      "pp": 15,
+      "priority": 0,
+      "contact": false,
+      "desc": "No additional effect."
+    },
+    "Seismic Toss": {
+      "type": "Fighting",
+      "category": "Physical",
+      "power": 0,
+      "accuracy": 100,
+      "pp": 20,
+      "priority": 0,
+      "contact": true,
+      "desc": "Does damage equal to the user's level."
+    },
+    "Shadow Ball": {
+      "type": "Ghost",
+      "category": "Special",
+      "power": 80,
+      "accuracy": 100,
+      "pp": 15,
+      "priority": 0,
+      "contact": false,
+      "desc": "20% chance to lower the target's Sp. Def by 1."
+    },
+    "Signal Beam": {
+      "type": "Bug",
+      "category": "Special",
+      "power": 75,
+      "accuracy": 100,
+      "pp": 15,
+      "priority": 0,
+      "contact": false,
+      "desc": "10% chance to confuse the target."
+    },
+    "Slack Off": {
+      "type": "Normal",
+      "category": "Status",
+      "power": 0,
+      "accuracy": true,
+      "pp": 10,
+      "priority": 0,
+      "contact": false,
+      "desc": "Heals the user by 50% of its max HP."
+    },
+    "Sleep Talk": {
+      "type": "Normal",
+      "category": "Status",
+      "power": 0,
+      "accuracy": true,
+      "pp": 10,
+      "priority": 0,
+      "contact": false,
+      "desc": "User must be asleep. Uses another known move."
+    },
+    "Sludge Bomb": {
+      "type": "Poison",
+      "category": "Special",
+      "power": 90,
+      "accuracy": 100,
+      "pp": 10,
+      "priority": 0,
+      "contact": false,
+      "desc": "30% chance to poison the target."
+    },
+    "Sludge Wave": {
+      "type": "Poison",
+      "category": "Special",
+      "power": 95,
+      "accuracy": 100,
+      "pp": 10,
+      "priority": 0,
+      "contact": false,
+      "desc": "10% chance to poison adjacent Pokemon."
+    },
+    "Soft-Boiled": {
+      "type": "Normal",
+      "category": "Status",
+      "power": 0,
+      "accuracy": true,
+      "pp": 10,
+      "priority": 0,
+      "contact": false,
+      "desc": "Heals the user by 50% of its max HP."
+    },
+    "Solar Beam": {
+      "type": "Grass",
+      "category": "Special",
+      "power": 120,
+      "accuracy": 100,
+      "pp": 10,
+      "priority": 0,
+      "contact": false,
+      "desc": "Charges turn 1. Hits turn 2. No charge in sunlight."
+    },
+    "Spikes": {
+      "type": "Ground",
+      "category": "Status",
+      "power": 0,
+      "accuracy": true,
+      "pp": 20,
+      "priority": 0,
+      "contact": false,
+      "desc": "Hurts grounded foes on switch-in. Max 3 layers."
+    },
+    "Stealth Rock": {
+      "type": "Rock",
+      "category": "Status",
+      "power": 0,
+      "accuracy": true,
+      "pp": 20,
+      "priority": 0,
+      "contact": false,
+      "desc": "Hurts foes on switch-in. Factors Rock weakness."
+    },
+    "Stone Edge": {
+      "type": "Rock",
+      "category": "Physical",
+      "power": 100,
+      "accuracy": 80,
+      "pp": 5,
+      "priority": 0,
+      "contact": false,
+      "desc": "High critical hit ratio."
+    },
+    "Stun Spore": {
+      "type": "Grass",
+      "category": "Status",
+      "power": 0,
+      "accuracy": 75,
+      "pp": 30,
+      "priority": 0,
+      "contact": false,
+      "desc": "Paralyzes the target."
+    },
+    "Substitute": {
+      "type": "Normal",
+      "category": "Status",
+      "power": 0,
+      "accuracy": true,
+      "pp": 10,
+      "priority": 0,
+      "contact": false,
+      "desc": "User takes 1/4 its max HP to put in a substitute."
+    },
+    "Sucker Punch": {
+      "type": "Dark",
+      "category": "Physical",
+      "power": 80,
+      "accuracy": 100,
+      "pp": 5,
+      "priority": 1,
+      "contact": true,
+      "desc": "Usually goes first. Fails if target is not attacking."
+    },
+    "Sunny Day": {
+      "type": "Fire",
+      "category": "Status",
+      "power": 0,
+      "accuracy": true,
+      "pp": 5,
+      "priority": 0,
+      "contact": false,
+      "desc": "For 5 turns, intense sunlight powers Fire moves."
+    },
+    "Super Fang": {
+      "type": "Normal",
+      "category": "Physical",
+      "power": 0,
+      "accuracy": 90,
+      "pp": 10,
+      "priority": 0,
+      "contact": true,
+      "desc": "Does damage equal to 1/2 target's current HP."
+    },
+    "Superpower": {
+      "type": "Fighting",
+      "category": "Physical",
+      "power": 120,
+      "accuracy": 100,
+      "pp": 5,
+      "priority": 0,
+      "contact": true,
+      "desc": "Lowers the user's Attack and Defense by 1."
+    },
+    "Surf": {
+      "type": "Water",
+      "category": "Special",
+      "power": 95,
+      "accuracy": 100,
+      "pp": 15,
+      "priority": 0,
+      "contact": false,
+      "desc": "Hits adjacent Pokemon. Double damage on Dive."
+    },
+    "Swords Dance": {
+      "type": "Normal",
+      "category": "Status",
+      "power": 0,
+      "accuracy": true,
+      "pp": 30,
+      "priority": 0,
+      "contact": false,
+      "desc": "Raises the user's Attack by 2."
+    },
+    "Synthesis": {
+      "type": "Grass",
+      "category": "Status",
+      "power": 0,
+      "accuracy": true,
+      "pp": 5,
+      "priority": 0,
+      "contact": false,
+      "desc": "Heals the user by a weather-dependent amount."
+    },
+    "Tailwind": {
+      "type": "Flying",
+      "category": "Status",
+      "power": 0,
+      "accuracy": true,
+      "pp": 30,
+      "priority": 0,
+      "contact": false,
+      "desc": "For 4 turns, allies' Speed is doubled."
+    },
+    "Taunt": {
+      "type": "Dark",
+      "category": "Status",
+      "power": 0,
+      "accuracy": 100,
+      "pp": 20,
+      "priority": 0,
+      "contact": false,
+      "desc": "Target can't use status moves its next 3 turns."
+    },
+    "Thunder": {
+      "type": "Electric",
+      "category": "Special",
+      "power": 120,
+      "accuracy": 70,
+      "pp": 10,
+      "priority": 0,
+      "contact": false,
+      "desc": "30% chance to paralyze. Can't miss in rain."
+    },
+    "Thunder Punch": {
+      "type": "Electric",
+      "category": "Physical",
+      "power": 75,
+      "accuracy": 100,
+      "pp": 15,
+      "priority": 0,
+      "contact": true,
+      "desc": "10% chance to paralyze the target."
+    },
+    "Thunder Wave": {
+      "type": "Electric",
+      "category": "Status",
+      "power": 0,
+      "accuracy": 100,
+      "pp": 20,
+      "priority": 0,
+      "contact": false,
+      "desc": "Paralyzes the target."
+    },
+    "Thunderbolt": {
+      "type": "Electric",
+      "category": "Special",
+      "power": 95,
+      "accuracy": 100,
+      "pp": 15,
+      "priority": 0,
+      "contact": false,
+      "desc": "10% chance to paralyze the target."
+    },
+    "Toxic": {
+      "type": "Poison",
+      "category": "Status",
+      "power": 0,
+      "accuracy": 90,
+      "pp": 10,
+      "priority": 0,
+      "contact": false,
+      "desc": "Badly poisons the target."
+    },
+    "Toxic Spikes": {
+      "type": "Poison",
+      "category": "Status",
+      "power": 0,
+      "accuracy": true,
+      "pp": 20,
+      "priority": 0,
+      "contact": false,
+      "desc": "Poisons grounded foes on switch-in. Max 2 layers."
+    },
+    "Tri Attack": {
+      "type": "Normal",
+      "category": "Special",
+      "power": 80,
+      "accuracy": 100,
+      "pp": 10,
+      "priority": 0,
+      "contact": false,
+      "desc": "20% chance to paralyze or burn or freeze target."
+    },
+    "Trick": {
+      "type": "Psychic",
+      "category": "Status",
+      "power": 0,
+      "accuracy": 100,
+      "pp": 10,
+      "priority": 0,
+      "contact": false,
+      "desc": "User switches its held item with the target's."
+    },
+    "Trick Room": {
+      "type": "Psychic",
+      "category": "Status",
+      "power": 0,
+      "accuracy": true,
+      "pp": 5,
+      "priority": -7,
+      "contact": false,
+      "desc": "Goes last. For 5 turns, turn order is reversed."
+    },
+    "U-turn": {
+      "type": "Bug",
+      "category": "Physical",
+      "power": 70,
+      "accuracy": 100,
+      "pp": 20,
+      "priority": 0,
+      "contact": true,
+      "desc": "User switches out after damaging the target."
+    },
+    "V-create": {
+      "type": "Fire",
+      "category": "Physical",
+      "power": 180,
+      "accuracy": 95,
+      "pp": 5,
+      "priority": 0,
+      "contact": true,
+      "desc": "Lowers the user's Defense, Sp. Def, Speed by 1."
+    },
+    "Vacuum Wave": {
+      "type": "Fighting",
+      "category": "Special",
+      "power": 40,
+      "accuracy": 100,
+      "pp": 30,
+      "priority": 1,
+      "contact": false,
+      "desc": "Usually goes first."
+    },
+    "Volt Switch": {
+      "type": "Electric",
+      "category": "Special",
+      "power": 70,
+      "accuracy": 100,
+      "pp": 20,
+      "priority": 0,
+      "contact": false,
+      "desc": "User switches out after damaging the target."
+    },
+    "Waterfall": {
+      "type": "Water",
+      "category": "Physical",
+      "power": 80,
+      "accuracy": 100,
+      "pp": 15,
+      "priority": 0,
+      "contact": true,
+      "desc": "20% chance to make the target flinch."
+    },
+    "Whirlwind": {
+      "type": "Normal",
+      "category": "Status",
+      "power": 0,
+      "accuracy": 100,
+      "pp": 20,
+      "priority": -6,
+      "contact": false,
+      "desc": "Forces the target to switch to a random ally."
+    },
+    "Wild Charge": {
+      "type": "Electric",
+      "category": "Physical",
+      "power": 90,
+      "accuracy": 100,
+      "pp": 15,
+      "priority": 0,
+      "contact": true,
+      "desc": "Has 1/4 recoil."
+    },
+    "Will-O-Wisp": {
+      "type": "Fire",
+      "category": "Status",
+      "power": 0,
+      "accuracy": 75,
+      "pp": 15,
+      "priority": 0,
+      "contact": false,
+      "desc": "Burns the target."
+    },
+    "Wish": {
+      "type": "Normal",
+      "category": "Status",
+      "power": 0,
+      "accuracy": true,
+      "pp": 10,
+      "priority": 0,
+      "contact": false,
+      "desc": "Next turn, 50% of the user's max HP is restored."
+    },
+    "Wood Hammer": {
+      "type": "Grass",
+      "category": "Physical",
+      "power": 120,
+      "accuracy": 100,
+      "pp": 15,
+      "priority": 0,
+      "contact": true,
+      "desc": "Has 33% recoil."
+    },
+    "X-Scissor": {
+      "type": "Bug",
+      "category": "Physical",
+      "power": 80,
+      "accuracy": 100,
+      "pp": 15,
+      "priority": 0,
+      "contact": true,
+      "desc": "No additional effect."
+    },
+    "Zen Headbutt": {
+      "type": "Psychic",
+      "category": "Physical",
+      "power": 80,
+      "accuracy": 90,
+      "pp": 15,
+      "priority": 0,
+      "contact": true,
+      "desc": "20% chance to make the target flinch."
+    }
+  },
+  "typeChart": {
+    "Electric": {
+      "Electric": 0.5,
+      "Ghost": 1,
+      "Grass": 0.5,
+      "Steel": 1,
+      "Dark": 1,
+      "Bug": 1,
+      "Dragon": 0.5,
+      "Fighting": 1,
+      "Fire": 1,
+      "Flying": 2,
+      "Ground": 0,
+      "Ice": 1,
+      "Normal": 1,
+      "Poison": 1,
+      "Psychic": 1,
+      "Rock": 1,
+      "Water": 2
+    },
+    "Ghost": {
+      "Electric": 1,
+      "Ghost": 2,
+      "Grass": 1,
+      "Steel": 0.5,
+      "Dark": 0.5,
+      "Bug": 1,
+      "Dragon": 1,
+      "Fighting": 1,
+      "Fire": 1,
+      "Flying": 1,
+      "Ground": 1,
+      "Ice": 1,
+      "Normal": 0,
+      "Poison": 1,
+      "Psychic": 2,
+      "Rock": 1,
+      "Water": 1
+    },
+    "Grass": {
+      "Electric": 1,
+      "Ghost": 1,
+      "Grass": 0.5,
+      "Steel": 0.5,
+      "Dark": 1,
+      "Bug": 0.5,
+      "Dragon": 0.5,
+      "Fighting": 1,
+      "Fire": 0.5,
+      "Flying": 0.5,
+      "Ground": 2,
+      "Ice": 1,
+      "Normal": 1,
+      "Poison": 0.5,
+      "Psychic": 1,
+      "Rock": 2,
+      "Water": 2
+    },
+    "Steel": {
+      "Electric": 0.5,
+      "Ghost": 1,
+      "Grass": 1,
+      "Steel": 0.5,
+      "Dark": 1,
+      "Bug": 1,
+      "Dragon": 1,
+      "Fighting": 1,
+      "Fire": 0.5,
+      "Flying": 1,
+      "Ground": 1,
+      "Ice": 2,
+      "Normal": 1,
+      "Poison": 1,
+      "Psychic": 1,
+      "Rock": 2,
+      "Water": 0.5
+    },
+    "Dark": {
+      "Electric": 1,
+      "Ghost": 2,
+      "Grass": 1,
+      "Steel": 0.5,
+      "Dark": 0.5,
+      "Bug": 1,
+      "Dragon": 1,
+      "Fighting": 0.5,
+      "Fire": 1,
+      "Flying": 1,
+      "Ground": 1,
+      "Ice": 1,
+      "Normal": 1,
+      "Poison": 1,
+      "Psychic": 2,
+      "Rock": 1,
+      "Water": 1
+    },
+    "Bug": {
+      "Electric": 1,
+      "Ghost": 0.5,
+      "Grass": 2,
+      "Steel": 0.5,
+      "Dark": 2,
+      "Bug": 1,
+      "Dragon": 1,
+      "Fighting": 0.5,
+      "Fire": 0.5,
+      "Flying": 0.5,
+      "Ground": 1,
+      "Ice": 1,
+      "Normal": 1,
+      "Poison": 0.5,
+      "Psychic": 2,
+      "Rock": 1,
+      "Water": 1
+    },
+    "Dragon": {
+      "Electric": 1,
+      "Ghost": 1,
+      "Grass": 1,
+      "Steel": 0.5,
+      "Dark": 1,
+      "Bug": 1,
+      "Dragon": 2,
+      "Fighting": 1,
+      "Fire": 1,
+      "Flying": 1,
+      "Ground": 1,
+      "Ice": 1,
+      "Normal": 1,
+      "Poison": 1,
+      "Psychic": 1,
+      "Rock": 1,
+      "Water": 1
+    },
+    "Fighting": {
+      "Electric": 1,
+      "Ghost": 0,
+      "Grass": 1,
+      "Steel": 2,
+      "Dark": 2,
+      "Bug": 0.5,
+      "Dragon": 1,
+      "Fighting": 1,
+      "Fire": 1,
+      "Flying": 0.5,
+      "Ground": 1,
+      "Ice": 2,
+      "Normal": 2,
+      "Poison": 0.5,
+      "Psychic": 0.5,
+      "Rock": 2,
+      "Water": 1
+    },
+    "Fire": {
+      "Electric": 1,
+      "Ghost": 1,
+      "Grass": 2,
+      "Steel": 2,
+      "Dark": 1,
+      "Bug": 2,
+      "Dragon": 0.5,
+      "Fighting": 1,
+      "Fire": 0.5,
+      "Flying": 1,
+      "Ground": 1,
+      "Ice": 2,
+      "Normal": 1,
+      "Poison": 1,
+      "Psychic": 1,
+      "Rock": 0.5,
+      "Water": 0.5
+    },
+    "Flying": {
+      "Electric": 0.5,
+      "Ghost": 1,
+      "Grass": 2,
+      "Steel": 0.5,
+      "Dark": 1,
+      "Bug": 2,
+      "Dragon": 1,
+      "Fighting": 2,
+      "Fire": 1,
+      "Flying": 1,
+      "Ground": 1,
+      "Ice": 1,
+      "Normal": 1,
+      "Poison": 1,
+      "Psychic": 1,
+      "Rock": 0.5,
+      "Water": 1
+    },
+    "Ground": {
+      "Electric": 2,
+      "Ghost": 1,
+      "Grass": 0.5,
+      "Steel": 2,
+      "Dark": 1,
+      "Bug": 0.5,
+      "Dragon": 1,
+      "Fighting": 1,
+      "Fire": 2,
+      "Flying": 0,
+      "Ground": 1,
+      "Ice": 1,
+      "Normal": 1,
+      "Poison": 2,
+      "Psychic": 1,
+      "Rock": 2,
+      "Water": 1
+    },
+    "Ice": {
+      "Electric": 1,
+      "Ghost": 1,
+      "Grass": 2,
+      "Steel": 0.5,
+      "Dark": 1,
+      "Bug": 1,
+      "Dragon": 2,
+      "Fighting": 1,
+      "Fire": 0.5,
+      "Flying": 2,
+      "Ground": 2,
+      "Ice": 0.5,
+      "Normal": 1,
+      "Poison": 1,
+      "Psychic": 1,
+      "Rock": 1,
+      "Water": 0.5
+    },
+    "Normal": {
+      "Electric": 1,
+      "Ghost": 0,
+      "Grass": 1,
+      "Steel": 0.5,
+      "Dark": 1,
+      "Bug": 1,
+      "Dragon": 1,
+      "Fighting": 1,
+      "Fire": 1,
+      "Flying": 1,
+      "Ground": 1,
+      "Ice": 1,
+      "Normal": 1,
+      "Poison": 1,
+      "Psychic": 1,
+      "Rock": 0.5,
+      "Water": 1
+    },
+    "Poison": {
+      "Electric": 1,
+      "Ghost": 0.5,
+      "Grass": 2,
+      "Steel": 0,
+      "Dark": 1,
+      "Bug": 1,
+      "Dragon": 1,
+      "Fighting": 1,
+      "Fire": 1,
+      "Flying": 1,
+      "Ground": 0.5,
+      "Ice": 1,
+      "Normal": 1,
+      "Poison": 0.5,
+      "Psychic": 1,
+      "Rock": 0.5,
+      "Water": 1
+    },
+    "Psychic": {
+      "Electric": 1,
+      "Ghost": 1,
+      "Grass": 1,
+      "Steel": 0.5,
+      "Dark": 0,
+      "Bug": 1,
+      "Dragon": 1,
+      "Fighting": 2,
+      "Fire": 1,
+      "Flying": 1,
+      "Ground": 1,
+      "Ice": 1,
+      "Normal": 1,
+      "Poison": 2,
+      "Psychic": 0.5,
+      "Rock": 1,
+      "Water": 1
+    },
+    "Rock": {
+      "Electric": 1,
+      "Ghost": 1,
+      "Grass": 1,
+      "Steel": 0.5,
+      "Dark": 1,
+      "Bug": 2,
+      "Dragon": 1,
+      "Fighting": 0.5,
+      "Fire": 2,
+      "Flying": 2,
+      "Ground": 0.5,
+      "Ice": 2,
+      "Normal": 1,
+      "Poison": 1,
+      "Psychic": 1,
+      "Rock": 1,
+      "Water": 1
+    },
+    "Water": {
+      "Electric": 1,
+      "Ghost": 1,
+      "Grass": 0.5,
+      "Steel": 1,
+      "Dark": 1,
+      "Bug": 1,
+      "Dragon": 0.5,
+      "Fighting": 1,
+      "Fire": 2,
+      "Flying": 1,
+      "Ground": 2,
+      "Ice": 1,
+      "Normal": 1,
+      "Poison": 1,
+      "Psychic": 1,
+      "Rock": 2,
+      "Water": 0.5
+    }
+  }
+}

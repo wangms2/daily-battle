@@ -8,8 +8,13 @@ export const GENERATOR_VERSION = 4;
 /** Tiers that count as OU for the pool's below-OU quota; everything else (UU, UUBL, NU, PU...) is below OU. */
 export const OU_TIERS = ['OU', '(OU)'];
 
+/**
+ * Seed-key prefix for a format. Gen 4 OU keeps the bare keys it launched with,
+ * so its published days never change; every other format gets its own keys.
+ */
+export const seedPrefix = (format: string): string => (format === 'gen4ou' ? '' : `${format}:`);
+
 export const CONFIG = {
-  format: 'gen4ou',
   /** Species are drawn with weight usage^exponent; 0.5 favors staples without letting them dominate. */
   usageExponent: 0.5,
   /** Give up on rejection sampling after this many attempts (never hit in practice; see `check`). */

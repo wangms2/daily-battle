@@ -3,6 +3,7 @@ import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
 import { Dex, TeamValidator, toID } from '@pkmn/sim';
 import { samePurpose } from './distinct';
+import { DEFAULT_FORMAT, formatInfo, type FormatId } from './formats';
 import { resolveSet, usageShares } from './resolve';
 import { assignRoles } from './roles';
 import type {
@@ -16,7 +17,6 @@ import type {
 } from './types';
 import { scoreSet, selectAndWeight } from './weights';
 
-export const FORMAT = 'gen4ou';
 export const METHOD = 'curated-usage-weighted-v1';
 /** How many species make the playable data set. */
 export const SPECIES_COUNT = 70;
@@ -24,12 +24,24 @@ export const SPECIES_COUNT = 70;
 export const UU_TIERS = ['UU', 'UUBL'];
 export const UU_MIN_USAGE = 0.001;
 
-const dex = Dex.forGen(4);
+/**
+ * Per-format build rules. `exclude` leaves out species whose mechanics break the
+ * game's assumptions: Ditto (Imposter copies your set) and Zoroark (Illusion
+ * disguises it on the brief). `avoidAbilities` are legal on a set but can make a
+ * team illegal (gen5ou bans Drizzle with Swift Swim and Drought with Chlorophyll),
+ * so sets use the species' other abilities and any 6 of a pool stay legal.
+ */
+export const BUILD_RULES: Record<FormatId, { exclude: string[]; avoidAbilities: string[] }> = {
+  gen4ou: { exclude: [], avoidAbilities: [] },
+  gen5ou: { exclude: ['Ditto', 'Zoroark'], avoidAbilities: ['Swift Swim', 'Chlorophyll'] },
+};
 
 export interface BuildInput {
-  /** Curated gen4ou sets. */
+  /** Which format to build for; defaults to Gen 4 OU. */
+  format?: FormatId;
+  /** Curated sets for the format (e.g. gen4ou). */
   curated: CuratedSets;
-  /** Curated gen4uu sets, used for UU species with no gen4ou sets. */
+  /** Curated sets for its lower tier (e.g. gen4uu), used for UU species with no OU sets. */
   curatedUU: CuratedSets;
   stats: ChaosStats;
   sources: SourcesMeta;
@@ -39,7 +51,7 @@ export interface BuildInput {
 }
 
 /**
- * `gen4ou/set-curation.json`. `add` sets are written like curated ones and
+ * `<format>/set-curation.json`. `add` sets are written like curated ones and
  * compete on equal terms; `drop` names curated sets (by species and set name)
  * that don't earn a place, such as a near-copy of a better set; `swap`
  * replaces moves one for one in a named set (species → set → old → new).
@@ -88,26 +100,30 @@ export function buildSets(
   opts: { speciesCount?: number; builtAt?: string } = {},
 ): BuildReport {
   const { speciesCount = SPECIES_COUNT, builtAt = new Date().toISOString() } = opts;
-  const validator = TeamValidator.get(FORMAT);
+  const format = formatInfo(input.format ?? DEFAULT_FORMAT);
+  const rules = BUILD_RULES[format.id as FormatId];
+  const dex = Dex.forGen(format.gen);
+  const validator = TeamValidator.get(format.id);
   const dropped: BuildReport['dropped'] = [];
   const species: SetsFile['species'] = {};
 
   const ranked = Object.entries(input.stats.data)
     .sort((a, b) => b[1].usage - a[1].usage)
-    .map(([name]) => name);
+    .map(([name]) => name)
+    .filter((name) => !rules.exclude.includes(name));
 
   // The top species by OU usage, then UU-tier species with real OU usage.
   const picks: { name: string; setSource: SpeciesEntry['setSource'] }[] = [];
   for (const name of ranked) {
     if (picks.length >= speciesCount) break;
-    if (input.curated[name]) picks.push({ name, setSource: 'gen4ou' });
+    if (input.curated[name]) picks.push({ name, setSource: format.id });
   }
   for (const name of ranked) {
     if (picks.some((p) => p.name === name)) continue;
     if (!UU_TIERS.includes(dex.species.get(name).tier)) continue;
     if (input.stats.data[name]!.usage < UU_MIN_USAGE) continue;
-    if (input.curated[name]) picks.push({ name, setSource: 'gen4ou' });
-    else if (input.curatedUU[name]) picks.push({ name, setSource: 'gen4uu' });
+    if (input.curated[name]) picks.push({ name, setSource: format.id });
+    else if (input.curatedUU[name]) picks.push({ name, setSource: format.uu });
   }
 
   for (const { name, setSource } of picks) {
@@ -116,7 +132,7 @@ export function buildSets(
     // Every set we know for the species: its own tier's analysis first, then
     // the other tier's, then hand-added ones. Usage decides which make the cut.
     const sources = (
-      setSource === 'gen4ou'
+      setSource === format.id
         ? [input.curated[name], input.curatedUU[name]]
         : [input.curatedUU[name], input.curated[name]]
     ).concat(input.curation?.add?.[name]);
@@ -140,7 +156,7 @@ export function buildSets(
             ),
           }
         : original;
-      const set = resolveSet(name, curatedSet, usage);
+      const set = resolveSet(name, curatedSet, usage, format.gen, rules.avoidAbilities);
       if (!set) {
         dropped.push({ species: name, set: setName, reason: 'not enough distinct moves' });
         continue;
@@ -234,7 +250,7 @@ export function buildSets(
   return {
     file: {
       meta: {
-        format: FORMAT,
+        format: format.id,
         method: METHOD,
         simVersion: simVersion(),
         builtAt,

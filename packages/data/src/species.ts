@@ -1,6 +1,7 @@
 // Species facts the web client needs (types, stats, tier), the moves the sets
-// use, and the Gen 4 type chart, so the UI never has to load the simulator's dex.
+// use, and the type chart, so the UI never has to load the simulator's dex.
 import { Dex } from '@pkmn/sim';
+import { genOf } from './formats';
 import type { SetsFile, StatID } from './types';
 
 export interface SpeciesInfo {
@@ -30,12 +31,12 @@ export interface SpeciesFile {
   species: Record<string, SpeciesInfo>;
   /** Every move a set uses, by name as the sets spell it. */
   moves: Record<string, MoveInfo>;
-  /** typeChart[attacking][defending] = damage multiplier (Gen 4, 17 types). */
+  /** typeChart[attacking][defending] = damage multiplier (17 types through Gen 5). */
   typeChart: Record<string, Record<string, number>>;
 }
 
 export function buildSpecies(sets: SetsFile): SpeciesFile {
-  const dex = Dex.forGen(4);
+  const dex = Dex.forGen(genOf(sets.meta.format));
   const species: SpeciesFile['species'] = {};
   for (const name of Object.keys(sets.species)) {
     const s = dex.species.get(name);

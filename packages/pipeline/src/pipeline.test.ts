@@ -101,6 +101,7 @@ describe('sampling and simulation', () => {
     const teams = poolTeams(POOL, 4, rngFor('test:workers')).map((t) => teamSets(sets, t));
     const opponent = teamSets(sets, poolTeams(POOL, 1, rngFor('test:opp'))[0]!);
     const jobs: Job[] = Array.from({ length: 12 }, (_, i) => ({
+      format: 'gen4ou',
       bot: i % 2 ? 'naive' : 'mid',
       player: teams[i % teams.length]!,
       opponent,

@@ -1,11 +1,11 @@
 // Fetches fresh source data into sources/. Run `build-sets` afterwards and review the diff.
-//   pnpm --filter @daily-battle/data refresh [--month YYYY-MM]
+//   pnpm --filter @daily-battle/data refresh [--format gen4ou] [--month YYYY-MM]
 import { writeFileSync } from 'node:fs';
 import type { ChaosSpecies, ChaosStats, SourcesMeta } from '../src/types';
-import { SOURCES } from './paths';
+import { FORMAT, SOURCES } from './paths';
 
-const SETS_URL = 'https://data.pkmn.cc/sets/gen4ou.json';
-const UU_SETS_URL = 'https://data.pkmn.cc/sets/gen4uu.json';
+const SETS_URL = `https://data.pkmn.cc/sets/${FORMAT.id}.json`;
+const UU_SETS_URL = `https://data.pkmn.cc/sets/${FORMAT.uu}.json`;
 const STATS_INDEX = 'https://www.smogon.com/stats/';
 const CUTOFF = 1500;
 
@@ -27,7 +27,7 @@ const writeJson = (path: string, data: unknown) =>
 
 const monthArg = process.argv.indexOf('--month');
 const month = monthArg > 0 ? process.argv[monthArg + 1]! : await latestMonth();
-const statsUrl = `${STATS_INDEX}${month}/chaos/gen4ou-${CUTOFF}.json`;
+const statsUrl = `${STATS_INDEX}${month}/chaos/${FORMAT.id}-${CUTOFF}.json`;
 
 const curated = (await (await get(SETS_URL)).json()) as Record<string, unknown>;
 const curatedUU = (await (await get(UU_SETS_URL)).json()) as Record<string, unknown>;

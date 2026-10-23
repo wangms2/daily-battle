@@ -1,8 +1,16 @@
 import { sets } from '@daily-battle/data';
 import { describe, expect, it } from 'vitest';
+import { seedPrefix } from './config';
 import { addDays, dayKey, mondayOf, weekDays, weekKey } from './dates';
 import { rngFor, weightedSample } from './rng';
 import { checksType, setTraits, stabTypes } from './traits';
+
+describe('seedPrefix', () => {
+  it('keeps Gen 4 OU on its launch keys and gives other formats their own', () => {
+    expect(seedPrefix('gen4ou')).toBe('');
+    expect(seedPrefix('gen5ou')).toBe('gen5ou:');
+  });
+});
 
 describe('dates', () => {
   it('maps a local date to its day key', () => {
@@ -75,15 +83,15 @@ describe('traits', () => {
 
   it('counts resistances, type immunities, and immunity abilities', () => {
     const entry = (name: string) => sets.species[name]!;
-    expect(checksType('Skarmory', entry('Skarmory'), 'Ground')).toBe(true); // Flying immunity
-    expect(checksType('Heatran', entry('Heatran'), 'Fire')).toBe(true); // resist + Flash Fire
-    expect(checksType('Gengar', entry('Gengar'), 'Ground')).toBe(true); // Levitate
-    expect(checksType('Tyranitar', entry('Tyranitar'), 'Water')).toBe(false);
+    expect(checksType('Skarmory', entry('Skarmory'), 'Ground', 4)).toBe(true); // Flying immunity
+    expect(checksType('Heatran', entry('Heatran'), 'Fire', 4)).toBe(true); // resist + Flash Fire
+    expect(checksType('Gengar', entry('Gengar'), 'Ground', 4)).toBe(true); // Levitate
+    expect(checksType('Tyranitar', entry('Tyranitar'), 'Water', 4)).toBe(false);
   });
 
   it('finds STAB attacking types only', () => {
     const scizor = sets.species['Scizor']!.sets.find((s) => s.moves.includes('Bullet Punch'))!;
-    expect(stabTypes('Scizor', scizor)).toContain('Steel');
-    expect(stabTypes('Scizor', scizor)).not.toContain('Fighting');
+    expect(stabTypes('Scizor', scizor, 4)).toContain('Steel');
+    expect(stabTypes('Scizor', scizor, 4)).not.toContain('Fighting');
   });
 });

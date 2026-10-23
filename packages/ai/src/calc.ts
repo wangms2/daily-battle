@@ -1,8 +1,20 @@
-// Thin wrapper around @smogon/calc for Gen 4.
+// Thin wrapper around @smogon/calc. Every helper takes the calc generation,
+// which comes from the set data's format (`genFor(data.meta.format)`).
+import { genOf } from '@daily-battle/data';
 import { calculate, Field, Generations, Move, Pokemon } from '@smogon/calc';
 import type { SideConds } from './state';
 
-export const gen = Generations.get(4);
+export type Gen = ReturnType<typeof Generations.get>;
+
+const GENS = new Map<number, Gen>();
+
+/** The calc generation for a format id, e.g. `gen4ou` → Gen 4. Built once per generation. */
+export function genFor(format: string): Gen {
+  const num = genOf(format);
+  let gen = GENS.get(num);
+  if (!gen) GENS.set(num, (gen = Generations.get(num as Parameters<typeof Generations.get>[0])));
+  return gen;
+}
 
 type StatusName = '' | 'slp' | 'psn' | 'brn' | 'frz' | 'par' | 'tox';
 type Stats = { hp: number; atk: number; def: number; spa: number; spd: number; spe: number };
@@ -22,7 +34,7 @@ export interface MonSpec {
 
 const STATUSES = new Set(['slp', 'psn', 'brn', 'frz', 'par', 'tox']);
 
-export function makeMon(spec: MonSpec): Pokemon {
+export function makeMon(gen: Gen, spec: MonSpec): Pokemon {
   const mon = new Pokemon(gen, spec.species, {
     item: spec.item as never,
     ability: spec.ability as never,
@@ -81,9 +93,9 @@ export function hit(
   }
   let result: Hit = NO_HIT;
   try {
-    const move = new Move(gen, moveName);
+    const move = new Move(attacker.gen, moveName);
     if (move.category !== 'Status') {
-      const { damage } = calculate(gen, attacker, defender, move, field);
+      const { damage } = calculate(attacker.gen, attacker, defender, move, field);
       const rolls = (Array.isArray(damage) ? damage.flat() : [damage]) as number[];
       if (rolls.length && rolls.some((d) => d > 0)) {
         const cur = defender.curHP();
@@ -126,14 +138,14 @@ const EMPTY_SIDE: SideConds = {
  * to the defender at full HP, on a neutral field. Used offline (M5) to spot
  * Pokémon a pool has no answer to.
  */
-export function bestDamage(attacker: SetLike, defender: SetLike): number {
-  const a = makeMon({ ...attacker, boosts: {}, status: '', hpFrac: 1 });
-  const d = makeMon({ ...defender, boosts: {}, status: '', hpFrac: 1 });
+export function bestDamage(gen: Gen, attacker: SetLike, defender: SetLike): number {
+  const a = makeMon(gen, { ...attacker, boosts: {}, status: '', hpFrac: 1 });
+  const d = makeMon(gen, { ...defender, boosts: {}, status: '', hpFrac: 1 });
   const field = makeField('', EMPTY_SIDE, EMPTY_SIDE);
   return Math.max(0, ...attacker.moves.map((m) => hit(a, d, m, field).frac));
 }
 
-export function moveInfo(name: string) {
+export function moveInfo(gen: Gen, name: string) {
   const move = new Move(gen, name);
   return { category: move.category, type: move.type, priority: move.priority, bp: move.bp };
 }
@@ -141,7 +153,7 @@ export function moveInfo(name: string) {
 const BOOST = [1, 1.5, 2, 2.5, 3, 3.5, 4];
 const boostMult = (stage: number) => (stage >= 0 ? BOOST[stage]! : 1 / BOOST[-stage]!);
 
-/** Effective Speed with the main Gen 4 modifiers. */
+/** Effective Speed with the main modifiers (Gens 4–5). */
 export function speed(mon: Pokemon, weather: string): number {
   let spe = mon.rawStats.spe * boostMult(Math.max(-6, Math.min(6, mon.boosts.spe ?? 0)));
   if (mon.hasItem('Choice Scarf')) spe *= 1.5;
@@ -152,15 +164,15 @@ export function speed(mon: Pokemon, weather: string): number {
   return spe;
 }
 
-export function typesOf(species: string): string[] {
+export function typesOf(gen: Gen, species: string): string[] {
   return [
     ...(gen.species.get(species.toLowerCase().replace(/[^a-z0-9]/g, '') as never)?.types ?? []),
   ];
 }
 
 /** Type effectiveness multiplier of an attacking type against a species. */
-export function effectiveness(type: string, species: string): number {
-  return typesOf(species).reduce(
+export function effectiveness(gen: Gen, type: string, species: string): number {
+  return typesOf(gen, species).reduce(
     (m, t) => m * (gen.types.get(type.toLowerCase() as never)?.effectiveness[t as never] ?? 1),
     1,
   );

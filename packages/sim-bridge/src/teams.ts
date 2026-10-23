@@ -30,12 +30,8 @@ function weightedPick<T extends { weight: number }>(items: T[], rng: Rng): T {
  * A random legal team from the set snapshot: 6 distinct species (uniform),
  * each with a set drawn by weight. Redraws if the validator rejects the team.
  */
-export function randomTeam(
-  rng: Rng,
-  data: SetsFile = defaultSets,
-  format = 'gen4ou',
-): PokemonSet[] {
-  const validator = TeamValidator.get(format);
+export function randomTeam(rng: Rng, data: SetsFile = defaultSets): PokemonSet[] {
+  const validator = TeamValidator.get(data.meta.format);
   const names = Object.keys(data.species);
   for (let attempt = 0; attempt < 100; attempt++) {
     const pool = [...names];

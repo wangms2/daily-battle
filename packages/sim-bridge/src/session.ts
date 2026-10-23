@@ -2,6 +2,7 @@
 // choices one at a time, and drain each side's new protocol lines. runBattle
 // and replayBattle drive it in a loop; the web client drives it turn by turn
 // inside a worker.
+import { DEFAULT_FORMAT } from '@daily-battle/data';
 import { Battle as ClientBattle } from '@pkmn/client';
 import { Generations } from '@pkmn/data';
 import { Protocol } from '@pkmn/protocol';
@@ -40,7 +41,7 @@ export class BattleSession {
   private turnCapped = false;
 
   constructor(readonly input: ReplayInput) {
-    const { format = 'gen4ou', seed, maxTurns = 300 } = input;
+    const { format = DEFAULT_FORMAT, seed, maxTurns = 300 } = input;
     this.maxTurns = maxTurns;
     const side = (): SideState => ({
       client: new ClientBattle(gens),

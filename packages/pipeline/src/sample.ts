@@ -19,7 +19,7 @@ export function poolTeams(
   rng: Rng,
   data: SetsFile = defaultSets,
 ): TeamSlot[][] {
-  const validator = TeamValidator.get('gen4ou');
+  const validator = TeamValidator.get(data.meta.format);
   const teams: TeamSlot[][] = [];
   for (let guard = 0; teams.length < n && guard < n * 50; guard++) {
     const left = [...species];

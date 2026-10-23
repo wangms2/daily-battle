@@ -32,6 +32,12 @@ const SWEEP_SETUP = [
   'Tail Glow',
   'Belly Drum',
   'Bulk Up',
+  // Gen 5
+  'Quiver Dance',
+  'Shell Smash',
+  'Coil',
+  'Shift Gear',
+  'Hone Claws',
 ];
 const RECOVERY = [
   'Recover',
@@ -55,9 +61,12 @@ const WALL_TOOLS = [
   'Protect',
   'Seismic Toss',
   'Leech Seed',
+  // Gen 5
+  'Scald',
 ];
 
-const LEFTOVERS = ['Leftovers', 'Black Sludge'];
+/** Items a wall holds; Eviolite and Rocky Helmet are Gen 5 on. */
+const LEFTOVERS = ['Leftovers', 'Black Sludge', 'Eviolite', 'Rocky Helmet'];
 
 export function setRole(set: SetEntry): SetRole {
   const has = (m: string) => set.moves.includes(m);
@@ -129,7 +138,7 @@ export function archetypeTeams(
     }))
     .filter((o) => o.sets.length > 0);
   if (options.length < 6) return [];
-  const validator = TeamValidator.get('gen4ou');
+  const validator = TeamValidator.get(data.meta.format);
   const seen = new Set<string>();
   const teams: TeamSlot[][] = [];
   for (let t = 0; t < tries && teams.length < n; t++) {

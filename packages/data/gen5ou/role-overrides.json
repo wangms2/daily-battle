@@ -1,0 +1,131 @@
+{
+  "jellicent-standard": {
+    "label": "Taunt wall",
+    "description": "Burns attackers with Will-O-Wisp, Taunts walls and setup, and heals with Recover."
+  },
+  "heatran-sunny-day-trapper": {
+    "label": "Sun trapper",
+    "description": "Traps foes with Magma Storm and fires sun-boosted Solar Beams at the Water-types that come in."
+  },
+  "metagross-shuca-berry-attacker": {
+    "label": "Bulky attacker",
+    "description": "Survives a Ground-type hit with Shuca Berry and hits back with Meteor Mash and priority Bullet Punch."
+  },
+  "mew-defensive": {
+    "label": "Will-O-Wisp support",
+    "description": "Burns attackers with Will-O-Wisp, Taunts setup, and heals with Soft-Boiled."
+  },
+  "sableye-prankster": {
+    "label": "Prankster support",
+    "description": "Uses Will-O-Wisp, Taunt, and Recover before the foe can move, thanks to Prankster."
+  },
+  "crobat-stallbreaker": {
+    "description": "Uses Taunt to stop defensive Pokémon from healing or setting hazards, and pivots out with U-turn."
+  },
+  "azumarill-bulky-attacker": {
+    "label": "Bulky attacker",
+    "description": "Huge Power makes every hit count; a bulky spread and Sitrus Berry let it take hits, and Aqua Jet picks off weakened foes."
+  },
+  "snorlax-offensive": {
+    "label": "Pursuit trapper",
+    "description": "Hits hard off its huge HP and catches fleeing Psychic- and Ghost-types with Pursuit."
+  },
+  "snorlax-classic-curselax": {
+    "label": "Curse sweeper (Rest)"
+  },
+  "snorlax-offensive-curselax": {
+    "label": "Curse sweeper (offensive)"
+  },
+  "chansey-cleric": {
+    "label": "Cleric",
+    "description": "Cures the team with Aromatherapy, paralyzes with Thunder Wave, and takes special hits with Eviolite."
+  },
+  "celebi-bulky-pivot": {
+    "label": "Baton Pass support",
+    "description": "Makes a Substitute and passes it to a teammate with Baton Pass, healing with Recover."
+  },
+  "magnezone-sunny-day": {
+    "label": "Steel trapper",
+    "description": "Traps Steel-types with Magnet Pull and burns them with sun-boosted Hidden Power Fire."
+  },
+  "kingdra-rain-dance": {
+    "label": "Rain Dance attacker",
+    "description": "Sets its own rain with Rain Dance to power up its Water attacks, with Draco Meteor for coverage."
+  },
+  "tyranitar-bulky-pursuit-trapper": {
+    "label": "Pursuit trapper",
+    "description": "Traps and removes fleeing Psychic- and Ghost-types with Pursuit, while its bulk soaks special hits."
+  },
+  "tornadus-offensive": {
+    "label": "Fast attacker"
+  },
+  "tornadus-rain-dance": {
+    "label": "Rain Dance support",
+    "description": "Sets rain with a Prankster Rain Dance, then hits hard with Hurricane, which never misses in rain."
+  },
+  "tornadus-mixed-attacker": {
+    "label": "Rain Dance attacker",
+    "description": "Sets rain with a Prankster Rain Dance, then breaks through with Hurricane, Grass Knot, and Superpower."
+  },
+  "blissey-special-wall": {
+    "label": "Special wall",
+    "description": "Absorbs special attacks, heals with Soft-Boiled, and sets Stealth Rock."
+  },
+  "blissey-toxic-attacker": {
+    "label": "Toxic staller",
+    "description": "Absorbs special attacks and wears foes down with Toxic, Flamethrower, and Ice Beam."
+  },
+  "politoed-defensive": {
+    "label": "Rain setter",
+    "description": "Brings rain with Drizzle that lasts until another weather replaces it, and walls physical attackers with Scald, Protect, and Encore."
+  },
+  "azelf-dual-screens": {
+    "label": "Dual screens lead",
+    "description": "Taunts the foe's lead, sets Stealth Rock, and puts up Reflect and Light Screen for the team."
+  },
+  "azelf-all-out-attacker": {
+    "label": "Stealth Rock attacker",
+    "description": "Sets Stealth Rock, then hits hard with Life Orb-boosted attacks."
+  },
+  "meloetta-offensive-calm-mind": {
+    "label": "Calm Mind sweeper"
+  },
+  "meloetta-substitute-calm-mind": {
+    "label": "Calm Mind sweeper (Substitute)"
+  },
+  "arcanine-offensive": {
+    "label": "Life Orb attacker"
+  },
+  "arcanine-sunny-day": {
+    "label": "Sun attacker",
+    "description": "Sets sun with Sunny Day to power up Fire Blast and fire Solar Beam without charging."
+  },
+  "sharpedo-physical-attacker": {
+    "label": "Life Orb attacker (physical)"
+  },
+  "sharpedo-special-attacker": {
+    "label": "Life Orb attacker (special)"
+  },
+  "gyarados-substitute-dragon-dance": {
+    "label": "Dragon Dance sweeper (Substitute)"
+  },
+  "gyarados-offensive-dragon-dance": {
+    "label": "Dragon Dance sweeper (offensive)"
+  },
+  "cofagrigus-offensive-trick-room": {
+    "label": "Trick Room attacker",
+    "description": "Sets Trick Room so it moves first, then boosts with Nasty Plot and sweeps."
+  },
+  "venusaur-leech-seed": {
+    "label": "Leech Seed staller",
+    "description": "Hides behind Substitute and Protect while Leech Seed drains the foe."
+  },
+  "abomasnow-subseed": {
+    "label": "Leech Seed staller",
+    "description": "Hides behind Substitute while Leech Seed drains the foe, with Ice Shard to finish it."
+  },
+  "umbreon-wish-support": {
+    "label": "Wish support",
+    "description": "Passes Wish heals to teammates, cures status with Heal Bell, and punishes physical attackers with Foul Play."
+  }
+}

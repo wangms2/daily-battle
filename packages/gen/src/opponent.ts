@@ -1,6 +1,6 @@
 import { sets as defaultSets, type SetEntry, type SetsFile } from '@daily-battle/data';
 import { TeamValidator } from '@pkmn/sim';
-import { CONFIG, GENERATOR_VERSION } from './config';
+import { CONFIG, GENERATOR_VERSION, seedPrefix } from './config';
 import { candidateKey, rngFor, weightedSample } from './rng';
 import { findSet, teamSets, type TeamSlot } from './sets';
 import { setTraits } from './traits';
@@ -38,7 +38,7 @@ export function opponentProblems(team: TeamSlot[], data: SetsFile = defaultSets)
   if (traits.every((t) => t.categories.has('offense') && t.categories.size === 1)) {
     problems.push('no non-offensive set');
   }
-  const invalid = TeamValidator.get(CONFIG.format).validateTeam(teamSets(data, team));
+  const invalid = TeamValidator.get(data.meta.format).validateTeam(teamSets(data, team));
   if (invalid) problems.push(`illegal: ${invalid.join(' ')}`);
   return problems;
 }
@@ -58,7 +58,9 @@ export function generateOpponent(
   /** Alternative draws for the same day, used when validation rejects one (M5). */
   candidate = 0,
 ): DailyOpponent {
-  const rng = rngFor(candidateKey(`gen${GENERATOR_VERSION}:day:${day}`, candidate));
+  const rng = rngFor(
+    candidateKey(`${seedPrefix(data.meta.format)}gen${GENERATOR_VERSION}:day:${day}`, candidate),
+  );
   const names = Object.keys(data.species);
   const weight = (s: string) => data.species[s]!.usage ** CONFIG.usageExponent;
   for (let attempts = 1; attempts <= CONFIG.maxAttempts; attempts++) {
