@@ -162,8 +162,15 @@ export type ImageMode = 'share' | 'copy' | 'save';
 /** How this browser can pass on an image: the share sheet, the clipboard, or a download. */
 export function imageMode(): ImageMode {
   if (typeof navigator === 'undefined') return 'save';
-  // The system share sheet is best (phones). Browsers with a share sheet but
-  // no canShare get to try it; shareImage falls back if it refuses the file.
+  const canCopy =
+    typeof ClipboardItem !== 'undefined' && typeof navigator.clipboard?.write === 'function';
+  // Desktops copy the picture itself: the Windows share sheet's Copy puts a
+  // file on the clipboard, which chat apps won't paste as an image.
+  const desktop =
+    typeof matchMedia === 'function' && matchMedia('(hover: hover) and (pointer: fine)').matches;
+  if (desktop && canCopy) return 'copy';
+  // Otherwise the system share sheet is best (phones). Browsers with a share
+  // sheet but no canShare get to try it; shareImage falls back if it refuses the file.
   if (typeof navigator.share === 'function') {
     if (typeof navigator.canShare !== 'function') return 'share';
     try {
@@ -173,10 +180,7 @@ export function imageMode(): ImageMode {
       // File unsupported: fall through.
     }
   }
-  if (typeof ClipboardItem !== 'undefined' && typeof navigator.clipboard?.write === 'function') {
-    return 'copy';
-  }
-  return 'save';
+  return canCopy ? 'copy' : 'save';
 }
 
 export type ImageOutcome = 'shared' | 'copied' | 'saved' | 'failed';

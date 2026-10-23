@@ -179,6 +179,17 @@ describe('imageMode', () => {
     expect(imageMode()).toBe('share');
   });
 
+  it('copies the picture on desktops, even with a share sheet (Windows)', () => {
+    vi.stubGlobal('ClipboardItem', class {});
+    vi.stubGlobal('matchMedia', (q: string) => ({ matches: q.includes('pointer: fine') }));
+    vi.stubGlobal('navigator', {
+      share: vi.fn(),
+      canShare: () => true,
+      clipboard: { write: vi.fn() },
+    });
+    expect(imageMode()).toBe('copy');
+  });
+
   it('copies on desktops whose share sheet refuses files, else saves', () => {
     vi.stubGlobal('ClipboardItem', class {});
     vi.stubGlobal('navigator', {
