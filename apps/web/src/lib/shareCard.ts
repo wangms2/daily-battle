@@ -124,9 +124,8 @@ export async function drawShareCard(m: ShareModel): Promise<HTMLCanvasElement> {
   await Promise.all(
     [500, 600, 700].map((w) => document.fonts?.load(`${w} 24px "IBM Plex Sans"`)),
   ).catch(() => {});
-  const [logo, backdrop, ...sprites] = await Promise.all([
+  const [logo, ...sprites] = await Promise.all([
     loadImage(`${import.meta.env.BASE_URL}favicon.svg`),
-    m.backdrop ? loadImage(m.backdrop) : Promise.resolve(null),
     ...m.team.map((s) => loadImage(getSprite(s.species, 'front'))),
   ]);
 
@@ -142,25 +141,6 @@ export async function drawShareCard(m: ShareModel): Promise<HTMLCanvasElement> {
   roundRect(ctx, 40, 40, CARD_W - 80, CARD_H - 80, 16);
   ctx.fillStyle = C.surface;
   ctx.fill();
-  // The day's battle scene, faded into the card so the panels stay readable.
-  if (backdrop) {
-    ctx.save();
-    roundRect(ctx, 40, 40, CARD_W - 80, CARD_H - 80, 16);
-    ctx.clip();
-    const w = CARD_W - 80;
-    const h = CARD_H - 80;
-    const k = Math.max(w / backdrop.width, h / backdrop.height);
-    ctx.imageSmoothingEnabled = false;
-    ctx.globalAlpha = 0.2;
-    ctx.drawImage(
-      backdrop,
-      40 + (w - backdrop.width * k) / 2,
-      40 + h - backdrop.height * k,
-      backdrop.width * k,
-      backdrop.height * k,
-    );
-    ctx.restore();
-  }
   ctx.strokeStyle = C.border;
   ctx.lineWidth = 1.5;
   roundRect(ctx, 40, 40, CARD_W - 80, CARD_H - 80, 16);

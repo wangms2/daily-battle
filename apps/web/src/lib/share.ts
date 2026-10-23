@@ -13,8 +13,6 @@ export interface ShareArgs {
   url?: string;
   /** The game's name, "Gen 4" or "Gen 5", shown after "Daily Battle". */
   game?: string;
-  /** The day's battle backdrop (image URL), faded behind the image card. */
-  backdrop?: string;
 }
 
 export interface ShareRow {
@@ -27,8 +25,6 @@ export interface ShareRow {
 export interface ShareModel {
   /** "Gen 5", or nothing. */
   game?: string;
-  /** The day's battle backdrop, for the image card only. */
-  backdrop?: string;
   date: string;
   status: DaySummary['status'];
   /** "First try! 4/6 left", "Won on try 2 · 3/6 left", … (no emoji). */
@@ -49,15 +45,7 @@ const row = (a: Attempt): ShareRow => ({
   remaining: a.remaining,
 });
 
-export function shareModel({
-  day,
-  summary,
-  streak,
-  change,
-  url,
-  game,
-  backdrop,
-}: ShareArgs): ShareModel {
+export function shareModel({ day, summary, streak, change, url, game }: ShareArgs): ShareModel {
   const { status, counted, tries, winTry } = summary;
   const date = new Date(`${day}T12:00:00`).toLocaleDateString('en-US', {
     month: 'short',
@@ -82,7 +70,6 @@ export function shareModel({
 
   return {
     ...(game && { game }),
-    ...(backdrop && { backdrop }),
     date,
     status,
     headline,
