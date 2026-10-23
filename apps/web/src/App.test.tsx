@@ -133,7 +133,7 @@ describe('team builder', () => {
     if (confirm) await user.click(within(confirm).getByRole('button', { name: /Lock/ }));
     // The finished try still counts; the unfinished one (for the old team) is gone.
     expect(await screen.findByRole('region', { name: 'Today’s result' })).toHaveTextContent(
-      '1 of 3 tries',
+      '1 try',
     );
   });
 
@@ -308,7 +308,7 @@ describe('daily brief', () => {
     await screen.findByRole('button', { name: /^Try again · / });
     expect(screen.queryByRole('button', { name: 'Resume battle' })).not.toBeInTheDocument();
     expect(screen.getByRole('region', { name: 'Today’s result' })).toHaveTextContent(
-      'Not cleared yet · 1 of 3 tries',
+      'Not cleared yet · 1 try',
     );
   });
 });
@@ -354,12 +354,13 @@ describe('results and streak', () => {
     expect(screen.getByRole('button', { name: 'Stats. Streak 0' })).toBeInTheDocument();
   });
 
-  it('offers a practice change once the counted tries are done, leaving the weekly team alone', async () => {
+  it('offers a practice change once the day is won, leaving the weekly team alone', async () => {
     const user = userEvent.setup();
     const state = seeded({ team: { week: WEEK } });
     state.games.gen4ou.days['2026-10-21'] = {
       swapUsed: false,
-      attempts: [finished('loss', 0, 1), finished('loss', 0, 2), finished('loss', 0, 3)],
+      // Practice starts once the day is won (here, on the second try).
+      attempts: [finished('loss', 0, 1), finished('win', 3, 2)],
     };
     renderApp(state);
     expect(await screen.findByRole('button', { name: 'Practice change' })).toBeInTheDocument();

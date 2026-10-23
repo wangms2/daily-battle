@@ -2,35 +2,31 @@
 // attempts rather than stored, so they can't drift out of sync.
 //
 // The streak counts days won on the first try: a first-try loss (giving up
-// counts) breaks it straight away, and so does a missed day. Tries 2–3 can still
-// clear the day and count toward the win rate; tries after that are practice.
+// counts) breaks it straight away, and so does a missed day. There's no limit
+// on tries: every try counts until the day is won, and runs after a win are
+// practice.
 import { addDays } from '@daily-battle/gen/dates';
 import type { Attempt, DayState } from '../state/schema';
-
-/** Tries that count toward the day's result (and the win rate). */
-export const COUNTED_TRIES = 3;
 
 export type DayStatus =
   /** Not played (or only a battle in progress). */
   | 'none'
-  /** Today, fewer than 3 tries and none won yet. */
+  /** Today, tried but not won yet. */
   | 'pending'
   | 'firstTry'
-  /** Won on try 2 or 3. */
+  /** Won on a later try. */
   | 'won'
-  /** Not won within 3 tries (or a past day that wasn't). */
+  /** A past day that was never won. */
   | 'failed';
 
 export interface DaySummary {
   status: DayStatus;
   /** Finished tries, in order. */
   tries: Attempt[];
-  /** The tries that count: up to the first win, at most 3. Later ones are practice. */
+  /** The tries that count: all of them up to the first win. Later ones are practice. */
   counted: Attempt[];
-  /** 1-based try of the day's first win, if any (it may be a practice try). */
+  /** 1-based try of the day's first win, if any. */
   winTry: number | null;
-  /** Tries that can still count today. */
-  triesLeft: number;
 }
 
 const won = (a: Attempt) => a.result === 'win';
@@ -39,23 +35,15 @@ export function summarizeDay(day: DayState | undefined, isToday: boolean): DaySu
   const tries = (day?.attempts ?? []).filter((a) => a.result !== 'inProgress');
   const first = tries.findIndex(won);
   const winTry = first >= 0 ? first + 1 : null;
-  const counted = tries.slice(0, Math.min(winTry ?? COUNTED_TRIES, COUNTED_TRIES));
+  const counted = winTry === null ? tries : tries.slice(0, winTry);
   let status: DayStatus;
   if (!tries.length) status = 'none';
   else if (winTry === 1) status = 'firstTry';
-  else if (winTry !== null && winTry <= COUNTED_TRIES) status = 'won';
-  else if (counted.length >= COUNTED_TRIES || !isToday) status = 'failed';
-  else status = 'pending';
-  return {
-    status,
-    tries,
-    counted,
-    winTry,
-    triesLeft: status === 'pending' ? COUNTED_TRIES - counted.length : 0,
-  };
+  else if (winTry !== null) status = 'won';
+  else status = isToday ? 'pending' : 'failed';
+  return { status, tries, counted, winTry };
 }
 
-const cleared = (s: DayStatus) => s === 'firstTry' || s === 'won';
 /** Played but not won on the first try: the streak is over. */
 const breaks = (s: DayStatus) => s !== 'none' && s !== 'firstTry';
 
@@ -65,9 +53,9 @@ export interface Stats {
   firstTryWins: number;
   /** Days with at least one finished try. */
   daysPlayed: number;
-  /** Share of decided days won within 3 tries, 0–100. */
-  winRate: number;
-  /** Days won at all, including on a practice try. */
+  /** Share of days played that were won on the first try, 0–100. */
+  firstTryRate: number;
+  /** Days won, on any try. */
   clears: number;
   /** Average tries to the first win, over cleared days; null with none. */
   triesPerClear: number | null;
@@ -95,8 +83,6 @@ export function computeStats(days: Record<string, DayState>, today: string): Sta
   let prev: string | null = null;
   let firstTryWins = 0;
   let daysPlayed = 0;
-  let decided = 0;
-  let wins = 0;
   let clears = 0;
   let triesToClear = 0;
   for (const key of keys) {
@@ -104,8 +90,6 @@ export function computeStats(days: Record<string, DayState>, today: string): Sta
     if (s.status === 'none') continue;
     daysPlayed++;
     if (s.status === 'firstTry') firstTryWins++;
-    if (s.status !== 'pending') decided++;
-    if (cleared(s.status)) wins++;
     if (s.winTry !== null) {
       clears++;
       triesToClear += s.winTry;
@@ -125,10 +109,23 @@ export function computeStats(days: Record<string, DayState>, today: string): Sta
     bestStreak: Math.max(bestStreak, streak),
     firstTryWins,
     daysPlayed,
-    winRate: decided ? Math.round((100 * wins) / decided) : 0,
+    firstTryRate: daysPlayed ? Math.round((100 * firstTryWins) / daysPlayed) : 0,
     clears,
     triesPerClear: clears ? triesToClear / clears : null,
   };
+}
+
+/** "1 try", "5 tries". */
+export const tryCount = (n: number) => `${n} ${n === 1 ? 'try' : 'tries'}`;
+
+/**
+ * A long list of tries, shortened to its ends: the first (the one the streak
+ * rides on), a count of the ones between, and the last `tail`. Lists up to
+ * `max` long are kept whole.
+ */
+export function condenseTries<T>(items: T[], max: number, tail = 2): (T | { more: number })[] {
+  if (items.length <= max) return items;
+  return [items[0]!, { more: items.length - 1 - tail }, ...items.slice(-tail)];
 }
 
 /** "⭐ First try! · 4/6 left", "✅ Won on try 2 · 3/6 left", … */
@@ -136,8 +133,8 @@ export function dayHeadline(s: DaySummary): string {
   const win = s.winTry !== null ? s.tries[s.winTry - 1] : undefined;
   if (s.status === 'firstTry') return `⭐ First try! · ${win!.remaining}/6 left`;
   if (win) return `✅ Won on try ${s.winTry} · ${win.remaining}/6 left`;
-  if (s.status === 'failed') return '❌ Not cleared in 3 tries';
-  if (s.status === 'pending') return `Not cleared yet · ${s.counted.length} of 3 tries`;
+  if (s.status === 'failed') return '❌ Not cleared';
+  if (s.status === 'pending') return `Not cleared yet · ${tryCount(s.counted.length)}`;
   return 'Not played yet';
 }
 

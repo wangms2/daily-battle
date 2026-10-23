@@ -405,7 +405,7 @@ export function Battle({
             </span>
           ) : (
             <span className="h-5 text-[14px] text-muted">
-              {tryIndex === 0 ? null : counts ? `Try ${tryIndex} of 3` : 'Practice'}
+              {tryIndex === 0 ? null : counts ? `Try ${tryIndex}` : 'Practice'}
             </span>
           )}
         </div>
@@ -417,9 +417,7 @@ export function Battle({
           <ShareButton share={result.share} />
           <div className="grid grid-cols-2 gap-2">
             <Button variant="secondary" onClick={onRunItBack}>
-              {result.summary.status === 'pending'
-                ? `Try again · ${result.summary.triesLeft} left`
-                : 'Play again'}
+              {result.summary.status === 'pending' ? 'Try again' : 'Play again'}
             </Button>
             <Button variant="secondary" onClick={onExit}>
               Back to today

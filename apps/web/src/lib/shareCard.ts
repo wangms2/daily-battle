@@ -2,6 +2,7 @@
 // a clean card in the app's light theme, with team sprites in place of names.
 // Drawn on a canvas in the browser from self-hosted assets, so nothing leaves
 // the device until the player shares it.
+import { condenseTries, tryCount } from './results';
 import type { ShareModel, ShareRow } from './share';
 import { getSprite } from './sprites';
 
@@ -75,6 +76,8 @@ function mark(ctx: CanvasRenderingContext2D, won: boolean, x: number, y: number)
 const SQ = 40;
 const SQ_GAP = 8;
 const ROW_H = 52;
+/** Try rows that fit between the headline and the address (rows start at y 252). */
+const MAX_ROWS = 5;
 
 /** One try: its mark, then six squares (green = Pokémon left). Returns the right edge. */
 function tryRow(ctx: CanvasRenderingContext2D, r: ShareRow, x: number, y: number): number {
@@ -190,26 +193,19 @@ export async function drawShareCard(m: ShareModel): Promise<HTMLCanvasElement> {
     ctx.fillText(m.headline, x, y);
   }
 
-  // The tries that counted, then a shared practice run.
+  // The tries that counted. The left column fits MAX_ROWS above the address;
+  // a longer day keeps its first try, a count, and its last tries.
   y = 252;
-  for (const r of m.rows) {
-    tryRow(ctx, r, left, y);
-    y += ROW_H;
-  }
-  if (m.practice) {
-    y += 6;
-    ctx.fillStyle = C.muted;
-    ctx.font = font(600, 15);
-    ctx.textBaseline = 'alphabetic';
-    ctx.fillText('PRACTICE', left + 40, y + 2);
-    y += 14;
-    const end = tryRow(ctx, m.practice, left, y);
-    if (m.practice.with) {
+  for (const r of condenseTries(m.rows, MAX_ROWS, MAX_ROWS - 2)) {
+    if ('more' in r) {
       ctx.textBaseline = 'middle';
       ctx.fillStyle = C.muted;
-      ctx.font = font(500, 20);
-      ctx.fillText(`with ${m.practice.with}`, end + 16, y + SQ / 2);
+      ctx.font = font(600, 22);
+      ctx.fillText(`⋯ ${tryCount(r.more)} more`, left + 40, y + SQ / 2);
+    } else {
+      tryRow(ctx, r, left, y);
     }
+    y += ROW_H;
   }
 
   // Team: two rows of three, sprites on a shared baseline, names under them.

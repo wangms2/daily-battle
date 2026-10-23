@@ -67,7 +67,7 @@ Daily swap (done on the daily brief screen, shown as "1 change left"):
 - One per day, resets at local midnight.
 - Either replace one team member with another of the 12 (choosing a set), or change the set of one existing member.
 - Unused swaps do not accumulate.
-- Once the day's counted tries are over (won within 3, or 3 lost), the daily swap is no longer offered. Instead each practice run may make one **practice change** (a swap or a set change) for that run only; the weekly team is untouched, and the next run decides afresh. If a practice run is won, its change stays on the team from then on.
+- Once the day is won, the daily swap is no longer offered. Instead each practice run may make one **practice change** (a swap or a set change) for that run only; the weekly team is untouched, and the next run decides afresh. If a practice run is won, its change stays on the team from then on.
 
 ### 4.3 Daily battle
 
@@ -80,10 +80,10 @@ Daily swap (done on the daily brief screen, shown as "1 change left"):
 ### 4.4 Stats
 
 - Per day: attempts, result of each, and whether the day has been cleared.
-- **Streak (revised after M9a):** consecutive days won **on the first try**. A lost first try breaks it at once (a forfeit or an abandoned try counts as a loss; reload resumes, §7, so a reload can't dodge one), and so does a missed day. Tries 2–3 still count for the day's result (won on try N) and the win rate; tries after the 3rd are practice: they can clear the day but don't count. No streak freezes.
+- **Streak (revised after M9a):** consecutive days won **on the first try**. A lost first try breaks it at once (a forfeit or an abandoned try counts as a loss; reload resumes, §7, so a reload can't dodge one), and so does a missed day. There's no limit on tries: every try counts until the day is won (the result is "won on try N"), and runs after a win are practice, which are never shared. No streak freezes.
 - **First-try wins are the best result.** They're celebrated simply: a ⭐ "First try!" headline in the share and a gold badge on the result card, plus a first-try count in stats.
-- Also track: best streak, win rate within 3 tries, days played, clears (days eventually won), average tries per clear.
-- A day shows one of: not played, first-try win, won on try 2–3, not cleared yet (fewer than 3 tries today), or not cleared in 3 tries.
+- Also track: best streak, first-try rate, days played, clears (days eventually won), average tries per clear.
+- A day shows one of: not played, first-try win, won on a later try, not cleared yet (today, tried but not won), or not cleared (a past day never won).
 - Streaks and stats are derived from the saved attempts (`apps/web/src/lib/results.ts`), not stored.
 
 ## 5. Data pipeline
@@ -301,7 +301,7 @@ Hippowdon, Azelf, Celebi, Heatran*, Jirachi, Lucario
 🔥 5-day streak
 ```
 
-Won on a later try (one row per try that counts, up to 3):
+Won on a later try (one row per try, up to the win; past ten tries the middle becomes a count: the first, `⋯ 11 tries more`, and the last two):
 
 ```
 Daily Battle · Gen 4 · Oct 21
@@ -313,7 +313,7 @@ Hippowdon, Azelf, Celebi, Heatran*, Jirachi, Lucario
 🔥 6-day streak
 ```
 
-Other headlines: `❌ Not cleared in 3 tries` (with `🔥 Streak reset`), `✅ Won on try 5` for a practice clear (rows still show the first 3 tries, with `🔥 Streak reset`), and `Not cleared yet · 1 of 3 tries` mid-day.
+Other headlines: `❌ Not cleared` (a past day never won, with `🔥 Streak reset`) and `Not cleared yet · 3 tries` mid-day. Practice runs after a win are never shared.
 
 - The last line is the link to play (the site's own address), so friends can tap through.
 - Each row shows that try's result and your Pokémon left out of 6 (green = alive; grey ⬜ = still standing on a try that was given up), led by one emoji (✅/❌, a first try too) so the squares line up. A practice run shared from its end card adds `🔁 🟩🟩🟩⬛⬛⬛ practice` (`practice, with Gengar` if it swapped one in). At most 7 lines plus the link.

@@ -447,9 +447,10 @@ describe('practice runs', () => {
         remaining: result === 'win' ? 2 : 0,
       },
     );
-  const decided = () => [1, 2, 3].reduce((s, ts) => play(s, ts, 'loss'), locked());
+  // A decided day is one that's been won: here, after a loss and a win.
+  const decided = () => play(play(locked(), 1, 'loss'), 2, 'win');
 
-  it('only offers practice changes once the counted tries are done, and never the daily change', () => {
+  it('only offers practice changes once the day is won, and never the daily change', () => {
     const fresh = play(locked(), 1, 'loss');
     const practice = { type: 'setPracticeChange', day: DAY, week: WEEK, change: swap } as const;
     expect(gameReducer(fresh, practice)).toBe(fresh);

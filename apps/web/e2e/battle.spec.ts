@@ -120,7 +120,7 @@ test('plays a full battle and stays on our own hosts', async ({ page }) => {
   expect(foreign).toEqual([]);
 
   await expect(page.getByRole('dialog', { name: 'Battle over' })).toContainText(
-    /Try 1 of 3|⭐ First try/,
+    /Try 1|⭐ First try/,
   );
   await page.getByRole('button', { name: 'Back to today' }).click();
   // Today's result now shows on the brief.
@@ -184,7 +184,7 @@ test('on a touch screen, holding a move shows its details and keeps them; a tap 
   await expect(page.locator('main')).toContainText(' used ');
 });
 
-test('a run after the day is won is practice, and shares as practice', async ({ page }) => {
+test('a run after the day is won is practice, and never shows in the share', async ({ page }) => {
   await page.addInitScript(() => {
     Object.defineProperty(navigator, 'share', { value: undefined });
     Object.defineProperty(navigator, 'clipboard', {
@@ -205,7 +205,6 @@ test('a run after the day is won is practice, and shares as practice', async ({ 
   await confirm.getByRole('button', { name: 'Give up' }).click();
   const card = page.getByRole('dialog', { name: 'Battle over' });
   await expect(card).toContainText('Practice');
-  await expect(card).not.toContainText('of 3');
   await card.getByRole('button', { name: 'Share' }).click();
   await page
     .getByRole('dialog', { name: 'Share your result' })
@@ -213,7 +212,8 @@ test('a run after the day is won is practice, and shares as practice', async ({ 
     .click();
   const copied = await page.evaluate(() => (window as unknown as { copied: string }).copied);
   expect(copied).toContain('⭐ First try! 4/6 left');
-  expect(copied).toMatch(/🔁 (?:🟩|⬛|⬜){6} practice/u);
+  // Practice runs are never shared.
+  expect(copied).not.toMatch(/practice|🔁/u);
 });
 
 test('resumes a battle after a reload', async ({ page }) => {
@@ -337,10 +337,11 @@ test('a lost first try breaks the streak, and the result copies to share', async
     await page.getByRole('button', { name: 'Give up' }).last().click();
     const card = page.getByRole('dialog', { name: 'Battle over' });
     await expect(card).toContainText('You gave up');
-    await expect(card).toContainText(`Try ${i} of 3`);
+    await expect(card).toContainText(`Try ${i}`);
     await expect(card).toContainText('Streak reset');
-    if (i < 3) await expect(card).toContainText(`Try again · ${3 - i} left`);
-    else {
+    // There is no limit: it always offers another try until the day is won.
+    await expect(card.getByRole('button', { name: 'Try again' })).toBeVisible();
+    if (i === 3) {
       await page.waitForTimeout(300);
       await noScroll(page, 'end card, 3 tries');
       await page.screenshot({ path: `${dir}/28-end-tries.png` });
@@ -349,11 +350,11 @@ test('a lost first try breaks the streak, and the result copies to share', async
   }
 
   const strip = page.getByRole('region', { name: 'Today’s result' });
-  await expect(strip).toContainText('Not cleared in 3 tries');
+  await expect(strip).toContainText('Not cleared yet · 3 tries');
   await expect(page.getByRole('button', { name: 'Stats. Streak 0' })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Play again · practice' })).toBeVisible();
-  // From here on, changes are per practice run; the daily change is gone.
-  await expect(page.getByRole('button', { name: 'Practice change' })).toBeVisible();
+  // Still open, so the next run is a try, not practice, and the daily change stays.
+  await expect(page.getByRole('button', { name: /^Try again · / })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Practice change' })).toHaveCount(0);
   await noScroll(page, 'brief with result');
   await page.screenshot({ path: `${dir}/29-brief-result.png` });
 
@@ -373,7 +374,7 @@ test('a lost first try breaks the streak, and the result copies to share', async
   await expect(page.getByRole('status')).toContainText('Text copied');
   const copied = await page.evaluate(() => (window as unknown as { copied: string }).copied);
   const lines = copied.split('\n');
-  expect(lines.slice(0, 2)).toEqual(['Daily Battle · Gen 4 · Oct 21', '❌ Not cleared in 3 tries']);
+  expect(lines.slice(0, 2)).toEqual(['Daily Battle · Gen 4 · Oct 21', 'Not cleared yet · 3 tries']);
   for (const row of lines.slice(2, 5)) expect(row).toMatch(/^❌ ⬜+⬛*$/u); // given up: grey
   expect(copied).toContain('🔥 Streak reset');
   for (const s of schedule.days.find((d) => d.day === '2026-10-21')!.team) {

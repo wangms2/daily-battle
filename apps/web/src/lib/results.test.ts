@@ -36,11 +36,13 @@ describe('day status', () => {
     expect(summarizeDay(day(attempt('inProgress')), true).status).toBe('none');
     expect(summarizeDay(day(W), true).status).toBe('firstTry');
     expect(summarizeDay(day(L, L, W), true)).toMatchObject({ status: 'won', winTry: 3 });
-    expect(summarizeDay(day(L, F), true)).toMatchObject({ status: 'pending', triesLeft: 1 });
+    // There's no limit on tries: today stays open until it's won.
+    expect(summarizeDay(day(L, F), true).status).toBe('pending');
+    expect(summarizeDay(day(L, L, L, L, L), true).status).toBe('pending');
+    // A past day that was never won is over.
     expect(summarizeDay(day(L, F), false).status).toBe('failed');
-    expect(summarizeDay(day(L, L, L), true)).toMatchObject({ status: 'failed', triesLeft: 0 });
-    // A win on try 4 clears the day but doesn't keep the streak.
-    expect(summarizeDay(day(L, L, F, W), true)).toMatchObject({ status: 'failed', winTry: 4 });
+    // A late win clears the day but doesn't keep the streak.
+    expect(summarizeDay(day(L, L, F, W), true)).toMatchObject({ status: 'won', winTry: 4 });
   });
 });
 
@@ -48,7 +50,8 @@ describe('streak (first tries)', () => {
   it('counts tries only up to the first win; the rest are practice', () => {
     expect(summarizeDay(day(W, L, W), true).counted).toHaveLength(1);
     expect(summarizeDay(day(L, W, L), true).counted).toHaveLength(2);
-    expect(summarizeDay(day(L, L, L, W), true).counted).toHaveLength(3);
+    expect(summarizeDay(day(L, L, L, L, L, L, W, L), true).counted).toHaveLength(7);
+    expect(summarizeDay(day(L, L, L, L), true).counted).toHaveLength(4);
   });
 
   it('extends only with a first-try win', () => {
@@ -81,7 +84,7 @@ describe('streak (first tries)', () => {
 });
 
 describe('stats', () => {
-  it('counts first tries, clears, win rate, best streak, and tries per clear', () => {
+  it('counts first tries, clears, first-try rate, best streak, and tries per clear', () => {
     const stats = computeStats(
       history(day(W), day(L, W), day(W), null, day(L, L, L, L, W), day(W), day(L)),
       TODAY,
@@ -91,7 +94,7 @@ describe('stats', () => {
       bestStreak: 1, // no two first-try wins on consecutive days
       firstTryWins: 3,
       daysPlayed: 6,
-      winRate: 80, // 4 of 5 decided days (today is still pending)
+      firstTryRate: 50, // 3 of 6 days played
       clears: 5,
       triesPerClear: (1 + 2 + 1 + 5 + 1) / 5,
     });
@@ -103,7 +106,7 @@ describe('stats', () => {
       bestStreak: 0,
       firstTryWins: 0,
       daysPlayed: 0,
-      winRate: 0,
+      firstTryRate: 0,
       clears: 0,
       triesPerClear: null,
     });

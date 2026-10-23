@@ -1,7 +1,7 @@
 // The share text (DESIGN.md §11) and the share action. Plain text that pastes
 // anywhere; never opponent species, sets, or turn counts.
 import type { Attempt, DayChange } from '../state/schema';
-import { streakBroken, type DaySummary } from './results';
+import { condenseTries, streakBroken, tryCount, type DaySummary } from './results';
 
 export interface ShareArgs {
   /** `YYYY-MM-DD` */
@@ -9,8 +9,6 @@ export interface ShareArgs {
   summary: DaySummary;
   streak: number;
   change?: DayChange;
-  /** The run being shared from its end card; a practice run gets a line of its own. */
-  run?: Attempt;
   /** Where to play, added as the last line so friends can tap through. */
   url?: string;
   /** The game's name, "Gen 4" or "Gen 5", shown after "Daily Battle". */
@@ -31,12 +29,10 @@ export interface ShareModel {
   status: DaySummary['status'];
   /** "First try! 4/6 left", "Won on try 2 · 3/6 left", … (no emoji). */
   headline: string;
-  /** Won at all today, even on a practice try after the 3 that counted. */
+  /** Won today, on any try. */
   cleared: boolean;
-  /** The tries that counted (just the win on a first try). */
+  /** Every try that counted, up to the win (just the win on a first try). Practice runs after a win never show. */
   rows: ShareRow[];
-  /** A practice run shared from its end card, with the Pokémon it swapped in. */
-  practice?: ShareRow & { with?: string };
   /** The deciding try's team; `swapped` marks today's change. */
   team: { species: string; swapped: boolean }[];
   /** "5-day streak", "Streak reset", or nothing. */
@@ -49,15 +45,7 @@ const row = (a: Attempt): ShareRow => ({
   remaining: a.remaining,
 });
 
-export function shareModel({
-  day,
-  summary,
-  streak,
-  change,
-  run,
-  url,
-  game,
-}: ShareArgs): ShareModel {
+export function shareModel({ day, summary, streak, change, url, game }: ShareArgs): ShareModel {
   const { status, counted, tries, winTry } = summary;
   const date = new Date(`${day}T12:00:00`).toLocaleDateString('en-US', {
     month: 'short',
@@ -70,18 +58,8 @@ export function shareModel({
       : winning
         ? `Won on try ${winTry} · ${winning.remaining}/6 left`
         : status === 'failed'
-          ? 'Not cleared in 3 tries'
-          : `Not cleared yet · ${counted.length} of 3 tries`;
-
-  // A practice run after the day was decided: shown as an extra, never as a try.
-  const practice =
-    run &&
-    run.result !== 'inProgress' &&
-    run.ts !== winning?.ts &&
-    !counted.some((a) => a.ts === run.ts)
-      ? run
-      : undefined;
-  const swap = practice?.practiceChange;
+          ? 'Not cleared'
+          : `Not cleared yet · ${tryCount(counted.length)}`;
 
   // The team from the deciding try: the win, or the latest try that counted.
   const swappedIn = change?.kind === 'replace' ? change.to.species : undefined;
@@ -97,9 +75,6 @@ export function shareModel({
     headline,
     cleared: !!winning,
     rows: (status === 'firstTry' ? [winning!] : counted).map(row),
-    ...(practice && {
-      practice: { ...row(practice), ...(swap?.kind === 'replace' && { with: swap.to.species }) },
-    }),
     team,
     streak: streakBroken(summary) ? 'Streak reset' : streak > 0 ? `${streak}-day streak` : null,
     url,
@@ -121,12 +96,10 @@ export function formatShareText(m: ShareModel): string {
   const icon =
     m.status === 'firstTry' ? '⭐ ' : m.cleared ? '✅ ' : m.status === 'failed' ? '❌ ' : '';
   lines.push(`${icon}${m.headline}`);
-  // One row per try, each led by one emoji so the squares line up; a practice
-  // run is 🔁 with a short tag after its squares.
-  for (const r of m.rows) lines.push(`${mark(r)} ${squares(r)}`);
-  if (m.practice) {
-    const tag = m.practice.with ? `practice, with ${m.practice.with}` : 'practice';
-    lines.push(`🔁 ${squares(m.practice)} ${tag}`);
+  // One row per try, each led by one emoji so the squares line up. Past ten
+  // tries, the middle ones become a count.
+  for (const r of condenseTries(m.rows, 10)) {
+    lines.push('more' in r ? `⋯ ${tryCount(r.more)} more` : `${mark(r)} ${squares(r)}`);
   }
   if (m.team.length) {
     lines.push(m.team.map((s) => (s.swapped ? `${s.species}*` : s.species)).join(', '));

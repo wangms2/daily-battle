@@ -30,15 +30,10 @@ const swap: DayChange = {
 function text(
   attempts: Attempt[],
   streak: number,
-  {
-    isToday = true,
-    change,
-    run,
-    url,
-  }: { isToday?: boolean; change?: DayChange; run?: Attempt; url?: string } = {},
+  { isToday = true, change, url }: { isToday?: boolean; change?: DayChange; url?: string } = {},
 ) {
   const day: DayState = { swapUsed: !!change, change, attempts };
-  return shareText({ day: DAY, summary: summarizeDay(day, isToday), streak, change, run, url });
+  return shareText({ day: DAY, summary: summarizeDay(day, isToday), streak, change, url });
 }
 
 describe('share text', () => {
@@ -81,11 +76,11 @@ describe('share text', () => {
     );
   });
 
-  it('says when the day was not cleared in 3 tries', () => {
-    expect(text([a('loss', 2), a('loss', 0), a('loss', 1)], 0)).toBe(
+  it('says when a past day was never cleared', () => {
+    expect(text([a('loss', 2), a('loss', 0), a('loss', 1)], 0, { isToday: false })).toBe(
       [
         'Daily Battle · Oct 21',
-        '❌ Not cleared in 3 tries',
+        '❌ Not cleared',
         '❌ 🟩🟩⬛⬛⬛⬛',
         '❌ ⬛⬛⬛⬛⬛⬛',
         '❌ 🟩⬛⬛⬛⬛⬛',
@@ -95,22 +90,38 @@ describe('share text', () => {
     );
   });
 
-  it('shows a late clear, still listing only the 3 tries that counted', () => {
+  it('lists every try up to a late win, however many', () => {
     const t = text([a('loss', 0), a('loss', 0), a('loss', 0), a('loss', 1), a('win', 3)], 0);
-    expect(t.split('\n').slice(1, 5)).toEqual([
+    expect(t.split('\n').slice(1, 7)).toEqual([
       '✅ Won on try 5 · 3/6 left',
       '❌ ⬛⬛⬛⬛⬛⬛',
       '❌ ⬛⬛⬛⬛⬛⬛',
       '❌ ⬛⬛⬛⬛⬛⬛',
+      '❌ 🟩⬛⬛⬛⬛⬛',
+      '✅ 🟩🟩🟩⬛⬛⬛',
     ]);
     expect(t).toContain('🔥 Streak reset');
+  });
+
+  it('keeps the ends of a day past ten tries: the first, a count, and the last two', () => {
+    const tries = [a('loss', 2), ...Array.from({ length: 12 }, () => a('loss', 0)), a('win', 1)];
+    expect(text(tries, 0).split('\n').slice(1, 6)).toEqual([
+      '✅ Won on try 14 · 1/6 left',
+      '❌ 🟩🟩⬛⬛⬛⬛',
+      '⋯ 11 tries more',
+      '❌ ⬛⬛⬛⬛⬛⬛',
+      '✅ 🟩⬛⬛⬛⬛⬛',
+    ]);
+    // Ten fit whole.
+    const ten = Array.from({ length: 10 }, () => a('loss', 0));
+    expect(text(ten, 0)).not.toContain('⋯');
   });
 
   it('shares a day still in progress, the streak already reset', () => {
     expect(text([a('loss', 1)], 0)).toBe(
       [
         'Daily Battle · Oct 21',
-        'Not cleared yet · 1 of 3 tries',
+        'Not cleared yet · 1 try',
         '❌ 🟩⬛⬛⬛⬛⬛',
         'Hippowdon, Azelf, Celebi, Heatran, Jirachi, Lucario',
         '🔥 Streak reset',
@@ -118,23 +129,18 @@ describe('share text', () => {
     );
   });
 
-  it('adds a practice run shared from its end card, without counting it as a try', () => {
+  it('never shares practice runs after the win', () => {
     const practice = { ...a('win', 6), practiceChange: swap };
     const tries = [a('win', 4), a('loss', 0), practice];
-    expect(text(tries, 5, { run: practice })).toBe(
+    expect(text(tries, 5)).toBe(
       [
         'Daily Battle · Oct 21',
         '⭐ First try! 4/6 left',
         '✅ 🟩🟩🟩🟩⬛⬛',
-        '🔁 🟩🟩🟩🟩🟩🟩 practice, with Heatran',
         'Hippowdon, Azelf, Celebi, Heatran, Jirachi, Lucario',
         '🔥 5-day streak',
       ].join('\n'),
     );
-    // A try that counted, or the day's late win, isn't repeated as practice.
-    expect(text(tries, 5, { run: tries[0] })).not.toContain('practice');
-    const late = [a('loss', 0), a('loss', 0), a('loss', 0), a('win', 2)];
-    expect(text(late, 0, { run: late[3] })).not.toContain('practice');
   });
 
   it('ends with the link to play', () => {
@@ -150,8 +156,10 @@ describe('share text', () => {
       text([a('win', 4)], 5, { url }),
       text([a('loss', 0), a('loss', 0), a('win', 1), a('win', 6)], 1, { url }),
       text([a('loss', 0), a('loss', 0), a('loss', 0), a('win', 1)], 0, { url }),
+      // Past ten tries the middle becomes a count, so even a long day stays short.
+      text([...Array.from({ length: 30 }, () => a('loss', 0)), a('win', 1)], 0, { url }),
     ]) {
-      expect(t.split('\n').length).toBeLessThanOrEqual(8); // 7 plus the link
+      expect(t.split('\n').length).toBeLessThanOrEqual(16); // header, rows (five if condensed), team, streak, link
       for (const s of opponents) if (!ours.has(s)) expect(t).not.toContain(s);
       expect(t).not.toMatch(/turn/i);
     }

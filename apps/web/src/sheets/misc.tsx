@@ -52,7 +52,7 @@ export function WelcomeSheet({
     ],
     [
       'Win on your first try',
-      'That earns a ⭐ and keeps your streak going. Tries 2 and 3 can still clear the day.',
+      'That earns a ⭐ and keeps your streak going. You can keep trying until you win.',
     ],
   ];
   return (
@@ -167,7 +167,7 @@ export function StatsSheet({
         <StatTile value={stats.streak} label="Streak" />
         <StatTile value={stats.bestStreak} label="Best streak" />
         <StatTile value={`⭐ ${stats.firstTryWins}`} label="First-try wins" />
-        <StatTile value={`${stats.winRate}%`} label="Won in 3" />
+        <StatTile value={`${stats.firstTryRate}%`} label="First-try rate" />
         <StatTile value={stats.daysPlayed} label="Days played" />
         <StatTile
           value={stats.triesPerClear === null ? '–' : stats.triesPerClear.toFixed(1)}

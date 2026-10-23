@@ -2,7 +2,7 @@
 // that falls back to copying (or showing the text to copy).
 import clsx from 'clsx';
 import { useEffect, useState, type ReactNode } from 'react';
-import { type DaySummary } from '../lib/results';
+import { condenseTries, tryCount, type DaySummary } from '../lib/results';
 import {
   formatShareText,
   imageMode,
@@ -58,8 +58,9 @@ function TryRow({ a, label, current }: { a: Try; label: string; current: boolean
 }
 
 /**
- * The tries that count, one row of six squares each (green = Pokémon left). A
- * practice run being shown gets its own row under a "Practice" label.
+ * The tries that count, one row of six squares each (green = Pokémon left),
+ * shortened to their ends past four so the card keeps its size. A practice run
+ * being shown gets its own row under a "Practice" label.
  */
 export function TryRows({ summary, current }: { summary: DaySummary; current?: number }) {
   const practice = summary.tries.slice(summary.counted.length);
@@ -67,9 +68,18 @@ export function TryRows({ summary, current }: { summary: DaySummary; current?: n
   const others = practice.length - (shown ? 1 : 0);
   return (
     <div className="flex flex-col items-center gap-1">
-      {summary.counted.map((a, i) => (
-        <TryRow key={a.ts} a={a} label={`Try ${i + 1}`} current={a.ts === current} />
-      ))}
+      {condenseTries(
+        summary.counted.map((a, i) => ({ a, n: i + 1 })),
+        4,
+      ).map((x) =>
+        'more' in x ? (
+          <span key="more" className="text-[12px] text-muted">
+            ⋯ {tryCount(x.more)} more
+          </span>
+        ) : (
+          <TryRow key={x.a.ts} a={x.a} label={`Try ${x.n}`} current={x.a.ts === current} />
+        ),
+      )}
       {shown && (
         <>
           <span className="mt-1 text-[11px] font-semibold tracking-wide text-muted uppercase">

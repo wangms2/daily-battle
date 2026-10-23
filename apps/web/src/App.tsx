@@ -229,16 +229,8 @@ export function App() {
         result={{
           summary,
           streak: stats.streak,
-          // From the end card, share this run (a practice run adds its own line).
-          share: shareModel({
-            day,
-            summary,
-            streak: stats.streak,
-            change: dayState.change,
-            run: shownAttempt,
-            url: shareUrl(format),
-            game: game.name,
-          }),
+          // The same share as the brief's: practice runs never show in it.
+          share,
         }}
       />
     );
