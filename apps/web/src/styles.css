@@ -5,6 +5,7 @@
 @import '@fontsource/ibm-plex-sans/latin-700.css';
 /* The battle text is the only pixel type: a lookalike of each generation's game
    font (the games' own fonts are Nintendo's, so these are free stand-ins). */
+@import '@fontsource/jersey-10/latin-400.css';
 @import '@fontsource/jersey-15/latin-400.css';
 @import '@fontsource/pixelify-sans/latin-400.css';
 @import '@fontsource/nunito/latin-700.css';
@@ -37,6 +38,7 @@
   --font-display: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
   /* Gen 4 (Diamond/Pearl): chunky and bold. Gen 5 (Black/White): lighter and rounder.
      Gen 6 (X/Y): the games left pixel type behind for clean rounded text. */
+  --font-pixel-3: 'Jersey 10', ui-monospace, monospace;
   --font-pixel-4: 'Jersey 15', ui-monospace, monospace;
   --font-pixel-5: 'Pixelify Sans', ui-monospace, monospace;
   --font-pixel-6: 'Nunito', ui-rounded, ui-sans-serif, system-ui, sans-serif;
@@ -394,6 +396,9 @@ body {
 }
 
 /* The generation's pixel font, for the battle text and the move names. */
+[data-gen='3'] {
+  --font-pixel: var(--font-pixel-3);
+}
 [data-gen='4'] {
   --font-pixel: var(--font-pixel-4);
 }

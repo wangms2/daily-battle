@@ -52,4 +52,6 @@ Last local run (2026-10-21): 1,000 battles, 0 errors. p1 won 504, p2 won 488, wi
 - **The sim does not validate teams** passed to `setPlayer`. Generated and player teams must go through `TeamValidator.get('gen4ou').validateTeam` explicitly. `randomTeam` does this.
 - **Gen 5 OU** (`gen5ou`, same sim version) adds Team Preview: before turn 1 each side gets a `team` request, answered with `team N…` (`leadChoice`), and the client lists all six foe species from the `|poke|` lines with HP `0/0` until each is sent out. `legalChoices` lists one lead per Pokémon. `soak --format gen5ou` runs Gen 5 battles.
 
+- **Gen 3 OU** (`gen3ou`) has no Team Preview, like Gen 4, and uses Sleep Clause Mod and Freeze Clause Mod. Its Baton Pass clauses are team-wide, so the set data leaves out boost passers (see `@daily-battle/data`). `soak --format gen3ou` passed.
+
 - **Gen 6 OU** (`gen6ou`) adds Mega Evolution: while the active Pokémon can Mega Evolve, `legalChoices` adds `move N mega` for each usable move. `teamProblems` is the validator plus our one-Mega rule. The client sees a foe's stone only when it Mega Evolves (`detailschange` then `-mega`); tests check it stays hidden before. Sleep Clause Mod applies. `soak --format gen6ou` passed.

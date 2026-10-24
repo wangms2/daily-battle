@@ -8,7 +8,7 @@ const CREDITS: [string, string][] = [
   ['Battle simulator and text', '@pkmn (Pokémon Showdown’s simulator), MIT licensed.'],
   [
     'Sprites, item icons, Pokédex text',
-    'PokeAPI; animated sprites by the Smogon sprite community.',
+    'PokeAPI; animated sprites by the Smogon sprite community, and Gen 3’s from Pokémon Emerald.',
   ],
   [
     'Move animations',

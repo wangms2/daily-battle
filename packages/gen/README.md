@@ -89,3 +89,9 @@ Same algorithm, seeded `gen6ou:gen<N>:…` like Gen 5, with two rules that only 
 - **Opponents** are redrawn if they hold two Mega Stones (`oneMegaProblem`).
 
 `src/__fixtures__/golden-gen6ou.json` pins three weeks. `check --n 10000` passed with Gen 6 added.
+
+## Gen 3 OU
+
+Same algorithm, seeded `gen3ou:gen<N>:…`. Gen 3 has no Stealth Rock, so a pool needs a Spikes setter in its place, and every Gen 3 pool has one (the per-week Spikes draw still happens but doesn't apply). Gen 4 to 6 pools and their random draws are unchanged.
+
+`src/__fixtures__/golden-gen3ou.json` pins three weeks. The constraint tests (1000 weeks of pools, and any 6 of a pool legal with any sets) pass for Gen 3.

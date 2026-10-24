@@ -18,7 +18,9 @@ import {
   type RefObject,
 } from 'react';
 import { HAZARD_FX, TERRAIN_FX, WEATHER_FX } from '../../lib/fx';
+import { activeFormat } from '../../lib/data';
 import { getSprite } from '../../lib/sprites';
+import { genOf } from '@daily-battle/data';
 import type { SceneInit } from '../anim/scene';
 import type { Frame, MonView, SideConds, TeamMark, View, Who } from '../frames';
 import { boostLabels, STATUS_COLOR, STATUS_LABEL } from './labels';
@@ -67,6 +69,11 @@ const YOU_BAR_TOP = `calc(${Y(262)} - 42px)`;
 const YOU_BAR_H = '36px';
 /** Your back sprite is drawn this much larger (as in the games). */
 const BACK_SCALE = 1.4;
+/**
+ * Gen 3's Emerald sprites sit small in a 64px box, so they're drawn larger to
+ * stand on the platforms like the other gens' sprites.
+ */
+const GEN3_ZOOM = 1.5;
 
 /**
  * Where your stat bar goes: above your platform's left side, unless your
@@ -397,7 +404,11 @@ function FieldSprite({
         alt=""
         draggable={false}
         onLoad={(e) => {
-          const size = { w: e.currentTarget.naturalWidth, h: e.currentTarget.naturalHeight };
+          const zoom = genOf(activeFormat()) === 3 && !mon.substitute ? GEN3_ZOOM : 1;
+          const size = {
+            w: e.currentTarget.naturalWidth * zoom,
+            h: e.currentTarget.naturalHeight * zoom,
+          };
           setNatural(size);
           onSize?.(size);
         }}

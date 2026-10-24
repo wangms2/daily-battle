@@ -37,7 +37,7 @@ function memoryBackend(seed?: State, broken = false): globalThis.Storage {
 /** State after the welcome sheet, optionally with hints off and a team locked. */
 function seeded({ hints = true, team }: { hints?: boolean; team?: { week: string } } = {}): State {
   const state = initialState();
-  state.settings.shownExplainers = ['welcome', 'gen5-news', 'gen6-news'];
+  state.settings.shownExplainers = ['welcome', 'gen5-news', 'gen6-news', 'gen3-news'];
   state.settings.beginnerHints = hints;
   state.settings.format = 'gen4ou';
   if (team) {
@@ -443,9 +443,9 @@ describe('Species Clause', () => {
   });
 });
 
-describe('Gen 6 news', () => {
-  /** A player from before Gen 6: welcome and Gen 5 news seen, on Gen 4. */
-  const veteran = (shown = ['welcome', 'gen5-news']) => {
+describe('Gen 3 news', () => {
+  /** A player from before Gen 3: welcome and the Gen 5 and Gen 6 news seen, on Gen 4. */
+  const veteran = (shown = ['welcome', 'gen5-news', 'gen6-news']) => {
     const state = seeded();
     state.settings.shownExplainers = shown;
     return state;
@@ -455,8 +455,8 @@ describe('Gen 6 news', () => {
     vi.stubGlobal(
       'fetch',
       vi.fn(async (url: string) =>
-        // Gen 4 and 5 need a pool of their own; Gen 6's switch is checked by its title.
-        String(url).includes('gen6ou/')
+        // Gen 4 and 5 need a pool of their own; Gen 3's switch is checked by its title.
+        String(url).includes('gen3ou/') || String(url).includes('gen6ou/')
           ? new Response('Not found', { status: 404 })
           : String(url).includes('gen5ou/')
             ? new Response(JSON.stringify(gen5Schedule), { status: 200 })
@@ -465,14 +465,14 @@ describe('Gen 6 news', () => {
     );
   });
 
-  it('tells a player from before Gen 6 once, and Try switches to it', async () => {
+  it('tells a player from before Gen 3 once, and Try switches to it', async () => {
     const user = userEvent.setup();
     renderApp(veteran());
-    const news = await screen.findByRole('dialog', { name: 'New: Gen 6 OU' });
-    await user.click(within(news).getByRole('button', { name: 'Try Gen 6 OU' }));
-    // Gen 6's schedule isn't stubbed here; leaving Gen 4 is the switch.
+    const news = await screen.findByRole('dialog', { name: 'New: Gen 3 OU' });
+    await user.click(within(news).getByRole('button', { name: 'Try Gen 3 OU' }));
+    // Gen 3's schedule isn't stubbed here; leaving Gen 4 is the switch.
     await waitFor(() =>
-      expect(screen.queryByRole('dialog', { name: 'New: Gen 6 OU' })).not.toBeInTheDocument(),
+      expect(screen.queryByRole('dialog', { name: 'New: Gen 3 OU' })).not.toBeInTheDocument(),
     );
     expect(screen.queryByRole('button', { name: /^Gen 4 · / })).not.toBeInTheDocument();
   });
@@ -480,17 +480,18 @@ describe('Gen 6 news', () => {
   it('keeps the player on Gen 4 if they stay', async () => {
     const user = userEvent.setup();
     renderApp(veteran());
-    const news = await screen.findByRole('dialog', { name: 'New: Gen 6 OU' });
+    const news = await screen.findByRole('dialog', { name: 'New: Gen 3 OU' });
     await user.click(within(news).getByRole('button', { name: 'Stay on Gen 4' }));
     expect(await screen.findByRole('button', { name: /^Gen 4 · Week of/ })).toBeInTheDocument();
-    expect(screen.queryByRole('dialog', { name: 'New: Gen 6 OU' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('dialog', { name: 'New: Gen 3 OU' })).not.toBeInTheDocument();
   });
 
-  it('shows only the newest sheet to a player who missed the Gen 5 news', async () => {
+  it('shows only the newest sheet to a player who missed the earlier news', async () => {
     const user = userEvent.setup();
     renderApp(veteran(['welcome']));
-    const news = await screen.findByRole('dialog', { name: 'New: Gen 6 OU' });
+    const news = await screen.findByRole('dialog', { name: 'New: Gen 3 OU' });
     expect(screen.queryByRole('dialog', { name: 'New: Gen 5 OU' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('dialog', { name: 'New: Gen 6 OU' })).not.toBeInTheDocument();
     await user.click(within(news).getByRole('button', { name: 'Stay on Gen 4' }));
     expect(await screen.findByRole('button', { name: /^Gen 4 · Week of/ })).toBeInTheDocument();
     expect(screen.queryByRole('dialog', { name: /^New: / })).not.toBeInTheDocument();
@@ -505,9 +506,16 @@ describe('Gen 6 news', () => {
     expect(screen.queryByRole('dialog', { name: /^New: / })).not.toBeInTheDocument();
   });
 
-  it('offers all three games on the welcome sheet', async () => {
+  it('offers all four games on the welcome sheet, by generation', async () => {
     renderApp();
-    for (const gen of ['Gen 4 OU', 'Gen 5 OU', 'Gen 6 OU'])
+    const radios = await screen.findAllByRole('radio');
+    expect(radios.map((r) => r.textContent?.match(/Gen \d OU/)?.[0])).toEqual([
+      'Gen 3 OU',
+      'Gen 4 OU',
+      'Gen 5 OU',
+      'Gen 6 OU',
+    ]);
+    for (const gen of ['Gen 3 OU', 'Gen 4 OU', 'Gen 5 OU', 'Gen 6 OU'])
       expect(await screen.findByRole('radio', { name: new RegExp(gen) })).toBeInTheDocument();
   });
 });
