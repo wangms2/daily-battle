@@ -87,7 +87,7 @@ export default function LiveBattle({
         onChoice={() => {}}
         onEnd={() => {}}
         onExit={onBack}
-        topBarRight={<Countdown match={match} />}
+        topBarRight={<Countdown ms={match.timeLeftMs} at={match.receivedAt} />}
         live={{
           waiting: `Waiting for ${foe}…`,
           giveUpBody: `${foe} wins this battle.`,

@@ -1,15 +1,10 @@
-// A live battle between two players, run on the server so neither side ever
-// receives the other's sets or request (DESIGN.md §7, §18). It's rebuilt from
-// the match's seed, teams, leads, and recorded choices whenever the room wakes.
-import { setsFor } from '@daily-battle/data';
-import { BattleSession, legalChoices, randomTeam, type Rng } from '@daily-battle/sim-bridge';
-import { leadFirst, SIDES, type Match, type Side, type WireUpdate } from '@daily-battle/versus';
-import type { PokemonSet, PRNGSeed } from '@pkmn/sim';
-
-/** A team for one player: random sets for now, until rooms have a build phase (V4). */
-export function dealTeam(format: string, rng: Rng, size: number): PokemonSet[] {
-  return randomTeam(rng, setsFor(format)).slice(0, size);
-}
+// A live battle between two players (or a player and the AI), run on the
+// server so neither side ever receives the other's sets or request (DESIGN.md
+// §7, §18). It's rebuilt from the match's seed, teams, and recorded choices
+// whenever the room wakes.
+import { BattleSession, legalChoices, type SideView } from '@daily-battle/sim-bridge';
+import { SIDES, type Match, type Side, type WireUpdate } from '@daily-battle/versus';
+import type { PRNGSeed } from '@pkmn/sim';
 
 /** A fresh battle seed, never shown to players. */
 export function randomSeed(): string {
@@ -22,12 +17,12 @@ export class LiveBattle {
   private readonly session: BattleSession;
 
   constructor(match: Match) {
-    const team = (side: Side) => leadFirst(match.teams[side], match.leads[side]);
+    // The teams are stored lead first.
     this.session = new BattleSession({
       format: match.format,
       seed: match.seed as PRNGSeed,
-      p1: { team: team('p1'), name: match.names.p1 },
-      p2: { team: team('p2'), name: match.names.p2 },
+      p1: { team: match.teams.p1, name: match.names.p1 },
+      p2: { team: match.teams.p2, name: match.names.p2 },
     });
     // Team Preview (Gen 5): both teams come in lead first, so each keeps its order.
     // It's the same on every rebuild, so it isn't a recorded choice.
@@ -60,6 +55,11 @@ export class LiveBattle {
 
   get winner(): Side | null {
     return this.session.winner;
+  }
+
+  /** What the side sees when it has a choice to make (the AI's input); null otherwise. */
+  view(side: Side): SideView | null {
+    return this.session.view(side);
   }
 
   /** Whether the side has a choice to make (its clock runs). */

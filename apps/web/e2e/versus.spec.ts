@@ -179,84 +179,139 @@ test('the versus screens pass axe, light and dark', async ({ page, browser, base
   }
 });
 
-test('two friends play a live battle to the end, and the room shows the result', async ({
+/** Builds a team of `size` in the builder: the first Pokémon offered each time, its most used set. */
+async function build(page: Page, size: number) {
+  const wide = page.viewportSize()!.width >= 900;
+  await expect(page.getByRole('button', { name: `Pick ${size} more` })).toBeVisible();
+  for (let i = 0; i < size; i++) {
+    await page
+      .getByRole('button', { name: /^Add .* to team$/ })
+      .first()
+      .click();
+    if (!wide) {
+      await page
+        .getByRole('dialog', { name: /pick a set/ })
+        .getByRole('button', { name: /^Add / })
+        .click();
+    }
+  }
+  await page.getByRole('button', { name: 'Lock in team' }).click();
+  await page.getByRole('button', { name: 'Lock in', exact: true }).click();
+}
+
+/**
+ * One step of a game for a player: back to the room after a battle, ready up
+ * before one, or a choice in one. Returns true once the game is over.
+ */
+async function tick(page: Page): Promise<boolean> {
+  if (await page.getByRole('heading', { name: 'Game over' }).isVisible()) return true;
+  const back = page.getByRole('button', { name: 'Back to the room' });
+  if (await back.isVisible()) {
+    await back.click({ timeout: 2_000 }).catch(() => {});
+    return false;
+  }
+  const ready = page.getByRole('button', { name: /^Ready with / });
+  if ((await ready.isVisible()) && (await ready.isEnabled())) {
+    await ready.click({ timeout: 2_000 }).catch(() => {});
+    return false;
+  }
+  await step(page);
+  return false;
+}
+
+test('a room of three builds teams and plays to a winner', async ({ page, browser, baseURL }) => {
+  test.setTimeout(300_000);
+  const errors: string[] = [];
+  const red = page;
+  await quick(red);
+  const code = await createRoom(red, 'Red');
+  const blue = await friend(browser, baseURL);
+  const green = await friend(browser, baseURL);
+  const all = [red, blue, green];
+  for (const p of [blue, green]) await quick(p);
+  for (const p of all) p.on('pageerror', (e) => errors.push(String(e)));
+  await joinRoom(blue, code, 'Blue');
+  await joinRoom(green, code, 'Green');
+  // One life each and three Pokémon keep the game short.
+  await red.getByRole('button', { name: '1', exact: true }).click();
+  for (const name of ['Red', 'Blue', 'Green']) {
+    await red.getByRole('combobox', { name: `${name}’s team size` }).selectOption('3');
+  }
+  await expect(red.getByRole('list', { name: 'The pool' }).getByRole('listitem')).toHaveCount(12);
+  await red.getByRole('button', { name: 'Start the game' }).click();
+
+  // Everyone builds three from the pool; the first round starts when all are in.
+  for (const p of all) await build(p, 3);
+
+  // Round 1: three players, so one faces the AI. Blue makes a change first.
+  for (const p of all)
+    await expect(p.getByRole('heading', { name: /^Round 1 · vs / })).toBeVisible();
+  let vsAi = 0;
+  for (const p of all) {
+    if (await p.getByRole('heading', { name: 'Round 1 · vs Rival (AI)' }).isVisible()) vsAi++;
+  }
+  expect(vsAi).toBe(1);
+  await axe(blue);
+  await blue
+    .getByRole('button', { name: /^Change / })
+    .first()
+    .click();
+  await blue
+    .getByRole('button', { name: /^Swap in / })
+    .first()
+    .click();
+  await blue.getByRole('dialog').getByRole('button', { name: 'Swap in', exact: true }).click();
+  await expect(blue.getByText('New', { exact: true })).toBeVisible();
+
+  // Play every battle out, round after round, until the game ends.
+  const done = [false, false, false];
+  for (let i = 0; i < 3000 && done.some((d) => !d); i++) {
+    for (const [j, p] of all.entries()) if (!done[j]) done[j] = await tick(p);
+  }
+  for (const p of all) {
+    await expect(p.getByRole('heading', { name: 'Game over' })).toBeVisible();
+    await expect(p.getByRole('list', { name: 'Standings' })).toBeVisible();
+  }
+  const headline = (await red.getByRole('status').first().textContent())!;
+  expect(headline).toMatch(/You win!|(Blue|Green) wins|share the win/);
+  await axe(red);
+
+  // The host plays again: back to the lobby with everyone, lives reset.
+  await red.getByRole('button', { name: 'Play again' }).click();
+  for (const p of all) await expect(p.getByRole('heading', { name: /^Room / })).toBeVisible();
+  await expect(players(blue)).toHaveCount(3);
+  expect(errors).toEqual([]);
+});
+
+test('a player who gives up mid-battle loses it, and a reload resumes', async ({
   page,
   browser,
   baseURL,
 }) => {
-  test.setTimeout(240_000);
-  const errors: string[] = [];
-  await quick(page);
-  const code = await createRoom(page, 'Red');
-  const blue = await friend(browser, baseURL);
-  await quick(blue);
-  for (const p of [page, blue]) p.on('pageerror', (e) => errors.push(String(e)));
-  await joinRoom(blue, code, 'Blue');
-  // Three Pokémon each keeps the battle short.
-  await page.getByRole('combobox', { name: 'Red’s team size' }).selectOption('3');
-  await page.getByRole('combobox', { name: 'Blue’s team size' }).selectOption('3');
-  await expect(players(blue).nth(1)).toContainText('3 Pokémon');
-  await page.getByRole('button', { name: 'Start a round' }).click();
-
-  // Leads: each sees their own three with sets, and the foe's three species.
-  for (const p of [page, blue]) {
-    await expect(p.getByText('Pick your lead')).toBeVisible();
-    await expect(p.getByRole('button', { name: /^Lead with / })).toHaveCount(3);
-    await axe(p);
-    await p
-      .getByRole('button', { name: /^Lead with / })
-      .nth(1)
-      .click();
-  }
-  await expect(page.getByText('Waiting for Blue to pick a lead')).toHaveCount(0);
-
-  // The battle: both choose until it ends (the server decides every turn).
-  await expect(page.getByRole('timer')).toBeVisible({ timeout: 20_000 });
-  const over = { red: false, blue: false };
-  for (let i = 0; i < 1500 && !(over.red && over.blue); i++) {
-    over.red ||= await step(page);
-    over.blue ||= await step(blue);
-  }
-  for (const p of [page, blue]) {
-    await expect(p.getByRole('dialog', { name: 'Battle over' })).toBeVisible();
-  }
-  const redWon = (await page.getByRole('dialog', { name: 'Battle over' }).textContent())!.includes(
-    'You won',
-  );
-  await expect(blue.getByRole('dialog', { name: 'Battle over' })).toContainText(
-    redWon ? 'You lost' : /You won|Draw/,
-  );
-
-  // Back in the room: the round's result, and the host can start the next one.
-  await page.getByRole('button', { name: 'Back to the room' }).click();
-  await expect(page.getByRole('list', { name: 'Results' })).toContainText(
-    redWon ? 'Red beat Blue' : /Blue beat Red|drew/,
-  );
-  await expect(page.getByRole('button', { name: 'Start the next round' })).toBeEnabled();
-  expect(errors).toEqual([]);
-});
-
-test('a player who leaves mid-battle loses it', async ({ page, browser, baseURL }) => {
+  test.setTimeout(120_000);
   await quick(page);
   const code = await createRoom(page, 'Gold');
   const silver = await friend(browser, baseURL);
   await quick(silver);
   await joinRoom(silver, code, 'Silver');
-  await page.getByRole('button', { name: 'Start a round' }).click();
-  for (const p of [page, silver]) {
-    await p
-      .getByRole('button', { name: /^Lead with / })
-      .first()
-      .click();
+  for (const name of ['Gold', 'Silver']) {
+    await page.getByRole('combobox', { name: `${name}’s team size` }).selectOption('3');
   }
+  await page.getByRole('button', { name: 'Start the game' }).click();
+  for (const p of [page, silver]) await build(p, 3);
+  for (const p of [page, silver]) await p.getByRole('button', { name: /^Ready with / }).click();
   await expect(silver.getByRole('timer')).toBeVisible({ timeout: 20_000 });
   // A reload mid-battle comes back to the same battle.
   await silver.reload();
   await expect(silver.locator(MOVES).first()).toBeVisible({ timeout: 20_000 });
-  // Silver gives up: Gold wins.
+  // Silver gives up: Gold wins the battle, and Silver loses a life.
   await silver.getByRole('button', { name: 'Battle menu' }).click();
   await silver.getByRole('button', { name: 'Give up' }).click();
   await silver.getByRole('dialog').getByRole('button', { name: 'Give up' }).click();
   await expect(page.getByRole('dialog', { name: 'Battle over' })).toContainText('You won');
   await expect(page.getByRole('dialog', { name: 'Battle over' })).toContainText('Silver gave up.');
+  await page.getByRole('button', { name: 'Back to the room' }).click();
+  await expect(page.getByRole('heading', { name: 'Round 1 results' })).toBeVisible();
+  await expect(page.getByRole('list', { name: 'Results' })).toContainText('Gold beat Silver');
+  await expect(page.getByRole('list', { name: 'Standings' })).toContainText('Silver');
 });

@@ -12,6 +12,8 @@ import {
   roomView,
   type Result,
   type RoomState,
+  ROOM_VERSION,
+  upgradeRoom,
 } from './room';
 
 const ok = (r: Result): RoomState => {
@@ -118,7 +120,7 @@ describe('commands', () => {
 
 describe('the room view', () => {
   it('never includes tokens', () => {
-    const view = roomView(roomWith('Ash', 'Misty'), new Set(['id0']));
+    const view = roomView(roomWith('Ash', 'Misty'), new Set(['id0']), 0);
     expect(JSON.stringify(view)).not.toContain('token');
     expect(view.players.map((p) => p.online)).toEqual([true, false]);
   });
@@ -152,5 +154,34 @@ describe('parseClientMessage', () => {
     expect(parse({ type: 'teamSize', player: 'id1', size: 2 })).toBeNull();
     expect(parse({ type: 'rejoin', token: 42 })).toBeNull();
     expect(parse(['join'])).toBeNull();
+  });
+});
+
+describe('upgradeRoom', () => {
+  it('brings an older room back to the lobby, keeping its players and settings', () => {
+    const old = {
+      code: 'BCDFG',
+      createdAt: 5,
+      phase: 'playing',
+      hostId: 'id1',
+      players: [
+        { id: 'id0', name: 'Ash', token: 't0', teamSize: 4 },
+        { id: 'id1', name: 'Misty', token: 't1', teamSize: 6 },
+      ],
+      settings: { format: 'gen5ou', lives: 3, timer: 'fast', pool: 'random' },
+      matches: [{ id: '1-0', stage: 'battle' }],
+    } as unknown as RoomState;
+    const room = upgradeRoom(old);
+    expect(room.version).toBe(ROOM_VERSION);
+    expect(room.phase).toBe('lobby');
+    expect(room.matches).toEqual([]);
+    expect(room.hostId).toBe('id1');
+    expect(room.settings).toMatchObject({ format: 'gen5ou', lives: 3, timer: 'fast' });
+    expect(room.players.map((p) => [p.name, p.token, p.teamSize, p.lives])).toEqual([
+      ['Ash', 't0', 4, 3],
+      ['Misty', 't1', 6, 3],
+    ]);
+    const current = createRoom('BCDFG', 0);
+    expect(upgradeRoom(current)).toBe(current);
   });
 });

@@ -1,55 +1,103 @@
-import type { PokemonSet } from '@pkmn/sim';
 import { describe, expect, it } from 'vitest';
 import {
-  chooseLead,
+  AI_ID,
+  battleSlots,
+  changeProblem,
   clockDeadline,
   leadFirst,
-  leadsReady,
-  LEAD_MS,
   matchView,
   newMatch,
   nextDeadline,
-  pairUp,
+  PREP_MS,
+  prepDone,
   startClock,
   stopClock,
+  updatePrep,
+  withChange,
   type Match,
+  type Slot,
 } from './match';
 import { parseClientMessage } from './protocol';
-import { createRoom, putMatch, startRound } from './room';
 
-const set = (species: string) => ({ species, moves: ['Tackle'] }) as unknown as PokemonSet;
-const team = (...names: string[]) => names.map(set);
+const slots = (...names: string[]): Slot[] => names.map((species) => ({ species, setId: 'a' }));
+const POOL = ['Heatran', 'Latias', 'Jirachi', 'Starmie', 'Tyranitar', 'Gyarados', 'Scizor'];
 
-function match(now = 0): Match {
+function match(now = 0, ai = false): Match {
   return newMatch({
     id: '1-0',
-    players: { p1: 'a', p2: 'b' },
-    names: { p1: 'Ash', p2: 'Misty' },
+    players: { p1: 'a', p2: ai ? AI_ID : 'b' },
+    names: { p1: 'Ash', p2: ai ? 'Rival' : 'Misty' },
+    ai: ai ? 'p2' : null,
     format: 'gen4ou',
     seed: '1,2,3,4',
-    teams: {
-      p1: team('Heatran', 'Latias', 'Jirachi'),
-      p2: team('Starmie', 'Tyranitar', 'Gyarados'),
+    slots: {
+      p1: slots('Heatran', 'Latias', 'Jirachi'),
+      p2: slots('Starmie', 'Tyranitar', 'Gyarados'),
     },
     bankMs: 240_000,
     now,
   });
 }
 
-describe('leads', () => {
-  it('picks a lead from your own team, and waits for both or the deadline', () => {
-    const m = chooseLead(match(), 'p1', 'Latias')!;
-    expect(m.leads).toEqual({ p1: 'Latias' });
-    expect(chooseLead(m, 'p1', 'Starmie')).toBeNull();
-    expect(leadsReady(m, 1000)).toBe(false);
-    expect(leadsReady(m, LEAD_MS)).toBe(true);
-    expect(leadsReady(chooseLead(m, 'p2', 'Gyarados')!, 1000)).toBe(true);
+describe('the swap', () => {
+  it('allows one Pokémon from the pool, or another set, in one slot', () => {
+    const team = slots('Heatran', 'Latias', 'Jirachi');
+    expect(
+      changeProblem(team, { slot: 1, to: { species: 'Scizor', setId: 'a' } }, POOL),
+    ).toBeNull();
+    expect(
+      changeProblem(team, { slot: 1, to: { species: 'Latias', setId: 'b' } }, POOL),
+    ).toBeNull();
+    expect(changeProblem(team, { slot: 1, to: { species: 'Latias', setId: 'a' } }, POOL)).toBe(
+      'no change',
+    );
+    expect(changeProblem(team, { slot: 1, to: { species: 'Jirachi', setId: 'a' } }, POOL)).toBe(
+      'already on the team',
+    );
+    expect(changeProblem(team, { slot: 1, to: { species: 'Mew', setId: 'a' } }, POOL)).toBe(
+      'not in the pool',
+    );
+    expect(changeProblem(team, { slot: 5, to: { species: 'Scizor', setId: 'a' } }, POOL)).toBe(
+      'no such slot',
+    );
+    expect(
+      withChange(team, { slot: 0, to: { species: 'Scizor', setId: 'a' } }).map((s) => s.species),
+    ).toEqual(['Scizor', 'Latias', 'Jirachi']);
+  });
+
+  it('records the change and lead, and drops a lead the change swapped out', () => {
+    let m = updatePrep(match(), 'p1', { lead: 'Latias' }, POOL)!;
+    expect(m.prep.p1.lead).toBe('Latias');
+    m = updatePrep(m, 'p1', { change: { slot: 1, to: { species: 'Scizor', setId: 'a' } } }, POOL)!;
+    expect(m.prep.p1.lead).toBeNull();
+    expect(updatePrep(m, 'p1', { lead: 'Latias' }, POOL)).toBeNull();
+    m = updatePrep(m, 'p1', { lead: 'Scizor', ready: true }, POOL)!;
+    expect(battleSlots(m, 'p1').map((s) => s.species)).toEqual(['Scizor', 'Heatran', 'Jirachi']);
+    // The foe's view of the round shows none of it.
+    const foe = matchView(m, 'p2', 0, 60_000);
+    expect(foe.foeSpecies).toEqual(['Heatran', 'Latias', 'Jirachi']);
+    expect(foe.foeReady).toBe(true);
+    expect(JSON.stringify(foe)).not.toContain('Scizor');
+  });
+
+  it('is done when both are ready, or at the deadline', () => {
+    const m = updatePrep(match(), 'p1', { ready: true }, POOL)!;
+    expect(prepDone(m, 1000)).toBe(false);
+    expect(prepDone(m, PREP_MS)).toBe(true);
+    expect(prepDone(updatePrep(m, 'p2', { ready: true }, POOL)!, 1000)).toBe(true);
+  });
+
+  it('has the AI ready from the start, leading with its first Pokémon', () => {
+    const m = match(0, true);
+    expect(m.prep.p2).toEqual({ change: null, lead: 'Starmie', ready: true });
+    expect(updatePrep(m, 'p2', { lead: 'Gyarados' }, POOL)).toBeNull();
+    expect(matchView(m, 'p1', 0, 60_000).opponent).toEqual({ id: AI_ID, name: 'Rival', ai: true });
   });
 
   it('sends the lead first, the rest in order', () => {
-    const t = team('A', 'B', 'C', 'D');
+    const t = slots('A', 'B', 'C', 'D');
     expect(leadFirst(t, 'C').map((s) => s.species)).toEqual(['C', 'A', 'B', 'D']);
-    expect(leadFirst(t, undefined).map((s) => s.species)).toEqual(['A', 'B', 'C', 'D']);
+    expect(leadFirst(t, null).map((s) => s.species)).toEqual(['A', 'B', 'C', 'D']);
   });
 });
 
@@ -67,7 +115,7 @@ describe('clocks', () => {
 
   it('finds the next deadline in a match', () => {
     const m = match(0);
-    expect(nextDeadline(m, 60_000)).toBe(LEAD_MS);
+    expect(nextDeadline(m, 60_000)).toBe(PREP_MS);
     const battling: Match = {
       ...m,
       stage: 'battle',
@@ -78,63 +126,17 @@ describe('clocks', () => {
   });
 });
 
-describe('pairUp', () => {
-  it('pairs everyone, with one out on an odd count', () => {
-    let n = 0;
-    const random = () => (n++ * 0.618) % 1;
-    const { pairs, sittingOut } = pairUp(['a', 'b', 'c', 'd', 'e'], random);
-    expect(pairs).toHaveLength(2);
-    const seen = [...pairs.flat(), sittingOut];
-    expect([...seen].sort()).toEqual(['a', 'b', 'c', 'd', 'e']);
-    expect(pairUp(['a', 'b'], random).sittingOut).toBeNull();
-  });
-});
-
 describe('matchView', () => {
-  it('shows your team and only the foe’s species', () => {
-    const view = matchView(match(), 'p2', 1000, 60_000);
-    expect(view.team.map((s) => s.species)).toEqual(['Starmie', 'Tyranitar', 'Gyarados']);
-    expect(view.foeSpecies).toEqual(['Heatran', 'Latias', 'Jirachi']);
-    expect(view.opponent).toEqual({ id: 'a', name: 'Ash' });
-    expect(view.timeLeftMs).toBe(LEAD_MS - 1000);
-    expect(JSON.stringify(view)).not.toContain('Tackle"],"species":"Heatran');
-    expect(JSON.stringify(view)).not.toContain('1,2,3,4');
-  });
-
-  it('puts your lead first once the battle starts, and reports the result your way', () => {
-    const m: Match = {
-      ...chooseLead(match(), 'p2', 'Gyarados')!,
-      stage: 'over',
-      result: { winner: 'p1', reason: 'timeout' },
-    };
+  it('reports the result your way', () => {
+    const m: Match = { ...match(), stage: 'over', result: { winner: 'p1', reason: 'timeout' } };
     const view = matchView(m, 'p2', 0, 60_000);
-    expect(view.team[0]!.species).toBe('Gyarados');
     expect(view.result).toEqual({ winner: 'foe', reason: 'timeout' });
     expect(view.timeLeftMs).toBeNull();
+    expect(JSON.stringify(view)).not.toContain('1,2,3,4');
   });
 });
 
-describe('rounds', () => {
-  it('returns to the lobby with a summary once every battle is over', () => {
-    let room = startRound(createRoom('BCDFG', 0), [match(), { ...match(), id: '1-1' }], 'c');
-    expect(room.phase).toBe('playing');
-    expect(room.round).toBe(1);
-    room = putMatch(room, { ...match(), stage: 'over', result: { winner: 'p2', reason: 'win' } });
-    expect(room.phase).toBe('playing');
-    room = putMatch(room, {
-      ...match(),
-      id: '1-1',
-      stage: 'over',
-      result: { winner: null, reason: 'tie' },
-    });
-    expect(room.phase).toBe('lobby');
-    expect(room.matches).toEqual([]);
-    expect(room.lastRound?.matches.map((m) => m.winner)).toEqual(['p2', null]);
-    expect(room.lastRound?.sittingOut).toBe('c');
-  });
-});
-
-describe('battle messages', () => {
+describe('game messages', () => {
   const parse = (v: unknown) => parseClientMessage(JSON.stringify(v));
   it('accepts singles choices only', () => {
     expect(parse({ type: 'choose', choice: 'move 4' })).toEqual({
@@ -145,9 +147,26 @@ describe('battle messages', () => {
     expect(parse({ type: 'choose', choice: 'move 5' })).toBeNull();
     expect(parse({ type: 'choose', choice: 'team 123456' })).toBeNull();
     expect(parse({ type: 'choose', choice: 'move 1, move 2' })).toBeNull();
+  });
+
+  it('accepts teams, changes, and leads in shape', () => {
+    const slot = { species: 'Heatran', setId: 'scarf' };
+    expect(parse({ type: 'team', team: [slot, slot] })).toEqual({
+      type: 'team',
+      team: [slot, slot],
+    });
+    expect(parse({ type: 'team', team: [] })).toBeNull();
+    expect(parse({ type: 'team', team: [{ species: 'Heatran' }] })).toBeNull();
+    expect(parse({ type: 'change', change: { slot: 2, to: slot } })).toEqual({
+      type: 'change',
+      change: { slot: 2, to: slot },
+    });
+    expect(parse({ type: 'change', change: null })).toEqual({ type: 'change', change: null });
+    expect(parse({ type: 'change', change: { slot: 7, to: slot } })).toBeNull();
     expect(parse({ type: 'lead', species: 'Heatran' })).toEqual({
       type: 'lead',
       species: 'Heatran',
     });
+    expect(parse({ type: 'ready', extra: 1 })).toEqual({ type: 'ready' });
   });
 });

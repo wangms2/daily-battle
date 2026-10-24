@@ -226,9 +226,15 @@ importers:
 
   apps/server:
     dependencies:
+      '@daily-battle/ai':
+        specifier: workspace:*
+        version: link:../../packages/ai
       '@daily-battle/data':
         specifier: workspace:*
         version: link:../../packages/data
+      '@daily-battle/gen':
+        specifier: workspace:*
+        version: link:../../packages/gen
       '@daily-battle/sim-bridge':
         specifier: workspace:*
         version: link:../../packages/sim-bridge

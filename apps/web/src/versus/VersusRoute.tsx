@@ -4,9 +4,10 @@ import { cleanName, ERROR_TEXT, normalizeCode, type ErrorCode } from '@daily-bat
 import { lazy, Suspense, useState, type ReactNode } from 'react';
 import type { Settings } from '../state/schema';
 import { Button } from '../ui/bits';
-import { LeadPicker } from './LeadPicker';
+import { BuildScreen, GameOverScreen, IntermissionScreen, RoundScreen } from './GameScreens';
 import { Lobby } from './Lobby';
 import { Page } from './Page';
+import { PrepScreen } from './PrepScreen';
 import { savedName, saveName } from './saved';
 import { createRoom, useRoom, type EndReason } from './useRoom';
 
@@ -194,48 +195,84 @@ function RoomScreen({
   const [inRoomFor, setInRoomFor] = useState<string | null>(null);
 
   if (status.kind === 'joined') {
-    // A battle you can watch: one that has started (a finished one only if you saw it here).
+    const { room: view, you, at } = status;
+    const leave = () => {
+      room.leave();
+      onExit();
+    };
+    const common = { room: view, you, at, onLeave: leave, onBack: onExit };
+    // Your battle: the swap before it, the battle itself (a finished one only
+    // if you saw it here, until you go back to the room).
     const watchable =
       !!match &&
       (match.stage === 'battle' || (match.stage === 'over' && room.feedFor(match.id).size > 0));
-    if (match && inRoomFor !== match.id && (match.stage === 'lead' || watchable)) {
+    let screen: ReactNode;
+    if (match && inRoomFor !== match.id && (match.stage === 'prep' || watchable)) {
       const toRoom = () => {
         if (match.stage === 'over') room.dismissMatch();
         else setInRoomFor(match.id);
       };
-      if (match.stage === 'lead') {
-        return <LeadPicker match={match} onLead={room.lead} onBack={toRoom} />;
-      }
-      return (
-        <Suspense fallback={<p className="py-10 text-center text-muted">Loading the battle…</p>}>
-          <LiveBattle
-            key={match.id}
+      screen =
+        match.stage === 'prep' ? (
+          <PrepScreen
             match={match}
-            feed={room.feedFor(match.id)}
-            choose={room.choose}
-            forfeit={room.forfeit}
-            {...battle}
+            room={view}
+            onChange={room.change}
+            onLead={room.lead}
+            onReady={room.ready}
             onBack={toRoom}
           />
-        </Suspense>
+        ) : (
+          <Suspense fallback={<p className="py-10 text-center text-muted">Loading the battle…</p>}>
+            <LiveBattle
+              key={match.id}
+              match={match}
+              feed={room.feedFor(match.id)}
+              choose={room.choose}
+              forfeit={room.forfeit}
+              {...battle}
+              onBack={toRoom}
+            />
+          </Suspense>
+        );
+    } else if (view.phase === 'build') {
+      screen = (
+        <BuildScreen
+          {...common}
+          team={room.team}
+          hints={battle.settings.beginnerHints}
+          onSubmit={room.submitTeam}
+        />
+      );
+    } else if (view.phase === 'playing') {
+      screen = (
+        <RoundScreen
+          {...common}
+          onToBattle={match && match.stage !== 'over' ? () => setInRoomFor(null) : undefined}
+        />
+      );
+    } else if (view.phase === 'intermission') {
+      screen = <IntermissionScreen {...common} />;
+    } else if (view.phase === 'over') {
+      screen = <GameOverScreen {...common} onPlayAgain={room.playAgain} />;
+    } else {
+      screen = (
+        <Lobby
+          room={view}
+          you={you}
+          command={room.command}
+          onStart={room.start}
+          onRedraw={room.redraw}
+          onLeave={leave}
+          onBack={onExit}
+        />
       );
     }
     return (
-      <Lobby
-        room={status.room}
-        you={status.you}
-        connected={status.connected}
-        notice={room.notice}
-        command={room.command}
-        match={match}
-        onStart={room.start}
-        onToBattle={match && match.stage !== 'over' ? () => setInRoomFor(null) : undefined}
-        onLeave={() => {
-          room.leave();
-          onExit();
-        }}
-        onBack={onExit}
-      />
+      <>
+        {screen}
+        <RoomNotice connected={status.connected} notice={room.notice} />
+      </>
     );
   }
 
@@ -277,5 +314,21 @@ function RoomScreen({
     <Page title={`Room ${code}`} back="Versus" onBack={onExit}>
       {body}
     </Page>
+  );
+}
+
+/** Reconnecting, or a passing problem ("Only the host can do that."), over any room screen. */
+function RoomNotice({ connected, notice }: { connected: boolean; notice: string | null }) {
+  const text = !connected ? 'Reconnecting…' : notice;
+  if (!text) return null;
+  return (
+    <div className="pointer-events-none fixed inset-x-0 bottom-[max(1rem,env(safe-area-inset-bottom))] z-50 flex justify-center px-4">
+      <p
+        role={connected ? 'alert' : 'status'}
+        className="rounded-full bg-ink px-4 py-2 text-[13px] font-semibold text-surface shadow-card"
+      >
+        {text}
+      </p>
+    </div>
   );
 }

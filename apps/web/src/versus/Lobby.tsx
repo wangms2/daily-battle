@@ -3,8 +3,6 @@
 import { FORMATS, formatInfo, type FormatId } from '@daily-battle/data/formats';
 import {
   LIVES_MAX,
-  type MatchEnd,
-  type MatchView,
   LIVES_MIN,
   TEAM_SIZES,
   TIMERS,
@@ -18,14 +16,9 @@ import clsx from 'clsx';
 import { useState } from 'react';
 import { ConfirmDialog } from '../sheets/misc';
 import { Button, SectionLabel } from '../ui/bits';
+import { weekKey } from '@daily-battle/gen/dates';
+import { IconStrip } from './bits';
 import { Page } from './Page';
-
-const RESULT_REASON: Record<MatchEnd, string> = {
-  win: '',
-  tie: '',
-  forfeit: 'Gave up',
-  timeout: 'Out of time',
-};
 
 interface Option<T> {
   value: T;
@@ -102,33 +95,23 @@ const POOL_OPTIONS: Option<RoomSettings['pool']>[] = [
 export function Lobby({
   room,
   you,
-  connected,
-  notice,
   command,
-  match,
   onStart,
-  onToBattle,
+  onRedraw,
   onLeave,
   onBack,
 }: {
   room: RoomView;
   you: string;
-  connected: boolean;
-  notice: string | null;
   command: (c: RoomCommand) => void;
-  /** Your battle this round, if any. */
-  match: MatchView | null;
   onStart: () => void;
-  /** Back to your battle, while it's on. */
-  onToBattle?: () => void;
+  onRedraw: () => void;
   onLeave: () => void;
   onBack: () => void;
 }) {
   const host = room.hostId === you;
-  // The rules and team sizes are set between rounds.
+  // The rules and team sizes are set before a game.
   const editable = host && room.phase === 'lobby';
-  const nameOf = (id: string) => room.players.find((p) => p.id === id)?.name ?? 'Someone';
-  const inBattle = !!match && match.stage !== 'over';
   const [leaving, setLeaving] = useState(false);
   const [removing, setRemoving] = useState<RoomView['players'][number] | null>(null);
   const [copied, setCopied] = useState(false);
@@ -152,17 +135,6 @@ export function Lobby({
 
   return (
     <Page title={`Room ${room.code}`} back="Versus" onBack={onBack}>
-      {!connected && (
-        <p role="status" className="rounded-btn bg-gold-soft px-3 py-2 text-[13px]">
-          Reconnecting…
-        </p>
-      )}
-      {notice && (
-        <p role="alert" className="rounded-btn bg-surface-2 px-3 py-2 text-[13px]">
-          {notice}
-        </p>
-      )}
-
       <section className="card flex items-center justify-between gap-3 p-4">
         <div>
           <p className="text-[13px] text-muted">Room code</p>
@@ -237,63 +209,25 @@ export function Lobby({
         )}
       </section>
 
-      {room.phase === 'playing' && (
-        <section className="space-y-2">
-          <SectionLabel>Round {room.round}</SectionLabel>
-          <ul className="card divide-y divide-line" aria-label="Battles">
-            {room.matches.map((m) => (
-              <li key={m.id} className="flex min-h-12 items-center justify-between gap-3 px-4 py-2">
-                <span className="text-[15px] font-semibold">
-                  {nameOf(m.players.p1)} vs {nameOf(m.players.p2)}
-                </span>
-                <span className="text-[13px] text-muted">
-                  {m.stage === 'lead'
-                    ? 'Picking leads'
-                    : m.stage === 'battle'
-                      ? 'Battling'
-                      : m.winner
-                        ? `${nameOf(m.players[m.winner])} won`
-                        : 'Draw'}
-                </span>
-              </li>
-            ))}
-          </ul>
-          {room.sittingOut && (
-            <p className="text-[13px] text-muted">
-              {room.sittingOut === you ? 'You sit' : `${nameOf(room.sittingOut)} sits`} this round
-              out.
-            </p>
-          )}
-          {onToBattle && (
-            <Button className="w-full" onClick={onToBattle}>
-              Back to your battle
-            </Button>
-          )}
-        </section>
-      )}
-
-      {room.phase === 'lobby' && room.lastRound && (
-        <section className="space-y-2">
-          <SectionLabel>Round {room.lastRound.round} results</SectionLabel>
-          <ul className="card divide-y divide-line" aria-label="Results">
-            {room.lastRound.matches.map((m, i) => (
-              <li key={i} className="flex min-h-12 items-center justify-between gap-3 px-4 py-2">
-                <span className="text-[15px]">
-                  {m.winner ? (
-                    <>
-                      <span className="font-semibold">{m.names[m.winner]}</span> beat{' '}
-                      {m.names[m.winner === 'p1' ? 'p2' : 'p1']}
-                    </>
-                  ) : (
-                    `${m.names.p1} and ${m.names.p2} drew`
-                  )}
-                </span>
-                <span className="text-[13px] text-muted">{RESULT_REASON[m.reason]}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+      <section className="space-y-2">
+        <SectionLabel
+          right={
+            editable &&
+            room.settings.pool === 'random' && (
+              <button
+                type="button"
+                className="h-8 rounded-chip px-2 text-[13px] font-semibold text-accent hover:bg-surface-2"
+                onClick={onRedraw}
+              >
+                Redraw
+              </button>
+            )
+          }
+        >
+          The 12 · {room.pool?.source === 'weekly' ? 'this week’s pool' : 'random pool'}
+        </SectionLabel>
+        {room.pool && <IconStrip species={room.pool.species} label="The pool" />}
+      </section>
 
       <section className="space-y-2">
         <SectionLabel>Rules</SectionLabel>
@@ -320,7 +254,11 @@ export function Lobby({
             label="Pokémon pool"
             value={room.settings.pool}
             options={POOL_OPTIONS}
-            onChange={editable ? (pool) => set({ pool }) : undefined}
+            onChange={
+              editable
+                ? (pool) => set(pool === 'weekly' ? { pool, week: weekKey(new Date()) } : { pool })
+                : undefined
+            }
           />
         </div>
       </section>
@@ -330,15 +268,15 @@ export function Lobby({
           <>
             {host && (
               <Button className="w-full" disabled={room.players.length < 2} onClick={onStart}>
-                {room.round ? 'Start the next round' : 'Start a round'}
+                Start the game
               </Button>
             )}
             <p className="text-center text-[13px] text-muted">
               {host
                 ? room.players.length < 2
                   ? 'Invite at least one friend to start.'
-                  : 'Everyone gets a random team for now; building from the 12 comes next.'
-                : 'Waiting for the host to start a round.'}
+                  : 'Everyone builds a team from the 12, then the rounds begin.'
+                : 'Waiting for the host to start the game.'}
             </p>
           </>
         )}
@@ -352,7 +290,6 @@ export function Lobby({
         onOpenChange={setLeaving}
         title="Leave the room?"
         body={[
-          inBattle && 'You’ll lose your battle this round.',
           host && nextHost
             ? `${nextHost.name} becomes the host. You can join again with the code.`
             : 'You can join again with the code while the room is open.',
