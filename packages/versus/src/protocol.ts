@@ -28,7 +28,7 @@ export type ClientMessage =
   | { type: 'change'; change: Change | null }
   | { type: 'lead'; species: string }
   | { type: 'ready' }
-  /** In your battle: make a choice (`move 2`, `switch 4`), or give up. */
+  /** In your battle: make a choice (`move 2`, `move 2 mega`, `switch 4`), or give up. */
   | { type: 'choose'; choice: string }
   | { type: 'forfeit' }
   /** Watching: a reaction to a battle. */
@@ -100,8 +100,11 @@ export const CLOSE = {
 /** Longest message a room accepts, in characters. */
 export const MESSAGE_MAX = 2048;
 
-/** The choices a player makes in singles: one of four moves, or a switch to one of six. */
-const CHOICE = /^(move [1-4]|switch [1-6])$/;
+/**
+ * The choices a player makes in singles: one of four moves (Mega Evolving
+ * first, from Gen 6), or a switch to one of six.
+ */
+const CHOICE = /^(move [1-4]( mega)?|switch [1-6])$/;
 
 const isName = (v: unknown): v is string => typeof v === 'string' && v.length > 0 && v.length <= 64;
 

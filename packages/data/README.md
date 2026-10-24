@@ -1,6 +1,6 @@
 # @daily-battle/data
 
-Set snapshots for Gen 4 OU and Gen 5 OU: 2–4 usage-weighted sets per species, each with a player-facing role label and one-line description. The generators (M3) and the AI's set priors (M4) read them.
+Set snapshots for Gen 4 OU, Gen 5 OU, and Gen 6 OU: 2–4 usage-weighted sets per species, each with a player-facing role label and one-line description. The generators (M3) and the AI's set priors (M4) read them.
 
 ```ts
 import { sets, setsFor } from '@daily-battle/data';
@@ -12,13 +12,14 @@ setsFor('gen5ou').species['Politoed'].sets; // any format in src/formats.ts
 
 ## Sources
 
-| File                                                | From                                                                                                                                                  | License                                                             |
-| --------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| `sources/gen4ou-sets.json`                          | Smogon's curated analysis sets, via [data.pkmn.cc](https://data.pkmn.cc/sets/gen4ou.json)                                                             | © Smogon.com and contributors. Used **with permission** (see below) |
-| `sources/gen4uu-sets.json`                          | Smogon's curated gen4uu analysis sets, via [data.pkmn.cc](https://data.pkmn.cc/sets/gen4uu.json), for UU species without OU sets                      | © Smogon.com and contributors. Used **with permission**             |
-| `sources/gen4ou-stats.json`                         | [Smogon monthly usage stats](https://www.smogon.com/stats/), `chaos/gen4ou-1500.json`, trimmed to the fields we use, plus natures summed from spreads | Usage statistics from Pokémon Showdown ladder play                  |
-| `sources/gen4ou-sources.json`                       | URLs, fetch time, stats month, cutoff, and battle count                                                                                               |                                                                     |
-| `sources/gen5ou-*.json`, `sources/gen5uu-sets.json` | The same files for Gen 5 OU, from `gen5ou`, `gen5uu`, and `chaos/gen5ou-1500.json`                                                                    | As above                                                            |
+| File                                                | From                                                                                                                                                                                                                         | License                                                             |
+| --------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `sources/gen4ou-sets.json`                          | Smogon's curated analysis sets, via [data.pkmn.cc](https://data.pkmn.cc/sets/gen4ou.json)                                                                                                                                    | © Smogon.com and contributors. Used **with permission** (see below) |
+| `sources/gen4uu-sets.json`                          | Smogon's curated gen4uu analysis sets, via [data.pkmn.cc](https://data.pkmn.cc/sets/gen4uu.json), for UU species without OU sets                                                                                             | © Smogon.com and contributors. Used **with permission**             |
+| `sources/gen4ou-stats.json`                         | [Smogon monthly usage stats](https://www.smogon.com/stats/), `chaos/gen4ou-1500.json`, trimmed to the fields we use, plus natures summed from spreads                                                                        | Usage statistics from Pokémon Showdown ladder play                  |
+| `sources/gen4ou-sources.json`                       | URLs, fetch time, stats month, cutoff, and battle count                                                                                                                                                                      |                                                                     |
+| `sources/gen5ou-*.json`, `sources/gen5uu-sets.json` | The same files for Gen 5 OU, from `gen5ou`, `gen5uu`, and `chaos/gen5ou-1500.json`                                                                                                                                           | As above                                                            |
+| `sources/gen6ou-*.json`, `sources/gen6uu-sets.json` | The same files for Gen 6 OU, from `gen6ou`, `gen6uu`, and pkmn's processed Gen 6 OU stats (`refresh --mirror`: smogon.com and data.pkmn.cc weren't reachable; same month and battles, but pkmn's choice of cutoff, not 1500) | As above                                                            |
 
 `@smogon/sets` (the source DESIGN.md first named) isn't used. Its last release was in July 2021, and its stats-derived sets are a single naive set per species.
 
@@ -66,3 +67,17 @@ Built the same way (`--format gen5ou`), with a few differences, all in `BUILD_RU
 - **Team-wide bans:** gen5ou bans Drizzle with Swift Swim and Drought with Chlorophyll on one team. Each set passes on its own, so a pool could still offer an illegal six. Sets never take Swift Swim or Chlorophyll (Kingdra uses Sniper, Tangrowth Regenerator), and a test fails if every part of any `++` ban appears in the data. Sand Rush and Gems are banned outright, and the validator drops those sets.
 - **Curation** (`gen5ou/set-curation.json`): Gen 5's analyses are thin, and 36 species had a single distinct set. The file hand-adds one or two sets for each, chosen from the Gen 5 OU usage stats, so every species has 2–4. Usage still weights them, and each kept set gets at least 5%. It also drops Venusaur's sun set (pointless without Chlorophyll) and swaps setup and recovery moves off two Choice sets (Breloom, Crobat).
 - **Roles:** the rules gained Gen 5 vocabulary that can't change a Gen 4 label: the new setup moves (Quiver Dance, Shell Smash, Coil, Shift Gear, Hone Claws, Work Up), an **Eviolite tank** rule, and, after every other rule, **weather setters** (Drizzle, Drought, Sand Stream, Snow Warning) and **Volt Switch pivots**. `gen5ou/role-overrides.json` covers the rest.
+
+## Gen 6 OU
+
+Built the same way (`--format gen6ou`). The differences are Mega Evolution and a few rules, in `src/build.ts`, `src/roles.ts`, and `gen6ou/`:
+
+- **Species:** 106, 288 sets. Ditto and Zoroark are left out, as in Gen 5.
+- **Megas fold into their base species** (`foldMegas`). Usage stats list each Mega as its own species; its usage, counts, and options are added to the base species', and its sets become the base species' sets with the stone as the item. 26 species have Mega sets (47 sets). Sets holding different stones (Charizardite X and Y) are never merged.
+- **Tier:** the higher of the base species' and its non-Uber Megas' tiers (`tierWithMegas`), so Venusaur counts as OU. This decides the pool's below-OU quota.
+- **Set counts:** a species keeps only viable sets. A species with a Mega set is kept even with one set (Pidgeot is Mega-only), and curation doesn't pad it.
+- **Bans:** the validator's gen6ou rules (Baton Pass, Swagger, King's Rock, Quick Claw, Razor Fang, Arena Trap, Shadow Tag, Uber Megas). There are no team-wide `++` bans, so Swift Swim and Chlorophyll are allowed. Sleep moves are legal (Sleep Clause Mod).
+- **Species facts** (`gen6ou/species.json`): 18 types with Fairy, and per species its `megas`: forme, name ("Mega Charizard X"), stone, types, base stats, ability, and tier. The web client and AI read the Mega from here.
+- **One Mega per team** is our own rule. `oneMegaProblem` and `megaCount` in `@daily-battle/data/species` are the shared check (message `ONE_MEGA_MESSAGE`), used by the sim bridge, generator, pipeline, and web client.
+- **Roles:** "Mega" prefixes a Mega set's label ("Mega Dragon Dance sweeper", "Mega X …" and "Mega Y …" for Charizard), and the rules gained Assault Vest, Sticky Web, Defog, Parting Shot, and Weakness Policy. None of these can change a Gen 4 or 5 label. `gen6ou/role-overrides.json` covers the rest.
+- **Curation** (`gen6ou/set-curation.json`): 16 hand-added sets for species whose analyses had a single distinct set.

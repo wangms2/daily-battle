@@ -219,6 +219,12 @@ describe('cleanText', () => {
       '(Hitmontop lost 88.8% of its health!)',
     );
   });
+
+  it('says "your" for the player, whose trainer name is You', () => {
+    expect(cleanText("Manectric's Manectite is reacting to You's Mega Bracelet!")).toBe(
+      "Manectric's Manectite is reacting to your Mega Bracelet!",
+    );
+  });
 });
 
 describe('move details', () => {

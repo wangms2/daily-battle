@@ -24,7 +24,11 @@ export interface SetEntry {
 export interface SpeciesEntry {
   /** Species-level weighted usage in OU, from the stats source (not normalized). */
   usage: number;
-  /** Current tier in the format's generation, from the sim's data, e.g. `OU`, `UU`, `UUBL`, `NU`. */
+  /**
+   * Current tier in the format's generation, from the sim's data, e.g. `OU`,
+   * `UU`, `UUBL`, `NU`. From Gen 6, the higher of the species' own tier and
+   * those of the Megas its sets' stones make (Venusaur plays as OU).
+   */
   tier: string;
   /**
    * Which curated set list the sets came from: the format itself (`gen4ou`) or
@@ -37,7 +41,14 @@ export interface SpeciesEntry {
 export interface SourcesMeta {
   sets: { url: string; fetchedAt: string };
   uuSets: { url: string; fetchedAt: string };
-  stats: { url: string; month: string; cutoff: number; battles: number; fetchedAt: string };
+  stats: {
+    url: string;
+    month: string;
+    /** The ladder rating cutoff, or null when the source doesn't say (the `--mirror` stats). */
+    cutoff: number | null;
+    battles: number;
+    fetchedAt: string;
+  };
 }
 
 export interface SetsFile {
@@ -82,7 +93,7 @@ export interface ChaosSpecies {
 }
 
 export interface ChaosStats {
-  info: { metagame: string; cutoff: number; 'number of battles': number };
+  info: { metagame: string; cutoff: number | null; 'number of battles': number };
   data: Record<string, ChaosSpecies>;
 }
 

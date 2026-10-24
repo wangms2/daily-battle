@@ -1,4 +1,5 @@
 import { sets as defaultSets, type SetEntry, type SetsFile } from '@daily-battle/data';
+import { oneMegaProblem } from '@daily-battle/data/species';
 import { TeamValidator } from '@pkmn/sim';
 import { CONFIG, GENERATOR_VERSION, seedPrefix } from './config';
 import { candidateKey, rngFor, weightedSample } from './rng';
@@ -38,8 +39,12 @@ export function opponentProblems(team: TeamSlot[], data: SetsFile = defaultSets)
   if (traits.every((t) => t.categories.has('offense') && t.categories.size === 1)) {
     problems.push('no non-offensive set');
   }
-  const invalid = TeamValidator.get(data.meta.format).validateTeam(teamSets(data, team));
+  const sets = teamSets(data, team);
+  const invalid = TeamValidator.get(data.meta.format).validateTeam(sets);
   if (invalid) problems.push(`illegal: ${invalid.join(' ')}`);
+  // Our own rule from Gen 6: redraw any team holding two Mega Stones.
+  const megas = oneMegaProblem(data.meta.format, sets);
+  if (megas) problems.push(megas);
   return problems;
 }
 

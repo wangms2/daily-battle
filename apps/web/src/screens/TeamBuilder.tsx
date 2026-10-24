@@ -4,7 +4,17 @@
 import type { ScheduleFile } from '@daily-battle/gen/schedule';
 import clsx from 'clsx';
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
-import { CHECK_ITEMS, checklist, findSet, sameSpecies, topSet, type Slot } from '../lib/data';
+import {
+  CHECK_ITEMS,
+  checklist,
+  findSet,
+  megaClash,
+  megaFor,
+  ONE_MEGA_MESSAGE,
+  sameSpecies,
+  topSet,
+  type Slot,
+} from '../lib/data';
 import { getSprite } from '../lib/sprites';
 import { ConfirmDialog, TeamCheckSheet } from '../sheets/misc';
 import { InfoSheet } from '../sheets/InfoSheet';
@@ -110,7 +120,15 @@ export function TeamBuilder({
     }
   };
 
+  /** One Mega per team (Gen 6): blocks a second Mega set with a short message. */
+  const megaBlocked = (species: string, setId: string) => {
+    const other = megaClash(team, { species, setId });
+    if (other) setSnack({ message: `${ONE_MEGA_MESSAGE} ${other} has the Mega Stone.` });
+    return !!other;
+  };
+
   const add = (species: string, setId: string) => {
+    if (megaBlocked(species, setId)) return;
     setPopped(species);
     setTeam((t) => [...t, { species, setId }]);
   };
@@ -129,8 +147,10 @@ export function TeamBuilder({
     setTeam(s.team.map((slot) => ({ ...slot })));
   };
 
-  const setSetFor = (species: string, setId: string) =>
+  const setSetFor = (species: string, setId: string) => {
+    if (megaBlocked(species, setId)) return;
     setTeam((t) => t.map((s) => (s.species === species ? { ...s, setId } : s)));
+  };
 
   // The undo message takes the chips' place, so it never covers controls.
   const suggestions = schedule.suggestedTeams.length > 0 && (
@@ -412,6 +432,12 @@ export function TeamBuilder({
             : undefined
         }
         chooseLabel={picker?.adding ? `Add ${picker.species}` : 'Use this set'}
+        // One Mega per team: a second Mega Stone set can't be chosen.
+        blocked={(setId) => {
+          if (!picker) return undefined;
+          const other = megaClash(team, { species: picker.species, setId });
+          return other && `${ONE_MEGA_MESSAGE} ${other} has the Mega Stone.`;
+        }}
         onChoose={(setId) => {
           if (!picker) return;
           if (picker.adding) add(picker.species, setId);
@@ -430,7 +456,8 @@ export function TeamBuilder({
       <TeamCheckSheet
         open={checklistOpen}
         onOpenChange={setChecklistOpen}
-        team={team.map((s) => s.species)}
+        // A Mega set's type matchups are its Mega's: that's the form it battles in.
+        team={team.map((s) => megaFor(s.species, findSet(s))?.forme ?? s.species)}
         sets={team.map((s) => findSet(s)).filter((s) => !!s)}
         checks={checks}
       />

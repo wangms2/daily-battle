@@ -1,11 +1,12 @@
-import { readdirSync, readFileSync } from 'node:fs';
-import { sets } from '@daily-battle/data';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { sets, setsFor } from '@daily-battle/data';
+import { megaCount } from '@daily-battle/data/species';
 import { addDays, findSet, parseSchedule, rngFor, teamSets, toPokemonSet } from '@daily-battle/gen';
 import { TeamValidator, type PokemonSet } from '@pkmn/sim';
 import { afterAll, describe, expect, it } from 'vitest';
 import { PIPELINE } from './config';
 import type { Job } from './job';
-import { poolTeams } from './sample';
+import { legalTeam, poolTeams } from './sample';
 import { Simulator } from './simulate';
 import { checkOpponent, hardCounters, poolSetsOf } from './validate-opponent';
 
@@ -146,6 +147,34 @@ describe('published schedule files', () => {
     }
     for (const s of schedule.suggestedTeams) {
       expect(s.team.every((slot) => schedule.pool.species.includes(slot.species))).toBe(true);
+    }
+  });
+});
+
+describe('published Gen 6 schedule files', () => {
+  const dir = new URL('../../../apps/web/public/schedule/gen6ou/', import.meta.url);
+  const files = existsSync(dir) ? readdirSync(dir).filter((f) => f.endsWith('.json')) : [];
+  const data = setsFor('gen6ou');
+  const isMega = (species: string, setId: string) =>
+    megaCount('gen6ou', [{ species, item: findSet(data, { species, setId }).item }]) > 0;
+
+  // Until the first Gen 6 week is published there's nothing to check.
+  if (!files.length) it.skip('no Gen 6 weeks published yet', () => {});
+
+  it.each(files)('%s is legal, offers a Mega, and has at most one Mega per team', (file) => {
+    const schedule = parseSchedule(JSON.parse(readFileSync(new URL(file, dir), 'utf8')));
+    expect(`${schedule.week}.json`).toBe(file);
+    expect(new Set(schedule.pool.species).size).toBe(12);
+    expect(
+      schedule.pool.species.some((s) => data.species[s]!.sets.some((set) => isMega(s, set.id))),
+    ).toBe(true);
+    for (const team of [
+      ...schedule.days.map((d) => d.team),
+      ...schedule.suggestedTeams.map((s) => s.team),
+    ]) {
+      // The validator plus our one-Mega rule.
+      expect(legalTeam(data, team)).toBe(true);
+      expect(team.filter((slot) => isMega(slot.species, slot.setId)).length).toBeLessThanOrEqual(1);
     }
   });
 });

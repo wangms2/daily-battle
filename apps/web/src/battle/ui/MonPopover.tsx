@@ -2,7 +2,14 @@
 // Foes show just what the battle has revealed; yours show the set you brought.
 import clsx from 'clsx';
 import type { ReactNode } from 'react';
-import { abilityInfo, itemInfo, possibleSets, shortLabel, speciesInfo } from '../../lib/data';
+import {
+  abilityInfo,
+  canMega,
+  itemInfo,
+  possibleSets,
+  shortLabel,
+  speciesInfo,
+} from '../../lib/data';
 import { TypeBadge } from '../../ui/bits';
 import { Term } from '../../ui/DetailCard';
 import { ItemIcon } from '../../ui/ItemIcon';
@@ -25,7 +32,9 @@ type Props = {
 );
 
 export function MonPopover(props: Props) {
-  const species = props.foe ? props.mon.species : props.member.species;
+  // As it looks now (a Mega forme once Mega Evolved), and its team species.
+  const species = props.foe ? props.mon.species : (props.member.forme ?? props.member.species);
+  const base = props.foe ? (props.mon.base ?? species) : props.member.species;
   const info = speciesInfo(species);
   const status = props.foe ? props.mon.status : props.member.status;
   const boosts = props.foe ? props.mon.boosts : (props.mon?.boosts ?? {});
@@ -50,8 +59,10 @@ export function MonPopover(props: Props) {
   // Beginner hints: the sets this foe could still be running, given what it has shown.
   const could =
     props.foe && props.hints
-      ? possibleSets(species, props.revealed).map((s) => shortLabel(s.label))
+      ? possibleSets(base, props.revealed).map((s) => shortLabel(s.label))
       : [];
+  // Beginner hints, as on Showdown: a foe that hasn't Mega Evolved yet but could.
+  const megaHint = props.foe && props.hints && !props.mon.base && canMega(base);
   // Item and ability details open on tap only when the card itself takes taps.
   const term = (name: string, kind: 'Item' | 'Ability') =>
     props.children ? (
@@ -119,6 +130,7 @@ export function MonPopover(props: Props) {
       )}
       {moves.length > 0 && <MoveChips moves={moves} className="mt-1.5" />}
       {speed && <p className="mt-1 text-[12.5px] text-muted">{speed}</p>}
+      {megaHint && <p className="mt-0.5 text-[12.5px] text-muted">Can Mega Evolve</p>}
       {could.length > 0 && (
         <p className="mt-0.5 text-[12.5px] text-muted">
           {could.length === 1 ? 'Set: ' : 'Possible sets: '}

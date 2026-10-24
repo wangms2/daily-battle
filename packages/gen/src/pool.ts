@@ -3,7 +3,7 @@ import { TeamValidator } from '@pkmn/sim';
 import { CONFIG, GENERATOR_VERSION, OU_TIERS, seedPrefix } from './config';
 import { candidateKey, rngFor, weightedSample } from './rng';
 import { toPokemonSet } from './sets';
-import { checksType, majorOffensiveTypes, speciesTraits } from './traits';
+import { checksType, isMegaSet, majorOffensiveTypes, speciesTraits } from './traits';
 
 export interface WeeklyPool {
   generatorVersion: number;
@@ -45,6 +45,15 @@ export function poolProblems(species: string[], data: SetsFile = defaultSets): s
   }
   if (count((t) => t.categories.has('utility')) < pool.minUtility) problems.push('too few utility');
   const gen = genOf(data.meta.format);
+  if (gen >= 6) {
+    // Every Gen 6 pool offers a Mega; one per team, so at least five others must not need one.
+    const sets = (s: string) => data.species[s]!.sets;
+    if (!species.some((s) => sets(s).some((set) => isMegaSet(s, set, gen)))) {
+      problems.push('no Mega species');
+    }
+    const megaOnly = species.filter((s) => sets(s).every((set) => isMegaSet(s, set, gen)));
+    if (species.length - megaOnly.length < 5) problems.push('too many Mega-only species');
+  }
   for (const type of majorOffensiveTypes(data)) {
     if (!species.some((s) => checksType(s, data.species[s]!, type, gen))) {
       problems.push(`no ${type} check`);
@@ -52,10 +61,19 @@ export function poolProblems(species: string[], data: SetsFile = defaultSets): s
   }
   if (!problems.length) {
     // A legal team must exist: the six most-used species with their top sets.
+    // From Gen 6, each species brings its top set without a Mega Stone where it has one,
+    // and the team keeps the first Mega it meets (one Mega per team).
+    let mega = false;
     const team = [...species]
       .sort((a, b) => data.species[b]!.usage - data.species[a]!.usage)
-      .slice(0, 6)
-      .map((s) => toPokemonSet(s, data.species[s]!.sets[0]!));
+      .flatMap((s) => {
+        const sets = data.species[s]!.sets;
+        const set = mega ? sets.find((x) => !isMegaSet(s, x, gen)) : sets[0]!;
+        if (!set) return [];
+        mega ||= isMegaSet(s, set, gen);
+        return [toPokemonSet(s, set)];
+      })
+      .slice(0, 6);
     if (TeamValidator.get(data.meta.format).validateTeam(team)) problems.push('no legal team');
   }
   return problems;

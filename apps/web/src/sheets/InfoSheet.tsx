@@ -5,6 +5,7 @@ import {
   abilityInfo,
   itemInfo,
   matchups,
+  canMega,
   possibleSets,
   setsOf,
   shortLabel,
@@ -53,6 +54,10 @@ export function InfoSheet({
           <p className="text-[13px] text-muted">
             {info.tier} · Base stat total {total}
           </p>
+          {/* Beginner hints on a foe: a Mega is possible (which set it brings stays hidden). */}
+          {showPossibleSets && canMega(species) && (
+            <p className="text-[13px] font-semibold">Can Mega Evolve</p>
+          )}
         </div>
       </div>
 

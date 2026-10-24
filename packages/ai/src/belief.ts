@@ -1,7 +1,7 @@
 // What the AI believes about each foe Pokémon's hidden set (DESIGN.md §8.2):
 // the species' usage-weighted sets, filtered by everything revealed so far.
 import { sets as defaultSets, type SetEntry, type SetsFile } from '@daily-battle/data';
-import { moveId, toId, type FoeMon } from './state';
+import { isMegaForme, megaFormeOf, moveId, toId, type FoeMon } from './state';
 
 export interface Candidate {
   set: SetEntry;
@@ -29,16 +29,31 @@ export function consistent(set: SetEntry, foe: FoeMon, checkItem = true): boolea
   return true;
 }
 
+/**
+ * Mega Evolution narrows a foe's sets (Gen 6 on): once it has Mega Evolved,
+ * only sets with that stone fit; once a teammate has, none of its stone sets
+ * do (one Mega per team). Never narrows to nothing.
+ */
+function megaFit(all: SetEntry[], foe: FoeMon, data: SetsFile, foeMegaUsed: boolean): SetEntry[] {
+  const mega = (s: SetEntry) => megaFormeOf(data.meta.format, foe.species, s.item);
+  let fit = all;
+  if (isMegaForme(foe.forme)) fit = all.filter((s) => mega(s) === foe.forme);
+  else if (foeMegaUsed) fit = all.filter((s) => !mega(s));
+  return fit.length ? fit : all;
+}
+
 /** Candidate sets for a foe Pokémon, weights summing to 1. Never empty. */
 export function candidates(
   foe: FoeMon,
   data: SetsFile = defaultSets,
   known?: KnownSets,
+  /** A teammate of `foe` has already Mega Evolved. */
+  foeMegaUsed = false,
 ): Candidate[] {
   const knownSet = known?.[foe.species];
   if (knownSet) return [{ set: knownSet, weight: 1 }];
 
-  const all = data.species[foe.species]?.sets ?? [];
+  const all = megaFit(data.species[foe.species]?.sets ?? [], foe, data, foeMegaUsed);
   // Items can change hands (Trick, Knock Off), so relax the item check if nothing fits.
   let fit = all.filter((s) => consistent(s, foe));
   if (!fit.length) fit = all.filter((s) => consistent(s, foe, false));

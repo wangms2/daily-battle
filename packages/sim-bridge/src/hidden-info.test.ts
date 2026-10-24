@@ -16,6 +16,11 @@ import type { Policy, SideID, SideView } from './types';
 
 /** Fields on the client battle that hold dex data or machinery, not battle state. */
 const SKIP_KEYS = new Set(['gens', 'gen', 'handler', 'provider']);
+/**
+ * The client's own markers, not facts about a team: it sets `lastMove` to
+ * `healing-wish` after Lunar Dance as well as Healing Wish.
+ */
+const CLIENT_MARKERS = new Set(['healing-wish']);
 
 function addTokens(text: string, out: Set<string>) {
   for (const part of text.split(/[|:,]/)) {
@@ -26,7 +31,7 @@ function addTokens(text: string, out: Set<string>) {
 
 /** Every string (and key) reachable from `value`, split and normalized to ids. */
 export function tokens(value: unknown, out = new Set<string>(), seen = new WeakSet<object>()) {
-  if (typeof value === 'string') addTokens(value, out);
+  if (typeof value === 'string' && !CLIENT_MARKERS.has(value)) addTokens(value, out);
   if (!value || typeof value !== 'object' || seen.has(value)) return out;
   seen.add(value);
   for (const [key, child] of Object.entries(value)) {
@@ -100,7 +105,7 @@ const opposite = (side: SideID): SideID => (side === 'p1' ? 'p2' : 'p1');
 
 describe('hidden information', () => {
   // In Gen 5, Team Preview reveals all six species up front (in the log), never their sets.
-  it.each(['gen4ou', 'gen5ou'])(
+  it.each(['gen4ou', 'gen5ou', 'gen6ou'])(
     'never shows a %s policy unrevealed opponent species, moves, or items',
     (format) => {
       const found: string[] = [];
@@ -123,6 +128,35 @@ describe('hidden information', () => {
     },
     120_000,
   );
+
+  it("keeps a gen6ou foe's Mega Stone hidden until it Mega Evolves", () => {
+    let megas = 0;
+    for (let i = 0; i < 20; i++) {
+      const { teams, snapshots, logs } = playRecorded(i, 'gen6ou');
+      for (const side of ['p1', 'p2'] as const) {
+        const log = logs[side]!;
+        const opponent = opposite(side);
+        for (const set of teams[opponent]) {
+          const stone = toID(set.item);
+          if (!stone.endsWith('ite') && !/ite[xy]$/.test(stone)) continue;
+          const reveal = log.findIndex(
+            (l) => l.startsWith(`|-mega|${opponent}a:`) && toID(l).includes(stone),
+          );
+          if (reveal >= 0) megas++;
+          // No view handed to this side before the reveal names the stone.
+          const before = snapshots.filter(
+            (s) => s.side === side && (reveal < 0 || s.logLength <= reveal),
+          );
+          for (const s of before) {
+            if (teams[side].some((own) => toID(own.item) === stone)) continue;
+            expect(s.tokens.has(stone), `battle ${i}: ${set.item}`).toBe(false);
+          }
+        }
+      }
+    }
+    // RandomPolicy picks Mega moves often enough that some battles reveal a stone.
+    expect(megas).toBeGreaterThan(0);
+  }, 120_000);
 
   it('catches a leak (negative control)', () => {
     const { teams, snapshots, logs } = playRecorded(0);

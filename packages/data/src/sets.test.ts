@@ -145,3 +145,48 @@ describe('curation', () => {
     expect(setsFor('gen5ou').species['Politoed']!.sets[0]!.ability).toBe('Drizzle');
   });
 });
+
+describe('gen6ou Megas', () => {
+  const sets = setsFor('gen6ou');
+  const dex = Dex.forGen(6);
+
+  it('folds Mega sets into the base species, holding its own stone', () => {
+    const charizard = sets.species['Charizard']!.sets.map((s) => s.item);
+    expect(charizard).toContain('Charizardite X');
+    expect(charizard).toContain('Charizardite Y');
+    expect(Object.keys(sets.species).filter((n) => n.includes('-Mega'))).toEqual([]);
+    for (const [name, entry] of Object.entries(sets.species)) {
+      for (const s of entry.sets) {
+        const stone = dex.items.get(s.item).megaStone;
+        if (stone) expect(Object.keys(stone), s.id).toContain(name);
+      }
+    }
+  });
+
+  it('leaves out Ditto and Zoroark, and the Uber Megas', () => {
+    expect(sets.species['Ditto']).toBeUndefined();
+    expect(sets.species['Zoroark']).toBeUndefined();
+    const stones = Object.values(sets.species).flatMap((e) => e.sets.map((s) => s.item));
+    for (const uber of ['Kangaskhanite', 'Gengarite', 'Mawilite', 'Lucarionite', 'Blazikenite']) {
+      expect(stones).not.toContain(uber);
+    }
+  });
+
+  it('labels Mega sets with what they become', () => {
+    for (const entry of Object.values(sets.species)) {
+      for (const s of entry.sets) {
+        if (dex.items.get(s.item).megaStone) expect(s.label, s.id).toMatch(/^Mega /);
+      }
+    }
+  });
+
+  it('only leaves species with a Mega set at one set', () => {
+    const single = Object.entries(sets.species).filter(([, e]) => e.sets.length === 1);
+    for (const [name, entry] of single) {
+      expect(
+        entry.sets.some((s) => dex.items.get(s.item).megaStone),
+        name,
+      ).toBe(true);
+    }
+  });
+});

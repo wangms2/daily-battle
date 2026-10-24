@@ -1,12 +1,15 @@
 // Extracts what the AI reasons about from a SideView: its own team (full info,
 // from its own request) and what it has seen of the foe (from its own log).
 import { sets as defaultSets, type SetEntry, type SetsFile } from '@daily-battle/data';
+import { speciesDataFor } from '@daily-battle/data/species';
 import type { SideView } from '@daily-battle/sim-bridge';
 
 export interface SideConds {
   sr: boolean;
   spikes: number;
   tspikes: number;
+  /** Sticky Web (Gen 6 on). */
+  web: boolean;
   reflect: boolean;
   lightScreen: boolean;
 }
@@ -14,7 +17,10 @@ export interface SideConds {
 export interface OwnMon {
   /** 1-based index in the request, as used by `switch N`. */
   slot: number;
+  /** Base species, as in the set data (Mega Evolving doesn't change it). */
   species: string;
+  /** The forme it battles as right now, e.g. `Charizard-Mega-X` once it has Mega Evolved. */
+  forme: string;
   active: boolean;
   fainted: boolean;
   hpFrac: number;
@@ -22,10 +28,15 @@ export interface OwnMon {
   boosts: Record<string, number>;
   /** The full set (own team, so known); matched against the set data. */
   set: SetEntry;
+  /** The Mega its set's stone makes, if any (Gen 6 on). */
+  megaForme?: string;
 }
 
 export interface FoeMon {
+  /** Base species, as in the set data (Mega Evolving doesn't change it). */
   species: string;
+  /** The forme it battles as right now, e.g. `Charizard-Mega-X` once it has Mega Evolved. */
+  forme: string;
   active: boolean;
   fainted: boolean;
   hpFrac: number;
@@ -53,6 +64,28 @@ export interface AIState {
   foeSide: SideConds;
   /** Size of the foe's team, from `|teamsize|`. */
   foeTotal: number;
+  /** Electric, Grassy, Misty or Psychic Terrain's id (Gen 6 on), or ''. */
+  terrain: string;
+  /** The active Pokémon can Mega Evolve this turn (Gen 6 on). */
+  canMega: boolean;
+  /** One of ours has Mega Evolved; one Mega per battle. */
+  ownMegaUsed: boolean;
+  /** One of the foe's has Mega Evolved, so no other foe will. */
+  foeMegaUsed: boolean;
+}
+
+/** "Charizard-Mega-X" → "Charizard": the species the set data knows it as. */
+export const baseSpecies = (forme: string) => forme.replace(/-Mega(-[XY])?$/, '');
+export const isMegaForme = (forme: string) => /-Mega(-[XY])?$/.test(forme);
+
+/** The Mega a set's stone makes for its species, from the species data (Gen 6 on). */
+export function megaFormeOf(format: string, species: string, item: string): string | undefined {
+  return megaInfo(format, species, item)?.forme;
+}
+
+/** The Mega (forme and ability) a set's stone makes for its species, if any. */
+export function megaInfo(format: string, species: string, item: string) {
+  return speciesDataFor(format).species[species]?.megas?.[item];
 }
 
 export const toId = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -65,6 +98,7 @@ function sideConds(conditions: Record<string, { level?: number } | undefined>): 
     sr: level('stealthrock') > 0,
     spikes: level('spikes'),
     tspikes: level('toxicspikes'),
+    web: level('stickyweb') > 0,
     reflect: level('reflect') > 0,
     lightScreen: level('lightscreen') > 0,
   };
@@ -106,27 +140,36 @@ export function extractState(view: SideView, data: SetsFile = defaultSets): AISt
   const foeSide = battle[view.side === 'p1' ? 'p2' : 'p1'];
   const reqMons = request.requestType === 'wait' ? [] : request.side.pokemon;
 
+  const format = data.meta.format;
   const own: OwnMon[] = reqMons.map((p, i) => {
-    const species = p.speciesForme;
+    const forme = p.speciesForme;
+    // Track by base species: a Mega's forme changes mid-battle, its species doesn't.
+    const species = baseSpecies(forme);
     const client = ownSide.team.find(
-      (c) => c.originalIdent === p.ident || c.speciesForme === species,
+      (c) => c.originalIdent === p.ident || baseSpecies(c.speciesForme) === species,
     );
-    return {
+    const set = matchOwnSet(species, p.item, p.moves, data);
+    const mon: OwnMon = {
       slot: i + 1,
       species,
+      forme,
       active: !!p.active,
       fainted: !!p.fainted || p.condition.endsWith(' fnt'),
       hpFrac: p.maxhp ? p.hp / p.maxhp : 0,
       status: p.status ?? '',
       boosts: { ...(p.active ? client?.boosts : {}) },
-      set: matchOwnSet(species, p.item, p.moves, data),
+      set,
     };
+    const megaForme = megaFormeOf(format, species, set.item);
+    if (megaForme) mon.megaForme = megaForme;
+    return mon;
   });
 
   // With Team Preview (Gen 5 on), the foe's whole team is listed from the start;
   // the ones not yet sent out have no HP reading, so they count as healthy.
   const foe: FoeMon[] = foeSide.team.map((p) => ({
-    species: p.speciesForme,
+    species: baseSpecies(p.speciesForme),
+    forme: p.speciesForme,
     active: foeSide.active.includes(p),
     fainted: p.fainted,
     hpFrac: p.maxhp ? p.hp / p.maxhp : p.fainted ? 0 : 1,
@@ -138,10 +181,15 @@ export function extractState(view: SideView, data: SetsFile = defaultSets): AISt
     ability: toId(p.ability || p.baseAbility || ''),
   }));
 
+  const active = request.requestType === 'move' ? request.active[0] : undefined;
   return {
     side: view.side,
     turn: battle.turn,
     weather: battle.field.weatherState.id,
+    terrain: battle.field.terrainState.id,
+    canMega: !!active?.canMegaEvo,
+    ownMegaUsed: own.some((m) => isMegaForme(m.forme)),
+    foeMegaUsed: foe.some((m) => isMegaForme(m.forme)),
     own,
     ownActive: own.find((m) => m.active),
     ownSide: sideConds(ownSide.sideConditions as never),

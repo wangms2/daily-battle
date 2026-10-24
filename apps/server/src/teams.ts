@@ -3,7 +3,8 @@
 import { setsFor } from '@daily-battle/data';
 import { generateOpponent, generatePool, teamSets, type Style } from '@daily-battle/gen';
 import type { Pool, RoomSettings, Slot } from '@daily-battle/versus';
-import { TeamValidator, type PokemonSet } from '@pkmn/sim';
+import { teamProblems } from '@daily-battle/sim-bridge';
+import type { PokemonSet } from '@pkmn/sim';
 
 /** A random pool for the room: the same generator as the weekly pools, keyed by the room. */
 export function randomPool(format: string, code: string, draw: number): Pool {
@@ -23,7 +24,10 @@ export async function weeklyPool(assets: Fetcher, settings: RoomSettings): Promi
   return { species: species as string[], source: 'weekly', draw: 0, week: settings.week };
 }
 
-/** The sets for a team of slots, or null if a set doesn't exist or the team isn't legal. */
+/**
+ * The sets for a team of slots, or null if a set doesn't exist or the team
+ * isn't legal (the validator, plus one Mega per team from Gen 6).
+ */
 export function legalTeam(format: string, team: Slot[]): PokemonSet[] | null {
   let sets: PokemonSet[];
   try {
@@ -31,7 +35,7 @@ export function legalTeam(format: string, team: Slot[]): PokemonSet[] | null {
   } catch {
     return null;
   }
-  return TeamValidator.get(format).validateTeam(structuredClone(sets)) ? null : sets;
+  return teamProblems(format, sets) ? null : sets;
 }
 
 /**

@@ -1,3 +1,4 @@
+import { Dex } from '@pkmn/sim';
 import { describe, expect, it } from 'vitest';
 import { jobOf, samePurpose } from './distinct';
 import { FORMATS } from './formats';
@@ -19,6 +20,15 @@ describe('distinct sets', () => {
     item: 'Leftovers',
     evs: evs({ spa: 252, spe: 252 }),
   };
+
+  it('never merges sets that Mega Evolve into different forms', () => {
+    const dd = {
+      moves: ['Dragon Dance', 'Flare Blitz', 'Dragon Claw', 'Roost'],
+      item: 'Charizardite X',
+      evs: evs({ atk: 252, spe: 252 }),
+    };
+    expect(samePurpose(dd, { ...dd, item: 'Charizardite Y' })).toBe(false);
+  });
 
   it('merges a one-move variant that does the same job', () => {
     const cm = {
@@ -63,9 +73,11 @@ describe('distinct sets', () => {
     );
   });
 
-  it.each(Object.keys(FORMATS))('offers every %s species 2 to 4 sets', (format) => {
+  it.each(Object.keys(FORMATS))('offers every %s species 2 to 4 sets (1 with a Mega)', (format) => {
     for (const [name, entry] of Object.entries(setsFor(format).species)) {
-      expect(entry.sets.length, name).toBeGreaterThanOrEqual(2);
+      // A species with a Mega set keeps only its viable sets (Mega Lopunny alone).
+      const mega = entry.sets.some((s) => Dex.items.get(s.item).megaStone);
+      expect(entry.sets.length, name).toBeGreaterThanOrEqual(mega ? 1 : 2);
       expect(entry.sets.length, name).toBeLessThanOrEqual(4);
     }
   });

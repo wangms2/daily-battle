@@ -39,6 +39,8 @@ export interface Params {
   maxDamageBias: number;
   /** Chance to aim attacks at the foe's likely switch-in when it's threatened. */
   predictionRate: number;
+  /** Mega Evolving now (Gen 6 on), on top of the move's score in Mega form: the boost lasts all battle. */
+  mega: number;
 }
 
 const BALANCE: Params = {
@@ -59,6 +61,7 @@ const BALANCE: Params = {
   resistBias: 0.08,
   maxDamageBias: 0.1,
   predictionRate: 0.15,
+  mega: 0.2,
 };
 
 export const PRESETS: Record<Style, Params> = {

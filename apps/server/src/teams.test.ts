@@ -21,6 +21,15 @@ describe('pools and teams', () => {
     expect(legalTeam('gen4ou', [slot(a!), slot(a!)])).toBeNull(); // Species Clause
   });
 
+  it('allows one Mega per team in Gen 6', () => {
+    const data = setsFor('gen6ou');
+    const megaSet = (s: string) =>
+      data.species[s]!.sets.find((set) => /ite( [XY])?$/.test(set.item) && set.item !== 'Eviolite');
+    const [a, b] = ['Charizard', 'Metagross'].map((s) => ({ species: s, setId: megaSet(s)!.id }));
+    expect(legalTeam('gen6ou', [a!])).not.toBeNull();
+    expect(legalTeam('gen6ou', [a!, b!])).toBeNull();
+  });
+
   it('gives a late builder a legal team of their size from the pool', () => {
     const pool = randomPool('gen5ou', 'BCDFG', 2).species;
     for (const size of [6, 3]) {

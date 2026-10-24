@@ -9,8 +9,8 @@
 //   no attackers.
 // - Balanced: a mix, two or three of each.
 import type { SetEntry, SetsFile } from '@daily-battle/data';
-import { isBulky, teamSets, type Archetype, type Rng, type TeamSlot } from '@daily-battle/gen';
-import { TeamValidator } from '@pkmn/sim';
+import { isBulky, type Archetype, type Rng, type TeamSlot } from '@daily-battle/gen';
+import { legalTeam } from './sample';
 
 export type SetRole = 'attacker' | 'wall' | 'support';
 
@@ -21,6 +21,9 @@ const ATTACK_ITEMS = [
   'Life Orb',
   'Expert Belt',
   'Focus Sash',
+  // Gen 6: Assault Vest holders can only attack.
+  'Assault Vest',
+  'Weakness Policy',
 ];
 /** Setup moves that make a sweeper, however bulky the spread. */
 const SWEEP_SETUP = [
@@ -38,6 +41,8 @@ const SWEEP_SETUP = [
   'Coil',
   'Shift Gear',
   'Hone Claws',
+  // Gen 6
+  'Geomancy',
 ];
 const RECOVERY = [
   'Recover',
@@ -93,7 +98,7 @@ export const ARCHETYPE_RULES: Record<Archetype, Rule> = {
 };
 
 const hazard = (s: SetEntry) =>
-  ['Stealth Rock', 'Spikes', 'Toxic Spikes'].some((m) => s.moves.includes(m));
+  ['Stealth Rock', 'Spikes', 'Toxic Spikes', 'Sticky Web'].some((m) => s.moves.includes(m));
 
 /** Whether a team (as sets) meets an archetype's rules. */
 export function fitsArchetype(sets: SetEntry[], archetype: Archetype): boolean {
@@ -138,7 +143,6 @@ export function archetypeTeams(
     }))
     .filter((o) => o.sets.length > 0);
   if (options.length < 6) return [];
-  const validator = TeamValidator.get(data.meta.format);
   const seen = new Set<string>();
   const teams: TeamSlot[][] = [];
   for (let t = 0; t < tries && teams.length < n; t++) {
@@ -161,7 +165,7 @@ export function archetypeTeams(
       .join();
     if (seen.has(key)) continue;
     seen.add(key);
-    if (!validator.validateTeam(teamSets(data, team))) teams.push(team);
+    if (legalTeam(data, team)) teams.push(team);
   }
   return teams;
 }

@@ -66,7 +66,8 @@ describe('Showdown move animations', () => {
     }
     expect(failures).toEqual([]);
     expect(animated).toBeGreaterThan(1000);
-  });
+    // Every move through Gen 6, four ways each: give it room on a busy machine.
+  }, 30_000);
 
   it('falls back to the tackle animation for a move it does not know', () => {
     const run = playMove(init(), {

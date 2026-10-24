@@ -7,6 +7,7 @@
    font (the games' own fonts are Nintendo's, so these are free stand-ins). */
 @import '@fontsource/jersey-15/latin-400.css';
 @import '@fontsource/pixelify-sans/latin-400.css';
+@import '@fontsource/nunito/latin-700.css';
 
 /*
  * Design tokens. Every visual decision comes from these.
@@ -34,9 +35,11 @@
 
   --font-body: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
   --font-display: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
-  /* Gen 4 (Diamond/Pearl): chunky and bold. Gen 5 (Black/White): lighter and rounder. */
+  /* Gen 4 (Diamond/Pearl): chunky and bold. Gen 5 (Black/White): lighter and rounder.
+     Gen 6 (X/Y): the games left pixel type behind for clean rounded text. */
   --font-pixel-4: 'Jersey 15', ui-monospace, monospace;
   --font-pixel-5: 'Pixelify Sans', ui-monospace, monospace;
+  --font-pixel-6: 'Nunito', ui-rounded, ui-sans-serif, system-ui, sans-serif;
   --display-weight: 600;
 
   --r-card: 8px;
@@ -320,6 +323,18 @@ body {
   background: rgb(240 140 200 / 0.16);
 }
 
+/* Terrain (Gen 6 on): Showdown's overlay, a faint tint over the whole scene. */
+.terrain-fx {
+  background-size: cover;
+  background-position: center;
+  opacity: 0.35;
+}
+/* The Mega mark beside a Mega Evolved Pokémon's name. */
+.mega-badge {
+  color: #fff;
+  background: linear-gradient(135deg, #e94f84, #7c5cd6 55%, #2f80ed);
+}
+
 /* Weather overlays drift slowly; static with animations off or reduced motion. */
 .weather-fx {
   background-size: calc(var(--s) * 700) calc(var(--s) * 500);
@@ -385,6 +400,9 @@ body {
 [data-gen='5'] {
   --font-pixel: var(--font-pixel-5);
 }
+[data-gen='6'] {
+  --font-pixel: var(--font-pixel-6);
+}
 .battle-pixel {
   font-family: var(--font-pixel);
   font-weight: 400;
@@ -393,6 +411,12 @@ body {
 [data-gen='5'] .battle-pixel,
 [data-gen='5'] .battle-textbox {
   font-size: 14px;
+}
+/* Nunito is a regular-width face: bold, and a touch smaller to fit like the pixel fonts. */
+[data-gen='6'] .battle-pixel,
+[data-gen='6'] .battle-textbox {
+  font-weight: 700;
+  font-size: 15px;
 }
 
 /* Move chips outside the move buttons (sets, details, battle cards): tinted by
@@ -429,12 +453,16 @@ button.move-chip:hover,
   line-height: 1.3;
   cursor: pointer;
 }
-[data-gen='5'] .battle-textbox {
+[data-gen='5'] .battle-textbox,
+[data-gen='6'] .battle-textbox {
   line-height: 1.45;
 }
 .battle-textbox strong {
   font-weight: 400;
   color: var(--accent);
+}
+[data-gen='6'] .battle-textbox strong {
+  font-weight: 700;
 }
 
 /* Floating result labels and ability/item pop-ups. */
@@ -586,9 +614,28 @@ button.move-chip:hover,
 .anim-lunge-left {
   animation: lunge-left 260ms ease-out;
 }
+/* Mega Evolution: the new form bursts out of a rainbow glow, as on Showdown. */
+@keyframes mega {
+  0% {
+    transform: scale(0.85);
+    filter: brightness(6) saturate(0) drop-shadow(0 0 12px #fff);
+  }
+  45% {
+    transform: scale(1.06);
+    filter: brightness(2.4) drop-shadow(0 0 14px #e94f84) drop-shadow(0 0 8px #2f80ed);
+  }
+  100% {
+    transform: scale(1);
+    filter: none;
+  }
+}
+.anim-mega {
+  animation: mega 700ms ease-out;
+}
 
 @media (prefers-reduced-motion: reduce) {
   .anim-hit,
+  .anim-mega,
   .anim-faint,
   .anim-in-left,
   .anim-in-right,

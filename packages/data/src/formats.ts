@@ -18,6 +18,7 @@ export interface FormatInfo {
 export const FORMATS = {
   gen4ou: { id: 'gen4ou', gen: 4, name: 'Gen 4', uu: 'gen4uu', teamPreview: false },
   gen5ou: { id: 'gen5ou', gen: 5, name: 'Gen 5', uu: 'gen5uu', teamPreview: true },
+  gen6ou: { id: 'gen6ou', gen: 6, name: 'Gen 6', uu: 'gen6uu', teamPreview: true },
 } as const satisfies Record<string, FormatInfo>;
 
 export type FormatId = keyof typeof FORMATS;

@@ -314,6 +314,8 @@ export function ControlPanel({
   // Hover and focus cards belong to the turn they opened in too: a button that
   // goes away (a forced switch made) never sees the pointer leave.
   const [hover, setHover] = useState<{ info: Info; at: Controls | null } | null>(null);
+  // The Mega toggle belongs to the turn it was set in.
+  const [megaOn, setMegaOn] = useState<{ at: Controls | null } | null>(null);
   const info = hover && hover.at === controls ? hover.info : null;
   const setInfo = (i: Info) => setHover(i && { info: i, at: controls });
   const off = disabled || !controls;
@@ -411,6 +413,12 @@ export function ControlPanel({
   }
 
   const moves = controls?.moves ?? [];
+  // Mega Evolution (Gen 6): a toggle above the moves, as on Showdown. Once
+  // your team's Mega is used it stays, disabled, to say so.
+  const megaUsed = team.some((m) => m.forme);
+  const canMega = !!controls?.canMega;
+  const mega = !!megaOn && canMega && megaOn.at === controls;
+  const withMega = (choice: string) => (mega ? `${choice} mega` : choice);
   return (
     <div ref={panel} className="relative flex shrink-0 flex-col gap-1.5">
       {tooltip}
@@ -435,6 +443,27 @@ export function ControlPanel({
           </span>
         )}
       </p>
+      {(canMega || megaUsed) && (
+        <button
+          type="button"
+          aria-pressed={mega}
+          disabled={off || !canMega}
+          onClick={() => setMegaOn(mega ? null : { at: controls })}
+          className={clsx(
+            'flex h-8 items-center justify-center gap-2 rounded-btn border text-[13.5px] font-semibold select-none disabled:opacity-40',
+            mega ? 'border-accent bg-accent-soft text-soft-ink' : 'border-line text-muted',
+          )}
+        >
+          <span
+            aria-hidden
+            className={clsx(
+              'grid size-4 place-items-center rounded-full border-2',
+              mega ? 'border-accent bg-accent' : 'border-current',
+            )}
+          />
+          {canMega ? 'Mega Evolve' : 'Mega Evolution used'}
+        </button>
+      )}
       <div
         className={clsx(
           'grid grid-cols-2 grid-rows-2 gap-2',
@@ -447,7 +476,7 @@ export function ControlPanel({
               key={m.choice}
               move={disabled ? { ...m, disabled: true } : m}
               hints={hints}
-              onChoose={() => onChoose(m.choice)}
+              onChoose={() => onChoose(withMega(m.choice))}
               onInfo={(move) => setInfo(move && { move })}
             />
           ) : (

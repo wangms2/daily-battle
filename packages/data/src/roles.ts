@@ -1,3 +1,4 @@
+import { Dex } from '@pkmn/sim';
 import type { ResolvedSet } from './resolve';
 import type { RoleOverrides } from './types';
 
@@ -29,7 +30,8 @@ const SETUP_MOVES = [
   'Hone Claws',
   'Work Up',
 ];
-const HAZARDS = ['Stealth Rock', 'Spikes', 'Toxic Spikes'];
+// Sticky Web is Gen 6 on, so it can't change an earlier label.
+const HAZARDS = ['Stealth Rock', 'Spikes', 'Toxic Spikes', 'Sticky Web'];
 const RECOVERY = [
   'Recover',
   'Roost',
@@ -41,12 +43,15 @@ const RECOVERY = [
   'Rest',
 ];
 
-/** Abilities that set weather on switch-in, which lasts indefinitely in Gens 3–5. */
-const WEATHER_ABILITIES: Record<string, { name: string; summons: string }> = {
-  Drizzle: { name: 'Rain', summons: 'rain' },
-  Drought: { name: 'Sun', summons: 'harsh sunlight' },
-  'Sand Stream': { name: 'Sandstorm', summons: 'a sandstorm' },
-  'Snow Warning': { name: 'Hail', summons: 'hail' },
+/**
+ * Abilities that set weather on switch-in, which lasts indefinitely in Gens
+ * 3–5 and five turns from Gen 6 (eight with the weather's rock).
+ */
+const WEATHER_ABILITIES: Record<string, { name: string; summons: string; rock: string }> = {
+  Drizzle: { name: 'Rain', summons: 'rain', rock: 'Damp Rock' },
+  Drought: { name: 'Sun', summons: 'harsh sunlight', rock: 'Heat Rock' },
+  'Sand Stream': { name: 'Sandstorm', summons: 'a sandstorm', rock: 'Smooth Rock' },
+  'Snow Warning': { name: 'Hail', summons: 'hail', rock: 'Icy Rock' },
 };
 
 const has = (set: RoleInput, move: string) => set.moves.includes(move);
@@ -58,7 +63,8 @@ function listJoin(items: string[]): string {
     : `${items.slice(0, -1).join(', ')} and ${items.at(-1)}`;
 }
 
-type Rule = (set: RoleInput) => Role | null;
+/** A rule sees the set and its format's generation. */
+type Rule = (set: RoleInput, gen: number) => Role | null;
 
 /** Ordered rules; the first one that matches decides the role. */
 const RULES: Rule[] = [
@@ -86,6 +92,23 @@ const RULES: Rule[] = [
             'Hits extremely hard with special moves, but is locked into one move until it switches out.',
         }
       : null,
+  // Gen 6 items: neither exists earlier, so they can't change an earlier label.
+  (s) =>
+    s.item === 'Assault Vest'
+      ? {
+          label: 'Assault Vest tank',
+          description:
+            'Takes special hits far better with Assault Vest, but can only use attacking moves.',
+        }
+      : null,
+  (s) =>
+    s.item === 'Weakness Policy'
+      ? {
+          label: 'Weakness Policy attacker',
+          description:
+            'Takes a super-effective hit, then sharply raises its Attack and Special Attack.',
+        }
+      : null,
   (s) =>
     has(s, 'Stealth Rock') && s.item === 'Focus Sash'
       ? {
@@ -106,14 +129,25 @@ const RULES: Rule[] = [
     const hazards = HAZARDS.filter((m) => has(s, m));
     if (!hazards.length) return null;
     const spin = has(s, 'Rapid Spin') ? ', and clears your side with Rapid Spin' : '';
+    const web = hazards.includes('Sticky Web');
+    const effect = !web ? 'wear down' : hazards.length === 1 ? 'slow' : 'wear down and slow';
     return {
       label: hazards.length === 1 ? `${hazards[0]} setter` : 'Hazard setter',
-      description: `Sets ${listJoin(hazards)} to wear down every Pokémon the opponent switches in${spin}.`,
+      description: `Sets ${listJoin(hazards)} to ${effect} every Pokémon the opponent switches in${spin}.`,
     };
   },
   (s) =>
     has(s, 'Rapid Spin')
       ? { label: 'Spinner', description: 'Clears entry hazards from your side with Rapid Spin.' }
+      : null,
+  // From Gen 6, Defog clears hazards from both sides; earlier labels stay as they were.
+  (s, gen) =>
+    gen >= 6 && has(s, 'Defog')
+      ? {
+          label: 'Defogger',
+          description:
+            'Clears entry hazards (and screens) from both sides of the field with Defog.',
+        }
       : null,
   (s) =>
     has(s, 'Trick Room')
@@ -203,12 +237,15 @@ const RULES: Rule[] = [
       ? { label: 'Fast attacker', description: 'Hits fast and hard with wide move coverage.' }
       : null,
   // Last, so they only name sets that no rule above describes.
-  (s) => {
+  (s, gen) => {
     const weather = WEATHER_ABILITIES[s.ability];
     if (!weather) return null;
     return {
       label: `${weather.name} setter`,
-      description: `Summons ${weather.summons} as it switches in, which lasts until another weather replaces it.`,
+      description:
+        gen >= 6
+          ? `Summons ${weather.summons} as it switches in, for five turns (eight with ${weather.rock}).`
+          : `Summons ${weather.summons} as it switches in, which lasts until another weather replaces it.`,
     };
   },
   // Volt Switch only: U-turn sets already have labels from Gen 4.
@@ -220,14 +257,60 @@ const RULES: Rule[] = [
             'Takes a hit, then switches out with Volt Switch to bring in the right teammate.',
         }
       : null,
+  (s, gen) =>
+    gen >= 6 && has(s, 'Parting Shot')
+      ? {
+          label: 'Pivot',
+          description:
+            "Switches out with Parting Shot, lowering the foe's Attack and Special Attack on the way.",
+        }
+      : null,
 ];
+
+/**
+ * The Mega a set's item makes its species into ("Charizard-Mega-X"), if the
+ * item is that species' Mega Stone. Stones only exist from Gen 6.
+ */
+export function megaForm(species: string, item: string, dex = Dex.forGen(6)): string | undefined {
+  const stone = dex.items.get(item);
+  if (!stone.exists || !stone.megaStone) return undefined;
+  // `megaStone` maps the species a stone works for to the Mega it makes.
+  return stone.megaStone[dex.species.get(species).baseSpecies];
+}
+
+/** "Charizard-Mega-X" → "Mega Charizard X", the games' name for it. */
+export function megaName(form: string): string {
+  const match = /^(.*)-Mega(?:-([XY]))?$/.exec(form);
+  if (!match) return form;
+  return `Mega ${match[1]}${match[2] ? ` ${match[2]}` : ''}`;
+}
+
+/** "Mega" for one Mega, "Mega X" / "Mega Y" for Charizard's and Mewtwo's two. */
+function megaPrefix(form: string): string {
+  const letter = /-Mega-([XY])$/.exec(form)?.[1];
+  return letter ? `Mega ${letter}` : 'Mega';
+}
 
 /** "TyraniBoah (SubPunch)" → "TyraniBoah". */
 const cleanName = (name: string) => name.replace(/\s*\(.*\)\s*/g, ' ').trim();
 
-export function deriveRole(set: RoleInput): Role {
+export function deriveRole(set: RoleInput, gen = 4): Role {
+  const role = baseRole(set, gen);
+  const mega = megaForm(set.species, set.item);
+  if (!mega) return role;
+  // A Mega set leads with what it becomes: "Mega X Dragon Dance sweeper".
+  // Labels that start with a move keep its capital; others read on ("Mega fast attacker").
+  const startsWithMove = set.moves.some((m) => role.label.startsWith(m));
+  const rest = startsWithMove ? role.label : role.label[0]!.toLowerCase() + role.label.slice(1);
+  return {
+    label: `${megaPrefix(mega)} ${rest}`,
+    description: `${role.description} Holds ${set.item} to Mega Evolve into ${megaName(mega)} in battle.`,
+  };
+}
+
+function baseRole(set: RoleInput, gen: number): Role {
   for (const rule of RULES) {
-    const role = rule(set);
+    const role = rule(set, gen);
     if (role) return role;
   }
   return {
@@ -258,8 +341,9 @@ const SUFFIXES: ((s: RoleInput) => string)[] = [
 export function assignRoles(
   sets: (RoleInput & { id: string })[],
   overrides: RoleOverrides = {},
+  gen = 4,
 ): Role[] {
-  const roles = sets.map(deriveRole);
+  const roles = sets.map((s) => deriveRole(s, gen));
   const groups = new Map<string, number[]>();
   roles.forEach((r, i) => groups.set(r.label, [...(groups.get(r.label) ?? []), i]));
   for (const [label, members] of groups) {

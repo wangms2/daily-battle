@@ -1,4 +1,5 @@
 import { sets as defaultSets, type SetEntry, type SetsFile } from '@daily-battle/data';
+import { oneMegaProblem } from '@daily-battle/data/species';
 import { TeamValidator, type PokemonSet } from '@pkmn/sim';
 import type { Rng } from './rng';
 
@@ -27,11 +28,24 @@ function weightedPick<T extends { weight: number }>(items: T[], rng: Rng): T {
 }
 
 /**
+ * The format's validator plus our own team rules (one Mega per team, from
+ * Gen 6). Returns the problems, or null if the team is legal.
+ */
+export function teamProblems(format: string, team: PokemonSet[]): string[] | null {
+  const problems = [
+    ...(TeamValidator.get(format).validateTeam(structuredClone(team)) ?? []),
+    ...[oneMegaProblem(format, team)].filter((p): p is string => !!p),
+  ];
+  return problems.length ? problems : null;
+}
+
+/**
  * A random legal team from the set snapshot: 6 distinct species (uniform),
- * each with a set drawn by weight. Redraws if the validator rejects the team.
+ * each with a set drawn by weight. Redraws if the validator or our own team
+ * rules (one Mega) reject the team.
  */
 export function randomTeam(rng: Rng, data: SetsFile = defaultSets): PokemonSet[] {
-  const validator = TeamValidator.get(data.meta.format);
+  const format = data.meta.format;
   const names = Object.keys(data.species);
   for (let attempt = 0; attempt < 100; attempt++) {
     const pool = [...names];
@@ -40,7 +54,7 @@ export function randomTeam(rng: Rng, data: SetsFile = defaultSets): PokemonSet[]
       const name = pool.splice(Math.floor(rng() * pool.length), 1)[0]!;
       team.push(toPokemonSet(name, weightedPick(data.species[name]!.sets, rng)));
     }
-    if (!validator.validateTeam(structuredClone(team))) return team;
+    if (!teamProblems(format, team)) return team;
   }
   throw new Error('Could not draw a legal team in 100 attempts');
 }

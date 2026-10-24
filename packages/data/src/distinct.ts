@@ -1,6 +1,7 @@
 // Sets must be distinct enough to be worth a choice: two sets that share most
 // of their moves, invest EVs the same way, and do the same job are one set
 // (the more used one), not two.
+import { Dex } from '@pkmn/sim';
 import type { ResolvedSet } from './resolve';
 
 const STATS = ['hp', 'atk', 'def', 'spa', 'spd', 'spe'] as const;
@@ -44,6 +45,10 @@ const ROLE_MOVES = [
   'Baton Pass',
 ];
 
+/** The Mega forms an item makes, or '' if it isn't a Mega Stone. */
+const megaStone = (item: string): string =>
+  Object.values(Dex.items.get(item).megaStone ?? {}).join('+');
+
 function itemJob(item: string): string {
   if (item === 'Choice Scarf') return 'speed';
   if (['Choice Band', 'Choice Specs', 'Life Orb', 'Expert Belt'].includes(item)) return 'power';
@@ -66,6 +71,9 @@ export function samePurpose(
   a: Pick<ResolvedSet, 'moves' | 'item' | 'evs'>,
   b: Pick<ResolvedSet, 'moves' | 'item' | 'evs'>,
 ): boolean {
+  // A Mega set is never the same as a set with another stone, or none: the
+  // Mega changes typing, ability, and stats (Charizard X and Y are two sets).
+  if (megaStone(a.item) !== megaStone(b.item)) return false;
   const shared = a.moves.filter((m) => b.moves.includes(m)).length;
   const spread = STATS.reduce((sum, s) => sum + Math.abs(a.evs[s] - b.evs[s]), 0);
   return shared >= 3 && spread < SAME_SPREAD + 1 && jobOf(a) === jobOf(b);

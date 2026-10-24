@@ -144,6 +144,8 @@ describe('game messages', () => {
       choice: 'move 4',
     });
     expect(parse({ type: 'choose', choice: 'switch 6' })).not.toBeNull();
+    expect(parse({ type: 'choose', choice: 'move 2 mega' })).not.toBeNull(); // Gen 6
+    expect(parse({ type: 'choose', choice: 'switch 2 mega' })).toBeNull();
     expect(parse({ type: 'choose', choice: 'move 5' })).toBeNull();
     expect(parse({ type: 'choose', choice: 'team 123456' })).toBeNull();
     expect(parse({ type: 'choose', choice: 'move 1, move 2' })).toBeNull();

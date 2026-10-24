@@ -27,6 +27,14 @@ export const EXPLAINERS: Record<string, string> = {
   frz: 'A frozen Pokémon can’t move until it thaws.',
   substitute: 'A Substitute takes hits for its user until it breaks.',
   choicelock: 'Choice items lock the holder into one move until it switches out.',
+  mega: 'Mega Evolution changes a Pokémon’s stats, ability, and sometimes type for the rest of the battle. One per team.',
+  stickyweb: 'Sticky Web lowers the Speed of grounded Pokémon that switch in.',
+  electricterrain:
+    'Electric Terrain powers up Electric moves and keeps grounded Pokémon awake for five turns.',
+  grassyterrain:
+    'Grassy Terrain heals grounded Pokémon a little each turn and powers up Grass moves for five turns.',
+  mistyterrain:
+    'Misty Terrain halves Dragon damage and protects grounded Pokémon from status for five turns.',
 };
 
 export const STATUS_LABEL: Record<string, string> = {

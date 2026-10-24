@@ -22,6 +22,7 @@ import { MoveList } from '../ui/MoveList';
 import { Button, TypeBadge } from '../ui/bits';
 import { ItemIcon } from '../ui/ItemIcon';
 import { FinalStatsRow } from '../ui/StatLines';
+import { MegaPreview } from '../ui/MegaPreview';
 
 /**
  * A set's description: two lines, and when it's longer, a tap (or a mouse
@@ -105,6 +106,7 @@ function SetCard({
         </dd>
       </dl>
       <FinalStatsRow species={species} set={set} />
+      <MegaPreview species={species} set={set} />
     </article>
   );
 }
@@ -118,6 +120,7 @@ export function SetPicker({
   onRemove,
   chooseLabel = 'Use this set',
   title,
+  blocked,
 }: {
   species: string | null;
   open: boolean;
@@ -129,6 +132,8 @@ export function SetPicker({
   onRemove?: () => void;
   chooseLabel?: string;
   title?: string;
+  /** Why a set can't be chosen (one Mega per team), if it can't. */
+  blocked?: (setId: string) => string | undefined;
 }) {
   const sets = species ? setsOf(species) : [];
   const common = species && sets.length ? topSet(species).id : undefined;
@@ -142,6 +147,7 @@ export function SetPicker({
   const set = sets.find((s) => s.id === selected) ?? sets[0]!;
   const badge = set.id === currentSetId ? 'Current' : set.id === common ? 'Most used' : null;
   const unchanged = set.id === currentSetId;
+  const why = unchanged ? undefined : blocked?.(set.id);
 
   // Arrow keys move between tabs (WAI-ARIA tabs pattern).
   const onKey = (e: KeyboardEvent, i: number) => {
@@ -210,9 +216,20 @@ export function SetPicker({
         <SetCard species={species} set={set} badge={badge} />
       </div>
       {onChoose && (
-        <Button className="mt-2 h-12 w-full" disabled={unchanged} onClick={() => onChoose(set.id)}>
-          {unchanged ? 'Current set' : chooseLabel}
-        </Button>
+        <>
+          <Button
+            className="mt-2 h-12 w-full"
+            disabled={unchanged || !!why}
+            onClick={() => onChoose(set.id)}
+          >
+            {unchanged ? 'Current set' : chooseLabel}
+          </Button>
+          {why && (
+            <p role="status" className="mt-1 text-center text-[13px] font-semibold text-bad">
+              {why}
+            </p>
+          )}
+        </>
       )}
       {onRemove && (
         <div className="mt-1 flex justify-center">

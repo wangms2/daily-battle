@@ -20,7 +20,7 @@ function state({ team = false, animations = true } = {}) {
       beginnerHints: true,
       battleSpeed: 'instant',
       animations,
-      shownExplainers: ['welcome', 'gen5-news'],
+      shownExplainers: ['welcome', 'gen5-news', 'gen6-news'],
       format: 'gen4ou',
     },
   };

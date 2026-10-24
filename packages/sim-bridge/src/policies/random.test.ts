@@ -77,4 +77,12 @@ describe('legalChoices', () => {
   it('offers nothing while waiting', () => {
     expect(legalChoices({ requestType: 'wait', rqid: 1 } as Protocol.Request)).toEqual([]);
   });
+
+  it('adds a Mega Evolving version of each usable move when the Pokémon can Mega Evolve', () => {
+    const request = moveRequest([move('Flare Blitz'), move('Roost', { pp: 0 })], {
+      canMegaEvo: true,
+      trapped: true,
+    });
+    expect(legalChoices(request)).toEqual(['move 1', 'move 1 mega']);
+  });
 });

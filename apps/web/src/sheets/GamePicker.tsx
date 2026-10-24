@@ -1,4 +1,4 @@
-// Switches between the daily games (Gen 4 OU, Gen 5 OU). Each keeps its own
+// Switches between the daily games (Gen 4, 5, and 6 OU). Each keeps its own
 // weekly team, tries, and streak; the choice is remembered.
 import type { FormatId } from '@daily-battle/data/formats';
 import clsx from 'clsx';

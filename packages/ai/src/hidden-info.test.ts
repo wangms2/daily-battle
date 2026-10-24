@@ -61,7 +61,7 @@ function record(
 describe('AI hidden information', () => {
   // In Gen 5 the first decision is the lead, made after Team Preview shows the
   // foe's six species but none of their sets.
-  it.each(['gen4ou', 'gen5ou'])(
+  it.each(['gen4ou', 'gen5ou', 'gen6ou'])(
     '%s: chooses identically until the foe reveals something different',
     (format) => {
       const data = setsFor(format);

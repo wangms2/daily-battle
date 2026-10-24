@@ -55,7 +55,20 @@ const WEATHER: Record<string, 'Sand' | 'Rain' | 'Sun' | 'Hail'> = {
   hail: 'Hail',
 };
 
-export function makeField(weather: string, attacker: SideConds, defender: SideConds): Field {
+const TERRAIN: Record<string, 'Electric' | 'Grassy' | 'Misty' | 'Psychic'> = {
+  electricterrain: 'Electric',
+  grassyterrain: 'Grassy',
+  mistyterrain: 'Misty',
+  psychicterrain: 'Psychic',
+};
+
+/** The calc field for one direction of attack. Terrains arrive in Gen 6. */
+export function makeField(
+  weather: string,
+  attacker: SideConds,
+  defender: SideConds,
+  terrain = '',
+): Field {
   const side = (s: SideConds) => ({
     isSR: s.sr,
     spikes: s.spikes,
@@ -64,6 +77,7 @@ export function makeField(weather: string, attacker: SideConds, defender: SideCo
   });
   return new Field({
     weather: WEATHER[weather],
+    ...(TERRAIN[terrain] ? { terrain: TERRAIN[terrain] } : {}),
     attackerSide: side(attacker) as never,
     defenderSide: side(defender) as never,
   });
@@ -129,6 +143,7 @@ const EMPTY_SIDE: SideConds = {
   sr: false,
   spikes: 0,
   tspikes: 0,
+  web: false,
   reflect: false,
   lightScreen: false,
 };
@@ -153,7 +168,7 @@ export function moveInfo(gen: Gen, name: string) {
 const BOOST = [1, 1.5, 2, 2.5, 3, 3.5, 4];
 const boostMult = (stage: number) => (stage >= 0 ? BOOST[stage]! : 1 / BOOST[-stage]!);
 
-/** Effective Speed with the main modifiers (Gens 4–5). */
+/** Effective Speed with the main modifiers (Gens 4–6). */
 export function speed(mon: Pokemon, weather: string): number {
   let spe = mon.rawStats.spe * boostMult(Math.max(-6, Math.min(6, mon.boosts.spe ?? 0)));
   if (mon.hasItem('Choice Scarf')) spe *= 1.5;

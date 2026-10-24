@@ -5,7 +5,8 @@ import { BattleRoute } from './screens/BattleRoute';
 import { DailyBrief } from './screens/DailyBrief';
 import { TeamBuilder } from './screens/TeamBuilder';
 import { AboutSheet } from './sheets/About';
-import { GameNewsSheet, GEN5_NEWS } from './sheets/GameNews';
+import { ALL_NEWS, GEN6_NEWS } from './lib/news';
+import { GameNewsSheet } from './sheets/GameNews';
 import { GamePicker } from './sheets/GamePicker';
 import { SettingsSheet, StatsSheet, WelcomeSheet } from './sheets/misc';
 import { setActiveFormat } from './lib/data';
@@ -24,7 +25,7 @@ import { Button } from './ui/bits';
 import { TopBar } from './ui/TopBar';
 import { VersusRoute } from './versus/VersusRoute';
 
-/** The site's address, with the game for anything but Gen 4 OU (`…/#gen5`). */
+/** The site's address, with the game for anything but Gen 4 OU (`…/#gen5`, `…/#gen6`). */
 const shareUrl = (format: FormatId) =>
   format === DEFAULT_FORMAT
     ? window.location.origin
@@ -51,7 +52,7 @@ function useHashRoute(): [string, (r: string) => void] {
   return [route, (r: string) => (window.location.hash = r)];
 }
 
-/** A share link's `#gen5` (or `#gen4`): the game it was shared from. */
+/** A share link's `#gen5` or `#gen6` (or `#gen4`): the game it was shared from. */
 const formatFromHash = (hash: string): FormatId | undefined =>
   (Object.keys(FORMATS) as FormatId[]).find((f) => f === `${hash}ou`);
 
@@ -319,8 +320,8 @@ export function App() {
           if (!state.settings.format)
             dispatchAny({ type: 'setSetting', key: 'format', value: format });
           dispatchAny({ type: 'markExplainer', id: 'welcome' });
-          // They just picked a game, so the Gen 5 news is old news.
-          dispatchAny({ type: 'markExplainer', id: GEN5_NEWS });
+          // They just picked a game, so the game news is old news.
+          for (const id of ALL_NEWS) dispatchAny({ type: 'markExplainer', id });
         }}
         onAbout={() => setAboutOpen(true)}
       />
@@ -360,13 +361,16 @@ export function App() {
           route !== 'battle' &&
           !versus &&
           settings.shownExplainers.includes('welcome') &&
-          !settings.shownExplainers.includes(GEN5_NEWS)
+          !settings.shownExplainers.includes(GEN6_NEWS)
         }
+        current={game.name}
         onTry={() => {
-          dispatchAny({ type: 'markExplainer', id: GEN5_NEWS });
-          dispatchAny({ type: 'setSetting', key: 'format', value: 'gen5ou' });
+          for (const id of ALL_NEWS) dispatchAny({ type: 'markExplainer', id });
+          dispatchAny({ type: 'setSetting', key: 'format', value: 'gen6ou' });
         }}
-        onStay={() => dispatchAny({ type: 'markExplainer', id: GEN5_NEWS })}
+        onStay={() => {
+          for (const id of ALL_NEWS) dispatchAny({ type: 'markExplainer', id });
+        }}
       />
       <GamePicker
         open={pickerOpen}

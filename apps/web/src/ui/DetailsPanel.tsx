@@ -20,6 +20,7 @@ import { ItemIcon } from './ItemIcon';
 import { StatLines } from './StatLines';
 import { Term } from './DetailCard';
 import { MoveList } from './MoveList';
+import { MegaPreview } from './MegaPreview';
 import { Button, TypeBadge } from './bits';
 
 export function DetailsPanel({
@@ -163,6 +164,7 @@ export function DetailsPanel({
               {set.nature} · {formatEvs(set.evs)}
             </dd>
           </dl>
+          <MegaPreview species={species} set={set} />
         </div>
 
         <StatLines species={species} set={set} compact label="Base and final stats" />

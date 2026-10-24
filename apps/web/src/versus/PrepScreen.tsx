@@ -5,7 +5,7 @@
 import { formatInfo } from '@daily-battle/data/formats';
 import { withChange, type Change, type RoomView } from '@daily-battle/versus';
 import { useState, type ReactNode } from 'react';
-import { findSet, sameSpecies, setActiveFormat } from '../lib/data';
+import { findSet, megaClash, ONE_MEGA_MESSAGE, sameSpecies, setActiveFormat } from '../lib/data';
 import { SetPicker } from '../sheets/SetPicker';
 import { Button, SectionLabel } from '../ui/bits';
 import { StarIcon } from '../ui/icons';
@@ -176,6 +176,13 @@ export function PrepScreen({
             ? team[picking.slot]!.setId
             : undefined
         }
+        // One Mega per team (Gen 6): a second Mega Stone can't come in.
+        blocked={(setId) => {
+          if (!picking) return undefined;
+          const others = team.filter((_, i) => i !== picking.slot);
+          const other = megaClash(others, { species: picking.species, setId });
+          return other && `${ONE_MEGA_MESSAGE} ${other} has the Mega Stone.`;
+        }}
         chooseLabel={
           picking && team[picking.slot]?.species === picking.species ? 'Use this set' : 'Swap in'
         }

@@ -1,6 +1,6 @@
 # Daily Battle — Design Doc
 
-Name: **Daily Battle**, hosted on a subdomain of an existing domain, so the name does not need to be unique or separately registrable. A daily Pokémon battle game built on Gen 4 OU and Gen 5 OU (two daily games, added in that order), inspired by daily-red.com but with competitive Smogon sets, a player-built weekly team, a generated opponent each day, and a realistic ladder-style AI.
+Name: **Daily Battle**, hosted on a subdomain of an existing domain, so the name does not need to be unique or separately registrable. A daily Pokémon battle game built on Gen 4 OU, Gen 5 OU, and Gen 6 OU (three daily games, added in that order), inspired by daily-red.com but with competitive Smogon sets, a player-built weekly team, a generated opponent each day, and a realistic ladder-style AI.
 
 This doc is written to be split into implementation chunks. Section 13 lists milestones with acceptance criteria. Verify package APIs and licenses against current docs before relying on them; names below are from memory.
 
@@ -10,7 +10,7 @@ This doc is written to be split into implementation chunks. Section 13 lists mil
 
 - Each **week**, the player builds a team of 6 from a pool of 12 Pokémon, choosing a set for each. The team is locked for the week.
 - Each **day**, the player faces a generated opponent team. Opponent **species are visible; sets are hidden**.
-- The goal is to win a 6v6 Gen 4 OU battle. No other objective.
+- The goal is to win a 6v6 OU battle in the chosen game (Gen 4, 5, or 6). No other objective.
 - **Unlimited attempts** per day, but the **first attempt is the scored one**: it decides the day's result and the streak. Retries ("run it back") are allowed and still count as clearing the day, but they cannot rescue the streak. Sets are fixed for the day, so retries leak information.
 - **Difficulty target:** about a 50% first-attempt win rate for an average player, and typically 2–3 attempts to clear a day.
 - Once per day, the player may **swap one Pokémon or one set**.
@@ -21,7 +21,7 @@ This doc is written to be split into implementation chunks. Section 13 lists mil
 
 | Area                | Decision                                                                                                                                                                                               |
 | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Format              | Gen 4 OU and Gen 5 OU as two daily games (each its own team, opponents, tries, and streak), singles, 6v6, Showdown mechanics                                                                                                                                                             |
+| Format              | Gen 4 OU, Gen 5 OU, and Gen 6 OU as three daily games (each its own team, opponents, tries, and streak), singles, 6v6, Showdown mechanics. Gen 6 adds one rule of ours: one Mega per team (§19) |
 | Engine              | `@pkmn/sim` (standalone Showdown simulator), self-hosted, no Showdown server                                                                                                                           |
 | Set data            | Smogon data (usage-weighted). 1–4 most common sets per species, weighted by usage                                                                                                                      |
 | Player team         | Weekly. Pick 6 of 12, choose a role-named set for each, lock for the week. Optional suggested teams are a selection, not a default. No lineup ordering; the lead is picked on the daily brief          |
@@ -43,7 +43,7 @@ This doc is written to be split into implementation chunks. Section 13 lists mil
 
 - No accounts, server-side storage, or leaderboards in v1.
 - No multiplayer or PvP in the daily games. Versus rooms with friends are a separate mode (§18).
-- No formats beyond Gen 4 OU and Gen 5 OU for now. The format is a parameter throughout (`packages/data/src/formats.ts`), so another one is mostly data, sets, and a schedule run (§17).
+- No formats beyond Gen 4, 5, and 6 OU for now. The format is a parameter throughout (`packages/data/src/formats.ts`), so another one is mostly data, sets, and a schedule run (§17, §19).
 - No minimizing-turns scoring.
 - No Showdown server, websockets, or ladder integration.
 
@@ -509,7 +509,7 @@ See §14.
 Unofficial fan project, not affiliated with or endorsed by Nintendo, Creatures Inc., GAME FREAK inc., The Pokémon Company, or Smogon. Pokémon, Pokémon character names, and sprites are © Nintendo, Creatures Inc., and GAME FREAK inc.
 
 - Code: `@pkmn/*` packages and Pokémon Showdown code are MIT licensed. Keep license notices as required.
-- The Pokémon Showdown _client_ (`smogon/pokemon-showdown-client`) is AGPL-3.0. Daily Battle uses none of its AGPL code (no CSS, no UI). It does vendor the animation engine's data files, which are separately licensed: the move animations (`battle-animations-moves.ts`, CC0) and the effect table with the shared and status animations (`battle-animations.ts`, MIT), pinned to one client commit and sliced to Gen 1–5 moves by `scripts/anims.ts` (headers kept, in `src/battle/anim/vendor/`). The battle text comes from `@pkmn/view`'s MIT-licensed `LogFormatter`. The backgrounds, hazard sprites, weather overlays, and effect images are from the client's `fx/` folder (`scripts/fx.ts`), which it dedicates to the public domain (CC0) except `icicle.png` and `lightning.png` (GPL/CC-BY-SA, by Clint Bellanger) and `rock1.png`, `rock2.png`, `rocks.png` (GPLv3, by Gilad); those are credited in About, and `bone.png` (no license) isn't shipped: a plain wisp stands in. Everything is self-hosted. The animations are drawn with the Web Animations API by our own scene adapter (`src/battle/anim/scene.ts`): effects are placed in Showdown's scene space and mapped onto our field, anchored on the two sprites, and run synchronously per `move` event; the turn waits for the animation, tap skips it, speed scales it (Fast uses Showdown's quick generic animations), and Animations off or reduced motion draws none. Showdown's CSS-drawn effects (screens, Protect) are not ported.
+- The Pokémon Showdown _client_ (`smogon/pokemon-showdown-client`) is AGPL-3.0. Daily Battle uses none of its AGPL code (no CSS, no UI). It does vendor the animation engine's data files, which are separately licensed: the move animations (`battle-animations-moves.ts`, CC0) and the effect table with the shared and status animations (`battle-animations.ts`, MIT), pinned to one client commit and sliced to Gen 1–6 moves by `scripts/anims.ts` (headers kept, in `src/battle/anim/vendor/`). The battle text comes from `@pkmn/view`'s MIT-licensed `LogFormatter`. The backgrounds, hazard sprites, weather overlays, and effect images are from the client's `fx/` folder (`scripts/fx.ts`), which it dedicates to the public domain (CC0) except `icicle.png` and `lightning.png` (GPL/CC-BY-SA, by Clint Bellanger) and `rock1.png`, `rock2.png`, `rocks.png` (GPLv3, by Gilad); those are credited in About, and `bone.png` (no license) isn't shipped: a plain wisp stands in. Everything is self-hosted. The animations are drawn with the Web Animations API by our own scene adapter (`src/battle/anim/scene.ts`): effects are placed in Showdown's scene space and mapped onto our field, anchored on the two sprites, and run synchronously per `move` event; the turn waits for the animation, tap skips it, speed scales it (Fast uses Showdown's quick generic animations), and Animations off or reduced motion draws none. Showdown's CSS-drawn effects (screens, Protect) are not ported.
 - Data: confirm redistribution terms for Smogon set and usage data; credit Smogon.
 - Sprites: see §12.3a. Credit Nintendo/Game Freak/Creatures and the Smogon sprite community on the credits page.
 - Keep the project free and non-commercial (no ads, paywalls, or merchandise). Revisit this section if that changes.
@@ -588,3 +588,23 @@ A room where friends play live battles against each other, Super Auto Pets style
 | V3    | One live battle between two players in a room: server-side sim, turn timer, disconnect grace, resume                    | Two browsers play a battle to the end (done)                        |
 | V4    | The room loop: pool and build phase, pairing by lives, swap phase, lives, elimination, the AI for odd counts, results   | A room of three plays to a winner (done)                             |
 | V5    | The room drawer, spectating for players out and late joiners (multi-battle grid, reactions), the between-round sequence, elimination and winner screens, an entry from the daily game | A late joiner watches two battles at once on a phone, and an eliminated player watches the next round (done) |
+
+## 19. Gen 6 OU (added Oct 2026)
+
+A third daily game, built in seven phases the same way as Gen 5 (§17). Each phase kept Gen 4's and Gen 5's output byte-for-byte: seed keys, golden fixtures, set ids, schedules, and AI choices. Nothing in `GENERATOR_VERSION` or the AI changed for them; every new rule is gated on Gen 6 data or format.
+
+- **Format.** `gen6ou` in `formats.ts` (Team Preview on). Showdown's Gen 6 OU bans are the validator's: Baton Pass, Swagger, King's Rock, Quick Claw, Razor Fang, Arena Trap, Shadow Tag, and the Uber Megas. Gen 5's team-wide `++` bans don't exist in Gen 6, so Swift Swim and Chlorophyll sets are back. Sleep moves are legal under the sim's Sleep Clause Mod.
+- **Megas in the data** (`gen6ou/`, see `packages/data/README.md`): 106 species and 288 sets. Mega forms aren't species of their own: their sets and usage fold into the base species, with the stone as the set's item and a "Mega …" role label. 26 species have Mega sets (47 sets). A species' tier is the higher of its base and Mega tiers (Mega Venusaur makes Venusaur OU), and its usage is base plus Megas. A species keeps only its viable sets, so Pidgeot is Mega-only with one set; the 2–4 target is relaxed for Mega species. `species.json` records each Mega's forme, stone, types, stats, ability, and tier.
+- **One Mega per team** (our rule; Showdown has none). `oneMegaProblem` in `@daily-battle/data/species` is the one check, used by the sim bridge's `teamProblems`, the opponent generator (redraws a team with two stones), the pipeline's sampled teams, the team builder and the daily swap (blocked with "Only one Mega per team."), and tests.
+- **Pools** always offer at least one Mega species, and at least five that don't need one. Type-coverage checks count a Mega set's typing.
+- **Sim bridge.** With a Mega available, `legalChoices` adds `move N mega` for each move. A foe's stone stays hidden until it Mega Evolves (tested).
+- **AI.** Mega Evolution is a scored choice: the move's score in Mega form plus a preset bonus for keeping the boost all battle, sampled with the usual noise. It moves at its old Speed on the turn it Mega Evolves. Pokémon are tracked by base species; a revealed Mega narrows the foe's sets to that stone, and once one foe has Mega Evolved, no other is assumed to. Damage is calculated in Mega form when a Pokémon has Mega Evolved or is assumed able to, and leads are rated the same way. Gen 6 mechanics it scores: Sticky Web, Defog clearing both sides, terrains, 5-turn ability weather, Sleep Clause, Grass types ignoring powder, Electric types immune to paralysis, and Gale Wings and Prankster priority. Fairy, Assault Vest, and the damage changes come from `@smogon/calc`; trapping (Ghosts escape it from Gen 6) comes from the sim's own legal choices.
+- **Schedules** live in `schedule/gen6ou/` and `reports/gen6ou/`, built with `schedule --format gen6ou` from 2026-10-19. The player bots Mega Evolve too, and the archetypes know Assault Vest, Weakness Policy, Geomancy, and Sticky Web.
+- **Web.**
+  - **Font:** Nunito 700 (`@fontsource/nunito`, OFL), a clean rounded face close to X/Y's battle text, for Gen 6 only (`[data-gen='6']`).
+  - **Sprites:** the shared battle sprites were already Showdown's animated 3D (X/Y model) sprites, placed Showdown's way, so Gen 6 needed no separate folder: `scripts/sprites.ts` added the new species and every Mega forme.
+  - **Backgrounds:** Showdown's Gen 6 backdrops aren't in its client repo and aren't CC0, so Gen 6 uses the CC0 Gen 5 set, picked by its own hash.
+  - **Battle:** a Mega toggle above the moves (keyboard-reachable, disabled once used), the Mega sprite swap and Showdown's Mega Evolution animation, a Mega badge on the stat bar, Sticky Web on the ground, Grassy and Misty Terrain overlays, Fairy's type color, move animations through Gen 6, and first-time explainers for Mega Evolution, Sticky Web, and terrains.
+  - **Hidden info:** foe Megas stay hidden, as on Showdown. With Beginner hints on, the brief, popover, and info sheet say "Can Mega Evolve" for foes with Mega sets. Usage is never shown.
+  - **Builder:** a Mega set previews its Mega (sprite, typing, ability, stats) next to the base form, and the team checklist uses Mega typing.
+  - **News:** players from before Gen 6 see "New: Gen 6 OU" once (`gen6-news`), with Try or Stay; a player who missed the Gen 5 sheet sees only this one. The welcome sheet offers all three games. `#gen6` links open it. Saves need no new version: a missing game is added empty on load.

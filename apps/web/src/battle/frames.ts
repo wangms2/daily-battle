@@ -4,7 +4,10 @@
 export type Who = 'you' | 'foe';
 
 export interface MonView {
+  /** The species as it looks now: a Mega forme once it has Mega Evolved. */
   species: string;
+  /** The team species (Charizard) when `species` is its Mega forme (Charizard-Mega-X). */
+  base?: string;
   /** HP as a percentage, 0–100. */
   hp: number;
   /** Exact HP, only for your own Pokémon. */
@@ -22,6 +25,8 @@ export interface SideConds {
   tspikes: number;
   reflect: boolean;
   lightScreen: boolean;
+  /** Sticky Web (Gen 6 on). */
+  web?: boolean;
 }
 
 /** One of a side's six team marks under its HP bar. */
@@ -47,7 +52,9 @@ export interface View {
   foeSide: SideConds;
   /** 'Sandstorm' | 'RainDance' | 'SunnyDay' | 'Hail' | '' */
   weather: string;
-  /** Revealed info for each foe Pokémon seen so far, by species. */
+  /** 'Electric Terrain' | 'Grassy Terrain' | 'Misty Terrain' (Gen 6 on), or unset. */
+  terrain?: string;
+  /** Revealed info for each foe Pokémon seen so far, by team species (Charizard, not its Mega). */
   revealed: Record<string, Revealed>;
   /** Six marks per side: your team in order, then the foe's revealed Pokémon and unrevealed balls. */
   yourTeam: TeamMark[];
@@ -68,6 +75,7 @@ export type EventKind =
   | 'crit'
   | 'miss'
   | 'turn'
+  | 'mega'
   | 'end';
 
 export interface Frame {
@@ -116,6 +124,8 @@ export interface MoveOption {
 export interface TeamMember {
   slot: number;
   species: string;
+  /** Its Mega forme, once it has Mega Evolved. */
+  forme?: string;
   hp: number;
   hpExact: { hp: number; max: number };
   status: string;
@@ -135,6 +145,8 @@ export interface Controls {
   switches: { choice: string; slot: number }[];
   /** The only legal choice, if there is exactly one. You still make it yourself (a locked move, your last Pokémon). */
   only: string | null;
+  /** The active Pokémon can Mega Evolve this turn: each move also has a `move N mega` choice. */
+  canMega?: boolean;
 }
 
 export interface TurnPackage {
