@@ -41,12 +41,27 @@ export function verifyPool(pool: WeeklyPool, data: SetsFile, majorTypes: string[
     problems.push('too many top-tier');
   }
 
-  const dex = Dex.forGen(genOf(data.meta.format));
+  const gen = genOf(data.meta.format);
+  const dex = Dex.forGen(gen);
+  // Mega Stones name the Megas they make, keyed by the species that holds them.
+  const megaOf = (s: string, set: SetEntry) => dex.items.get(set.item).megaStone?.[s];
+  if (
+    gen >= 6 &&
+    !anySet((set) => Object.keys(dex.items.get(set.item).megaStone ?? {}).length > 0).length
+  ) {
+    problems.push('no Mega species');
+  }
   for (const type of majorTypes) {
     const checked = species.some((s) => {
-      const types = dex.species.get(s).types;
-      const immune = !dex.getImmunity(type, types);
-      const resists = dex.getEffectiveness(type, types) < 0;
+      const typings = [
+        dex.species.get(s).types,
+        ...allSets(s).flatMap((set) => {
+          const mega = megaOf(s, set);
+          return mega ? [dex.species.get(mega).types] : [];
+        }),
+      ];
+      const immune = typings.some((types) => !dex.getImmunity(type, types));
+      const resists = typings.some((types) => dex.getEffectiveness(type, types) < 0);
       const ability = allSets(s).some(
         (set) =>
           (set.ability === 'Levitate' && type === 'Ground') ||
@@ -80,5 +95,8 @@ export function verifyOpponent(opponent: DailyOpponent, data: SetsFile): string[
     problems.push('too many hazard setters');
   }
   if (!['offense', 'balance', 'stall'].includes(opponent.style)) problems.push('bad style');
+  const dex = Dex.forGen(genOf(data.meta.format));
+  const megas = sets.filter((s) => dex.items.get(s.item).megaStone).length;
+  if (megas > 1) problems.push(`${megas} Mega Stones`);
   return problems;
 }

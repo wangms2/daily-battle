@@ -66,7 +66,26 @@ const IMMUNITY_ABILITIES: Record<string, string> = {
   'Motor Drive': 'Electric',
 };
 
-/** True if the species resists or is immune to `type` (by typing, or the ability its sets use). */
+/** The Mega form a set's item makes its species into, if it holds that species' Mega Stone (Gen 6 on). */
+export function megaForme(species: string, set: SetEntry, gen: number): string | undefined {
+  const dex = Dex.forGen(gen);
+  return dex.items.get(set.item).megaStone?.[dex.species.get(species).baseSpecies];
+}
+
+/** True if a set Mega Evolves. */
+export const isMegaSet = (species: string, set: SetEntry, gen: number): boolean =>
+  !!megaForme(species, set, gen);
+
+/** The typing a set battles with: its Mega's once it Mega Evolves. */
+export function battleTypes(species: string, set: SetEntry, gen: number): string[] {
+  const dex = Dex.forGen(gen);
+  return [...dex.species.get(megaForme(species, set, gen) ?? species).types];
+}
+
+/**
+ * True if the species resists or is immune to `type` (by typing, or the
+ * ability its sets use). A species with a Mega set also counts its Mega's typing.
+ */
 export function checksType(
   species: string,
   entry: { sets: SetEntry[] },
@@ -75,14 +94,21 @@ export function checksType(
 ): boolean {
   if (entry.sets.some((s) => IMMUNITY_ABILITIES[s.ability] === type)) return true;
   const dex = Dex.forGen(gen);
-  const { types } = dex.species.get(species);
-  return !dex.getImmunity(type, types) || dex.getEffectiveness(type, types) < 0;
+  const typings = [
+    dex.species.get(species).types,
+    ...entry.sets.flatMap((s) =>
+      isMegaSet(species, s, gen) ? [battleTypes(species, s, gen)] : [],
+    ),
+  ];
+  return typings.some(
+    (types) => !dex.getImmunity(type, types) || dex.getEffectiveness(type, types) < 0,
+  );
 }
 
-/** Types of a set's damaging same-type (STAB) moves. */
+/** Types of a set's damaging same-type (STAB) moves, with its Mega's typing if it has one. */
 export function stabTypes(species: string, set: SetEntry, gen: number): string[] {
   const dex = Dex.forGen(gen);
-  const { types } = dex.species.get(species);
+  const types = battleTypes(species, set, gen);
   const out = new Set<string>();
   for (const name of set.moves) {
     const move = dex.moves.get(name);
