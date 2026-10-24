@@ -184,3 +184,22 @@ test('a long set description floats over the card on tap, and nothing scrolls', 
   await noScroll(page, 'set view with the full description');
   await shot(page, '08-description-open', info.project.name);
 });
+
+test('the one-per-team message is shown in full, and a tap dismisses it', async ({ page }) => {
+  await open(page, state());
+  await page.getByRole('button', { name: 'Add Rotom-Frost to team' }).click();
+  // Narrow layouts ask for the set first; wide ones add it straight away.
+  const confirm = page.getByRole('button', { name: 'Add Rotom-Frost', exact: true });
+  if (await confirm.isVisible({ timeout: 1000 }).catch(() => false)) await confirm.click();
+  await page.getByRole('button', { name: /^Rotom-Wash: one per team with Rotom-Frost/ }).click();
+  const note = page.getByRole('status').filter({ hasText: 'One per team' });
+  await expect(note).toBeVisible();
+  const fits = await note.evaluate((el) => {
+    const t = el.querySelector('span')!;
+    return t.scrollWidth <= t.clientWidth + 1 && t.scrollHeight <= t.clientHeight + 1;
+  });
+  expect(fits, 'the whole message is visible, not cut off').toBe(true);
+  await noScroll(page, 'builder with the one-per-team message');
+  await note.click();
+  await expect(note).toHaveCount(0);
+});

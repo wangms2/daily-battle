@@ -84,7 +84,8 @@ export function TeamBuilder({
   // The undo offer lasts a few seconds, and any manual edit makes it stale.
   useEffect(() => {
     if (!snack) return;
-    const id = setTimeout(() => setSnack(null), 5000);
+    // A rule explanation stays long enough to read in full.
+    const id = setTimeout(() => setSnack(null), snack.undo ? 5000 : 8000);
     return () => clearTimeout(id);
   }, [snack]);
 
@@ -135,10 +136,20 @@ export function TeamBuilder({
       {snack ? (
         <div
           role="status"
+          // Tap to dismiss; a rule message wraps to two lines instead of being cut off.
+          onClick={snack.undo ? undefined : () => setSnack(null)}
           className="flex h-10 items-center gap-2 rounded-chip bg-accent-soft px-4"
         >
           {snack.undo && <CheckIcon width={16} height={16} className="text-soft-ink" />}
-          <span className="min-w-0 flex-1 truncate text-[14px] font-semibold">{snack.message}</span>
+          <span
+            className={
+              snack.undo
+                ? 'min-w-0 flex-1 truncate text-[14px] font-semibold'
+                : 'min-w-0 flex-1 text-[13px] leading-4 font-semibold'
+            }
+          >
+            {snack.message}
+          </span>
           {snack.undo && (
             <button
               type="button"
