@@ -422,6 +422,12 @@ export function TeamBuilder({
             : undefined
         }
         chooseLabel={picker?.adding ? `Add ${picker.species}` : 'Use this set'}
+        // One Mega per team: a second Mega Stone set can't be chosen.
+        blocked={(setId) => {
+          if (!picker) return undefined;
+          const other = megaClash(team, { species: picker.species, setId });
+          return other && `${ONE_MEGA_MESSAGE} ${other} has the Mega Stone.`;
+        }}
         onChoose={(setId) => {
           if (!picker) return;
           if (picker.adding) add(picker.species, setId);
