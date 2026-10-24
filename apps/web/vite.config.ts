@@ -32,9 +32,17 @@ function siteHeaders(): Record<string, string> {
   return headers;
 }
 
+/**
+ * Versus rooms live on the Worker (apps/server). In dev and preview, /api goes
+ * to `wrangler dev` on its default port, sockets included, so the page and the
+ * rooms share an origin as they do when deployed.
+ */
+const api = { '/api': { target: 'http://localhost:8787', ws: true } };
+
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  preview: { headers: siteHeaders() },
+  server: { proxy: api },
+  preview: { headers: siteHeaders(), proxy: api },
   build: {
     // The simulator chunk (~6 MB) only loads if a published schedule is missing.
     chunkSizeWarningLimit: 7000,

@@ -557,13 +557,16 @@ A room where friends play live battles against each other, Super Auto Pets style
 - **Client.** `SidePresenter` turns one side's updates into the battle screen's frames, team, and controls. The daily engine uses it for p1 in the worker; a versus battle uses it for whichever side you are, fed from the websocket. The battle screen doesn't know which.
 - **Resume.** The room stores each battle's seed and both sides' choices, and rebuilds the battle by replaying them when the object restarts (the §7 design, on the server).
 - **Daily mode is unaffected.** The daily games stay client-side and work without the server.
+- **Rooms (V2).** `POST /api/rooms` picks a free code (5 letters from 20 consonants, so no words and no I/O look-alikes) and sets up that code's Durable Object; `GET /api/rooms/CODE/socket` is the room's websocket. Both refuse requests whose `Origin` isn't the site. The room's rules are pure functions in `packages/versus` (join, leave, host-only settings, team sizes, removal), and the Durable Object (`apps/server`) applies them and broadcasts the room to everyone in it. Up to 8 players, with unique names of 1–16 characters. The first to join is the host; when the host leaves, the next to have joined takes over. A room nobody has been connected to for 24 hours is deleted.
+- **Seats.** Joining returns a token, kept in localStorage (`daily-battle:versus`, apart from the daily save) with the name you play under. A reload or a dropped connection rejoins with it, retrying with backoff, so you keep your seat; the lobby shows who's away. Opening the room in a second tab moves you there. A removed player's token stops working, and they can join again as a new player.
+- **Entry.** Until rooms can play (V4), versus is reached only at `#versus` (and invite links, `#versus/CODE`); nothing in the daily game links to it yet.
 
 ### 18.4 Phases
 
 | Phase | What                                                                                                                   | Done when                                                           |
 | ----- | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | V1    | Split the frame building out of `BattleEngine` into `SidePresenter`, working from either side                          | Daily battles unchanged; tests drive a battle from both sides (done) |
-| V2    | Worker, room Durable Object, websocket protocol, lobby (create, join, settings), reconnect tokens                       | Friends can join a room and see each other                          |
+| V2    | Worker, room Durable Object, websocket protocol, lobby (create, join, settings), reconnect tokens                       | Friends can join a room and see each other (done)                   |
 | V3    | One live battle between two players in a room: server-side sim, turn timer, disconnect grace, resume                    | Two browsers play a battle to the end                               |
 | V4    | The room loop: pool and build phase, pairing, swap phase, lives, elimination, the AI for odd counts, results            | A room of three plays to a winner                                    |
 | V5    | Handicaps, spectating, a share card                                                                                     |                                                                     |

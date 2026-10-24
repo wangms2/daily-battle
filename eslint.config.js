@@ -5,7 +5,7 @@ import reactRefresh from 'eslint-plugin-react-refresh';
 import globals from 'globals';
 
 export default tseslint.config(
-  { ignores: ['**/dist/**', '**/coverage/**', '**/anim/vendor/**'] },
+  { ignores: ['**/dist/**', '**/coverage/**', '**/anim/vendor/**', '**/.wrangler/**'] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
