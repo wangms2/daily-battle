@@ -226,9 +226,18 @@ importers:
 
   apps/server:
     dependencies:
+      '@daily-battle/data':
+        specifier: workspace:*
+        version: link:../../packages/data
+      '@daily-battle/sim-bridge':
+        specifier: workspace:*
+        version: link:../../packages/sim-bridge
       '@daily-battle/versus':
         specifier: workspace:*
         version: link:../../packages/versus
+      '@pkmn/sim':
+        specifier: 'catalog:'
+        version: 0.10.11
     devDependencies:
       '@cloudflare/workers-types':
         specifier: 5.20261004.1
@@ -434,6 +443,10 @@ importers:
       '@daily-battle/data':
         specifier: workspace:*
         version: link:../data
+    devDependencies:
+      '@pkmn/sim':
+        specifier: 'catalog:'
+        version: 0.10.11
 
 packages:
 
