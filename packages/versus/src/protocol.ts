@@ -11,17 +11,24 @@ import {
   type RoomView,
   type TeamSize,
 } from './room';
-import type { MatchView, Side } from './match';
+import type { Change, MatchView, Side, Slot } from './match';
 
 export type ClientMessage =
   /** The first message on a socket: a new player, or one coming back with their token. */
   | { type: 'join'; name: string }
   | { type: 'rejoin'; token: string }
   | RoomCommand
-  /** The host starts a round. */
+  /** The host: draw another random pool, start a game, or play again after one. */
+  | { type: 'redraw' }
   | { type: 'start' }
-  /** In your battle: pick your lead, make a choice (`move 2`, `switch 4`), or give up. */
+  | { type: 'playAgain' }
+  /** Your team, built from the pool. */
+  | { type: 'team'; team: Slot[] }
+  /** Before your battle: your one change (or none), your lead, and that you're ready. */
+  | { type: 'change'; change: Change | null }
   | { type: 'lead'; species: string }
+  | { type: 'ready' }
+  /** In your battle: make a choice (`move 2`, `switch 4`), or give up. */
   | { type: 'choose'; choice: string }
   | { type: 'forfeit' };
 
@@ -44,6 +51,8 @@ export type ServerMessage =
   /** You're in: your id, the token to rejoin with, and the room. */
   | { type: 'welcome'; you: string; token: string; room: RoomView }
   | { type: 'room'; room: RoomView }
+  /** Your own team (null before you've built one). */
+  | { type: 'team'; team: Slot[] | null }
   /** Your battle this round (null when you have none). */
   | { type: 'match'; match: MatchView | null }
   /** Battle lines for your side; `resync` when it's the whole battle so far, after a reconnect. */
@@ -69,6 +78,15 @@ export const MESSAGE_MAX = 2048;
 
 /** The choices a player makes in singles: one of four moves, or a switch to one of six. */
 const CHOICE = /^(move [1-4]|switch [1-6])$/;
+
+const isName = (v: unknown): v is string => typeof v === 'string' && v.length > 0 && v.length <= 64;
+
+/** A team slot from the network: a species and a set id. */
+function slotOf(v: unknown): Slot | null {
+  return isRecord(v) && isName(v.species) && isName(v.setId)
+    ? { species: v.species, setId: v.setId }
+    : null;
+}
 
 const isId = (v: unknown): v is string => typeof v === 'string' && v.length > 0 && v.length <= 64;
 
@@ -102,13 +120,28 @@ export function parseClientMessage(raw: unknown): ClientMessage | null {
     case 'leave':
       return { type: 'leave' };
     case 'start':
-      return { type: 'start' };
+    case 'redraw':
+    case 'playAgain':
+    case 'ready':
+      return { type: msg.type };
+    case 'team': {
+      if (!Array.isArray(msg.team) || msg.team.length < 1 || msg.team.length > 6) return null;
+      const team = msg.team.map(slotOf);
+      return team.every(Boolean) ? { type: 'team', team: team as Slot[] } : null;
+    }
+    case 'change': {
+      if (msg.change === null) return { type: 'change', change: null };
+      if (!isRecord(msg.change)) return null;
+      const { slot } = msg.change;
+      const to = slotOf(msg.change.to);
+      return Number.isInteger(slot) && (slot as number) >= 0 && (slot as number) < 6 && to
+        ? { type: 'change', change: { slot: slot as number, to } }
+        : null;
+    }
     case 'forfeit':
       return { type: 'forfeit' };
     case 'lead':
-      return typeof msg.species === 'string' && msg.species.length <= 64
-        ? { type: 'lead', species: msg.species }
-        : null;
+      return isName(msg.species) ? { type: 'lead', species: msg.species } : null;
     case 'choose':
       return typeof msg.choice === 'string' && CHOICE.test(msg.choice)
         ? { type: 'choose', choice: msg.choice }

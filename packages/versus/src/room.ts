@@ -1,8 +1,9 @@
 // A versus room's rules, as pure functions over plain state (DESIGN.md §18).
 // The room server holds the state and applies messages through these; the
-// client only ever sees `roomView`, which leaves out every player's token.
+// client only ever sees `roomView`, which leaves out every player's token and
+// team. The game itself (build, rounds, lives) is in game.ts.
 import { DEFAULT_FORMAT, FORMATS, type FormatId } from '@daily-battle/data/formats';
-import type { Match, MatchEnd, Side } from './match';
+import type { Match, MatchEnd, Side, Slot } from './match';
 
 export const MAX_PLAYERS = 8;
 export const NAME_MAX = 16;
@@ -25,6 +26,8 @@ export interface RoomSettings {
   timer: TimerId;
   /** A new random pool for the room, or this week's daily pool for the game. */
   pool: 'random' | 'weekly';
+  /** The host's week (its Monday, `YYYY-MM-DD`), for this week's pool. */
+  week?: string;
 }
 
 export const DEFAULT_SETTINGS: RoomSettings = {
@@ -34,6 +37,15 @@ export const DEFAULT_SETTINGS: RoomSettings = {
   pool: 'random',
 };
 
+/** The 12 Pokémon everyone builds from, and where they came from. */
+export interface Pool {
+  species: string[];
+  source: 'random' | 'weekly';
+  /** Which random draw (the host can redraw). */
+  draw: number;
+  week?: string;
+}
+
 export interface Player {
   id: string;
   name: string;
@@ -41,6 +53,22 @@ export interface Player {
   token: string;
   /** A handicap: how many Pokémon this player brings. */
   teamSize: TeamSize;
+  /** Lives left in this game. */
+  lives: number;
+  /** Built from the pool; each round's change stays on it. Null until built. */
+  team: Slot[] | null;
+  /** Final placement (1 for the winner), once it's known. */
+  place: number | null;
+  /** The round they went out in. */
+  outRound: number | null;
+  /** Left mid-game: kept for the standings, out at the end of the round. */
+  left: boolean;
+  wins: number;
+  losses: number;
+  /** Last round's opponent, so pairing avoids a rematch. */
+  lastOpponent: string | null;
+  /** Rounds played against the AI, so the odd one out rotates. */
+  aiRounds: number;
 }
 
 /** How a finished battle went, by name (players may have left since). */
@@ -51,40 +79,72 @@ export interface MatchSummary {
   reason: MatchEnd;
 }
 
+/** A pairing for a round; `p2` may be the AI. */
+export interface Pairing {
+  p1: string;
+  p2: string;
+}
+
+/** Bumped when the stored shape of a room changes; older rooms start over in the lobby. */
+export const ROOM_VERSION = 4;
+
 export interface RoomState {
+  version: number;
   code: string;
   createdAt: number;
-  /** In the lobby between rounds, or playing a round's battles. */
-  phase: 'lobby' | 'playing';
+  /**
+   * The lobby, building teams, a round's battles, the break between rounds,
+   * or the end of a game.
+   */
+  phase: 'lobby' | 'build' | 'playing' | 'intermission' | 'over';
   /** The first player to join; passes to the next when the host leaves. */
   hostId: string | null;
   players: Player[];
   settings: RoomSettings;
+  pool: Pool | null;
+  /** When the build or the break between rounds ends. */
+  deadline: number | null;
   /** Rounds played so far, counting the one in progress. */
   round: number;
-  /** This round's battles (empty in the lobby). */
+  /** This round's battles. */
   matches: Match[];
-  /** Who sits this round out, with an odd number of players. */
-  sittingOut: string | null;
-  /** How the last finished round went. */
-  lastRound: { round: number; matches: MatchSummary[]; sittingOut: string | null } | null;
+  /** The next round's pairings, shown during the break. */
+  next: Pairing[];
+  /** How the last finished round went, and who went out in it. */
+  lastRound: { round: number; matches: MatchSummary[]; out: string[] } | null;
 }
 
-/** What every player sees of the room: who plays whom, never teams. */
+/** What every player sees of the room: who plays whom and who's in, never teams. */
 export interface RoomView {
   code: string;
   phase: RoomState['phase'];
   hostId: string | null;
-  players: { id: string; name: string; teamSize: TeamSize; online: boolean }[];
+  players: {
+    id: string;
+    name: string;
+    teamSize: TeamSize;
+    online: boolean;
+    lives: number;
+    built: boolean;
+    place: number | null;
+    outRound: number | null;
+    left: boolean;
+    wins: number;
+    losses: number;
+  }[];
   settings: RoomSettings;
+  pool: Pool | null;
+  /** Time left in the build or the break; null otherwise. */
+  timeLeftMs: number | null;
   round: number;
   matches: {
     id: string;
     players: Record<Side, string>;
+    names: Record<Side, string>;
     stage: Match['stage'];
     winner: Side | null;
   }[];
-  sittingOut: string | null;
+  next: Pairing[];
   lastRound: RoomState['lastRound'];
 }
 
@@ -99,6 +159,8 @@ export type ErrorCode =
   | 'notJoined'
   | 'notEnough'
   | 'notYourTurn'
+  | 'badTeam'
+  | 'noPool'
   | 'badMessage';
 
 export const ERROR_TEXT: Record<ErrorCode, string> = {
@@ -112,6 +174,8 @@ export const ERROR_TEXT: Record<ErrorCode, string> = {
   notJoined: 'Join the room first.',
   notEnough: 'You need at least two players to start.',
   notYourTurn: 'That choice isn’t available right now.',
+  badTeam: 'That team isn’t allowed. Check it and try again.',
+  noPool: 'There’s no pool for that week. The room keeps a random pool.',
   badMessage: 'Something went wrong. Try reloading.',
 };
 
@@ -137,16 +201,39 @@ export function normalizeCode(input: string): string | null {
 
 export function createRoom(code: string, now: number): RoomState {
   return {
+    version: ROOM_VERSION,
     code,
     createdAt: now,
     phase: 'lobby',
     hostId: null,
     players: [],
     settings: { ...DEFAULT_SETTINGS },
+    pool: null,
+    deadline: null,
     round: 0,
     matches: [],
-    sittingOut: null,
+    next: [],
     lastRound: null,
+  };
+}
+
+/**
+ * A room saved by an older version of the server: back to the lobby with its
+ * code, its players (and their seats), and its settings; any game is dropped.
+ */
+export function upgradeRoom(saved: RoomState): RoomState {
+  if (saved.version === ROOM_VERSION) return saved;
+  const old = saved as Partial<RoomState> & Pick<RoomState, 'code' | 'createdAt' | 'players'>;
+  const room = createRoom(old.code, old.createdAt);
+  const settings = { ...room.settings, ...old.settings };
+  return {
+    ...room,
+    hostId: old.hostId ?? old.players[0]?.id ?? null,
+    settings,
+    pool: old.pool ?? null,
+    players: old.players.map((p) =>
+      freshPlayer({ ...p, teamSize: p.teamSize ?? 6 }, settings.lives),
+    ),
   };
 }
 
@@ -160,9 +247,29 @@ export function cleanName(input: string): string | null {
 
 export type Result = { ok: true; state: RoomState } | { ok: false; error: ErrorCode };
 
-const fail = (error: ErrorCode): Result => ({ ok: false, error });
+export const fail = (error: ErrorCode): Result => ({ ok: false, error });
 
-/** Adds a player. The first one in becomes the host. */
+/** A player as they start a game (or wait in the lobby for one). */
+export const freshPlayer = (
+  p: Pick<Player, 'id' | 'name' | 'token' | 'teamSize'>,
+  lives: number,
+): Player => ({
+  id: p.id,
+  name: p.name,
+  token: p.token,
+  teamSize: p.teamSize,
+  lives,
+  team: null,
+  place: null,
+  outRound: null,
+  left: false,
+  wins: 0,
+  losses: 0,
+  lastOpponent: null,
+  aiRounds: 0,
+});
+
+/** Adds a player. The first one in becomes the host. Joining is for the lobby only. */
 export function joinRoom(
   state: RoomState,
   input: { id: string; name: string; token: string },
@@ -174,7 +281,7 @@ export function joinRoom(
   if (state.players.some((p) => p.name.toLowerCase() === name.toLowerCase())) {
     return fail('nameTaken');
   }
-  const player: Player = { id: input.id, name, token: input.token, teamSize: 6 };
+  const player = freshPlayer({ ...input, name, teamSize: 6 }, state.settings.lives);
   return {
     ok: true,
     state: { ...state, hostId: state.hostId ?? player.id, players: [...state.players, player] },
@@ -184,10 +291,22 @@ export function joinRoom(
 export const playerByToken = (state: RoomState, token: string): Player | undefined =>
   state.players.find((p) => p.token === token);
 
-/** Removes a player; the host passes to whoever joined next. */
+/** Players still in the game: they have lives and haven't left. */
+export const alive = (state: RoomState): Player[] =>
+  state.players.filter((p) => p.lives > 0 && !p.left);
+
+/**
+ * Takes a player out of the room. In the lobby they're gone; mid-game they
+ * stay in the standings, with no lives left (the room server forfeits their
+ * battle first). The host passes to the next player still here.
+ */
 export function removePlayer(state: RoomState, id: string): RoomState {
-  const players = state.players.filter((p) => p.id !== id);
-  const hostId = state.hostId === id ? (players[0]?.id ?? null) : state.hostId;
+  const players =
+    state.phase === 'lobby'
+      ? state.players.filter((p) => p.id !== id)
+      : state.players.map((p) => (p.id === id ? { ...p, left: true, lives: 0 } : p));
+  const here = players.filter((p) => p.id !== id && !p.left);
+  const hostId = state.hostId === id ? (here[0]?.id ?? null) : state.hostId;
   return { ...state, players, hostId };
 }
 
@@ -203,14 +322,14 @@ export function applyCommand(state: RoomState, by: string, command: RoomCommand)
   if (!state.players.some((p) => p.id === by)) return fail('notJoined');
   if (command.type === 'leave') return { ok: true, state: removePlayer(state, by) };
   if (state.hostId !== by) return fail('notHost');
-  // Removing works mid-round too (the room server forfeits their battle first).
+  // Removing works mid-game too (the room server forfeits their battle first).
   if (command.type !== 'kick' && state.phase !== 'lobby') return fail('started');
   switch (command.type) {
-    case 'settings':
-      return {
-        ok: true,
-        state: { ...state, settings: { ...state.settings, ...command.settings } },
-      };
+    case 'settings': {
+      const settings = { ...state.settings, ...command.settings };
+      const players = state.players.map((p) => ({ ...p, lives: settings.lives }));
+      return { ok: true, state: { ...state, settings, players } };
+    }
     case 'teamSize': {
       if (!state.players.some((p) => p.id === command.player)) return fail('badMessage');
       const players = state.players.map((p) =>
@@ -220,12 +339,14 @@ export function applyCommand(state: RoomState, by: string, command: RoomCommand)
     }
     case 'kick':
       // The host leaves with "leave", not by kicking themselves.
-      if (command.player === by) return fail('badMessage');
+      if (command.player === by || !state.players.some((p) => p.id === command.player)) {
+        return fail('badMessage');
+      }
       return { ok: true, state: removePlayer(state, command.player) };
   }
 }
 
-export function roomView(state: RoomState, online: ReadonlySet<string>): RoomView {
+export function roomView(state: RoomState, online: ReadonlySet<string>, now: number): RoomView {
   return {
     code: state.code,
     phase: state.phase,
@@ -235,63 +356,41 @@ export function roomView(state: RoomState, online: ReadonlySet<string>): RoomVie
       name: p.name,
       teamSize: p.teamSize,
       online: online.has(p.id),
+      lives: p.lives,
+      built: !!p.team,
+      place: p.place,
+      outRound: p.outRound,
+      left: p.left,
+      wins: p.wins,
+      losses: p.losses,
     })),
     settings: state.settings,
+    pool: state.pool,
+    timeLeftMs: state.deadline === null ? null : Math.max(0, state.deadline - now),
     round: state.round,
     matches: state.matches.map((m) => ({
       id: m.id,
       players: m.players,
+      names: m.names,
       stage: m.stage,
       winner: m.result?.winner ?? null,
     })),
-    sittingOut: state.sittingOut,
+    next: state.next,
     lastRound: state.lastRound,
   };
-}
-
-/** Why `by` can't start a round now, or null if they can. */
-export function cannotStart(state: RoomState, by: string): ErrorCode | null {
-  if (!state.players.some((p) => p.id === by)) return 'notJoined';
-  if (state.hostId !== by) return 'notHost';
-  if (state.phase !== 'lobby') return 'started';
-  if (state.players.length < 2) return 'notEnough';
-  return null;
-}
-
-/** Starts a round with its battles, already paired and dealt. */
-export function startRound(
-  state: RoomState,
-  matches: Match[],
-  sittingOut: string | null,
-): RoomState {
-  return { ...state, phase: 'playing', round: state.round + 1, matches, sittingOut };
 }
 
 /** The player's battle this round, if they have one. */
 export const matchOf = (state: RoomState, player: string): Match | undefined =>
   state.matches.find((m) => m.players.p1 === player || m.players.p2 === player);
 
-/** Puts back an updated battle; once every battle is over, the room returns to the lobby. */
-export function putMatch(state: RoomState, match: Match): RoomState {
-  const matches = state.matches.map((m) => (m.id === match.id ? match : m));
-  if (matches.some((m) => m.stage !== 'over')) return { ...state, matches };
-  return {
-    ...state,
-    phase: 'lobby',
-    matches: [],
-    sittingOut: null,
-    lastRound: {
-      round: state.round,
-      sittingOut: state.sittingOut,
-      matches: matches.map((m) => ({
-        names: m.names,
-        players: m.players,
-        winner: m.result?.winner ?? null,
-        reason: m.result?.reason ?? 'tie',
-      })),
-    },
-  };
-}
+/** Puts back an updated battle. */
+export const putMatch = (state: RoomState, match: Match): RoomState => ({
+  ...state,
+  matches: state.matches.map((m) => (m.id === match.id ? match : m)),
+});
+
+const WEEK = /^\d{4}-\d{2}-\d{2}$/;
 
 /** Checks a partial settings object from the network; null if any field is invalid. */
 export function validSettings(input: unknown): Partial<RoomSettings> | null {
@@ -311,6 +410,8 @@ export function validSettings(input: unknown): Partial<RoomSettings> | null {
       out.timer = value as TimerId;
     } else if (key === 'pool' && (value === 'random' || value === 'weekly')) {
       out.pool = value;
+    } else if (key === 'week' && typeof value === 'string' && WEEK.test(value)) {
+      out.week = value;
     } else {
       return null;
     }
