@@ -5,7 +5,9 @@
 // the curated sets data.pkmn.cc serves, and pkmn's processed copy of Smogon's
 // latest monthly stats (shares rather than counts, converted below). Use it
 // where data.pkmn.cc or smogon.com can't be reached, with `--month` set to the
-// month of the repo's latest "Stats (YYYY-MM)" commit.
+// month of the repo's latest "Stats (YYYY-MM)" commit. The mirror carries
+// pkmn's pick of the month's stats for the format (not the 1500 file, and it
+// doesn't say which cutoff), so the cutoff is recorded as unknown.
 import { writeFileSync } from 'node:fs';
 import type { ChaosSpecies, ChaosStats, SourcesMeta } from '../src/types';
 import { FORMAT, SOURCES } from './paths';
@@ -40,7 +42,7 @@ const writeJson = (path: string, data: unknown) =>
 const curated = (await (await get(SETS_URL)).json()) as Record<string, unknown>;
 const curatedUU = (await (await get(UU_SETS_URL)).json()) as Record<string, unknown>;
 
-const { statsUrl, month, battles, info, data } = MIRROR ? await mirrorStats() : await chaosStats();
+const { statsUrl, month, cutoff, battles, info, data } = MIRROR ? await mirrorStats() : await chaosStats();
 
 /** Smogon's chaos file for a month, trimmed to the fields the build uses. */
 async function chaosStats() {
@@ -63,7 +65,14 @@ async function chaosStats() {
       Natures: byNature(s.Spreads),
     };
   }
-  return { statsUrl, month, battles: chaos.info['number of battles'], info: chaos.info, data };
+  return {
+    statsUrl,
+    month,
+    cutoff: CUTOFF,
+    battles: chaos.info['number of battles'],
+    info: chaos.info,
+    data,
+  };
 }
 
 /**
@@ -105,8 +114,8 @@ async function mirrorStats() {
       Natures: counts(byNature(s.spreads)),
     };
   }
-  const info = { metagame: FORMAT.id, cutoff: CUTOFF, 'number of battles': raw.battles };
-  return { statsUrl, month, battles: raw.battles, info, data };
+  const info = { metagame: FORMAT.id, cutoff: null, 'number of battles': raw.battles };
+  return { statsUrl, month, cutoff: null, battles: raw.battles, info, data };
 }
 
 function byNature(spreads: Record<string, number>): Record<string, number> {
@@ -125,7 +134,7 @@ const meta: SourcesMeta = {
   stats: {
     url: statsUrl,
     month,
-    cutoff: CUTOFF,
+    cutoff,
     battles,
     fetchedAt,
   },

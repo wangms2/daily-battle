@@ -41,7 +41,14 @@ export interface SpeciesEntry {
 export interface SourcesMeta {
   sets: { url: string; fetchedAt: string };
   uuSets: { url: string; fetchedAt: string };
-  stats: { url: string; month: string; cutoff: number; battles: number; fetchedAt: string };
+  stats: {
+    url: string;
+    month: string;
+    /** The ladder rating cutoff, or null when the source doesn't say (the `--mirror` stats). */
+    cutoff: number | null;
+    battles: number;
+    fetchedAt: string;
+  };
 }
 
 export interface SetsFile {
@@ -86,7 +93,7 @@ export interface ChaosSpecies {
 }
 
 export interface ChaosStats {
-  info: { metagame: string; cutoff: number; 'number of battles': number };
+  info: { metagame: string; cutoff: number | null; 'number of battles': number };
   data: Record<string, ChaosSpecies>;
 }
 

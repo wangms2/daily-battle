@@ -19,7 +19,7 @@ setsFor('gen5ou').species['Politoed'].sets; // any format in src/formats.ts
 | `sources/gen4ou-stats.json`                         | [Smogon monthly usage stats](https://www.smogon.com/stats/), `chaos/gen4ou-1500.json`, trimmed to the fields we use, plus natures summed from spreads | Usage statistics from Pokémon Showdown ladder play                  |
 | `sources/gen4ou-sources.json`                       | URLs, fetch time, stats month, cutoff, and battle count                                                                                               |                                                                     |
 | `sources/gen5ou-*.json`, `sources/gen5uu-sets.json` | The same files for Gen 5 OU, from `gen5ou`, `gen5uu`, and `chaos/gen5ou-1500.json`                                                                    | As above                                                            |
-| `sources/gen6ou-*.json`, `sources/gen6uu-sets.json` | The same files for Gen 6 OU, from `gen6ou`, `gen6uu`, and `chaos/gen6ou-1500.json`                                                                    | As above                                                            |
+| `sources/gen6ou-*.json`, `sources/gen6uu-sets.json` | The same files for Gen 6 OU, from `gen6ou`, `gen6uu`, and pkmn's processed Gen 6 OU stats (`refresh --mirror`: smogon.com and data.pkmn.cc weren't reachable; same month and battles, but pkmn's choice of cutoff, not 1500)                                                                    | As above                                                            |
 
 `@smogon/sets` (the source DESIGN.md first named) isn't used. Its last release was in July 2021, and its stats-derived sets are a single naive set per species.
 

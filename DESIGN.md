@@ -21,7 +21,7 @@ This doc is written to be split into implementation chunks. Section 13 lists mil
 
 | Area                | Decision                                                                                                                                                                                               |
 | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Format              | Gen 4 OU, Gen 5 OU, and Gen 6 OU as three daily games (each its own team, opponents, tries, and streak), singles, 6v6, Showdown mechanics. Gen 6 adds one rule of ours: one Mega per team (§18) |
+| Format              | Gen 4 OU, Gen 5 OU, and Gen 6 OU as three daily games (each its own team, opponents, tries, and streak), singles, 6v6, Showdown mechanics. Gen 6 adds one rule of ours: one Mega per team (§19) |
 | Engine              | `@pkmn/sim` (standalone Showdown simulator), self-hosted, no Showdown server                                                                                                                           |
 | Set data            | Smogon data (usage-weighted). 1–4 most common sets per species, weighted by usage                                                                                                                      |
 | Player team         | Weekly. Pick 6 of 12, choose a role-named set for each, lock for the week. Optional suggested teams are a selection, not a default. No lineup ordering; the lead is picked on the daily brief          |
@@ -43,7 +43,7 @@ This doc is written to be split into implementation chunks. Section 13 lists mil
 
 - No accounts, server-side storage, or leaderboards in v1.
 - No multiplayer or PvP.
-- No formats beyond Gen 4, 5, and 6 OU for now. The format is a parameter throughout (`packages/data/src/formats.ts`), so another one is mostly data, sets, and a schedule run (§17, §18).
+- No formats beyond Gen 4, 5, and 6 OU for now. The format is a parameter throughout (`packages/data/src/formats.ts`), so another one is mostly data, sets, and a schedule run (§17, §19).
 - No minimizing-turns scoring.
 - No Showdown server, websockets, or ladder integration.
 
@@ -525,7 +525,7 @@ A second daily game beside Gen 4 OU, built in phases G1–G6 on the `gen5` branc
 - **Schedules** live in `schedule/gen5ou/` and `reports/gen5ou/`, built with `schedule --format gen5ou`. A trial week met the existing bands with no AI retuning. Gen 5 opponents come out too hard more often (the resampling absorbs it), and its pools are weaker against random probes (about 60% of sampled teams viable, against Gen 4's 85%).
 - **Web.** The title (`Gen 5 · Wed, Oct 28 ▾`) opens a picker with each game's streak and today's status. A first-time player picks a game on the welcome sheet; returning players land on the last one played. Gen 5 battles use Showdown's 15 Gen 5 backgrounds, and the sprites are shared. With hints on, the brief notes that the opponent sees your six too.
 
-## 18. Gen 6 OU (added Oct 2026)
+## 19. Gen 6 OU (added Oct 2026)
 
 A third daily game, built in seven phases the same way as Gen 5 (§17). Each phase kept Gen 4's and Gen 5's output byte-for-byte: seed keys, golden fixtures, set ids, schedules, and AI choices. Nothing in `GENERATOR_VERSION` or the AI changed for them; every new rule is gated on Gen 6 data or format.
 

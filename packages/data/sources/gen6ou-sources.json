@@ -10,7 +10,7 @@
   "stats": {
     "url": "https://raw.githubusercontent.com/pkmn/smogon/main/data/stats/gen6ou.json",
     "month": "2026-09",
-    "cutoff": 1500,
+    "cutoff": null,
     "battles": 39219,
     "fetchedAt": "2026-10-24T02:51:14.767Z"
   }

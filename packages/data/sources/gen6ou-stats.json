@@ -1,7 +1,7 @@
 {
   "info": {
     "metagame": "gen6ou",
-    "cutoff": 1500,
+    "cutoff": null,
     "number of battles": 39219
   },
   "data": {
