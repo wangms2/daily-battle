@@ -80,3 +80,12 @@ Last run (2026-10-21, generator v3, `--n 10000`, 52s): **0 failures**.
   - Starmie is in 23% of teams and Tyranitar 22%; the rarest are in about 1%.
   - Below-OU species fill 29% of slots through √usage weighting alone.
   - Styles: balance 71%, offense 17%, stall 12%.
+
+## Gen 6 OU
+
+Same algorithm, seeded `gen6ou:gen<N>:…` like Gen 5, with two rules that only Gen 6 data triggers (they draw no extra randomness, so Gen 4 and 5 are unchanged):
+
+- **Pools** must offer at least one species with a Mega set, and at least five species that don't need one (one Mega per team). Type coverage counts a Mega set's typing.
+- **Opponents** are redrawn if they hold two Mega Stones (`oneMegaProblem`).
+
+`src/__fixtures__/golden-gen6ou.json` pins three weeks. `check --n 10000` passed with Gen 6 added.

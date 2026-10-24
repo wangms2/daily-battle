@@ -30,6 +30,8 @@ Each decision:
      - Self-KO moves: carry a cost.
      - Against Magic Bounce (Gen 5), hazards and status moves count against us in proportion to the chance the foe has it.
    - **Switches:** the matchup gain over staying in, minus the free hit and entry hazards, minus a fixed switching cost, plus a small bonus for resisting the foe's STABs, plus Regenerator's heal on the way out (Gen 5). After a faint, the switch-in with the best matchup.
+   - **Mega Evolution** (Gen 6): `move N mega` scores the move from Mega form, at its old Speed (in Gen 6 the turn order uses the pre-Mega Speed), plus the preset's `mega` bonus for keeping the boost all battle. Damage uses the Mega form once it has Mega Evolved, or while a stone holder is assumed able to. A revealed Mega narrows that foe's sets to the stone; once a foe has Mega Evolved, no other foe is assumed to. Pokémon are tracked by base species.
+   - **Gen 6 mechanics:** Sticky Web, Defog clearing both sides, terrains, 5-turn ability weather, Sleep Clause, powder immunity for Grass, paralysis immunity for Electric, Gale Wings and Prankster priority. Fairy and Assault Vest come from the calc.
    - **Team Preview** (Gen 5): `scoreLeads` rates each of ours as the lead by its average matchup against the foe's six, plus half a hazard's early value for a setter; the lead is then sampled with the usual softmax noise. The naive bot leads with its first Pokémon.
 4. **Choice** (`choose.ts`, §8.4): softmax over scores at the preset's temperature, sampled with the seeded `rng`. Soft biases:
    - A bonus for the highest-damage move.
