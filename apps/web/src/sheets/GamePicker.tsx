@@ -20,12 +20,15 @@ export function GamePicker({
   current,
   games,
   onPick,
+  onVersus,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   current: FormatId;
   games: GameRow[];
   onPick: (id: FormatId) => void;
+  /** Open a versus room with friends. */
+  onVersus: () => void;
 }) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange} title="Choose a game">
@@ -65,6 +68,21 @@ export function GamePicker({
           );
         })}
       </ul>
+      <button
+        type="button"
+        onClick={onVersus}
+        className="card mt-4 flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-surface-2"
+      >
+        <span className="min-w-0 flex-1">
+          <span className="block text-[16px] font-semibold">Versus with friends</span>
+          <span className="block truncate text-[13px] text-muted">
+            Make a room, share the code, and battle live.
+          </span>
+        </span>
+        <span aria-hidden className="text-[18px] text-muted">
+          ›
+        </span>
+      </button>
     </Sheet>
   );
 }

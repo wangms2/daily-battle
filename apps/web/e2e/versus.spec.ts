@@ -74,6 +74,15 @@ async function step(page: Page): Promise<boolean> {
 
 /** No WCAG 2.1 A/AA violations on the page as it is. */
 async function axe(p: Page) {
+  // Let entrances finish: axe reads colours mid-fade as low contrast.
+  await p.evaluate(() =>
+    Promise.all(
+      document
+        .getAnimations()
+        .filter((a) => a.effect?.getTiming().iterations !== Infinity)
+        .map((a) => a.finished.catch(() => {})),
+    ),
+  );
   const { violations } = await new AxeBuilder({ page: p })
     .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
     .analyze();
@@ -154,6 +163,17 @@ test('the host can remove a player, and names are unique', async ({ page, browse
   await page.getByRole('dialog').getByRole('button', { name: 'Remove' }).click();
   await expect(other.getByText('The host removed you from the room.')).toBeVisible();
   await expect(players(page)).toHaveCount(1);
+});
+
+test('the game picker opens versus rooms', async ({ page }) => {
+  await quick(page);
+  await page.goto('/');
+  await page.getByRole('button', { name: /^Gen 4 · / }).click();
+  await page
+    .getByRole('dialog', { name: 'Choose a game' })
+    .getByRole('button', { name: /Versus with friends/ })
+    .click();
+  await expect(page.getByRole('button', { name: 'Create a room' })).toBeVisible();
 });
 
 test('a code for no room says so', async ({ page }) => {
@@ -312,6 +332,125 @@ test('a player who gives up mid-battle loses it, and a reload resumes', async ({
   await expect(page.getByRole('dialog', { name: 'Battle over' })).toContainText('Silver gave up.');
   await page.getByRole('button', { name: 'Back to the room' }).click();
   await expect(page.getByRole('heading', { name: 'Round 1 results' })).toBeVisible();
-  await expect(page.getByRole('list', { name: 'Results' })).toContainText('Gold beat Silver');
+  await expect(page.getByRole('region', { name: 'Results' })).toContainText('Gold beat Silver');
+  // The break moves on to the standings by itself.
   await expect(page.getByRole('list', { name: 'Standings' })).toContainText('Silver');
+});
+
+/** Gives up the battle on screen and goes back to the room. */
+async function giveUp(page: Page) {
+  await page.getByRole('button', { name: 'Battle menu' }).click();
+  await page.getByRole('button', { name: 'Give up' }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Give up' }).click();
+  await page.getByRole('button', { name: 'Back to the room' }).click();
+}
+
+test('late joiners and players who are out watch the battles; players still in see only balls', async ({
+  page,
+  browser,
+  baseURL,
+}) => {
+  test.setTimeout(240_000);
+  const errors: string[] = [];
+  const names = ['Ash', 'Brock', 'Misty', 'Gary'];
+  await quick(page);
+  const code = await createRoom(page, 'Ash');
+  const pages: Record<string, Page> = { Ash: page };
+  for (const name of names.slice(1)) {
+    pages[name] = await friend(browser, baseURL);
+    await quick(pages[name]);
+    await joinRoom(pages[name], code, name);
+  }
+  for (const p of Object.values(pages)) p.on('pageerror', (e) => errors.push(String(e)));
+  await page.getByRole('button', { name: '1', exact: true }).click();
+  for (const name of names) {
+    await page.getByRole('combobox', { name: `${name}’s team size` }).selectOption('3');
+  }
+  await page.getByRole('button', { name: 'Start the game' }).click();
+  for (const name of names) await build(pages[name]!, 3);
+
+  // Who faces whom in round 1.
+  const foeOf: Record<string, string> = {};
+  for (const name of names) {
+    const heading = pages[name]!.getByRole('heading', { name: /^Round 1 · vs / });
+    await expect(heading).toBeVisible();
+    foeOf[name] = (await heading.textContent())!.replace(/^Round 1 · vs /, '');
+  }
+  const pairs = names
+    .filter((n) => names.indexOf(n) < names.indexOf(foeOf[n]!))
+    .map((n) => [n, foeOf[n]!] as const);
+  expect(pairs).toHaveLength(2);
+
+  // Oak joins after the start: a spectator, watching both battles.
+  const oak = await friend(browser, baseURL);
+  await quick(oak);
+  oak.on('pageerror', (e) => errors.push(String(e)));
+  await oak.goto(`/#versus/${code}`);
+  await oak.getByLabel('Your name').fill('Oak');
+  await oak.getByRole('button', { name: 'Join room' }).click();
+  await expect(oak.getByText('You’re watching. You’ll play in the next game.')).toBeVisible();
+  for (const name of names)
+    await pages[name]!.getByRole('button', { name: /^Ready with / }).click();
+  const cards = oak.locator('section[aria-label*=" vs "]');
+  await expect(cards).toHaveCount(2);
+  await expect(oak.getByText('Getting ready…')).toHaveCount(0, { timeout: 20_000 });
+  await expect(cards.first().getByRole('log')).not.toContainText('The battle is starting…');
+  await axe(oak);
+
+  // Oak reacts to a battle; its players see it float up.
+  const watched = (await cards.first().getAttribute('aria-label'))!.split(' vs ');
+  // Reactions float over what's on screen, so wait for the players' battle screens.
+  for (const name of watched) await expect(pages[name]!.locator(MOVES).first()).toBeVisible();
+  await cards.first().getByRole('button', { name: 'React 🔥' }).click();
+  // Both at once: a reaction floats by in a couple of seconds.
+  await Promise.all(
+    watched.map((name) => expect(pages[name]!.getByText('Oak', { exact: true })).toBeVisible()),
+  );
+
+  // A player still in sees the room as balls only, and can't watch.
+  await page.getByRole('button', { name: /Room$/ }).click();
+  const drawer = page.getByRole('dialog', { name: `Room ${code}` });
+  await expect(drawer.getByRole('list', { name: 'Battles' }).getByRole('listitem')).toHaveCount(2);
+  await expect(drawer.getByRole('img', { name: /’s team: \d of 3 left/ })).toHaveCount(4);
+  await expect(drawer.locator('img:not([src="/fx/pokeball.png"])')).toHaveCount(0);
+  await expect(drawer.getByRole('button', { name: /^Watch / })).toHaveCount(0);
+  await expect(drawer).toContainText('Players still in can’t watch other battles');
+  await expect(drawer).toContainText('Watching: Oak');
+  await axe(page);
+  await page.keyboard.press('Escape');
+
+  // The second of each pair gives up and is out (one life).
+  for (const [winner, loser] of pairs) {
+    await giveUp(pages[loser]!);
+    await pages[winner]!.getByRole('button', { name: 'Back to the room' }).click();
+  }
+  const [out] = pairs.map(([, loser]) => pages[loser]!);
+  await expect(out!.getByText('You’re out')).toBeVisible();
+  await expect(out!.getByRole('region', { name: 'Results' })).toBeVisible();
+  await axe(out!);
+
+  // Round 2: the two winners. Those out watch it, and can open it from the drawer.
+  const [a, b] = pairs.map(([winner]) => winner);
+  for (const name of [a!, b!]) {
+    await pages[name]!.getByRole('button', { name: /^Ready with / }).click({ timeout: 20_000 });
+  }
+  await expect(out!.getByText(/^You’re out \(/)).toBeVisible();
+  await expect(out!.locator('section[aria-label*=" vs "]')).toHaveCount(1);
+  await out!.getByRole('button', { name: /Room$/ }).click();
+  await expect(
+    out!
+      .getByRole('dialog')
+      .getByRole('button', { name: new RegExp(`^Watch (${a} vs ${b}|${b} vs ${a})$`) }),
+  ).toBeVisible();
+  await out!.keyboard.press('Escape');
+
+  // The game ends; Oak takes a seat in the next one.
+  await giveUp(pages[b!]!);
+  await pages[a!]!.getByRole('button', { name: 'Back to the room' }).click();
+  for (const p of [page, oak])
+    await expect(p.getByRole('heading', { name: 'Game over' })).toBeVisible();
+  await expect(oak.getByRole('group', { name: 'Podium' })).toContainText(a!);
+  await page.getByRole('button', { name: 'Play again' }).click();
+  await expect(players(oak)).toHaveCount(5);
+  expect(errors).toEqual([]);
 });

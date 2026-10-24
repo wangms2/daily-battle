@@ -382,6 +382,10 @@ export function App() {
           setPickerOpen(false);
           if (id !== format) dispatchAny({ type: 'setSetting', key: 'format', value: id });
         }}
+        onVersus={() => {
+          setPickerOpen(false);
+          go('versus');
+        }}
       />
     </div>
   );

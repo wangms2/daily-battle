@@ -16,6 +16,7 @@ import {
   applyCommand,
   battleSlots,
   buildDone,
+  canWatch,
   cannotStartGame,
   clockDeadline,
   CLOSE,
@@ -32,6 +33,7 @@ import {
   parseClientMessage,
   playAgain,
   playerByToken,
+  spectatorByToken,
   prepDone,
   putMatch,
   roomView,
@@ -54,6 +56,7 @@ import {
   type Pairing,
   type Player,
   type Prep,
+  type Reaction,
   type RoomState,
   type ServerMessage,
   type Side,
@@ -87,6 +90,10 @@ export class Room extends DurableObject<Env> {
   private readonly sent = new Map<string, Record<Side, number>>();
   /** The AI's policy in each battle against it, by match id. */
   private readonly policies = new Map<string, Policy>();
+  /** How many of each battle's public lines watchers have been sent, by match id. */
+  private readonly watched = new Map<string, number>();
+  /** When each person last reacted, to keep reactions to one a second. */
+  private readonly reacted = new Map<string, number>();
 
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
@@ -152,6 +159,7 @@ export class Room extends DurableObject<Env> {
         if (!result.ok) return this.send(ws, { type: 'error', code: result.error });
         this.battles.clear();
         this.sent.clear();
+        this.watched.clear();
         await this.save(result.state);
         return this.broadcast();
       }
@@ -167,6 +175,8 @@ export class Room extends DurableObject<Env> {
         return this.choose(ws, me, msg.choice, now);
       case 'forfeit':
         return this.forfeitFor(me, now);
+      case 'react':
+        return this.react(ws, me, msg.match, msg.emoji, now);
     }
 
     // Leaving, or being removed, mid-game loses your battle first.
@@ -185,6 +195,7 @@ export class Room extends DurableObject<Env> {
     for (const s of this.sockets()) {
       const id = playerOf(s);
       if (!id || next.players.some((p) => p.id === id && !p.left)) continue;
+      if (next.spectators.some((p) => p.id === id)) continue;
       if (id === me) {
         this.disconnect(s, CLOSE.left, 'Left the room');
       } else {
@@ -259,34 +270,33 @@ export class Room extends DurableObject<Env> {
     room: RoomState,
     msg: Extract<ClientMessage, { type: 'join' | 'rejoin' }>,
   ) {
-    let player: Player | undefined;
+    // A player, or a spectator (someone who joined after the game started).
+    let who: { id: string; token: string; team?: Player['team'] } | undefined;
     let next = room;
     if (msg.type === 'rejoin') {
-      player = playerByToken(room, msg.token);
-      if (!player || player.left) return this.refuse(ws, 'badToken');
+      const player = playerByToken(room, msg.token);
+      who = player?.left ? undefined : (player ?? spectatorByToken(room, msg.token));
+      if (!who) return this.refuse(ws, 'badToken');
     } else {
-      const result = joinRoom(room, {
-        id: crypto.randomUUID(),
-        name: msg.name,
-        token: crypto.randomUUID(),
-      });
+      const id = crypto.randomUUID();
+      const result = joinRoom(room, { id, name: msg.name, token: crypto.randomUUID() });
       if (!result.ok) return this.refuse(ws, result.error);
       next = result.state;
-      player = next.players.at(-1)!;
+      who = [...next.players, ...next.spectators].find((p) => p.id === id)!;
     }
-    // The same player in another tab gives way to this one.
+    // The same person in another tab gives way to this one.
     for (const other of this.sockets()) {
-      if (playerOf(other) === player.id) this.disconnect(other, CLOSE.replaced, 'Opened elsewhere');
+      if (playerOf(other) === who.id) this.disconnect(other, CLOSE.replaced, 'Opened elsewhere');
     }
-    ws.serializeAttachment({ player: player.id } satisfies Attachment);
+    ws.serializeAttachment({ player: who.id } satisfies Attachment);
     if (next !== room) await this.save(next);
-    this.send(ws, { type: 'welcome', you: player.id, token: player.token, room: this.view() });
-    this.send(ws, { type: 'team', team: player.team });
+    this.send(ws, { type: 'welcome', you: who.id, token: who.token, room: this.view() });
+    this.send(ws, { type: 'team', team: who.team ?? null });
     this.broadcast(ws);
     // Back in the middle of a round: your battle, and its whole log so far.
-    const match = matchOf(next, player.id);
+    const match = matchOf(next, who.id);
     if (match) {
-      const side = sideOf(match, player.id)!;
+      const side = sideOf(match, who.id)!;
       this.send(ws, { type: 'match', match: matchView(match, side, Date.now(), this.perTurnMs()) });
       if (match.stage === 'battle') {
         this.send(ws, {
@@ -298,6 +308,8 @@ export class Room extends DurableObject<Env> {
         });
       }
     }
+    // Watching: every battle this round so far.
+    if (canWatch(next, who.id)) this.watchAll(ws);
   }
 
   // The lobby
@@ -335,6 +347,7 @@ export class Room extends DurableObject<Env> {
     if (error) return this.send(ws, { type: 'error', code: error });
     this.battles.clear();
     this.sent.clear();
+    this.watched.clear();
     await this.save(startBuild(this.room!, now));
     this.broadcast();
     for (const p of this.room!.players) this.sendTo(p.id, { type: 'team', team: null });
@@ -375,6 +388,7 @@ export class Room extends DurableObject<Env> {
     const player = (id: string) => room.players.find((p) => p.id === id)!;
     this.battles.clear();
     this.sent.clear();
+    this.watched.clear();
     this.policies.clear();
     const matches = pairs.map(({ p1, p2 }, i) => {
       const a = player(p1);
@@ -451,11 +465,12 @@ export class Room extends DurableObject<Env> {
     this.battles.set(m.id, battle);
     this.sent.set(m.id, { p1: 0, p2: 0 });
     m = this.runAi(m, battle);
-    m = this.runClocks(m, battle, now);
+    m = withFainted(this.runClocks(m, battle, now), battle);
     await this.save(putMatch(room, m));
     this.broadcast();
     this.sendMatch(m, now);
     for (const side of SIDES) this.sendSide(m, side);
+    this.sendWatch(m);
   }
 
   private async choose(ws: WebSocket, me: string, choice: string, now: number) {
@@ -474,9 +489,12 @@ export class Room extends DurableObject<Env> {
     let m = record(match, side, choice);
     m = this.runAi(m, battle);
     if (battle.ended) return this.endMatch(m, battle.winner ? 'win' : 'tie', now);
-    m = this.runClocks(m, battle, now);
+    m = withFainted(this.runClocks(m, battle, now), battle);
     await this.save(putMatch(this.room!, m));
     for (const s of SIDES) this.sendSide(m, s);
+    this.sendWatch(m);
+    // The drawer's balls follow the battle.
+    this.broadcast();
     this.sendMatch(m, now);
   }
 
@@ -511,13 +529,16 @@ export class Room extends DurableObject<Env> {
   private async endMatch(match: Match, reason: MatchEnd, now: number, winner?: Side) {
     const battle = match.stage === 'battle' ? this.battle(match) : null;
     const m: Match = {
-      ...match,
+      ...(battle ? withFainted(match, battle) : match),
       stage: 'over',
       clocks: { p1: stopClock(match.clocks.p1, now), p2: stopClock(match.clocks.p2, now) },
       result: { winner: winner ?? battle?.winner ?? null, reason },
     };
     let room = putMatch(this.room!, m);
-    if (battle) for (const s of SIDES) this.sendSide(m, s);
+    if (battle) {
+      for (const s of SIDES) this.sendSide(m, s);
+      this.sendWatch(m);
+    }
     this.sendMatch(m, now);
     // Players keep their result on screen until they go back to the room.
     if (roundDone(room)) room = endRound(room, now, random);
@@ -545,6 +566,7 @@ export class Room extends DurableObject<Env> {
       this.battles.set(match.id, battle);
       // Everything up to the last recorded choice was sent before the room slept.
       this.sent.set(match.id, { p1: battle.logLength('p1'), p2: battle.logLength('p2') });
+      this.watched.set(match.id, battle.spectatorLength());
     }
     return battle;
   }
@@ -596,6 +618,48 @@ export class Room extends DurableObject<Env> {
     for (const s of this.sockets()) if (playerOf(s) === player) this.send(s, msg);
   }
 
+  /** Sockets of everyone who may watch battles: spectators, and players who are out. */
+  private watchers(): WebSocket[] {
+    return this.sockets().filter((s) => {
+      const id = playerOf(s);
+      return !!id && canWatch(this.room!, id);
+    });
+  }
+
+  /** Every battle this round, from the start, to one watcher who just arrived. */
+  private watchAll(ws: WebSocket) {
+    for (const m of this.room!.matches) {
+      if (m.stage === 'prep') continue;
+      const battle = this.battle(m);
+      this.send(ws, { type: 'watch', match: m.id, from: 0, ...battle.spectate(0), resync: true });
+    }
+  }
+
+  /** A battle's new public lines, to everyone watching. */
+  private sendWatch(match: Match) {
+    const battle = this.battle(match);
+    const from = this.watched.get(match.id) ?? 0;
+    this.watched.set(match.id, battle.spectatorLength());
+    const msg: ServerMessage = { type: 'watch', match: match.id, from, ...battle.spectate(from) };
+    for (const s of this.watchers()) this.send(s, msg);
+  }
+
+  /** A watcher's reaction, to the battle's players and everyone watching it. One a second. */
+  private react(ws: WebSocket, me: string, matchId: string, emoji: Reaction, now: number) {
+    const room = this.room!;
+    const match = room.matches.find((m) => m.id === matchId);
+    if (!match || !canWatch(room, me)) return this.send(ws, { type: 'error', code: 'notYourTurn' });
+    if (now - (this.reacted.get(me) ?? 0) < 1000) return;
+    this.reacted.set(me, now);
+    const from = [...room.players, ...room.spectators].find((p) => p.id === me)!.name;
+    const msg: ServerMessage = { type: 'reaction', match: matchId, emoji, from };
+    const to = new Set([
+      ...this.watchers(),
+      ...this.sockets().filter((s) => sideOf(match, playerOf(s) ?? '') !== null),
+    ]);
+    for (const s of to) this.send(s, msg);
+  }
+
   /** Each player's own view of the match. */
   private sendMatch(match: Match, now: number) {
     for (const side of SIDES) {
@@ -639,6 +703,12 @@ export class Room extends DurableObject<Env> {
     ws.close(code, reason);
   }
 }
+
+/** A match with its fainted counts brought up to date from the battle. */
+const withFainted = (match: Match, battle: LiveBattle): Match => ({
+  ...match,
+  fainted: { p1: battle.fainted('p1'), p2: battle.fainted('p2') },
+});
 
 /** A match with one more accepted choice for a side. */
 const record = (match: Match, side: Side, choice: string): Match => ({

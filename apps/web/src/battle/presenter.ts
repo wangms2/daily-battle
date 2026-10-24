@@ -237,22 +237,30 @@ function teamMarks(side: ClientSide, order?: string[]): TeamMark[] {
         ),
       )
     : side.team.map((p) => mark(p));
-  while (marks.length < Math.max(6, side.totalPokemon || 0)) marks.push(mark(undefined));
+  // A versus team can be smaller than six; the sim says how many in `|teamsize|`.
+  while (marks.length < (side.totalPokemon || 6)) marks.push(mark(undefined));
   return marks.slice(0, 6);
 }
 
-function viewOf(dex: ModdedDex, b: ClientBattle, me: SideID, yourOrder: string[]): View {
+function viewOf(
+  dex: ModdedDex,
+  b: ClientBattle,
+  me: SideID,
+  yourOrder: string[],
+  spectator = false,
+): View {
   const you = b[me];
   const foe = b[otherSide(me)];
   return {
     turn: b.turn,
-    you: monView(you.active[0] ?? undefined, true),
+    you: monView(you.active[0] ?? undefined, !spectator),
     foe: monView(foe.active[0] ?? undefined, false),
     yourSide: sideConds(you),
     foeSide: sideConds(foe),
     weather: WEATHER[b.field.weatherState.id] ?? '',
     revealed: revealedOf(dex, foe),
-    yourTeam: teamMarks(you, yourOrder),
+    // A spectator knows no team order: the bottom side's marks go as revealed, like the top's.
+    yourTeam: teamMarks(you, spectator ? undefined : yourOrder),
     foeTeam: teamMarks(foe),
   };
 }
@@ -319,6 +327,11 @@ export class SidePresenter {
     /** Your team as sent into battle, lead first. */
     readonly sets: PokemonSet[],
     format: string = DEFAULT_FORMAT,
+    /**
+     * Watching someone else's battle from its public log: `me` is the side
+     * drawn at the bottom, there are no sets, and HP is percentages only.
+     */
+    readonly spectator = false,
   ) {
     this.dex = Dex.forGen(genOf(format));
     this.foe = otherSide(me);
@@ -334,7 +347,7 @@ export class SidePresenter {
     const frames: Frame[] = [];
     const explainers = new Set<string>();
     const order = this.sets.map((s) => s.species);
-    let before = viewOf(this.dex, this.client, me, order);
+    let before = viewOf(this.dex, this.client, me, order, this.spectator);
     for (const line of update.lines) {
       for (const { args, kwArgs } of Protocol.parse(line)) {
         const text = cleanText(this.formatter.formatText(args, kwArgs));
@@ -346,7 +359,7 @@ export class SidePresenter {
         const popup = popupOf(me, a, kw);
         if (!text && !event && !popup) continue;
         if (text.startsWith('Battle started between')) continue;
-        const view = viewOf(this.dex, this.client, me, order);
+        const view = viewOf(this.dex, this.client, me, order, this.spectator);
         const label = labelOf(me, a, kw, before, view);
         frames.push({ text, event, view, ...(label && { label }), ...(popup && { popup }) });
         before = view;
@@ -374,7 +387,9 @@ export class SidePresenter {
       end: ended
         ? {
             winner: winner === me ? 'you' : winner ? 'foe' : null,
-            youLeft: this.sets.length - you.team.filter((p) => p.fainted).length,
+            youLeft:
+              (this.sets.length || you.totalPokemon || 6) -
+              you.team.filter((p) => p.fainted).length,
             foeLeft: (foe.totalPokemon || 6) - foe.team.filter((p) => p.fainted).length,
           }
         : null,

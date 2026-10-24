@@ -82,6 +82,24 @@ export class LiveBattle {
     this.session.forfeit(side);
   }
 
+  /** How many of the side's Pokémon have fainted, from the public log. */
+  fainted(side: Side): number {
+    return this.session.spectatorLog.filter((l) => l.startsWith(`|faint|${side}a:`)).length;
+  }
+
+  spectatorLength(): number {
+    return this.session.spectatorLog.length;
+  }
+
+  /** The battle as spectators see it from line `from` on: no hidden sets, HP as percentages. */
+  spectate(from: number): { lines: string[]; ended: boolean; winner: Side | null } {
+    return {
+      lines: this.session.spectatorLog.slice(from),
+      ended: this.session.ended,
+      winner: this.session.winner,
+    };
+  }
+
   logLength(side: Side): number {
     return this.session.log(side).length;
   }

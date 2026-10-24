@@ -8,6 +8,7 @@ import {
   type Change,
   type ErrorCode,
   type MatchView,
+  type Reaction,
   type Slot,
   type RoomCommand,
   type RoomView,
@@ -18,6 +19,9 @@ import { Feed } from './feed';
 import { forgetToken, saveName, saveToken, tokenFor } from './saved';
 
 export type SideMessage = Extract<ServerMessage, { type: 'side' }>;
+export type WatchMessage = Extract<ServerMessage, { type: 'watch' }>;
+/** A reaction as it arrives, numbered so each floats up once. */
+export type ReactionEvent = Extract<ServerMessage, { type: 'reaction' }> & { n: number };
 
 /** Your battle as the room last described it, and when that was (its clock counts from then). */
 export type LocalMatch = MatchView & { receivedAt: number };
@@ -60,6 +64,7 @@ export function useRoom(code: string, autoJoinAs?: string) {
   const [session, setSession] = useState(0);
   /** Your battle this round; kept after it ends, until a new round replaces it. */
   const [match, setMatch] = useState<LocalMatch | null>(null);
+  const [watchTick, setWatchTick] = useState(0);
   /** Your team in this game, as the room has it. */
   const [team, setTeam] = useState<Slot[] | null>(null);
   /** Each battle's lines, by match id. */
@@ -69,6 +74,15 @@ export function useRoom(code: string, autoJoinAs?: string) {
     if (!feed) feeds.current.set(id, (feed = new Feed()));
     return feed;
   }, []);
+  /** Each battle's public log, by match id, for watching (out of the game, or a spectator). */
+  const watchFeeds = useRef(new Map<string, Feed<WatchMessage>>());
+  const watchFeedFor = useCallback((id: string) => {
+    let feed = watchFeeds.current.get(id);
+    if (!feed) watchFeeds.current.set(id, (feed = new Feed()));
+    return feed;
+  }, []);
+  /** Spectators' reactions, to the battles you play or watch. */
+  const [reactions] = useState(() => new Feed<ReactionEvent>());
 
   const send = useCallback((msg: ClientMessage) => {
     if (socket.current?.readyState === WebSocket.OPEN) socket.current.send(JSON.stringify(msg));
@@ -78,6 +92,7 @@ export function useRoom(code: string, autoJoinAs?: string) {
     let disposed = false;
     let retry: number | undefined;
     let failures = 0;
+    let reactionCount = 0;
     /** A rejoin was refused (you were removed meanwhile): reconnect and join afresh. */
     let rejoinRefused = false;
 
@@ -120,6 +135,13 @@ export function useRoom(code: string, autoJoinAs?: string) {
           setMatch((m) => (next || !m || m.stage !== 'over' ? next : m));
         } else if (msg.type === 'side') {
           feedFor(msg.match).push(msg);
+        } else if (msg.type === 'watch') {
+          // A resync starts the battle over (a reconnect): drop what came before.
+          if (msg.resync) watchFeeds.current.delete(msg.match);
+          watchFeedFor(msg.match).push(msg);
+          setWatchTick((n) => n + 1);
+        } else if (msg.type === 'reaction') {
+          reactions.push({ ...msg, n: ++reactionCount });
         } else if (msg.type === 'kicked') {
           forgetToken(code);
         } else if (msg.code === 'badToken') {
@@ -168,7 +190,7 @@ export function useRoom(code: string, autoJoinAs?: string) {
       socket.current?.close(1000);
       socket.current = null;
     };
-  }, [code, session, feedFor]);
+  }, [code, session, feedFor, watchFeedFor, reactions]);
 
   useEffect(() => {
     if (!notice) return;
@@ -187,6 +209,11 @@ export function useRoom(code: string, autoJoinAs?: string) {
     command: (command: RoomCommand) => send(command),
     match,
     feedFor,
+    watchFeedFor,
+    /** Changes when a watched battle gets news, so screens can re-read the feeds. */
+    watchTick,
+    reactions,
+    react: (match: string, emoji: Reaction) => send({ type: 'react', match, emoji }),
     /** Back to the room from a finished battle. */
     dismissMatch: () => setMatch((m) => (m?.stage === 'over' ? null : m)),
     team,

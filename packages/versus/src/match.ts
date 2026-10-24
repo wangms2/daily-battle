@@ -72,6 +72,8 @@ export interface Match {
   teams: Record<Side, PokemonSet[]>;
   /** Each side's accepted choices, in order. */
   choices: Record<Side, string[]>;
+  /** How many of each side's Pokémon have fainted (for the room drawer's balls). */
+  fainted: Record<Side, number>;
   clocks: Record<Side, Clock>;
   result?: { winner: Side | null; reason: MatchEnd };
 }
@@ -109,6 +111,7 @@ export function newMatch(input: {
     prepDeadline: input.now + PREP_MS,
     teams: { p1: [], p2: [] },
     choices: { p1: [], p2: [] },
+    fainted: { p1: 0, p2: 0 },
     clocks: { p1: clock(), p2: clock() },
   };
 }

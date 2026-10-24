@@ -1,4 +1,6 @@
-// The frame of a versus screen: a back button, a title, and a centered column.
+// The frame of a versus screen: a back button, a title, something on the
+// right (the room drawer), and a centered column.
+import clsx from 'clsx';
 import type { ReactNode } from 'react';
 import { ChevronIcon } from '../ui/icons';
 
@@ -6,11 +8,16 @@ export function Page({
   title,
   back,
   onBack,
+  right,
+  wide = false,
   children,
 }: {
   title: string;
   back: string;
   onBack: () => void;
+  right?: ReactNode;
+  /** A wider column, for watching several battles on a big screen. */
+  wide?: boolean;
   children: ReactNode;
 }) {
   return (
@@ -26,10 +33,17 @@ export function Page({
         </button>
         <h1 className="display min-w-0 flex-1 truncate text-center text-[16px]">{title}</h1>
         {/* Balances the back button so the title stays centered. */}
-        <span className="w-16" aria-hidden />
+        <span className="flex min-w-16 justify-end">{right}</span>
       </header>
       <main className="min-h-0 flex-1 overflow-y-auto px-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
-        <div className="mx-auto w-full max-w-[560px] space-y-4 pt-2">{children}</div>
+        <div
+          className={clsx(
+            'mx-auto w-full space-y-4 pt-2',
+            wide ? 'max-w-[1200px]' : 'max-w-[560px]',
+          )}
+        >
+          {children}
+        </div>
       </main>
     </div>
   );

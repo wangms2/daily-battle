@@ -96,6 +96,28 @@ describe('LiveBattle', () => {
     expect(battle.update('p2', 0).ended).toBe(true);
   });
 
+  it('shows spectators only the public log, and counts faints for the drawer', () => {
+    const start = match(5);
+    const fresh = new LiveBattle({ ...start, choices: { p1: [], p2: [] } });
+    const opening = fresh.spectate(0).lines.join('\n');
+    // Only the leads are out; HP shows as a percentage, never exact.
+    for (const side of SIDES) {
+      for (const set of start.teams[side].slice(1)) expect(opening).not.toContain(set.species);
+    }
+    expect(opening).toMatch(/\|switch\|p1a: [^|]+\|[^|]+\|100\/100/);
+    const { battle } = playOut(start, 5);
+    const lines = battle.spectate(0).lines;
+    expect(lines.length).toBe(battle.spectatorLength());
+    for (const side of SIDES) {
+      expect(battle.fainted(side)).toBe(
+        lines.filter((l) => l.startsWith(`|faint|${side}a:`)).length,
+      );
+    }
+    const loser = battle.winner === 'p1' ? 'p2' : 'p1';
+    if (battle.winner) expect(battle.fainted(loser)).toBe(start.teams[loser].length);
+    expect(battle.spectate(0).ended).toBe(true);
+  }, 60_000);
+
   it('makes seeds the sim accepts', () => {
     expect(randomSeed()).toMatch(/^\d+,\d+,\d+,\d+$/);
   });

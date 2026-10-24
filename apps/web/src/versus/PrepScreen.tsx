@@ -4,7 +4,7 @@
 // the foe until the battle starts, and it stays on your team after.
 import { formatInfo } from '@daily-battle/data/formats';
 import { withChange, type Change, type RoomView } from '@daily-battle/versus';
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { findSet, sameSpecies, setActiveFormat } from '../lib/data';
 import { SetPicker } from '../sheets/SetPicker';
 import { Button, SectionLabel } from '../ui/bits';
@@ -23,6 +23,7 @@ export function PrepScreen({
   onLead,
   onReady,
   onBack,
+  right,
 }: {
   match: LocalMatch;
   room: RoomView;
@@ -30,6 +31,8 @@ export function PrepScreen({
   onLead: (species: string) => void;
   onReady: () => void;
   onBack: () => void;
+  /** The room drawer. */
+  right?: ReactNode;
 }) {
   // Tiles and set cards read the room's game, which may not be the daily game.
   setActiveFormat(match.format);
@@ -55,7 +58,7 @@ export function PrepScreen({
       : 'Make one change if you like, pick your lead, and ready up';
 
   return (
-    <Page title={`Round ${room.round} · vs ${foe}`} back="Room" onBack={onBack}>
+    <Page title={`Round ${room.round} · vs ${foe}`} back="Room" onBack={onBack} right={right}>
       <div className="flex items-center justify-between gap-3">
         <p className="text-[15px] font-semibold" role="status">
           {status}

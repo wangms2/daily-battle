@@ -6,6 +6,7 @@ import {
   alive,
   fail,
   freshPlayer,
+  MAX_PLAYERS,
   type ErrorCode,
   type MatchSummary,
   type Pairing,
@@ -235,9 +236,22 @@ export function playAgain(state: RoomState, by: string): Result {
       matches: [],
       next: [],
       lastRound: null,
-      players: state.players
-        .filter((p) => !p.left)
-        .map((p) => freshPlayer(p, state.settings.lives)),
+      ...seats(state),
     },
+  };
+}
+
+/** The next game's seats: everyone who stayed, then spectators while there's room. */
+function seats(state: RoomState): Pick<RoomState, 'players' | 'spectators'> {
+  const stayed = state.players.filter((p) => !p.left);
+  const room = Math.max(0, MAX_PLAYERS - stayed.length);
+  return {
+    players: [
+      ...stayed.map((p) => freshPlayer(p, state.settings.lives)),
+      ...state.spectators
+        .slice(0, room)
+        .map((s) => freshPlayer({ ...s, teamSize: 6 }, state.settings.lives)),
+    ],
+    spectators: state.spectators.slice(room),
   };
 }
