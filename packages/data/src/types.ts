@@ -24,7 +24,11 @@ export interface SetEntry {
 export interface SpeciesEntry {
   /** Species-level weighted usage in OU, from the stats source (not normalized). */
   usage: number;
-  /** Current tier in the format's generation, from the sim's data, e.g. `OU`, `UU`, `UUBL`, `NU`. */
+  /**
+   * Current tier in the format's generation, from the sim's data, e.g. `OU`,
+   * `UU`, `UUBL`, `NU`. From Gen 6, the higher of the species' own tier and
+   * those of the Megas its sets' stones make (Venusaur plays as OU).
+   */
   tier: string;
   /**
    * Which curated set list the sets came from: the format itself (`gen4ou`) or

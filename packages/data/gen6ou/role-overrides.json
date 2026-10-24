@@ -1,0 +1,50 @@
+{
+  "slowbro-offensive-tank-slowbro": {
+    "label": "Mega offensive tank",
+    "description": "Hits hard with Scald and Flamethrower from Mega Slowbro's huge Defense, and heals with Slack Off. Holds Slowbronite to Mega Evolve into Mega Slowbro in battle."
+  },
+  "gardevoir-bulky-attacker": {
+    "label": "Mega bulky attacker",
+    "description": "Fires Pixilate-boosted Hyper Voice and Taunts walls and setup. Holds Gardevoirite to Mega Evolve into Mega Gardevoir in battle."
+  },
+  "altaria-special-attacker": {
+    "label": "Mega special attacker",
+    "description": "Fires Pixilate-boosted Hyper Voice and Fire Blast, and heals with Roost. Holds Altarianite to Mega Evolve into Mega Altaria in battle."
+  },
+  "altaria-support": {
+    "label": "Mega cleric",
+    "description": "Heals the team's status with Heal Bell and itself with Roost. Holds Altarianite to Mega Evolve into Mega Altaria in battle."
+  },
+  "charizard-bulky-will-o-wisp": {
+    "label": "Mega X Will-O-Wisp tank",
+    "description": "Burns physical attackers with Will-O-Wisp and heals with Roost. Holds Charizardite X to Mega Evolve into Mega Charizard X in battle."
+  },
+  "venusaur-offensive": {
+    "label": "Mega Growth attacker",
+    "description": "Boosts with Growth behind Mega Venusaur's bulk and heals with Synthesis. Holds Venusaurite to Mega Evolve into Mega Venusaur in battle."
+  },
+  "venusaur-defensive": {
+    "label": "Mega tank",
+    "description": "Walls Fire, Water and Fighting attackers with Thick Fat and heals with Synthesis. Holds Venusaurite to Mega Evolve into Mega Venusaur in battle."
+  },
+  "latias-defensive": {
+    "label": "Mega Thunder Wave support",
+    "description": "Paralyzes foes with Thunder Wave and heals with Recover. Holds Latiasite to Mega Evolve into Mega Latias in battle."
+  },
+  "blissey-wish": {
+    "label": "Wish support",
+    "description": "Passes big Wishes to the team and wears foes down with Toxic and Seismic Toss."
+  },
+  "hydreigon-expert-belt": {
+    "label": "Expert Belt attacker",
+    "description": "Boosts its super-effective hits with Expert Belt and covers many foes with four attacking types."
+  },
+  "cresselia-defensive": {
+    "label": "Lunar Dance support",
+    "description": "Paralyzes foes with Thunder Wave, then sacrifices itself with Lunar Dance to fully heal a teammate."
+  },
+  "volcanion-bulky-offensive": {
+    "label": "Bulky attacker",
+    "description": "Hits hard with Steam Eruption and wide coverage while taking hits well."
+  }
+}

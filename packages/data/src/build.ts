@@ -5,7 +5,7 @@ import { Dex, TeamValidator, toID } from '@pkmn/sim';
 import { samePurpose } from './distinct';
 import { DEFAULT_FORMAT, formatInfo, type FormatId } from './formats';
 import { resolveSet, usageShares } from './resolve';
-import { assignRoles } from './roles';
+import { assignRoles, megaForm } from './roles';
 import type {
   ChaosStats,
   CuratedSets,
@@ -34,7 +34,81 @@ export const UU_MIN_USAGE = 0.001;
 export const BUILD_RULES: Record<FormatId, { exclude: string[]; avoidAbilities: string[] }> = {
   gen4ou: { exclude: [], avoidAbilities: [] },
   gen5ou: { exclude: ['Ditto', 'Zoroark'], avoidAbilities: ['Swift Swim', 'Chlorophyll'] },
+  // Gen 6 OU has no team-wide ability bans, so Swift Swim and Chlorophyll are back.
+  gen6ou: { exclude: ['Ditto', 'Zoroark'], avoidAbilities: [] },
 };
+
+/** Tiers from highest to lowest, for "the higher of two tiers". Unlisted tiers rank last. */
+const TIER_ORDER = [
+  'Uber',
+  'OU',
+  '(OU)',
+  'UUBL',
+  'UU',
+  'RUBL',
+  'RU',
+  'NUBL',
+  'NU',
+  'PUBL',
+  'PU',
+  '(PU)',
+  'ZU',
+  'NFE',
+  'LC',
+];
+const tierRank = (tier: string) => {
+  const i = TIER_ORDER.indexOf(tier);
+  return i < 0 ? TIER_ORDER.length : i;
+};
+/** The higher of some tiers, e.g. RU and OU → OU (Venusaur with its Mega). */
+export const higherTier = (...tiers: string[]): string =>
+  tiers.reduce((a, b) => (tierRank(b) < tierRank(a) ? b : a));
+
+type GenDex = ReturnType<typeof Dex.forGen>;
+
+/** The Mega form a set's item turns its species into, if the item is that species' Mega Stone. */
+export const megaFormOf = (dex: GenDex, species: string, item: string) =>
+  megaForm(species, item, dex);
+
+/**
+ * Usage stats list each Mega as its own species (`Charizard-Mega-X`). The
+ * game shows the base species and keeps the Mega in the hidden set, so a
+ * Mega's numbers are added into its base species' (usage, counts, options).
+ */
+export function foldMegas(data: ChaosStats['data'], dex: GenDex): ChaosStats['data'] {
+  const out: ChaosStats['data'] = {};
+  const add = (a: Record<string, number>, b: Record<string, number>) => {
+    for (const [k, v] of Object.entries(b)) a[k] = (a[k] ?? 0) + v;
+  };
+  for (const [name, s] of Object.entries(data)) {
+    const species = dex.species.get(name);
+    const key = species.exists && species.isMega ? species.baseSpecies : name;
+    const into = (out[key] ??= {
+      'Raw count': 0,
+      usage: 0,
+      Abilities: {},
+      Items: {},
+      Moves: {},
+      Natures: {},
+    });
+    into['Raw count'] += s['Raw count'];
+    into.usage += s.usage;
+    add(into.Abilities, s.Abilities);
+    add(into.Items, s.Items);
+    add(into.Moves, s.Moves);
+    add(into.Natures, s.Natures);
+  }
+  return out;
+}
+
+/** A species' tier counting the Megas it could hold a stone for (those not banned to Uber). */
+function tierWithMegas(dex: GenDex, name: string): string {
+  const species = dex.species.get(name);
+  const megas = (species.otherFormes ?? [])
+    .map((f) => dex.species.get(f))
+    .filter((f) => f.isMega && f.gen <= dex.gen && f.tier !== 'Uber' && f.tier !== 'Illegal');
+  return higherTier(species.tier, ...megas.map((f) => f.tier));
+}
 
 export interface BuildInput {
   /** Which format to build for; defaults to Gen 4 OU. */
@@ -107,7 +181,9 @@ export function buildSets(
   const dropped: BuildReport['dropped'] = [];
   const species: SetsFile['species'] = {};
 
-  const ranked = Object.entries(input.stats.data)
+  // Folding changes nothing before Gen 6: there are no Megas to fold.
+  const stats = format.gen >= 6 ? foldMegas(input.stats.data, dex) : input.stats.data;
+  const ranked = Object.entries(stats)
     .sort((a, b) => b[1].usage - a[1].usage)
     .map(([name]) => name)
     .filter((name) => !rules.exclude.includes(name));
@@ -120,14 +196,14 @@ export function buildSets(
   }
   for (const name of ranked) {
     if (picks.some((p) => p.name === name)) continue;
-    if (!UU_TIERS.includes(dex.species.get(name).tier)) continue;
-    if (input.stats.data[name]!.usage < UU_MIN_USAGE) continue;
+    if (!UU_TIERS.includes(tierWithMegas(dex, name))) continue;
+    if (stats[name]!.usage < UU_MIN_USAGE) continue;
     if (input.curated[name]) picks.push({ name, setSource: format.id });
     else if (input.curatedUU[name]) picks.push({ name, setSource: format.uu });
   }
 
   for (const { name, setSource } of picks) {
-    const usage = usageShares(input.stats.data[name]!);
+    const usage = usageShares(stats[name]!);
     const skip = new Set(input.curation?.drop?.[name] ?? []);
     // Every set we know for the species: its own tier's analysis first, then
     // the other tier's, then hand-added ones. Usage decides which make the cut.
@@ -237,11 +313,17 @@ export function buildSets(
     const roles = assignRoles(
       sets.map((s) => ({ ...s, species: name })),
       input.overrides,
+      format.gen,
     );
     sets.forEach((s, i) => Object.assign(s, roles[i]));
+    // A species with a Mega set plays at the higher of its own and its Mega's tier.
+    const megaTiers = sets.flatMap((s) => {
+      const mega = megaFormOf(dex, name, s.item);
+      return mega ? [dex.species.get(mega).tier] : [];
+    });
     species[name] = {
-      usage: Math.round(input.stats.data[name]!.usage * 1e6) / 1e6,
-      tier: dex.species.get(name).tier,
+      usage: Math.round(stats[name]!.usage * 1e6) / 1e6,
+      tier: higherTier(dex.species.get(name).tier, ...megaTiers),
       setSource,
       sets,
     };

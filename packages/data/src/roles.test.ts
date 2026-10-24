@@ -46,6 +46,51 @@ describe('deriveRole', () => {
   });
 });
 
+describe('deriveRole in Gen 6', () => {
+  it.each<[Partial<RoleInput>, string]>([
+    [{ item: 'Assault Vest' }, 'Assault Vest tank'],
+    [{ item: 'Weakness Policy' }, 'Weakness Policy attacker'],
+    [{ moves: ['Sticky Web', 'Taunt', 'Ember', 'Bubble'] }, 'Sticky Web setter'],
+    [{ moves: ['Defog', 'Roost', 'Ember', 'Bubble'] }, 'Defogger'],
+    [{ moves: ['Parting Shot', 'Taunt', 'Ember', 'Bubble'] }, 'Pivot'],
+    [
+      {
+        species: 'Charizard',
+        item: 'Charizardite X',
+        moves: ['Dragon Dance', 'Flare Blitz', 'Dragon Claw', 'Roost'],
+      },
+      'Mega X Dragon Dance sweeper',
+    ],
+    [
+      {
+        species: 'Lopunny',
+        item: 'Lopunnite',
+        evs: { hp: 0, atk: 252, def: 4, spa: 0, spd: 0, spe: 252 },
+      },
+      'Mega fast attacker',
+    ],
+  ])('%o → %s', (overrides, label) => {
+    expect(deriveRole(set(overrides), 6).label).toBe(label);
+  });
+
+  it('keeps Gen 4–5 labels for moves that only gained a role in Gen 6', () => {
+    expect(deriveRole(set({ moves: ['Defog', 'Roost', 'Ember', 'Bubble'] }), 5).label).toBe(
+      'Source Name',
+    );
+  });
+
+  it('says how long ability weather lasts in each generation', () => {
+    const politoed = set({ ability: 'Drizzle' });
+    expect(deriveRole(politoed, 5).description).toContain('until another weather');
+    expect(deriveRole(politoed, 6).description).toContain('five turns (eight with Damp Rock)');
+  });
+
+  it("names the Mega a set's stone makes", () => {
+    const role = deriveRole(set({ species: 'Charizard', item: 'Charizardite Y' }), 6);
+    expect(role.description).toContain('Mega Charizard Y');
+  });
+});
+
 describe('assignRoles', () => {
   it('tells apart shared labels by item when items differ', () => {
     const moves = ['Swords Dance', 'Bullet Punch', 'Bug Bite', 'Superpower'];

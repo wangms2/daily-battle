@@ -1,0 +1,295 @@
+{
+  "add": {
+    "Weavile": {
+      "Swords Dance": {
+        "moves": [
+          "Swords Dance",
+          "Knock Off",
+          "Icicle Crash",
+          "Ice Shard"
+        ],
+        "item": "Life Orb",
+        "ability": "Pressure",
+        "nature": "Jolly",
+        "evs": {
+          "atk": 252,
+          "def": 4,
+          "spe": 252
+        }
+      }
+    },
+    "Ferrothorn": {
+      "Stealth Rock": {
+        "moves": [
+          "Stealth Rock",
+          "Leech Seed",
+          "Gyro Ball",
+          "Knock Off"
+        ],
+        "item": "Leftovers",
+        "ability": "Iron Barbs",
+        "nature": "Relaxed",
+        "evs": {
+          "hp": 252,
+          "def": 88,
+          "spd": 168
+        },
+        "ivs": {
+          "spe": 0
+        }
+      }
+    },
+    "Tornadus-Therian": {
+      "Life Orb": {
+        "moves": [
+          "Hurricane",
+          "Heat Wave",
+          "Knock Off",
+          "U-turn"
+        ],
+        "item": "Life Orb",
+        "ability": "Regenerator",
+        "nature": "Timid",
+        "evs": {
+          "spa": 252,
+          "spd": 4,
+          "spe": 252
+        }
+      }
+    },
+    "Skarmory": {
+      "Defog": {
+        "moves": [
+          "Defog",
+          "Roost",
+          "Whirlwind",
+          "Brave Bird"
+        ],
+        "item": "Rocky Helmet",
+        "ability": "Sturdy",
+        "nature": "Impish",
+        "evs": {
+          "hp": 252,
+          "def": 252,
+          "spd": 4
+        }
+      }
+    },
+    "Magnezone": {
+      "Choice Specs": {
+        "moves": [
+          "Thunderbolt",
+          "Flash Cannon",
+          "Hidden Power Fire",
+          "Volt Switch"
+        ],
+        "item": "Choice Specs",
+        "ability": "Magnet Pull",
+        "nature": "Modest",
+        "evs": {
+          "hp": 4,
+          "spa": 252,
+          "spe": 252
+        }
+      }
+    },
+    "Amoonguss": {
+      "Specially Defensive": {
+        "moves": [
+          "Spore",
+          "Giga Drain",
+          "Sludge Bomb",
+          "Hidden Power Fire"
+        ],
+        "item": "Black Sludge",
+        "ability": "Regenerator",
+        "nature": "Calm",
+        "evs": {
+          "hp": 252,
+          "def": 4,
+          "spd": 252
+        }
+      }
+    },
+    "Azelf": {
+      "Expert Belt": {
+        "moves": [
+          "Psychic",
+          "Fire Blast",
+          "Thunderbolt",
+          "U-turn"
+        ],
+        "item": "Expert Belt",
+        "ability": "Levitate",
+        "nature": "Timid",
+        "evs": {
+          "spa": 252,
+          "spd": 4,
+          "spe": 252
+        }
+      }
+    },
+    "Chansey": {
+      "Wish": {
+        "moves": [
+          "Wish",
+          "Protect",
+          "Seismic Toss",
+          "Toxic"
+        ],
+        "item": "Eviolite",
+        "ability": "Natural Cure",
+        "nature": "Bold",
+        "evs": {
+          "hp": 248,
+          "def": 252,
+          "spd": 8
+        }
+      }
+    },
+    "Shuckle": {
+      "Red Card": {
+        "moves": [
+          "Sticky Web",
+          "Stealth Rock",
+          "Final Gambit",
+          "Infestation"
+        ],
+        "item": "Red Card",
+        "ability": "Sturdy",
+        "nature": "Calm",
+        "evs": {
+          "hp": 248,
+          "def": 8,
+          "spd": 252
+        }
+      }
+    },
+    "Quagsire": {
+      "Curse": {
+        "moves": [
+          "Curse",
+          "Waterfall",
+          "Earthquake",
+          "Recover"
+        ],
+        "item": "Leftovers",
+        "ability": "Unaware",
+        "nature": "Impish",
+        "evs": {
+          "hp": 252,
+          "def": 252,
+          "spd": 4
+        }
+      }
+    },
+    "Politoed": {
+      "Choice Scarf": {
+        "moves": [
+          "Hydro Pump",
+          "Ice Beam",
+          "Focus Blast",
+          "Hidden Power Grass"
+        ],
+        "item": "Choice Scarf",
+        "ability": "Drizzle",
+        "nature": "Timid",
+        "evs": {
+          "spa": 252,
+          "spd": 4,
+          "spe": 252
+        }
+      }
+    },
+    "Blissey": {
+      "Wish": {
+        "moves": [
+          "Wish",
+          "Protect",
+          "Seismic Toss",
+          "Toxic"
+        ],
+        "item": "Leftovers",
+        "ability": "Natural Cure",
+        "nature": "Calm",
+        "evs": {
+          "hp": 120,
+          "def": 252,
+          "spd": 136
+        }
+      }
+    },
+    "Nidoking": {
+      "Stealth Rock": {
+        "moves": [
+          "Stealth Rock",
+          "Earth Power",
+          "Sludge Wave",
+          "Ice Beam"
+        ],
+        "item": "Focus Sash",
+        "ability": "Sheer Force",
+        "nature": "Timid",
+        "evs": {
+          "spa": 252,
+          "spd": 4,
+          "spe": 252
+        }
+      }
+    },
+    "Mandibuzz": {
+      "Physically Defensive": {
+        "moves": [
+          "Foul Play",
+          "Roost",
+          "Defog",
+          "Toxic"
+        ],
+        "item": "Rocky Helmet",
+        "ability": "Overcoat",
+        "nature": "Bold",
+        "evs": {
+          "hp": 248,
+          "def": 252,
+          "spd": 8
+        }
+      }
+    },
+    "Feraligatr": {
+      "Choice Band": {
+        "moves": [
+          "Waterfall",
+          "Crunch",
+          "Ice Punch",
+          "Aqua Jet"
+        ],
+        "item": "Choice Band",
+        "ability": "Sheer Force",
+        "nature": "Adamant",
+        "evs": {
+          "atk": 252,
+          "spd": 4,
+          "spe": 252
+        }
+      }
+    },
+    "Hawlucha": {
+      "Choice Band": {
+        "moves": [
+          "High Jump Kick",
+          "Stone Edge",
+          "Poison Jab",
+          "U-turn"
+        ],
+        "item": "Choice Band",
+        "ability": "Mold Breaker",
+        "nature": "Jolly",
+        "evs": {
+          "atk": 252,
+          "def": 4,
+          "spe": 252
+        }
+      }
+    }
+  }
+}
