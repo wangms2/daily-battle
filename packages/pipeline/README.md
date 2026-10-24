@@ -39,6 +39,8 @@ Each opponent candidate (`generateOpponent(day, data, candidate)`) plays 200 tea
 
 8 weeks are published, Oct 19 to Dec 7, 2026. Every pool and every day passed (no closest-candidate fallbacks). Details are in `reports/`.
 
+**Gen 3 OU** schedules are built with `schedule --format gen3ou --from 2026-10-19` into `schedule/gen3ou/` and `reports/gen3ou/`. Sampled pool teams pass `legalTeam` like every format; the set data already leaves out the boost passers ADV's clauses would make illegal in pairs. One week is published so far, Oct 19, 2026, the trial: every day passed with no retuning (first try 45.8–54.0%, no turn caps), though days took up to 18 candidates. It took 17 minutes on 4 workers; the next weeks follow.
+
 **Gen 6 OU** schedules are built with `schedule --format gen6ou --from 2026-10-19` into `schedule/gen6ou/` and `reports/gen6ou/`. Sampled pool teams pass `legalTeam` (the validator plus one Mega per team), the player bots Mega Evolve like the AI, and the archetypes count Assault Vest, Weakness Policy, Geomancy, and Sticky Web. Seven weeks are published so far, Oct 19 to Nov 30, 2026 (the rest of the 24 to Mar 29, 2027 follow). Every pool passed on its first candidate; two days kept their closest candidate, just outside the first-try band (Nov 8 at 44.5%, Dec 1 at 55.5%). A week takes about 14–26 minutes on 4 workers.
 
 ## Tests

@@ -142,8 +142,8 @@ test('a Gen 5 battle shows the foe six from the start, and resumes', async ({ pa
 });
 
 test('a player from before Gen 5 gets only the newest news, once', async ({ page }, info) => {
-  // A Gen 4 save from before Gen 5 (v3), as most players have. Gen 6 has
-  // come out since, so its sheet is the one they see; Gen 5's never shows.
+  // A Gen 4 save from before Gen 5 (v3), as most players have. Gen 6 and
+  // Gen 3 have come out since, so Gen 3's sheet is the one they see.
   await open(page, {
     version: 3,
     weeks: {},
@@ -155,9 +155,10 @@ test('a player from before Gen 5 gets only the newest news, once', async ({ page
       shownExplainers: ['welcome'],
     },
   });
-  const news = page.getByRole('dialog', { name: 'New: Gen 6 OU' });
+  const news = page.getByRole('dialog', { name: 'New: Gen 3 OU' });
   await expect(news).toBeVisible();
   await expect(page.getByRole('dialog', { name: 'New: Gen 5 OU' })).toBeHidden();
+  await expect(page.getByRole('dialog', { name: 'New: Gen 6 OU' })).toBeHidden();
   await noScroll(page, 'news');
   await shot(page, '07-news', info.project.name);
   await news.getByRole('button', { name: 'Stay on Gen 4' }).click();
