@@ -1,0 +1,237 @@
+{
+  "tyranitar-bulky-physical-attacker": {
+    "label": "Bulky attacker",
+    "description": "Summons a sandstorm and hits hard with Rock Slide, Earthquake, and Focus Punch from a bulky spread."
+  },
+  "tyranitar-pursuit": {
+    "label": "Pursuit trapper",
+    "description": "Summons a sandstorm and catches fleeing Psychic and Ghost types with Pursuit."
+  },
+  "swampert-standard-defensive": {
+    "label": "Physical wall (Earthquake)"
+  },
+  "swampert-surf-defensive": {
+    "label": "Physical wall (Roar)",
+    "description": "Soaks up physical attacks, spreads Toxic, and Roars away setup sweepers."
+  },
+  "swampert-standard-offensive": {
+    "label": "Bulky attacker",
+    "description": "Attacks with Hydro Pump, Ice Beam, and Earthquake from a bulky spread, and cures its status with Refresh."
+  },
+  "metagross-bulky-attacker": {
+    "label": "Bulky attacker",
+    "description": "Hits hard with Meteor Mash and Earthquake from a bulky spread, scouting with Protect and taking a foe down with Explosion."
+  },
+  "metagross-mixed": {
+    "label": "Mixed attacker",
+    "description": "Mixes Meteor Mash with Psychic and Hidden Power Fire to break through walls of either kind, then Explodes."
+  },
+  "gengar-defensive": {
+    "label": "Will-O-Wisp support (bulky)",
+    "description": "Burns physical attackers with Will-O-Wisp, attacks with Thunderbolt and Ice Punch, and takes a foe down with Explosion."
+  },
+  "gengar-utility": {
+    "label": "Will-O-Wisp support (fast)",
+    "description": "Outspeeds and burns physical attackers with Will-O-Wisp, attacks with Thunderbolt and Ice Punch, and takes a foe down with Explosion."
+  },
+  "gengar-perish-trap": {
+    "label": "Perish trapper",
+    "description": "Traps a foe with Mean Look and KOs it with Perish Song, Taunting healers and taking a foe down with Destiny Bond."
+  },
+  "blissey-utility": {
+    "label": "Special wall",
+    "description": "Takes special hits all day, heals with Soft-Boiled, paralyzes with Thunder Wave, and chips away with Seismic Toss."
+  },
+  "aerodactyl-taunt-lead": {
+    "label": "Taunt lead",
+    "description": "Leads with Taunt to stop Spikes and setup, then attacks with Rock Slide, Earthquake, and Double-Edge."
+  },
+  "suicune-modest-resttalk": {
+    "label": "Calm Mind sweeper (RestTalk)"
+  },
+  "celebi-leech-seed-3-attacks": {
+    "label": "Leech Seed attacker",
+    "description": "Saps HP with Leech Seed and attacks with Giga Drain, Psychic, and Hidden Power Fire."
+  },
+  "celebi-utility": {
+    "label": "Leech Seed support",
+    "description": "Saps HP with Leech Seed, heals with Recover, and Baton Passes out to a teammate."
+  },
+  "celebi-offensive": {
+    "label": "Calm Mind sweeper (offensive)"
+  },
+  "celebi-defensive-calm-mind": {
+    "label": "Calm Mind sweeper (bulky)"
+  },
+  "snorlax-utility-lax": {
+    "label": "Bulky attacker",
+    "description": "Hits with Body Slam, Shadow Ball, and Earthquake from huge HP, and takes a foe down with Self-Destruct."
+  },
+  "snorlax-offensive-curse": {
+    "label": "Curse sweeper (offensive)"
+  },
+  "snorlax-curserestlax": {
+    "label": "Curse sweeper (Rest)"
+  },
+  "jirachi-substitute-calm-mind": {
+    "label": "Calm Mind sweeper (Substitute)"
+  },
+  "jirachi-superachi-offensive-calm-mind": {
+    "label": "Calm Mind sweeper (offensive)"
+  },
+  "jirachi-wish-calm-mind": {
+    "label": "Calm Mind sweeper (Wish)"
+  },
+  "magneton-trapper": {
+    "label": "Steel trapper",
+    "description": "Traps Steel types with Magnet Pull and takes them out with Thunderbolt and Hidden Power Fire."
+  },
+  "jynx-perish-trapper": {
+    "label": "Perish trapper",
+    "description": "Puts a foe to sleep with Lovely Kiss, traps it with Mean Look, and KOs it with Perish Song from behind a Substitute."
+  },
+  "charizard-sun": {
+    "label": "Sun attacker",
+    "description": "Sets sun with Sunny Day to power up Fire Blast, with Hidden Power Grass and Dragon Claw for coverage."
+  },
+  "medicham-reversal": {
+    "label": "Reversal attacker",
+    "description": "Behind a Substitute, Salac Berry and low HP power up Reversal and Focus Punch."
+  },
+  "cloyster-spiker": {
+    "label": "Spikes setter (spinner)"
+  },
+  "cloyster-offensive-spikes": {
+    "label": "Spikes setter (offensive)"
+  },
+  "regirock-physical-attacker": {
+    "label": "Bulky attacker",
+    "description": "Hits with Rock Slide and Focus Punch, paralyzes with Thunder Wave, and takes a foe down with Explosion."
+  },
+  "hariyama-offensive": {
+    "label": "Bulky attacker",
+    "description": "Hits with Focus Punch, Brick Break, and Rock Slide from huge HP, and removes items with Knock Off."
+  },
+  "hariyama-defensive-knock-off": {
+    "label": "Knock Off support",
+    "description": "Removes the foe's item with Knock Off, heals with Rest, and hits back with Brick Break."
+  },
+  "kingdra-rain-dance-sweeper": {
+    "label": "Rain sweeper",
+    "description": "Sets rain with Rain Dance; Swift Swim doubles its Speed for rain-boosted Surf and Hydro Pump."
+  },
+  "houndoom-pursuit": {
+    "label": "Pursuit trapper",
+    "description": "Catches fleeing Psychic and Ghost types with Pursuit and burns physical attackers with Will-O-Wisp."
+  },
+  "venusaur-special-attacker": {
+    "label": "Leech Seed attacker",
+    "description": "Puts a foe to sleep with Sleep Powder, saps HP with Leech Seed, and attacks with Razor Leaf and Hidden Power Fire."
+  },
+  "venusaur-disabler": {
+    "label": "Leech Seed staller"
+  },
+  "umbreon-wishpasser": {
+    "label": "Wish passer",
+    "description": "Passes big Wishes to teammates with Baton Pass and wears foes down with Toxic."
+  },
+  "umbreon-mean-look-toxic": {
+    "label": "Toxic trapper",
+    "description": "Traps a foe with Mean Look and wears it down with Toxic while it stalls with Protect and Wish."
+  },
+  "blaziken-special-attacker": {
+    "label": "Mixed attacker (Salac Berry)",
+    "description": "Mixes Fire Blast, Thunder Punch, and Hidden Power Ice with Sky Uppercut, with a Salac Berry for Speed."
+  },
+  "blaziken-mixed-sweeper": {
+    "label": "Mixed attacker (Leftovers)",
+    "description": "Mixes Fire Blast with Focus Punch, Sky Uppercut, and Rock Slide to break through walls of either kind."
+  },
+  "blaziken-reversal": {
+    "label": "Reversal attacker",
+    "description": "Behind a Substitute, Salac Berry and low HP power up Reversal, with Fire Blast and Hidden Power Ice for coverage."
+  },
+  "marowak-all-out-attacker": {
+    "label": "Thick Club attacker",
+    "description": "Thick Club doubles its Attack for Earthquake, Rock Slide, Double-Edge, and Focus Punch."
+  },
+  "alakazam-encore": {
+    "label": "Encore attacker",
+    "description": "Locks foes into their last move with Encore and attacks from behind a Substitute."
+  },
+  "alakazam-special-trick": {
+    "label": "Trick attacker (special)",
+    "description": "Attacks with Psychic and Fire Punch, then Tricks its Choice Band onto a wall to cripple it."
+  },
+  "alakazam-physical-trick": {
+    "label": "Trick attacker (physical)",
+    "description": "Attacks with Psychic, Focus Punch, and Shadow Ball, then Tricks its Choice Band onto a wall to cripple it."
+  },
+  "ludicolo-rain-dance-sweeper": {
+    "label": "Rain sweeper",
+    "description": "Sets rain with Rain Dance; Swift Swim doubles its Speed for Surf and Ice Beam, and Leech Seed wears foes down."
+  },
+  "ludicolo-stall": {
+    "label": "Leech Seed staller"
+  },
+  "misdreavus-perish-trapper": {
+    "label": "Perish trapper",
+    "description": "Traps a foe with Mean Look and KOs it with Perish Song, Taunting healers and stalling with Protect."
+  },
+  "misdreavus-imprison": {
+    "label": "Imprison support",
+    "description": "Locks out foes that share its moves with Imprison, and paralyzes with Thunder Wave."
+  },
+  "gardevoir-special-sweeper": {
+    "label": "Calm Mind sweeper (Will-O-Wisp)"
+  },
+  "gardevoir-mono-attacker": {
+    "label": "Calm Mind sweeper (Substitute)"
+  },
+  "gardevoir-supporter": {
+    "label": "Wish support",
+    "description": "Passes Wishes to teammates and attacks with Psychic and Thunderbolt."
+  },
+  "lapras-offensive-utility": {
+    "label": "Bulky attacker",
+    "description": "Attacks with Hydro Pump, Ice Beam, and Thunderbolt from a bulky spread, and cures the team's status with Heal Bell."
+  },
+  "scizor-reversal": {
+    "label": "Reversal attacker",
+    "description": "Endures a hit, then uses Liechi Berry, Agility, and Swords Dance to power up a low-HP Reversal."
+  },
+  "scizor-swords-dance": {
+    "label": "Swords Dance sweeper"
+  },
+  "miltank-psych-up": {
+    "label": "Psych Up staller",
+    "description": "Copies the foe's boosts with Psych Up and heals with Milk Drink."
+  },
+  "entei-subcm": {
+    "label": "Calm Mind sweeper (Substitute)"
+  },
+  "entei-sunnybeam": {
+    "label": "Sun sweeper",
+    "description": "Sets sun with Sunny Day to power up Flamethrower and fire Solar Beam without charging, boosted by Calm Mind."
+  },
+  "exeggutor-sunnybeam": {
+    "label": "Sun sweeper",
+    "description": "Sets sun with Sunny Day to fire Solar Beam without charging, with Sleep Powder and Hidden Power Fire."
+  },
+  "exeggutor-stall": {
+    "label": "Bulky attacker",
+    "description": "Puts a foe to sleep with Sleep Powder, attacks with Psychic and Giga Drain, and takes a foe down with Explosion."
+  },
+  "lanturn-parafusion": {
+    "label": "Paralysis support",
+    "description": "Paralyzes with Thunder Wave and confuses with Confuse Ray, then attacks while foes struggle to move."
+  },
+  "quagsire-counter": {
+    "label": "Counter wall",
+    "description": "Takes physical hits and returns them double with Counter, resetting setup with Haze."
+  },
+  "omastar-rain-dance-sweeper": {
+    "label": "Rain sweeper",
+    "description": "Sets rain with Rain Dance; Swift Swim doubles its Speed for rain-boosted Surf."
+  }
+}

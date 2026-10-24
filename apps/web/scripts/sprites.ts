@@ -5,8 +5,11 @@
 // animated 3D sprites (its `ani` and `ani-back` folders, as mirrored by PokeAPI),
 // the X/Y models. Files are committed and self-hosted; nothing is hotlinked.
 // Also writes a still first frame of each front and back GIF for when
-// animations are off.
+// animations are off. Gen 3 battles use the games' own Emerald sprites
+// (PokeAPI's `generation-iii/emerald`), still PNGs, in `gen3/front` and
+// `gen3/back`; box icons stay shared.
 //   pnpm --filter web sprites [--force]
+// CHROMIUM_PATH points the still-frame step at a browser other than Playwright's own.
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { FORMATS, setsFor } from '@daily-battle/data';
@@ -23,6 +26,11 @@ const SOURCES = {
   ],
 };
 const EXT = { front: 'gif', back: 'gif', icons: 'png' } as const;
+/** The Gen 3 games' sprites, for Gen 3 battles. */
+const GEN3 = {
+  front: (id: number) => [`${RAW}/versions/generation-iii/emerald/${id}.png`],
+  back: (id: number) => [`${RAW}/versions/generation-iii/emerald/back/${id}.png`],
+};
 /** Where each animated kind's still first frames go. */
 const STILL = { front: 'front-still', back: 'back-still' } as const;
 
@@ -114,6 +122,23 @@ for (const species of [...allSpecies.filter((s) => s !== 'Substitute'), ...megas
   }
   console.log(`${species} (${id})`);
 }
+const gen3Species = [
+  ...new Set(
+    Object.values(FORMATS)
+      .filter((f) => f.gen === 3)
+      .flatMap((f) => Object.keys(setsFor(f.id).species)),
+  ),
+];
+for (const kind of ['front', 'back'] as const) {
+  mkdirSync(out(`gen3/${kind}`), { recursive: true });
+  for (const species of gen3Species) {
+    const file = `${out(`gen3/${kind}`)}${toId(species)}.png`;
+    if (!force && existsSync(file)) continue;
+    if (!(await download(GEN3[kind](await pokeapiId(species)), file))) {
+      missing.push(`${species} Gen 3 ${kind}`);
+    }
+  }
+}
 if (missing.length) {
   console.error(`Missing: ${missing.join(', ')}`);
   process.exit(1);
@@ -128,7 +153,7 @@ const stills = (Object.keys(STILL) as (keyof typeof STILL)[]).flatMap((kind) =>
 );
 if (stills.length) {
   for (const dir of Object.values(STILL)) mkdirSync(out(dir), { recursive: true });
-  const browser = await chromium.launch();
+  const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH });
   const page = await browser.newPage();
   for (const { kind, id } of stills) {
     const gif = readFileSync(`${out(kind)}${id}.gif`).toString('base64');

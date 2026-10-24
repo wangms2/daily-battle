@@ -1,6 +1,6 @@
 // Gen 6 OU as a third daily game: picking it on first run, a battle where your
 // Pokémon Mega Evolves (and the battle resumes after a reload), the one-Mega
-// rule in the team builder, and the news sheet a returning player sees once.
+// rule in the team builder. (The news sheet is Gen 3's now: gen3.spec.ts.)
 import { expect, test, type Page } from '@playwright/test';
 import schedule from '../public/schedule/gen6ou/2026-10-19.json' with { type: 'json' };
 
@@ -34,7 +34,7 @@ function gen6State({ locked = true } = {}) {
       beginnerHints: true,
       battleSpeed: 'instant',
       animations: true,
-      shownExplainers: ['welcome', 'gen5-news', 'gen6-news'],
+      shownExplainers: ['welcome', 'gen5-news', 'gen6-news', 'gen3-news'],
       format: 'gen6ou',
     },
   };
@@ -144,22 +144,6 @@ test('your Pokémon Mega Evolves, and the battle resumes', async ({ page }, info
     .waitFor();
   // One Mega per team: no other Pokémon is offered Mega Evolution after the resume.
   await expect(page.getByRole('button', { name: 'Mega Evolve', exact: true })).toHaveCount(0);
-});
-
-test('a player from before Gen 6 gets the news once, and can try it', async ({ page }, info) => {
-  const state = gen6State({ locked: false });
-  state.settings.format = 'gen4ou';
-  state.settings.shownExplainers = ['welcome', 'gen5-news'];
-  await open(page, state);
-  const news = page.getByRole('dialog', { name: 'New: Gen 6 OU' });
-  await expect(news).toBeVisible();
-  await noScroll(page, 'gen 6 news');
-  await shot(page, '06-news', info.project.name);
-  await news.getByRole('button', { name: 'Try Gen 6 OU' }).click();
-  await expect(page.getByRole('button', { name: /^Gen 6 · / })).toBeVisible();
-  await page.reload();
-  await expect(page.getByRole('button', { name: /^Gen 6 · / })).toBeVisible();
-  await expect(news).toBeHidden();
 });
 
 test('a #gen6 share link opens Gen 6', async ({ page }) => {

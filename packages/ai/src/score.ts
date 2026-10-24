@@ -100,7 +100,12 @@ const STATUS_GEN6: Record<string, string[]> = {
   stunspore: ['Grass', 'Electric'],
   glare: ['Electric'],
 };
-/** Sleep moves, scored from Gen 6 with Sleep Clause; `true` marks powder moves. */
+/** Gen 3: only Ground types escape Thunder Wave (Electric types' immunity to paralysis is Gen 6). */
+const STATUS_GEN3: Record<string, string[]> = { ...STATUS, thunderwave: ['Ground'] };
+/**
+ * Sleep moves, scored in Gen 3 and from Gen 6, both with Sleep Clause (ADV is
+ * full of Spore, Hypnosis, and Lovely Kiss); `true` marks powder moves.
+ */
 const SLEEP: Record<string, boolean> = {
   spore: true,
   sleeppowder: true,
@@ -488,7 +493,8 @@ function statusValue(
       0.05
     );
   }
-  if (gen6 && id in SLEEP) {
+  const gen3 = ctx.gen.num === 3;
+  if ((gen6 || gen3) && id in SLEEP) {
     if (!foe || foe.status || foe.substitute) return -0.05;
     // Sleep Clause: only one of the foe's team asleep at a time.
     if (state.foe.some((f) => !f.fainted && f.status === 'slp')) return -0.2;
@@ -497,7 +503,8 @@ function statusValue(
       (a, f) =>
         a +
         f.weight *
-          (SLEEP[id] &&
+          (gen6 &&
+          SLEEP[id] &&
           (types.includes('Grass') || f.ability === 'Overcoat' || f.mon.hasItem('Safety Goggles'))
             ? 1
             : 0),
@@ -512,7 +519,9 @@ function statusValue(
   if (id in STATUS) {
     if (!foe || foe.status || foe.substitute || foe.hpFrac < 0.4) return -0.05;
     const types = typesOf(ctx.gen, foe.forme);
-    if ((gen6 ? STATUS_GEN6 : STATUS)[id]!.some((t) => types.includes(t))) return -0.2;
+    if ((gen6 ? STATUS_GEN6 : gen3 ? STATUS_GEN3 : STATUS)[id]!.some((t) => types.includes(t))) {
+      return -0.2;
+    }
     if (gen6 && POWDER.has(id) && foes.every((f) => f.ability === 'Overcoat')) return -0.2;
     const physical = foes.reduce((a, f) => a + f.weight * (f.physical ? 1 : 0), 0);
     return params.status * (id === 'willowisp' ? 0.6 + 0.6 * physical : 1) * (1 - 2 * bounce);

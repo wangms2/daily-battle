@@ -23,6 +23,7 @@
     "@daily-battle/sim-bridge": "workspace:*",
     "@daily-battle/versus": "workspace:*",
     "@fontsource/ibm-plex-sans": "^5.3.0",
+    "@fontsource/jersey-10": "^5.3.0",
     "@fontsource/jersey-15": "^5.3.0",
     "@fontsource/nunito": "^5.3.0",
     "@fontsource/pixelify-sans": "^5.3.0",

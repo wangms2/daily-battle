@@ -44,6 +44,51 @@ Timid Nature
   });
 });
 
+describe('gen3ou format', () => {
+  const mon = (species: string, ability: string, moves: string[]) => ({
+    name: species,
+    species,
+    item: 'Leftovers',
+    ability,
+    moves,
+    nature: 'Hardy',
+    evs: { hp: 4, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 },
+    ivs: { hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31 },
+    level: 100,
+    gender: '',
+  });
+  const validateGen3 = (team: ReturnType<typeof mon>[]) =>
+    TeamValidator.get('gen3ou').validateTeam(structuredClone(team));
+
+  it('is bundled in @pkmn/sim without Team Preview, with the ADV bans and clauses', () => {
+    const format = Dex.formats.get('gen3ou');
+    expect(format.exists).toBe(true);
+    expect(format.mod).toBe('gen3');
+    expect(format.ruleset).not.toContain('Team Preview');
+    expect(format.ruleset).toEqual(expect.arrayContaining(['One Boost Passer Clause']));
+    expect(format.banlist).toEqual(expect.arrayContaining(['Swagger', 'Soundproof', 'Sand Veil']));
+  });
+
+  it('rejects an Uber and accepts an OU team', () => {
+    expect(validateGen3([mon('Latios', 'Levitate', ['Calm Mind', 'Psychic'])])?.join('\n')).toMatch(
+      /Latios/,
+    );
+    expect(
+      validateGen3([
+        mon('Skarmory', 'Keen Eye', ['Spikes', 'Roar']),
+        mon('Blissey', 'Natural Cure', ['Soft-Boiled', 'Ice Beam']),
+      ]),
+    ).toBeNull();
+  });
+
+  it('allows one Baton Passer that boosts per team, not two', () => {
+    const celebi = mon('Celebi', 'Natural Cure', ['Calm Mind', 'Baton Pass']);
+    const umbreon = mon('Umbreon', 'Synchronize', ['Curse', 'Baton Pass']);
+    expect(validateGen3([celebi])).toBeNull();
+    expect(validateGen3([celebi, umbreon])?.join('\n')).toMatch(/One Boost Passer/);
+  });
+});
+
 describe('gen6ou format', () => {
   it('is bundled in @pkmn/sim with Team Preview and the OU bans', () => {
     const format = Dex.formats.get('gen6ou');

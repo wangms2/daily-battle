@@ -5,7 +5,7 @@ import { BattleRoute } from './screens/BattleRoute';
 import { DailyBrief } from './screens/DailyBrief';
 import { TeamBuilder } from './screens/TeamBuilder';
 import { AboutSheet } from './sheets/About';
-import { ALL_NEWS, GEN6_NEWS } from './lib/news';
+import { ALL_NEWS, GEN3_NEWS } from './lib/news';
 import { GameNewsSheet } from './sheets/GameNews';
 import { GamePicker } from './sheets/GamePicker';
 import { SettingsSheet, StatsSheet, WelcomeSheet } from './sheets/misc';
@@ -361,12 +361,12 @@ export function App() {
           route !== 'battle' &&
           !versus &&
           settings.shownExplainers.includes('welcome') &&
-          !settings.shownExplainers.includes(GEN6_NEWS)
+          !settings.shownExplainers.includes(GEN3_NEWS)
         }
         current={game.name}
         onTry={() => {
           for (const id of ALL_NEWS) dispatchAny({ type: 'markExplainer', id });
-          dispatchAny({ type: 'setSetting', key: 'format', value: 'gen6ou' });
+          dispatchAny({ type: 'setSetting', key: 'format', value: 'gen3ou' });
         }}
         onStay={() => {
           for (const id of ALL_NEWS) dispatchAny({ type: 'markExplainer', id });

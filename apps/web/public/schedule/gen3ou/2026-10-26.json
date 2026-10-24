@@ -1,0 +1,302 @@
+{
+  "version": 1,
+  "generatorVersion": 4,
+  "dataBuiltAt": "2026-10-24T16:51:53.962Z",
+  "week": "2026-10-26",
+  "pool": {
+    "species": [
+      "Flygon",
+      "Zapdos",
+      "Medicham",
+      "Starmie",
+      "Forretress",
+      "Blissey",
+      "Jolteon",
+      "Aerodactyl",
+      "Slaking",
+      "Gardevoir",
+      "Machamp",
+      "Quagsire"
+    ],
+    "candidate": 0
+  },
+  "suggestedTeams": [
+    {
+      "archetype": "Balanced",
+      "team": [
+        {
+          "species": "Aerodactyl",
+          "setId": "aerodactyl-choice-band"
+        },
+        {
+          "species": "Quagsire",
+          "setId": "quagsire-curse-rest"
+        },
+        {
+          "species": "Starmie",
+          "setId": "starmie-defensive"
+        },
+        {
+          "species": "Blissey",
+          "setId": "blissey-calm-mind"
+        },
+        {
+          "species": "Zapdos",
+          "setId": "zapdos-rest"
+        },
+        {
+          "species": "Forretress",
+          "setId": "forretress-standard"
+        }
+      ]
+    },
+    {
+      "archetype": "Stall",
+      "team": [
+        {
+          "species": "Quagsire",
+          "setId": "quagsire-counter"
+        },
+        {
+          "species": "Starmie",
+          "setId": "starmie-defensive"
+        },
+        {
+          "species": "Flygon",
+          "setId": "flygon-defensive"
+        },
+        {
+          "species": "Forretress",
+          "setId": "forretress-standard"
+        },
+        {
+          "species": "Zapdos",
+          "setId": "zapdos-rest"
+        },
+        {
+          "species": "Gardevoir",
+          "setId": "gardevoir-supporter"
+        }
+      ]
+    }
+  ],
+  "days": [
+    {
+      "day": "2026-10-26",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Gengar",
+          "setId": "gengar-offensive"
+        },
+        {
+          "species": "Regirock",
+          "setId": "regirock-curse"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-bulky-dragon-dance"
+        },
+        {
+          "species": "Dugtrio",
+          "setId": "dugtrio-choice-band"
+        },
+        {
+          "species": "Suicune",
+          "setId": "suicune-substitute"
+        },
+        {
+          "species": "Steelix",
+          "setId": "steelix-choice-band"
+        }
+      ],
+      "candidate": 3
+    },
+    {
+      "day": "2026-10-27",
+      "style": "stall",
+      "team": [
+        {
+          "species": "Aerodactyl",
+          "setId": "aerodactyl-choice-band"
+        },
+        {
+          "species": "Salamence",
+          "setId": "salamence-dragon-dance"
+        },
+        {
+          "species": "Quagsire",
+          "setId": "quagsire-curse-rest"
+        },
+        {
+          "species": "Medicham",
+          "setId": "medicham-choice-band"
+        },
+        {
+          "species": "Suicune",
+          "setId": "suicune-defensive"
+        },
+        {
+          "species": "Skarmory",
+          "setId": "skarmory-standard"
+        }
+      ],
+      "candidate": 1
+    },
+    {
+      "day": "2026-10-28",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Celebi",
+          "setId": "celebi-leech-seed-3-attacks"
+        },
+        {
+          "species": "Aerodactyl",
+          "setId": "aerodactyl-choice-band"
+        },
+        {
+          "species": "Jirachi",
+          "setId": "jirachi-defensive"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-bulky-dragon-dance"
+        },
+        {
+          "species": "Charizard",
+          "setId": "charizard-mixed-attacker"
+        },
+        {
+          "species": "Claydol",
+          "setId": "claydol-utility"
+        }
+      ],
+      "candidate": 4
+    },
+    {
+      "day": "2026-10-29",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Regirock",
+          "setId": "regirock-choice-band"
+        },
+        {
+          "species": "Forretress",
+          "setId": "forretress-standard"
+        },
+        {
+          "species": "Celebi",
+          "setId": "celebi-defensive-calm-mind"
+        },
+        {
+          "species": "Gengar",
+          "setId": "gengar-defensive"
+        },
+        {
+          "species": "Suicune",
+          "setId": "suicune-modest-resttalk"
+        },
+        {
+          "species": "Moltres",
+          "setId": "moltres-standard"
+        }
+      ],
+      "candidate": 3
+    },
+    {
+      "day": "2026-10-30",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Flygon",
+          "setId": "flygon-defensive"
+        },
+        {
+          "species": "Jynx",
+          "setId": "jynx-special-sweeper"
+        },
+        {
+          "species": "Medicham",
+          "setId": "medicham-bulk-up"
+        },
+        {
+          "species": "Claydol",
+          "setId": "claydol-utility"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-bulky-dragon-dance"
+        },
+        {
+          "species": "Breloom",
+          "setId": "breloom-swords-dance"
+        }
+      ],
+      "candidate": 3
+    },
+    {
+      "day": "2026-10-31",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Jynx",
+          "setId": "jynx-special-sweeper"
+        },
+        {
+          "species": "Starmie",
+          "setId": "starmie-offensive"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-bulky-physical-attacker"
+        },
+        {
+          "species": "Suicune",
+          "setId": "suicune-defensive"
+        },
+        {
+          "species": "Celebi",
+          "setId": "celebi-utility"
+        },
+        {
+          "species": "Venusaur",
+          "setId": "venusaur-special-attacker"
+        }
+      ],
+      "candidate": 3
+    },
+    {
+      "day": "2026-11-01",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Milotic",
+          "setId": "milotic-standard"
+        },
+        {
+          "species": "Starmie",
+          "setId": "starmie-defensive"
+        },
+        {
+          "species": "Gengar",
+          "setId": "gengar-defensive"
+        },
+        {
+          "species": "Snorlax",
+          "setId": "snorlax-offensive-curse"
+        },
+        {
+          "species": "Smeargle",
+          "setId": "smeargle-standard-spikes-lead"
+        },
+        {
+          "species": "Aerodactyl",
+          "setId": "aerodactyl-choice-band"
+        }
+      ],
+      "candidate": 0
+    }
+  ]
+}

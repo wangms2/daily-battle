@@ -1,6 +1,6 @@
 # Daily Battle — Design Doc
 
-Name: **Daily Battle**, hosted on a subdomain of an existing domain, so the name does not need to be unique or separately registrable. A daily Pokémon battle game built on Gen 4 OU, Gen 5 OU, and Gen 6 OU (three daily games, added in that order), inspired by daily-red.com but with competitive Smogon sets, a player-built weekly team, a generated opponent each day, and a realistic ladder-style AI.
+Name: **Daily Battle**, hosted on a subdomain of an existing domain, so the name does not need to be unique or separately registrable. A daily Pokémon battle game built on Gen 3, 4, 5, and 6 OU (four daily games; Gen 4 came first, then 5, 6, and 3), inspired by daily-red.com but with competitive Smogon sets, a player-built weekly team, a generated opponent each day, and a realistic ladder-style AI.
 
 This doc is written to be split into implementation chunks. Section 13 lists milestones with acceptance criteria. Verify package APIs and licenses against current docs before relying on them; names below are from memory.
 
@@ -10,7 +10,7 @@ This doc is written to be split into implementation chunks. Section 13 lists mil
 
 - Each **week**, the player builds a team of 6 from a pool of 12 Pokémon, choosing a set for each. The team is locked for the week.
 - Each **day**, the player faces a generated opponent team. Opponent **species are visible; sets are hidden**.
-- The goal is to win a 6v6 OU battle in the chosen game (Gen 4, 5, or 6). No other objective.
+- The goal is to win a 6v6 OU battle in the chosen game (Gen 3, 4, 5, or 6). No other objective.
 - **Unlimited attempts** per day, but the **first attempt is the scored one**: it decides the day's result and the streak. Retries ("run it back") are allowed and still count as clearing the day, but they cannot rescue the streak. Sets are fixed for the day, so retries leak information.
 - **Difficulty target:** about a 50% first-attempt win rate for an average player, and typically 2–3 attempts to clear a day.
 - Once per day, the player may **swap one Pokémon or one set**.
@@ -21,7 +21,7 @@ This doc is written to be split into implementation chunks. Section 13 lists mil
 
 | Area                | Decision                                                                                                                                                                                               |
 | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Format              | Gen 4 OU, Gen 5 OU, and Gen 6 OU as three daily games (each its own team, opponents, tries, and streak), singles, 6v6, Showdown mechanics. Gen 6 adds one rule of ours: one Mega per team (§19) |
+| Format              | Gen 3, 4, 5, and 6 OU as four daily games (each its own team, opponents, tries, and streak), singles, 6v6, Showdown mechanics. Gen 6 adds one rule of ours: one Mega per team (§19) |
 | Engine              | `@pkmn/sim` (standalone Showdown simulator), self-hosted, no Showdown server                                                                                                                           |
 | Set data            | Smogon data (usage-weighted). 1–4 most common sets per species, weighted by usage                                                                                                                      |
 | Player team         | Weekly. Pick 6 of 12, choose a role-named set for each, lock for the week. Optional suggested teams are a selection, not a default. No lineup ordering; the lead is picked on the daily brief          |
@@ -43,7 +43,7 @@ This doc is written to be split into implementation chunks. Section 13 lists mil
 
 - No accounts, server-side storage, or leaderboards in v1.
 - No multiplayer or PvP in the daily games. Versus rooms with friends are a separate mode (§18).
-- No formats beyond Gen 4, 5, and 6 OU for now. The format is a parameter throughout (`packages/data/src/formats.ts`), so another one is mostly data, sets, and a schedule run (§17, §19).
+- No formats beyond Gen 3 to 6 OU for now. The format is a parameter throughout (`packages/data/src/formats.ts`), so another one is mostly data, sets, and a schedule run (§17, §19, §20).
 - No minimizing-turns scoring.
 - No Showdown server, websockets, or ladder integration.
 
@@ -608,3 +608,15 @@ A third daily game, built in seven phases the same way as Gen 5 (§17). Each pha
   - **Hidden info:** foe Megas stay hidden, as on Showdown. With Beginner hints on, the brief, popover, and info sheet say "Can Mega Evolve" for foes with Mega sets. Usage is never shown.
   - **Builder:** a Mega set previews its Mega (sprite, typing, ability, stats) next to the base form, and the team checklist uses Mega typing.
   - **News:** players from before Gen 6 see "New: Gen 6 OU" once (`gen6-news`), with Try or Stay; a player who missed the Gen 5 sheet sees only this one. The welcome sheet offers all three games. `#gen6` links open it. Saves need no new version: a missing game is added empty on load.
+
+## 20. Gen 3 OU (added Oct 2026)
+
+A fourth daily game, ADV OU, built in the same phases as Gen 5 and 6. Gen 4, 5, and 6 output is unchanged: golden fixtures, set ids, schedules, and AI choices (the Gen 4 AI eval matches `main` exactly). Every new rule is gated on Gen 3.
+
+- **Format.** `gen3ou` (no Team Preview, like Gen 4), listed first in `formats.ts` so the picker and welcome sheet run by generation. Showdown's ADV rules apply: Ubers, Sand Veil, Soundproof, Quick Claw, Assist, and Swagger banned, Sleep Clause Mod and Freeze Clause Mod, and the One Boost Passer, Speed Pass, and Accuracy Trap clauses. Physical or special follows the move's type, and Spikes is the only hazard.
+- **Data** (`gen3ou/`, see `packages/data/README.md`): 76 species, 197 sets, 2–4 each. Ditto and Wobbuffet are left out: Shadow Tag with Counter and Mirror Coat plays as a coin flip against a hidden set. The One Boost Passer Clause is team-wide, so Baton Pass sets that can raise their stats are dropped and any 6 of a pool stay legal (every cross-species pair passes the validator). 23 hand-written sets fill out species with a single distinct set, and 63 labels were rewritten by hand. Stats come from pkmn's mirror, as for Gen 6.
+- **Pools** need a Spikes setter where later gens need Stealth Rock.
+- **AI.** Sleep moves are scored under Sleep Clause (ADV is full of Spore, Hypnosis, and Lovely Kiss), and Electric types can be paralyzed. The calc handles type-based categories, Explosion halving Defense, and the Gen 3 items. The eval (`--format gen3ou`) meets every threshold; strong beats mid narrowly (51%), but the pipeline's skill check rejected only one candidate in the trial week.
+- **Schedules** live in `schedule/gen3ou/` and `reports/gen3ou/`. A trial week met the bands with no retuning and no turn caps (ADV stall doesn't stall the pipeline). Opponents land far from the band more often than in Gen 4, and the resampling absorbs it (up to 18 candidates for a day). A week takes about 17 minutes on 4 workers.
+- **Web.** Gen 3 battles look like the games: Emerald's own front and back sprites (still, from PokeAPI's `generation-iii/emerald`, in `sprites/gen3/`, drawn 1.5× to stand on the platforms like the other gens'), Showdown's six Gen 3 backgrounds (CC0), and Jersey 10 (OFL) as the battle font. Box icons stay shared. Returning players see "New: Gen 3 OU" once (`gen3-news`), and `#gen3` links open it. Versus rooms can pick Gen 3 too.
+

@@ -19,16 +19,18 @@ import { CheckIcon, CloseIcon } from '../ui/icons';
 
 /** What sets each game apart, for the welcome sheet's choice. */
 const GAME_BLURB: Record<FormatId, string> = {
+  gen3ou: 'Ruby, Sapphire, and Emerald',
   gen4ou: 'Diamond and Pearl',
   gen5ou: 'Black and White, with Team Preview',
   gen6ou: 'X and Y, with Mega Evolution and Fairy types',
 };
 
-/** The games, for phones: three options side by side must fit a 360px-wide sheet. */
+/** The games, for phones: four side by side must fit a 360px-wide sheet, so the games' short names. */
 const GAME_SHORT: Record<FormatId, string> = {
-  gen4ou: 'Diamond & Pearl',
-  gen5ou: 'Black & White',
-  gen6ou: 'X & Y, Megas',
+  gen3ou: 'RSE',
+  gen4ou: 'DPPt',
+  gen5ou: 'BW',
+  gen6ou: 'XY, Megas',
 };
 
 export function WelcomeSheet({
@@ -92,7 +94,11 @@ export function WelcomeSheet({
             <legend className="mb-2 text-[15px] font-semibold">
               Pick your game <span className="font-normal text-muted">· you can switch later</span>
             </legend>
-            <div role="radiogroup" aria-label="Game" className="grid grid-cols-3 gap-2">
+            <div
+              role="radiogroup"
+              aria-label="Game"
+              className="grid grid-cols-4 gap-1.5 sm:grid-cols-2 sm:gap-2"
+            >
               {(Object.keys(FORMATS) as FormatId[]).map((id) => (
                 <button
                   key={id}
@@ -101,11 +107,13 @@ export function WelcomeSheet({
                   aria-checked={format === id}
                   onClick={() => onFormat(id)}
                   className={clsx(
-                    'card px-2.5 py-1.5 text-left sm:px-3',
+                    'card px-2 py-1.5 text-left sm:px-3',
                     format === id ? 'is-selected' : 'hover:bg-surface-2',
                   )}
                 >
-                  <span className="block text-[15px] font-semibold">{FORMATS[id].name} OU</span>
+                  <span className="block text-[14px] font-semibold sm:text-[15px]">
+                    {FORMATS[id].name} OU
+                  </span>
                   <span className="block text-[12px] leading-snug text-muted">
                     <span className="sm:hidden">{GAME_SHORT[id]}</span>
                     <span className="hidden sm:inline">{GAME_BLURB[id]}</span>

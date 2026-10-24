@@ -23,8 +23,10 @@ export function verifyPool(pool: WeeklyPool, data: SetsFile, majorTypes: string[
   if (species.some((s) => !data.species[s])) problems.push('unknown species');
 
   const anySet = (pred: (s: SetEntry) => boolean) => species.filter((sp) => allSets(sp).some(pred));
-  // Spikes and hazard removal are soft constraints, so only Stealth Rock is required.
-  if (!anySet((s) => s.moves.includes('Stealth Rock')).length) problems.push('no Stealth Rock');
+  // Spikes and hazard removal are soft constraints, so only Stealth Rock is
+  // required; Gen 3 has none, so there it's Spikes.
+  const hazard = genOf(data.meta.format) >= 4 ? 'Stealth Rock' : 'Spikes';
+  if (!anySet((s) => s.moves.includes(hazard)).length) problems.push(`no ${hazard}`);
   const belowOu = species.filter((s) => !['OU', '(OU)'].includes(data.species[s]?.tier ?? ''));
   if (belowOu.length < CONFIG.pool.belowOuMin || belowOu.length > CONFIG.pool.belowOuMax) {
     problems.push(`${belowOu.length} below-OU species`);

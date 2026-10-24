@@ -124,6 +124,14 @@ describe('gen5ou (Team Preview)', () => {
   }, 120_000);
 });
 
+describe('gen3ou', () => {
+  it('runs 100 random battles without errors', () => {
+    const { results, errors } = soak({ n: 100, seed: 'vitest-gen3', format: 'gen3ou' });
+    expect(errors).toEqual([]);
+    expect(results).toHaveLength(100);
+  }, 120_000);
+});
+
 describe('leadChoice', () => {
   it('leads with one Pokémon and keeps the rest in order', () => {
     expect(leadChoice(1, 6)).toBe('team 123456');

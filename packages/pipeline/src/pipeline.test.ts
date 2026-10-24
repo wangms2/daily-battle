@@ -178,3 +178,33 @@ describe('published Gen 6 schedule files', () => {
     }
   });
 });
+
+describe('published Gen 3 schedule files', () => {
+  const dir = new URL('../../../apps/web/public/schedule/gen3ou/', import.meta.url);
+  const files = existsSync(dir) ? readdirSync(dir).filter((f) => f.endsWith('.json')) : [];
+  const data = setsFor('gen3ou');
+
+  // Until the first Gen 3 week is published there's nothing to check.
+  if (!files.length) it.skip('no Gen 3 weeks published yet', () => {});
+
+  it.each(files)('%s is legal, uses known sets, and has a Spikes setter', (file) => {
+    const schedule = parseSchedule(JSON.parse(readFileSync(new URL(file, dir), 'utf8')));
+    expect(`${schedule.week}.json`).toBe(file);
+    expect(new Set(schedule.pool.species).size).toBe(12);
+    // No Stealth Rock in Gen 3: Spikes takes its place in every pool.
+    expect(
+      schedule.pool.species.some((s) =>
+        data.species[s]!.sets.some((set) => set.moves.includes('Spikes')),
+      ),
+    ).toBe(true);
+    for (const team of [
+      ...schedule.days.map((d) => d.team),
+      ...schedule.suggestedTeams.map((s) => s.team),
+    ]) {
+      expect(legalTeam(data, team)).toBe(true);
+    }
+    for (const s of schedule.suggestedTeams) {
+      expect(s.team.every((slot) => schedule.pool.species.includes(slot.species))).toBe(true);
+    }
+  });
+});

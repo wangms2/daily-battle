@@ -1,6 +1,7 @@
 // All sprite access goes through here (DESIGN.md §12.3a), so styles and sources
 // can change without touching the UI. Files are self-hosted under /sprites.
-import { toId } from './data';
+import { genOf } from '@daily-battle/data';
+import { activeFormat, toId } from './data';
 
 export type SpriteKind = 'front' | 'back' | 'icon';
 /** 'animated' GIFs, or 'still' first frames (animations off, or reduced motion). */
@@ -34,6 +35,11 @@ export function getSprite(
   kind: SpriteKind = 'front',
   style: SpriteStyle = defaultStyle,
 ): string {
+  // Gen 3 battles look like Ruby, Sapphire, and Emerald: the games' own still
+  // sprites, front and back (Showdown's substitute doll stays shared).
+  if (kind !== 'icon' && species !== 'Substitute' && genOf(activeFormat()) === 3) {
+    return `${import.meta.env.BASE_URL}sprites/gen3/${kind}/${toId(species)}.png`;
+  }
   const { dir, ext } = DIRS[style][kind];
   return `${import.meta.env.BASE_URL}sprites/${dir}/${toId(species)}.${ext}`;
 }
