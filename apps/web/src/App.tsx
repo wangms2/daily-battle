@@ -9,6 +9,7 @@ import { ALL_NEWS, GEN3_NEWS } from './lib/news';
 import { GameNewsSheet } from './sheets/GameNews';
 import { GamePicker } from './sheets/GamePicker';
 import { SettingsSheet, StatsSheet, WelcomeSheet } from './sheets/misc';
+import { configureAudio } from './lib/audio';
 import { setActiveFormat } from './lib/data';
 import { setSpriteStyle } from './lib/sprites';
 import { useMediaQuery } from './ui/useWide';
@@ -74,6 +75,8 @@ export function App() {
   // Animations off (or the system asking for less motion) means still sprites everywhere.
   const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
   setSpriteStyle(state.settings.animations && !reducedMotion ? 'animated' : 'still');
+  const { sound, musicVolume, effectsVolume } = state.settings;
+  configureAudio({ sound, musicVolume, effectsVolume });
   const dispatch = (action: GameAction) => dispatchAny({ ...action, format });
   const [retry, setRetry] = useState(0);
   const schedule = useSchedule(week, format, retry);

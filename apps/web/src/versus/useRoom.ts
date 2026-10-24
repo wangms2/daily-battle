@@ -15,6 +15,7 @@ import {
   type ServerMessage,
 } from '@daily-battle/versus';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { playChime } from '../lib/audio';
 import { Feed } from './feed';
 import { forgetToken, saveName, saveToken, tokenFor } from './saved';
 
@@ -64,6 +65,8 @@ export function useRoom(code: string, autoJoinAs?: string) {
   const [session, setSession] = useState(0);
   /** Your battle this round; kept after it ends, until a new round replaces it. */
   const [match, setMatch] = useState<LocalMatch | null>(null);
+  /** The last match stage seen, to chime once when a battle starts. */
+  const lastStage = useRef<{ id: string; stage: string } | null>(null);
   const [watchTick, setWatchTick] = useState(0);
   /** Your team in this game, as the room has it. */
   const [team, setTeam] = useState<Slot[] | null>(null);
@@ -131,10 +134,20 @@ export function useRoom(code: string, autoJoinAs?: string) {
           setTeam(msg.team);
         } else if (msg.type === 'match') {
           const next = msg.match && { ...msg.match, receivedAt: Date.now() };
+          // A chime when your battle starts (its prep ends).
+          if (next?.stage === 'battle' && lastStage.current?.id === next.id) {
+            if (lastStage.current.stage === 'prep') playChime();
+          }
+          lastStage.current = next && { id: next.id, stage: next.stage };
           // A finished battle stays up until you go back to the room.
           setMatch((m) => (next || !m || m.stage !== 'over' ? next : m));
         } else if (msg.type === 'side') {
           feedFor(msg.match).push(msg);
+          // Your move, while you're on another tab.
+          const request = msg.update.request as { requestType?: string } | null;
+          if (!msg.resync && document.hidden && request && request.requestType !== 'wait') {
+            playChime();
+          }
         } else if (msg.type === 'watch') {
           // A resync starts the battle over (a reconnect): drop what came before.
           if (msg.resync) watchFeeds.current.delete(msg.match);
