@@ -563,6 +563,20 @@ A room where friends play live battles against each other, Super Auto Pets style
 - **Cost.** Measured locally, a turn takes about 2 ms of CPU, setting up a battle 3–17 ms, and rebuilding a whole battle from its choices about 100 ms. The Worker bundles the simulator (about 10.6 MB, under the 64 MiB limit). The Durable Objects limit is 30 s of CPU per message; if Workers Free's 10 ms per request applies to Durable Objects too, the setup and rebuild steps would need the paid plan.
 - **Entry.** Until rooms can play (V4), versus is reached only at `#versus` (and invite links, `#versus/CODE`); nothing in the daily game links to it yet.
 
+### 18.3a Elimination, spectating, and between rounds (decided Oct 2026)
+
+- **Out.** A knocked-out player gets a short card (placement, their wins and losses, empty hearts), then **Keep watching**. They stay in the room as "Out (5th)", see every round's results and pairings, and can leave at any time. The last player standing gets a winner screen with light confetti, a podium for the top three, and the full standings; the host can **Play again** with the same players.
+- **Who watches.** Everyone not in a battle can watch the ones in progress: eliminated players, and players whose battle already ended. Watching shows what the public log shows (moves, items, and abilities as they're revealed, HP as percentages), so scouting is part of the game. Spectators never see hidden sets or exact HP. No delay.
+- **The spectator feed.** The room sends a third view of each battle, its spectator log (`BattleSession.spectatorLog`), drawn with a spectator presenter: p1 at the bottom, p2 at the top, both named.
+- **Layout.** On desktop, a grid of every live battle. With at most 8 players there are at most 4 battles, so a 2×2 grid shows them all. Each card has a compact field, both names with hearts, team icons, and the last couple of log lines; clicking one focuses it full size with the full log, and the rest move to a side rail. On phones, two battles are stacked, each a compact field with one line of text, and a strip of chips picks which two. Full move animations play only on the focused battle; compact cards animate HP, faints, and switches. A "Last Pokémon!" badge marks a battle down to one Pokémon on either side, and on phones the closest battle moves to the top.
+- **Reactions.** Spectators can send a few fixed emoji (😮 🔥 😂 💀), which float over the battle for everyone watching it, including its two players. Rate-limited per player; no text chat.
+- **Pairing.** Players with the same number of lives are paired when possible, avoiding last round's rematch. An odd player out faces the AI.
+- **Between rounds.** A sequence of about 8 s that everyone sees together, driven by the room (an `intermission` phase on the alarm):
+  1. results, with each battle's card sliding in, the winner lit and the loser's heart cracking, and eliminations stamped "Out" with a placement;
+  2. standings that reorder with a short animation;
+  3. a VS reveal, where a quick shuffle of names lands on "You vs …" and both teams' species slide in from opposite sides, leading into the swap phase.
+  The swap timer starts for everyone when the sequence ends. Tapping skips ahead on your own screen only. Reduced motion uses fades only.
+
 ### 18.4 Phases
 
 | Phase | What                                                                                                                   | Done when                                                           |
@@ -570,5 +584,5 @@ A room where friends play live battles against each other, Super Auto Pets style
 | V1    | Split the frame building out of `BattleEngine` into `SidePresenter`, working from either side                          | Daily battles unchanged; tests drive a battle from both sides (done) |
 | V2    | Worker, room Durable Object, websocket protocol, lobby (create, join, settings), reconnect tokens                       | Friends can join a room and see each other (done)                   |
 | V3    | One live battle between two players in a room: server-side sim, turn timer, disconnect grace, resume                    | Two browsers play a battle to the end (done)                        |
-| V4    | The room loop: pool and build phase, pairing, swap phase, lives, elimination, the AI for odd counts, results            | A room of three plays to a winner                                    |
-| V5    | Handicaps, spectating, a share card                                                                                     |                                                                     |
+| V4    | The room loop: pool and build phase, pairing by lives, swap phase, lives, elimination, the AI for odd counts, results   | A room of three plays to a winner                                    |
+| V5    | Spectating (multi-battle grid, reactions), the between-round sequence, elimination and winner screens, a share card    | An eliminated player watches two battles at once on a phone         |
