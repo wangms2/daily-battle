@@ -1,20 +1,24 @@
-import { deriveSeed, legalChoices, makeRng } from '@daily-battle/sim-bridge';
+import { setsFor } from '@daily-battle/data';
+import { deriveSeed, legalChoices, makeRng, randomTeam } from '@daily-battle/sim-bridge';
 import { newMatch, SIDES, type Match, type Side } from '@daily-battle/versus';
 import { describe, expect, it } from 'vitest';
-import { dealTeam, LiveBattle, randomSeed } from './battle';
+import { LiveBattle, randomSeed } from './battle';
 
+/** A match in battle with random teams, lead first as the room stores them. */
 function match(i: number, format: 'gen4ou' | 'gen5ou' = 'gen4ou', size = 6): Match {
   const rng = makeRng(deriveSeed('server:teams', i));
-  return newMatch({
+  const team = () => randomTeam(rng, setsFor(format)).slice(0, size);
+  const m = newMatch({
     id: `1-${i}`,
     players: { p1: 'a', p2: 'b' },
     names: { p1: 'Ash', p2: 'Misty' },
     format,
     seed: deriveSeed('server:battle', i),
-    teams: { p1: dealTeam(format, rng, size), p2: dealTeam(format, rng, size) },
+    slots: { p1: [], p2: [] },
     bankMs: 240_000,
     now: 0,
   });
+  return { ...m, stage: 'battle', teams: { p1: team(), p2: team() } };
 }
 
 /** Plays random legal choices to the end, recording them on the match as the room does. */
@@ -58,18 +62,18 @@ describe('LiveBattle', () => {
   }, 60_000);
 
   it('sends each lead first, and works with Team Preview and smaller teams', () => {
-    const m: Match = { ...match(7, 'gen5ou', 4), stage: 'battle' };
-    const lead = m.teams.p2[2]!.species;
-    const battle = new LiveBattle({ ...m, leads: { p2: lead } });
+    const m = match(7, 'gen5ou', 4);
+    const lead = m.teams.p2[0]!.species;
+    const battle = new LiveBattle(m);
     const lines = battle.update('p2', 0).lines.join('\n');
     expect(lines).toMatch(new RegExp(`\\|switch\\|p2a: ${lead}`));
     expect(battle.waitingOn('p1') && battle.waitingOn('p2')).toBe(true);
-    const { battle: done } = playOut({ ...m, leads: { p2: lead } }, 7);
+    const { battle: done } = playOut(m, 7);
     expect(done.ended).toBe(true);
   }, 60_000);
 
   it('keeps each side to its own view and refuses illegal choices', () => {
-    const m: Match = { ...match(3), stage: 'battle' };
+    const m: Match = match(3);
     const battle = new LiveBattle(m);
     const foeSets = (side: Side) => m.teams[side === 'p1' ? 'p2' : 'p1'];
     for (const side of SIDES) {
@@ -85,7 +89,7 @@ describe('LiveBattle', () => {
   });
 
   it('records a forfeit as a loss for that side', () => {
-    const battle = new LiveBattle({ ...match(4), stage: 'battle' });
+    const battle = new LiveBattle(match(4));
     battle.forfeit('p2');
     expect(battle.ended).toBe(true);
     expect(battle.winner).toBe('p1');

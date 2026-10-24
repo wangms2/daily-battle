@@ -9,7 +9,9 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@daily-battle/ai": "workspace:*",
     "@daily-battle/data": "workspace:*",
+    "@daily-battle/gen": "workspace:*",
     "@daily-battle/sim-bridge": "workspace:*",
     "@daily-battle/versus": "workspace:*",
     "@pkmn/sim": "catalog:"

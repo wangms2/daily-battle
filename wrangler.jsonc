@@ -8,6 +8,8 @@
   "main": "./apps/server/src/index.ts",
   "assets": {
     "directory": "./apps/web/dist",
+    // The room server reads this week's pool from the published schedules.
+    "binding": "ASSETS",
     // Only /api reaches the Worker; everything else is a static file.
     "run_worker_first": ["/api/*"],
   },
