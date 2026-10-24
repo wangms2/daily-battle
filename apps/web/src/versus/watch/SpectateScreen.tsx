@@ -4,9 +4,10 @@
 // chips to switch between them. Loaded on demand: it brings the presenter.
 import type { Reaction, RoomView } from '@daily-battle/versus';
 import clsx from 'clsx';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Field } from '../../battle/ui/Field';
 import { BattleText } from '../../battle/ui/text';
+import { startMusic, stopMusic } from '../../lib/audio';
 import { setActiveFormat } from '../../lib/data';
 import { backgroundFor } from '../../lib/fx';
 import { useWide } from '../../ui/useWide';
@@ -163,6 +164,12 @@ export default function SpectateScreen({
   onBack: () => void;
 }) {
   setActiveFormat(room.settings.format);
+  // The battle music while you watch (cries stay off: several battles at once would clash).
+  const format = room.settings.format;
+  useEffect(() => {
+    startMusic(format);
+    return () => stopMusic();
+  }, [format]);
   const wide = useWide();
   const me = room.players.find((p) => p.id === you);
   const matches = room.matches;

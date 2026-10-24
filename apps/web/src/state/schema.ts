@@ -60,6 +60,11 @@ export interface Settings {
   /** 'instant' is for automated tests only; the UI offers slow, normal, and fast. */
   battleSpeed: 'slow' | 'normal' | 'fast' | 'instant';
   animations: boolean;
+  /** Battle music and Pokémon cries (DESIGN.md §21); off until the player turns it on. */
+  sound: boolean;
+  /** 0 to 1, each with its own slider. */
+  musicVolume: number;
+  effectsVolume: number;
   /** One-time explainers already shown; includes 'welcome' after first run. */
   shownExplainers: string[];
   /** The game to show (Gen 4 OU or Gen 5 OU); unset until the player picks one. */
@@ -91,7 +96,15 @@ export function initialState(): State {
       FormatId,
       GameState
     >,
-    settings: { beginnerHints: true, battleSpeed: 'normal', animations: true, shownExplainers: [] },
+    settings: {
+      beginnerHints: true,
+      battleSpeed: 'normal',
+      animations: true,
+      sound: false,
+      musicVolume: 0.5,
+      effectsVolume: 0.5,
+      shownExplainers: [],
+    },
   };
 }
 

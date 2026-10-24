@@ -15,6 +15,7 @@ import { fileURLToPath } from 'node:url';
 import { FORMATS, setsFor } from '@daily-battle/data';
 import { speciesDataFor } from '@daily-battle/data/species';
 import { chromium } from '@playwright/test';
+import { pokeapiId } from './pokeapi';
 
 const RAW = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon';
 const SOURCES = {
@@ -43,38 +44,6 @@ const SUBSTITUTE = {
 const force = process.argv.includes('--force');
 const out = (dir: string) => fileURLToPath(new URL(`../public/sprites/${dir}/`, import.meta.url));
 const toId = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
-const slug = (s: string) => s.toLowerCase().replace(/[.']/g, '').replace(/\s+/g, '-');
-
-const CSV = 'https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv';
-let ids: Map<string, number> | undefined;
-
-/** Identifier → id from one of PokeAPI's CSV tables (`id,identifier,...`). */
-async function csvIds(table: string): Promise<[string, number][]> {
-  const res = await fetch(`${CSV}/${table}.csv`);
-  if (!res.ok) throw new Error(`Could not fetch PokeAPI ${table}.csv`);
-  return (await res.text())
-    .split('\n')
-    .slice(1)
-    .filter(Boolean)
-    .map((line) => {
-      const [id, identifier] = line.split(',');
-      return [identifier!, Number(id)];
-    });
-}
-
-/**
- * PokeAPI pokemon id for a species name, e.g. Rotom-Wash → 10009. Species whose
- * default form has its own name (Thundurus → thundurus-incarnate) use the
- * species id, which is also its default form's id.
- */
-async function pokeapiId(species: string): Promise<number> {
-  if (!ids) {
-    ids = new Map([...(await csvIds('pokemon_species')), ...(await csvIds('pokemon'))]);
-  }
-  const id = ids.get(slug(species));
-  if (!id) throw new Error(`No PokeAPI entry for ${species}`);
-  return id;
-}
 
 async function download(urls: string[], file: string): Promise<boolean> {
   for (const url of urls) {
