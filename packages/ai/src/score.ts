@@ -18,7 +18,7 @@ import {
   type Hit,
 } from './calc';
 import type { Params } from './presets';
-import { moveId, type AIState, type FoeMon, type OwnMon } from './state';
+import { isMegaForme, megaInfo, moveId, type AIState, type FoeMon, type OwnMon } from './state';
 
 export interface ScoredAction {
   choice: string;
@@ -31,7 +31,10 @@ export interface ScoredAction {
 }
 
 interface FoeCand {
+  /** For damage: in Mega form if it has Mega Evolved or is assumed able to. */
   mon: Pokemon;
+  /** For Speed: its current form, since it moves at its old Speed the turn it Mega Evolves (Gen 6). */
+  spe: Pokemon;
   weight: number;
   moves: string[];
   physical: boolean;
@@ -40,6 +43,7 @@ interface FoeCand {
 
 interface Ctx {
   gen: Gen;
+  format: string;
   state: AIState;
   params: Params;
   cache: Map<string, Hit>;
@@ -47,10 +51,15 @@ interface Ctx {
   toOwn: Field;
 }
 
-const HAZARDS: Record<string, { key: 'sr' | 'spikes' | 'tspikes'; max: number }> = {
+const HAZARDS: Record<
+  string,
+  { key: 'sr' | 'spikes' | 'tspikes' | 'web'; max: number; value?: number }
+> = {
   stealthrock: { key: 'sr', max: 1 },
   spikes: { key: 'spikes', max: 3 },
   toxicspikes: { key: 'tspikes', max: 2 },
+  // Gen 6: slows instead of damaging, so worth a bit less.
+  stickyweb: { key: 'web', max: 1, value: 0.6 },
 };
 const SETUP = new Set([
   'swordsdance',
@@ -85,13 +94,35 @@ const STATUS: Record<string, string[]> = {
   stunspore: ['Grass'],
   glare: [],
 };
+/** Gen 6 changes: Electric types can't be paralyzed, Grass types ignore powder moves. */
+const STATUS_GEN6: Record<string, string[]> = {
+  ...STATUS,
+  stunspore: ['Grass', 'Electric'],
+  glare: ['Electric'],
+};
+/** Sleep moves, scored from Gen 6 with Sleep Clause; `true` marks powder moves. */
+const SLEEP: Record<string, boolean> = {
+  spore: true,
+  sleeppowder: true,
+  hypnosis: false,
+  sing: false,
+  lovelykiss: false,
+  darkvoid: false,
+  grasswhistle: false,
+};
+const POWDER = new Set(['spore', 'sleeppowder', 'stunspore', 'poisonpowder', 'ragepowder']);
 const SELF_KO = new Set(['explosion', 'selfdestruct', 'memento']);
 
-function ownCalc(gen: Gen, m: OwnMon): Pokemon {
+/**
+ * One of ours for the calc, in Mega form if `mega` (it has Mega Evolved, or
+ * will, Gen 6 on), else as it battles now.
+ */
+function ownCalc(gen: Gen, format: string, m: OwnMon, mega = isMegaForme(m.forme)): Pokemon {
+  const info = mega ? megaInfo(format, m.species, m.set.item) : undefined;
   return makeMon(gen, {
-    species: m.species,
+    species: info?.forme ?? m.forme,
     item: m.set.item,
-    ability: m.set.ability,
+    ability: info?.ability ?? m.set.ability,
     nature: m.set.nature,
     evs: m.set.evs,
     ivs: m.set.ivs,
@@ -101,30 +132,47 @@ function ownCalc(gen: Gen, m: OwnMon): Pokemon {
   });
 }
 
-/** Top candidate sets for a foe Pokémon as calc Pokémon, weights renormalized. */
-export function foeCands(foe: FoeMon, data: SetsFile, known?: KnownSets): FoeCand[] {
-  const top = candidates(foe, data, known)
+/**
+ * Top candidate sets for a foe Pokémon as calc Pokémon, weights renormalized.
+ * A stone set counts in Mega form unless a teammate has already Mega Evolved.
+ */
+export function foeCands(
+  foe: FoeMon,
+  data: SetsFile,
+  known?: KnownSets,
+  foeMegaUsed = false,
+): FoeCand[] {
+  const top = candidates(foe, data, known, foeMegaUsed)
     .sort((a, b) => b.weight - a.weight)
     .slice(0, 4);
   const total = top.reduce((a, c) => a + c.weight, 0);
-  const gen = genFor(data.meta.format);
-  return top.map(({ set, weight }) => ({
-    mon: makeMon(gen, {
-      species: foe.species,
-      item: set.item,
-      ability: set.ability,
-      nature: set.nature,
-      evs: set.evs,
-      ivs: set.ivs,
-      boosts: foe.boosts,
-      status: foe.status,
-      hpFrac: foe.hpFrac,
-    }),
-    weight: weight / total,
-    moves: set.moves,
-    physical: set.evs.atk >= 200,
-    ability: set.ability,
-  }));
+  const format = data.meta.format;
+  const gen = genFor(format);
+  return top.map(({ set, weight }) => {
+    const mega = megaInfo(format, foe.species, set.item);
+    const asMega = !!mega && (isMegaForme(foe.forme) || !foeMegaUsed);
+    const spec = (species: string, ability: string) =>
+      makeMon(gen, {
+        species,
+        item: set.item,
+        ability,
+        nature: set.nature,
+        evs: set.evs,
+        ivs: set.ivs,
+        boosts: foe.boosts,
+        status: foe.status,
+        hpFrac: foe.hpFrac,
+      });
+    const mon = asMega ? spec(mega.forme, mega.ability) : spec(foe.forme, set.ability);
+    return {
+      mon,
+      spe: asMega && !isMegaForme(foe.forme) ? spec(foe.forme, set.ability) : mon,
+      weight: weight / total,
+      moves: set.moves,
+      physical: set.evs.atk >= 200,
+      ability: asMega ? mega.ability : set.ability,
+    };
+  });
 }
 
 /** Our expected hit on a foe, averaged over its candidate sets. */
@@ -162,10 +210,14 @@ function theirHit(ctx: Ctx, target: Pokemon, targetKey: string, foes: FoeCand[])
   return { frac, ko };
 }
 
+/** Cache key for one of ours: its slot, plus its forme once that's a Mega. */
+const calcKey = (mon: OwnMon, calc: Pokemon) =>
+  isMegaForme(calc.name) ? `${mon.slot}|${calc.name}` : `${mon.slot}`;
+
 function bestOwnHit(ctx: Ctx, mon: OwnMon, calc: Pokemon, foes: FoeCand[]): Hit {
   let best: Hit = { frac: 0, ko: 0 };
   for (const move of mon.set.moves) {
-    const h = ourHit(ctx, calc, `${mon.slot}`, move, foes);
+    const h = ourHit(ctx, calc, calcKey(mon, calc), move, foes);
     if (h.frac > best.frac) best = h;
   }
   return best;
@@ -174,7 +226,7 @@ function bestOwnHit(ctx: Ctx, mon: OwnMon, calc: Pokemon, foes: FoeCand[]): Hit 
 function probFirst(me: Pokemon, foes: FoeCand[], weather: string): number {
   const mine = speed(me, weather);
   return foes.reduce((p, f) => {
-    const theirs = speed(f.mon, weather);
+    const theirs = speed(f.spe, weather);
     return p + f.weight * (mine > theirs ? 1 : mine === theirs ? 0.5 : 0);
   }, 0);
 }
@@ -185,6 +237,8 @@ function hazardCost(gen: Gen, state: AIState, mon: OwnMon): number {
   let cost = s.sr ? 0.125 * effectiveness(gen, 'Rock', mon.species) : 0;
   const grounded = !typesOf(gen, mon.species).includes('Flying') && mon.set.ability !== 'Levitate';
   if (grounded) cost += [0, 1 / 8, 1 / 6, 1 / 4][Math.min(3, s.spikes)]!;
+  // Sticky Web (Gen 6): a Speed drop rather than damage.
+  if (grounded && s.web) cost += 0.04;
   return cost;
 }
 
@@ -193,10 +247,17 @@ function hazardCost(gen: Gen, state: AIState, mon: OwnMon): number {
  * (weighted by the chance it moves before being knocked out), a bonus for
  * outspeeding and KOing, minus damage taken.
  */
-function matchup(ctx: Ctx, mon: OwnMon, calc: Pokemon, foes: FoeCand[]): number {
+function matchup(
+  ctx: Ctx,
+  mon: OwnMon,
+  calc: Pokemon,
+  foes: FoeCand[],
+  /** Its Speed this turn, if not `calc`'s (a Mega Evolves at its old Speed). */
+  spe: Pokemon = calc,
+): number {
   const dealt = bestOwnHit(ctx, mon, calc, foes);
-  const taken = theirHit(ctx, calc, `${mon.slot}`, foes);
-  const first = probFirst(calc, foes, ctx.state.weather);
+  const taken = theirHit(ctx, calc, calcKey(mon, calc), foes);
+  const first = probFirst(spe, foes, ctx.state.weather);
   const lands = first + (1 - first) * (1 - taken.ko);
   return (
     ctx.params.damage * dealt.frac * lands +
@@ -211,7 +272,28 @@ function resists(gen: Gen, mon: OwnMon, foes: FoeCand[]): boolean {
 }
 
 const hazardSeverity = (s: AIState['ownSide']) =>
-  (s.sr ? 0.5 : 0) + 0.25 * s.spikes + 0.15 * s.tspikes;
+  (s.sr ? 0.5 : 0) + 0.25 * s.spikes + 0.15 * s.tspikes + (s.web ? 0.2 : 0);
+
+function makeCtx(state: AIState, params: Params, data: SetsFile): Ctx {
+  const format = data.meta.format;
+  return {
+    gen: genFor(format),
+    format,
+    state,
+    params,
+    cache: new Map(),
+    toFoe: makeField(state.weather, state.ownSide, state.foeSide, state.terrain),
+    toOwn: makeField(state.weather, state.foeSide, state.ownSide, state.terrain),
+  };
+}
+
+/** A move's priority for its user: Gale Wings and Prankster add one from Gen 6 here. */
+function priority(ctx: Ctx, user: Pokemon, info: ReturnType<typeof moveInfo>): number {
+  if (ctx.gen.num < 6) return info.priority;
+  const galeWings = user.hasAbility('Gale Wings') && info.type === 'Flying';
+  const prankster = user.hasAbility('Prankster') && info.category === 'Status';
+  return info.priority + (galeWings || prankster ? 1 : 0);
+}
 
 /**
  * Scores every legal action for the current request. `rng` is only used for
@@ -226,38 +308,39 @@ export function scoreActions(
   known?: KnownSets,
 ): ScoredAction[] {
   const legal = legalChoices(view.request);
-  const gen = genFor(data.meta.format);
-  const ctx: Ctx = {
-    gen,
-    state,
-    params,
-    cache: new Map(),
-    toFoe: makeField(state.weather, state.ownSide, state.foeSide),
-    toOwn: makeField(state.weather, state.foeSide, state.ownSide),
-  };
+  const ctx = makeCtx(state, params, data);
+  const { gen } = ctx;
+  const format = data.meta.format;
   const foe = state.foeActive;
-  const foes = foe ? foeCands(foe, data, known) : [];
+  const foes = foe ? foeCands(foe, data, known, state.foeMegaUsed) : [];
   const ownBySlot = new Map(state.own.map((m) => [m.slot, m]));
-  const calcs = new Map<number, Pokemon>();
-  const calcFor = (m: OwnMon) => {
-    if (!calcs.has(m.slot)) calcs.set(m.slot, ownCalc(gen, m));
-    return calcs.get(m.slot)!;
+  const calcs = new Map<string, Pokemon>();
+  const calcFor = (m: OwnMon, mega = isMegaForme(m.forme)) => {
+    const key = `${m.slot}|${mega}`;
+    if (!calcs.has(key)) calcs.set(key, ownCalc(gen, format, m, mega));
+    return calcs.get(key)!;
   };
+  // A benched stone holder is rated in Mega form while our Mega is unused,
+  // moving at its old Speed on the turn it Mega Evolves.
+  const benchMatchup = (mon: OwnMon) =>
+    mon.megaForme && !state.ownMegaUsed
+      ? matchup(ctx, mon, calcFor(mon, true), foes, calcFor(mon))
+      : matchup(ctx, mon, calcFor(mon), foes);
 
   const scoreSwitch = (slot: number, forced: boolean): number => {
     const mon = ownBySlot.get(slot);
     if (!mon || !foes.length) return 0;
     const calc = calcFor(mon);
     const entry = hazardCost(gen, state, mon);
-    if (forced) return matchup(ctx, mon, calc, foes) - entry;
+    if (forced) return benchMatchup(mon) - entry;
     const active = state.ownActive!;
-    const gain = matchup(ctx, mon, calc, foes) - matchup(ctx, active, calcFor(active), foes);
+    const gain = benchMatchup(mon) - benchMatchup(active);
     // Regenerator (Gen 5) heals a third of max HP on the way out.
     const regen =
       active.set.ability === 'Regenerator'
         ? params.recover * Math.min(1 / 3, 1 - active.hpFrac)
         : 0;
-    const freeHit = theirHit(ctx, calc, `${slot}`, foes).frac;
+    const freeHit = theirHit(ctx, calc, calcKey(mon, calc), foes).frac;
     return (
       params.position * gain -
       params.risk * freeHit -
@@ -279,7 +362,11 @@ export function scoreActions(
 
   const me = state.ownActive;
   const meCalc = calcFor(me);
-  const taken = foes.length ? theirHit(ctx, meCalc, `${me.slot}`, foes) : { frac: 0, ko: 0 };
+  const meMega = state.canMega && me.megaForme ? calcFor(me, true) : undefined;
+  const takenBy = (calc: Pokemon) =>
+    foes.length ? theirHit(ctx, calc, calcKey(me, calc), foes) : { frac: 0, ko: 0 };
+  const takenNow = takenBy(meCalc);
+  // Mega Evolving, it still moves at its old Speed this turn (Gen 6).
   const first = foes.length ? probFirst(meCalc, foes, state.weather) : 0.5;
   const foesLeft = Math.max(1, state.foeTotal - state.foe.filter((f) => f.fainted).length);
 
@@ -289,7 +376,7 @@ export function scoreActions(
     const bench = state.foe.filter((f) => !f.active && !f.fainted);
     let safest: { cands: FoeCand[]; dmg: number } | undefined;
     for (const b of bench) {
-      const cands = foeCands(b, data, known);
+      const cands = foeCands(b, data, known, state.foeMegaUsed);
       const dmg = bestOwnHit(ctx, me, meCalc, cands).frac;
       if (!safest || dmg < safest.dmg) safest = { cands, dmg };
     }
@@ -298,16 +385,22 @@ export function scoreActions(
 
   const request = view.request.requestType === 'move' ? view.request : null;
   const scored = legal.map((choice): ScoredAction => {
-    const [kind, n] = choice.split(' ');
+    const [kind, n, extra] = choice.split(' ');
     if (kind === 'switch') {
       return { choice, kind: 'switch', damage: 0, score: scoreSwitch(Number(n), false) };
     }
+    // `move N mega` (Gen 6): the move from Mega form, which it keeps all battle.
+    const mega = extra === 'mega' && meMega ? meMega : undefined;
+    const calc = mega ?? meCalc;
+    const taken = mega ? takenBy(mega) : takenNow;
     const slot = request?.active[0]?.moves[Number(n) - 1];
     const name = slot?.name ?? me.set.moves[Number(n) - 1] ?? '';
     const id = moveId(name);
     const info = moveInfo(gen, name);
-    const dmg = foes.length ? ourHit(ctx, meCalc, `${me.slot}`, name, targets) : { frac: 0, ko: 0 };
-    const goesFirst = info.priority > 0 ? 1 : info.priority < 0 ? 0 : first;
+    const dmg = foes.length
+      ? ourHit(ctx, calc, calcKey(me, calc), name, targets)
+      : { frac: 0, ko: 0 };
+    const goesFirst = priority(ctx, calc, info) > 0 ? 1 : priority(ctx, calc, info) < 0 ? 0 : first;
     const survive = 1 - taken.ko;
     const stayCost = params.risk * taken.frac;
 
@@ -324,6 +417,7 @@ export function scoreActions(
     } else {
       score = -stayCost + statusValue(id, ctx, me, foe, foes, taken, foesLeft);
     }
+    if (mega) score += params.mega;
     return { choice, kind: 'move', move: id, damage: dmg.frac, score };
   });
 
@@ -347,20 +441,15 @@ export function scoreLeads(
   data: SetsFile,
   known?: KnownSets,
 ): number[] {
-  const gen = genFor(data.meta.format);
-  const ctx: Ctx = {
-    gen,
-    state,
-    params,
-    cache: new Map(),
-    toFoe: makeField(state.weather, state.ownSide, state.foeSide),
-    toOwn: makeField(state.weather, state.foeSide, state.ownSide),
-  };
+  const ctx = makeCtx(state, params, data);
+  const { gen, format } = ctx;
   const foes = state.foe.map((f) => foeCands(f, data, known));
   const leadHazard = 0.5 * params.hazard * (1 + params.earlyHazardBonus);
   return state.own.map((mon) => {
-    const calc = ownCalc(gen, mon);
-    const vs = foes.reduce((a, cands) => a + matchup(ctx, mon, calc, cands), 0);
+    // A Mega set leads as its Mega (Gen 6), at its old Speed on the first turn.
+    const base = ownCalc(gen, format, mon, false);
+    const calc = mon.megaForme ? ownCalc(gen, format, mon, true) : base;
+    const vs = foes.reduce((a, cands) => a + matchup(ctx, mon, calc, cands, base), 0);
     const setter = mon.set.moves.some((m) => moveId(m) in HAZARDS);
     return (foes.length ? vs / foes.length : 0) + (setter ? leadHazard : 0);
   });
@@ -385,7 +474,36 @@ function statusValue(
     if ((typeof current === 'boolean' ? (current ? 1 : 0) : current) >= hazard.max) return -0.05;
     const early = state.turn <= 3 ? 1 + params.earlyHazardBonus : 1;
     const layerDecay = typeof current === 'number' ? 1 / (1 + current) : 1;
-    return params.hazard * (foesLeft / 6) * early * layerDecay * (1 - 2 * bounce);
+    const value = hazard.value ?? 1;
+    return params.hazard * value * (foesLeft / 6) * early * layerDecay * (1 - 2 * bounce);
+  }
+  const gen6 = ctx.gen.num >= 6;
+  // From Gen 6, Defog clears hazards on both sides: ours is the gain, theirs the cost.
+  if (gen6 && id === 'defog') {
+    const foeScreens = (state.foeSide.reflect ? 0.1 : 0) + (state.foeSide.lightScreen ? 0.1 : 0);
+    return (
+      params.spin * hazardSeverity(state.ownSide) -
+      0.5 * params.spin * hazardSeverity(state.foeSide) +
+      foeScreens -
+      0.05
+    );
+  }
+  if (gen6 && id in SLEEP) {
+    if (!foe || foe.status || foe.substitute) return -0.05;
+    // Sleep Clause: only one of the foe's team asleep at a time.
+    if (state.foe.some((f) => !f.fainted && f.status === 'slp')) return -0.2;
+    const types = typesOf(ctx.gen, foe.forme);
+    const blocked = foes.reduce(
+      (a, f) =>
+        a +
+        f.weight *
+          (SLEEP[id] &&
+          (types.includes('Grass') || f.ability === 'Overcoat' || f.mon.hasItem('Safety Goggles'))
+            ? 1
+            : 0),
+      0,
+    );
+    return params.status * 1.3 * (1 - blocked) * (1 - 2 * bounce) - 0.2 * blocked;
   }
   if (SETUP.has(id)) {
     const boosted = Object.values(me.boosts).reduce((a, b) => a + Math.max(0, b), 0);
@@ -393,8 +511,9 @@ function statusValue(
   }
   if (id in STATUS) {
     if (!foe || foe.status || foe.substitute || foe.hpFrac < 0.4) return -0.05;
-    const types = typesOf(ctx.gen, foe.species);
-    if (STATUS[id]!.some((t) => types.includes(t))) return -0.2;
+    const types = typesOf(ctx.gen, foe.forme);
+    if ((gen6 ? STATUS_GEN6 : STATUS)[id]!.some((t) => types.includes(t))) return -0.2;
+    if (gen6 && POWDER.has(id) && foes.every((f) => f.ability === 'Overcoat')) return -0.2;
     const physical = foes.reduce((a, f) => a + f.weight * (f.physical ? 1 : 0), 0);
     return params.status * (id === 'willowisp' ? 0.6 + 0.6 * physical : 1) * (1 - 2 * bounce);
   }

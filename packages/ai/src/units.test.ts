@@ -9,6 +9,7 @@ import type { FoeMon } from './state';
 
 const foe = (species: string, extra: Partial<FoeMon> = {}): FoeMon => ({
   species,
+  forme: species,
   active: true,
   fainted: false,
   hpFrac: 1,
@@ -51,7 +52,14 @@ describe('belief', () => {
 });
 
 describe('calc wrapper', () => {
-  const conds = { sr: false, spikes: 0, tspikes: 0, reflect: false, lightScreen: false };
+  const conds = {
+    sr: false,
+    spikes: 0,
+    tspikes: 0,
+    web: false,
+    reflect: false,
+    lightScreen: false,
+  };
   const mon = (species: string, setIndex = 0, hpFrac = 1) => {
     const s = sets.species[species]!.sets[setIndex]!;
     return makeMon(genFor('gen4ou'), { species, ...s, boosts: {}, status: '', hpFrac });

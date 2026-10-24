@@ -23,6 +23,7 @@ const DAMAGE_ONLY: Params = {
   maxDamageBias: 0,
   predictionRate: 0,
   resistBias: 0,
+  mega: 0,
 };
 
 /**
