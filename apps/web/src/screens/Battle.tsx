@@ -62,6 +62,18 @@ export interface DayResult {
   ts: number;
 }
 
+/** A battle against a friend (versus rooms, DESIGN.md §18) instead of the day's opponent. */
+export interface LiveOptions {
+  /** The end card's contents, in place of the daily result. */
+  renderEnd: (end: NonNullable<TurnPackage['end']>, gaveUp: boolean) => ReactNode;
+  /** Shown over the field while the foe chooses. */
+  waiting: string;
+  /** What giving up means here. */
+  giveUpBody: string;
+  /** The way out, e.g. "Back to the room". */
+  exitLabel: string;
+}
+
 export interface BattleOutcome {
   result: 'win' | 'loss' | 'forfeit';
   remaining: number;
@@ -81,13 +93,16 @@ export function Battle({
   topBarRight,
   background,
   result,
+  live,
 }: {
-  result: DayResult;
+  /** The day's result, for the end card (daily battles). */
+  result?: DayResult;
+  live?: LiveOptions;
   start: EngineStart;
   /** The day's battle background image URL. */
   background: string;
   /** 1 for the day's first (scored) try. */
-  tryNumber: number;
+  tryNumber?: number;
   settings: Settings;
   onSetting: <K extends keyof Settings>(key: K, value: Settings[K]) => void;
   onExplainerSeen: (id: string) => void;
@@ -95,9 +110,9 @@ export function Battle({
   onChoice: (choice: string) => void;
   onEnd: (outcome: BattleOutcome) => void;
   onExit: () => void;
-  onRunItBack: () => void;
+  onRunItBack?: () => void;
   /** After a loss: back to the brief with the team open for changes. */
-  onChangeTeam: () => void;
+  onChangeTeam?: () => void;
   topBarRight?: ReactNode;
 }) {
   const wide = useWide();
@@ -264,6 +279,16 @@ export function Battle({
       running.current?.cancel();
     };
   }, [backend, start, play]);
+
+  // A live foe's turn (or the end) can arrive while it's your move or between turns.
+  useEffect(
+    () =>
+      backend.subscribe?.((pkg) => {
+        if (pending.current) skip();
+        play(pkg);
+      }),
+    [backend, play, skip],
+  );
 
   const choose = useCallback(
     (choice: string) => {
@@ -435,6 +460,19 @@ export function Battle({
     </div>
   );
 
+  // A live battle: your choice is in, and the foe hasn't made theirs.
+  // It sits over the (dimmed) controls, where your next choice will appear.
+  const waitingNote = live && !end && !playing && !controls && view && (
+    <div className="pointer-events-none absolute inset-0 z-10 grid place-items-center">
+      <p
+        role="status"
+        className="rounded-full bg-ink px-4 py-1.5 text-[14px] font-semibold text-surface shadow-card"
+      >
+        {live.waiting}
+      </p>
+    </div>
+  );
+
   const field = (
     <div className={clsx('relative w-full', wide ? 'shrink-0' : 'shrink')}>
       <Field
@@ -459,7 +497,7 @@ export function Battle({
     </div>
   );
 
-  const panel = (
+  const controlPanel = (
     <ControlPanel
       controls={controls}
       team={team}
@@ -468,12 +506,68 @@ export function Battle({
       onChoose={choose}
     />
   );
+  const panel = live ? (
+    <div className="relative flex shrink-0 flex-col">
+      {controlPanel}
+      {waitingNote}
+    </div>
+  ) : (
+    controlPanel
+  );
 
   // Which of today's tries this battle was (known once its result is saved).
-  const tryIndex = result.summary.tries.findIndex((a) => a.ts === result.ts) + 1;
-  const counts = tryIndex > 0 && tryIndex <= result.summary.counted.length;
-  const firstTryWin = tryIndex === 1 && result.summary.status === 'firstTry';
-  const streakText = streakLine(result.summary, result.streak);
+  const tryIndex = result ? result.summary.tries.findIndex((a) => a.ts === result.ts) + 1 : 0;
+  const counts = !!result && tryIndex > 0 && tryIndex <= result.summary.counted.length;
+  const firstTryWin = tryIndex === 1 && result?.summary.status === 'firstTry';
+  const streakText = result && streakLine(result.summary, result.streak);
+  const dailyEnd = (e: NonNullable<TurnPackage['end']>, r: DayResult) => (
+    <>
+      <p className="display text-[22px]">
+        {gaveUp ? 'You gave up' : e.winner === 'you' ? 'You won' : 'You lost'}
+      </p>
+      <div className="mt-1 flex justify-center">
+        {firstTryWin ? (
+          <span className="flex items-center gap-1 rounded-badge bg-gold px-2 py-0.5 text-[13px] font-bold text-on-gold">
+            ⭐ First try
+          </span>
+        ) : (
+          <span className="h-5 text-[14px] text-muted">
+            {tryIndex === 0 ? null : counts ? `Try ${tryIndex}` : 'Practice'}
+          </span>
+        )}
+      </div>
+      <div className="mt-3">
+        <TryRows summary={r.summary} current={r.ts} />
+      </div>
+      {streakText && <p className="mt-2 text-[14px] font-semibold">{streakText}</p>}
+      <div className="mt-4 grid gap-2">
+        <ShareButton share={r.share} />
+        <div className="grid grid-cols-2 gap-2">
+          <Button variant="secondary" onClick={onRunItBack}>
+            {r.summary.status === 'pending' ? 'Try again' : 'Play again'}
+          </Button>
+          {r.summary.status === 'pending' ? (
+            <Button variant="secondary" onClick={onChangeTeam}>
+              Change team
+            </Button>
+          ) : (
+            <Button variant="secondary" onClick={onExit}>
+              Back to today
+            </Button>
+          )}
+        </div>
+        {r.summary.status === 'pending' && (
+          <button
+            type="button"
+            onClick={onExit}
+            className="min-h-9 text-[13px] font-semibold text-muted"
+          >
+            Back to today
+          </button>
+        )}
+      </div>
+    </>
+  );
   const endCard = end && (
     <div className="animate-fade-in absolute inset-0 z-20 grid place-items-center bg-black/35 p-4">
       <div
@@ -483,54 +577,10 @@ export function Battle({
         role="dialog"
         aria-label="Battle over"
       >
-        <p className="display text-[22px]">
-          {gaveUp ? 'You gave up' : end.winner === 'you' ? 'You won' : 'You lost'}
-        </p>
-        <div className="mt-1 flex justify-center">
-          {firstTryWin ? (
-            <span className="flex items-center gap-1 rounded-badge bg-gold px-2 py-0.5 text-[13px] font-bold text-on-gold">
-              ⭐ First try
-            </span>
-          ) : (
-            <span className="h-5 text-[14px] text-muted">
-              {tryIndex === 0 ? null : counts ? `Try ${tryIndex}` : 'Practice'}
-            </span>
-          )}
-        </div>
-        <div className="mt-3">
-          <TryRows summary={result.summary} current={result.ts} />
-        </div>
-        {streakText && <p className="mt-2 text-[14px] font-semibold">{streakText}</p>}
-        <div className="mt-4 grid gap-2">
-          <ShareButton share={result.share} />
-          <div className="grid grid-cols-2 gap-2">
-            <Button variant="secondary" onClick={onRunItBack}>
-              {result.summary.status === 'pending' ? 'Try again' : 'Play again'}
-            </Button>
-            {result.summary.status === 'pending' ? (
-              <Button variant="secondary" onClick={onChangeTeam}>
-                Change team
-              </Button>
-            ) : (
-              <Button variant="secondary" onClick={onExit}>
-                Back to today
-              </Button>
-            )}
-          </div>
-          {result.summary.status === 'pending' && (
-            <button
-              type="button"
-              onClick={onExit}
-              className="min-h-9 text-[13px] font-semibold text-muted"
-            >
-              Back to today
-            </button>
-          )}
-        </div>
+        {live ? live.renderEnd(end, gaveUp) : result && dailyEnd(end, result)}
       </div>
     </div>
   );
-
   const topBar = (
     <header className="flex h-12 shrink-0 items-center justify-between gap-2 px-3 pt-[env(safe-area-inset-top)] wide:px-6">
       <div className="display text-[16px] tabular-nums">
@@ -569,7 +619,7 @@ export function Battle({
             <p className="text-[16px] font-semibold">Something went wrong in this battle.</p>
             <p className="text-[13px] text-muted">{error}</p>
             <Button variant="secondary" onClick={onExit}>
-              Back to today
+              {live?.exitLabel ?? 'Back to today'}
             </Button>
           </div>
         </div>
@@ -624,7 +674,8 @@ export function Battle({
         onOpenChange={setGiveUpOpen}
         onConfirm={giveUp}
         firstTry={tryNumber === 1}
-        practice={!end && !['none', 'pending'].includes(result.summary.status)}
+        practice={!!result && !end && !['none', 'pending'].includes(result.summary.status)}
+        body={live?.giveUpBody}
       />
     </div>
   );

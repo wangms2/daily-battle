@@ -185,7 +185,18 @@ export function App() {
 
   let screen: ReactNode;
   if (versus) {
-    screen = <VersusRoute route={route} go={go} onExit={() => go('')} />;
+    screen = (
+      <VersusRoute
+        route={route}
+        go={go}
+        onExit={() => go('')}
+        battle={{
+          settings,
+          onSetting: setSetting,
+          onExplainerSeen: (id) => dispatchAny({ type: 'markExplainer', id }),
+        }}
+      />
+    );
   } else if (schedule.status === 'loading') {
     screen = <div className="grid h-full place-items-center text-muted">Loading this week…</div>;
   } else if (schedule.status === 'error') {

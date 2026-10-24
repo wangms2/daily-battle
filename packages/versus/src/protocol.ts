@@ -11,15 +11,43 @@ import {
   type RoomView,
   type TeamSize,
 } from './room';
+import type { MatchView, Side } from './match';
 
 export type ClientMessage =
   /** The first message on a socket: a new player, or one coming back with their token. */
-  { type: 'join'; name: string } | { type: 'rejoin'; token: string } | RoomCommand;
+  | { type: 'join'; name: string }
+  | { type: 'rejoin'; token: string }
+  | RoomCommand
+  /** The host starts a round. */
+  | { type: 'start' }
+  /** In your battle: pick your lead, make a choice (`move 2`, `switch 4`), or give up. */
+  | { type: 'lead'; species: string }
+  | { type: 'choose'; choice: string }
+  | { type: 'forfeit' };
+
+/**
+ * One side's view of its battle since `from` lines in: new protocol lines,
+ * the pending request, and the end. The client turns it into frames with
+ * SidePresenter (apps/web/src/battle/presenter.ts).
+ */
+export interface WireUpdate {
+  lines: string[];
+  /** A parsed @pkmn/protocol request, or null while waiting or once it's over. */
+  request: unknown;
+  ended: boolean;
+  winner: Side | null;
+  /** Your last choice was blocked by something you couldn't see (Imprison); choose again. */
+  blocked?: boolean;
+}
 
 export type ServerMessage =
   /** You're in: your id, the token to rejoin with, and the room. */
   | { type: 'welcome'; you: string; token: string; room: RoomView }
   | { type: 'room'; room: RoomView }
+  /** Your battle this round (null when you have none). */
+  | { type: 'match'; match: MatchView | null }
+  /** Battle lines for your side; `resync` when it's the whole battle so far, after a reconnect. */
+  | { type: 'side'; match: string; from: number; update: WireUpdate; resync?: boolean }
   | { type: 'error'; code: ErrorCode }
   /** The host removed you; the socket closes after this. */
   | { type: 'kicked' };
@@ -38,6 +66,9 @@ export const CLOSE = {
 
 /** Longest message a room accepts, in characters. */
 export const MESSAGE_MAX = 2048;
+
+/** The choices a player makes in singles: one of four moves, or a switch to one of six. */
+const CHOICE = /^(move [1-4]|switch [1-6])$/;
 
 const isId = (v: unknown): v is string => typeof v === 'string' && v.length > 0 && v.length <= 64;
 
@@ -70,6 +101,18 @@ export function parseClientMessage(raw: unknown): ClientMessage | null {
       return isId(msg.player) ? { type: 'kick', player: msg.player } : null;
     case 'leave':
       return { type: 'leave' };
+    case 'start':
+      return { type: 'start' };
+    case 'forfeit':
+      return { type: 'forfeit' };
+    case 'lead':
+      return typeof msg.species === 'string' && msg.species.length <= 64
+        ? { type: 'lead', species: msg.species }
+        : null;
+    case 'choose':
+      return typeof msg.choice === 'string' && CHOICE.test(msg.choice)
+        ? { type: 'choose', choice: msg.choice }
+        : null;
     default:
       return null;
   }

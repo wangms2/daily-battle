@@ -107,6 +107,7 @@ export function GiveUpDialog({
   onConfirm,
   firstTry,
   practice = false,
+  body,
 }: {
   open: boolean;
   onOpenChange: (o: boolean) => void;
@@ -114,6 +115,8 @@ export function GiveUpDialog({
   firstTry: boolean;
   /** Today's counted tries are already done. */
   practice?: boolean;
+  /** What giving up means, when it isn't about today's tries (a versus battle). */
+  body?: string;
 }) {
   return (
     <ConfirmDialog
@@ -121,11 +124,12 @@ export function GiveUpDialog({
       onOpenChange={onOpenChange}
       title="Give up this battle?"
       body={
-        practice
+        body ??
+        (practice
           ? 'It’s a practice run, so it doesn’t change today’s result.'
           : firstTry
             ? 'It counts as a loss for today’s first try, with the Pokémon you have left.'
-            : 'It counts as a lost try, with the Pokémon you have left.'
+            : 'It counts as a lost try, with the Pokémon you have left.')
       }
       confirm="Give up"
       cancel="Keep battling"

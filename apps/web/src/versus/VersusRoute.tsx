@@ -1,12 +1,24 @@
 // Versus rooms with friends (DESIGN.md §18): `#versus` creates or joins a
 // room, `#versus/CODE` is the room itself.
 import { cleanName, ERROR_TEXT, normalizeCode, type ErrorCode } from '@daily-battle/versus';
-import { useState, type ReactNode } from 'react';
+import { lazy, Suspense, useState, type ReactNode } from 'react';
+import type { Settings } from '../state/schema';
 import { Button } from '../ui/bits';
+import { LeadPicker } from './LeadPicker';
 import { Lobby } from './Lobby';
 import { Page } from './Page';
 import { savedName, saveName } from './saved';
 import { createRoom, useRoom, type EndReason } from './useRoom';
+
+// The battle screen brings the simulator's data, so it loads when a battle starts.
+const LiveBattle = lazy(() => import('./LiveBattle'));
+
+/** What the battle screen needs from the app: your battle settings. */
+export interface BattleSettings {
+  settings: Settings;
+  onSetting: <K extends keyof Settings>(key: K, value: Settings[K]) => void;
+  onExplainerSeen: (id: string) => void;
+}
 
 /** The room code in a `versus/CODE` route, or null for the versus home. */
 const roomCodeOf = (route: string): string | null =>
@@ -16,11 +28,13 @@ export function VersusRoute({
   route,
   go,
   onExit,
+  battle,
 }: {
   route: string;
   go: (route: string) => void;
   /** Back to the daily game. */
   onExit: () => void;
+  battle: BattleSettings;
 }) {
   const code = roomCodeOf(route);
   // The name to join a room with straight away (you just created it, or typed a name first).
@@ -41,6 +55,7 @@ export function VersusRoute({
       key={code}
       code={code}
       autoJoinAs={joinAs?.code === code ? joinAs.name : undefined}
+      battle={battle}
       onExit={() => go('versus')}
     />
   );
@@ -164,17 +179,47 @@ function RoomScreen({
   code,
   autoJoinAs,
   onExit,
+  battle,
 }: {
   code: string;
   autoJoinAs?: string;
   onExit: () => void;
+  battle: BattleSettings;
 }) {
   const room = useRoom(code, autoJoinAs);
-  const { status } = room;
+  const { status, match } = room;
   const [name, setName] = useState(savedName);
   const clean = cleanName(name);
+  // The room's lobby, opened from your battle (it carries on meanwhile).
+  const [inRoomFor, setInRoomFor] = useState<string | null>(null);
 
   if (status.kind === 'joined') {
+    // A battle you can watch: one that has started (a finished one only if you saw it here).
+    const watchable =
+      !!match &&
+      (match.stage === 'battle' || (match.stage === 'over' && room.feedFor(match.id).size > 0));
+    if (match && inRoomFor !== match.id && (match.stage === 'lead' || watchable)) {
+      const toRoom = () => {
+        if (match.stage === 'over') room.dismissMatch();
+        else setInRoomFor(match.id);
+      };
+      if (match.stage === 'lead') {
+        return <LeadPicker match={match} onLead={room.lead} onBack={toRoom} />;
+      }
+      return (
+        <Suspense fallback={<p className="py-10 text-center text-muted">Loading the battle…</p>}>
+          <LiveBattle
+            key={match.id}
+            match={match}
+            feed={room.feedFor(match.id)}
+            choose={room.choose}
+            forfeit={room.forfeit}
+            {...battle}
+            onBack={toRoom}
+          />
+        </Suspense>
+      );
+    }
     return (
       <Lobby
         room={status.room}
@@ -182,6 +227,9 @@ function RoomScreen({
         connected={status.connected}
         notice={room.notice}
         command={room.command}
+        match={match}
+        onStart={room.start}
+        onToBattle={match && match.stage !== 'over' ? () => setInRoomFor(null) : undefined}
         onLeave={() => {
           room.leave();
           onExit();

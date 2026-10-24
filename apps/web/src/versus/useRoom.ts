@@ -6,11 +6,19 @@ import {
   parseServerMessage,
   type ClientMessage,
   type ErrorCode,
+  type MatchView,
   type RoomCommand,
   type RoomView,
+  type ServerMessage,
 } from '@daily-battle/versus';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { Feed } from './feed';
 import { forgetToken, saveName, saveToken, tokenFor } from './saved';
+
+export type SideMessage = Extract<ServerMessage, { type: 'side' }>;
+
+/** Your battle as the room last described it, and when that was (its clock counts from then). */
+export type LocalMatch = MatchView & { receivedAt: number };
 
 /** Why you're no longer in a room. */
 export type EndReason = 'noRoom' | 'full' | 'started' | 'kicked' | 'replaced' | 'left';
@@ -47,6 +55,15 @@ export function useRoom(code: string, autoJoinAs?: string) {
   /** The name to join with once connected. */
   const joinAs = useRef(autoJoinAs);
   const [session, setSession] = useState(0);
+  /** Your battle this round; kept after it ends, until a new round replaces it. */
+  const [match, setMatch] = useState<LocalMatch | null>(null);
+  /** Each battle's lines, by match id. */
+  const feeds = useRef(new Map<string, Feed<SideMessage>>());
+  const feedFor = useCallback((id: string) => {
+    let feed = feeds.current.get(id);
+    if (!feed) feeds.current.set(id, (feed = new Feed()));
+    return feed;
+  }, []);
 
   const send = useCallback((msg: ClientMessage) => {
     if (socket.current?.readyState === WebSocket.OPEN) socket.current.send(JSON.stringify(msg));
@@ -63,6 +80,7 @@ export function useRoom(code: string, autoJoinAs?: string) {
       const ws = new WebSocket(socketUrl(code));
       socket.current = ws;
       const sendHere = (msg: ClientMessage) => ws.send(JSON.stringify(msg));
+      let joined = false;
       ws.onopen = () => {
         failures = 0;
         const token = tokenFor(code);
@@ -74,11 +92,18 @@ export function useRoom(code: string, autoJoinAs?: string) {
         const msg = parseServerMessage(e.data);
         if (!msg) return;
         if (msg.type === 'welcome') {
+          joined = true;
           saveToken(code, msg.token);
           joinAs.current = undefined;
           setStatus({ kind: 'joined', you: msg.you, room: msg.room, connected: true });
         } else if (msg.type === 'room') {
           setStatus((s) => (s.kind === 'joined' ? { ...s, room: msg.room, connected: true } : s));
+        } else if (msg.type === 'match') {
+          const next = msg.match && { ...msg.match, receivedAt: Date.now() };
+          // A finished battle stays up until you go back to the room.
+          setMatch((m) => (next || !m || m.stage !== 'over' ? next : m));
+        } else if (msg.type === 'side') {
+          feedFor(msg.match).push(msg);
         } else if (msg.type === 'kicked') {
           forgetToken(code);
         } else if (msg.code === 'badToken') {
@@ -87,7 +112,10 @@ export function useRoom(code: string, autoJoinAs?: string) {
         } else if (msg.code === 'badName' || msg.code === 'nameTaken') {
           joinAs.current = undefined;
           setStatus({ kind: 'name', error: msg.code });
-        } else if (msg.code === 'noRoom' || msg.code === 'full' || msg.code === 'started') {
+        } else if (
+          msg.code === 'noRoom' ||
+          (!joined && (msg.code === 'full' || msg.code === 'started'))
+        ) {
           setStatus({ kind: 'ended', reason: msg.code });
         } else {
           setNotice(ERROR_TEXT[msg.code]);
@@ -124,7 +152,7 @@ export function useRoom(code: string, autoJoinAs?: string) {
       socket.current?.close(1000);
       socket.current = null;
     };
-  }, [code, session]);
+  }, [code, session, feedFor]);
 
   useEffect(() => {
     if (!notice) return;
@@ -141,6 +169,14 @@ export function useRoom(code: string, autoJoinAs?: string) {
       send({ type: 'join', name });
     },
     command: (command: RoomCommand) => send(command),
+    match,
+    feedFor,
+    /** Back to the room from a finished battle. */
+    dismissMatch: () => setMatch((m) => (m?.stage === 'over' ? null : m)),
+    start: () => send({ type: 'start' }),
+    lead: (species: string) => send({ type: 'lead', species }),
+    choose: (choice: string) => send({ type: 'choose', choice }),
+    forfeit: () => send({ type: 'forfeit' }),
     leave: () => {
       send({ type: 'leave' });
       forgetToken(code);

@@ -547,7 +547,7 @@ A room where friends play live battles against each other, Super Auto Pets style
 ### 18.2 Live play
 
 - **Turn timer.** Like Showdown's: a time bank plus a cap per turn. Running out loses the battle.
-- **Disconnects.** The battle waits a grace period (about 60 s) for a reconnect, then counts it as a forfeit. A reconnect resumes the battle where it was.
+- **Disconnects.** A player's clock keeps running while they're away, so an abandoned battle ends when their time does (at most one turn's cap). A reconnect, or a reload, resumes the battle where it was.
 - **Length.** A live 6v6 takes 10–20 minutes, so a room of four with 2 lives runs several rounds. The timer, the lives default, and handicap teams keep it in bounds.
 
 ### 18.3 Architecture
@@ -559,7 +559,23 @@ A room where friends play live battles against each other, Super Auto Pets style
 - **Daily mode is unaffected.** The daily games stay client-side and work without the server.
 - **Rooms (V2).** `POST /api/rooms` picks a free code (5 letters from 20 consonants, so no words and no I/O look-alikes) and sets up that code's Durable Object; `GET /api/rooms/CODE/socket` is the room's websocket. Both refuse requests whose `Origin` isn't the site. The room's rules are pure functions in `packages/versus` (join, leave, host-only settings, team sizes, removal), and the Durable Object (`apps/server`) applies them and broadcasts the room to everyone in it. Up to 8 players, with unique names of 1–16 characters. The first to join is the host; when the host leaves, the next to have joined takes over. A room nobody has been connected to for 24 hours is deleted.
 - **Seats.** Joining returns a token, kept in localStorage (`daily-battle:versus`, apart from the daily save) with the name you play under. A reload or a dropped connection rejoins with it, retrying with backoff, so you keep your seat; the lobby shows who's away. Opening the room in a second tab moves you there. A removed player's token stops working, and they can join again as a new player.
+- **Battles (V3).** The host starts a round: players are paired at random (an odd one sits out until V4 brings the AI), each is dealt a random team of their team size for now (V4 replaces this with the build phase), and both pick a lead within 45 s (an unpicked lead is the first Pokémon). The room runs each battle on `BattleSession` and records every accepted choice on the match, so the battle is rebuilt by replay when the Durable Object wakes. Choices are checked against the request first; a move hidden information blocks (Imprison) comes back to its player to choose again, as in §17. After each choice both players get their side's new lines and request (`WireUpdate`), so a choice is always answered: waiting for the foe shows as "Waiting for …" over the controls. Clocks are Showdown-style per `TIMERS`: each side's runs while it has a request, and the room's alarm goes off at the next deadline (a lead or a clock) to end the battle for whoever ran out. Giving up, leaving, or being removed mid-round loses that battle. When every battle is over the room goes back to the lobby with the round's results, and each player keeps their end card until they go back.
+- **Cost.** Measured locally, a turn takes about 2 ms of CPU, setting up a battle 3–17 ms, and rebuilding a whole battle from its choices about 100 ms. The Worker bundles the simulator (about 10.6 MB, under the 64 MiB limit). The Durable Objects limit is 30 s of CPU per message; if Workers Free's 10 ms per request applies to Durable Objects too, the setup and rebuild steps would need the paid plan.
 - **Entry.** Until rooms can play (V4), versus is reached only at `#versus` (and invite links, `#versus/CODE`); nothing in the daily game links to it yet.
+
+### 18.3a Elimination, spectating, and between rounds (decided Oct 2026)
+
+- **Out.** A knocked-out player gets a short card (placement, their wins and losses, empty hearts), then **Keep watching**. They stay in the room as "Out (5th)", see every round's results and pairings, and can leave at any time. The last player standing gets a winner screen with light confetti, a podium for the top three, and the full standings; the host can **Play again** with the same players.
+- **Who watches.** Everyone not in a battle can watch the ones in progress: eliminated players, and players whose battle already ended. Watching shows what the public log shows (moves, items, and abilities as they're revealed, HP as percentages), so scouting is part of the game. Spectators never see hidden sets or exact HP. No delay.
+- **The spectator feed.** The room sends a third view of each battle, its spectator log (`BattleSession.spectatorLog`), drawn with a spectator presenter: p1 at the bottom, p2 at the top, both named.
+- **Layout.** On desktop, a grid of every live battle. With at most 8 players there are at most 4 battles, so a 2×2 grid shows them all. Each card has a compact field, both names with hearts, team icons, and the last couple of log lines; clicking one focuses it full size with the full log, and the rest move to a side rail. On phones, two battles are stacked, each a compact field with one line of text, and a strip of chips picks which two. Full move animations play only on the focused battle; compact cards animate HP, faints, and switches. A "Last Pokémon!" badge marks a battle down to one Pokémon on either side, and on phones the closest battle moves to the top.
+- **Reactions.** Spectators can send a few fixed emoji (😮 🔥 😂 💀), which float over the battle for everyone watching it, including its two players. Rate-limited per player; no text chat.
+- **Pairing.** Players with the same number of lives are paired when possible, avoiding last round's rematch. An odd player out faces the AI.
+- **Between rounds.** A sequence of about 8 s that everyone sees together, driven by the room (an `intermission` phase on the alarm):
+  1. results, with each battle's card sliding in, the winner lit and the loser's heart cracking, and eliminations stamped "Out" with a placement;
+  2. standings that reorder with a short animation;
+  3. a VS reveal, where a quick shuffle of names lands on "You vs …" and both teams' species slide in from opposite sides, leading into the swap phase.
+  The swap timer starts for everyone when the sequence ends. Tapping skips ahead on your own screen only. Reduced motion uses fades only.
 
 ### 18.4 Phases
 
@@ -567,6 +583,6 @@ A room where friends play live battles against each other, Super Auto Pets style
 | ----- | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | V1    | Split the frame building out of `BattleEngine` into `SidePresenter`, working from either side                          | Daily battles unchanged; tests drive a battle from both sides (done) |
 | V2    | Worker, room Durable Object, websocket protocol, lobby (create, join, settings), reconnect tokens                       | Friends can join a room and see each other (done)                   |
-| V3    | One live battle between two players in a room: server-side sim, turn timer, disconnect grace, resume                    | Two browsers play a battle to the end                               |
-| V4    | The room loop: pool and build phase, pairing, swap phase, lives, elimination, the AI for odd counts, results            | A room of three plays to a winner                                    |
-| V5    | Handicaps, spectating, a share card                                                                                     |                                                                     |
+| V3    | One live battle between two players in a room: server-side sim, turn timer, disconnect grace, resume                    | Two browsers play a battle to the end (done)                        |
+| V4    | The room loop: pool and build phase, pairing by lives, swap phase, lives, elimination, the AI for odd counts, results   | A room of three plays to a winner                                    |
+| V5    | Spectating (multi-battle grid, reactions), the between-round sequence, elimination and winner screens, a share card    | An eliminated player watches two battles at once on a phone         |

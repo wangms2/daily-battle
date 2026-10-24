@@ -2,6 +2,7 @@
 // The room server holds the state and applies messages through these; the
 // client only ever sees `roomView`, which leaves out every player's token.
 import { DEFAULT_FORMAT, FORMATS, type FormatId } from '@daily-battle/data/formats';
+import type { Match, MatchEnd, Side } from './match';
 
 export const MAX_PLAYERS = 8;
 export const NAME_MAX = 16;
@@ -42,23 +43,49 @@ export interface Player {
   teamSize: TeamSize;
 }
 
+/** How a finished battle went, by name (players may have left since). */
+export interface MatchSummary {
+  names: Record<Side, string>;
+  players: Record<Side, string>;
+  winner: Side | null;
+  reason: MatchEnd;
+}
+
 export interface RoomState {
   code: string;
   createdAt: number;
-  phase: 'lobby';
+  /** In the lobby between rounds, or playing a round's battles. */
+  phase: 'lobby' | 'playing';
   /** The first player to join; passes to the next when the host leaves. */
   hostId: string | null;
   players: Player[];
   settings: RoomSettings;
+  /** Rounds played so far, counting the one in progress. */
+  round: number;
+  /** This round's battles (empty in the lobby). */
+  matches: Match[];
+  /** Who sits this round out, with an odd number of players. */
+  sittingOut: string | null;
+  /** How the last finished round went. */
+  lastRound: { round: number; matches: MatchSummary[]; sittingOut: string | null } | null;
 }
 
-/** What every player sees of the room. */
+/** What every player sees of the room: who plays whom, never teams. */
 export interface RoomView {
   code: string;
   phase: RoomState['phase'];
   hostId: string | null;
   players: { id: string; name: string; teamSize: TeamSize; online: boolean }[];
   settings: RoomSettings;
+  round: number;
+  matches: {
+    id: string;
+    players: Record<Side, string>;
+    stage: Match['stage'];
+    winner: Side | null;
+  }[];
+  sittingOut: string | null;
+  lastRound: RoomState['lastRound'];
 }
 
 export type ErrorCode =
@@ -70,6 +97,8 @@ export type ErrorCode =
   | 'badToken'
   | 'notHost'
   | 'notJoined'
+  | 'notEnough'
+  | 'notYourTurn'
   | 'badMessage';
 
 export const ERROR_TEXT: Record<ErrorCode, string> = {
@@ -81,6 +110,8 @@ export const ERROR_TEXT: Record<ErrorCode, string> = {
   badToken: 'You’re no longer in that room.',
   notHost: 'Only the host can do that.',
   notJoined: 'Join the room first.',
+  notEnough: 'You need at least two players to start.',
+  notYourTurn: 'That choice isn’t available right now.',
   badMessage: 'Something went wrong. Try reloading.',
 };
 
@@ -112,6 +143,10 @@ export function createRoom(code: string, now: number): RoomState {
     hostId: null,
     players: [],
     settings: { ...DEFAULT_SETTINGS },
+    round: 0,
+    matches: [],
+    sittingOut: null,
+    lastRound: null,
   };
 }
 
@@ -168,7 +203,8 @@ export function applyCommand(state: RoomState, by: string, command: RoomCommand)
   if (!state.players.some((p) => p.id === by)) return fail('notJoined');
   if (command.type === 'leave') return { ok: true, state: removePlayer(state, by) };
   if (state.hostId !== by) return fail('notHost');
-  if (state.phase !== 'lobby') return fail('started');
+  // Removing works mid-round too (the room server forfeits their battle first).
+  if (command.type !== 'kick' && state.phase !== 'lobby') return fail('started');
   switch (command.type) {
     case 'settings':
       return {
@@ -201,6 +237,59 @@ export function roomView(state: RoomState, online: ReadonlySet<string>): RoomVie
       online: online.has(p.id),
     })),
     settings: state.settings,
+    round: state.round,
+    matches: state.matches.map((m) => ({
+      id: m.id,
+      players: m.players,
+      stage: m.stage,
+      winner: m.result?.winner ?? null,
+    })),
+    sittingOut: state.sittingOut,
+    lastRound: state.lastRound,
+  };
+}
+
+/** Why `by` can't start a round now, or null if they can. */
+export function cannotStart(state: RoomState, by: string): ErrorCode | null {
+  if (!state.players.some((p) => p.id === by)) return 'notJoined';
+  if (state.hostId !== by) return 'notHost';
+  if (state.phase !== 'lobby') return 'started';
+  if (state.players.length < 2) return 'notEnough';
+  return null;
+}
+
+/** Starts a round with its battles, already paired and dealt. */
+export function startRound(
+  state: RoomState,
+  matches: Match[],
+  sittingOut: string | null,
+): RoomState {
+  return { ...state, phase: 'playing', round: state.round + 1, matches, sittingOut };
+}
+
+/** The player's battle this round, if they have one. */
+export const matchOf = (state: RoomState, player: string): Match | undefined =>
+  state.matches.find((m) => m.players.p1 === player || m.players.p2 === player);
+
+/** Puts back an updated battle; once every battle is over, the room returns to the lobby. */
+export function putMatch(state: RoomState, match: Match): RoomState {
+  const matches = state.matches.map((m) => (m.id === match.id ? match : m));
+  if (matches.some((m) => m.stage !== 'over')) return { ...state, matches };
+  return {
+    ...state,
+    phase: 'lobby',
+    matches: [],
+    sittingOut: null,
+    lastRound: {
+      round: state.round,
+      sittingOut: state.sittingOut,
+      matches: matches.map((m) => ({
+        names: m.names,
+        players: m.players,
+        winner: m.result?.winner ?? null,
+        reason: m.result?.reason ?? 'tie',
+      })),
+    },
   };
 }
 
