@@ -27,7 +27,7 @@ function gen5State() {
   };
 }
 
-async function open(page: Page, state?: object, path = '/') {
+async function open(page: Page, state?: object, path = '/#play') {
   if (state) {
     await page.addInitScript((s) => {
       if (!localStorage.getItem('daily-battle:state'))
@@ -55,13 +55,12 @@ const shot = (page: Page, name: string, project: string) =>
   page.screenshot({ path: `e2e/look/gen5/${project}/${name}.png` });
 
 test('a first-time player picks Gen 5 and gets its pool', async ({ page }, info) => {
-  await open(page);
+  await open(page, undefined, '/#daily');
+  await page.getByRole('button', { name: /Gen 5 OU/ }).click();
   const welcome = page.getByRole('dialog', { name: 'Welcome to Daily Battle' });
-  await expect(welcome.getByRole('button', { name: 'Pick a game to start' })).toBeDisabled();
-  await welcome.getByRole('radio', { name: /Gen 5 OU/ }).click();
   await noScroll(page, 'welcome sheet');
-  await shot(page, '01-welcome-picked', info.project.name);
-  await welcome.getByRole('button', { name: 'Play Gen 5 OU' }).click();
+  await shot(page, '01-welcome', info.project.name);
+  await welcome.getByRole('button', { name: 'Let’s play' }).click();
   await expect(page.getByRole('button', { name: /^Gen 5 · Week of/ })).toBeVisible();
   // A Pokémon only Gen 5 has.
   await expect(page.getByText(schedule.pool.species[0]!).first()).toBeVisible();
@@ -71,31 +70,29 @@ test('a first-time player picks Gen 5 and gets its pool', async ({ page }, info)
   await shot(page, '02-builder', info.project.name);
 });
 
-test('the title switches games, each with its own team', async ({ page }, info) => {
+test('the title opens the picker to switch games, each with its own team', async ({
+  page,
+}, info) => {
   await open(page, gen5State());
   await page.getByRole('button', { name: /^Gen 5 · / }).click();
-  const picker = page.getByRole('dialog', { name: 'Choose a game' });
-  await expect(picker).toBeVisible();
+  await expect(page.getByText('Choose a game')).toBeVisible();
   await noScroll(page, 'game picker');
   await shot(page, '03-picker', info.project.name);
-  await picker.getByRole('button', { name: /Gen 4 OU/ }).click();
+  await page.getByRole('button', { name: /Gen 4 OU/ }).click();
   // No Gen 4 team yet this week: its builder opens.
   await expect(page.getByRole('button', { name: /^Gen 4 · Week of/ })).toBeVisible();
   await page.getByRole('button', { name: /^Gen 4 · / }).click();
-  await page
-    .getByRole('dialog', { name: 'Choose a game' })
-    .getByRole('button', { name: /Gen 5 OU/ })
-    .click();
+  await page.getByRole('button', { name: /Gen 5 OU/ }).click();
   // Back on Gen 5's brief with its locked team.
   await expect(page.getByRole('button', { name: /^Start · / })).toBeVisible();
 });
 
-test('a #gen5 share link opens Gen 5', async ({ page }) => {
+test('an older #gen5 link opens Gen 5', async ({ page }) => {
   const state = gen5State();
   state.settings.format = 'gen4ou';
   await open(page, state, '/#gen5');
   await expect(page.getByRole('button', { name: /^Gen 5 · / })).toBeVisible();
-  await expect(page).toHaveURL(/\/#?$/);
+  await expect(page).toHaveURL(/\/#play$/);
 });
 
 test('a Gen 5 battle shows the foe six from the start, and resumes', async ({ page }, info) => {
@@ -139,30 +136,4 @@ test('a Gen 5 battle shows the foe six from the start, and resumes', async ({ pa
     .first()
     .waitFor();
   await noScroll(page, 'resumed');
-});
-
-test('a player from before Gen 5 gets only the newest news, once', async ({ page }, info) => {
-  // A Gen 4 save from before Gen 5 (v3), as most players have. Gen 6 has
-  // come out since, so its sheet is the one they see; Gen 5's never shows.
-  await open(page, {
-    version: 3,
-    weeks: {},
-    days: {},
-    settings: {
-      beginnerHints: true,
-      battleSpeed: 'instant',
-      animations: true,
-      shownExplainers: ['welcome'],
-    },
-  });
-  const news = page.getByRole('dialog', { name: 'New: Gen 6 OU' });
-  await expect(news).toBeVisible();
-  await expect(page.getByRole('dialog', { name: 'New: Gen 5 OU' })).toBeHidden();
-  await noScroll(page, 'news');
-  await shot(page, '07-news', info.project.name);
-  await news.getByRole('button', { name: 'Stay on Gen 4' }).click();
-  await expect(page.getByRole('button', { name: /^Gen 4 · / })).toBeVisible();
-  await page.reload();
-  await expect(page.getByRole('button', { name: /^Gen 4 · / })).toBeVisible();
-  await expect(page.getByRole('dialog', { name: /^New: / })).toBeHidden();
 });

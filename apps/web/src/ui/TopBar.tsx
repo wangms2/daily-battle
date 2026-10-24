@@ -3,7 +3,7 @@ import { ChevronIcon, FlameIcon, GearIcon } from './icons';
 
 export function TopBar({
   title,
-  streak,
+  streak = 0,
   onStats,
   onSettings,
   onTitle,
@@ -12,8 +12,9 @@ export function TopBar({
   title: ReactNode;
   /** Makes the title a button (it opens the game picker). */
   onTitle?: () => void;
-  streak: number;
-  onStats: () => void;
+  streak?: number;
+  /** The streak badge that opens stats; left out where no one game is shown. */
+  onStats?: () => void;
   onSettings: () => void;
   /** Replaces the title (e.g. edit mode's Cancel). */
   left?: ReactNode;
@@ -27,22 +28,23 @@ export function TopBar({
           type="button"
           onClick={onTitle}
           className="display -ml-2 flex h-10 min-w-0 items-center gap-1 rounded-full px-2 text-[16px] hover:bg-surface-2"
-          aria-haspopup="dialog"
         >
           <span className="truncate">{title}</span>
           <ChevronIcon className="size-4 shrink-0 rotate-90 text-muted" aria-hidden />
         </button>
       )}
       <div className="flex items-center gap-1">
-        <button
-          type="button"
-          onClick={onStats}
-          className="flex h-10 items-center gap-1 rounded-full px-3 text-[15px] font-semibold hover:bg-surface-2"
-          aria-label={`Stats. Streak ${streak}`}
-        >
-          <FlameIcon className={streak > 0 ? 'text-gold' : 'text-muted'} />
-          {streak}
-        </button>
+        {onStats && (
+          <button
+            type="button"
+            onClick={onStats}
+            className="flex h-10 items-center gap-1 rounded-full px-3 text-[15px] font-semibold hover:bg-surface-2"
+            aria-label={`Stats. Streak ${streak}`}
+          >
+            <FlameIcon className={streak > 0 ? 'text-gold' : 'text-muted'} />
+            {streak}
+          </button>
+        )}
         <button
           type="button"
           onClick={onSettings}

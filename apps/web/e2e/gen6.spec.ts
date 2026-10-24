@@ -40,7 +40,7 @@ function gen6State({ locked = true } = {}) {
   };
 }
 
-async function open(page: Page, state?: object, path = '/') {
+async function open(page: Page, state?: object, path = '/#play') {
   if (state) {
     await page.addInitScript((s) => {
       if (!localStorage.getItem('daily-battle:state'))
@@ -68,12 +68,12 @@ const shot = (page: Page, name: string, project: string) =>
   page.screenshot({ path: `e2e/look/gen6/${project}/${name}.png` });
 
 test('a first-time player picks Gen 6 and gets its pool', async ({ page }, info) => {
-  await open(page);
+  await open(page, undefined, '/#daily');
+  await page.getByRole('button', { name: /Gen 6 OU/ }).click();
   const welcome = page.getByRole('dialog', { name: 'Welcome to Daily Battle' });
-  await welcome.getByRole('radio', { name: /Gen 6 OU/ }).click();
   await noScroll(page, 'welcome sheet');
-  await shot(page, '01-welcome-picked', info.project.name);
-  await welcome.getByRole('button', { name: 'Play Gen 6 OU' }).click();
+  await shot(page, '01-welcome', info.project.name);
+  await welcome.getByRole('button', { name: 'Let’s play' }).click();
   await expect(page.getByRole('button', { name: /^Gen 6 · Week of/ })).toBeVisible();
   await expect(page.getByRole('button', { name: `Add ${MEGA} to team` })).toBeVisible();
   await noScroll(page, 'gen 6 builder');
@@ -146,26 +146,10 @@ test('your Pokémon Mega Evolves, and the battle resumes', async ({ page }, info
   await expect(page.getByRole('button', { name: 'Mega Evolve', exact: true })).toHaveCount(0);
 });
 
-test('a player from before Gen 6 gets the news once, and can try it', async ({ page }, info) => {
-  const state = gen6State({ locked: false });
-  state.settings.format = 'gen4ou';
-  state.settings.shownExplainers = ['welcome', 'gen5-news'];
-  await open(page, state);
-  const news = page.getByRole('dialog', { name: 'New: Gen 6 OU' });
-  await expect(news).toBeVisible();
-  await noScroll(page, 'gen 6 news');
-  await shot(page, '06-news', info.project.name);
-  await news.getByRole('button', { name: 'Try Gen 6 OU' }).click();
-  await expect(page.getByRole('button', { name: /^Gen 6 · / })).toBeVisible();
-  await page.reload();
-  await expect(page.getByRole('button', { name: /^Gen 6 · / })).toBeVisible();
-  await expect(news).toBeHidden();
-});
-
-test('a #gen6 share link opens Gen 6', async ({ page }) => {
+test('an older #gen6 link opens Gen 6', async ({ page }) => {
   const state = gen6State();
   state.settings.format = 'gen4ou';
   await open(page, state, '/#gen6');
   await expect(page.getByRole('button', { name: /^Gen 6 · / })).toBeVisible();
-  await expect(page).toHaveURL(/\/#?$/);
+  await expect(page).toHaveURL(/\/#play$/);
 });

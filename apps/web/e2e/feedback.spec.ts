@@ -31,7 +31,7 @@ async function open(page: Page, s: object) {
     if (!localStorage.getItem('daily-battle:state')) localStorage.setItem('daily-battle:state', v);
   }, JSON.stringify(s));
   await page.clock.setFixedTime(TODAY);
-  await page.goto('/');
+  await page.goto('/#play');
 }
 
 /** Neither the page nor an open sheet scrolls (checked once sheets have slid in). */

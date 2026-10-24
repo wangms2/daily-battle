@@ -13,11 +13,10 @@ for (const scheme of ['light', 'dark'] as const) {
       const dir = `e2e/look/${info.project.name}/${scheme}${hints ? '-hints' : ''}`;
       await page.clock.setFixedTime(TODAY);
       await page.emulateMedia({ colorScheme: scheme });
-      await page.goto('/');
+      await page.goto('/#play');
       await page.screenshot({ path: `${dir}/welcome.png` });
       if (!hints) await page.getByRole('switch').click();
-      await page.getByRole('radio', { name: /Gen 4 OU/ }).click();
-      await page.getByRole('button', { name: 'Play Gen 4 OU' }).click();
+      await page.getByRole('button', { name: 'Let’s play' }).click();
       await page.screenshot({ path: `${dir}/builder-empty.png` });
 
       await page.getByRole('button', { name: 'Balanced' }).click();

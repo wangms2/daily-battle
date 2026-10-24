@@ -55,7 +55,7 @@ async function open(
     JSON.stringify(seededState(speed, days)),
   );
   await page.clock.setFixedTime(TODAY);
-  await page.goto('/');
+  await page.goto('/#play');
 }
 
 async function noScroll(page: Page, step: string) {
@@ -409,7 +409,7 @@ test('with animations off, no effect images are drawn', async ({ page }) => {
     }),
   );
   await page.clock.setFixedTime(TODAY);
-  await page.goto('/');
+  await page.goto('/#play');
   await page.getByRole('button', { name: /^Start · / }).click();
   const fx = page.locator('.battle-field img[style*="position: absolute"]');
   await page.locator(MOVES).first().click({ timeout: 20_000 });

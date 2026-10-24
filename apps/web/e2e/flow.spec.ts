@@ -32,13 +32,12 @@ for (const scheme of ['light', 'dark'] as const) {
     const project = `${info.project.name}/${scheme}`;
     await page.clock.setFixedTime(TODAY);
     await page.emulateMedia({ colorScheme: scheme });
-    await page.goto('/');
+    await page.goto('/#play');
 
     // First run: welcome sheet.
     await expect(page.getByRole('dialog', { name: 'Welcome to Daily Battle' })).toBeVisible();
     await shot(page, '01-welcome', project);
-    await page.getByRole('radio', { name: /Gen 4 OU/ }).click();
-    await page.getByRole('button', { name: 'Play Gen 4 OU' }).click();
+    await page.getByRole('button', { name: 'Let’s play' }).click();
 
     // Builder: empty, then a suggested team, then info and set picker.
     await expect(page.getByRole('button', { name: /Pick 6 more/ })).toBeVisible();
