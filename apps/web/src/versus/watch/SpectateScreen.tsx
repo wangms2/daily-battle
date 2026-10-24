@@ -196,7 +196,7 @@ export default function SpectateScreen({
   return (
     <Page
       title={`Round ${room.round}`}
-      back="Versus"
+      back="Back"
       onBack={onBack}
       wide={wide}
       right={<RoomDrawer room={room} you={you} onWatch={wide ? setFocus : pick} />}

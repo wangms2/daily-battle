@@ -458,26 +458,26 @@ describe('home', () => {
 
   it('lands on Daily Battle or Versus, with no sheet over them', async () => {
     renderApp();
-    expect(await screen.findByRole('button', { name: /^Daily Battle/ })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /^Versus with friends/ })).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: 'Play' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'With friends' })).toBeInTheDocument();
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
-  it('opens a versus room from Versus with friends', async () => {
+  it('opens a versus room from With friends', async () => {
     const user = userEvent.setup();
     renderApp(seeded());
-    await user.click(await screen.findByRole('button', { name: /^Versus with friends/ }));
+    await user.click(await screen.findByRole('button', { name: 'With friends' }));
     expect(window.location.hash).toBe('#versus');
   });
 
   it('shows every game with its status and streak, and a pick plays that game', async () => {
     const user = userEvent.setup();
     renderApp(seeded());
-    await user.click(await screen.findByRole('button', { name: /^Daily Battle/ }));
-    for (const gen of ['Gen 3 OU', 'Gen 4 OU', 'Gen 5 OU', 'Gen 6 OU'])
+    await user.click(await screen.findByRole('button', { name: 'Play' }));
+    for (const gen of ['Gen 3', 'Gen 4', 'Gen 5', 'Gen 6'])
       expect(screen.getByRole('button', { name: new RegExp(gen) })).toBeInTheDocument();
     expect(window.location.hash).toBe('#daily');
-    await user.click(screen.getByRole('button', { name: /Gen 5 OU/ }));
+    await user.click(screen.getByRole('button', { name: /^Gen 5/ }));
     expect(await screen.findByRole('button', { name: /^Gen 5 · Week of/ })).toBeInTheDocument();
     expect(window.location.hash).toBe('#play');
   });
@@ -500,9 +500,9 @@ describe('home', () => {
     window.location.hash = '#daily';
     renderApp(seeded());
     await user.click(await screen.findByRole('button', { name: 'Back' }));
-    expect(await screen.findByRole('button', { name: /^Daily Battle/ })).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: /^Daily Battle/ }));
-    await user.click(await screen.findByRole('button', { name: /Gen 4 OU/ }));
+    expect(await screen.findByRole('button', { name: 'Play' })).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Play' }));
+    await user.click(await screen.findByRole('button', { name: /^Gen 4/ }));
     await user.click(await screen.findByRole('button', { name: /^Gen 4 · Week of/ }));
     expect(await screen.findByText('Choose a game')).toBeInTheDocument();
   });

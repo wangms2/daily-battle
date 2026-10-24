@@ -1,5 +1,6 @@
 // The share image: the same facts as the share text (lib/share.ts), drawn as
-// a clean card in the app's light theme, with team sprites in place of names.
+// a card in the home screens' look (clay lid, seam and ball, stone ground), with
+// team sprites in place of names.
 // Drawn on a canvas in the browser from self-hosted assets, so nothing leaves
 // the device until the player shares it.
 import { condenseTries, tryCount } from './results';
@@ -11,7 +12,7 @@ export const CARD_W = 1200;
 export const CARD_H = 630;
 const SCALE = 2;
 
-// Light theme tokens (styles.css :root).
+// Light theme tokens (styles.css :root), and the home screens' clay.
 const C = {
   bg: '#f5f5f7',
   surface: '#ffffff',
@@ -25,6 +26,10 @@ const C = {
   good: '#3d7a5a',
   bad: '#a33a46',
   forfeit: '#b2b3bc', // muted at about half strength, as on the result card
+  clay: '#a3646a',
+  clayDeep: '#8a4f58',
+  seam: '#2b2d36',
+  stone: '#f4f3f1',
 };
 const FONT = '"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif';
 const EMOJI = '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji"';
@@ -76,7 +81,7 @@ function mark(ctx: CanvasRenderingContext2D, won: boolean, x: number, y: number)
 const SQ = 40;
 const SQ_GAP = 8;
 const ROW_H = 52;
-/** Try rows that fit between the headline and the address (rows start at y 252). */
+/** Try rows that fit between the headline and the address (rows start at y 270). */
 const MAX_ROWS = 5;
 
 /** One try: its mark, then six squares (green = Pokémon left). Returns the right edge. */
@@ -120,14 +125,30 @@ function pill(
   return w;
 }
 
+/** The home screens' serif, for the name and the headline. */
+const serif = (size: number) => `600 ${size}px Fraunces, Georgia, serif`;
+
+/** A soft shadow on the ground under a sprite, centred on (cx, y). */
+function groundShadow(ctx: CanvasRenderingContext2D, cx: number, y: number, rx: number) {
+  ctx.save();
+  ctx.translate(cx, y);
+  ctx.scale(1, 0.14);
+  const g = ctx.createRadialGradient(0, 0, 0, 0, 0, rx);
+  g.addColorStop(0, 'rgb(0 0 0 / 0.26)');
+  g.addColorStop(1, 'rgb(0 0 0 / 0)');
+  ctx.fillStyle = g;
+  ctx.beginPath();
+  ctx.arc(0, 0, rx, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+}
+
 export async function drawShareCard(m: ShareModel): Promise<HTMLCanvasElement> {
-  await Promise.all(
-    [500, 600, 700].map((w) => document.fonts?.load(`${w} 24px "IBM Plex Sans"`)),
-  ).catch(() => {});
-  const [logo, ...sprites] = await Promise.all([
-    loadImage(`${import.meta.env.BASE_URL}favicon.svg`),
-    ...m.team.map((s) => loadImage(getSprite(s.species, 'front'))),
-  ]);
+  await Promise.all([
+    ...[500, 600, 700].map((w) => document.fonts?.load(`${w} 24px "IBM Plex Sans"`)),
+    document.fonts?.load('600 40px Fraunces'),
+  ]).catch(() => {});
+  const sprites = await Promise.all(m.team.map((s) => loadImage(getSprite(s.species, 'front'))));
 
   const canvas = document.createElement('canvas');
   canvas.width = CARD_W * SCALE;
@@ -135,36 +156,58 @@ export async function drawShareCard(m: ShareModel): Promise<HTMLCanvasElement> {
   const ctx = canvas.getContext('2d')!;
   ctx.scale(SCALE, SCALE);
 
-  // Page and card.
-  ctx.fillStyle = C.bg;
+  // The page is the stone of the home screens' lower half.
+  ctx.fillStyle = C.stone;
   ctx.fillRect(0, 0, CARD_W, CARD_H);
-  roundRect(ctx, 40, 40, CARD_W - 80, CARD_H - 80, 16);
-  ctx.fillStyle = C.surface;
-  ctx.fill();
-  ctx.strokeStyle = C.border;
-  ctx.lineWidth = 1.5;
-  roundRect(ctx, 40, 40, CARD_W - 80, CARD_H - 80, 16);
-  ctx.stroke();
 
   const left = 96;
   const right = CARD_W - 96;
 
-  // Header: mark, name and date; the streak on the right.
-  if (logo) ctx.drawImage(logo, left, 84, 44, 44);
+  // Header: the clay lid, the dark seam, and the ball on it.
+  const lid = ctx.createLinearGradient(0, 0, CARD_W, 150);
+  lid.addColorStop(0, C.clay);
+  lid.addColorStop(1, C.clayDeep);
+  ctx.fillStyle = lid;
+  ctx.fillRect(0, 0, CARD_W, 150);
+  ctx.fillStyle = C.seam;
+  ctx.fillRect(0, 150, CARD_W, 12);
+  ctx.save();
+  ctx.shadowColor = 'rgb(0 0 0 / 0.28)';
+  ctx.shadowBlur = 14;
+  ctx.shadowOffsetY = 4;
+  ctx.beginPath();
+  ctx.arc(CARD_W / 2, 156, 34, 0, Math.PI * 2);
+  ctx.fillStyle = C.stone;
+  ctx.fill();
+  ctx.restore();
+  ctx.beginPath();
+  ctx.arc(CARD_W / 2, 156, 30, 0, Math.PI * 2);
+  ctx.lineWidth = 8;
+  ctx.strokeStyle = C.seam;
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(CARD_W / 2, 156, 9, 0, Math.PI * 2);
+  ctx.fillStyle = C.clay;
+  ctx.fill();
+  ctx.lineWidth = 4;
+  ctx.stroke();
+
+  // The name and date on the lid; the streak on the right.
+  const mid = 78;
   ctx.textBaseline = 'middle';
-  ctx.fillStyle = C.text;
-  ctx.font = font(600, 30);
-  ctx.fillText('Daily Battle', left + 60, 107);
+  ctx.fillStyle = '#ffffff';
+  ctx.font = serif(38);
+  ctx.fillText('Daily Battle', left, mid);
   const nameW = ctx.measureText('Daily Battle').width;
-  ctx.fillStyle = C.muted;
-  ctx.font = font(500, 30);
-  ctx.fillText(`· ${m.game ? `${m.game} · ` : ''}${m.date}`, left + 60 + nameW + 12, 107);
+  ctx.fillStyle = 'rgb(255 255 255 / 0.86)';
+  ctx.font = font(500, 28);
+  ctx.fillText(`· ${m.game ? `${m.game} · ` : ''}${m.date}`, left + nameW + 14, mid + 2);
   if (m.streak) {
     const reset = m.streak === 'Streak reset';
     const text = reset ? m.streak : `🔥 ${m.streak}`;
     ctx.font = font(700, 20);
     const w = ctx.measureText(text).width + 22;
-    pill(ctx, text, right - w, 89, {
+    pill(ctx, text, right - w, mid - 18, {
       bg: reset ? C.surface2 : C.goldSoft,
       fg: reset ? C.muted : C.goldText,
       size: 20,
@@ -172,7 +215,7 @@ export async function drawShareCard(m: ShareModel): Promise<HTMLCanvasElement> {
   }
 
   // Headline.
-  let y = 196;
+  let y = 222;
   ctx.textBaseline = 'middle';
   if (m.status === 'firstTry') {
     const w = pill(ctx, '⭐ First try', left, y - 21, {
@@ -181,8 +224,8 @@ export async function drawShareCard(m: ShareModel): Promise<HTMLCanvasElement> {
       size: 24,
     });
     ctx.fillStyle = C.text;
-    ctx.font = font(600, 28);
-    ctx.fillText(`${m.rows[0]!.remaining}/6 left`, left + w + 16, y);
+    ctx.font = serif(34);
+    ctx.fillText(`${m.rows[0]!.remaining}/6 left`, left + w + 18, y);
   } else {
     let x = left;
     if (m.cleared || m.status === 'failed') {
@@ -190,13 +233,13 @@ export async function drawShareCard(m: ShareModel): Promise<HTMLCanvasElement> {
       x += 40;
     }
     ctx.fillStyle = m.status === 'pending' ? C.muted : C.text;
-    ctx.font = font(600, 28);
+    ctx.font = serif(34);
     ctx.fillText(m.headline, x, y);
   }
 
   // The tries that counted. The left column fits MAX_ROWS above the address;
   // a longer day keeps its first try, a count, and its last tries.
-  y = 252;
+  y = 270;
   for (const r of condenseTries(m.rows, MAX_ROWS, MAX_ROWS - 2)) {
     if ('more' in r) {
       ctx.textBaseline = 'middle';
@@ -209,12 +252,12 @@ export async function drawShareCard(m: ShareModel): Promise<HTMLCanvasElement> {
     y += ROW_H;
   }
 
-  // Team: two rows of three, sprites on a shared baseline, names under them.
+  // Team: two rows of three, sprites standing on a shadow, names under them.
   const cellW = 160;
   const gridX = right - cellW * 3;
   m.team.forEach((s, i) => {
     const cx = gridX + (i % 3) * cellW + cellW / 2;
-    const base = 272 + Math.floor(i / 3) * 160; // sprite baseline
+    const base = 322 + Math.floor(i / 3) * 160; // sprite baseline
     const img = sprites[i];
     if (img) {
       // Half-pixel steps at the 2× canvas, as large as fits a 136px cell, 1× to 2×.
@@ -224,6 +267,7 @@ export async function drawShareCard(m: ShareModel): Promise<HTMLCanvasElement> {
       );
       const w = img.width * k;
       const h = img.height * k;
+      groundShadow(ctx, cx, base + 2, Math.max(36, w * 0.5));
       ctx.imageSmoothingEnabled = false;
       ctx.drawImage(img, cx - w / 2, base - h, w, h);
     }
@@ -231,7 +275,7 @@ export async function drawShareCard(m: ShareModel): Promise<HTMLCanvasElement> {
     ctx.textAlign = 'center';
     ctx.font = font(600, 17);
     ctx.fillStyle = s.swapped ? C.gold : C.text;
-    ctx.fillText(s.swapped ? `${s.species}*` : s.species, cx, base + 26, cellW - 8);
+    ctx.fillText(s.swapped ? `${s.species}*` : s.species, cx, base + 28, cellW - 8);
     ctx.textAlign = 'left';
   });
 
@@ -240,7 +284,7 @@ export async function drawShareCard(m: ShareModel): Promise<HTMLCanvasElement> {
     ctx.textBaseline = 'alphabetic';
     ctx.fillStyle = C.muted;
     ctx.font = font(500, 20);
-    ctx.fillText(m.url.replace(/^https?:\/\//, ''), left, CARD_H - 84);
+    ctx.fillText(m.url.replace(/^https?:\/\//, ''), left, CARD_H - 44);
   }
   return canvas;
 }

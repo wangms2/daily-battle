@@ -61,6 +61,7 @@ export function WelcomeSheet({
           </li>
         ))}
       </ol>
+      <p className="mt-3 text-[13px] text-muted">Every game uses the OU (OverUsed) tier.</p>
       {review ? (
         <Button className="mt-4 w-full" onClick={onDone}>
           Got it

@@ -194,7 +194,7 @@ export function BreakScreen({ room, you, at, onLeave, onBack, right }: Common) {
   return (
     <Page
       title={`Round ${room.lastRound?.round ?? room.round} results`}
-      back="Versus"
+      back="Back"
       onBack={onBack}
       right={right}
     >
@@ -256,7 +256,7 @@ export function GameOverScreen({
   const podium = [top[1], top[0], top[2]];
   const heights = ['h-16', 'h-24', 'h-12'];
   return (
-    <Page title="Game over" back="Versus" onBack={onBack}>
+    <Page title="Game over" back="Back" onBack={onBack}>
       <section className="card relative overflow-hidden p-5 text-center">
         <div aria-hidden className="pointer-events-none absolute inset-0">
           {Array.from({ length: 24 }, (_, i) => (

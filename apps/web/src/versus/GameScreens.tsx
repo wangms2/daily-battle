@@ -137,7 +137,7 @@ export function RoundScreen({
   return (
     <Page
       title={room.phase === 'build' ? 'Building teams' : `Round ${room.round}`}
-      back="Versus"
+      back="Back"
       onBack={onBack}
       right={right}
     >

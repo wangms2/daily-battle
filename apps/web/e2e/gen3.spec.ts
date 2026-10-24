@@ -72,10 +72,8 @@ test('a first-time player picks Gen 3 and gets its pool in Emerald sprites', asy
 }, info) => {
   await open(page, undefined, '/#daily');
   // The games run by generation: Gen 3 comes first.
-  await expect(page.getByRole('button', { name: /^Gen [0-9] OU/ }).first()).toContainText(
-    'Gen 3 OU',
-  );
-  await page.getByRole('button', { name: /Gen 3 OU/ }).click();
+  await expect(page.getByRole('button', { name: /^Gen [0-9]/ }).first()).toContainText('Gen 3');
+  await page.getByRole('button', { name: /^Gen 3/ }).click();
   const welcome = page.getByRole('dialog', { name: 'Welcome to Daily Battle' });
   await noScroll(page, 'welcome sheet');
   await shot(page, '01-welcome', info.project.name);

@@ -134,7 +134,7 @@ export function Lobby({
   };
 
   return (
-    <Page title={`Room ${room.code}`} back="Versus" onBack={onBack}>
+    <Page title={`Room ${room.code}`} back="Back" onBack={onBack}>
       <section className="card flex items-center justify-between gap-3 p-4">
         <div>
           <p className="text-[13px] text-muted">Room code</p>

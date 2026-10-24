@@ -56,7 +56,7 @@ const shot = (page: Page, name: string, project: string) =>
 
 test('a first-time player picks Gen 5 and gets its pool', async ({ page }, info) => {
   await open(page, undefined, '/#daily');
-  await page.getByRole('button', { name: /Gen 5 OU/ }).click();
+  await page.getByRole('button', { name: /^Gen 5/ }).click();
   const welcome = page.getByRole('dialog', { name: 'Welcome to Daily Battle' });
   await noScroll(page, 'welcome sheet');
   await shot(page, '01-welcome', info.project.name);
@@ -78,11 +78,11 @@ test('the title opens the picker to switch games, each with its own team', async
   await expect(page.getByText('Choose a game')).toBeVisible();
   await noScroll(page, 'game picker');
   await shot(page, '03-picker', info.project.name);
-  await page.getByRole('button', { name: /Gen 4 OU/ }).click();
+  await page.getByRole('button', { name: /^Gen 4/ }).click();
   // No Gen 4 team yet this week: its builder opens.
   await expect(page.getByRole('button', { name: /^Gen 4 · Week of/ })).toBeVisible();
   await page.getByRole('button', { name: /^Gen 4 · / }).click();
-  await page.getByRole('button', { name: /Gen 5 OU/ }).click();
+  await page.getByRole('button', { name: /^Gen 5/ }).click();
   // Back on Gen 5's brief with its locked team.
   await expect(page.getByRole('button', { name: /^Start · / })).toBeVisible();
 });

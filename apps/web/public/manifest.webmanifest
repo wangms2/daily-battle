@@ -1,11 +1,11 @@
 {
   "name": "Daily Battle",
   "short_name": "Daily Battle",
-  "description": "A new Gen 4 or Gen 5 OU opponent every day.",
+  "description": "A new battle every day. Or play with friends.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f5f5f7",
-  "theme_color": "#3f5f8a",
+  "theme_color": "#8a4f58",
   "icons": [
     { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
     { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" }

@@ -3,6 +3,8 @@
 @import '@fontsource/ibm-plex-sans/latin-500.css';
 @import '@fontsource/ibm-plex-sans/latin-600.css';
 @import '@fontsource/ibm-plex-sans/latin-700.css';
+/* The home screens' headings and buttons (the Poké Ball split). */
+@import '@fontsource/fraunces/latin-600.css';
 /* The battle text is the only pixel type: a lookalike of each generation's game
    font (the games' own fonts are Nintendo's, so these are free stand-ins). */
 @import '@fontsource/jersey-10/latin-400.css';
@@ -24,7 +26,7 @@
   --border: #dcdce4;
   --text: #1b1d26;
   --muted: #646778;
-  --accent: #3f5f8a;
+  --accent: #4a7088;
   --accent-text: #ffffff;
   --accent-soft: #ece7f2;
   --accent-soft-text: #6b5482;
@@ -65,7 +67,7 @@
     --border: #30303c;
     --text: #ececf1;
     --muted: #9c9daf;
-    --accent: #8fadd4;
+    --accent: #8db2c5;
     --accent-text: #121218;
     --accent-soft: #2a2433;
     --accent-soft-text: #c7b5da;
@@ -798,4 +800,261 @@ button {
   .confetti-piece {
     display: none;
   }
+}
+
+/* ---- Home screens: the Poké Ball split (landing and game picker) ---- */
+.home-serif {
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 600;
+}
+/* The top half stays a muted clay in both themes, like a Poké Ball's lid. */
+.home-top {
+  position: relative;
+  overflow: hidden;
+  color: #fff;
+  background: linear-gradient(165deg, #a3646a, #8a4f58);
+}
+.home-seam {
+  position: relative;
+  height: 12px;
+  flex-shrink: 0;
+  background: #2b2d36;
+  view-transition-name: seam;
+  /* Above the sections after it, so the ball isn't cut off where it overlaps them. */
+  z-index: 10;
+}
+/* Inside the game, the seam is just a line under the header. */
+.home-seam.is-thin {
+  height: 6px;
+}
+.home-ball {
+  --ball: 70px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 5;
+  translate: -50% -50%;
+  display: grid;
+  place-items: center;
+  width: var(--ball);
+  height: var(--ball);
+  box-sizing: border-box;
+  border: calc(var(--ball) * 0.1) solid #2b2d36;
+  border-radius: 50%;
+  background: #f4f3f1;
+  box-shadow: 0 3px 10px rgb(0 0 0 / 0.25);
+  pointer-events: none;
+  view-transition-name: ball;
+}
+.home-ball::after {
+  content: '';
+  box-sizing: border-box;
+  width: calc(var(--ball) * 0.31);
+  height: calc(var(--ball) * 0.31);
+  border: calc(var(--ball) * 0.057) solid #2b2d36;
+  border-radius: 50%;
+  background: #a3646a;
+}
+.home-btn {
+  display: inline-grid;
+  place-items: center;
+  border-radius: 12px;
+  transition: transform 120ms;
+}
+.home-btn:active {
+  transform: translateY(2px);
+}
+.home-play {
+  background: #f7f6f4;
+  color: #2b2d36;
+  box-shadow: 0 4px 0 rgb(0 0 0 / 0.2);
+}
+.home-friends-btn {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  box-shadow: 0 3px 0 color-mix(in srgb, var(--border) 80%, black);
+}
+.home-cart {
+  position: relative;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 10px 10px 4px 4px;
+  box-shadow: 0 2px 0 color-mix(in srgb, var(--border) 80%, black);
+}
+
+/* The landing's top half borrows the anime's "Who's that Pokémon?" card: a burst of rays,
+   a blue silhouette with a dark offset edge, and a big outlined question mark, all muted. */
+.home-burst {
+  --burst-x: max(30%, calc(50% - 104px));
+  --burst-y: 58%;
+  background:
+    radial-gradient(
+      circle at var(--burst-x) var(--burst-y),
+      rgb(255 255 255 / 0.8) 0,
+      rgb(224 237 241 / 0.5) 22%,
+      transparent 58%
+    ),
+    repeating-conic-gradient(
+      from 3deg at var(--burst-x) var(--burst-y),
+      rgb(255 255 255 / 0.18) 0 5deg,
+      rgb(0 0 0 / 0.05) 5deg 10deg
+    ),
+    linear-gradient(95deg, #b9d1d7 0%, #aeb1b9 36%, #a3646a 64%, #8a4f58 100%);
+}
+.home-silhouette {
+  height: 34.4cqh;
+  width: 28.8cqh;
+  background-color: #43677f;
+  mask: var(--sprite) center / contain no-repeat;
+  -webkit-mask: var(--sprite) center / contain no-repeat;
+  filter: drop-shadow(-4px 3px 0 #223847);
+}
+.home-question {
+  font-size: 13cqh;
+  color: #d9b75c;
+  -webkit-text-stroke: 5px #3b2f25;
+  paint-order: stroke fill;
+}
+
+/* ---- Landing to picker: one screen, two states (data-view on .home) ----
+   The landing's and the picker's layers each keep a fixed size, so nothing squashes
+   while the top half rises and the ball rides the seam up. */
+.home {
+  --ease: cubic-bezier(0.22, 0.8, 0.2, 1);
+  --picker-top: 94px;
+  container-type: size;
+}
+.home .home-top {
+  height: calc(50cqh - 6px);
+  transition: height 460ms var(--ease);
+}
+.home[data-view='picker'] .home-top {
+  height: var(--picker-top);
+}
+.home-ball {
+  scale: 1;
+  transition: scale 460ms var(--ease);
+}
+.home[data-view='picker'] .home-ball {
+  scale: 0.66;
+}
+
+/* Landing art (the burst, silhouette, date, Play): fades up and away. */
+.home-landing {
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: calc(50cqh - 6px);
+  transition:
+    opacity 220ms ease,
+    translate 460ms var(--ease);
+}
+.home[data-view='picker'] .home-landing {
+  opacity: 0;
+  translate: 0 -12px;
+  pointer-events: none;
+}
+
+/* Picker title and Back: ease in once the top has mostly risen. */
+.home-fade {
+  opacity: 0;
+  translate: 0 4px;
+  transition:
+    opacity 160ms ease,
+    translate 160ms ease;
+}
+.home[data-view='picker'] .home-fade {
+  opacity: 1;
+  translate: 0 0;
+  transition:
+    opacity 280ms ease 200ms,
+    translate 380ms var(--ease) 200ms;
+}
+
+/* With friends: sinks away as the picker rises into its place. */
+.home-friends {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: calc(50cqh - 6px);
+  transition:
+    opacity 200ms ease,
+    translate 400ms var(--ease);
+}
+.home[data-view='picker'] .home-friends {
+  opacity: 0;
+  translate: 0 14px;
+  pointer-events: none;
+}
+
+/* The cartridges rise in one after another. */
+.home-games {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: calc(100cqh - var(--picker-top) - 12px);
+}
+.home:not([data-view='picker']) .home-games {
+  pointer-events: none;
+}
+.home-cart {
+  opacity: 0;
+  translate: 0 16px;
+  transition:
+    opacity 160ms ease,
+    translate 240ms var(--ease);
+}
+.home[data-view='picker'] .home-cart {
+  opacity: 1;
+  translate: 0 0;
+  transition:
+    opacity 320ms ease calc(180ms + var(--i, 0) * 55ms),
+    translate 460ms var(--ease) calc(180ms + var(--i, 0) * 55ms);
+}
+
+/* ---- Between screens (the browser's view transitions, where it has them) ----
+   The seam and the ball are named, so they glide from one screen's place to the next's;
+   everything else gives way with a quick crossfade. */
+::view-transition-group(seam),
+::view-transition-group(ball) {
+  animation-duration: 420ms;
+  animation-timing-function: cubic-bezier(0.22, 0.8, 0.2, 1);
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 240ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home *,
+  .home {
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
+  }
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+/* ---- The landing's buttons and the crowd grow with the screen's height ---- */
+.home-play {
+  height: clamp(64px, 10cqh, 120px);
+  min-width: clamp(176px, 27.5cqh, 330px);
+  padding-inline: clamp(32px, 5cqh, 60px);
+  font-size: clamp(28px, 4.4cqh, 52px);
+}
+.home-friends-btn {
+  height: clamp(60px, 9.4cqh, 112px);
+  min-width: clamp(230px, 36cqh, 430px);
+  padding-inline: clamp(28px, 4.4cqh, 52px);
+  font-size: clamp(25px, 3.9cqh, 46px);
+}
+.home-friend {
+  height: clamp(82px, 13.5cqh, 170px);
+}
+.home-friend.is-big {
+  height: clamp(104px, 17.2cqh, 216px);
 }

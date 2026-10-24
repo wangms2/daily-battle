@@ -23,21 +23,21 @@ test('the first screen offers Daily Battle and Versus, then the four games', asy
   page,
 }, info) => {
   await open(page, '/');
-  await expect(page.getByRole('button', { name: /^Daily Battle/ })).toBeVisible();
-  await expect(page.getByRole('button', { name: /^Versus with friends/ })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Play' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'With friends' })).toBeVisible();
   // Nothing pops up over a first visit.
   await expect(page.getByRole('dialog')).toHaveCount(0);
   await noScroll(page, 'landing');
   await shot(page, '01-landing', info.project.name);
 
-  await page.getByRole('button', { name: /^Daily Battle/ }).click();
-  for (const gen of ['Gen 3 OU', 'Gen 4 OU', 'Gen 5 OU', 'Gen 6 OU'])
+  await page.getByRole('button', { name: 'Play' }).click();
+  for (const gen of ['Gen 3', 'Gen 4', 'Gen 5', 'Gen 6'])
     await expect(page.getByRole('button', { name: new RegExp(gen) })).toBeVisible();
   await noScroll(page, 'game picker');
   await shot(page, '02-picker', info.project.name);
 
   await page.getByRole('button', { name: 'Back' }).click();
-  await expect(page.getByRole('button', { name: /^Versus with friends/ })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'With friends' })).toBeVisible();
 });
 
 test('a shared link opens the game picker', async ({ page }) => {
@@ -46,8 +46,8 @@ test('a shared link opens the game picker', async ({ page }) => {
   await expect(page.getByRole('dialog')).toHaveCount(0);
 });
 
-test('Versus with friends opens the room screen', async ({ page }) => {
+test('With friends opens the room screen', async ({ page }) => {
   await open(page, '/');
-  await page.getByRole('button', { name: /^Versus with friends/ }).click();
+  await page.getByRole('button', { name: 'With friends' }).click();
   await expect(page).toHaveURL(/#versus$/);
 });
