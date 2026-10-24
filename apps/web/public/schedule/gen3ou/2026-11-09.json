@@ -1,0 +1,302 @@
+{
+  "version": 1,
+  "generatorVersion": 4,
+  "dataBuiltAt": "2026-10-24T16:51:53.962Z",
+  "week": "2026-11-09",
+  "pool": {
+    "species": [
+      "Salamence",
+      "Magneton",
+      "Breloom",
+      "Porygon2",
+      "Heracross",
+      "Forretress",
+      "Moltres",
+      "Aerodactyl",
+      "Skarmory",
+      "Smeargle",
+      "Camerupt",
+      "Golduck"
+    ],
+    "candidate": 0
+  },
+  "suggestedTeams": [
+    {
+      "archetype": "Balanced",
+      "team": [
+        {
+          "species": "Camerupt",
+          "setId": "camerupt-tank"
+        },
+        {
+          "species": "Porygon2",
+          "setId": "porygon2-standard"
+        },
+        {
+          "species": "Moltres",
+          "setId": "moltres-standard"
+        },
+        {
+          "species": "Heracross",
+          "setId": "heracross-standard"
+        },
+        {
+          "species": "Forretress",
+          "setId": "forretress-standard"
+        },
+        {
+          "species": "Salamence",
+          "setId": "salamence-dragon-dance"
+        }
+      ]
+    },
+    {
+      "archetype": "Offense",
+      "team": [
+        {
+          "species": "Heracross",
+          "setId": "heracross-choice-band"
+        },
+        {
+          "species": "Camerupt",
+          "setId": "camerupt-tank"
+        },
+        {
+          "species": "Breloom",
+          "setId": "breloom-spore"
+        },
+        {
+          "species": "Aerodactyl",
+          "setId": "aerodactyl-choice-band"
+        },
+        {
+          "species": "Salamence",
+          "setId": "salamence-dragon-dance"
+        },
+        {
+          "species": "Skarmory",
+          "setId": "skarmory-offensive-spikes"
+        }
+      ]
+    }
+  ],
+  "days": [
+    {
+      "day": "2026-11-09",
+      "style": "offense",
+      "team": [
+        {
+          "species": "Cloyster",
+          "setId": "cloyster-spiker"
+        },
+        {
+          "species": "Gengar",
+          "setId": "gengar-offensive"
+        },
+        {
+          "species": "Zapdos",
+          "setId": "zapdos-mixed"
+        },
+        {
+          "species": "Smeargle",
+          "setId": "smeargle-standard-spikes-lead"
+        },
+        {
+          "species": "Blissey",
+          "setId": "blissey-calm-mind"
+        },
+        {
+          "species": "Breloom",
+          "setId": "breloom-swords-dance"
+        }
+      ],
+      "candidate": 12
+    },
+    {
+      "day": "2026-11-10",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Dugtrio",
+          "setId": "dugtrio-choice-band"
+        },
+        {
+          "species": "Claydol",
+          "setId": "claydol-utility"
+        },
+        {
+          "species": "Metagross",
+          "setId": "metagross-choice-band"
+        },
+        {
+          "species": "Flygon",
+          "setId": "flygon-defensive"
+        },
+        {
+          "species": "Skarmory",
+          "setId": "skarmory-standard"
+        },
+        {
+          "species": "Magneton",
+          "setId": "magneton-trapper"
+        }
+      ],
+      "candidate": 7
+    },
+    {
+      "day": "2026-11-11",
+      "style": "stall",
+      "team": [
+        {
+          "species": "Forretress",
+          "setId": "forretress-standard"
+        },
+        {
+          "species": "Sableye",
+          "setId": "sableye-physically-defensive"
+        },
+        {
+          "species": "Charizard",
+          "setId": "charizard-mixed-attacker"
+        },
+        {
+          "species": "Registeel",
+          "setId": "registeel-mixed-wall"
+        },
+        {
+          "species": "Gyarados",
+          "setId": "gyarados-rest"
+        },
+        {
+          "species": "Metagross",
+          "setId": "metagross-choice-band"
+        }
+      ],
+      "candidate": 7
+    },
+    {
+      "day": "2026-11-12",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Claydol",
+          "setId": "claydol-utility"
+        },
+        {
+          "species": "Gengar",
+          "setId": "gengar-utility"
+        },
+        {
+          "species": "Skarmory",
+          "setId": "skarmory-standard"
+        },
+        {
+          "species": "Flygon",
+          "setId": "flygon-defensive"
+        },
+        {
+          "species": "Rhydon",
+          "setId": "rhydon-substitute"
+        },
+        {
+          "species": "Metagross",
+          "setId": "metagross-agility"
+        }
+      ],
+      "candidate": 7
+    },
+    {
+      "day": "2026-11-13",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Gengar",
+          "setId": "gengar-offensive"
+        },
+        {
+          "species": "Metagross",
+          "setId": "metagross-choice-band"
+        },
+        {
+          "species": "Ursaring",
+          "setId": "ursaring-bulk-up"
+        },
+        {
+          "species": "Alakazam",
+          "setId": "alakazam-encore"
+        },
+        {
+          "species": "Porygon2",
+          "setId": "porygon2-standard"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-bulky-physical-attacker"
+        }
+      ],
+      "candidate": 17
+    },
+    {
+      "day": "2026-11-14",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Dugtrio",
+          "setId": "dugtrio-choice-band"
+        },
+        {
+          "species": "Umbreon",
+          "setId": "umbreon-wishpasser"
+        },
+        {
+          "species": "Regice",
+          "setId": "regice-offensive"
+        },
+        {
+          "species": "Metagross",
+          "setId": "metagross-bulky-attacker"
+        },
+        {
+          "species": "Jirachi",
+          "setId": "jirachi-superachi-offensive-calm-mind"
+        },
+        {
+          "species": "Registeel",
+          "setId": "registeel-toxic-stall"
+        }
+      ],
+      "candidate": 2
+    },
+    {
+      "day": "2026-11-15",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Celebi",
+          "setId": "celebi-leech-seed-3-attacks"
+        },
+        {
+          "species": "Claydol",
+          "setId": "claydol-utility"
+        },
+        {
+          "species": "Skarmory",
+          "setId": "skarmory-standard"
+        },
+        {
+          "species": "Houndoom",
+          "setId": "houndoom-pursuit"
+        },
+        {
+          "species": "Sceptile",
+          "setId": "sceptile-all-out-mixed-sweeper"
+        },
+        {
+          "species": "Blissey",
+          "setId": "blissey-calm-mind"
+        }
+      ],
+      "candidate": 17
+    }
+  ]
+}
