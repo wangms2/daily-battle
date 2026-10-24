@@ -73,12 +73,20 @@ export function StatLines({
 }
 
 /** The six final stats on one line, for tight places (the set picker). */
-export function FinalStatsRow({ species, set }: { species: string; set: SetEntry }) {
+export function FinalStatsRow({
+  species,
+  set,
+  label = 'Final stats at level 100',
+}: {
+  species: string;
+  set: SetEntry;
+  label?: string;
+}) {
   const final = finalStats(speciesInfo(species).baseStats, set);
   return (
     <dl
       className="mt-2 flex justify-between gap-0.5 rounded-chip bg-surface-2 px-1.5 py-1 text-[12px] whitespace-nowrap"
-      aria-label="Final stats at level 100"
+      aria-label={label}
     >
       {STAT_IDS.map((k) => (
         <div key={k} className="flex gap-[3px]">

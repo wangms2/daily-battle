@@ -85,7 +85,7 @@ export function WelcomeSheet({
             <legend className="mb-2 text-[15px] font-semibold">
               Pick your game <span className="font-normal text-muted">· you can switch later</span>
             </legend>
-            <div role="radiogroup" aria-label="Game" className="grid grid-cols-2 gap-2">
+            <div role="radiogroup" aria-label="Game" className="grid gap-2 sm:grid-cols-3">
               {(Object.keys(FORMATS) as FormatId[]).map((id) => (
                 <button
                   key={id}

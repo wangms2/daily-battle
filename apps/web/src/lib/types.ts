@@ -17,6 +17,7 @@ export const TYPE_COLORS: Record<string, { bg: string; fg: string }> = {
   Dragon: { bg: '#5b5fd6', fg: '#ffffff' },
   Dark: { bg: '#4f4442', fg: '#ffffff' },
   Steel: { bg: '#7d95a5', fg: '#16181f' },
+  Fairy: { bg: '#ee90e6', fg: '#16181f' },
 };
 
 export const typeAbbr = (t: string) => t.slice(0, 3).toUpperCase();

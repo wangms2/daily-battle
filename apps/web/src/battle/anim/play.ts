@@ -63,6 +63,15 @@ export function playStatus(init: SceneInit, event: NonNullable<Frame['event']>):
   return run(scene, () => entry.anim(scene, sprites(scene, target, undefined)));
 }
 
+/** Showdown's Mega Evolution burst (`|-mega|`), at any speed: it's a once-a-battle moment. */
+export function playMega(init: SceneInit, event: NonNullable<Frame['event']>): Running | null {
+  if (event.kind !== 'mega') return null;
+  const entry = BattleOtherAnims.megaevo;
+  if (!entry) return null;
+  const scene = new AnimScene(init);
+  return run(scene, () => entry.anim(scene, sprites(scene, event.who, undefined)));
+}
+
 /** The names of every move and status that has an animation (for tests). */
 export const ANIMATED = {
   moves: Object.keys(BattleMoveAnims),

@@ -1,4 +1,5 @@
 import { sets as defaultSets, type SetEntry, type SetsFile } from '@daily-battle/data';
+import { oneMegaProblem } from '@daily-battle/data/species';
 import { teamSets, toPokemonSet, type Rng, type TeamSlot } from '@daily-battle/gen';
 import { TeamValidator, type PokemonSet } from '@pkmn/sim';
 import type { KnownSets } from '@daily-battle/ai';
@@ -7,6 +8,15 @@ function pickSet(sets: SetEntry[], rng: Rng): SetEntry {
   let r = rng();
   for (const s of sets) if ((r -= s.weight) < 0) return s;
   return sets[sets.length - 1]!;
+}
+
+/** Legal for the format's validator and our own team rules (one Mega, Gen 6 on). */
+export function legalTeam(data: SetsFile, team: TeamSlot[]): boolean {
+  const sets = teamSets(data, team);
+  return (
+    !TeamValidator.get(data.meta.format).validateTeam(sets) &&
+    !oneMegaProblem(data.meta.format, sets)
+  );
 }
 
 /**
@@ -19,7 +29,6 @@ export function poolTeams(
   rng: Rng,
   data: SetsFile = defaultSets,
 ): TeamSlot[][] {
-  const validator = TeamValidator.get(data.meta.format);
   const teams: TeamSlot[][] = [];
   for (let guard = 0; teams.length < n && guard < n * 50; guard++) {
     const left = [...species];
@@ -28,7 +37,7 @@ export function poolTeams(
       const name = left.splice(Math.floor(rng() * left.length), 1)[0]!;
       team.push({ species: name, setId: pickSet(data.species[name]!.sets, rng).id });
     }
-    if (!validator.validateTeam(teamSets(data, team))) teams.push(team);
+    if (legalTeam(data, team)) teams.push(team);
   }
   if (teams.length < n) throw new Error(`Could only draw ${teams.length} legal teams`);
   return teams;

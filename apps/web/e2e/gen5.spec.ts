@@ -21,7 +21,7 @@ function gen5State() {
       beginnerHints: true,
       battleSpeed: 'instant',
       animations: true,
-      shownExplainers: ['welcome', 'gen5-news'],
+      shownExplainers: ['welcome', 'gen5-news', 'gen6-news'],
       format: 'gen5ou',
     },
   };
@@ -141,8 +141,9 @@ test('a Gen 5 battle shows the foe six from the start, and resumes', async ({ pa
   await noScroll(page, 'resumed');
 });
 
-test('a player from before Gen 5 gets the news once, and can try it', async ({ page }, info) => {
-  // A Gen 4 save from before Gen 5 (v3), as most players have.
+test('a player from before Gen 5 gets only the newest news, once', async ({ page }, info) => {
+  // A Gen 4 save from before Gen 5 (v3), as most players have. Gen 6 has
+  // come out since, so its sheet is the one they see; Gen 5's never shows.
   await open(page, {
     version: 3,
     weeks: {},
@@ -154,13 +155,14 @@ test('a player from before Gen 5 gets the news once, and can try it', async ({ p
       shownExplainers: ['welcome'],
     },
   });
-  const news = page.getByRole('dialog', { name: 'New: Gen 5 OU' });
+  const news = page.getByRole('dialog', { name: 'New: Gen 6 OU' });
   await expect(news).toBeVisible();
-  await noScroll(page, 'gen 5 news');
+  await expect(page.getByRole('dialog', { name: 'New: Gen 5 OU' })).toBeHidden();
+  await noScroll(page, 'news');
   await shot(page, '07-news', info.project.name);
-  await news.getByRole('button', { name: 'Try Gen 5 OU' }).click();
-  await expect(page.getByRole('button', { name: /^Gen 5 · / })).toBeVisible();
+  await news.getByRole('button', { name: 'Stay on Gen 4' }).click();
+  await expect(page.getByRole('button', { name: /^Gen 4 · / })).toBeVisible();
   await page.reload();
-  await expect(page.getByRole('button', { name: /^Gen 5 · / })).toBeVisible();
-  await expect(news).toBeHidden();
+  await expect(page.getByRole('button', { name: /^Gen 4 · / })).toBeVisible();
+  await expect(page.getByRole('dialog', { name: /^New: / })).toBeHidden();
 });

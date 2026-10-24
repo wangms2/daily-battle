@@ -17,7 +17,7 @@ import {
   type ReactNode,
   type RefObject,
 } from 'react';
-import { HAZARD_FX, WEATHER_FX } from '../../lib/fx';
+import { HAZARD_FX, TERRAIN_FX, WEATHER_FX } from '../../lib/fx';
 import { getSprite } from '../../lib/sprites';
 import type { SceneInit } from '../anim/scene';
 import type { Frame, MonView, SideConds, TeamMark, View, Who } from '../frames';
@@ -172,12 +172,20 @@ function StatBar({
       }}
       onPointerEnter={(e) => e.pointerType === 'mouse' && onInfo(who, 'hover')}
       onPointerLeave={(e) => e.pointerType === 'mouse' && onInfo(null, 'hover')}
-      aria-label={`${who === 'foe' ? 'Foe' : 'Your'} ${mon.species}, ${mon.hp}% HP${mon.status ? `, ${STATUS_LABEL[mon.status]}` : ''}, ${left} of 6 left. Details`}
+      aria-label={`${who === 'foe' ? 'Foe' : 'Your'} ${mon.base ? `Mega ${mon.base}` : mon.species}, ${mon.hp}% HP${mon.status ? `, ${STATUS_LABEL[mon.status]}` : ''}, ${left} of 6 left. Details`}
       className="statbar absolute z-10 w-[9.75rem] text-left"
       style={style}
     >
       <span className="flex items-center gap-1">
-        <span className="truncate text-[13px] leading-4 font-bold">{mon.species}</span>
+        <span className="truncate text-[13px] leading-4 font-bold">{mon.base ?? mon.species}</span>
+        {mon.base && (
+          <span
+            className="mega-badge shrink-0 rounded-[3px] px-1 text-[9.5px] leading-[14px] font-bold"
+            title={mon.species}
+          >
+            Mega
+          </span>
+        )}
         {/* Every Pokémon here is level 100, as on Showdown's ladder. */}
         <span className="shrink-0 text-[10px] leading-4 font-semibold text-muted">L100</span>
         {mon.status && (
@@ -217,7 +225,7 @@ function StatBar({
   );
 }
 
-/** Stealth Rock, Spikes, and Toxic Spikes on one side's ground; screens as tinted glass. */
+/** Stealth Rock, Spikes, Toxic Spikes, and Sticky Web on one side's ground; screens as tinted glass. */
 function SideEffects({ side, who }: { side: SideConds; who: Who }) {
   const foe = who === 'foe';
   const rocks = foe
@@ -266,6 +274,7 @@ function SideEffects({ side, who }: { side: SideConds; who: Who }) {
     side.sr && 'Stealth Rock',
     side.spikes && `Spikes ×${side.spikes}`,
     side.tspikes && `Toxic Spikes ×${side.tspikes}`,
+    side.web && 'Sticky Web',
     side.reflect && 'Reflect',
     side.lightScreen && 'Light Screen',
   ].filter(Boolean);
@@ -299,6 +308,9 @@ function SideEffects({ side, who }: { side: SideConds; who: Who }) {
           }}
         />
       )}
+      {side.web &&
+        // Where Showdown lays it: a faint web just behind the platform's center.
+        sprite(HAZARD_FX.web, foe ? [495, 255] : [265, 380], foe ? 90 : 120, 'web')}
       {side.sr && rocks.map((p, i) => sprite(HAZARD_FX.rocks[i % 2]!, p, foe ? 20 : 26, `r${i}`))}
       {spikes
         .slice(0, side.spikes)
@@ -348,11 +360,13 @@ function FieldSprite({
             : 'anim-in-right'
           : anim.kind === 'faint'
             ? 'anim-faint'
-            : anim.kind === 'move' && !ported
-              ? who === 'you'
-                ? 'anim-lunge-right'
-                : 'anim-lunge-left'
-              : ''
+            : anim.kind === 'mega'
+              ? 'anim-mega'
+              : anim.kind === 'move' && !ported
+                ? who === 'you'
+                  ? 'anim-lunge-right'
+                  : 'anim-lunge-left'
+                : ''
       : '';
   const spot = SPOT[who];
   // Near-side (back) sprites are drawn a little larger, as in the games.
@@ -441,6 +455,7 @@ export function Field({
   popover: ReactNode;
 }) {
   const weather = view?.weather ?? '';
+  const terrain = view?.terrain ?? '';
   const fieldEl = useRef<HTMLDivElement>(null);
   const fxEl = useRef<HTMLDivElement>(null);
   const bgFxEl = useRef<HTMLDivElement>(null);
@@ -530,6 +545,13 @@ export function Field({
           aria-hidden
         />
       )}
+      {terrain && TERRAIN_FX[terrain] && (
+        <div
+          className="terrain-fx absolute inset-0"
+          style={{ backgroundImage: `url(${TERRAIN_FX[terrain]})` }}
+          aria-hidden
+        />
+      )}
 
       {view && <SideEffects side={view.foeSide} who="foe" />}
       <FieldSprite
@@ -591,9 +613,16 @@ export function Field({
         />
       )}
 
-      {weather && (
-        <span className="absolute top-1.5 left-1.5 rounded-badge bg-black/45 px-1.5 py-0.5 text-[11px] font-semibold text-white">
-          {WEATHER_LABEL[weather] ?? weather}
+      {(weather || terrain) && (
+        <span className="absolute top-1.5 left-1.5 flex gap-1">
+          {[weather && (WEATHER_LABEL[weather] ?? weather), terrain].filter(Boolean).map((name) => (
+            <span
+              key={name}
+              className="rounded-badge bg-black/45 px-1.5 py-0.5 text-[11px] font-semibold text-white"
+            >
+              {name}
+            </span>
+          ))}
         </span>
       )}
 

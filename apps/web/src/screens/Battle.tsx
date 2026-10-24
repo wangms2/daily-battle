@@ -171,7 +171,10 @@ export function Battle({
     const play = animsRef.current;
     if (!init || !play || !f.event) return 0;
     const full = { ...init, accel: ACCEL[settingsRef.current.battleSpeed] };
-    const run = play.playMove(full, f.event) ?? play.playStatus(full, f.event);
+    const run =
+      play.playMove(full, f.event) ??
+      play.playStatus(full, f.event) ??
+      play.playMega(full, f.event);
     if (!run) return 0;
     running.current = run;
     return run.duration;
@@ -408,7 +411,7 @@ export function Battle({
       <MonPopover
         foe
         mon={view.foe}
-        revealed={view.revealed[view.foe.species]}
+        revealed={view.revealed[view.foe.base ?? view.foe.species]}
         hints={settings.beginnerHints}
       />
     ) : monFor === 'you' && active ? (

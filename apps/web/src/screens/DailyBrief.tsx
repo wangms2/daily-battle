@@ -4,7 +4,17 @@ import type { ScheduleFile } from '@daily-battle/gen/schedule';
 import clsx from 'clsx';
 import { useEffect, useState, type ReactNode } from 'react';
 import { warmBattleWorker } from '../battle/backend';
-import { findSet, sameSpecies, speciesInfo, STAT_LABEL, type Slot } from '../lib/data';
+import {
+  canMega,
+  findSet,
+  megaClash,
+  megaFor,
+  ONE_MEGA_MESSAGE,
+  sameSpecies,
+  speciesInfo,
+  STAT_LABEL,
+  type Slot,
+} from '../lib/data';
 import { finalStats } from '../lib/stats';
 import { dayHeadline, streakLine, type DaySummary } from '../lib/results';
 import { getSprite, preloadSprites } from '../lib/sprites';
@@ -26,6 +36,15 @@ type Mode =
   | { kind: 'edit' }
   /** Choosing who comes in for team slot `slot`. */
   | { kind: 'replace'; slot: number };
+
+/** A small Mega mark on a tile's corner. */
+function MegaMark({ text }: { text: string }) {
+  return (
+    <span className="mega-badge rounded-badge px-1.5 py-0.5 text-[10.5px] leading-none font-bold">
+      {text}
+    </span>
+  );
+}
 
 export function DailyBrief({
   schedule,
@@ -211,8 +230,9 @@ export function DailyBrief({
             <PokemonTile
               key={species}
               species={species}
-              label={`About ${species}`}
+              label={`About ${species}${hints && canMega(species) ? ', can Mega Evolve' : ''}`}
               onTap={() => setInfoFor({ species, foe: true })}
+              badge={hints && canMega(species) ? <MegaMark text="Can Mega Evolve" /> : undefined}
               hoverCard={wide ? hoverOf(species) : undefined}
             />
           ))}
@@ -236,9 +256,14 @@ export function DailyBrief({
               hoverCard={wide && !editing ? hoverOf(slot.species, slot.setId) : undefined}
               selected={!editing && isLead}
               badge={
-                !editing && isLead ? (
-                  <span className="flex items-center gap-0.5 rounded-badge bg-gold px-1.5 py-0.5 text-[11px] font-bold text-on-gold">
-                    <StarIcon width={11} height={11} /> Lead
+                (!editing && isLead) || megaFor(slot.species, findSet(slot)) ? (
+                  <span className="flex flex-col items-start gap-0.5">
+                    {!editing && isLead && (
+                      <span className="flex items-center gap-0.5 rounded-badge bg-gold px-1.5 py-0.5 text-[11px] font-bold text-on-gold">
+                        <StarIcon width={11} height={11} /> Lead
+                      </span>
+                    )}
+                    {megaFor(slot.species, findSet(slot)) && <MegaMark text="Mega" />}
                   </span>
                 ) : undefined
               }
@@ -388,6 +413,13 @@ export function DailyBrief({
         onOpenChange={(o) => !o && setPicker(null)}
         currentSetId={picker?.kind === 'set' ? team[picker.slot]!.setId : undefined}
         chooseLabel={picker?.kind === 'replace' ? 'Bring in' : 'Use this set'}
+        // One Mega per team: the swap can't bring in a second Mega Stone.
+        blocked={(setId) => {
+          if (!picker) return undefined;
+          const others = team.filter((_, i) => i !== picker.slot);
+          const other = megaClash(others, { species: picker.species, setId });
+          return other && `${ONE_MEGA_MESSAGE} ${other} has the Mega Stone.`;
+        }}
         title={
           picker
             ? picker.kind === 'replace'

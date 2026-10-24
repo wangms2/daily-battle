@@ -1,5 +1,5 @@
 // Read-only helpers over the set data and species facts of the game being
-// shown (Gen 4 OU or Gen 5 OU). No simulator code here.
+// shown (Gen 4, 5, or 6 OU). No simulator code here.
 import {
   DEFAULT_FORMAT,
   FORMATS,
@@ -9,7 +9,9 @@ import {
   type SetsFile,
 } from '@daily-battle/data';
 import {
+  ONE_MEGA_MESSAGE,
   speciesDataFor,
+  type MegaInfo,
   type MoveInfo,
   type SpeciesFile,
   type SpeciesInfo,
@@ -99,8 +101,41 @@ export const sameSpecies = (a: string, b: string) =>
   a === b || (dexNum(a) !== undefined && dexNum(a) === dexNum(b));
 
 export function speciesInfo(species: string): SpeciesInfo {
-  return speciesData.species[species]!;
+  const info = speciesData.species[species];
+  if (info) return info;
+  // A Mega forme (Charizard-Mega-X): its base's facts with the Mega's typing and stats.
+  const mega = megaOf(species);
+  return (mega && { ...mega.base, types: mega.info.types, baseStats: mega.info.baseStats })!;
 }
+
+/** The Mega a forme name belongs to, and its base species' facts. */
+function megaOf(forme: string): { base: SpeciesInfo; info: MegaInfo } | undefined {
+  for (const base of Object.values(speciesData.species)) {
+    const info = Object.values(base.megas ?? {}).find((m) => m.forme === forme);
+    if (info) return { base, info };
+  }
+  return undefined;
+}
+
+/** The Mega a set Mega Evolves into (its item is the stone), if any. */
+export function megaFor(species: string, set: { item: string } | undefined): MegaInfo | undefined {
+  return set ? speciesData.species[species]?.megas?.[set.item] : undefined;
+}
+
+export { ONE_MEGA_MESSAGE };
+
+/**
+ * One Mega per team (Gen 6): the teammate already holding a Mega Stone if
+ * `slot`'s set holds one too (its own slot doesn't count), else undefined.
+ */
+export function megaClash(team: Slot[], slot: Slot): string | undefined {
+  if (!megaFor(slot.species, findSet(slot))) return undefined;
+  return team.find((s) => s.species !== slot.species && megaFor(s.species, findSet(s)))?.species;
+}
+
+/** Whether any of a species' sets can Mega Evolve (for the "Can Mega Evolve" hint). */
+export const canMega = (species: string) =>
+  Object.keys(speciesData.species[species]?.megas ?? {}).length > 0;
 
 /** Damage multiplier of an attacking type against a species' typing. */
 export function multiplier(attacking: string, species: string): number {
@@ -110,7 +145,7 @@ export function multiplier(attacking: string, species: string): number {
   );
 }
 
-/** Every type in the chart (the same 17 in Gens 4 and 5). */
+/** Every type in the chart (17 in Gens 4 and 5, 18 with Fairy from Gen 6). */
 export const allTypes = () => Object.keys(speciesData.typeChart);
 
 export interface Matchups {
@@ -206,7 +241,7 @@ export function defenseGaps(team: string[]): { type: string; species: string[] }
     .map(({ type, species }) => ({ type, species }));
 }
 
-const HAZARDS = ['Stealth Rock', 'Spikes', 'Toxic Spikes'];
+const HAZARDS = ['Stealth Rock', 'Spikes', 'Toxic Spikes', 'Sticky Web'];
 const REMOVAL = ['Rapid Spin', 'Defog'];
 const isBulky = (s: SetEntry) => s.evs.hp >= 200 && Math.max(s.evs.def, s.evs.spd) >= 160;
 

@@ -27,4 +27,23 @@ export const BACKGROUNDS: Record<string, readonly string[]> = {
     'bg-icecave.png',
     'bg-route.png',
   ],
+  // Showdown's own Gen 6-on backdrops are official game art served outside its
+  // repository (not CC0), so Gen 6 draws from the CC0 set, on its own daily order.
+  gen6ou: [
+    'bg-beach.png',
+    'bg-beachshore.png',
+    'bg-desert.png',
+    'bg-meadow.png',
+    'bg-thunderplains.png',
+    'bg-city.png',
+    'bg-earthycave.png',
+    'bg-mountain.png',
+    'bg-volcanocave.png',
+    'bg-dampcave.png',
+    'bg-forest.png',
+    'bg-river.png',
+    'bg-deepsea.png',
+    'bg-icecave.png',
+    'bg-route.png',
+  ],
 };

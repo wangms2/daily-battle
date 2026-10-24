@@ -1,7 +1,7 @@
 // Vendors Pokémon Showdown's battle animations: the move animations
 // (battle-animations-moves.ts, CC0), and the effect table plus the shared
 // "other" and status animations from battle-animations.ts (MIT), at the pinned
-// client commit. Only moves that exist through Gen 5 are kept (plus whatever
+// client commit. Only moves that exist through Gen 6 are kept (plus whatever
 // they build on), so the lazy chunk stays small. The output goes to
 // src/battle/anim/vendor/ with the license notes intact and is committed.
 //   pnpm --filter web anims [--force]
@@ -80,7 +80,7 @@ ${slice(scene, otherStart + 1, otherEnd)}
 `,
 );
 
-// battle-animations-moves.ts: keep the moves that exist in Gen 5 or earlier.
+// battle-animations-moves.ts: keep the moves that exist in Gen 6 or earlier.
 const moves = lines(await get('battle-animations-moves.ts'));
 const tableStart = findLine(moves, /^export const BattleMoveAnims/);
 const tableEnd = findLine(moves, /^};/, tableStart);
@@ -98,17 +98,23 @@ for (let i = tableStart + 1; i < tableEnd;) {
   i = end + 1;
 }
 const aliases = new Map<string, string>();
-for (const l of moves.slice(tableEnd + 1)) {
-  const m = /^BattleMoveAnims\['([a-z0-9]+)'\] = /.exec(l);
-  if (m) aliases.set(m[1]!, l);
+const rest = moves.slice(tableEnd + 1);
+for (let i = 0; i < rest.length; i++) {
+  const m = /^BattleMoveAnims\['([a-z0-9]+)'\] = /.exec(rest[i]!);
+  if (!m) continue;
+  // Most aliases are one line; a few (Phantom Force) run until the closing `};`.
+  let end = i;
+  while (!rest[end]!.trimEnd().endsWith(';')) end++;
+  aliases.set(m[1]!, rest.slice(i, end + 1).join('\n'));
+  i = end;
 }
 console.log(`anims: ${entries.size} entries, ${aliases.size} aliases in the source`);
 
-const gen5 = Dex.mod('gen5');
+const gen6 = Dex.mod('gen6');
 const wanted = new Set(
-  gen5.moves
+  gen6.moves
     .all()
-    .filter((mv) => mv.gen <= 5)
+    .filter((mv) => mv.gen <= 6)
     .map((mv) => mv.id as string),
 );
 const keep = new Set<string>();
@@ -128,7 +134,7 @@ const keptAliases = [...aliases].filter(([id]) => keep.has(id)).map(([, l]) => l
 console.log(`anims: keeping ${keptEntries.length} entries, ${keptAliases.length} aliases`);
 const missing = [...wanted].filter((id) => !keep.has(id));
 console.log(
-  `anims: ${missing.length} Gen 1–5 moves use the fallback (e.g. ${missing.slice(0, 8).join(', ')})`,
+  `anims: ${missing.length} Gen 1–6 moves use the fallback (e.g. ${missing.slice(0, 8).join(', ')})`,
 );
 
 writeFileSync(

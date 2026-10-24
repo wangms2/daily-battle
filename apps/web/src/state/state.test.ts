@@ -133,6 +133,14 @@ describe('a game per format (v4)', () => {
     expect(migrated.games.gen4ou).toEqual(locked());
   });
 
+  it('adds an empty Gen 6 game to a save from before Gen 6, without a new version', () => {
+    const { gen6ou: _, ...games } = lockedState().games;
+    const migrated = migrate({ ...lockedState(), games });
+    expect(migrated.games.gen6ou).toEqual(emptyGame());
+    expect(migrated.games.gen4ou).toEqual(locked());
+    expect(migrated.version).toBe(lockedState().version);
+  });
+
   it('applies game actions to their own format only', () => {
     const state = reducer(initialState(), {
       type: 'lockTeam',

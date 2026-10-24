@@ -65,6 +65,7 @@ function eventOf(
     '-unboost': 'unboost',
     '-sidestart': 'hazard',
     '-weather': 'weather',
+    '-mega': 'mega',
     '-crit': 'crit',
     '-miss': 'miss',
     turn: 'turn',
@@ -131,6 +132,7 @@ function labelOf(
     return { who, text: `${STAT_NAME[b] ?? b} ${cmd === '-boost' ? '+' : '−'}${n}`, tone: 'info' };
   }
   if (cmd === '-crit') return { who, text: 'Critical hit!', tone: 'damage' };
+  if (cmd === '-mega') return { who, text: 'Mega Evolved!', tone: 'info' };
   if (cmd === '-miss') return { who: whoOf(b) ?? who, text: 'Missed!', tone: 'info' };
   if (cmd === '-enditem' && String(kwArgs.from ?? '').includes('Knock Off')) {
     return { who, text: 'Item knocked off', tone: 'info' };
@@ -164,6 +166,8 @@ function explainersOf(args: readonly string[]): string[] {
   if (cmd === '-weather' && a && a !== 'none') return [id(a)];
   if (cmd === '-status') return [id(b)];
   if (cmd === '-start' && id(b) === 'substitute') return ['substitute'];
+  if (cmd === '-mega') return ['mega'];
+  if (cmd === '-fieldstart' && a) return [id(a)];
   return [];
 }
 
@@ -176,14 +180,23 @@ function sideConds(side: ClientSide): SideConds {
     tspikes: level('toxicspikes'),
     reflect: level('reflect') > 0,
     lightScreen: level('lightscreen') > 0,
+    ...(level('stickyweb') > 0 && { web: true }),
   };
 }
 
-function monView(p: ClientPokemon | undefined, own: boolean): MonView | null {
+/** The team species a forme belongs to: Charizard for Charizard-Mega-X, itself otherwise. */
+export function teamSpecies(dex: ModdedDex, forme: string): string {
+  const species = dex.species.get(forme);
+  return species.exists && species.forme.startsWith('Mega') ? species.baseSpecies : forme;
+}
+
+function monView(dex: ModdedDex, p: ClientPokemon | undefined, own: boolean): MonView | null {
   if (!p) return null;
   const pct = p.maxhp ? Math.round((100 * p.hp) / p.maxhp) : 0;
+  const base = teamSpecies(dex, p.speciesForme);
   return {
     species: p.speciesForme,
+    ...(base !== p.speciesForme && { base }),
     hp: p.hp > 0 ? Math.max(1, pct) : 0,
     hpExact: own ? { hp: p.hp, max: p.maxhp } : undefined,
     status: p.status ?? '',
@@ -202,7 +215,7 @@ function itemName(dex: ModdedDex, id: string): string {
 function revealedOf(dex: ModdedDex, side: ClientSide): Record<string, Revealed> {
   const out: Record<string, Revealed> = {};
   for (const p of side.team) {
-    out[p.speciesForme] = {
+    out[teamSpecies(dex, p.speciesForme)] = {
       moves: p.moveSlots.map((m) => dex.moves.get(m.id).name),
       item: p.item ? itemName(dex, p.item) : '',
       ability: p.ability || p.baseAbility ? dex.abilities.get(p.ability || p.baseAbility).name : '',
@@ -219,17 +232,24 @@ const WEATHER: Record<string, string> = {
   hail: 'Hail',
 };
 
+/** @pkmn/client's terrain ids, to the names the UI uses. */
+const TERRAIN: Record<string, string> = {
+  electricterrain: 'Electric Terrain',
+  grassyterrain: 'Grassy Terrain',
+  mistyterrain: 'Misty Terrain',
+};
+
 /** Your marks follow your team order; the foe's show revealed Pokémon, then balls. */
-function teamMarks(side: ClientSide, order?: string[]): TeamMark[] {
+function teamMarks(dex: ModdedDex, side: ClientSide, order?: string[]): TeamMark[] {
   const mark = (p: ClientPokemon | undefined, species?: string): TeamMark => ({
-    species: species ?? p?.speciesForme,
+    species: species ?? (p && teamSpecies(dex, p.speciesForme)),
     fainted: !!p?.fainted,
     status: p?.status ?? '',
   });
   const marks = order
     ? order.map((s) =>
         mark(
-          side.team.find((p) => p.speciesForme === s),
+          side.team.find((p) => teamSpecies(dex, p.speciesForme) === s),
           s,
         ),
       )
@@ -239,16 +259,18 @@ function teamMarks(side: ClientSide, order?: string[]): TeamMark[] {
 }
 
 function viewOf(dex: ModdedDex, b: ClientBattle, yourOrder: string[]): View {
+  const terrain = TERRAIN[b.field.terrainState.id];
   return {
     turn: b.turn,
-    you: monView(b.p1.active[0] ?? undefined, true),
-    foe: monView(b.p2.active[0] ?? undefined, false),
+    you: monView(dex, b.p1.active[0] ?? undefined, true),
+    foe: monView(dex, b.p2.active[0] ?? undefined, false),
     yourSide: sideConds(b.p1),
     foeSide: sideConds(b.p2),
     weather: WEATHER[b.field.weatherState.id] ?? '',
+    ...(terrain && { terrain }),
     revealed: revealedOf(dex, b.p2),
-    yourTeam: teamMarks(b.p1, yourOrder),
-    foeTeam: teamMarks(b.p2),
+    yourTeam: teamMarks(dex, b.p1, yourOrder),
+    foeTeam: teamMarks(dex, b.p2),
   };
 }
 
@@ -411,11 +433,13 @@ export class BattleEngine {
     const request = client.request;
     const order = request && request.requestType !== 'wait' ? request.side.pokemon : [];
     const live = client.p1.team;
+    const team = (forme: string) => teamSpecies(this.dex, forme);
     const species = order.length
       ? order.map((p) => p.speciesForme)
       : live.map((p) => p.speciesForme);
-    return species.map((name, i) => {
-      const p = live.find((x) => x.speciesForme === name);
+    return species.map((forme, i) => {
+      const name = team(forme);
+      const p = live.find((x) => team(x.speciesForme) === name);
       const set = this.sets.find((s) => s.species === name);
       const req = order[i];
       // Your request has exact HP for every team member; the client only tracks those seen.
@@ -425,11 +449,14 @@ export class BattleEngine {
       return {
         slot: i + 1,
         species: name,
+        ...(forme !== name && { forme }),
         hp: hp > 0 ? Math.max(1, Math.round((100 * hp) / max)) : 0,
         hpExact: { hp, max },
         status: (req ? req.status : p?.status) ?? '',
         fainted: !!p?.fainted || (req ? !!req.fainted || hp <= 0 : hp <= 0),
-        active: !!req?.active || (!req && client.p1.active[0]?.speciesForme === name),
+        active:
+          !!req?.active ||
+          (!req && !!client.p1.active[0] && team(client.p1.active[0].speciesForme) === name),
         item: set?.item ?? '',
         ability: set?.ability ?? '',
         moves: set?.moves ?? [],
@@ -474,6 +501,7 @@ export class BattleEngine {
       moves,
       switches,
       only: legal.length === 1 ? legal[0]! : null,
+      ...(legal.some((c) => c.endsWith(' mega')) && { canMega: true }),
     };
   }
 }

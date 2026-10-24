@@ -1,5 +1,5 @@
-// Downloads the battle effects the client ships: Gen 4 and Gen 5 backgrounds, hazard
-// sprites, weather overlays, the Poké Ball team mark, and every image the move
+// Downloads the battle effects the client ships: Gen 4, 5, and 6 backgrounds, hazard
+// sprites, weather and terrain overlays, the Poké Ball team mark, and every image the move
 // animations draw with (the table in src/battle/anim/vendor/effects.ts), from
 // Pokémon Showdown's fx/ folder at a pinned commit. Showdown dedicates the fx/
 // images to the public domain (CC0; see the header of src/battle-animations.ts),
@@ -27,6 +27,9 @@ const FX_FILES = [
   'weather-trickroom.png',
   'weather-psychicterrain.png',
   'weather-electricterrain.png',
+  'weather-grassyterrain.png',
+  'weather-mistyterrain.png',
+  'web.png',
   ...Object.values(BACKGROUNDS).flat(),
   'rock1.png',
   'rock2.png',

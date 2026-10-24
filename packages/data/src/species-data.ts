@@ -4,7 +4,7 @@ import gen6ou from '../gen6ou/species.json';
 import type { FormatId } from './formats';
 import type { SpeciesFile } from './species';
 
-export type { MoveInfo, SpeciesFile, SpeciesInfo } from './species';
+export type { MegaInfo, MoveInfo, SpeciesFile, SpeciesInfo } from './species';
 
 /** Types, base stats, and tier per species, plus the type chart, for Gen 4 OU. */
 export const speciesData = gen4ou as SpeciesFile;
