@@ -1,116 +1,206 @@
-// The first screen: Daily Battle or a versus room with friends. Daily Battle
-// opens the game picker (Gen 4, 5, 6), where each game keeps its own weekly
-// team, tries, and streak. A shared link lands on the picker.
+// The first screens, a Poké Ball split: Play (Daily Battle) in the top half,
+// With friends below. Play opens the game picker (Gen 3 to 6), where each game
+// keeps its own weekly team, tries, and streak. A shared link lands on the picker.
+//
+// The landing and the picker are one screen in two states, so tapping Play is a
+// curtain: the clay top rises, the ball glides up the seam and shrinks, the
+// landing art fades, and the cartridges rise in one by one (see styles.css).
 import type { FormatId } from '@daily-battle/data/formats';
-import type { ReactNode } from 'react';
-import { ChevronIcon, FlameIcon } from '../ui/icons';
+import { Fragment, type CSSProperties } from 'react';
+import { getSprite } from '../lib/sprites';
+import { Friends } from '../ui/Friends';
+import { ChevronIcon, FlameIcon, GearIcon } from '../ui/icons';
 
 export interface GameRow {
   id: FormatId;
-  /** "Gen 5 OU" */
+  /** "Gen 5" */
   name: string;
-  /** What sets the game apart: "Black and White, with Team Preview". */
-  blurb: string;
+  /** The games it covers: ["Black", "White"]. */
+  blurb: string[];
   streak: number;
   /** Today's status, e.g. "First try!" or "Not played yet". */
   today: string;
 }
 
-function Choice({
-  title,
-  body,
-  onClick,
-  children,
-}: {
-  title: string;
-  body: string;
-  onClick: () => void;
-  children?: ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="card flex w-full items-center gap-3 px-4 py-4 text-left hover:bg-surface-2"
-    >
-      <span className="min-w-0 flex-1">
-        <span className="display block text-[18px]">{title}</span>
-        <span className="mt-0.5 block text-[14px] text-muted">{body}</span>
-      </span>
-      {children}
-      <ChevronIcon className="size-5 shrink-0 text-muted" aria-hidden />
-    </button>
-  );
-}
+/** One Pokémon for each game, on its cartridge. Gen 3 shows the games' own Emerald sprite. */
+const MASCOT: Record<FormatId, { species: string; gen: number }> = {
+  gen3ou: { species: 'Swampert', gen: 3 },
+  gen4ou: { species: 'Lucario', gen: 4 },
+  gen5ou: { species: 'Volcarona', gen: 5 },
+  gen6ou: { species: 'Sylveon', gen: 6 },
+};
 
-export function Landing({
-  topBar,
-  onDaily,
-  onVersus,
-}: {
-  topBar: ReactNode;
-  onDaily: () => void;
-  onVersus: () => void;
-}) {
-  return (
-    <div className="flex h-full flex-col">
-      {topBar}
-      <main className="mx-auto flex w-full max-w-[480px] min-h-0 flex-1 flex-col justify-center gap-3 px-4 pb-8">
-        <Choice
-          title="Daily Battle"
-          body="A new team each week and a new opponent every day. Keep your streak going."
-          onClick={onDaily}
-        />
-        <Choice
-          title="Versus with friends"
-          body="Make a room, share the code, and battle live."
-          onClick={onVersus}
-        />
-      </main>
-    </div>
-  );
-}
+/** Each cartridge's label wears the colors of its games, muted to sit with the rest of the UI. */
+const LABEL: Record<FormatId, string> = {
+  gen3ou: 'linear-gradient(110deg, #b3666c 0 34%, #6f8cb8 34% 67%, #5f9a80 67% 100%)',
+  gen4ou: 'linear-gradient(110deg, #8aa0c4 0 calc(50% - 0.5px), #d8bfca calc(50% + 0.5px) 100%)',
+  gen5ou: 'linear-gradient(110deg, #5d606b 0 calc(50% - 0.5px), #e2e2e8 calc(50% + 0.5px) 100%)',
+  gen6ou: 'linear-gradient(110deg, #7b9bc2 0 calc(50% - 0.5px), #c4868c calc(50% + 0.5px) 100%)',
+};
 
-export function DailyPicker({
-  topBar,
+export function Home({
+  view,
+  lead,
   games,
+  onPlay,
+  onFriends,
   onPick,
+  onBack,
+  onSettings,
 }: {
-  topBar: ReactNode;
+  view: 'landing' | 'picker';
+  /** Today's opponent's lead, shown as a mystery silhouette. */
+  lead?: string;
   games: GameRow[];
+  onPlay: () => void;
+  onFriends: () => void;
   onPick: (id: FormatId) => void;
+  onBack: () => void;
+  onSettings: () => void;
 }) {
+  const landing = view === 'landing';
   return (
-    <div className="flex h-full flex-col">
-      {topBar}
-      <main className="mx-auto flex w-full max-w-[480px] min-h-0 flex-1 flex-col justify-center gap-3 px-4 pb-8">
-        <h1 className="display text-[20px]">Choose a game</h1>
-        <p className="-mt-2 text-[14px] text-muted">
-          Each game has its own team, opponents, and streak.
-        </p>
-        {games.map((g) => (
-          <button
-            key={g.id}
-            type="button"
-            onClick={() => onPick(g.id)}
-            className="card flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-surface-2"
-          >
-            <span className="min-w-0 flex-1">
-              <span className="block text-[17px] font-semibold">{g.name}</span>
-              <span className="block truncate text-[13px] text-muted">{g.blurb}</span>
-              <span className="block truncate text-[13px] text-muted">{g.today}</span>
-            </span>
-            <span
-              className="flex items-center gap-1 text-[15px] font-semibold tabular-nums"
-              aria-label={`Streak ${g.streak}`}
+    <div className="home flex h-full flex-col" data-view={view}>
+      <section className="home-top relative shrink-0 overflow-hidden">
+        <header className="absolute inset-x-0 top-0 z-20 flex h-12 items-center justify-between px-3 pt-[env(safe-area-inset-top)] wide:px-6">
+          <div className="home-fade min-w-0" inert={landing} aria-hidden={landing}>
+            <button
+              type="button"
+              onClick={onBack}
+              className="-ml-2 flex h-10 items-center gap-0.5 rounded-full pl-1 pr-3 font-semibold text-white hover:bg-white/10"
             >
-              <FlameIcon className={g.streak > 0 ? 'text-gold' : 'text-muted'} />
-              {g.streak}
-            </span>
-            <ChevronIcon className="size-5 shrink-0 text-muted" aria-hidden />
+              <ChevronIcon className="size-[18px] rotate-180" aria-hidden />
+              Back
+            </button>
+          </div>
+          <button
+            type="button"
+            onClick={onSettings}
+            className="grid size-10 place-items-center rounded-full text-white/85 hover:bg-white/10"
+            aria-label="Settings"
+          >
+            <GearIcon />
           </button>
-        ))}
-      </main>
+        </header>
+
+        <div
+          className="home-fade home-title absolute inset-x-0 top-12 z-10"
+          inert={landing}
+          aria-hidden={landing}
+        >
+          <h1 className="home-serif mx-auto w-full max-w-[520px] px-5 text-[26px] leading-[1.1]">
+            Choose a game
+          </h1>
+        </div>
+
+        {/* The landing's top half borrows the anime's "Who's that Pokémon?" card. It keeps
+            its size while the top rises, so the curtain hides it and it never squashes. */}
+        <div className="home-landing home-burst" inert={!landing} aria-hidden={!landing}>
+          {lead && (
+            <>
+              {/* Centered on the burst, so the rays come from behind it. */}
+              <span
+                aria-hidden
+                className="home-silhouette pointer-events-none absolute left-[var(--burst-x)] top-[var(--burst-y)] -translate-x-1/2 -translate-y-1/2"
+                style={{ '--sprite': `url(${getSprite(lead, 'front', 'still')})` } as CSSProperties}
+              />
+              <span
+                aria-hidden
+                className="home-question home-serif pointer-events-none absolute left-[calc(var(--burst-x)+11cqh)] top-[16%] -rotate-[8deg] leading-none"
+              >
+                ?
+              </span>
+            </>
+          )}
+          <div className="relative mx-auto flex h-full w-full max-w-[520px] flex-col justify-end px-[22px] pb-[clamp(34px,5.3cqh,70px)] pt-12">
+            <button
+              type="button"
+              onClick={onPlay}
+              className="home-btn home-play home-serif ml-auto after:absolute after:inset-0 after:content-['']"
+            >
+              Play
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <div className="home-seam">
+        <span aria-hidden className="home-ball" />
+      </div>
+
+      <section className="relative min-h-0 flex-1 overflow-hidden bg-bg">
+        <div className="home-friends" inert={!landing} aria-hidden={!landing}>
+          <div className="relative mx-auto flex h-full w-full max-w-[520px] justify-center pt-[clamp(48px,7.5cqh,96px)]">
+            <button
+              type="button"
+              onClick={onFriends}
+              className="home-btn home-friends-btn home-serif after:absolute after:inset-0 after:content-['']"
+            >
+              With friends
+            </button>
+          </div>
+          <Friends className="absolute inset-x-0 bottom-6" />
+        </div>
+
+        <main
+          className="home-games mx-auto flex w-full max-w-[520px] flex-col gap-2.5 px-4 pb-5 pt-7"
+          inert={landing}
+          aria-hidden={landing}
+        >
+          {games.map((g, i) => {
+            const mascot = MASCOT[g.id];
+            return (
+              <button
+                key={g.id}
+                type="button"
+                onClick={() => onPick(g.id)}
+                style={{ '--i': i } as CSSProperties}
+                className="home-cart grid min-h-0 max-h-[124px] flex-1 grid-cols-[84px_1fr_auto] items-center gap-2 p-2 text-left"
+              >
+                <span
+                  className="relative grid h-[76px] max-h-full place-items-center overflow-hidden rounded-md border border-black/15"
+                  style={{ background: LABEL[g.id] }}
+                >
+                  <span
+                    aria-hidden
+                    className="absolute inset-0"
+                    style={{
+                      background:
+                        'radial-gradient(circle at 50% 55%, rgb(255 255 255 / 0.45), transparent 62%)',
+                    }}
+                  />
+                  <img
+                    alt=""
+                    src={getSprite(mascot.species, 'front', undefined, mascot.gen)}
+                    className={`relative max-h-[66px] max-w-[72px] object-contain drop-shadow-[0_1px_1px_rgb(0_0_0/0.3)] ${mascot.gen === 3 ? '[image-rendering:pixelated]' : ''}`}
+                  />
+                </span>
+                <span className="min-w-0">
+                  <span className="block text-[17px] font-semibold">{g.name}</span>
+                  <span className="flex flex-wrap items-center text-[12.5px] leading-snug text-muted">
+                    {g.blurb.map((game, j) => (
+                      <Fragment key={game}>
+                        {j > 0 && (
+                          <span aria-hidden className="mx-2 h-4 w-0.5 rounded-full bg-muted/45" />
+                        )}
+                        {game}
+                      </Fragment>
+                    ))}
+                  </span>
+                  <span className="block truncate text-[12.5px] text-muted">{g.today}</span>
+                </span>
+                <span
+                  className="flex items-center gap-1 text-[15px] font-semibold tabular-nums"
+                  aria-label={`Streak ${g.streak}`}
+                >
+                  <FlameIcon className={g.streak > 0 ? 'text-gold' : 'text-muted'} />
+                  {g.streak}
+                </span>
+              </button>
+            );
+          })}
+        </main>
+      </section>
     </div>
   );
 }

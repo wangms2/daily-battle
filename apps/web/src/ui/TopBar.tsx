@@ -1,3 +1,5 @@
+// The header of the daily game's screens: the home screens' clay band and seam,
+// so tapping Play carries on in the same place.
 import type { ReactNode } from 'react';
 import { ChevronIcon, FlameIcon, GearIcon } from './icons';
 
@@ -10,7 +12,7 @@ export function TopBar({
   left,
 }: {
   title: ReactNode;
-  /** Makes the title a button (it opens the game picker). */
+  /** Makes the title a button (it goes back to the game picker). */
   onTitle?: () => void;
   streak?: number;
   /** The streak badge that opens stats; left out where no one game is shown. */
@@ -20,40 +22,43 @@ export function TopBar({
   left?: ReactNode;
 }) {
   return (
-    <header className="flex h-12 shrink-0 items-center justify-between gap-2 px-3 pt-[env(safe-area-inset-top)] wide:px-6">
-      {left || !onTitle ? (
-        <div className="display min-w-0 truncate text-[16px]">{left ?? title}</div>
-      ) : (
-        <button
-          type="button"
-          onClick={onTitle}
-          className="display -ml-2 flex h-10 min-w-0 items-center gap-1 rounded-full px-2 text-[16px] hover:bg-surface-2"
-        >
-          <span className="truncate">{title}</span>
-          <ChevronIcon className="size-4 shrink-0 rotate-90 text-muted" aria-hidden />
-        </button>
-      )}
-      <div className="flex items-center gap-1">
-        {onStats && (
+    <>
+      <header className="home-top flex h-12 shrink-0 items-center justify-between gap-2 px-3 pt-[env(safe-area-inset-top)] wide:px-6">
+        {left || !onTitle ? (
+          <div className="home-serif min-w-0 truncate text-[16px]">{left ?? title}</div>
+        ) : (
           <button
             type="button"
-            onClick={onStats}
-            className="flex h-10 items-center gap-1 rounded-full px-3 text-[15px] font-semibold hover:bg-surface-2"
-            aria-label={`Stats. Streak ${streak}`}
+            onClick={onTitle}
+            className="home-serif relative z-10 -ml-2 flex h-10 min-w-0 items-center gap-1 rounded-full px-2 text-[16px] hover:bg-white/10"
           >
-            <FlameIcon className={streak > 0 ? 'text-gold' : 'text-muted'} />
-            {streak}
+            <span className="truncate">{title}</span>
+            <ChevronIcon className="size-4 shrink-0 rotate-90 text-white/70" aria-hidden />
           </button>
         )}
-        <button
-          type="button"
-          onClick={onSettings}
-          className="grid size-10 place-items-center rounded-full text-muted hover:bg-surface-2"
-          aria-label="Settings"
-        >
-          <GearIcon />
-        </button>
-      </div>
-    </header>
+        <div className="relative z-10 flex items-center gap-1">
+          {onStats && (
+            <button
+              type="button"
+              onClick={onStats}
+              className="flex h-10 items-center gap-1 rounded-full px-3 text-[15px] font-semibold hover:bg-white/10"
+              aria-label={`Stats. Streak ${streak}`}
+            >
+              <FlameIcon className={streak > 0 ? 'text-[#f0cf7a]' : 'text-white/70'} />
+              {streak}
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={onSettings}
+            className="grid size-10 place-items-center rounded-full text-white/85 hover:bg-white/10"
+            aria-label="Settings"
+          >
+            <GearIcon />
+          </button>
+        </div>
+      </header>
+      <div className="home-seam is-thin" />
+    </>
   );
 }

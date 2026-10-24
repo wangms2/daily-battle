@@ -60,7 +60,7 @@ export interface Settings {
   /** 'instant' is for automated tests only; the UI offers slow, normal, and fast. */
   battleSpeed: 'slow' | 'normal' | 'fast' | 'instant';
   animations: boolean;
-  /** Battle music and Pokémon cries (DESIGN.md §21); off until the player turns it on. */
+  /** Battle music and Pokémon cries (DESIGN.md §21); on for new players, at a gentle volume. */
   sound: boolean;
   /** 0 to 1, each with its own slider. */
   musicVolume: number;
@@ -100,9 +100,9 @@ export function initialState(): State {
       beginnerHints: true,
       battleSpeed: 'normal',
       animations: true,
-      sound: false,
-      musicVolume: 0.5,
-      effectsVolume: 0.5,
+      sound: true,
+      musicVolume: 0.35,
+      effectsVolume: 0.4,
       shownExplainers: [],
     },
   };

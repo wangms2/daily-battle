@@ -1,4 +1,5 @@
-// Sound (DESIGN.md §21): off by default, with nothing downloaded; a Sound switch
+// Sound (DESIGN.md §21): on for new players at a gentle volume, and with nothing
+// downloaded when it is off; a Sound switch
 // and separate music and effects sliders in Settings, kept across reloads; and
 // with sound on, a battle loads its generation's track and the cries of the
 // Pokémon sent out.
@@ -38,6 +39,7 @@ function state(sound?: object) {
       animations: false,
       shownExplainers: ['welcome'],
       format: 'gen3ou',
+      sound: false,
       ...sound,
     },
   };
@@ -70,7 +72,7 @@ async function battle(page: Page) {
     .waitFor();
 }
 
-test('sound is off by default, and a battle loads no audio', async ({ page }) => {
+test('with sound off, a battle loads no audio', async ({ page }) => {
   const audio = await open(page, state());
   await battle(page);
   await page.waitForTimeout(500);

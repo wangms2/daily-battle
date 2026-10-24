@@ -7,6 +7,7 @@ import { Button } from '../ui/bits';
 import { BreakScreen, GameOverScreen } from './Break';
 import { BuildScreen, RoundScreen } from './GameScreens';
 import { Lobby } from './Lobby';
+import { Friends } from '../ui/Friends';
 import { Page } from './Page';
 import { PrepScreen } from './PrepScreen';
 import { RoomDrawer } from './RoomDrawer';
@@ -124,7 +125,8 @@ function VersusHome({
   };
 
   return (
-    <Page title="Versus" back="Daily" onBack={onExit}>
+    <Page title="With friends" back="Back" onBack={onExit}>
+      <Friends size="sm" className="pt-1" />
       <p className="text-[14px] leading-relaxed text-muted">
         Live battles with friends. Everyone builds from the same 12, makes one change before each
         round, and plays until one player has lives left.
@@ -337,7 +339,7 @@ function RoomScreen({
     );
   }
   return (
-    <Page title={`Room ${code}`} back="Versus" onBack={onExit}>
+    <Page title={`Room ${code}`} back="Back" onBack={onExit}>
       {body}
     </Page>
   );

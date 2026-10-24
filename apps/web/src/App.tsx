@@ -1,9 +1,9 @@
 import { DEFAULT_FORMAT, FORMATS, formatInfo, type FormatId } from '@daily-battle/data/formats';
 import { addDays, dayKey, weekKey } from '@daily-battle/gen/dates';
-import { Fragment, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { Fragment, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { BattleRoute } from './screens/BattleRoute';
 import { DailyBrief } from './screens/DailyBrief';
-import { DailyPicker, Landing } from './screens/Home';
+import { Home } from './screens/Home';
 import { TeamBuilder } from './screens/TeamBuilder';
 import { AboutSheet } from './sheets/About';
 import { SettingsSheet, StatsSheet, WelcomeSheet } from './sheets/misc';
@@ -21,19 +21,18 @@ import { attemptInProgress, dayDecided, withChange, type GameAction } from './st
 import { emptyDay, type Settings } from './state/schema';
 import { useNow, useStore } from './state/context';
 import { Button } from './ui/bits';
-import { ChevronIcon } from './ui/icons';
 import { TopBar } from './ui/TopBar';
 import { VersusRoute } from './versus/VersusRoute';
 
 /** Shared links open the game picker, so a friend can choose any generation. */
 const shareUrl = () => `${window.location.origin}/#daily`;
 
-/** What sets each game apart, for the picker. */
-const GAME_BLURB: Record<FormatId, string> = {
-  gen3ou: 'Ruby, Sapphire, and Emerald',
-  gen4ou: 'Diamond and Pearl',
-  gen5ou: 'Black and White, with Team Preview',
-  gen6ou: 'X and Y, with Mega Evolution',
+/** The games each generation covers, for the picker. */
+const GAME_BLURB: Record<FormatId, string[]> = {
+  gen3ou: ['Ruby', 'Sapphire', 'Emerald'],
+  gen4ou: ['Diamond', 'Pearl'],
+  gen5ou: ['Black', 'White'],
+  gen6ou: ['X', 'Y'],
 };
 
 const fmtDay = (key: string, opts: Intl.DateTimeFormatOptions) =>
@@ -47,14 +46,58 @@ function countdownTo(now: Date, nextDay: string): string {
   return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
 
+/** The part of the app a route is in: the home screens, versus, today's game, or the battle. */
+const area = (route: string) =>
+  route === '' || route === 'daily'
+    ? 'home'
+    : route === 'versus' || route.startsWith('versus/')
+      ? 'versus'
+      : route === 'battle'
+        ? 'battle'
+        : 'play';
+
+type ViewTransitions = { startViewTransition?: (update: () => Promise<void>) => unknown };
+
 function useHashRoute(): [string, (r: string) => void] {
   const [route, setRoute] = useState(() => window.location.hash.slice(1));
+  // Resolves once the new route has rendered, so a view transition can take its picture.
+  const settled = useRef<(() => void) | null>(null);
   useEffect(() => {
     const on = () => setRoute(window.location.hash.slice(1));
     window.addEventListener('hashchange', on);
     return () => window.removeEventListener('hashchange', on);
   }, []);
-  return [route, (r: string) => (window.location.hash = r)];
+  useEffect(() => {
+    settled.current?.();
+    settled.current = null;
+  }, [route]);
+  const go = (next: string) => {
+    const from = window.location.hash.slice(1);
+    if (next === from) return;
+    // The landing and the picker animate themselves, and the battle comes in without ceremony.
+    const [a, b] = [area(from), area(next)];
+    const glide =
+      a !== b &&
+      a !== 'battle' &&
+      b !== 'battle' &&
+      !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const start = (document as unknown as ViewTransitions).startViewTransition;
+    if (!glide || !start) {
+      window.location.hash = next;
+      return;
+    }
+    start.call(
+      document,
+      () =>
+        new Promise<void>((resolve) => {
+          settled.current = resolve;
+          window.location.hash = next;
+          // Never leave the page frozen if the route doesn't change.
+          window.setTimeout(resolve, 600);
+        }),
+    );
+  };
+  return [route, go];
 }
 
 /** An older share link's `#gen5` (or `#gen4`, `#gen6`): the game it was shared from. */
@@ -196,44 +239,31 @@ export function App() {
   const playing = route === 'play' || route === 'battle';
 
   let screen: ReactNode;
-  if (route === 'daily') {
+  if (!versus && !playing) {
+    // The silhouette is the lead of today's opponent in the game last played.
+    const lead =
+      schedule.status === 'ready'
+        ? schedule.schedule.days.find((d) => d.day === day)?.team[0]?.species
+        : undefined;
     screen = (
-      <DailyPicker
-        topBar={
-          <TopBar
-            title="Daily Battle"
-            left={
-              <button
-                type="button"
-                onClick={() => go('')}
-                className="display -ml-2 flex h-10 items-center gap-1 rounded-full px-2 hover:bg-surface-2"
-              >
-                <ChevronIcon className="size-4 rotate-180 text-muted" aria-hidden />
-                Back
-              </button>
-            }
-            onSettings={() => setSettingsOpen(true)}
-          />
-        }
+      <Home
+        view={route === 'daily' ? 'picker' : 'landing'}
+        lead={lead}
         games={(Object.keys(FORMATS) as FormatId[]).map((id) => ({
           id,
-          name: `${formatInfo(id).name} OU`,
+          name: formatInfo(id).name,
           blurb: GAME_BLURB[id],
           streak: computeStats(state.games[id].days, day).streak,
           today: dayHeadline(summarizeDay(state.games[id].days[day], true)),
         }))}
+        onPlay={() => go('daily')}
+        onFriends={() => go('versus')}
         onPick={(id) => {
           if (id !== format) dispatchAny({ type: 'setSetting', key: 'format', value: id });
           go('play');
         }}
-      />
-    );
-  } else if (!versus && !playing) {
-    screen = (
-      <Landing
-        topBar={<TopBar title="Daily Battle" onSettings={() => setSettingsOpen(true)} />}
-        onDaily={() => go('daily')}
-        onVersus={() => go('versus')}
+        onBack={() => go('')}
+        onSettings={() => setSettingsOpen(true)}
       />
     );
   } else if (versus) {
@@ -343,7 +373,7 @@ export function App() {
 
   return (
     <div
-      className={`mx-auto h-dvh overflow-hidden ${route === 'battle' ? 'max-w-[1440px]' : 'max-w-[1280px]'}`}
+      className={`mx-auto h-dvh overflow-hidden ${route === 'battle' ? 'max-w-[1440px]' : !versus && !playing ? '' : 'max-w-[1280px]'}`}
     >
       {!storageAvailable && !storageNoticeDismissed && (
         <div

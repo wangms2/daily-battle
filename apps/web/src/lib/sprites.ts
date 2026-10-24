@@ -34,10 +34,12 @@ export function getSprite(
   species: string,
   kind: SpriteKind = 'front',
   style: SpriteStyle = defaultStyle,
+  /** The generation's art; the active game's unless a screen shows other games (the home screens). */
+  gen: number = genOf(activeFormat()),
 ): string {
   // Gen 3 battles look like Ruby, Sapphire, and Emerald: the games' own still
   // sprites, front and back (Showdown's substitute doll stays shared).
-  if (kind !== 'icon' && species !== 'Substitute' && genOf(activeFormat()) === 3) {
+  if (kind !== 'icon' && species !== 'Substitute' && gen === 3) {
     return `${import.meta.env.BASE_URL}sprites/gen3/${kind}/${toId(species)}.png`;
   }
   const { dir, ext } = DIRS[style][kind];
