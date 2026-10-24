@@ -1,6 +1,6 @@
 // Gen 3 OU as a fourth daily game: picking it on first run, its builder and a
 // battle in the games' own look (Emerald sprites, Gen 3 backgrounds, its pixel
-// font), the news sheet a returning player sees once, and #gen3 links.
+// font), and older #gen3 links.
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from '@playwright/test';
 import schedule from '../public/schedule/gen3ou/2026-10-19.json' with { type: 'json' };
@@ -26,13 +26,13 @@ function gen3State({ locked = true } = {}) {
       beginnerHints: true,
       battleSpeed: 'instant',
       animations: true,
-      shownExplainers: ['welcome', 'gen5-news', 'gen6-news', 'gen3-news'],
+      shownExplainers: ['welcome'],
       format: 'gen3ou',
     },
   };
 }
 
-async function open(page: Page, state?: object, path = '/') {
+async function open(page: Page, state?: object, path = '/#play') {
   if (state) {
     await page.addInitScript((s) => {
       if (!localStorage.getItem('daily-battle:state'))
@@ -70,14 +70,16 @@ const shot = (page: Page, name: string, project: string) =>
 test('a first-time player picks Gen 3 and gets its pool in Emerald sprites', async ({
   page,
 }, info) => {
-  await open(page);
-  const welcome = page.getByRole('dialog', { name: 'Welcome to Daily Battle' });
+  await open(page, undefined, '/#daily');
   // The games run by generation: Gen 3 comes first.
-  await expect(welcome.getByRole('radio').first()).toContainText('Gen 3 OU');
-  await welcome.getByRole('radio', { name: /Gen 3 OU/ }).click();
+  await expect(page.getByRole('button', { name: /^Gen [0-9] OU/ }).first()).toContainText(
+    'Gen 3 OU',
+  );
+  await page.getByRole('button', { name: /Gen 3 OU/ }).click();
+  const welcome = page.getByRole('dialog', { name: 'Welcome to Daily Battle' });
   await noScroll(page, 'welcome sheet');
-  await shot(page, '01-welcome-picked', info.project.name);
-  await welcome.getByRole('button', { name: 'Play Gen 3 OU' }).click();
+  await shot(page, '01-welcome', info.project.name);
+  await welcome.getByRole('button', { name: 'Let’s play' }).click();
   await expect(page.getByRole('button', { name: /^Gen 3 · Week of/ })).toBeVisible();
   const species = schedule.pool.species[0]!;
   await expect(page.getByRole('button', { name: `Add ${species} to team` })).toBeVisible();
@@ -121,26 +123,10 @@ test('a Gen 3 battle uses the Emerald sprites, a Gen 3 background, and its font'
   await shot(page, '04-after-a-turn', info.project.name);
 });
 
-test('a player from before Gen 3 gets the news once, and can try it', async ({ page }, info) => {
-  const state = gen3State({ locked: false });
-  state.settings.format = 'gen4ou';
-  state.settings.shownExplainers = ['welcome', 'gen5-news', 'gen6-news'];
-  await open(page, state);
-  const news = page.getByRole('dialog', { name: 'New: Gen 3 OU' });
-  await expect(news).toBeVisible();
-  await noScroll(page, 'gen 3 news');
-  await shot(page, '05-news', info.project.name);
-  await news.getByRole('button', { name: 'Try Gen 3 OU' }).click();
-  await expect(page.getByRole('button', { name: /^Gen 3 · / })).toBeVisible();
-  await page.reload();
-  await expect(page.getByRole('button', { name: /^Gen 3 · / })).toBeVisible();
-  await expect(news).toBeHidden();
-});
-
-test('a #gen3 share link opens Gen 3', async ({ page }) => {
+test('an older #gen3 link opens Gen 3', async ({ page }) => {
   const state = gen3State();
   state.settings.format = 'gen4ou';
   await open(page, state, '/#gen3');
   await expect(page.getByRole('button', { name: /^Gen 3 · / })).toBeVisible();
-  await expect(page).toHaveURL(/\/#?$/);
+  await expect(page).toHaveURL(/\/#play$/);
 });
