@@ -1,3 +1,4 @@
+import gen3ou from '../gen3ou/species.json';
 import gen4ou from '../gen4ou/species.json';
 import gen5ou from '../gen5ou/species.json';
 import gen6ou from '../gen6ou/species.json';
@@ -10,6 +11,7 @@ export type { MegaInfo, MoveInfo, SpeciesFile, SpeciesInfo } from './species';
 export const speciesData = gen4ou as SpeciesFile;
 
 const SPECIES: Record<FormatId, SpeciesFile> = {
+  gen3ou: gen3ou as SpeciesFile,
   gen4ou: speciesData,
   gen5ou: gen5ou as SpeciesFile,
   gen6ou: gen6ou as SpeciesFile,

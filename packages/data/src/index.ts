@@ -1,3 +1,4 @@
+import gen3ou from '../gen3ou/sets.json';
 import gen4ou from '../gen4ou/sets.json';
 import gen5ou from '../gen5ou/sets.json';
 import gen6ou from '../gen6ou/sets.json';
@@ -11,6 +12,7 @@ export type { SetEntry, SetsFile, SpeciesEntry, Stats, StatID } from './types';
 export const sets = gen4ou as SetsFile;
 
 const SETS: Record<FormatId, SetsFile> = {
+  gen3ou: gen3ou as SetsFile,
   gen4ou: sets,
   gen5ou: gen5ou as SetsFile,
   gen6ou: gen6ou as SetsFile,

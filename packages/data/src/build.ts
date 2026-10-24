@@ -27,11 +27,19 @@ export const UU_MIN_USAGE = 0.001;
 /**
  * Per-format build rules. `exclude` leaves out species whose mechanics break the
  * game's assumptions: Ditto (Imposter copies your set) and Zoroark (Illusion
- * disguises it on the brief). `avoidAbilities` are legal on a set but can make a
+ * disguises it on the brief), plus Wobbuffet in Gen 3. `avoidAbilities` are legal on a set but can make a
  * team illegal (gen5ou bans Drizzle with Swift Swim and Drought with Chlorophyll),
  * so sets use the species' other abilities and any 6 of a pool stay legal.
  */
-export const BUILD_RULES: Record<FormatId, { exclude: string[]; avoidAbilities: string[] }> = {
+export const BUILD_RULES: Record<
+  FormatId,
+  { exclude: string[]; avoidAbilities: string[]; noBoostPassers?: boolean }
+> = {
+  // Wobbuffet traps with Shadow Tag and turns hits back with Counter and Mirror
+  // Coat, which against a hidden set plays as a coin flip, not a battle. ADV's
+  // One Boost Passer Clause allows one Baton Passer that can raise its stats
+  // per team, so those sets are left out and any 6 of a pool stay legal.
+  gen3ou: { exclude: ['Ditto', 'Wobbuffet'], avoidAbilities: [], noBoostPassers: true },
   gen4ou: { exclude: [], avoidAbilities: [] },
   gen5ou: { exclude: ['Ditto', 'Zoroark'], avoidAbilities: ['Swift Swim', 'Chlorophyll'] },
   // Gen 6 OU has no team-wide ability bans, so Swift Swim and Chlorophyll are back.
@@ -99,6 +107,17 @@ export function foldMegas(data: ChaosStats['data'], dex: GenDex): ChaosStats['da
     add(into.Natures, s.Natures);
   }
   return out;
+}
+
+/** A set that can raise its own stats and Baton Pass them (One Boost Passer Clause). */
+function boostPasser(dex: GenDex, set: { moves: string[] }): boolean {
+  if (!set.moves.includes('Baton Pass')) return false;
+  return set.moves.some((name) => {
+    const move = dex.moves.get(name);
+    // Curse's boosts aren't in its data: they depend on the user's type.
+    if (move.id === 'curse') return true;
+    return !!(move.target === 'self' && move.boosts) || !!move.self?.boosts;
+  });
 }
 
 /** A species' tier counting the Megas it could hold a stone for (those not banned to Uber). */
@@ -235,6 +254,10 @@ export function buildSets(
       const set = resolveSet(name, curatedSet, usage, format.gen, rules.avoidAbilities);
       if (!set) {
         dropped.push({ species: name, set: setName, reason: 'not enough distinct moves' });
+        continue;
+      }
+      if (rules.noBoostPassers && boostPasser(dex, set)) {
+        dropped.push({ species: name, set: setName, reason: 'Baton Passes stat boosts' });
         continue;
       }
       const problems = validator.validateSet(

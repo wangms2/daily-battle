@@ -1,6 +1,6 @@
 // The formats Daily Battle plays. Everything format-specific (the sim's
 // format id, its dex generation, the lower tier its extra sets come from)
-// hangs off this, so a second format is a new entry rather than new code.
+// hangs off this, so another format is a new entry rather than new code.
 
 export interface FormatInfo {
   /** The sim's format id, e.g. `gen4ou`. */
@@ -15,7 +15,9 @@ export interface FormatInfo {
   teamPreview: boolean;
 }
 
+// Listed by generation: the game picker and the welcome sheet show them in this order.
 export const FORMATS = {
+  gen3ou: { id: 'gen3ou', gen: 3, name: 'Gen 3', uu: 'gen3uu', teamPreview: false },
   gen4ou: { id: 'gen4ou', gen: 4, name: 'Gen 4', uu: 'gen4uu', teamPreview: false },
   gen5ou: { id: 'gen5ou', gen: 5, name: 'Gen 5', uu: 'gen5uu', teamPreview: true },
   gen6ou: { id: 'gen6ou', gen: 6, name: 'Gen 6', uu: 'gen6uu', teamPreview: true },

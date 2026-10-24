@@ -105,7 +105,7 @@ const opposite = (side: SideID): SideID => (side === 'p1' ? 'p2' : 'p1');
 
 describe('hidden information', () => {
   // In Gen 5, Team Preview reveals all six species up front (in the log), never their sets.
-  it.each(['gen4ou', 'gen5ou', 'gen6ou'])(
+  it.each(['gen3ou', 'gen4ou', 'gen5ou', 'gen6ou'])(
     'never shows a %s policy unrevealed opponent species, moves, or items',
     (format) => {
       const found: string[] = [];

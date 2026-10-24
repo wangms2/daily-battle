@@ -33,13 +33,16 @@ describe.each(Object.keys(FORMATS) as FormatId[])('%s/species.json', (format) =>
     }
   });
 
-  it("has the generation's typings (Rotom's forms took their own types in Gen 5)", () => {
-    const expected = {
-      gen4ou: ['Electric', 'Ghost'],
-      gen5ou: ['Electric', 'Water'],
-      gen6ou: ['Electric', 'Water'],
-    }[format];
-    expect(speciesData.species['Rotom-Wash']!.types).toEqual(expected);
+  it("has the generation's typings (Rotom's forms took their own types in Gen 5, Gardevoir is pure Psychic before Fairy)", () => {
+    const [species, expected] = (
+      {
+        gen3ou: ['Gardevoir', ['Psychic']],
+        gen4ou: ['Rotom-Wash', ['Electric', 'Ghost']],
+        gen5ou: ['Rotom-Wash', ['Electric', 'Water']],
+        gen6ou: ['Rotom-Wash', ['Electric', 'Water']],
+      } as const
+    )[format];
+    expect(speciesData.species[species]!.types).toEqual(expected);
   });
 
   it('has the Mega form of every set holding a Mega Stone, and none before Gen 6', () => {

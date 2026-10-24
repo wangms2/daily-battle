@@ -1,0 +1,418 @@
+{
+  "add": {
+    "Aerodactyl": {
+      "Taunt Lead": {
+        "moves": [
+          "Taunt",
+          "Rock Slide",
+          "Earthquake",
+          "Double-Edge"
+        ],
+        "item": "Leftovers",
+        "ability": "Rock Head",
+        "nature": "Jolly",
+        "evs": {
+          "hp": 4,
+          "atk": 252,
+          "spe": 252
+        }
+      }
+    },
+    "Claydol": {
+      "Bulky Spinner": {
+        "moves": [
+          "Rapid Spin",
+          "Earthquake",
+          "Ice Beam",
+          "Toxic"
+        ],
+        "item": "Leftovers",
+        "ability": "Levitate",
+        "nature": "Relaxed",
+        "evs": {
+          "hp": 252,
+          "atk": 4,
+          "def": 252
+        }
+      }
+    },
+    "Dugtrio": {
+      "Salac Berry": {
+        "moves": [
+          "Earthquake",
+          "Rock Slide",
+          "Aerial Ace",
+          "Substitute"
+        ],
+        "item": "Salac Berry",
+        "ability": "Arena Trap",
+        "nature": "Jolly",
+        "evs": {
+          "atk": 252,
+          "spd": 4,
+          "spe": 252
+        }
+      }
+    },
+    "Forretress": {
+      "Physically Defensive": {
+        "moves": [
+          "Spikes",
+          "Rapid Spin",
+          "Toxic",
+          "Hidden Power Bug"
+        ],
+        "item": "Leftovers",
+        "ability": "Sturdy",
+        "nature": "Relaxed",
+        "evs": {
+          "hp": 252,
+          "def": 252,
+          "spd": 4
+        }
+      }
+    },
+    "Magneton": {
+      "Substitute": {
+        "moves": [
+          "Substitute",
+          "Thunderbolt",
+          "Hidden Power Grass",
+          "Toxic"
+        ],
+        "item": "Leftovers",
+        "ability": "Magnet Pull",
+        "nature": "Modest",
+        "evs": {
+          "hp": 4,
+          "spa": 252,
+          "spe": 252
+        }
+      }
+    },
+    "Registeel": {
+      "Toxic Stall": {
+        "moves": [
+          "Toxic",
+          "Seismic Toss",
+          "Rest",
+          "Sleep Talk"
+        ],
+        "item": "Leftovers",
+        "ability": "Clear Body",
+        "nature": "Careful",
+        "evs": {
+          "hp": 252,
+          "def": 4,
+          "spd": 252
+        }
+      }
+    },
+    "Jolteon": {
+      "Substitute Pass": {
+        "moves": [
+          "Substitute",
+          "Baton Pass",
+          "Thunderbolt",
+          "Hidden Power Ice"
+        ],
+        "item": "Leftovers",
+        "ability": "Volt Absorb",
+        "nature": "Timid",
+        "evs": {
+          "hp": 4,
+          "spa": 252,
+          "spe": 252
+        }
+      }
+    },
+    "Charizard": {
+      "Sun": {
+        "moves": [
+          "Sunny Day",
+          "Fire Blast",
+          "Hidden Power Grass",
+          "Dragon Claw"
+        ],
+        "item": "Leftovers",
+        "ability": "Blaze",
+        "nature": "Timid",
+        "evs": {
+          "hp": 4,
+          "spa": 252,
+          "spe": 252
+        }
+      }
+    },
+    "Moltres": {
+      "Substitute + Toxic": {
+        "moves": [
+          "Substitute",
+          "Toxic",
+          "Fire Blast",
+          "Hidden Power Grass"
+        ],
+        "item": "Leftovers",
+        "ability": "Pressure",
+        "nature": "Modest",
+        "evs": {
+          "hp": 252,
+          "spa": 252,
+          "spe": 4
+        }
+      }
+    },
+    "Cloyster": {
+      "Offensive Spikes": {
+        "moves": [
+          "Spikes",
+          "Ice Beam",
+          "Surf",
+          "Explosion"
+        ],
+        "item": "Leftovers",
+        "ability": "Shell Armor",
+        "nature": "Modest",
+        "evs": {
+          "hp": 4,
+          "spa": 252,
+          "spe": 252
+        }
+      }
+    },
+    "Milotic": {
+      "Specially Defensive": {
+        "moves": [
+          "Surf",
+          "Ice Beam",
+          "Recover",
+          "Mirror Coat"
+        ],
+        "item": "Leftovers",
+        "ability": "Marvel Scale",
+        "nature": "Calm",
+        "evs": {
+          "hp": 252,
+          "def": 4,
+          "spd": 252
+        }
+      }
+    },
+    "Breloom": {
+      "Swords Dance": {
+        "moves": [
+          "Spore",
+          "Swords Dance",
+          "Sky Uppercut",
+          "Hidden Power Ghost"
+        ],
+        "item": "Leftovers",
+        "ability": "Effect Spore",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 4,
+          "atk": 252,
+          "spe": 252
+        }
+      }
+    },
+    "Regice": {
+      "RestTalk": {
+        "moves": [
+          "Rest",
+          "Sleep Talk",
+          "Ice Beam",
+          "Thunderbolt"
+        ],
+        "item": "Leftovers",
+        "ability": "Clear Body",
+        "nature": "Calm",
+        "evs": {
+          "hp": 252,
+          "def": 4,
+          "spd": 252
+        }
+      }
+    },
+    "Kingdra": {
+      "RestTalk": {
+        "moves": [
+          "Rest",
+          "Sleep Talk",
+          "Surf",
+          "Ice Beam"
+        ],
+        "item": "Leftovers",
+        "ability": "Swift Swim",
+        "nature": "Calm",
+        "evs": {
+          "hp": 252,
+          "def": 4,
+          "spd": 252
+        }
+      }
+    },
+    "Houndoom": {
+      "Special Attacker": {
+        "moves": [
+          "Fire Blast",
+          "Crunch",
+          "Hidden Power Grass",
+          "Overheat"
+        ],
+        "item": "Leftovers",
+        "ability": "Flash Fire",
+        "nature": "Timid",
+        "evs": {
+          "hp": 4,
+          "spa": 252,
+          "spe": 252
+        }
+      }
+    },
+    "Porygon2": {
+      "Specially Defensive": {
+        "moves": [
+          "Recover",
+          "Ice Beam",
+          "Toxic",
+          "Return"
+        ],
+        "item": "Leftovers",
+        "ability": "Trace",
+        "nature": "Careful",
+        "evs": {
+          "hp": 252,
+          "def": 4,
+          "spd": 252
+        }
+      }
+    },
+    "Articuno": {
+      "Substitute + Toxic": {
+        "moves": [
+          "Substitute",
+          "Toxic",
+          "Ice Beam",
+          "Protect"
+        ],
+        "item": "Leftovers",
+        "ability": "Pressure",
+        "nature": "Bold",
+        "evs": {
+          "hp": 252,
+          "def": 252,
+          "spe": 4
+        }
+      }
+    },
+    "Slaking": {
+      "Slack Off": {
+        "moves": [
+          "Return",
+          "Earthquake",
+          "Shadow Ball",
+          "Slack Off"
+        ],
+        "item": "Leftovers",
+        "ability": "Truant",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 4,
+          "atk": 252,
+          "spe": 252
+        }
+      }
+    },
+    "Sableye": {
+      "Toxic Stall": {
+        "moves": [
+          "Toxic",
+          "Recover",
+          "Seismic Toss",
+          "Protect"
+        ],
+        "item": "Leftovers",
+        "ability": "Keen Eye",
+        "nature": "Careful",
+        "evs": {
+          "hp": 252,
+          "def": 4,
+          "spd": 252
+        }
+      }
+    },
+    "Blastoise": {
+      "RestTalk": {
+        "moves": [
+          "Rest",
+          "Sleep Talk",
+          "Surf",
+          "Roar"
+        ],
+        "item": "Leftovers",
+        "ability": "Torrent",
+        "nature": "Calm",
+        "evs": {
+          "hp": 252,
+          "def": 4,
+          "spd": 252
+        }
+      }
+    },
+    "Golduck": {
+      "Mixed Attacker": {
+        "moves": [
+          "Hydro Pump",
+          "Ice Beam",
+          "Cross Chop",
+          "Hidden Power Grass"
+        ],
+        "item": "Leftovers",
+        "ability": "Cloud Nine",
+        "nature": "Hasty",
+        "evs": {
+          "atk": 100,
+          "spa": 156,
+          "spe": 252
+        }
+      }
+    },
+    "Tauros": {
+      "Substitute": {
+        "moves": [
+          "Substitute",
+          "Return",
+          "Earthquake",
+          "Hidden Power Ghost"
+        ],
+        "item": "Leftovers",
+        "ability": "Intimidate",
+        "nature": "Jolly",
+        "evs": {
+          "hp": 4,
+          "atk": 252,
+          "spe": 252
+        }
+      }
+    },
+    "Smeargle": {
+      "Substitute Spikes": {
+        "moves": [
+          "Substitute",
+          "Spore",
+          "Spikes",
+          "Baton Pass"
+        ],
+        "item": "Leftovers",
+        "ability": "Own Tempo",
+        "nature": "Jolly",
+        "evs": {
+          "hp": 252,
+          "def": 4,
+          "spe": 252
+        }
+      }
+    }
+  }
+}

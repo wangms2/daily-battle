@@ -19,6 +19,7 @@ import { CheckIcon, CloseIcon } from '../ui/icons';
 
 /** What sets each game apart, for the welcome sheet's choice. */
 const GAME_BLURB: Record<FormatId, string> = {
+  gen3ou: 'Ruby, Sapphire, and Emerald',
   gen4ou: 'Diamond and Pearl',
   gen5ou: 'Black and White, with Team Preview',
   gen6ou: 'X and Y, with Mega Evolution and Fairy types',
@@ -26,6 +27,7 @@ const GAME_BLURB: Record<FormatId, string> = {
 
 /** The games, for phones: three options side by side must fit a 360px-wide sheet. */
 const GAME_SHORT: Record<FormatId, string> = {
+  gen3ou: 'Ruby & Sapphire',
   gen4ou: 'Diamond & Pearl',
   gen5ou: 'Black & White',
   gen6ou: 'X & Y, Megas',
