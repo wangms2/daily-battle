@@ -9,6 +9,7 @@ pnpm test                    # unit tests (from the repo root)
 pnpm --filter web e2e        # Playwright on the production build: flow and battles at six sizes, light and dark
 pnpm --filter web sprites    # (re)download sprites for every species in the set data
 pnpm --filter web fx         # (re)download the battle backgrounds and effects
+pnpm --filter web audio      # (re)download and convert the Pokémon cries
 ```
 
 ## Design
@@ -70,6 +71,8 @@ The full spec is in DESIGN.md §12 and the M6 and M7 plans.
 ## Sprites
 
 The sprites are Showdown-style animated GIFs and Gen 7 box icons from [PokeAPI/sprites](https://github.com/PokeAPI/sprites), downloaded by `scripts/sprites.ts` for exactly the species in the set data and committed here. Nothing is hotlinked. Pokémon and sprites © Nintendo, Creatures Inc., GAME FREAK inc. The animated sprites are by the Smogon sprite community. Daily Battle is an unofficial, free fan project.
+
+Sound (off by default) lives in `public/audio/`: `cries/legacy/` and `cries/latest/` from [PokeAPI/cries](https://github.com/PokeAPI/cries), converted to MP3 by `scripts/audio.ts`, and one battle track per generation in `music/` (supplied files, prepared as in DESIGN.md §21). `src/lib/audio.ts` plays them. Pokémon music and cries © Nintendo, Creatures Inc., GAME FREAK inc.
 
 The battle backgrounds (Gen 4 and Gen 5), hazard sprites, weather overlays, and Poké Ball mark come from Pokémon Showdown's `fx/` folder, which Showdown dedicates to the public domain (CC0). `scripts/fx.ts` downloads them from a pinned commit into `public/fx/`.
 

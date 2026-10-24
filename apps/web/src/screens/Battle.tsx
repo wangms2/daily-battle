@@ -13,6 +13,7 @@ import {
 } from 'react';
 import type * as AnimPlay from '../battle/anim/play';
 import { useBattleBackend } from '../battle/backend';
+import { playCry, startMusic, stopMusic } from '../lib/audio';
 import type {
   Controls,
   EngineStart,
@@ -157,7 +158,10 @@ export function Battle({
   const animateRef = useRef(animate);
   const onEndRef = useRef(onEnd);
   const onChoiceRef = useRef(onChoice);
+  const format = start.format ?? DEFAULT_FORMAT;
+  const formatRef = useRef(format);
   useLayoutEffect(() => {
+    formatRef.current = format;
     settingsRef.current = settings;
     animateRef.current = animate;
     onEndRef.current = onEnd;
@@ -165,6 +169,14 @@ export function Battle({
   });
   const ended = useRef(false);
   const endRef = useRef<HTMLDivElement>(null);
+  // The generation's battle music, from the start of the battle to its end.
+  useEffect(() => {
+    startMusic(format);
+    return () => stopMusic();
+  }, [format]);
+  useEffect(() => {
+    if (end) stopMusic();
+  }, [end]);
   // Move focus to the result so keyboard and screen-reader users land on it.
   useEffect(() => {
     if (end) endRef.current?.focus();
@@ -177,6 +189,14 @@ export function Battle({
     if (lines.length) setLog((l) => [...l, ...lines]);
     if (withAnim && f.event)
       setAnim({ kind: f.event.kind, who: f.event.who, key: ++animKey.current });
+    // Cries, as on Showdown: on the way in, Mega Evolving, and lower as it faints.
+    // Only for turns that play out (not skipped, resumed, or instant).
+    const mon = withAnim && f.event?.who ? f.view[f.event.who] : null;
+    if (mon && (f.event!.kind === 'switch' || f.event!.kind === 'mega')) {
+      playCry(mon.species, formatRef.current);
+    } else if (mon && f.event!.kind === 'faint') {
+      playCry(mon.species, formatRef.current, { faint: true });
+    }
     if (withAnim && animateRef.current && (f.label || f.popup)) {
       const float = { id: ++animKey.current, label: f.label, popup: f.popup };
       // A few at a time is plenty; drop the oldest if animations stall.
@@ -385,7 +405,7 @@ export function Battle({
   // The battle text on phones: the latest lines in a pixel-font box under the field,
   // taking the spare height. Older lines fade.
   const recent = log.filter((l) => l.trim() && !l.startsWith('== Turn')).slice(-8);
-  const gen = formatInfo(start.format ?? DEFAULT_FORMAT).gen;
+  const gen = formatInfo(format).gen;
   const textbox = (
     <div
       // It is the log on phones: the full history is read out, and a tap opens it.

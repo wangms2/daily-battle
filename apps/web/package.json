@@ -14,7 +14,8 @@
     "items": "tsx scripts/items.ts",
     "flavor": "tsx scripts/flavor.ts",
     "icons": "tsx scripts/icons.ts",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "audio": "tsx scripts/audio.ts"
   },
   "dependencies": {
     "@daily-battle/ai": "workspace:*",

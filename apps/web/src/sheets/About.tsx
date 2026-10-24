@@ -23,6 +23,11 @@ const CREDITS: [string, string][] = [
     'By Clint Bellanger, via OpenGameArt: GPLv2, GPLv3, or CC-BY-SA 3.0.',
   ],
   ['Rock effects', 'By “Gilad” for Pokémon Online, GPLv3.'],
+  [
+    'Battle music',
+    'The trainer battle themes of Pokémon Ruby and Sapphire, Diamond and Pearl, Black and White, and X and Y.',
+  ],
+  ['Pokémon cries', 'PokeAPI’s cries collection: the games’ own cries.'],
   ['Damage calculations', '@smogon/calc, MIT licensed.'],
 ];
 

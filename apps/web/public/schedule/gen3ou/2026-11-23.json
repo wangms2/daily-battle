@@ -1,0 +1,273 @@
+{
+  "version": 1,
+  "generatorVersion": 4,
+  "dataBuiltAt": "2026-10-24T16:51:53.962Z",
+  "week": "2026-11-23",
+  "pool": {
+    "species": [
+      "Snorlax",
+      "Heracross",
+      "Salamence",
+      "Tyranitar",
+      "Forretress",
+      "Starmie",
+      "Breloom",
+      "Gyarados",
+      "Moltres",
+      "Raikou",
+      "Blastoise",
+      "Registeel"
+    ],
+    "candidate": 0
+  },
+  "suggestedTeams": [
+    {
+      "archetype": "Balanced",
+      "team": [
+        {
+          "species": "Snorlax",
+          "setId": "snorlax-curserestlax"
+        },
+        {
+          "species": "Gyarados",
+          "setId": "gyarados-rest"
+        },
+        {
+          "species": "Registeel",
+          "setId": "registeel-mixed-wall"
+        },
+        {
+          "species": "Breloom",
+          "setId": "breloom-spore"
+        },
+        {
+          "species": "Forretress",
+          "setId": "forretress-physically-defensive"
+        },
+        {
+          "species": "Raikou",
+          "setId": "raikou-calm-mind-sweeper"
+        }
+      ]
+    }
+  ],
+  "days": [
+    {
+      "day": "2026-11-23",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Porygon2",
+          "setId": "porygon2-standard"
+        },
+        {
+          "species": "Metagross",
+          "setId": "metagross-choice-band"
+        },
+        {
+          "species": "Snorlax",
+          "setId": "snorlax-offensive-curse"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-bulky-dragon-dance"
+        },
+        {
+          "species": "Houndoom",
+          "setId": "houndoom-special-attacker"
+        },
+        {
+          "species": "Regirock",
+          "setId": "regirock-choice-band"
+        }
+      ],
+      "candidate": 3
+    },
+    {
+      "day": "2026-11-24",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-bulky-physical-attacker"
+        },
+        {
+          "species": "Rhydon",
+          "setId": "rhydon-substitute"
+        },
+        {
+          "species": "Zapdos",
+          "setId": "zapdos-rest"
+        },
+        {
+          "species": "Claydol",
+          "setId": "claydol-utility"
+        },
+        {
+          "species": "Skarmory",
+          "setId": "skarmory-standard"
+        },
+        {
+          "species": "Jolteon",
+          "setId": "jolteon-substitute-pass"
+        }
+      ],
+      "candidate": 0
+    },
+    {
+      "day": "2026-11-25",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Forretress",
+          "setId": "forretress-standard"
+        },
+        {
+          "species": "Machamp",
+          "setId": "machamp-bulk-up"
+        },
+        {
+          "species": "Aerodactyl",
+          "setId": "aerodactyl-choice-band"
+        },
+        {
+          "species": "Jirachi",
+          "setId": "jirachi-substitute-calm-mind"
+        },
+        {
+          "species": "Registeel",
+          "setId": "registeel-mixed-wall"
+        },
+        {
+          "species": "Snorlax",
+          "setId": "snorlax-offensive-curse"
+        }
+      ],
+      "candidate": 10
+    },
+    {
+      "day": "2026-11-26",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Celebi",
+          "setId": "celebi-offensive"
+        },
+        {
+          "species": "Registeel",
+          "setId": "registeel-mixed-wall"
+        },
+        {
+          "species": "Dusclops",
+          "setId": "dusclops-staller"
+        },
+        {
+          "species": "Machamp",
+          "setId": "machamp-bulk-up"
+        },
+        {
+          "species": "Gengar",
+          "setId": "gengar-offensive"
+        },
+        {
+          "species": "Sceptile",
+          "setId": "sceptile-all-out-mixed-sweeper"
+        }
+      ],
+      "candidate": 3
+    },
+    {
+      "day": "2026-11-27",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Registeel",
+          "setId": "registeel-mixed-wall"
+        },
+        {
+          "species": "Heracross",
+          "setId": "heracross-choice-band"
+        },
+        {
+          "species": "Starmie",
+          "setId": "starmie-defensive"
+        },
+        {
+          "species": "Claydol",
+          "setId": "claydol-utility"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-bulky-dragon-dance"
+        },
+        {
+          "species": "Swampert",
+          "setId": "swampert-standard-offensive"
+        }
+      ],
+      "candidate": 1
+    },
+    {
+      "day": "2026-11-28",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Jirachi",
+          "setId": "jirachi-wish-calm-mind"
+        },
+        {
+          "species": "Marowak",
+          "setId": "marowak-all-out-attacker"
+        },
+        {
+          "species": "Gengar",
+          "setId": "gengar-defensive"
+        },
+        {
+          "species": "Milotic",
+          "setId": "milotic-standard"
+        },
+        {
+          "species": "Ursaring",
+          "setId": "ursaring-swords-dance"
+        },
+        {
+          "species": "Celebi",
+          "setId": "celebi-offensive"
+        }
+      ],
+      "candidate": 0
+    },
+    {
+      "day": "2026-11-29",
+      "style": "offense",
+      "team": [
+        {
+          "species": "Gengar",
+          "setId": "gengar-offensive"
+        },
+        {
+          "species": "Magneton",
+          "setId": "magneton-trapper"
+        },
+        {
+          "species": "Jynx",
+          "setId": "jynx-special-sweeper"
+        },
+        {
+          "species": "Claydol",
+          "setId": "claydol-utility"
+        },
+        {
+          "species": "Starmie",
+          "setId": "starmie-offensive"
+        },
+        {
+          "species": "Suicune",
+          "setId": "suicune-substitute"
+        }
+      ],
+      "candidate": 4
+    }
+  ]
+}

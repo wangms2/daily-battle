@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import clsx from 'clsx';
 import type { SetEntry } from '@daily-battle/data';
 import {
   CHECK_ITEMS,
@@ -144,6 +145,41 @@ export function StatsSheet({
   );
 }
 
+/** A 0–100% slider for one kind of sound (Settings). */
+function VolumeSlider({
+  label,
+  value,
+  disabled,
+  onChange,
+}: {
+  label: string;
+  /** 0 to 1. */
+  value: number;
+  disabled: boolean;
+  onChange: (value: number) => void;
+}) {
+  const pct = Math.round(value * 100);
+  return (
+    <label className={clsx('flex min-h-12 items-center gap-4 py-2', disabled && 'opacity-50')}>
+      <span className="w-32 shrink-0 text-[15px] font-medium">{label}</span>
+      <input
+        type="range"
+        min={0}
+        max={100}
+        step={5}
+        value={pct}
+        disabled={disabled}
+        onChange={(e) => onChange(Number(e.currentTarget.value) / 100)}
+        aria-valuetext={`${pct}%`}
+        className="h-9 min-w-0 flex-1 accent-[var(--accent)]"
+      />
+      <span className="w-10 shrink-0 text-right text-[13px] text-muted tabular-nums" aria-hidden>
+        {pct}%
+      </span>
+    </label>
+  );
+}
+
 export function SettingsSheet({
   open,
   onOpenChange,
@@ -200,6 +236,24 @@ export function SettingsSheet({
           onCheckedChange={(v) => onChange('animations', v)}
           label="Animations"
           hint="Battle effects and animated sprites"
+        />
+        <Switch
+          checked={settings.sound}
+          onCheckedChange={(v) => onChange('sound', v)}
+          label="Sound"
+          hint="Battle music and Pokémon cries"
+        />
+        <VolumeSlider
+          label="Music volume"
+          value={settings.musicVolume}
+          disabled={!settings.sound}
+          onChange={(v) => onChange('musicVolume', v)}
+        />
+        <VolumeSlider
+          label="Effects volume"
+          value={settings.effectsVolume}
+          disabled={!settings.sound}
+          onChange={(v) => onChange('effectsVolume', v)}
         />
       </div>
       <div className="mt-3 grid grid-cols-2 gap-2">

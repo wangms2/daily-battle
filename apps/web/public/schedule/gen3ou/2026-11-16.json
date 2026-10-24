@@ -1,0 +1,331 @@
+{
+  "version": 1,
+  "generatorVersion": 4,
+  "dataBuiltAt": "2026-10-24T16:51:53.962Z",
+  "week": "2026-11-16",
+  "pool": {
+    "species": [
+      "Celebi",
+      "Skarmory",
+      "Magneton",
+      "Dugtrio",
+      "Salamence",
+      "Flygon",
+      "Milotic",
+      "Forretress",
+      "Blaziken",
+      "Houndoom",
+      "Steelix",
+      "Miltank"
+    ],
+    "candidate": 0
+  },
+  "suggestedTeams": [
+    {
+      "archetype": "Balanced",
+      "team": [
+        {
+          "species": "Salamence",
+          "setId": "salamence-choice-band"
+        },
+        {
+          "species": "Forretress",
+          "setId": "forretress-standard"
+        },
+        {
+          "species": "Flygon",
+          "setId": "flygon-choice-band"
+        },
+        {
+          "species": "Dugtrio",
+          "setId": "dugtrio-choice-band"
+        },
+        {
+          "species": "Steelix",
+          "setId": "steelix-standard-wall"
+        },
+        {
+          "species": "Miltank",
+          "setId": "miltank-curse"
+        }
+      ]
+    },
+    {
+      "archetype": "Offense",
+      "team": [
+        {
+          "species": "Magneton",
+          "setId": "magneton-trapper"
+        },
+        {
+          "species": "Flygon",
+          "setId": "flygon-offensive"
+        },
+        {
+          "species": "Celebi",
+          "setId": "celebi-leech-seed-3-attacks"
+        },
+        {
+          "species": "Skarmory",
+          "setId": "skarmory-offensive-spikes"
+        },
+        {
+          "species": "Dugtrio",
+          "setId": "dugtrio-choice-band"
+        },
+        {
+          "species": "Steelix",
+          "setId": "steelix-choice-band"
+        }
+      ]
+    },
+    {
+      "archetype": "Stall",
+      "team": [
+        {
+          "species": "Miltank",
+          "setId": "miltank-curse"
+        },
+        {
+          "species": "Skarmory",
+          "setId": "skarmory-standard"
+        },
+        {
+          "species": "Celebi",
+          "setId": "celebi-defensive-calm-mind"
+        },
+        {
+          "species": "Milotic",
+          "setId": "milotic-standard"
+        },
+        {
+          "species": "Flygon",
+          "setId": "flygon-defensive"
+        },
+        {
+          "species": "Steelix",
+          "setId": "steelix-standard-wall"
+        }
+      ]
+    }
+  ],
+  "days": [
+    {
+      "day": "2026-11-16",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Moltres",
+          "setId": "moltres-substitute-toxic"
+        },
+        {
+          "species": "Charizard",
+          "setId": "charizard-mixed-attacker"
+        },
+        {
+          "species": "Blissey",
+          "setId": "blissey-utility"
+        },
+        {
+          "species": "Skarmory",
+          "setId": "skarmory-standard"
+        },
+        {
+          "species": "Regice",
+          "setId": "regice-offensive"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-bulky-physical-attacker"
+        }
+      ],
+      "candidate": 0
+    },
+    {
+      "day": "2026-11-17",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Blaziken",
+          "setId": "blaziken-special-attacker"
+        },
+        {
+          "species": "Claydol",
+          "setId": "claydol-utility"
+        },
+        {
+          "species": "Omastar",
+          "setId": "omastar-spikes"
+        },
+        {
+          "species": "Starmie",
+          "setId": "starmie-defensive"
+        },
+        {
+          "species": "Blissey",
+          "setId": "blissey-utility"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-bulky-physical-attacker"
+        }
+      ],
+      "candidate": 5
+    },
+    {
+      "day": "2026-11-18",
+      "style": "stall",
+      "team": [
+        {
+          "species": "Forretress",
+          "setId": "forretress-standard"
+        },
+        {
+          "species": "Snorlax",
+          "setId": "snorlax-utility-lax"
+        },
+        {
+          "species": "Breloom",
+          "setId": "breloom-spore"
+        },
+        {
+          "species": "Salamence",
+          "setId": "salamence-dragon-dance"
+        },
+        {
+          "species": "Milotic",
+          "setId": "milotic-standard"
+        },
+        {
+          "species": "Donphan",
+          "setId": "donphan-tank"
+        }
+      ],
+      "candidate": 3
+    },
+    {
+      "day": "2026-11-19",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Claydol",
+          "setId": "claydol-utility"
+        },
+        {
+          "species": "Salamence",
+          "setId": "salamence-dragon-dance"
+        },
+        {
+          "species": "Metagross",
+          "setId": "metagross-agility"
+        },
+        {
+          "species": "Cloyster",
+          "setId": "cloyster-spiker"
+        },
+        {
+          "species": "Jirachi",
+          "setId": "jirachi-substitute-calm-mind"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-bulky-dragon-dance"
+        }
+      ],
+      "candidate": 1
+    },
+    {
+      "day": "2026-11-20",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Aerodactyl",
+          "setId": "aerodactyl-choice-band"
+        },
+        {
+          "species": "Claydol",
+          "setId": "claydol-utility"
+        },
+        {
+          "species": "Dugtrio",
+          "setId": "dugtrio-choice-band"
+        },
+        {
+          "species": "Kingdra",
+          "setId": "kingdra-rain-dance-sweeper"
+        },
+        {
+          "species": "Steelix",
+          "setId": "steelix-standard-wall"
+        },
+        {
+          "species": "Slowbro",
+          "setId": "slowbro-defensive"
+        }
+      ],
+      "candidate": 12
+    },
+    {
+      "day": "2026-11-21",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Misdreavus",
+          "setId": "misdreavus-calm-mind"
+        },
+        {
+          "species": "Snorlax",
+          "setId": "snorlax-utility-lax"
+        },
+        {
+          "species": "Blissey",
+          "setId": "blissey-utility"
+        },
+        {
+          "species": "Slaking",
+          "setId": "slaking-choice-band"
+        },
+        {
+          "species": "Heracross",
+          "setId": "heracross-standard"
+        },
+        {
+          "species": "Registeel",
+          "setId": "registeel-mixed-wall"
+        }
+      ],
+      "candidate": 6
+    },
+    {
+      "day": "2026-11-22",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Swampert",
+          "setId": "swampert-standard-defensive"
+        },
+        {
+          "species": "Starmie",
+          "setId": "starmie-defensive"
+        },
+        {
+          "species": "Metagross",
+          "setId": "metagross-choice-band"
+        },
+        {
+          "species": "Magneton",
+          "setId": "magneton-trapper"
+        },
+        {
+          "species": "Marowak",
+          "setId": "marowak-swords-dance"
+        },
+        {
+          "species": "Skarmory",
+          "setId": "skarmory-standard"
+        }
+      ],
+      "candidate": 0
+    }
+  ]
+}
