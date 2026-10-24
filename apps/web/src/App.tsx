@@ -3,11 +3,9 @@ import { addDays, dayKey, weekKey } from '@daily-battle/gen/dates';
 import { Fragment, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { BattleRoute } from './screens/BattleRoute';
 import { DailyBrief } from './screens/DailyBrief';
+import { DailyPicker, Landing } from './screens/Home';
 import { TeamBuilder } from './screens/TeamBuilder';
 import { AboutSheet } from './sheets/About';
-import { ALL_NEWS, GEN3_NEWS } from './lib/news';
-import { GameNewsSheet } from './sheets/GameNews';
-import { GamePicker } from './sheets/GamePicker';
 import { SettingsSheet, StatsSheet, WelcomeSheet } from './sheets/misc';
 import { setActiveFormat } from './lib/data';
 import { setSpriteStyle } from './lib/sprites';
@@ -22,14 +20,20 @@ import { attemptInProgress, dayDecided, withChange, type GameAction } from './st
 import { emptyDay, type Settings } from './state/schema';
 import { useNow, useStore } from './state/context';
 import { Button } from './ui/bits';
+import { ChevronIcon } from './ui/icons';
 import { TopBar } from './ui/TopBar';
 import { VersusRoute } from './versus/VersusRoute';
 
-/** The site's address, with the game for anything but Gen 4 OU (`…/#gen5`, `…/#gen6`). */
-const shareUrl = (format: FormatId) =>
-  format === DEFAULT_FORMAT
-    ? window.location.origin
-    : `${window.location.origin}/#${format.replace(/ou$/, '')}`;
+/** Shared links open the game picker, so a friend can choose any generation. */
+const shareUrl = () => `${window.location.origin}/#daily`;
+
+/** What sets each game apart, for the picker. */
+const GAME_BLURB: Record<FormatId, string> = {
+  gen3ou: 'Ruby, Sapphire, and Emerald',
+  gen4ou: 'Diamond and Pearl',
+  gen5ou: 'Black and White, with Team Preview',
+  gen6ou: 'X and Y, with Mega Evolution',
+};
 
 const fmtDay = (key: string, opts: Intl.DateTimeFormatOptions) =>
   new Date(`${key}T12:00:00`).toLocaleDateString(undefined, opts);
@@ -52,7 +56,7 @@ function useHashRoute(): [string, (r: string) => void] {
   return [route, (r: string) => (window.location.hash = r)];
 }
 
-/** A share link's `#gen5` or `#gen6` (or `#gen4`): the game it was shared from. */
+/** An older share link's `#gen5` (or `#gen4`, `#gen6`): the game it was shared from. */
 const formatFromHash = (hash: string): FormatId | undefined =>
   (Object.keys(FORMATS) as FormatId[]).find((f) => f === `${hash}ou`);
 
@@ -67,7 +71,7 @@ export function App() {
   const day = dayKey(now);
   const week = weekKey(now);
   const [route, go] = useHashRoute();
-  // Until a player picks a game (on the welcome sheet), Gen 4 OU is shown behind it.
+  // Until a player picks a game (on the picker), Gen 4 OU is the default.
   const format = state.settings.format ?? DEFAULT_FORMAT;
   const game = formatInfo(format);
   setActiveFormat(format);
@@ -77,15 +81,16 @@ export function App() {
   const dispatch = (action: GameAction) => dispatchAny({ ...action, format });
   const [retry, setRetry] = useState(0);
   const schedule = useSchedule(week, format, retry);
-  const [pickerOpen, setPickerOpen] = useState(false);
 
-  // A shared link (`…/#gen5`) opens the game it came from.
+  // An older shared link (`…/#gen5`) opens the game it came from.
   const linked = formatFromHash(route);
   useEffect(() => {
     if (!linked) return;
-    dispatchAny({ type: 'setSetting', key: 'format', value: linked });
-    go('');
-  }, [linked, dispatchAny, go]);
+    // Only when it differs: the hash change that ends this link arrives later.
+    if (state.settings.format !== linked)
+      dispatchAny({ type: 'setSetting', key: 'format', value: linked });
+    go('play');
+  }, [linked, state.settings.format, dispatchAny, go]);
   const [statsOpen, setStatsOpen] = useState(false);
   // After a loss, the end card's "Change team" opens the brief with the team editable.
   const [openEdit, setOpenEdit] = useState(false);
@@ -106,7 +111,7 @@ export function App() {
     summary,
     streak: stats.streak,
     change: dayState.change,
-    url: shareUrl(format),
+    url: shareUrl(),
     game: game.name,
   });
   const countdown = countdownTo(now, addDays(day, 1));
@@ -173,7 +178,7 @@ export function App() {
   const renderTopBar = (title: string) => (left?: ReactNode) => (
     <TopBar
       title={`${game.name} · ${title}`}
-      onTitle={() => setPickerOpen(true)}
+      onTitle={() => go('daily')}
       left={left}
       streak={stats.streak}
       onStats={() => setStatsOpen(true)}
@@ -183,9 +188,52 @@ export function App() {
 
   // Versus rooms (#versus, #versus/CODE) stand apart from the daily games.
   const versus = route === 'versus' || route.startsWith('versus/');
+  // Today's game is #play (and #battle); anything else is the landing screen,
+  // or #daily, the picker a shared link opens.
+  const playing = route === 'play' || route === 'battle';
 
   let screen: ReactNode;
-  if (versus) {
+  if (route === 'daily') {
+    screen = (
+      <DailyPicker
+        topBar={
+          <TopBar
+            title="Daily Battle"
+            left={
+              <button
+                type="button"
+                onClick={() => go('')}
+                className="display -ml-2 flex h-10 items-center gap-1 rounded-full px-2 hover:bg-surface-2"
+              >
+                <ChevronIcon className="size-4 rotate-180 text-muted" aria-hidden />
+                Back
+              </button>
+            }
+            onSettings={() => setSettingsOpen(true)}
+          />
+        }
+        games={(Object.keys(FORMATS) as FormatId[]).map((id) => ({
+          id,
+          name: `${formatInfo(id).name} OU`,
+          blurb: GAME_BLURB[id],
+          streak: computeStats(state.games[id].days, day).streak,
+          today: dayHeadline(summarizeDay(state.games[id].days[day], true)),
+        }))}
+        onPick={(id) => {
+          if (id !== format) dispatchAny({ type: 'setSetting', key: 'format', value: id });
+          go('play');
+        }}
+      />
+    );
+  } else if (!versus && !playing) {
+    screen = (
+      <Landing
+        topBar={<TopBar title="Daily Battle" onSettings={() => setSettingsOpen(true)} />}
+        onDaily={() => go('daily')}
+        onVersus={() => go('versus')}
+      />
+    );
+  } else if (versus) {
     screen = (
       <VersusRoute
         route={route}
@@ -227,7 +275,7 @@ export function App() {
             poolId: poolIdOf(schedule.schedule),
             team,
           });
-          go('');
+          go('play');
         }}
       />
     );
@@ -244,13 +292,13 @@ export function App() {
         format={format}
         onExit={() => {
           setBattleTs(null);
-          go('');
+          go('play');
         }}
         onRunItBack={startBattle}
         onChangeTeam={() => {
           setOpenEdit(true);
           setBattleTs(null);
-          go('');
+          go('play');
         }}
         result={{
           summary,
@@ -311,18 +359,10 @@ export function App() {
       )}
       <Fragment key={format}>{screen}</Fragment>
       <WelcomeSheet
-        open={!versus && !settings.shownExplainers.includes('welcome')}
+        open={playing && !settings.shownExplainers.includes('welcome')}
         hints={settings.beginnerHints}
         onHints={(v) => setSetting('beginnerHints', v)}
-        format={state.settings.format}
-        onFormat={(value) => dispatchAny({ type: 'setSetting', key: 'format', value })}
-        onDone={() => {
-          if (!state.settings.format)
-            dispatchAny({ type: 'setSetting', key: 'format', value: format });
-          dispatchAny({ type: 'markExplainer', id: 'welcome' });
-          // They just picked a game, so the game news is old news.
-          for (const id of ALL_NEWS) dispatchAny({ type: 'markExplainer', id });
-        }}
+        onDone={() => dispatchAny({ type: 'markExplainer', id: 'welcome' })}
         onAbout={() => setAboutOpen(true)}
       />
       <StatsSheet
@@ -350,47 +390,10 @@ export function App() {
         open={howToPlayOpen}
         hints={settings.beginnerHints}
         onHints={() => {}}
-        format={format}
-        onFormat={() => {}}
         onDone={() => setHowToPlayOpen(false)}
         onAbout={() => setAboutOpen(true)}
       />
       <AboutSheet open={aboutOpen} onOpenChange={setAboutOpen} />
-      <GameNewsSheet
-        open={
-          route !== 'battle' &&
-          !versus &&
-          settings.shownExplainers.includes('welcome') &&
-          !settings.shownExplainers.includes(GEN3_NEWS)
-        }
-        current={game.name}
-        onTry={() => {
-          for (const id of ALL_NEWS) dispatchAny({ type: 'markExplainer', id });
-          dispatchAny({ type: 'setSetting', key: 'format', value: 'gen3ou' });
-        }}
-        onStay={() => {
-          for (const id of ALL_NEWS) dispatchAny({ type: 'markExplainer', id });
-        }}
-      />
-      <GamePicker
-        open={pickerOpen}
-        onOpenChange={setPickerOpen}
-        current={format}
-        games={(Object.keys(FORMATS) as FormatId[]).map((id) => ({
-          id,
-          name: `${formatInfo(id).name} OU`,
-          streak: computeStats(state.games[id].days, day).streak,
-          today: dayHeadline(summarizeDay(state.games[id].days[day], true)),
-        }))}
-        onPick={(id) => {
-          setPickerOpen(false);
-          if (id !== format) dispatchAny({ type: 'setSetting', key: 'format', value: id });
-        }}
-        onVersus={() => {
-          setPickerOpen(false);
-          go('versus');
-        }}
-      />
     </div>
   );
 }

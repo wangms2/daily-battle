@@ -1,5 +1,3 @@
-import { FORMATS, type FormatId } from '@daily-battle/data/formats';
-import clsx from 'clsx';
 import type { ReactNode } from 'react';
 import type { SetEntry } from '@daily-battle/data';
 import {
@@ -17,28 +15,10 @@ import { Sheet } from '../ui/Sheet';
 import { Button, Switch, TypeBadge } from '../ui/bits';
 import { CheckIcon, CloseIcon } from '../ui/icons';
 
-/** What sets each game apart, for the welcome sheet's choice. */
-const GAME_BLURB: Record<FormatId, string> = {
-  gen3ou: 'Ruby, Sapphire, and Emerald',
-  gen4ou: 'Diamond and Pearl',
-  gen5ou: 'Black and White, with Team Preview',
-  gen6ou: 'X and Y, with Mega Evolution and Fairy types',
-};
-
-/** The games, for phones: four side by side must fit a 360px-wide sheet, so the games' short names. */
-const GAME_SHORT: Record<FormatId, string> = {
-  gen3ou: 'RSE',
-  gen4ou: 'DPPt',
-  gen5ou: 'BW',
-  gen6ou: 'XY, Megas',
-};
-
 export function WelcomeSheet({
   open,
   hints,
   onHints,
-  format,
-  onFormat,
   onDone,
   onAbout,
   review = false,
@@ -46,12 +26,9 @@ export function WelcomeSheet({
   open: boolean;
   hints: boolean;
   onHints: (v: boolean) => void;
-  /** The game picked so far; unset until the player picks one. */
-  format: FormatId | undefined;
-  onFormat: (format: FormatId) => void;
   onDone: () => void;
   onAbout: () => void;
-  /** Reopened from Settings as "How to play": the rules only, no game pick or hints switch. */
+  /** Reopened from Settings as "How to play": the rules only, no hints switch. */
   review?: boolean;
 }) {
   const rules = [
@@ -90,38 +67,6 @@ export function WelcomeSheet({
         </Button>
       ) : (
         <>
-          <fieldset className="mt-3">
-            <legend className="mb-2 text-[15px] font-semibold">
-              Pick your game <span className="font-normal text-muted">· you can switch later</span>
-            </legend>
-            <div
-              role="radiogroup"
-              aria-label="Game"
-              className="grid grid-cols-4 gap-1.5 sm:grid-cols-2 sm:gap-2"
-            >
-              {(Object.keys(FORMATS) as FormatId[]).map((id) => (
-                <button
-                  key={id}
-                  type="button"
-                  role="radio"
-                  aria-checked={format === id}
-                  onClick={() => onFormat(id)}
-                  className={clsx(
-                    'card px-2 py-1.5 text-left sm:px-3',
-                    format === id ? 'is-selected' : 'hover:bg-surface-2',
-                  )}
-                >
-                  <span className="block text-[14px] font-semibold sm:text-[15px]">
-                    {FORMATS[id].name} OU
-                  </span>
-                  <span className="block text-[12px] leading-snug text-muted">
-                    <span className="sm:hidden">{GAME_SHORT[id]}</span>
-                    <span className="hidden sm:inline">{GAME_BLURB[id]}</span>
-                  </span>
-                </button>
-              ))}
-            </div>
-          </fieldset>
           <div className="mt-3 rounded-card bg-surface-2 px-4 py-2">
             <Switch
               checked={hints}
@@ -130,8 +75,8 @@ export function WelcomeSheet({
               hint="Checklists and tips. You can turn these off in Settings."
             />
           </div>
-          <Button className="mt-4 w-full" onClick={onDone} disabled={!format}>
-            {format ? `Play ${FORMATS[format].name} OU` : 'Pick a game to start'}
+          <Button className="mt-4 w-full" onClick={onDone}>
+            Let’s play
           </Button>
           <p className="mt-3 text-center text-[12px] text-muted">
             An unofficial fan project.{' '}

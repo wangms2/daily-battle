@@ -46,7 +46,7 @@ test('the game runs under the production CSP', async ({ page }) => {
     },
   );
   await page.clock.setFixedTime(new Date('2026-10-21T10:00:00-04:00'));
-  await page.goto('/');
+  await page.goto('/#play');
   await page.getByRole('button', { name: /^Start · / }).click();
   // The simulator runs in a worker: a first move proves it loaded under the CSP.
   await page.locator('main button[aria-label*=" PP"]:enabled').first().click({ timeout: 20_000 });

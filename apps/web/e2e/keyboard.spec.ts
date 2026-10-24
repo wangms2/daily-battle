@@ -51,7 +51,7 @@ test('plays a whole battle with only the keyboard', async ({ page }) => {
     },
   );
   await page.clock.setFixedTime(new Date('2026-10-21T10:00:00-04:00'));
-  await page.goto('/');
+  await page.goto('/#play');
 
   await tabTo(page, (el) => /^Start · /.test(el.textContent ?? ''));
   await page.keyboard.press('Enter');

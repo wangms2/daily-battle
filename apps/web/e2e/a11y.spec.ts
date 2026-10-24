@@ -42,7 +42,7 @@ async function seed(page: Page, { team = true, welcome = false } = {}) {
     },
   );
   await page.clock.setFixedTime(new Date('2026-10-21T10:00:00-04:00'));
-  await page.goto('/');
+  await page.goto('/#play');
 }
 
 /** Fails on serious or critical violations, listing each with where it is. */
@@ -73,8 +73,7 @@ for (const scheme of ['light', 'dark'] as const) {
       await page.getByRole('button', { name: 'About and credits' }).click();
       await check(page, 'about sheet');
       await page.keyboard.press('Escape');
-      await page.getByRole('radio', { name: /Gen 4 OU/ }).click();
-      await page.getByRole('button', { name: 'Play Gen 4 OU' }).click();
+      await page.getByRole('button', { name: 'Let’s play' }).click();
       await check(page, 'team builder');
       await page
         .getByRole('button', { name: /info|About/i })

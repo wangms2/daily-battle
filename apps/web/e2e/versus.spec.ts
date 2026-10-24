@@ -165,14 +165,10 @@ test('the host can remove a player, and names are unique', async ({ page, browse
   await expect(players(page)).toHaveCount(1);
 });
 
-test('the game picker opens versus rooms', async ({ page }) => {
+test('the first screen opens versus rooms', async ({ page }) => {
   await quick(page);
   await page.goto('/');
-  await page.getByRole('button', { name: /^Gen 4 · / }).click();
-  await page
-    .getByRole('dialog', { name: 'Choose a game' })
-    .getByRole('button', { name: /Versus with friends/ })
-    .click();
+  await page.getByRole('button', { name: /^Versus with friends/ }).click();
   await expect(page.getByRole('button', { name: 'Create a room' })).toBeVisible();
 });
 

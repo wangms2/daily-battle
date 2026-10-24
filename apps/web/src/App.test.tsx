@@ -1,6 +1,6 @@
 import { sets } from '@daily-battle/data';
 import type { ScheduleFile } from '@daily-battle/gen/schedule';
-import { act, render, screen, waitFor, within } from '@testing-library/react';
+import { act, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import scheduleJson from '../public/schedule/2026-10-19.json';
@@ -37,7 +37,7 @@ function memoryBackend(seed?: State, broken = false): globalThis.Storage {
 /** State after the welcome sheet, optionally with hints off and a team locked. */
 function seeded({ hints = true, team }: { hints?: boolean; team?: { week: string } } = {}): State {
   const state = initialState();
-  state.settings.shownExplainers = ['welcome', 'gen5-news', 'gen6-news', 'gen3-news'];
+  state.settings.shownExplainers = ['welcome'];
   state.settings.beginnerHints = hints;
   state.settings.format = 'gen4ou';
   if (team) {
@@ -59,7 +59,8 @@ function renderApp(seed?: State, { broken = false } = {}) {
 }
 
 beforeEach(() => {
-  window.location.hash = '';
+  // Most tests play today's game; the landing screen is tested on its own.
+  window.location.hash = '#play';
   vi.stubGlobal(
     'fetch',
     vi.fn(async () => new Response(JSON.stringify(schedule), { status: 200 })),
@@ -71,8 +72,7 @@ describe('first run', () => {
   it('shows the welcome sheet, then the team builder', async () => {
     const user = userEvent.setup();
     renderApp();
-    await user.click(await screen.findByRole('radio', { name: /Gen 4 OU/ }));
-    await user.click(screen.getByRole('button', { name: 'Play Gen 4 OU' }));
+    await user.click(await screen.findByRole('button', { name: 'Let’s play' }));
     expect(await screen.findByRole('button', { name: /Pick 6 more/ })).toBeDisabled();
   });
 
@@ -403,8 +403,7 @@ describe('edge cases', () => {
     const user = userEvent.setup();
     renderApp(undefined, { broken: true });
     // Nothing can remember the welcome was seen, so it shows; dismiss it first.
-    await user.click(await screen.findByRole('radio', { name: /Gen 4 OU/ }));
-    await user.click(screen.getByRole('button', { name: 'Play Gen 4 OU' }));
+    await user.click(await screen.findByRole('button', { name: 'Let’s play' }));
     expect(await screen.findByRole('alert')).toHaveTextContent('Progress won’t be saved');
   });
 
@@ -443,80 +442,69 @@ describe('Species Clause', () => {
   });
 });
 
-describe('Gen 3 news', () => {
-  /** A player from before Gen 3: welcome and the Gen 5 and Gen 6 news seen, on Gen 4. */
-  const veteran = (shown = ['welcome', 'gen5-news', 'gen6-news']) => {
-    const state = seeded();
-    state.settings.shownExplainers = shown;
-    return state;
-  };
-
+describe('home', () => {
   beforeEach(() => {
+    window.location.hash = '';
     vi.stubGlobal(
       'fetch',
       vi.fn(async (url: string) =>
-        // Gen 4 and 5 need a pool of their own; Gen 3's switch is checked by its title.
-        String(url).includes('gen3ou/') || String(url).includes('gen6ou/')
-          ? new Response('Not found', { status: 404 })
-          : String(url).includes('gen5ou/')
-            ? new Response(JSON.stringify(gen5Schedule), { status: 200 })
-            : new Response(JSON.stringify(schedule), { status: 200 }),
+        // Gen 4 and 5 need a pool of their own; Gen 3 and 6 are never opened here.
+        String(url).includes('gen5ou/')
+          ? new Response(JSON.stringify(gen5Schedule), { status: 200 })
+          : new Response(JSON.stringify(schedule), { status: 200 }),
       ),
     );
   });
 
-  it('tells a player from before Gen 3 once, and Try switches to it', async () => {
-    const user = userEvent.setup();
-    renderApp(veteran());
-    const news = await screen.findByRole('dialog', { name: 'New: Gen 3 OU' });
-    await user.click(within(news).getByRole('button', { name: 'Try Gen 3 OU' }));
-    // Gen 3's schedule isn't stubbed here; leaving Gen 4 is the switch.
-    await waitFor(() =>
-      expect(screen.queryByRole('dialog', { name: 'New: Gen 3 OU' })).not.toBeInTheDocument(),
-    );
-    expect(screen.queryByRole('button', { name: /^Gen 4 · / })).not.toBeInTheDocument();
-  });
-
-  it('keeps the player on Gen 4 if they stay', async () => {
-    const user = userEvent.setup();
-    renderApp(veteran());
-    const news = await screen.findByRole('dialog', { name: 'New: Gen 3 OU' });
-    await user.click(within(news).getByRole('button', { name: 'Stay on Gen 4' }));
-    expect(await screen.findByRole('button', { name: /^Gen 4 · Week of/ })).toBeInTheDocument();
-    expect(screen.queryByRole('dialog', { name: 'New: Gen 3 OU' })).not.toBeInTheDocument();
-  });
-
-  it('shows only the newest sheet to a player who missed the earlier news', async () => {
-    const user = userEvent.setup();
-    renderApp(veteran(['welcome']));
-    const news = await screen.findByRole('dialog', { name: 'New: Gen 3 OU' });
-    expect(screen.queryByRole('dialog', { name: 'New: Gen 5 OU' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('dialog', { name: 'New: Gen 6 OU' })).not.toBeInTheDocument();
-    await user.click(within(news).getByRole('button', { name: 'Stay on Gen 4' }));
-    expect(await screen.findByRole('button', { name: /^Gen 4 · Week of/ })).toBeInTheDocument();
-    expect(screen.queryByRole('dialog', { name: /^New: / })).not.toBeInTheDocument();
-  });
-
-  it('never shows it to a new player, who picks a game on the welcome sheet', async () => {
-    const user = userEvent.setup();
+  it('lands on Daily Battle or Versus, with no sheet over them', async () => {
     renderApp();
-    await user.click(await screen.findByRole('radio', { name: /Gen 4 OU/ }));
-    await user.click(screen.getByRole('button', { name: 'Play Gen 4 OU' }));
-    expect(await screen.findByRole('button', { name: /Pick 6 more/ })).toBeInTheDocument();
-    expect(screen.queryByRole('dialog', { name: /^New: / })).not.toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: /^Daily Battle/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^Versus with friends/ })).toBeInTheDocument();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
-  it('offers all four games on the welcome sheet, by generation', async () => {
-    renderApp();
-    const radios = await screen.findAllByRole('radio');
-    expect(radios.map((r) => r.textContent?.match(/Gen \d OU/)?.[0])).toEqual([
-      'Gen 3 OU',
-      'Gen 4 OU',
-      'Gen 5 OU',
-      'Gen 6 OU',
-    ]);
+  it('opens a versus room from Versus with friends', async () => {
+    const user = userEvent.setup();
+    renderApp(seeded());
+    await user.click(await screen.findByRole('button', { name: /^Versus with friends/ }));
+    expect(window.location.hash).toBe('#versus');
+  });
+
+  it('shows every game with its status and streak, and a pick plays that game', async () => {
+    const user = userEvent.setup();
+    renderApp(seeded());
+    await user.click(await screen.findByRole('button', { name: /^Daily Battle/ }));
     for (const gen of ['Gen 3 OU', 'Gen 4 OU', 'Gen 5 OU', 'Gen 6 OU'])
-      expect(await screen.findByRole('radio', { name: new RegExp(gen) })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: new RegExp(gen) })).toBeInTheDocument();
+    expect(window.location.hash).toBe('#daily');
+    await user.click(screen.getByRole('button', { name: /Gen 5 OU/ }));
+    expect(await screen.findByRole('button', { name: /^Gen 5 · Week of/ })).toBeInTheDocument();
+    expect(window.location.hash).toBe('#play');
+  });
+
+  it('opens the game picker from a shared link', async () => {
+    window.location.hash = '#daily';
+    renderApp();
+    expect(await screen.findByText('Choose a game')).toBeInTheDocument();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('still opens the game of an older #gen5 link', async () => {
+    window.location.hash = '#gen5';
+    renderApp(seeded());
+    expect(await screen.findByRole('button', { name: /^Gen 5 · Week of/ })).toBeInTheDocument();
+  });
+
+  it('returns from the picker to the first screen, and from a game to the picker', async () => {
+    const user = userEvent.setup();
+    window.location.hash = '#daily';
+    renderApp(seeded());
+    await user.click(await screen.findByRole('button', { name: 'Back' }));
+    expect(await screen.findByRole('button', { name: /^Daily Battle/ })).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: /^Daily Battle/ }));
+    await user.click(await screen.findByRole('button', { name: /Gen 4 OU/ }));
+    await user.click(await screen.findByRole('button', { name: /^Gen 4 · Week of/ }));
+    expect(await screen.findByText('Choose a game')).toBeInTheDocument();
   });
 });
 
