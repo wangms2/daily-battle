@@ -35,7 +35,7 @@ export type ClientMessage =
   | { type: 'react'; match: string; emoji: Reaction };
 
 /** The reactions spectators can send. */
-export const REACTIONS = ['😮', '🔥', '😂', '💀'] as const;
+export const REACTIONS = ['😮', '🔥', '😂', '💀', '💩', '👀'] as const;
 export type Reaction = (typeof REACTIONS)[number];
 
 /**

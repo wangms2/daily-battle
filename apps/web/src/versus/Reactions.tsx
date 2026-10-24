@@ -52,15 +52,25 @@ export function FloatingReactions({
   );
 }
 
-export function ReactionBar({ onReact }: { onReact: (emoji: Reaction) => void }) {
+export function ReactionBar({
+  onReact,
+  compact = false,
+}: {
+  onReact: (emoji: Reaction) => void;
+  /** Smaller buttons, to share a row with a phone card's log line. */
+  compact?: boolean;
+}) {
   return (
-    <div className="flex gap-1" role="group" aria-label="React">
+    <div className={clsx('flex', !compact && 'gap-1')} role="group" aria-label="React">
       {REACTIONS.map((emoji) => (
         <button
           key={emoji}
           type="button"
           onClick={() => onReact(emoji)}
-          className="grid size-9 place-items-center rounded-full text-[18px] hover:bg-surface-2 active:scale-90"
+          className={clsx(
+            'grid place-items-center rounded-full hover:bg-surface-2 active:scale-90',
+            compact ? 'size-8 text-[16px]' : 'size-9 text-[18px]',
+          )}
           aria-label={`React ${emoji}`}
         >
           {emoji}

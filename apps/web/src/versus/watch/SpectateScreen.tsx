@@ -125,7 +125,7 @@ function WatchCard({
         </div>
         {compact && (
           <div className="shrink-0 pr-1">
-            <ReactionBar onReact={onReact} />
+            <ReactionBar onReact={onReact} compact />
           </div>
         )}
       </div>
