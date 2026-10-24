@@ -1,0 +1,331 @@
+{
+  "version": 1,
+  "generatorVersion": 4,
+  "dataBuiltAt": "2026-10-24T02:55:39.964Z",
+  "week": "2026-11-02",
+  "pool": {
+    "species": [
+      "Tornadus-Therian",
+      "Rotom-Wash",
+      "Latias",
+      "Volcanion",
+      "Kyurem-Black",
+      "Mew",
+      "Manaphy",
+      "Charizard",
+      "Heracross",
+      "Bisharp",
+      "Whimsicott",
+      "Swampert"
+    ],
+    "candidate": 0
+  },
+  "suggestedTeams": [
+    {
+      "archetype": "Balanced",
+      "team": [
+        {
+          "species": "Mew",
+          "setId": "mew-lead"
+        },
+        {
+          "species": "Volcanion",
+          "setId": "volcanion-assault-vest"
+        },
+        {
+          "species": "Swampert",
+          "setId": "swampert-curse"
+        },
+        {
+          "species": "Rotom-Wash",
+          "setId": "rotomwash-physically-defensive-pivot"
+        },
+        {
+          "species": "Bisharp",
+          "setId": "bisharp-assault-vest"
+        },
+        {
+          "species": "Whimsicott",
+          "setId": "whimsicott-applaud-attack-offensive"
+        }
+      ]
+    },
+    {
+      "archetype": "Offense",
+      "team": [
+        {
+          "species": "Bisharp",
+          "setId": "bisharp-swords-dance"
+        },
+        {
+          "species": "Tornadus-Therian",
+          "setId": "tornadustherian-assault-vest-pivot"
+        },
+        {
+          "species": "Volcanion",
+          "setId": "volcanion-choice-scarf"
+        },
+        {
+          "species": "Kyurem-Black",
+          "setId": "kyuremblack-mixed-wallbreaker"
+        },
+        {
+          "species": "Mew",
+          "setId": "mew-lead"
+        },
+        {
+          "species": "Manaphy",
+          "setId": "manaphy-tail-glow-rain-dance"
+        }
+      ]
+    },
+    {
+      "archetype": "Stall",
+      "team": [
+        {
+          "species": "Rotom-Wash",
+          "setId": "rotomwash-physically-defensive-pivot"
+        },
+        {
+          "species": "Mew",
+          "setId": "mew-lead"
+        },
+        {
+          "species": "Latias",
+          "setId": "latias-utility"
+        },
+        {
+          "species": "Swampert",
+          "setId": "swampert-curse"
+        },
+        {
+          "species": "Volcanion",
+          "setId": "volcanion-physically-defensive"
+        },
+        {
+          "species": "Whimsicott",
+          "setId": "whimsicott-support"
+        }
+      ]
+    }
+  ],
+  "days": [
+    {
+      "day": "2026-11-02",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Dragonite",
+          "setId": "dragonite-choice-band"
+        },
+        {
+          "species": "Ferrothorn",
+          "setId": "ferrothorn-utility"
+        },
+        {
+          "species": "Manaphy",
+          "setId": "manaphy-tail-glow-rain-dance"
+        },
+        {
+          "species": "Whimsicott",
+          "setId": "whimsicott-support"
+        },
+        {
+          "species": "Charizard",
+          "setId": "charizard-dragon-dance"
+        },
+        {
+          "species": "Keldeo",
+          "setId": "keldeo-choice-specs"
+        }
+      ],
+      "candidate": 1
+    },
+    {
+      "day": "2026-11-03",
+      "style": "stall",
+      "team": [
+        {
+          "species": "Skarmory",
+          "setId": "skarmory-defog"
+        },
+        {
+          "species": "Seismitoad",
+          "setId": "seismitoad-defensive"
+        },
+        {
+          "species": "Bisharp",
+          "setId": "bisharp-swords-dance"
+        },
+        {
+          "species": "Thundurus",
+          "setId": "thundurus-nasty-plot"
+        },
+        {
+          "species": "Slowbro",
+          "setId": "slowbro-calm-mind"
+        },
+        {
+          "species": "Diancie",
+          "setId": "diancie-offensive"
+        }
+      ],
+      "candidate": 4
+    },
+    {
+      "day": "2026-11-04",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Talonflame",
+          "setId": "talonflame-bulky-swords-dance"
+        },
+        {
+          "species": "Scizor",
+          "setId": "scizor-utility"
+        },
+        {
+          "species": "Zapdos",
+          "setId": "zapdos-physically-defensive"
+        },
+        {
+          "species": "Dragonite",
+          "setId": "dragonite-choice-band"
+        },
+        {
+          "species": "Gliscor",
+          "setId": "gliscor-swords-dance-wallbreaker"
+        },
+        {
+          "species": "Keldeo",
+          "setId": "keldeo-substitute-calm-mind"
+        }
+      ],
+      "candidate": 0
+    },
+    {
+      "day": "2026-11-05",
+      "style": "stall",
+      "team": [
+        {
+          "species": "Jellicent",
+          "setId": "jellicent-utility"
+        },
+        {
+          "species": "Ferrothorn",
+          "setId": "ferrothorn-utility"
+        },
+        {
+          "species": "Raikou",
+          "setId": "raikou-calm-mind"
+        },
+        {
+          "species": "Magnezone",
+          "setId": "magnezone-choice-scarf"
+        },
+        {
+          "species": "Amoonguss",
+          "setId": "amoonguss-pivot"
+        },
+        {
+          "species": "Talonflame",
+          "setId": "talonflame-bulky-swords-dance"
+        }
+      ],
+      "candidate": 0
+    },
+    {
+      "day": "2026-11-06",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Volcanion",
+          "setId": "volcanion-bulky-offensive"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-choice-band"
+        },
+        {
+          "species": "Manectric",
+          "setId": "manectric-special-attacker"
+        },
+        {
+          "species": "Zapdos",
+          "setId": "zapdos-physically-defensive"
+        },
+        {
+          "species": "Landorus-Therian",
+          "setId": "landorustherian-suicide-lead"
+        },
+        {
+          "species": "Talonflame",
+          "setId": "talonflame-bulky-swords-dance"
+        }
+      ],
+      "candidate": 2
+    },
+    {
+      "day": "2026-11-07",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Bisharp",
+          "setId": "bisharp-assault-vest"
+        },
+        {
+          "species": "Latios",
+          "setId": "latios-calm-mind"
+        },
+        {
+          "species": "Clefable",
+          "setId": "clefable-stealth-rock"
+        },
+        {
+          "species": "Blastoise",
+          "setId": "blastoise-offensive-spinner"
+        },
+        {
+          "species": "Tentacruel",
+          "setId": "tentacruel-support"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-choice-band"
+        }
+      ],
+      "candidate": 3
+    },
+    {
+      "day": "2026-11-08",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Metagross",
+          "setId": "metagross-offensive"
+        },
+        {
+          "species": "Volcanion",
+          "setId": "volcanion-physically-defensive"
+        },
+        {
+          "species": "Rotom-Wash",
+          "setId": "rotomwash-fast-utility"
+        },
+        {
+          "species": "Bisharp",
+          "setId": "bisharp-swords-dance"
+        },
+        {
+          "species": "Ferrothorn",
+          "setId": "ferrothorn-utility"
+        },
+        {
+          "species": "Aerodactyl",
+          "setId": "aerodactyl-lead"
+        }
+      ],
+      "candidate": 0
+    }
+  ]
+}

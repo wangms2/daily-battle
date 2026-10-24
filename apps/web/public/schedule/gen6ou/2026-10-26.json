@@ -1,0 +1,302 @@
+{
+  "version": 1,
+  "generatorVersion": 4,
+  "dataBuiltAt": "2026-10-24T02:55:39.964Z",
+  "week": "2026-10-26",
+  "pool": {
+    "species": [
+      "Ferrothorn",
+      "Serperior",
+      "Gengar",
+      "Landorus-Therian",
+      "Latias",
+      "Thundurus",
+      "Metagross",
+      "Charizard",
+      "Aerodactyl",
+      "Zygarde",
+      "Krookodile",
+      "Absol"
+    ],
+    "candidate": 0
+  },
+  "suggestedTeams": [
+    {
+      "archetype": "Balanced",
+      "team": [
+        {
+          "species": "Latias",
+          "setId": "latias-calm-mind"
+        },
+        {
+          "species": "Ferrothorn",
+          "setId": "ferrothorn-utility"
+        },
+        {
+          "species": "Landorus-Therian",
+          "setId": "landorustherian-defensive"
+        },
+        {
+          "species": "Gengar",
+          "setId": "gengar-life-orb-attacker"
+        },
+        {
+          "species": "Aerodactyl",
+          "setId": "aerodactyl-suicide-lead"
+        },
+        {
+          "species": "Serperior",
+          "setId": "serperior-stallbreaker"
+        }
+      ]
+    },
+    {
+      "archetype": "Offense",
+      "team": [
+        {
+          "species": "Metagross",
+          "setId": "metagross-offensive"
+        },
+        {
+          "species": "Gengar",
+          "setId": "gengar-hex"
+        },
+        {
+          "species": "Landorus-Therian",
+          "setId": "landorustherian-choice-scarf"
+        },
+        {
+          "species": "Aerodactyl",
+          "setId": "aerodactyl-suicide-lead"
+        },
+        {
+          "species": "Zygarde",
+          "setId": "zygarde-subcoil"
+        },
+        {
+          "species": "Krookodile",
+          "setId": "krookodile-choice-scarf"
+        }
+      ]
+    }
+  ],
+  "days": [
+    {
+      "day": "2026-10-26",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Gliscor",
+          "setId": "gliscor-stallbreaker"
+        },
+        {
+          "species": "Mew",
+          "setId": "mew-lead"
+        },
+        {
+          "species": "Tornadus-Therian",
+          "setId": "tornadustherian-assault-vest-pivot"
+        },
+        {
+          "species": "Weavile",
+          "setId": "weavile-choice-band"
+        },
+        {
+          "species": "Whimsicott",
+          "setId": "whimsicott-support"
+        },
+        {
+          "species": "Serperior",
+          "setId": "serperior-stallbreaker"
+        }
+      ],
+      "candidate": 2
+    },
+    {
+      "day": "2026-10-27",
+      "style": "offense",
+      "team": [
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-choice-band"
+        },
+        {
+          "species": "Cloyster",
+          "setId": "cloyster-shell-smash"
+        },
+        {
+          "species": "Rotom-Wash",
+          "setId": "rotomwash-fast-utility"
+        },
+        {
+          "species": "Thundurus",
+          "setId": "thundurus-bulky-pivot"
+        },
+        {
+          "species": "Diancie",
+          "setId": "diancie-offensive"
+        },
+        {
+          "species": "Keldeo",
+          "setId": "keldeo-choice-specs"
+        }
+      ],
+      "candidate": 10
+    },
+    {
+      "day": "2026-10-28",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Excadrill",
+          "setId": "excadrill-fast-utility"
+        },
+        {
+          "species": "Zapdos",
+          "setId": "zapdos-physically-defensive"
+        },
+        {
+          "species": "Rotom-Wash",
+          "setId": "rotomwash-physically-defensive-pivot"
+        },
+        {
+          "species": "Aerodactyl",
+          "setId": "aerodactyl-lead"
+        },
+        {
+          "species": "Tornadus-Therian",
+          "setId": "tornadustherian-assault-vest-pivot"
+        },
+        {
+          "species": "Weavile",
+          "setId": "weavile-choice-band"
+        }
+      ],
+      "candidate": 6
+    },
+    {
+      "day": "2026-10-29",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Ferrothorn",
+          "setId": "ferrothorn-stealth-rock"
+        },
+        {
+          "species": "Toxicroak",
+          "setId": "toxicroak-swords-dance"
+        },
+        {
+          "species": "Azelf",
+          "setId": "azelf-lead"
+        },
+        {
+          "species": "Volcanion",
+          "setId": "volcanion-assault-vest"
+        },
+        {
+          "species": "Tornadus-Therian",
+          "setId": "tornadustherian-assault-vest-pivot"
+        },
+        {
+          "species": "Excadrill",
+          "setId": "excadrill-choice-scarf"
+        }
+      ],
+      "candidate": 0
+    },
+    {
+      "day": "2026-10-30",
+      "style": "stall",
+      "team": [
+        {
+          "species": "Zapdos",
+          "setId": "zapdos-physically-defensive"
+        },
+        {
+          "species": "Excadrill",
+          "setId": "excadrill-fast-utility"
+        },
+        {
+          "species": "Volcarona",
+          "setId": "volcarona-bulkarona"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-choice-band"
+        },
+        {
+          "species": "Azumarill",
+          "setId": "azumarill-choice-band"
+        },
+        {
+          "species": "Blissey",
+          "setId": "blissey-special-wall"
+        }
+      ],
+      "candidate": 0
+    },
+    {
+      "day": "2026-10-31",
+      "style": "stall",
+      "team": [
+        {
+          "species": "Zapdos",
+          "setId": "zapdos-specially-defensive"
+        },
+        {
+          "species": "Diancie",
+          "setId": "diancie-offensive"
+        },
+        {
+          "species": "Clefable",
+          "setId": "clefable-calm-mind"
+        },
+        {
+          "species": "Kyurem-Black",
+          "setId": "kyuremblack-choice-item-attacker"
+        },
+        {
+          "species": "Zygarde",
+          "setId": "zygarde-subcoil"
+        },
+        {
+          "species": "Politoed",
+          "setId": "politoed-support"
+        }
+      ],
+      "candidate": 3
+    },
+    {
+      "day": "2026-11-01",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Gengar",
+          "setId": "gengar-life-orb-attacker"
+        },
+        {
+          "species": "Clefable",
+          "setId": "clefable-stealth-rock"
+        },
+        {
+          "species": "Starmie",
+          "setId": "starmie-utility"
+        },
+        {
+          "species": "Weavile",
+          "setId": "weavile-swords-dance"
+        },
+        {
+          "species": "Thundurus-Therian",
+          "setId": "thundurustherian-nasty-plot"
+        },
+        {
+          "species": "Ferrothorn",
+          "setId": "ferrothorn-utility"
+        }
+      ],
+      "candidate": 8
+    }
+  ]
+}

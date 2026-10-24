@@ -34,7 +34,7 @@ async function quick(page: Page) {
           beginnerHints: false,
           battleSpeed: 'instant',
           animations: false,
-          shownExplainers: ['welcome', 'gen5-news'],
+          shownExplainers: ['welcome', 'gen5-news', 'gen6-news'],
           format: 'gen4ou',
         },
       }),

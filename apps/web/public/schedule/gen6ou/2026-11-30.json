@@ -1,0 +1,302 @@
+{
+  "version": 1,
+  "generatorVersion": 4,
+  "dataBuiltAt": "2026-10-24T02:55:39.964Z",
+  "week": "2026-11-30",
+  "pool": {
+    "species": [
+      "Dragonite",
+      "Slowbro",
+      "Magnezone",
+      "Diancie",
+      "Serperior",
+      "Excadrill",
+      "Lopunny",
+      "Charizard",
+      "Aggron",
+      "Crawdaunt",
+      "Shuckle",
+      "Alakazam"
+    ],
+    "candidate": 0
+  },
+  "suggestedTeams": [
+    {
+      "archetype": "Balanced",
+      "team": [
+        {
+          "species": "Diancie",
+          "setId": "diancie-defensive"
+        },
+        {
+          "species": "Magnezone",
+          "setId": "magnezone-choice-scarf"
+        },
+        {
+          "species": "Dragonite",
+          "setId": "dragonite-dragon-dance-three-attacks"
+        },
+        {
+          "species": "Slowbro",
+          "setId": "slowbro-calm-mind"
+        },
+        {
+          "species": "Crawdaunt",
+          "setId": "crawdaunt-choice-band"
+        },
+        {
+          "species": "Serperior",
+          "setId": "serperior-stallbreaker"
+        }
+      ]
+    },
+    {
+      "archetype": "Offense",
+      "team": [
+        {
+          "species": "Aggron",
+          "setId": "aggron-tank"
+        },
+        {
+          "species": "Diancie",
+          "setId": "diancie-offensive-trick-room"
+        },
+        {
+          "species": "Excadrill",
+          "setId": "excadrill-sand-rush"
+        },
+        {
+          "species": "Serperior",
+          "setId": "serperior-stallbreaker"
+        },
+        {
+          "species": "Magnezone",
+          "setId": "magnezone-choice-scarf"
+        },
+        {
+          "species": "Dragonite",
+          "setId": "dragonite-dragon-dance-three-attacks"
+        }
+      ]
+    }
+  ],
+  "days": [
+    {
+      "day": "2026-11-30",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Manaphy",
+          "setId": "manaphy-tail-glow-3-attacks"
+        },
+        {
+          "species": "Volcarona",
+          "setId": "volcarona-offensive-quiver-dance"
+        },
+        {
+          "species": "Reuniclus",
+          "setId": "reuniclus-utility"
+        },
+        {
+          "species": "Charizard",
+          "setId": "charizard-dragon-dance"
+        },
+        {
+          "species": "Zapdos",
+          "setId": "zapdos-physically-defensive"
+        },
+        {
+          "species": "Latios",
+          "setId": "latios-life-orb-attacker"
+        }
+      ],
+      "candidate": 10
+    },
+    {
+      "day": "2026-12-01",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Talonflame",
+          "setId": "talonflame-bulky-swords-dance"
+        },
+        {
+          "species": "Mew",
+          "setId": "mew-lead"
+        },
+        {
+          "species": "Empoleon",
+          "setId": "empoleon-specially-defensive-support"
+        },
+        {
+          "species": "Serperior",
+          "setId": "serperior-substitute-attacker"
+        },
+        {
+          "species": "Tornadus-Therian",
+          "setId": "tornadustherian-assault-vest-pivot"
+        },
+        {
+          "species": "Diancie",
+          "setId": "diancie-offensive-trick-room"
+        }
+      ],
+      "candidate": 5
+    },
+    {
+      "day": "2026-12-02",
+      "style": "stall",
+      "team": [
+        {
+          "species": "Terrakion",
+          "setId": "terrakion-choice-scarf"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-choice-band"
+        },
+        {
+          "species": "Skarmory",
+          "setId": "skarmory-defog"
+        },
+        {
+          "species": "Clefable",
+          "setId": "clefable-calm-mind"
+        },
+        {
+          "species": "Chansey",
+          "setId": "chansey-de-blob"
+        },
+        {
+          "species": "Heatran",
+          "setId": "heatran-specially-defensive"
+        }
+      ],
+      "candidate": 7
+    },
+    {
+      "day": "2026-12-03",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Clefable",
+          "setId": "clefable-unaware-wall"
+        },
+        {
+          "species": "Lopunny",
+          "setId": "lopunny-all-out-attacker"
+        },
+        {
+          "species": "Volcarona",
+          "setId": "volcarona-offensive-quiver-dance"
+        },
+        {
+          "species": "Haxorus",
+          "setId": "haxorus-dragon-dance"
+        },
+        {
+          "species": "Victini",
+          "setId": "victini-choice-band"
+        },
+        {
+          "species": "Volcanion",
+          "setId": "volcanion-bulky-offensive"
+        }
+      ],
+      "candidate": 7
+    },
+    {
+      "day": "2026-12-04",
+      "style": "offense",
+      "team": [
+        {
+          "species": "Mew",
+          "setId": "mew-lead"
+        },
+        {
+          "species": "Bisharp",
+          "setId": "bisharp-swords-dance"
+        },
+        {
+          "species": "Rotom-Wash",
+          "setId": "rotomwash-fast-utility"
+        },
+        {
+          "species": "Garchomp",
+          "setId": "garchomp-choice-scarf"
+        },
+        {
+          "species": "Keldeo",
+          "setId": "keldeo-choice-specs"
+        },
+        {
+          "species": "Excadrill",
+          "setId": "excadrill-sand-rush"
+        }
+      ],
+      "candidate": 0
+    },
+    {
+      "day": "2026-12-05",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Thundurus-Therian",
+          "setId": "thundurustherian-double-dance"
+        },
+        {
+          "species": "Blastoise",
+          "setId": "blastoise-offensive-spinner"
+        },
+        {
+          "species": "Keldeo",
+          "setId": "keldeo-substitute-calm-mind"
+        },
+        {
+          "species": "Weavile",
+          "setId": "weavile-choice-band"
+        },
+        {
+          "species": "Politoed",
+          "setId": "politoed-support"
+        },
+        {
+          "species": "Gengar",
+          "setId": "gengar-life-orb-attacker"
+        }
+      ],
+      "candidate": 3
+    },
+    {
+      "day": "2026-12-06",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Ferrothorn",
+          "setId": "ferrothorn-utility"
+        },
+        {
+          "species": "Hydreigon",
+          "setId": "hydreigon-stallbreaker"
+        },
+        {
+          "species": "Lopunny",
+          "setId": "lopunny-all-out-attacker"
+        },
+        {
+          "species": "Heatran",
+          "setId": "heatran-fast-utility"
+        },
+        {
+          "species": "Scolipede",
+          "setId": "scolipede-bulky-sweeper"
+        },
+        {
+          "species": "Cloyster",
+          "setId": "cloyster-the-janitor-shell-smash"
+        }
+      ],
+      "candidate": 0
+    }
+  ]
+}
