@@ -42,7 +42,9 @@ const writeJson = (path: string, data: unknown) =>
 const curated = (await (await get(SETS_URL)).json()) as Record<string, unknown>;
 const curatedUU = (await (await get(UU_SETS_URL)).json()) as Record<string, unknown>;
 
-const { statsUrl, month, cutoff, battles, info, data } = MIRROR ? await mirrorStats() : await chaosStats();
+const { statsUrl, month, cutoff, battles, info, data } = MIRROR
+  ? await mirrorStats()
+  : await chaosStats();
 
 /** Smogon's chaos file for a month, trimmed to the fields the build uses. */
 async function chaosStats() {

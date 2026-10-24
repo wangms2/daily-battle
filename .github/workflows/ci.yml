@@ -74,8 +74,8 @@ jobs:
         env:
           E2E_PREBUILT: '1'
 
-  # Deploy the tested build to Cloudflare (battle.peanutbuilds.com) on pushes
-  # to main. Needs the CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID secrets;
+  # Deploy the tested build and the room server to Cloudflare
+  # (battle.peanutbuilds.com) on pushes to main. Needs the CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID secrets;
   # skipped until they're set.
   deploy:
     needs: [check, e2e]
@@ -89,9 +89,13 @@ jobs:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
+          cache: pnpm
+      # The room server (apps/server) is bundled from source, with the pinned wrangler.
+      - run: pnpm install --frozen-lockfile
       - uses: actions/download-artifact@v4
         with:
           name: web-dist
@@ -102,4 +106,4 @@ jobs:
             echo "::notice::Cloudflare secrets not set; skipping deploy."
             exit 0
           fi
-          npx --yes wrangler@4 deploy
+          pnpm exec wrangler deploy

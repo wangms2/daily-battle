@@ -23,6 +23,7 @@ import { emptyDay, type Settings } from './state/schema';
 import { useNow, useStore } from './state/context';
 import { Button } from './ui/bits';
 import { TopBar } from './ui/TopBar';
+import { VersusRoute } from './versus/VersusRoute';
 
 /** The site's address, with the game for anything but Gen 4 OU (`…/#gen5`, `…/#gen6`). */
 const shareUrl = (format: FormatId) =>
@@ -180,8 +181,24 @@ export function App() {
     />
   );
 
+  // Versus rooms (#versus, #versus/CODE) stand apart from the daily games.
+  const versus = route === 'versus' || route.startsWith('versus/');
+
   let screen: ReactNode;
-  if (schedule.status === 'loading') {
+  if (versus) {
+    screen = (
+      <VersusRoute
+        route={route}
+        go={go}
+        onExit={() => go('')}
+        battle={{
+          settings,
+          onSetting: setSetting,
+          onExplainerSeen: (id) => dispatchAny({ type: 'markExplainer', id }),
+        }}
+      />
+    );
+  } else if (schedule.status === 'loading') {
     screen = <div className="grid h-full place-items-center text-muted">Loading this week…</div>;
   } else if (schedule.status === 'error') {
     screen = (
@@ -294,7 +311,7 @@ export function App() {
       )}
       <Fragment key={format}>{screen}</Fragment>
       <WelcomeSheet
-        open={!settings.shownExplainers.includes('welcome')}
+        open={!versus && !settings.shownExplainers.includes('welcome')}
         hints={settings.beginnerHints}
         onHints={(v) => setSetting('beginnerHints', v)}
         format={state.settings.format}
@@ -342,6 +359,7 @@ export function App() {
       <GameNewsSheet
         open={
           route !== 'battle' &&
+          !versus &&
           settings.shownExplainers.includes('welcome') &&
           !settings.shownExplainers.includes(GEN6_NEWS)
         }
@@ -367,6 +385,10 @@ export function App() {
         onPick={(id) => {
           setPickerOpen(false);
           if (id !== format) dispatchAny({ type: 'setSetting', key: 'format', value: id });
+        }}
+        onVersus={() => {
+          setPickerOpen(false);
+          go('versus');
         }}
       />
     </div>

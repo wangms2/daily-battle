@@ -19,17 +19,26 @@ export default defineConfig({
     // Pin "today" to a scheduled day so runs are repeatable.
     timezoneId: 'America/New_York',
   },
-  webServer: {
-    // The production build: realistic, and the worker loads as one bundle instead of
-    // hundreds of dev modules.
-    // CI builds once and shares dist/ with the e2e shards (E2E_PREBUILT=1).
-    command: process.env.E2E_PREBUILT
-      ? 'pnpm exec vite preview --port 5179 --strictPort'
-      : 'pnpm exec vite build && pnpm exec vite preview --port 5179 --strictPort',
-    url: 'http://localhost:5179',
-    reuseExistingServer: false,
-    timeout: 120_000,
-  },
+  webServer: [
+    {
+      // The production build: realistic, and the worker loads as one bundle instead of
+      // hundreds of dev modules.
+      // CI builds once and shares dist/ with the e2e shards (E2E_PREBUILT=1).
+      command: process.env.E2E_PREBUILT
+        ? 'pnpm exec vite preview --port 5179 --strictPort'
+        : 'pnpm exec vite build && pnpm exec vite preview --port 5179 --strictPort',
+      url: 'http://localhost:5179',
+      reuseExistingServer: false,
+      timeout: 120_000,
+    },
+    {
+      // The versus room server; the preview sends /api to it (vite.config.ts).
+      command: 'pnpm --dir ../.. exec wrangler dev --port 8787 --persist-to .wrangler/e2e',
+      url: 'http://localhost:8787/',
+      reuseExistingServer: false,
+      timeout: 120_000,
+    },
+  ],
   projects: [
     { name: 'phone-360x640', use: phone(360, 640) },
     { name: 'phone-375x667', use: phone(375, 667) },

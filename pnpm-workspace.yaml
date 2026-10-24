@@ -4,6 +4,7 @@ packages:
 
 allowBuilds:
   esbuild: true
+  workerd: true
 
 # Engine and protocol packages, pinned exactly: resume depends on the sim being deterministic (DESIGN.md §15).
 catalog:

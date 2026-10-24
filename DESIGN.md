@@ -42,7 +42,7 @@ This doc is written to be split into implementation chunks. Section 13 lists mil
 ## 3. Non-goals
 
 - No accounts, server-side storage, or leaderboards in v1.
-- No multiplayer or PvP.
+- No multiplayer or PvP in the daily games. Versus rooms with friends are a separate mode (§18).
 - No formats beyond Gen 4, 5, and 6 OU for now. The format is a parameter throughout (`packages/data/src/formats.ts`), so another one is mostly data, sets, and a schedule run (§17, §19).
 - No minimizing-turns scoring.
 - No Showdown server, websockets, or ladder integration.
@@ -524,6 +524,70 @@ A second daily game beside Gen 4 OU, built in phases G1–G6 on the `gen5` branc
 - **Hidden blocks.** Imprison blocks moves without the request saying so. The sim rejects the choice as unavailable and sends an updated request, and the side chooses again. The rejected choice isn't recorded, and the player sees "That move can't be used right now. Choose another."
 - **Schedules** live in `schedule/gen5ou/` and `reports/gen5ou/`, built with `schedule --format gen5ou`. A trial week met the existing bands with no AI retuning. Gen 5 opponents come out too hard more often (the resampling absorbs it), and its pools are weaker against random probes (about 60% of sampled teams viable, against Gen 4's 85%).
 - **Web.** The title (`Gen 5 · Wed, Oct 28 ▾`) opens a picker with each game's streak and today's status. A first-time player picks a game on the welcome sheet; returning players land on the last one played. Gen 5 battles use Showdown's 15 Gen 5 backgrounds, and the sprites are shared. With hints on, the brief notes that the opponent sees your six too.
+
+## 18. Versus rooms (Oct 2026)
+
+A room where friends play live battles against each other, Super Auto Pets style. Same pools, sets, builder, and battle screen as the daily games; the opponent is a friend instead of the AI.
+
+### 18.1 Rules
+
+- **Room.** The host creates a room and shares its short code; friends join with the code and a display name. No accounts: a token in localStorage reconnects you. The host picks the game (any supported format, §17), the lives, the turn timer, and handicaps, then starts.
+- **Pool.** A new random pool of 12 per room, drawn by `generatePool` from the room's seed. The host can redraw it before starting, or pick the current week's daily pool for that game instead.
+- **Build.** Everyone builds 6 from the 12 at once, on a timer, with the daily builder.
+- **Rounds.** Each round pairs living players at random, avoiding last round's rematch where possible. Then:
+  1. **Swap phase.** You see who you face and their current six species (never their sets, even ones revealed in earlier rounds). You may make one change: replace one Pokémon from the 12 (choosing a set) or change one set, the same rule as the daily change (§4.2). Both players swap at once, on a timer, and swaps stay hidden until the battle starts. Unused changes don't accumulate.
+  2. **Lead.** You pick your lead, as on the daily brief.
+  3. **Battle.** A live battle with a turn timer.
+- **Your team carries over** from round to round, changes included.
+- **Lives.** 2 by default (host setting). A loss costs one; a tie (the turn cap, or both sides' last Pokémon fainting together) costs both players one. At 0 you're out and can spectate.
+- **Odd counts.** One living player each round faces the AI with a generated opponent team. A loss to it costs a life, the same as any other.
+- **End.** The last player standing wins. If the last players all reach 0 in the same round, they share the win.
+- **Handicaps.** A team size per player (6, 5, 4, or 3), set by the host. The sim doesn't require six in these formats.
+
+### 18.2 Live play
+
+- **Turn timer.** Like Showdown's: a time bank plus a cap per turn. Running out loses the battle.
+- **Disconnects.** A player's clock keeps running while they're away, so an abandoned battle ends when their time does (at most one turn's cap). A reconnect, or a reload, resumes the battle where it was.
+- **Length.** A live 6v6 takes 10–20 minutes, so a room of four with 2 lives runs several rounds. The timer, the lives default, and handicap teams keep it in bounds.
+
+### 18.3 Architecture
+
+- **Server.** A Cloudflare Worker with one Durable Object per room, deployed with the existing `wrangler` config. The room object holds the room state and each player's websocket, and runs the battles itself on `@pkmn/sim` through `BattleSession`, so a player's browser never receives the other side's sets or request (the same hiding rule as §7). Hosting a battle in one player's browser would expose the other player's sets to them.
+- **Messages.** After each choice the room sends each player a `SideUpdate`: that side's new protocol lines, its pending request, and whether the battle is over (`apps/web/src/battle/presenter.ts`). It never sends the spectator log to players in the battle.
+- **Client.** `SidePresenter` turns one side's updates into the battle screen's frames, team, and controls. The daily engine uses it for p1 in the worker; a versus battle uses it for whichever side you are, fed from the websocket. The battle screen doesn't know which.
+- **Resume.** The room stores each battle's seed and both sides' choices, and rebuilds the battle by replaying them when the object restarts (the §7 design, on the server).
+- **Daily mode is unaffected.** The daily games stay client-side and work without the server.
+- **Rooms (V2).** `POST /api/rooms` picks a free code (5 letters from 20 consonants, so no words and no I/O look-alikes) and sets up that code's Durable Object; `GET /api/rooms/CODE/socket` is the room's websocket. Both refuse requests whose `Origin` isn't the site. The room's rules are pure functions in `packages/versus` (join, leave, host-only settings, team sizes, removal), and the Durable Object (`apps/server`) applies them and broadcasts the room to everyone in it. Up to 8 players, with unique names of 1–16 characters. The first to join is the host; when the host leaves, the next to have joined takes over. A room nobody has been connected to for 24 hours is deleted.
+- **Seats.** Joining returns a token, kept in localStorage (`daily-battle:versus`, apart from the daily save) with the name you play under. A reload or a dropped connection rejoins with it, retrying with backoff, so you keep your seat; the lobby shows who's away. Opening the room in a second tab moves you there. A removed player's token stops working, and they can join again as a new player.
+- **Battles (V3).** Each battle starts lead first. The room runs each battle on `BattleSession` and records every accepted choice on the match, so the battle is rebuilt by replay when the Durable Object wakes. Choices are checked against the request first; a move hidden information blocks (Imprison) comes back to its player to choose again, as in §17. After each choice both players get their side's new lines and request (`WireUpdate`), so a choice is always answered: waiting for the foe shows as "Waiting for …" over the controls. Clocks are Showdown-style per `TIMERS`: each side's runs while it has a request, and the room's alarm goes off at the next deadline (the swap, a clock, the build, or the break) to move the game on, ending a battle for whoever ran out. Giving up, leaving, or being removed mid-round loses that battle. Each player keeps their end card until they go back to the room.
+- **The game (V4).** The lobby shows the room's 12; the host can redraw a random pool or switch to this week's (read from the published schedule through the Worker's `ASSETS` binding, with the host's week; a week with no schedule keeps a random pool and says so). **Start the game** opens the build: everyone builds their team size from the 12 in the daily builder, for 3 minutes; anyone still building then gets the pool's most used Pokémon with their most used sets. Each round pairs players by lives (fewest rematches first, then the smallest gap in lives, over every possible pairing), and an odd player out faces the AI ("Rival", a daily-style generated team at their team size, played by the daily AI with that team's style), rotating to whoever has faced it least. Before each battle, both players have 60 s to make one change (another Pokémon from the pool, or another set; checked against the set data and the validator), pick a lead, and ready up; the change stays on their team for good. A loss costs a life, a tie costs both, a loss to the AI costs one too. When every battle is over the room shows the round's results, the standings with hearts, and your next opponent for 8 s, then starts the next round. A player out of lives gets a placement (players out in the same round share it); the last one in wins, and if the last ones go out together they share the win. Leaving or being removed mid-game puts you out at once (your battle counts as a loss) and keeps you in the standings. The host can **Play again** with the same players. Rooms carry a version: a room saved by an older server goes back to the lobby with its players and settings.
+- **Cost.** Measured locally, a turn takes about 2 ms of CPU, setting up a battle 3–17 ms, and rebuilding a whole battle from its choices about 100 ms. The Worker bundles the simulator (about 10.6 MB, under the 64 MiB limit). The Durable Objects limit is 30 s of CPU per message; if Workers Free's 10 ms per request applies to Durable Objects too, the setup and rebuild steps would need the paid plan.
+- **Entry.** The game picker (tap the title) ends with **Versus with friends**, which opens `#versus`; invite links are `#versus/CODE`.
+
+### 18.3a Elimination, spectating, and between rounds (decided Oct 2026)
+
+- **Out.** A knocked-out player gets a short card in the break ("You’re out", placement, wins and losses), then goes straight to watching when the next round starts. They stay in the room as "Out (5th)", see every round's results and pairings, and can leave at any time. The last player standing gets a winner screen with light confetti, a podium for the top three, and the full standings; the host can **Play again** with the same players.
+- **Who watches (revised).** As in Showdown tournaments, players still in the game can't watch battles in progress. Full spectating is for players who are out, and for people who join a game already under way as spectators: they enter a name, take no part in this game, and become players when the host plays again (if the room has space). At most 8 spectators. Spectators see what the public log shows (moves, items, and abilities as they're revealed, HP as percentages), never hidden sets or exact HP, with no delay.
+- **The room drawer.** A drawer on every in-game screen (the swap, a battle, the break), like Super Auto Pets' versus rooms: each player with their hearts and their team as Poké Balls (no species), fainted ones greyed while they battle, plus who's battling whom and how each battle stands. For spectators, each battle in it opens that battle.
+- **The spectator feed.** The room sends spectators a third view of each battle, its spectator log (`BattleSession.spectatorLog`), drawn with a spectator presenter: p1 at the bottom, p2 at the top, both named. Players still in never receive it.
+- **Layout.** On desktop, a grid of every live battle. With at most 8 players there are at most 4 battles, so a 2×2 grid shows them all. Each card has a compact field, both names with hearts, team balls, and the last couple of log lines; clicking one focuses it full size with the full log, and the rest move to a side rail. On phones, two battles are stacked, each a compact field with one line of text, with chips to switch quickly between battles. Full move animations play only on the focused battle; compact cards animate HP, faints, and switches. A "Last Pokémon!" badge marks a battle down to one Pokémon on either side, and on phones the closest battle moves to the top.
+- **Reactions.** Spectators can send a few fixed emoji (😮 🔥 😂 💀 💩 👀), which float over the battle for everyone watching it, including its two players. One a second per person; no text chat. A player sees reactions once their battle screen is up (one sent while it loads is dropped).
+- **Pairing.** Players with the same number of lives are paired when possible, avoiding last round's rematch. An odd player out faces the AI.
+- **Between rounds.** A sequence of about 8 s that everyone sees together, driven by the room (an `intermission` phase on the alarm):
+  1. results, with each battle's card sliding in, the winner lit and the loser's heart cracking, and eliminations stamped "Out" with a placement;
+  2. the standings, sliding in;
+  3. a VS reveal, where a quick shuffle of names lands on "You vs …" with both players' hearts (the species come in the swap phase); players who are out see every pairing instead.
+  The swap timer starts for everyone when the sequence ends. Tapping skips ahead on your own screen only. Reduced motion uses fades only.
+
+### 18.4 Phases
+
+| Phase | What                                                                                                                   | Done when                                                           |
+| ----- | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| V1    | Split the frame building out of `BattleEngine` into `SidePresenter`, working from either side                          | Daily battles unchanged; tests drive a battle from both sides (done) |
+| V2    | Worker, room Durable Object, websocket protocol, lobby (create, join, settings), reconnect tokens                       | Friends can join a room and see each other (done)                   |
+| V3    | One live battle between two players in a room: server-side sim, turn timer, disconnect grace, resume                    | Two browsers play a battle to the end (done)                        |
+| V4    | The room loop: pool and build phase, pairing by lives, swap phase, lives, elimination, the AI for odd counts, results   | A room of three plays to a winner (done)                             |
+| V5    | The room drawer, spectating for players out and late joiners (multi-battle grid, reactions), the between-round sequence, elimination and winner screens, an entry from the daily game | A late joiner watches two battles at once on a phone, and an eliminated player watches the next round (done) |
 
 ## 19. Gen 6 OU (added Oct 2026)
 

@@ -7,6 +7,11 @@ export interface BattleBackend {
   start(start: EngineStart): Promise<TurnPackage>;
   choose(choice: string): Promise<TurnPackage>;
   forfeit(): Promise<TurnPackage>;
+  /**
+   * Packages that arrive without a choice of yours: a live foe's turn, their
+   * giving up, or your clock running out. Returns an unsubscribe.
+   */
+  subscribe?(onPackage: (pkg: TurnPackage) => void): () => void;
 }
 
 let shared: Worker | null = null;
