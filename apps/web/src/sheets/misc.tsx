@@ -24,6 +24,13 @@ const GAME_BLURB: Record<FormatId, string> = {
   gen6ou: 'X and Y, with Mega Evolution and Fairy types',
 };
 
+/** The games, for phones: three options side by side must fit a 360px-wide sheet. */
+const GAME_SHORT: Record<FormatId, string> = {
+  gen4ou: 'Diamond & Pearl',
+  gen5ou: 'Black & White',
+  gen6ou: 'X & Y, Megas',
+};
+
 export function WelcomeSheet({
   open,
   hints,
@@ -85,7 +92,7 @@ export function WelcomeSheet({
             <legend className="mb-2 text-[15px] font-semibold">
               Pick your game <span className="font-normal text-muted">· you can switch later</span>
             </legend>
-            <div role="radiogroup" aria-label="Game" className="grid gap-2 sm:grid-cols-3">
+            <div role="radiogroup" aria-label="Game" className="grid grid-cols-3 gap-2">
               {(Object.keys(FORMATS) as FormatId[]).map((id) => (
                 <button
                   key={id}
@@ -94,13 +101,14 @@ export function WelcomeSheet({
                   aria-checked={format === id}
                   onClick={() => onFormat(id)}
                   className={clsx(
-                    'card px-3 py-1.5 text-left',
+                    'card px-2.5 py-1.5 text-left sm:px-3',
                     format === id ? 'is-selected' : 'hover:bg-surface-2',
                   )}
                 >
                   <span className="block text-[15px] font-semibold">{FORMATS[id].name} OU</span>
                   <span className="block text-[12px] leading-snug text-muted">
-                    {GAME_BLURB[id]}
+                    <span className="sm:hidden">{GAME_SHORT[id]}</span>
+                    <span className="hidden sm:inline">{GAME_BLURB[id]}</span>
                   </span>
                 </button>
               ))}

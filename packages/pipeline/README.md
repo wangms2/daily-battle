@@ -39,7 +39,7 @@ Each opponent candidate (`generateOpponent(day, data, candidate)`) plays 200 tea
 
 8 weeks are published, Oct 19 to Dec 7, 2026. Every pool and every day passed (no closest-candidate fallbacks). Details are in `reports/`.
 
-**Gen 6 OU** schedules are built with `schedule --format gen6ou --from 2026-10-19` into `schedule/gen6ou/` and `reports/gen6ou/`. Sampled pool teams pass `legalTeam` (the validator plus one Mega per team), the player bots Mega Evolve like the AI, and the archetypes count Assault Vest, Weakness Policy, Geomancy, and Sticky Web. On a 2-core machine a Gen 6 week takes hours, so generate on a many-core machine.
+**Gen 6 OU** schedules are built with `schedule --format gen6ou --from 2026-10-19` into `schedule/gen6ou/` and `reports/gen6ou/`. Sampled pool teams pass `legalTeam` (the validator plus one Mega per team), the player bots Mega Evolve like the AI, and the archetypes count Assault Vest, Weakness Policy, Geomancy, and Sticky Web. One week is published so far (Oct 19, 2026; every day passed, first try 46.3–53.5%). It took 42 minutes on 2 workers; the rest are generated on a many-core machine.
 
 ## Tests
 

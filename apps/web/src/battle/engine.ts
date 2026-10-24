@@ -308,7 +308,13 @@ const BLOCKED = 'That move can’t be used right now. Choose another.';
  * `||−270/304||88.8%||`); keep the shown part.
  */
 export function cleanText(text: string): string {
-  return text.replace(/\|\|[^|]*\|\|([^|]*)\|\|/g, '$1').trim();
+  return (
+    text
+      .replace(/\|\|[^|]*\|\|([^|]*)\|\|/g, '$1')
+      // The player's trainer name is "You": "reacting to your Mega Bracelet", not "You's".
+      .replace(/\bYou's\b/g, 'your')
+      .trim()
+  );
 }
 
 export class BattleEngine {

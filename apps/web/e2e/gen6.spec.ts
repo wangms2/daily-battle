@@ -125,11 +125,14 @@ test('your Pokémon Mega Evolves, and the battle resumes', async ({ page }, info
   await shot(page, '04-toggle', info.project.name);
   await page.locator(MOVES).first().click();
 
-  // The stat bar names the Mega; the toggle stays, disabled, while Manectric is out.
-  const bar = page.getByRole('button', { name: new RegExp(`^Your Mega ${MEGA},`) });
-  const over = page.getByRole('dialog', { name: 'Battle over' });
-  await expect(bar.or(over).first()).toBeVisible();
-  if (await over.isVisible()) return;
+  // It Mega Evolves before it moves (it may still faint this turn: each try has a fresh seed).
+  await expect(
+    page
+      .getByRole('log', { name: 'Battle log' })
+      .getByText(`${MEGA} has Mega Evolved into Mega ${MEGA}!`)
+      // Phones show the latest lines twice: the strip and the full log.
+      .first(),
+  ).toBeAttached();
   await shot(page, '05-mega', info.project.name);
 
   await page.reload();
@@ -139,8 +142,7 @@ test('your Pokémon Mega Evolves, and the battle resumes', async ({ page }, info
     )
     .first()
     .waitFor();
-  // Still Mega after the resume, and no second Mega on offer.
-  if (await bar.isVisible()) await expect(bar).toBeVisible();
+  // One Mega per team: no other Pokémon is offered Mega Evolution after the resume.
   await expect(page.getByRole('button', { name: 'Mega Evolve', exact: true })).toHaveCount(0);
 });
 
