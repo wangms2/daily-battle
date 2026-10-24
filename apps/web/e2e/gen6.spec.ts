@@ -94,20 +94,26 @@ test('the builder allows one Mega per team', async ({ page }, info) => {
   };
   const first = await add(MEGA);
   await first?.getByRole('button', { name: `Add ${MEGA}` }).click();
-  await expect(page.getByRole('button', { name: `Remove ${MEGA} from team` })).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: `Remove ${MEGA} from team` }).first(),
+  ).toBeVisible();
 
   // Gardevoir's most used set holds Gardevoirite: a second Mega Stone is blocked.
   const second = await add(SECOND_MEGA);
   const message = page.getByText(`Only one Mega per team. ${MEGA} has the Mega Stone.`);
   await expect(message).toBeVisible();
-  if (second) await expect(second.getByRole('button', { name: `Add ${SECOND_MEGA}` })).toBeDisabled();
+  if (second)
+    await expect(second.getByRole('button', { name: `Add ${SECOND_MEGA}` })).toBeDisabled();
   await shot(page, '03-one-mega', info.project.name);
-  await expect(page.getByRole('button', { name: `Remove ${SECOND_MEGA} from team` })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: `Remove ${SECOND_MEGA} from team` })).toHaveCount(
+    0,
+  );
 });
 
 test('your Pokémon Mega Evolves, and the battle resumes', async ({ page }, info) => {
   await open(page, gen6State());
-  await page.getByRole('button', { name: `Lead with ${MEGA}` }).click();
+  // The first of the team leads by default: Manectric.
+  await expect(page.getByRole('button', { name: `${MEGA}, leading` })).toBeVisible();
   await page.getByRole('button', { name: `Start · ${MEGA} leads` }).click();
   await page.locator(MOVES).first().waitFor();
 
