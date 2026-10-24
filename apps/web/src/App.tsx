@@ -159,6 +159,7 @@ export function App() {
     change: dayState.change,
     url: shareUrl(),
     game: game.name,
+    format,
   });
   const countdown = countdownTo(now, addDays(day, 1));
   const setSetting = <K extends keyof Settings>(key: K, value: Settings[K]) =>
