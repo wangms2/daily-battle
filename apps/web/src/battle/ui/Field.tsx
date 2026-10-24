@@ -172,7 +172,7 @@ function StatBar({
       }}
       onPointerEnter={(e) => e.pointerType === 'mouse' && onInfo(who, 'hover')}
       onPointerLeave={(e) => e.pointerType === 'mouse' && onInfo(null, 'hover')}
-      aria-label={`${who === 'foe' ? 'Foe' : 'Your'} ${mon.species}, ${mon.hp}% HP${mon.status ? `, ${STATUS_LABEL[mon.status]}` : ''}, ${left} of 6 left. Details`}
+      aria-label={`${who === 'foe' ? 'Foe' : 'Your'} ${mon.species}, ${mon.hp}% HP${mon.status ? `, ${STATUS_LABEL[mon.status]}` : ''}, ${left} of ${marks.length} left. Details`}
       className="statbar absolute z-10 w-[9.75rem] text-left"
       style={style}
     >
@@ -575,7 +575,7 @@ export function Field({
           className="statbar absolute z-10 rounded-[4px] px-1 py-0.5"
           style={{ left: foeBarLeft(null), top: FOE_BAR_TOP }}
           role="img"
-          aria-label={`Foe has ${view.foeTeam.filter((m) => !m.fainted).length} of 6 left`}
+          aria-label={`Foe has ${view.foeTeam.filter((m) => !m.fainted).length} of ${view.foeTeam.length} left`}
         >
           <TeamMarks marks={view.foeTeam} />
         </span>

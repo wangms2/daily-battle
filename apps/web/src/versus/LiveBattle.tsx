@@ -1,6 +1,6 @@
 // A live battle against a friend, on the daily game's battle screen. Loaded
 // on demand: it brings the presenter (and with it the simulator's data).
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { BattleBackendContext } from '../battle/backend';
 import type { EngineStart, TurnPackage } from '../battle/frames';
 import { setActiveFormat } from '../lib/data';
@@ -11,7 +11,8 @@ import { Button } from '../ui/bits';
 import { Countdown } from './Countdown';
 import { remoteBackend } from './remoteBackend';
 import type { Feed } from './feed';
-import type { LocalMatch, SideMessage } from './useRoom';
+import { FloatingReactions } from './Reactions';
+import type { LocalMatch, ReactionEvent, SideMessage } from './useRoom';
 
 function endText(match: LocalMatch, end: NonNullable<TurnPackage['end']>, gaveUp: boolean) {
   const foe = match.opponent.name;
@@ -50,6 +51,8 @@ export default function LiveBattle({
   onSetting,
   onExplainerSeen,
   onBack,
+  right,
+  reactions,
 }: {
   match: LocalMatch;
   feed: Feed<SideMessage>;
@@ -59,6 +62,10 @@ export default function LiveBattle({
   onSetting: <K extends keyof Settings>(key: K, value: Settings[K]) => void;
   onExplainerSeen: (id: string) => void;
   onBack: () => void;
+  /** The room drawer. */
+  right?: ReactNode;
+  /** Spectators' reactions, some to this battle. */
+  reactions: Feed<ReactionEvent>;
 }) {
   setActiveFormat(match.format);
   // One backend and one opening for the battle's life on screen.
@@ -87,7 +94,12 @@ export default function LiveBattle({
         onChoice={() => {}}
         onEnd={() => {}}
         onExit={onBack}
-        topBarRight={<Countdown ms={match.timeLeftMs} at={match.receivedAt} />}
+        topBarRight={
+          <>
+            <Countdown ms={match.timeLeftMs} at={match.receivedAt} />
+            {right}
+          </>
+        }
         live={{
           waiting: `Waiting for ${foe}…`,
           giveUpBody: `${foe} wins this battle.`,
@@ -107,6 +119,8 @@ export default function LiveBattle({
           },
         }}
       />
+      {/* Spectators' reactions float up over the top of the screen. */}
+      <FloatingReactions feed={reactions} match={match.id} top />
     </BattleBackendContext.Provider>
   );
 }

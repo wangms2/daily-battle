@@ -4,15 +4,18 @@ import { cleanName, ERROR_TEXT, normalizeCode, type ErrorCode } from '@daily-bat
 import { lazy, Suspense, useState, type ReactNode } from 'react';
 import type { Settings } from '../state/schema';
 import { Button } from '../ui/bits';
-import { BuildScreen, GameOverScreen, IntermissionScreen, RoundScreen } from './GameScreens';
+import { BreakScreen, GameOverScreen } from './Break';
+import { BuildScreen, RoundScreen } from './GameScreens';
 import { Lobby } from './Lobby';
 import { Page } from './Page';
 import { PrepScreen } from './PrepScreen';
+import { RoomDrawer } from './RoomDrawer';
 import { savedName, saveName } from './saved';
 import { createRoom, useRoom, type EndReason } from './useRoom';
 
 // The battle screen brings the simulator's data, so it loads when a battle starts.
 const LiveBattle = lazy(() => import('./LiveBattle'));
+const SpectateScreen = lazy(() => import('./watch/SpectateScreen'));
 
 /** What the battle screen needs from the app: your battle settings. */
 export interface BattleSettings {
@@ -200,7 +203,12 @@ function RoomScreen({
       room.leave();
       onExit();
     };
-    const common = { room: view, you, at, onLeave: leave, onBack: onExit };
+    // Watching battles in progress is for spectators and players already out.
+    const watcher =
+      view.spectators.some((s) => s.id === you) ||
+      view.players.some((p) => p.id === you && p.place !== null);
+    const drawer = <RoomDrawer room={view} you={you} />;
+    const common = { room: view, you, at, onLeave: leave, onBack: onExit, right: drawer };
     // Your battle: the swap before it, the battle itself (a finished one only
     // if you saw it here, until you go back to the room).
     const watchable =
@@ -221,6 +229,7 @@ function RoomScreen({
             onLead={room.lead}
             onReady={room.ready}
             onBack={toRoom}
+            right={drawer}
           />
         ) : (
           <Suspense fallback={<p className="py-10 text-center text-muted">Loading the battle…</p>}>
@@ -232,9 +241,26 @@ function RoomScreen({
               forfeit={room.forfeit}
               {...battle}
               onBack={toRoom}
+              right={drawer}
+              reactions={room.reactions}
             />
           </Suspense>
         );
+    } else if (view.phase === 'playing' && watcher) {
+      screen = (
+        <Suspense fallback={<p className="py-10 text-center text-muted">Loading the battles…</p>}>
+          <SpectateScreen
+            room={view}
+            you={you}
+            watchFeedFor={room.watchFeedFor}
+            reactions={room.reactions}
+            onReact={room.react}
+            onBack={onExit}
+          />
+        </Suspense>
+      );
+    } else if (view.phase === 'build' && !view.players.some((p) => p.id === you)) {
+      screen = <RoundScreen {...common} note="The players are building their teams." />;
     } else if (view.phase === 'build') {
       screen = (
         <BuildScreen
@@ -252,7 +278,7 @@ function RoomScreen({
         />
       );
     } else if (view.phase === 'intermission') {
-      screen = <IntermissionScreen {...common} />;
+      screen = <BreakScreen {...common} />;
     } else if (view.phase === 'over') {
       screen = <GameOverScreen {...common} onPlayAgain={room.playAgain} />;
     } else {
