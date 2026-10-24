@@ -1,6 +1,6 @@
 // Gen 6 OU as a third daily game: picking it on first run, a battle where your
 // Pokémon Mega Evolves (and the battle resumes after a reload), the one-Mega
-// rule in the team builder, and the news sheet a returning player sees once.
+// rule in the team builder. (The news sheet is Gen 3's now: gen3.spec.ts.)
 import { expect, test, type Page } from '@playwright/test';
 import schedule from '../public/schedule/gen6ou/2026-10-19.json' with { type: 'json' };
 
@@ -34,7 +34,7 @@ function gen6State({ locked = true } = {}) {
       beginnerHints: true,
       battleSpeed: 'instant',
       animations: true,
-      shownExplainers: ['welcome', 'gen5-news', 'gen6-news'],
+      shownExplainers: ['welcome', 'gen5-news', 'gen6-news', 'gen3-news'],
       format: 'gen6ou',
     },
   };

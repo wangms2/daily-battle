@@ -1,0 +1,331 @@
+{
+  "version": 1,
+  "generatorVersion": 4,
+  "dataBuiltAt": "2026-10-24T16:51:53.962Z",
+  "week": "2026-10-19",
+  "pool": {
+    "species": [
+      "Forretress",
+      "Skarmory",
+      "Heracross",
+      "Swampert",
+      "Zapdos",
+      "Charizard",
+      "Dugtrio",
+      "Milotic",
+      "Flygon",
+      "Tyranitar",
+      "Alakazam",
+      "Regirock"
+    ],
+    "candidate": 0
+  },
+  "suggestedTeams": [
+    {
+      "archetype": "Balanced",
+      "team": [
+        {
+          "species": "Regirock",
+          "setId": "regirock-curse"
+        },
+        {
+          "species": "Swampert",
+          "setId": "swampert-standard-defensive"
+        },
+        {
+          "species": "Flygon",
+          "setId": "flygon-defensive"
+        },
+        {
+          "species": "Zapdos",
+          "setId": "zapdos-mixed"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-bulky-physical-attacker"
+        },
+        {
+          "species": "Skarmory",
+          "setId": "skarmory-standard"
+        }
+      ]
+    },
+    {
+      "archetype": "Offense",
+      "team": [
+        {
+          "species": "Charizard",
+          "setId": "charizard-mixed-attacker"
+        },
+        {
+          "species": "Skarmory",
+          "setId": "skarmory-offensive-spikes"
+        },
+        {
+          "species": "Swampert",
+          "setId": "swampert-standard-offensive"
+        },
+        {
+          "species": "Flygon",
+          "setId": "flygon-offensive"
+        },
+        {
+          "species": "Heracross",
+          "setId": "heracross-standard"
+        },
+        {
+          "species": "Zapdos",
+          "setId": "zapdos-standard-offensive"
+        }
+      ]
+    },
+    {
+      "archetype": "Stall",
+      "team": [
+        {
+          "species": "Regirock",
+          "setId": "regirock-curse"
+        },
+        {
+          "species": "Swampert",
+          "setId": "swampert-standard-defensive"
+        },
+        {
+          "species": "Zapdos",
+          "setId": "zapdos-rest"
+        },
+        {
+          "species": "Flygon",
+          "setId": "flygon-defensive"
+        },
+        {
+          "species": "Milotic",
+          "setId": "milotic-standard"
+        },
+        {
+          "species": "Forretress",
+          "setId": "forretress-standard"
+        }
+      ]
+    }
+  ],
+  "days": [
+    {
+      "day": "2026-10-19",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Umbreon",
+          "setId": "umbreon-wishpasser"
+        },
+        {
+          "species": "Porygon2",
+          "setId": "porygon2-standard"
+        },
+        {
+          "species": "Gengar",
+          "setId": "gengar-defensive"
+        },
+        {
+          "species": "Zapdos",
+          "setId": "zapdos-rest"
+        },
+        {
+          "species": "Regice",
+          "setId": "regice-offensive"
+        },
+        {
+          "species": "Snorlax",
+          "setId": "snorlax-offensive-curse"
+        }
+      ],
+      "candidate": 6
+    },
+    {
+      "day": "2026-10-20",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Forretress",
+          "setId": "forretress-standard"
+        },
+        {
+          "species": "Suicune",
+          "setId": "suicune-modest-resttalk"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-bulky-physical-attacker"
+        },
+        {
+          "species": "Moltres",
+          "setId": "moltres-standard"
+        },
+        {
+          "species": "Celebi",
+          "setId": "celebi-utility"
+        },
+        {
+          "species": "Skarmory",
+          "setId": "skarmory-standard"
+        }
+      ],
+      "candidate": 1
+    },
+    {
+      "day": "2026-10-21",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Celebi",
+          "setId": "celebi-defensive-calm-mind"
+        },
+        {
+          "species": "Metagross",
+          "setId": "metagross-agility"
+        },
+        {
+          "species": "Camerupt",
+          "setId": "camerupt-tank"
+        },
+        {
+          "species": "Armaldo",
+          "setId": "armaldo-knock-off"
+        },
+        {
+          "species": "Suicune",
+          "setId": "suicune-modest-resttalk"
+        },
+        {
+          "species": "Flygon",
+          "setId": "flygon-defensive"
+        }
+      ],
+      "candidate": 1
+    },
+    {
+      "day": "2026-10-22",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Jirachi",
+          "setId": "jirachi-defensive"
+        },
+        {
+          "species": "Snorlax",
+          "setId": "snorlax-utility-lax"
+        },
+        {
+          "species": "Starmie",
+          "setId": "starmie-defensive"
+        },
+        {
+          "species": "Jolteon",
+          "setId": "jolteon-standard"
+        },
+        {
+          "species": "Swampert",
+          "setId": "swampert-standard-offensive"
+        },
+        {
+          "species": "Rhydon",
+          "setId": "rhydon-substitute"
+        }
+      ],
+      "candidate": 11
+    },
+    {
+      "day": "2026-10-23",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Jolteon",
+          "setId": "jolteon-standard"
+        },
+        {
+          "species": "Gengar",
+          "setId": "gengar-utility"
+        },
+        {
+          "species": "Regirock",
+          "setId": "regirock-curse"
+        },
+        {
+          "species": "Scizor",
+          "setId": "scizor-swords-dance"
+        },
+        {
+          "species": "Dusclops",
+          "setId": "dusclops-staller"
+        },
+        {
+          "species": "Starmie",
+          "setId": "starmie-offensive"
+        }
+      ],
+      "candidate": 1
+    },
+    {
+      "day": "2026-10-24",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Medicham",
+          "setId": "medicham-reversal"
+        },
+        {
+          "species": "Metagross",
+          "setId": "metagross-bulky-attacker"
+        },
+        {
+          "species": "Swampert",
+          "setId": "swampert-standard-offensive"
+        },
+        {
+          "species": "Moltres",
+          "setId": "moltres-standard"
+        },
+        {
+          "species": "Zapdos",
+          "setId": "zapdos-rest"
+        },
+        {
+          "species": "Jolteon",
+          "setId": "jolteon-substitute-pass"
+        }
+      ],
+      "candidate": 11
+    },
+    {
+      "day": "2026-10-25",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Quagsire",
+          "setId": "quagsire-curse"
+        },
+        {
+          "species": "Charizard",
+          "setId": "charizard-mixed-attacker"
+        },
+        {
+          "species": "Starmie",
+          "setId": "starmie-offensive"
+        },
+        {
+          "species": "Claydol",
+          "setId": "claydol-utility"
+        },
+        {
+          "species": "Gengar",
+          "setId": "gengar-utility"
+        },
+        {
+          "species": "Registeel",
+          "setId": "registeel-mixed-wall"
+        }
+      ],
+      "candidate": 18
+    }
+  ]
+}

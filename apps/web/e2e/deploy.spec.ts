@@ -35,7 +35,7 @@ test('the game runs under the production CSP', async ({ page }) => {
             beginnerHints: true,
             battleSpeed: 'instant',
             animations: true,
-            shownExplainers: ['welcome', 'gen5-news', 'gen6-news'],
+            shownExplainers: ['welcome', 'gen5-news', 'gen6-news', 'gen3-news'],
           },
         }),
       );

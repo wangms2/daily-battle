@@ -1,6 +1,6 @@
 # @daily-battle/data
 
-Set snapshots for Gen 4 OU, Gen 5 OU, and Gen 6 OU: 2–4 usage-weighted sets per species, each with a player-facing role label and one-line description. The generators (M3) and the AI's set priors (M4) read them.
+Set snapshots for Gen 3 OU, Gen 4 OU, Gen 5 OU, and Gen 6 OU: 2–4 usage-weighted sets per species, each with a player-facing role label and one-line description. The generators (M3) and the AI's set priors (M4) read them.
 
 ```ts
 import { sets, setsFor } from '@daily-battle/data';
@@ -19,6 +19,7 @@ setsFor('gen5ou').species['Politoed'].sets; // any format in src/formats.ts
 | `sources/gen4ou-stats.json`                         | [Smogon monthly usage stats](https://www.smogon.com/stats/), `chaos/gen4ou-1500.json`, trimmed to the fields we use, plus natures summed from spreads                                                                        | Usage statistics from Pokémon Showdown ladder play                  |
 | `sources/gen4ou-sources.json`                       | URLs, fetch time, stats month, cutoff, and battle count                                                                                                                                                                      |                                                                     |
 | `sources/gen5ou-*.json`, `sources/gen5uu-sets.json` | The same files for Gen 5 OU, from `gen5ou`, `gen5uu`, and `chaos/gen5ou-1500.json`                                                                                                                                           | As above                                                            |
+| `sources/gen3ou-*.json`, `sources/gen3uu-sets.json` | The same files for Gen 3 OU, from `gen3ou`, `gen3uu`, and pkmn's processed Gen 3 OU stats (`refresh --mirror`, as for Gen 6)                                                                                                 | As above                                                            |
 | `sources/gen6ou-*.json`, `sources/gen6uu-sets.json` | The same files for Gen 6 OU, from `gen6ou`, `gen6uu`, and pkmn's processed Gen 6 OU stats (`refresh --mirror`: smogon.com and data.pkmn.cc weren't reachable; same month and battles, but pkmn's choice of cutoff, not 1500) | As above                                                            |
 
 `@smogon/sets` (the source DESIGN.md first named) isn't used. Its last release was in July 2021, and its stats-derived sets are a single naive set per species.
@@ -81,3 +82,14 @@ Built the same way (`--format gen6ou`). The differences are Mega Evolution and a
 - **One Mega per team** is our own rule. `oneMegaProblem` and `megaCount` in `@daily-battle/data/species` are the shared check (message `ONE_MEGA_MESSAGE`), used by the sim bridge, generator, pipeline, and web client.
 - **Roles:** "Mega" prefixes a Mega set's label ("Mega Dragon Dance sweeper", "Mega X …" and "Mega Y …" for Charizard), and the rules gained Assault Vest, Sticky Web, Defog, Parting Shot, and Weakness Policy. None of these can change a Gen 4 or 5 label. `gen6ou/role-overrides.json` covers the rest.
 - **Curation** (`gen6ou/set-curation.json`): 16 hand-added sets for species whose analyses had a single distinct set.
+
+## Gen 3 OU
+
+Built the same way (`--format gen3ou`), with these differences in `BUILD_RULES` in `src/build.ts` and in `gen3ou/`:
+
+- **Species:** 76, 197 sets, 2–4 each. Gen 3's playable OU is smaller than later gens'. **Ditto** is left out as in Gen 5 and 6, and **Wobbuffet**, whose Shadow Tag with Counter and Mirror Coat plays as a coin flip against a hidden set.
+- **Boost passers:** ADV's One Boost Passer Clause allows one Pokémon per team that can raise its stats and Baton Pass. Sets that do both (`noBoostPassers`; Calm Mind Celebi, Acid Armor Vaporeon, Curse Umbreon) are dropped, so any 6 of a pool are legal. Baton Pass sets that don't boost (Wish passers, Substitute Jolteon) stay. Every cross-species pair of sets passes the validator.
+- **Bans and clauses:** the validator's gen3ou rules: Ubers, Sand Veil, Soundproof, Quick Claw, Assist, Swagger, Smeargle + Ingrain, and Baton Pass with trapping; Sleep Clause Mod, Freeze Clause Mod, Accuracy Trap Clause, One Boost Passer Clause, and Speed Pass Clause.
+- **Species facts** (`gen3ou/species.json`): 17 types. Move categories come from the Gen 3 dex, so they follow the move's type (Crunch is special, Shadow Ball physical).
+- **Curation** (`gen3ou/set-curation.json`): 23 hand-added sets for species whose analyses had a single distinct set, each checked against the validator.
+- **Roles:** `gen3ou/role-overrides.json` relabels 63 sets whose analysis names came through as labels ("Utility Lax", "WishPasser", "Parafusion") or whose role rule missed (Perish trappers, Pursuit trappers, rain and sun sweepers).

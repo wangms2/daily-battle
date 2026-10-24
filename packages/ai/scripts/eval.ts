@@ -1,8 +1,8 @@
 // Plays the AI against comparison bots on generated content (DESIGN.md §13 M4).
-//   pnpm --filter @daily-battle/ai eval [--n 200] [--assert] [--debug] [--styles]
+//   pnpm --filter @daily-battle/ai eval [--n 200] [--assert] [--debug] [--styles] [--format gen4ou]
 // Each matchup pairs a team drawn from a weekly pool with that week's daily
 // opponent, and is played twice with the policies swapped between the teams.
-import { sets } from '@daily-battle/data';
+import { setsFor } from '@daily-battle/data';
 import {
   addDays,
   generateOpponent,
@@ -32,11 +32,14 @@ const DEBUG = process.argv.includes('--debug');
 /** Also report the opponent AI's behavior per style preset (slower; M9). */
 const STYLES = process.argv.includes('--styles');
 const START = '2026-01-05';
+/** The format to play, Gen 4 OU unless `--format` says otherwise. */
+const FORMAT = arg('format') ?? 'gen4ou';
+const sets = setsFor(FORMAT);
 
 /** A pool team: 6 of the week's 12, sets drawn by weight. */
 function poolTeam(i: number, week: string): PokemonSet[] {
   const rng = rngFor(`eval:pool-team:${i}`);
-  const species = [...generatePool(week).species];
+  const species = [...generatePool(week, sets).species];
   const team: PokemonSet[] = [];
   for (let k = 0; k < 6; k++) {
     const name = species.splice(Math.floor(rng() * species.length), 1)[0]!;
@@ -51,7 +54,7 @@ function poolTeam(i: number, week: string): PokemonSet[] {
 const matchups = Array.from({ length: N }, (_, i) => {
   const week = addDays(START, 7 * Math.floor(i / 7));
   const day = addDays(week, i % 7);
-  return { i, a: poolTeam(i, week), b: teamSets(sets, generateOpponent(day).team) };
+  return { i, a: poolTeam(i, week), b: teamSets(sets, generateOpponent(day, sets).team) };
 });
 
 interface Totals {
@@ -90,6 +93,7 @@ function play(label: string, makeA: () => Policy, makeB: () => Policy): Totals {
         },
       };
       const result = runBattle({
+        format: FORMAT,
         seed: deriveSeed(`eval:${label}:battle`, 2 * i + Number(swap)),
         p1: { team: swap ? b : a, policy: timed, seed: deriveSeed(`eval:${label}:p1`, i) },
         p2: { team: swap ? a : b, policy: pb, seed: deriveSeed(`eval:${label}:p2`, i) },
@@ -115,7 +119,7 @@ const rows: [string, Totals, number | null][] = [
     'mid vs random',
     play(
       'mid-random',
-      () => midBot(),
+      () => midBot({ data: sets }),
       () => new RandomPolicy(),
     ),
     0.9,
@@ -124,8 +128,8 @@ const rows: [string, Totals, number | null][] = [
     'mid vs naive',
     play(
       'mid-naive',
-      () => midBot(),
-      () => new NaivePolicy(),
+      () => midBot({ data: sets }),
+      () => new NaivePolicy(sets),
     ),
     0.6,
   ],
@@ -133,8 +137,8 @@ const rows: [string, Totals, number | null][] = [
     'strong vs mid',
     play(
       'strong-mid',
-      () => strongBot(),
-      () => midBot(),
+      () => strongBot({ data: sets }),
+      () => midBot({ data: sets }),
     ),
     0.5,
   ],
@@ -142,7 +146,7 @@ const rows: [string, Totals, number | null][] = [
     'naive vs random',
     play(
       'naive-random',
-      () => new NaivePolicy(),
+      () => new NaivePolicy(sets),
       () => new RandomPolicy(),
     ),
     null,
@@ -186,8 +190,8 @@ if (STYLES) console.log('Opponent AI by style (vs mid):');
 for (const style of STYLES ? (['offense', 'balance', 'stall'] as const) : []) {
   const t = play(
     `style-${style}`,
-    () => aiForStyle(style),
-    () => midBot(),
+    () => aiForStyle(style, { data: sets }),
+    () => midBot({ data: sets }),
   );
   const total = (f: (s: PolicyStats) => number) => t.stats.reduce((a, s) => a + f(s), 0);
   const moves = total((s) => s.moveDecisions);

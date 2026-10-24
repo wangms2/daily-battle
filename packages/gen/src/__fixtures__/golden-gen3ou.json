@@ -1,0 +1,746 @@
+{
+  "generatorVersion": 4,
+  "weeks": {
+    "2026-10-19": {
+      "pool": {
+        "generatorVersion": 4,
+        "week": "2026-10-19",
+        "species": [
+          "Forretress",
+          "Skarmory",
+          "Heracross",
+          "Swampert",
+          "Zapdos",
+          "Charizard",
+          "Dugtrio",
+          "Milotic",
+          "Flygon",
+          "Tyranitar",
+          "Alakazam",
+          "Regirock"
+        ],
+        "attempts": 18
+      },
+      "opponents": [
+        {
+          "generatorVersion": 4,
+          "day": "2026-10-19",
+          "style": "balance",
+          "team": [
+            {
+              "species": "Flygon",
+              "setId": "flygon-defensive"
+            },
+            {
+              "species": "Blissey",
+              "setId": "blissey-utility"
+            },
+            {
+              "species": "Suicune",
+              "setId": "suicune-substitute"
+            },
+            {
+              "species": "Gardevoir",
+              "setId": "gardevoir-special-sweeper"
+            },
+            {
+              "species": "Tyranitar",
+              "setId": "tyranitar-bulky-dragon-dance"
+            },
+            {
+              "species": "Jirachi",
+              "setId": "jirachi-superachi-offensive-calm-mind"
+            }
+          ],
+          "attempts": 1
+        },
+        {
+          "generatorVersion": 4,
+          "day": "2026-10-20",
+          "style": "stall",
+          "team": [
+            {
+              "species": "Magneton",
+              "setId": "magneton-trapper"
+            },
+            {
+              "species": "Milotic",
+              "setId": "milotic-standard"
+            },
+            {
+              "species": "Skarmory",
+              "setId": "skarmory-standard"
+            },
+            {
+              "species": "Forretress",
+              "setId": "forretress-physically-defensive"
+            },
+            {
+              "species": "Blaziken",
+              "setId": "blaziken-special-attacker"
+            },
+            {
+              "species": "Aerodactyl",
+              "setId": "aerodactyl-choice-band"
+            }
+          ],
+          "attempts": 2
+        },
+        {
+          "generatorVersion": 4,
+          "day": "2026-10-21",
+          "style": "stall",
+          "team": [
+            {
+              "species": "Skarmory",
+              "setId": "skarmory-standard"
+            },
+            {
+              "species": "Zapdos",
+              "setId": "zapdos-standard-offensive"
+            },
+            {
+              "species": "Porygon2",
+              "setId": "porygon2-standard"
+            },
+            {
+              "species": "Dugtrio",
+              "setId": "dugtrio-choice-band"
+            },
+            {
+              "species": "Registeel",
+              "setId": "registeel-mixed-wall"
+            },
+            {
+              "species": "Swampert",
+              "setId": "swampert-standard-offensive"
+            }
+          ],
+          "attempts": 3
+        },
+        {
+          "generatorVersion": 4,
+          "day": "2026-10-22",
+          "style": "balance",
+          "team": [
+            {
+              "species": "Salamence",
+              "setId": "salamence-mixed"
+            },
+            {
+              "species": "Starmie",
+              "setId": "starmie-offensive"
+            },
+            {
+              "species": "Vaporeon",
+              "setId": "vaporeon-substitute-wishpass"
+            },
+            {
+              "species": "Metagross",
+              "setId": "metagross-bulky-attacker"
+            },
+            {
+              "species": "Sceptile",
+              "setId": "sceptile-subseed"
+            },
+            {
+              "species": "Aerodactyl",
+              "setId": "aerodactyl-choice-band"
+            }
+          ],
+          "attempts": 1
+        },
+        {
+          "generatorVersion": 4,
+          "day": "2026-10-23",
+          "style": "balance",
+          "team": [
+            {
+              "species": "Porygon2",
+              "setId": "porygon2-standard"
+            },
+            {
+              "species": "Zapdos",
+              "setId": "zapdos-standard-offensive"
+            },
+            {
+              "species": "Raikou",
+              "setId": "raikou-calm-mind-sweeper"
+            },
+            {
+              "species": "Starmie",
+              "setId": "starmie-offensive"
+            },
+            {
+              "species": "Tyranitar",
+              "setId": "tyranitar-bulky-dragon-dance"
+            },
+            {
+              "species": "Blissey",
+              "setId": "blissey-utility"
+            }
+          ],
+          "attempts": 1
+        },
+        {
+          "generatorVersion": 4,
+          "day": "2026-10-24",
+          "style": "balance",
+          "team": [
+            {
+              "species": "Charizard",
+              "setId": "charizard-mixed-attacker"
+            },
+            {
+              "species": "Metagross",
+              "setId": "metagross-mixed"
+            },
+            {
+              "species": "Aerodactyl",
+              "setId": "aerodactyl-choice-band"
+            },
+            {
+              "species": "Heracross",
+              "setId": "heracross-choice-band"
+            },
+            {
+              "species": "Misdreavus",
+              "setId": "misdreavus-perish-trapper"
+            },
+            {
+              "species": "Linoone",
+              "setId": "linoone-subflail"
+            }
+          ],
+          "attempts": 1
+        },
+        {
+          "generatorVersion": 4,
+          "day": "2026-10-25",
+          "style": "balance",
+          "team": [
+            {
+              "species": "Metagross",
+              "setId": "metagross-agility"
+            },
+            {
+              "species": "Gengar",
+              "setId": "gengar-defensive"
+            },
+            {
+              "species": "Milotic",
+              "setId": "milotic-standard"
+            },
+            {
+              "species": "Swampert",
+              "setId": "swampert-standard-defensive"
+            },
+            {
+              "species": "Dugtrio",
+              "setId": "dugtrio-choice-band"
+            },
+            {
+              "species": "Blissey",
+              "setId": "blissey-utility"
+            }
+          ],
+          "attempts": 1
+        }
+      ]
+    },
+    "2026-10-26": {
+      "pool": {
+        "generatorVersion": 4,
+        "week": "2026-10-26",
+        "species": [
+          "Flygon",
+          "Zapdos",
+          "Medicham",
+          "Starmie",
+          "Forretress",
+          "Blissey",
+          "Jolteon",
+          "Aerodactyl",
+          "Slaking",
+          "Gardevoir",
+          "Machamp",
+          "Quagsire"
+        ],
+        "attempts": 18
+      },
+      "opponents": [
+        {
+          "generatorVersion": 4,
+          "day": "2026-10-26",
+          "style": "stall",
+          "team": [
+            {
+              "species": "Claydol",
+              "setId": "claydol-utility"
+            },
+            {
+              "species": "Celebi",
+              "setId": "celebi-offensive"
+            },
+            {
+              "species": "Vaporeon",
+              "setId": "vaporeon-substitute-wishpass"
+            },
+            {
+              "species": "Quagsire",
+              "setId": "quagsire-curse-rest"
+            },
+            {
+              "species": "Slowbro",
+              "setId": "slowbro-defensive"
+            },
+            {
+              "species": "Forretress",
+              "setId": "forretress-physically-defensive"
+            }
+          ],
+          "attempts": 1
+        },
+        {
+          "generatorVersion": 4,
+          "day": "2026-10-27",
+          "style": "balance",
+          "team": [
+            {
+              "species": "Tyranitar",
+              "setId": "tyranitar-bulky-dragon-dance"
+            },
+            {
+              "species": "Skarmory",
+              "setId": "skarmory-standard"
+            },
+            {
+              "species": "Charizard",
+              "setId": "charizard-sun"
+            },
+            {
+              "species": "Zapdos",
+              "setId": "zapdos-standard-offensive"
+            },
+            {
+              "species": "Claydol",
+              "setId": "claydol-utility"
+            },
+            {
+              "species": "Breloom",
+              "setId": "breloom-spore"
+            }
+          ],
+          "attempts": 1
+        },
+        {
+          "generatorVersion": 4,
+          "day": "2026-10-28",
+          "style": "balance",
+          "team": [
+            {
+              "species": "Sableye",
+              "setId": "sableye-physically-defensive"
+            },
+            {
+              "species": "Cloyster",
+              "setId": "cloyster-spiker"
+            },
+            {
+              "species": "Metagross",
+              "setId": "metagross-choice-band"
+            },
+            {
+              "species": "Tyranitar",
+              "setId": "tyranitar-bulky-physical-attacker"
+            },
+            {
+              "species": "Dugtrio",
+              "setId": "dugtrio-choice-band"
+            },
+            {
+              "species": "Zapdos",
+              "setId": "zapdos-standard-offensive"
+            }
+          ],
+          "attempts": 1
+        },
+        {
+          "generatorVersion": 4,
+          "day": "2026-10-29",
+          "style": "balance",
+          "team": [
+            {
+              "species": "Aerodactyl",
+              "setId": "aerodactyl-choice-band"
+            },
+            {
+              "species": "Swampert",
+              "setId": "swampert-standard-defensive"
+            },
+            {
+              "species": "Marowak",
+              "setId": "marowak-all-out-attacker"
+            },
+            {
+              "species": "Snorlax",
+              "setId": "snorlax-offensive-curse"
+            },
+            {
+              "species": "Gengar",
+              "setId": "gengar-offensive"
+            },
+            {
+              "species": "Regirock",
+              "setId": "regirock-physical-attacker"
+            }
+          ],
+          "attempts": 2
+        },
+        {
+          "generatorVersion": 4,
+          "day": "2026-10-30",
+          "style": "offense",
+          "team": [
+            {
+              "species": "Cloyster",
+              "setId": "cloyster-spiker"
+            },
+            {
+              "species": "Tyranitar",
+              "setId": "tyranitar-bulky-physical-attacker"
+            },
+            {
+              "species": "Ludicolo",
+              "setId": "ludicolo-rain-dance-sweeper"
+            },
+            {
+              "species": "Snorlax",
+              "setId": "snorlax-offensive-curse"
+            },
+            {
+              "species": "Aerodactyl",
+              "setId": "aerodactyl-taunt-lead"
+            },
+            {
+              "species": "Dugtrio",
+              "setId": "dugtrio-choice-band"
+            }
+          ],
+          "attempts": 1
+        },
+        {
+          "generatorVersion": 4,
+          "day": "2026-10-31",
+          "style": "stall",
+          "team": [
+            {
+              "species": "Registeel",
+              "setId": "registeel-mixed-wall"
+            },
+            {
+              "species": "Blissey",
+              "setId": "blissey-calm-mind"
+            },
+            {
+              "species": "Forretress",
+              "setId": "forretress-standard"
+            },
+            {
+              "species": "Swampert",
+              "setId": "swampert-standard-defensive"
+            },
+            {
+              "species": "Starmie",
+              "setId": "starmie-offensive"
+            },
+            {
+              "species": "Claydol",
+              "setId": "claydol-utility"
+            }
+          ],
+          "attempts": 1
+        },
+        {
+          "generatorVersion": 4,
+          "day": "2026-11-01",
+          "style": "balance",
+          "team": [
+            {
+              "species": "Milotic",
+              "setId": "milotic-standard"
+            },
+            {
+              "species": "Starmie",
+              "setId": "starmie-defensive"
+            },
+            {
+              "species": "Gengar",
+              "setId": "gengar-defensive"
+            },
+            {
+              "species": "Snorlax",
+              "setId": "snorlax-offensive-curse"
+            },
+            {
+              "species": "Smeargle",
+              "setId": "smeargle-standard-spikes-lead"
+            },
+            {
+              "species": "Aerodactyl",
+              "setId": "aerodactyl-choice-band"
+            }
+          ],
+          "attempts": 3
+        }
+      ]
+    },
+    "2027-01-04": {
+      "pool": {
+        "generatorVersion": 4,
+        "week": "2027-01-04",
+        "species": [
+          "Gyarados",
+          "Breloom",
+          "Swampert",
+          "Moltres",
+          "Tyranitar",
+          "Celebi",
+          "Cloyster",
+          "Zapdos",
+          "Hariyama",
+          "Registeel",
+          "Houndoom",
+          "Umbreon"
+        ],
+        "attempts": 5
+      },
+      "opponents": [
+        {
+          "generatorVersion": 4,
+          "day": "2027-01-04",
+          "style": "balance",
+          "team": [
+            {
+              "species": "Cloyster",
+              "setId": "cloyster-spiker"
+            },
+            {
+              "species": "Claydol",
+              "setId": "claydol-utility"
+            },
+            {
+              "species": "Regice",
+              "setId": "regice-offensive"
+            },
+            {
+              "species": "Starmie",
+              "setId": "starmie-defensive"
+            },
+            {
+              "species": "Flygon",
+              "setId": "flygon-offensive"
+            },
+            {
+              "species": "Jolteon",
+              "setId": "jolteon-standard"
+            }
+          ],
+          "attempts": 2
+        },
+        {
+          "generatorVersion": 4,
+          "day": "2027-01-05",
+          "style": "balance",
+          "team": [
+            {
+              "species": "Breloom",
+              "setId": "breloom-spore"
+            },
+            {
+              "species": "Houndoom",
+              "setId": "houndoom-pursuit"
+            },
+            {
+              "species": "Jirachi",
+              "setId": "jirachi-substitute-calm-mind"
+            },
+            {
+              "species": "Articuno",
+              "setId": "articuno-heal-bell"
+            },
+            {
+              "species": "Aerodactyl",
+              "setId": "aerodactyl-choice-band"
+            },
+            {
+              "species": "Registeel",
+              "setId": "registeel-toxic-stall"
+            }
+          ],
+          "attempts": 2
+        },
+        {
+          "generatorVersion": 4,
+          "day": "2027-01-06",
+          "style": "stall",
+          "team": [
+            {
+              "species": "Flygon",
+              "setId": "flygon-defensive"
+            },
+            {
+              "species": "Tyranitar",
+              "setId": "tyranitar-bulky-physical-attacker"
+            },
+            {
+              "species": "Jirachi",
+              "setId": "jirachi-superachi-offensive-calm-mind"
+            },
+            {
+              "species": "Vaporeon",
+              "setId": "vaporeon-wall"
+            },
+            {
+              "species": "Skarmory",
+              "setId": "skarmory-standard"
+            },
+            {
+              "species": "Slowbro",
+              "setId": "slowbro-defensive"
+            }
+          ],
+          "attempts": 1
+        },
+        {
+          "generatorVersion": 4,
+          "day": "2027-01-07",
+          "style": "balance",
+          "team": [
+            {
+              "species": "Blissey",
+              "setId": "blissey-utility"
+            },
+            {
+              "species": "Aerodactyl",
+              "setId": "aerodactyl-choice-band"
+            },
+            {
+              "species": "Porygon2",
+              "setId": "porygon2-standard"
+            },
+            {
+              "species": "Celebi",
+              "setId": "celebi-leech-seed-3-attacks"
+            },
+            {
+              "species": "Claydol",
+              "setId": "claydol-utility"
+            },
+            {
+              "species": "Slaking",
+              "setId": "slaking-choice-band"
+            }
+          ],
+          "attempts": 2
+        },
+        {
+          "generatorVersion": 4,
+          "day": "2027-01-08",
+          "style": "offense",
+          "team": [
+            {
+              "species": "Regirock",
+              "setId": "regirock-physical-attacker"
+            },
+            {
+              "species": "Gengar",
+              "setId": "gengar-offensive"
+            },
+            {
+              "species": "Articuno",
+              "setId": "articuno-heal-bell"
+            },
+            {
+              "species": "Heracross",
+              "setId": "heracross-standard"
+            },
+            {
+              "species": "Metagross",
+              "setId": "metagross-agility"
+            },
+            {
+              "species": "Aerodactyl",
+              "setId": "aerodactyl-choice-band"
+            }
+          ],
+          "attempts": 2
+        },
+        {
+          "generatorVersion": 4,
+          "day": "2027-01-09",
+          "style": "balance",
+          "team": [
+            {
+              "species": "Forretress",
+              "setId": "forretress-standard"
+            },
+            {
+              "species": "Swampert",
+              "setId": "swampert-surf-defensive"
+            },
+            {
+              "species": "Gengar",
+              "setId": "gengar-offensive"
+            },
+            {
+              "species": "Jolteon",
+              "setId": "jolteon-standard"
+            },
+            {
+              "species": "Starmie",
+              "setId": "starmie-defensive"
+            },
+            {
+              "species": "Regirock",
+              "setId": "regirock-physical-attacker"
+            }
+          ],
+          "attempts": 1
+        },
+        {
+          "generatorVersion": 4,
+          "day": "2027-01-10",
+          "style": "stall",
+          "team": [
+            {
+              "species": "Swampert",
+              "setId": "swampert-surf-defensive"
+            },
+            {
+              "species": "Snorlax",
+              "setId": "snorlax-offensive-curse"
+            },
+            {
+              "species": "Flygon",
+              "setId": "flygon-defensive"
+            },
+            {
+              "species": "Claydol",
+              "setId": "claydol-utility"
+            },
+            {
+              "species": "Raikou",
+              "setId": "raikou-calm-mind-sweeper"
+            },
+            {
+              "species": "Registeel",
+              "setId": "registeel-mixed-wall"
+            }
+          ],
+          "attempts": 1
+        }
+      ]
+    }
+  }
+}

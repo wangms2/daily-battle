@@ -19,7 +19,7 @@ async function noScroll(page: Page, step: string) {
 const shot = (page: Page, name: string, project: string) =>
   page.screenshot({ path: `e2e/look/home/${project}/${name}.png` });
 
-test('the first screen offers Daily Battle and Versus, then the three games', async ({
+test('the first screen offers Daily Battle and Versus, then the four games', async ({
   page,
 }, info) => {
   await open(page, '/');
@@ -31,7 +31,7 @@ test('the first screen offers Daily Battle and Versus, then the three games', as
   await shot(page, '01-landing', info.project.name);
 
   await page.getByRole('button', { name: /^Daily Battle/ }).click();
-  for (const gen of ['Gen 4 OU', 'Gen 5 OU', 'Gen 6 OU'])
+  for (const gen of ['Gen 3 OU', 'Gen 4 OU', 'Gen 5 OU', 'Gen 6 OU'])
     await expect(page.getByRole('button', { name: new RegExp(gen) })).toBeVisible();
   await noScroll(page, 'game picker');
   await shot(page, '02-picker', info.project.name);

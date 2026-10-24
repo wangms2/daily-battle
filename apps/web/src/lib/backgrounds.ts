@@ -1,8 +1,16 @@
 // Battle backgrounds by format, from Showdown's fx/ folder (CC0). Plain data, so
 // scripts/fx.ts can read it in Node to download them.
 
-/** One per day: Showdown's Gen 4 and Gen 5 rotations (battle-animations.ts). */
+/** One per day: Showdown's Gen 3, Gen 4, and Gen 5 rotations (battle-animations.ts). */
 export const BACKGROUNDS: Record<string, readonly string[]> = {
+  gen3ou: [
+    'bg-gen3.png',
+    'bg-gen3-cave.png',
+    'bg-gen3-ocean.png',
+    'bg-gen3-sand.png',
+    'bg-gen3-forest.png',
+    'bg-gen3-arena.png',
+  ],
   gen4ou: [
     'bg-gen4.png',
     'bg-gen4-cave.png',

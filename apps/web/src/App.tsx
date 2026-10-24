@@ -29,6 +29,7 @@ const shareUrl = () => `${window.location.origin}/#daily`;
 
 /** What sets each game apart, for the picker. */
 const GAME_BLURB: Record<FormatId, string> = {
+  gen3ou: 'Ruby, Sapphire, and Emerald',
   gen4ou: 'Diamond and Pearl',
   gen5ou: 'Black and White, with Team Preview',
   gen6ou: 'X and Y, with Mega Evolution',

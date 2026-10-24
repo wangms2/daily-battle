@@ -1,0 +1,6324 @@
+{
+  "info": {
+    "metagame": "gen3ou",
+    "cutoff": null,
+    "number of battles": 195470
+  },
+  "data": {
+    "Tyranitar": {
+      "Raw count": 200397,
+      "usage": 0.6219,
+      "Abilities": {
+        "Sand Stream": 243125.586
+      },
+      "Items": {
+        "Leftovers": 163890.95752260002,
+        "Lum Berry": 54022.505209200004,
+        "Choice Band": 12180.5918586,
+        "Salac Berry": 6588.7033806,
+        "Black Glasses": 2820.2567976,
+        "Black Belt": 2090.8800396,
+        "Silk Scarf": 413.3134962,
+        "Liechi Berry": 364.688379,
+        "Soft Sand": 243.12558600000003,
+        "Chesto Berry": 145.8753516,
+        "Never-Melt Ice": 121.56279300000001,
+        "White Herb": 72.9376758,
+        "Hard Stone": 48.625117200000005,
+        "Petaya Berry": 48.625117200000005,
+        "Cheri Berry": 24.312558600000003,
+        "Scope Lens": 24.312558600000003,
+        "Charcoal": 24.312558600000003,
+        "Leppa Berry": 24.312558600000003
+      },
+      "Moves": {
+        "Rock Slide": 162796.8923856,
+        "Earthquake": 148549.733046,
+        "Focus Punch": 93870.7887546,
+        "Hidden Power Bug": 91731.28359780001,
+        "Dragon Dance": 81520.0089858,
+        "Crunch": 80863.5699036,
+        "Fire Blast": 55991.8224558,
+        "Pursuit": 47433.8018286,
+        "Brick Break": 43543.792452600006,
+        "Hidden Power Grass": 41331.34962000001,
+        "Double-Edge": 38656.968174,
+        "Ice Beam": 20325.2989896,
+        "Flamethrower": 19522.9845558,
+        "Substitute": 18769.2952392,
+        "Roar": 7220.829904200001,
+        "Taunt": 5275.825216200001,
+        "Counter": 3209.2577352000003,
+        "Thunder": 3014.7572664,
+        "Toxic": 2577.1312116,
+        "Thunderbolt": 1628.9414262,
+        "Thunder Wave": 1385.8158402000001,
+        "Ancient Power": 1021.1274612,
+        "Protect": 510.5637306,
+        "Hidden Power Ghost": 364.688379,
+        "Body Slam": 340.3758204,
+        "Endure": 267.43814460000004,
+        "Hyper Beam": 267.43814460000004,
+        "Rest": 194.50046880000002,
+        "Hidden Power Rock": 121.56279300000001,
+        "Rain Dance": 97.25023440000001,
+        "Surf": 72.9376758,
+        "Sunny Day": 24.312558600000003,
+        "Curse": 24.312558600000003,
+        "Nothing": 24.312558600000003,
+        "Hidden Power Flying": 24.312558600000003
+      },
+      "Natures": {
+        "Jolly": 18453.231977400006,
+        "Adamant": 126352.3670441996,
+        "Modest": 30560.886160200018,
+        "Hasty": 12302.154651600003,
+        "Quiet": 27910.817272800017,
+        "Mild": 8995.646682000011,
+        "Rash": 4035.884727599999,
+        "Lonely": 4181.760079199998,
+        "Brave": 2674.381445999998,
+        "Naughty": 2066.5674809999987,
+        "Naive": 1726.1916606000004,
+        "Sassy": 753.6893166000001,
+        "Hardy": 510.5637306,
+        "Calm": 705.0641994000001,
+        "Timid": 218.81302740000007,
+        "Relaxed": 145.87535160000002,
+        "Careful": 24.312558600000003,
+        "Bold": 24.312558600000003,
+        "Gentle": 24.312558600000003
+      }
+    },
+    "Swampert": {
+      "Raw count": 138958,
+      "usage": 0.4142,
+      "Abilities": {
+        "Torrent": 161927.348
+      },
+      "Items": {
+        "Leftovers": 142042.6696656,
+        "Salac Berry": 19577.0163732,
+        "Choice Band": 291.46922639999997,
+        "Lum Berry": 16.1927348
+      },
+      "Moves": {
+        "Earthquake": 103439.1899024,
+        "Ice Beam": 97593.6126396,
+        "Hydro Pump": 81935.238088,
+        "Protect": 81821.8889444,
+        "Surf": 59605.4567988,
+        "Roar": 48659.168074,
+        "Toxic": 42813.5908112,
+        "Refresh": 34846.7652896,
+        "Curse": 23706.1637472,
+        "Focus Punch": 23155.610763999997,
+        "Substitute": 22783.177863599998,
+        "Endeavor": 19819.9073952,
+        "Rest": 2687.9939768,
+        "Rock Slide": 1473.5388668,
+        "Hidden Power Rock": 987.7568228,
+        "Hidden Power Bug": 858.2149444,
+        "Counter": 615.3239224,
+        "Rain Dance": 210.5055524,
+        "Hidden Power Grass": 178.1200828,
+        "Double-Edge": 145.73461319999998,
+        "Hidden Power Ghost": 97.1564088,
+        "Hidden Power Electric": 97.1564088,
+        "Sleep Talk": 80.963674,
+        "Mirror Coat": 32.3854696,
+        "Nothing": 16.1927348,
+        "Facade": 16.1927348,
+        "Body Slam": 16.1927348
+      },
+      "Natures": {
+        "Relaxed": 56399.29530839991,
+        "Timid": 19657.9800472,
+        "Bold": 36045.02766479994,
+        "Quiet": 28062.009408399957,
+        "Naughty": 2704.1867116,
+        "Rash": 7983.018256400007,
+        "Brave": 5359.795218800008,
+        "Sassy": 1020.1422924000003,
+        "Modest": 1036.3350272,
+        "Careful": 404.81836999999996,
+        "Naive": 404.81837,
+        "Adamant": 1311.6115187999999,
+        "Jolly": 97.1564088,
+        "Calm": 129.5418784,
+        "Hardy": 242.891022,
+        "Impish": 80.963674,
+        "Hasty": 16.1927348,
+        "Mild": 16.1927348
+      }
+    },
+    "Skarmory": {
+      "Raw count": 136684,
+      "usage": 0.3888,
+      "Abilities": {
+        "Keen Eye": 150629.49475199997,
+        "Sturdy": 1367.9772479999997
+      },
+      "Items": {
+        "Leftovers": 142132.8360672,
+        "Nothing": 8922.2516064,
+        "Salac Berry": 319.19469119999997,
+        "Chesto Berry": 288.7951968,
+        "Soft Sand": 167.19721919999998,
+        "Lum Berry": 91.19848319999998,
+        "Choice Band": 45.59924159999999,
+        "Liechi Berry": 15.1997472
+      },
+      "Moves": {
+        "Spikes": 151997.47199999998,
+        "Roar": 148729.526352,
+        "Drill Peck": 94557.62733119998,
+        "Toxic": 86896.95474239999,
+        "Protect": 73110.78403199998,
+        "Taunt": 27450.743443199997,
+        "Thief": 9545.441241599998,
+        "Rest": 4818.319862399999,
+        "Hidden Power Steel": 4331.927952,
+        "Hidden Power Ground": 2006.3666303999996,
+        "Counter": 1291.978512,
+        "Hidden Power Fighting": 1139.98104,
+        "Whirlwind": 1094.3817983999998,
+        "Torment": 395.1934271999999,
+        "Hidden Power Fire": 273.59544959999994,
+        "Steel Wing": 75.998736,
+        "Sunny Day": 60.7989888,
+        "Sleep Talk": 45.59924159999999,
+        "Rock Slide": 45.59924159999999,
+        "Pursuit": 30.3994944,
+        "Hidden Power Flying": 30.3994944,
+        "Agility": 15.1997472,
+        "Nothing": 15.1997472,
+        "Sky Attack": 15.1997472
+      },
+      "Natures": {
+        "Careful": 132207.40114559984,
+        "Impish": 9363.044275200002,
+        "Calm": 5061.5158176,
+        "Adamant": 1489.5752255999994,
+        "Jolly": 2492.7585407999995,
+        "Bold": 972.7838207999998,
+        "Timid": 91.19848319999998,
+        "Hardy": 15.1997472
+      }
+    },
+    "Metagross": {
+      "Raw count": 144165,
+      "usage": 0.3718,
+      "Abilities": {
+        "Clear Body": 145351.492
+      },
+      "Items": {
+        "Leftovers": 76571.1659856,
+        "Choice Band": 45989.2120688,
+        "Lum Berry": 19055.5806012,
+        "Liechi Berry": 2834.354094,
+        "Salac Berry": 712.2223108,
+        "White Herb": 87.2108952,
+        "Metal Coat": 72.675746,
+        "Silk Scarf": 14.535149200000001
+      },
+      "Moves": {
+        "Meteor Mash": 143636.3443944,
+        "Earthquake": 130641.9210096,
+        "Explosion": 123694.119692,
+        "Rock Slide": 61948.805890400006,
+        "Agility": 59986.5607484,
+        "Protect": 15014.8091236,
+        "Psychic": 12616.509505600001,
+        "Hidden Power Fire": 11889.7520456,
+        "Double-Edge": 4607.642296399999,
+        "Hidden Power Grass": 4215.193268,
+        "Thunder Punch": 2456.4402148,
+        "Brick Break": 2369.2293195999996,
+        "Substitute": 2020.3857388,
+        "Pursuit": 1308.1634279999998,
+        "Hidden Power Rock": 1104.6713392,
+        "Reflect": 1017.460444,
+        "Shadow Ball": 813.9683552,
+        "Hidden Power Bug": 552.3356696,
+        "Toxic": 494.1950728,
+        "Endure": 319.7732824,
+        "Body Slam": 188.9569396,
+        "Return": 145.351492,
+        "Rain Dance": 116.28119360000001,
+        "Sleep Talk": 87.2108952,
+        "Ice Punch": 72.675746,
+        "Sludge Bomb": 29.070298400000002,
+        "Nothing": 29.070298400000002,
+        "Sunny Day": 14.535149200000001,
+        "Light Screen": 14.535149200000001,
+        "Mimic": 14.535149200000001
+      },
+      "Natures": {
+        "Adamant": 116397.47479359954,
+        "Impish": 7456.531539600006,
+        "Quiet": 7035.012212800005,
+        "Jolly": 4026.2363284000007,
+        "Rash": 6540.817140000004,
+        "Brave": 1395.374323199999,
+        "Naughty": 930.2495488000001,
+        "Modest": 276.1678348,
+        "Naive": 159.88664120000004,
+        "Hardy": 130.8163428,
+        "Relaxed": 72.675746,
+        "Mild": 43.605447600000005,
+        "Careful": 14.535149200000001
+      }
+    },
+    "Gengar": {
+      "Raw count": 128905,
+      "usage": 0.334,
+      "Abilities": {
+        "Levitate": 130573.96
+      },
+      "Items": {
+        "Leftovers": 127414.070168,
+        "Lum Berry": 1632.1745,
+        "Choice Band": 1384.0839760000001,
+        "Magnet": 65.28698,
+        "Liechi Berry": 26.114792,
+        "Nothing": 26.114792,
+        "Petaya Berry": 26.114792,
+        "Miracle Seed": 13.057396
+      },
+      "Moves": {
+        "Thunderbolt": 95318.9908,
+        "Ice Punch": 92446.36368,
+        "Will-O-Wisp": 75876.528156,
+        "Explosion": 71828.735396,
+        "Taunt": 46327.641008000006,
+        "Hidden Power Grass": 36195.101712,
+        "Fire Punch": 31611.955716000004,
+        "Giga Drain": 28190.917964000004,
+        "Destiny Bond": 10955.155244000001,
+        "Focus Punch": 10184.76888,
+        "Hypnosis": 8931.258864000001,
+        "Substitute": 2520.077428,
+        "Shadow Ball": 1632.1745,
+        "Rain Dance": 1397.141372,
+        "Mean Look": 1357.969184,
+        "Brick Break": 1357.969184,
+        "Night Shade": 1331.8543920000002,
+        "Curse": 1044.59168,
+        "Perish Song": 1005.4194920000001,
+        "Protect": 809.558552,
+        "Rest": 430.894068,
+        "Sludge Bomb": 365.60708800000003,
+        "Psychic": 287.262712,
+        "Seismic Toss": 274.205316,
+        "Thunder": 235.033128,
+        "Haze": 208.918336,
+        "Sunny Day": 65.28698,
+        "Dynamic Punch": 26.114792,
+        "Hidden Power Fire": 26.114792,
+        "Toxic": 13.057396,
+        "Hidden Power Water": 13.057396,
+        "Metronome": 13.057396,
+        "Nothing": 13.057396,
+        "Thief": 13.057396
+      },
+      "Natures": {
+        "Timid": 76451.05357999969,
+        "Hasty": 22106.17142799998,
+        "Modest": 19429.40524799998,
+        "Mild": 4165.309324000001,
+        "Calm": 1318.7969959999996,
+        "Jolly": 3721.35786,
+        "Naive": 1410.198768,
+        "Adamant": 1292.6822040000002,
+        "Hardy": 143.631356,
+        "Careful": 65.28698,
+        "Lonely": 39.172188,
+        "Rash": 52.229584,
+        "Sassy": 13.057396,
+        "Gentle": 39.172188000000006
+      }
+    },
+    "Blissey": {
+      "Raw count": 109421,
+      "usage": 0.3142,
+      "Abilities": {
+        "Natural Cure": 122587.681304,
+        "Serene Grace": 245.666696
+      },
+      "Items": {
+        "Leftovers": 122821.0646652
+      },
+      "Moves": {
+        "Soft-Boiled": 121850.681216,
+        "Seismic Toss": 77741.2259492,
+        "Ice Beam": 72803.3253596,
+        "Thunder Wave": 53223.6896884,
+        "Aromatherapy": 32956.1872684,
+        "Calm Mind": 26544.286502799998,
+        "Toxic": 22638.1860364,
+        "Thunderbolt": 22466.2193492,
+        "Wish": 20562.3024552,
+        "Hidden Power Grass": 11398.934694399999,
+        "Flamethrower": 7812.2009328,
+        "Heal Bell": 7284.0175364,
+        "Fire Blast": 6682.1341311999995,
+        "Counter": 4397.4338584,
+        "Sing": 1302.0334888,
+        "Protect": 872.1167708,
+        "Snatch": 294.80003519999997,
+        "Thunder": 110.5500132,
+        "Sunny Day": 85.9833436,
+        "Psych Up": 73.70000879999999,
+        "Mimic": 61.416674,
+        "Rain Dance": 49.1333392,
+        "Psychic": 24.5666696,
+        "Tail Whip": 24.5666696,
+        "Light Screen": 24.5666696,
+        "Refresh": 12.2833348,
+        "Substitute": 12.2833348
+      },
+      "Natures": {
+        "Modest": 61269.27398239997,
+        "Bold": 51811.10618639996,
+        "Impish": 9175.6510956,
+        "Hardy": 233.38336120000002,
+        "Jolly": 73.70000879999999,
+        "Timid": 73.7000088,
+        "Calm": 110.55001320000002,
+        "Relaxed": 12.2833348,
+        "Careful": 12.2833348
+      }
+    },
+    "Salamence": {
+      "Raw count": 116314,
+      "usage": 0.302,
+      "Abilities": {
+        "Intimidate": 118063.87999999999
+      },
+      "Items": {
+        "Leftovers": 103695.50580399999,
+        "Choice Band": 11416.777196,
+        "Lum Berry": 2443.9223159999997,
+        "Dragon Fang": 224.32137199999997,
+        "Black Belt": 129.870268,
+        "White Herb": 47.225552,
+        "Liechi Berry": 35.419163999999995,
+        "Scope Lens": 23.612776,
+        "Silk Scarf": 11.806388,
+        "Salac Berry": 11.806388,
+        "Leppa Berry": 11.806388
+      },
+      "Moves": {
+        "Hidden Power Flying": 75572.689588,
+        "Brick Break": 75431.012932,
+        "Dragon Dance": 67615.18407599999,
+        "Rock Slide": 67497.12019599999,
+        "Earthquake": 55371.95971999999,
+        "Dragon Claw": 35926.838684,
+        "Fire Blast": 32868.984191999996,
+        "Hidden Power Grass": 26044.891927999997,
+        "Flamethrower": 12561.996831999999,
+        "Wish": 6399.062295999999,
+        "Substitute": 3943.3335919999995,
+        "Refresh": 3010.6289399999996,
+        "Hydro Pump": 2892.56506,
+        "Protect": 2502.954256,
+        "Roar": 1806.3773639999997,
+        "Toxic": 1192.445188,
+        "Rest": 637.544952,
+        "Body Slam": 342.3852519999999,
+        "Double-Edge": 188.902208,
+        "Sunny Day": 82.64471599999999,
+        "Hidden Power Rock": 70.83832799999999,
+        "Dragon Breath": 70.83832799999999,
+        "Hidden Power Bug": 59.03194,
+        "Leer": 35.419163999999995,
+        "Hidden Power Ghost": 35.419163999999995,
+        "Return": 23.612776,
+        "Nothing": 11.806388,
+        "Steel Wing": 11.806388,
+        "Aerial Ace": 11.806388,
+        "Crunch": 11.806388
+      },
+      "Natures": {
+        "Adamant": 67792.27989599973,
+        "Rash": 14781.597775999999,
+        "Naive": 10035.429800000002,
+        "Jolly": 3966.9463680000003,
+        "Mild": 6576.1581160000005,
+        "Hasty": 2373.083988,
+        "Lonely": 5667.066240000005,
+        "Naughty": 3435.6589079999994,
+        "Bold": 2042.5051240000003,
+        "Timid": 436.8363559999999,
+        "Modest": 425.0299679999999,
+        "Hardy": 224.321372,
+        "Careful": 70.838328,
+        "Calm": 23.612776,
+        "Brave": 11.806388
+      }
+    },
+    "Zapdos": {
+      "Raw count": 90087,
+      "usage": 0.249,
+      "Abilities": {
+        "Pressure": 97344.06
+      },
+      "Items": {
+        "Leftovers": 95679.476574,
+        "Choice Band": 1314.14481,
+        "Magnet": 165.48490199999998,
+        "Lum Berry": 68.14084199999999,
+        "Petaya Berry": 48.67203,
+        "Sharp Beak": 19.468812,
+        "Nothing": 9.734406,
+        "Leppa Berry": 9.734406,
+        "Salac Berry": 9.734406
+      },
+      "Moves": {
+        "Thunderbolt": 96779.464452,
+        "Hidden Power Grass": 42870.324024,
+        "Baton Pass": 38353.55964,
+        "Roar": 34401.390803999995,
+        "Hidden Power Ice": 33418.215798,
+        "Toxic": 32882.823467999995,
+        "Thunder Wave": 30001.439291999995,
+        "Rest": 26399.709071999998,
+        "Substitute": 22866.119694,
+        "Drill Peck": 10289.267142,
+        "Sleep Talk": 4789.327752,
+        "Light Screen": 4682.249285999999,
+        "Protect": 4575.17082,
+        "Hidden Power Fighting": 2696.430462,
+        "Rain Dance": 1888.474764,
+        "Agility": 1664.583426,
+        "Thunder": 389.37624,
+        "Sunny Day": 214.156932,
+        "Metal Sound": 136.28168399999998,
+        "Hyper Beam": 9.734406,
+        "Hidden Power Ground": 9.734406,
+        "Nothing": 9.734406,
+        "Facade": 9.734406,
+        "Hidden Power Electric": 9.734406,
+        "Sky Attack": 9.734406,
+        "Return": 9.734406,
+        "Extrasensory": 9.734406
+      },
+      "Natures": {
+        "Timid": 25027.157825999966,
+        "Calm": 23820.091481999996,
+        "Modest": 36504.02249999995,
+        "Bold": 2365.460658,
+        "Mild": 4643.311662000005,
+        "Naughty": 827.4245099999998,
+        "Lonely": 1732.7242679999997,
+        "Hasty": 1041.5814419999995,
+        "Naive": 243.36014999999995,
+        "Rash": 447.7826759999999,
+        "Adamant": 243.36014999999995,
+        "Jolly": 107.078466,
+        "Careful": 19.468812,
+        "Brave": 19.468812,
+        "Hardy": 19.468812
+      }
+    },
+    "Aerodactyl": {
+      "Raw count": 81943,
+      "usage": 0.2357,
+      "Abilities": {
+        "Rock Head": 88034.91071319999,
+        "Pressure": 4109.6472868
+      },
+      "Items": {
+        "Choice Band": 74047.36680879998,
+        "Liechi Berry": 14715.4859126,
+        "White Herb": 1382.1683699999999,
+        "Leftovers": 1345.3105467999999,
+        "Lum Berry": 368.57823199999996,
+        "Salac Berry": 184.28911599999998,
+        "Silk Scarf": 82.9301022,
+        "Hard Stone": 9.2144558
+      },
+      "Moves": {
+        "Rock Slide": 91923.41106079999,
+        "Earthquake": 91453.47381499999,
+        "Double-Edge": 83353.9671668,
+        "Hidden Power Flying": 45325.908080199995,
+        "Hidden Power Bug": 33430.0456424,
+        "Substitute": 16263.514486999997,
+        "Toxic": 1815.2477925999997,
+        "Curse": 1170.2358865999997,
+        "Protect": 1013.5901379999998,
+        "Hidden Power Fighting": 893.8022126,
+        "Taunt": 313.2914971999999,
+        "Fire Blast": 248.79030659999998,
+        "Hidden Power Grass": 248.79030659999998,
+        "Pursuit": 230.361395,
+        "Ancient Power": 193.50357179999997,
+        "Endure": 184.28911599999998,
+        "Rain Dance": 165.8602044,
+        "Hidden Power Rock": 119.78792539999998,
+        "Flamethrower": 92.14455799999999,
+        "Roar": 46.072278999999995,
+        "Aerial Ace": 18.4289116,
+        "Sunny Day": 18.4289116,
+        "Attract": 9.2144558,
+        "Return": 9.2144558,
+        "Whirlwind": 9.2144558,
+        "Fly": 9.2144558
+      },
+      "Natures": {
+        "Jolly": 88808.92500039993,
+        "Adamant": 2662.9777261999993,
+        "Lonely": 202.7180276,
+        "Hasty": 193.50357179999997,
+        "Naive": 156.6457486,
+        "Hardy": 46.072278999999995
+      }
+    },
+    "Suicune": {
+      "Raw count": 86737,
+      "usage": 0.2233,
+      "Abilities": {
+        "Pressure": 87296.902
+      },
+      "Items": {
+        "Leftovers": 86947.714392,
+        "Lum Berry": 148.4047334,
+        "Salac Berry": 130.945353,
+        "Chesto Berry": 43.648451,
+        "Nothing": 8.7296902,
+        "Leppa Berry": 8.7296902
+      },
+      "Moves": {
+        "Calm Mind": 86860.41749,
+        "Surf": 74359.5011236,
+        "Rest": 59711.08096800001,
+        "Roar": 39170.1199274,
+        "Ice Beam": 33408.524395399996,
+        "Sleep Talk": 19240.237200800002,
+        "Hydro Pump": 12946.130566599999,
+        "Substitute": 9637.5779808,
+        "Hidden Power Grass": 7184.5350346,
+        "Rain Dance": 3910.9012096,
+        "Hidden Power Electric": 1641.1817576,
+        "Toxic": 881.6987101999999,
+        "Protect": 148.4047334,
+        "Mirror Coat": 61.1078314,
+        "Reflect": 26.189070599999997
+      },
+      "Natures": {
+        "Modest": 38113.82741319998,
+        "Bold": 35381.4343806,
+        "Calm": 6407.592606800005,
+        "Timid": 7149.616273800005,
+        "Hardy": 69.8375216
+      }
+    },
+    "Starmie": {
+      "Raw count": 76353,
+      "usage": 0.2063,
+      "Abilities": {
+        "Natural Cure": 80360.5786808,
+        "Illuminate": 290.3433192
+      },
+      "Items": {
+        "Leftovers": 76086.0798148,
+        "Mystic Water": 4395.475249,
+        "Lum Berry": 88.71601420000002,
+        "Petaya Berry": 56.4556454,
+        "Nothing": 24.1952766
+      },
+      "Moves": {
+        "Ice Beam": 54552.28364080001,
+        "Rapid Spin": 54019.9875556,
+        "Thunderbolt": 46471.061256400004,
+        "Surf": 44930.628646200006,
+        "Recover": 39567.3423332,
+        "Hydro Pump": 38204.3417514,
+        "Thunder Wave": 22929.0571246,
+        "Psychic": 17283.4925846,
+        "Hidden Power Grass": 2322.7465536,
+        "Thunder": 661.3375604000001,
+        "Reflect": 653.2724682,
+        "Light Screen": 621.0120994,
+        "Rain Dance": 193.5622128,
+        "Refresh": 96.7811064,
+        "Substitute": 56.4556454,
+        "Toxic": 24.1952766
+      },
+      "Natures": {
+        "Timid": 57471.8470171999,
+        "Modest": 14759.118726,
+        "Bold": 8307.044966000001,
+        "Mild": 24.1952766,
+        "Calm": 72.58582980000001,
+        "Hardy": 16.1301844,
+        "Jolly": 8.0650922
+      }
+    },
+    "Celebi": {
+      "Raw count": 93418,
+      "usage": 0.1973,
+      "Abilities": {
+        "Natural Cure": 77132.462
+      },
+      "Items": {
+        "Leftovers": 76515.402304,
+        "Lum Berry": 593.9199574,
+        "Salac Berry": 7.7132462,
+        "Choice Band": 7.7132462,
+        "Aguav Berry": 7.7132462
+      },
+      "Moves": {
+        "Leech Seed": 59507.694433,
+        "Psychic": 51308.5137224,
+        "Giga Drain": 40880.204860000005,
+        "Hidden Power Fire": 35218.6821492,
+        "Recover": 33583.4739548,
+        "Baton Pass": 22862.0617368,
+        "Calm Mind": 22106.1636092,
+        "Hidden Power Grass": 18264.967001600002,
+        "Perish Song": 6695.0977016,
+        "Swords Dance": 6054.898267,
+        "Heal Bell": 4519.9622732,
+        "Substitute": 1851.179088,
+        "Hidden Power Ice": 1820.3261032,
+        "Hidden Power Electric": 833.0305896,
+        "Hidden Power Fighting": 732.758389,
+        "Shadow Ball": 617.059696,
+        "Hidden Power Rock": 462.794772,
+        "Reflect": 370.23581759999996,
+        "Light Screen": 347.096079,
+        "Hidden Power Bug": 115.698693,
+        "Toxic": 92.55895439999999,
+        "Protect": 84.8457082,
+        "Secret Power": 69.4192158,
+        "Hidden Power Ghost": 46.279477199999995,
+        "Sunny Day": 23.139738599999998,
+        "Hidden Power Ground": 15.4264924,
+        "Return": 15.4264924,
+        "Double-Edge": 7.7132462,
+        "Ancient Power": 7.7132462,
+        "Aerial Ace": 7.7132462,
+        "Hidden Power Water": 7.7132462,
+        "Hidden Power Flying": 7.7132462
+      },
+      "Natures": {
+        "Modest": 22329.847748999957,
+        "Bold": 16375.221682599979,
+        "Calm": 14994.550612799974,
+        "Timid": 20694.639554599984,
+        "Impish": 1504.0830089999997,
+        "Jolly": 647.9126807999996,
+        "Sassy": 208.25764739999997,
+        "Careful": 131.12518540000002,
+        "Hardy": 38.566231,
+        "Adamant": 15.4264924,
+        "Naive": 7.7132462
+      }
+    },
+    "Snorlax": {
+      "Raw count": 80077,
+      "usage": 0.1946,
+      "Abilities": {
+        "Immunity": 65350.077716,
+        "Thick Fat": 10726.846284
+      },
+      "Items": {
+        "Leftovers": 72805.616268,
+        "Choice Band": 2061.6846404,
+        "Lum Berry": 1186.8000144,
+        "Chesto Berry": 7.6076924,
+        "Silk Scarf": 7.6076924,
+        "Nothing": 7.6076924
+      },
+      "Moves": {
+        "Shadow Ball": 56586.0160712,
+        "Body Slam": 50788.9544624,
+        "Earthquake": 45463.5697824,
+        "Self-Destruct": 42382.4543604,
+        "Curse": 39065.50047399999,
+        "Focus Punch": 22381.8310408,
+        "Rest": 15527.3001884,
+        "Return": 13108.0540052,
+        "Double-Edge": 4169.0154352,
+        "Frustration": 3621.2615824000004,
+        "Fire Blast": 3164.8000383999997,
+        "Counter": 2609.4384932,
+        "Brick Break": 1536.7538648,
+        "Sleep Talk": 1179.1923219999999,
+        "Hidden Power Bug": 562.9692376,
+        "Hidden Power Steel": 433.6384668,
+        "Block": 372.77692759999996,
+        "Yawn": 296.7000036,
+        "Protect": 197.80000239999998,
+        "Flamethrower": 159.7615404,
+        "Facade": 136.9384632,
+        "Amnesia": 129.33077079999998,
+        "Hidden Power Rock": 121.7230784,
+        "Substitute": 83.68461640000001,
+        "Ice Beam": 53.2538468,
+        "Belly Drum": 38.038462,
+        "Thunder": 30.4307696,
+        "Snore": 30.4307696,
+        "Rock Slide": 30.4307696,
+        "Refresh": 22.823077199999997,
+        "Sunny Day": 15.2153848,
+        "Nothing": 7.6076924,
+        "Hidden Power Flying": 7.6076924
+      },
+      "Natures": {
+        "Adamant": 59545.40841479976,
+        "Careful": 10308.423201999974,
+        "Brave": 2989.823113200001,
+        "Impish": 1711.73079,
+        "Relaxed": 639.0461616,
+        "Hardy": 296.7000036,
+        "Sassy": 159.7615404,
+        "Calm": 68.4692316,
+        "Lonely": 53.2538468,
+        "Modest": 30.4307696,
+        "Jolly": 7.6076924,
+        "Quiet": 7.6076924
+      }
+    },
+    "Claydol": {
+      "Raw count": 67419,
+      "usage": 0.1871,
+      "Abilities": {
+        "Levitate": 73144.874
+      },
+      "Items": {
+        "Leftovers": 72245.1920498,
+        "Choice Band": 885.0529753999999,
+        "Nothing": 7.3144874
+      },
+      "Moves": {
+        "Rapid Spin": 71872.1531924,
+        "Earthquake": 66101.02263379999,
+        "Explosion": 65311.0579946,
+        "Psychic": 53205.581347600004,
+        "Shadow Ball": 13041.731034199998,
+        "Rock Slide": 5164.028104399999,
+        "Refresh": 4630.070524199999,
+        "Rest": 3986.3956329999996,
+        "Ice Beam": 1821.3073625999998,
+        "Sunny Day": 1792.049413,
+        "Protect": 1565.3003035999998,
+        "Rain Dance": 1214.2049084,
+        "Hidden Power Rock": 906.9964375999999,
+        "Mud-Slap": 760.7066895999999,
+        "Hidden Power Fire": 636.3604038,
+        "Toxic": 299.8939834,
+        "Reflect": 95.08833619999999,
+        "Ancient Power": 43.88692439999999,
+        "Hidden Power Grass": 29.2579496,
+        "Light Screen": 21.943462199999995,
+        "Double-Edge": 21.943462199999995,
+        "Solar Beam": 14.6289748,
+        "Hidden Power Bug": 7.3144874,
+        "Nothing": 7.3144874,
+        "Hidden Power Electric": 7.3144874,
+        "Cosmic Power": 7.3144874
+      },
+      "Natures": {
+        "Adamant": 37398.97407619992,
+        "Jolly": 6144.169416000001,
+        "Sassy": 11929.928949399993,
+        "Impish": 5485.865550000003,
+        "Brave": 4147.314355800002,
+        "Bold": 1082.5441352,
+        "Relaxed": 4571.554625000001,
+        "Careful": 1250.7773453999991,
+        "Modest": 212.12013459999994,
+        "Calm": 431.55475659999996,
+        "Quiet": 197.4911597999999,
+        "Hardy": 80.4593614,
+        "Lonely": 80.45936139999999
+      }
+    },
+    "Jirachi": {
+      "Raw count": 53465,
+      "usage": 0.1841,
+      "Abilities": {
+        "Serene Grace": 71972.054
+      },
+      "Items": {
+        "Leftovers": 70273.5135256,
+        "Choice Band": 935.636702,
+        "Lum Berry": 511.0015834000001,
+        "Salac Berry": 244.7049836,
+        "Charcoal": 7.1972054000000005
+      },
+      "Moves": {
+        "Calm Mind": 44212.4327722,
+        "Fire Punch": 43931.74176160001,
+        "Wish": 27471.7330118,
+        "Psychic": 25967.5170832,
+        "Substitute": 23124.6209502,
+        "Hidden Power Grass": 22901.5075828,
+        "Ice Punch": 20288.9220226,
+        "Protect": 20051.414244400003,
+        "Thunderbolt": 19108.580337000003,
+        "Toxic": 13264.4495522,
+        "Body Slam": 10076.087560000002,
+        "Thunder": 7362.741124200001,
+        "Hidden Power Fighting": 3253.1368408,
+        "Reflect": 2087.189566,
+        "Doom Desire": 1806.4985554000002,
+        "Shadow Ball": 1194.7360964000002,
+        "Dynamic Punch": 640.5512806,
+        "Hidden Power Water": 482.21276180000007,
+        "Endure": 143.944108,
+        "Water Pulse": 122.3524918,
+        "Metronome": 93.5636702,
+        "Light Screen": 79.16925940000002,
+        "Skill Swap": 57.577643200000004,
+        "Refresh": 43.1832324,
+        "Rain Dance": 28.788821600000002,
+        "Thunder Wave": 21.5916162,
+        "Rest": 21.5916162,
+        "Hidden Power Steel": 14.394410800000001,
+        "Cosmic Power": 14.394410800000001,
+        "Hidden Power Fire": 7.1972054000000005,
+        "Hidden Power Ground": 7.1972054000000005,
+        "Icy Wind": 7.1972054000000005
+      },
+      "Natures": {
+        "Modest": 26946.337017599984,
+        "Timid": 15171.708983199997,
+        "Bold": 10695.047224399988,
+        "Sassy": 7261.980248600003,
+        "Calm": 7197.2054000000035,
+        "Adamant": 1101.1724262,
+        "Mild": 791.6925939999999,
+        "Brave": 208.71895659999998,
+        "Quiet": 582.9736374,
+        "Careful": 259.0993944,
+        "Gentle": 187.1273404,
+        "Relaxed": 511.0015834,
+        "Rash": 323.874243,
+        "Hasty": 309.4798322000001,
+        "Jolly": 107.958081,
+        "Lonely": 71.972054,
+        "Naive": 57.577643200000004,
+        "Impish": 71.972054,
+        "Naughty": 14.394410800000001
+      }
+    },
+    "Dugtrio": {
+      "Raw count": 73538,
+      "usage": 0.1737,
+      "Abilities": {
+        "Arena Trap": 67906.27799999999
+      },
+      "Items": {
+        "Choice Band": 66330.85235039999,
+        "Leftovers": 801.2940803999999,
+        "Soft Sand": 577.203363,
+        "Liechi Berry": 88.27816139999999,
+        "Salac Berry": 47.53439459999999,
+        "Nothing": 33.95313899999999,
+        "Petaya Berry": 13.581255599999999,
+        "Lum Berry": 6.790627799999999
+      },
+      "Moves": {
+        "Earthquake": 67899.48737219999,
+        "Hidden Power Bug": 66588.8962068,
+        "Aerial Ace": 64130.688943199995,
+        "Rock Slide": 36180.4649184,
+        "Beat Up": 13078.749142799998,
+        "Sunny Day": 11061.932686199998,
+        "Screech": 5221.992778199999,
+        "Substitute": 2797.7386535999995,
+        "Double-Edge": 1344.5443043999999,
+        "Sleep Talk": 998.2222865999998,
+        "Toxic": 658.6908966,
+        "Hidden Power Flying": 550.0408517999999,
+        "Protect": 380.27515679999993,
+        "Rock Tomb": 237.67197299999998,
+        "Ancient Power": 129.0219282,
+        "Charm": 88.27816139999999,
+        "Sludge Bomb": 81.48753359999998,
+        "Endure": 47.53439459999999,
+        "Hidden Power Ghost": 40.74376679999999,
+        "Thief": 33.95313899999999,
+        "Hidden Power Fighting": 20.371883399999994,
+        "Hidden Power Grass": 20.371883399999994,
+        "Facade": 6.790627799999999,
+        "Pursuit": 6.790627799999999,
+        "Body Slam": 6.790627799999999,
+        "Return": 6.790627799999999
+      },
+      "Natures": {
+        "Jolly": 42115.473615599876,
+        "Adamant": 25458.063622199985,
+        "Hasty": 203.71883399999996,
+        "Lonely": 6.790627799999999,
+        "Gentle": 6.790627799999999
+      }
+    },
+    "Forretress": {
+      "Raw count": 40578,
+      "usage": 0.1459,
+      "Abilities": {
+        "Sturdy": 57038.146
+      },
+      "Items": {
+        "Leftovers": 56838.512489,
+        "Choice Band": 131.1877358,
+        "Lum Berry": 62.741960600000006,
+        "Silk Scarf": 5.7038146
+      },
+      "Moves": {
+        "Spikes": 56724.436197,
+        "Rapid Spin": 55013.291817000005,
+        "Explosion": 45191.3230758,
+        "Hidden Power Ghost": 24001.6518368,
+        "Earthquake": 16877.5874014,
+        "Hidden Power Bug": 15611.3405602,
+        "Zap Cannon": 6713.3897842,
+        "Counter": 3319.6200972,
+        "Rest": 1859.4435595999998,
+        "Hidden Power Fire": 918.3141506,
+        "Toxic": 547.5662016,
+        "Body Slam": 524.7509432,
+        "Protect": 359.34031980000003,
+        "Hidden Power Steel": 239.5602132,
+        "Rock Slide": 119.7801066,
+        "Hidden Power Rock": 51.334331399999996,
+        "Hidden Power Flying": 28.519073000000002,
+        "Pin Missile": 5.7038146,
+        "Reflect": 5.7038146,
+        "Hidden Power Fighting": 5.7038146,
+        "Nothing": 5.7038146,
+        "Giga Drain": 5.7038146,
+        "Hidden Power Ice": 5.7038146
+      },
+      "Natures": {
+        "Careful": 42453.492067799976,
+        "Sassy": 8510.091383199997,
+        "Adamant": 3291.101024200001,
+        "Impish": 1870.8511888000005,
+        "Calm": 211.0411402,
+        "Relaxed": 416.3784658,
+        "Bold": 176.8182526,
+        "Jolly": 39.9267022,
+        "Hardy": 22.8152584,
+        "Brave": 17.111443800000004,
+        "Modest": 5.7038146
+      }
+    },
+    "Magneton": {
+      "Raw count": 74802,
+      "usage": 0.118,
+      "Abilities": {
+        "Magnet Pull": 46121.693816,
+        "Sturdy": 9.226184
+      },
+      "Items": {
+        "Magnet": 34155.333168,
+        "Leftovers": 6799.6976079999995,
+        "Salac Berry": 3672.021232,
+        "Charcoal": 1273.2133919999999,
+        "Focus Band": 202.976048,
+        "Petaya Berry": 23.065459999999998,
+        "Lum Berry": 4.613092
+      },
+      "Moves": {
+        "Thunderbolt": 45927.943952,
+        "Hidden Power Fire": 29606.824456000002,
+        "Thunder Wave": 25247.452516,
+        "Toxic": 24684.655292,
+        "Hidden Power Grass": 14697.311112,
+        "Protect": 12067.848672,
+        "Substitute": 11980.199923999999,
+        "Rain Dance": 10411.748644,
+        "Endure": 2352.67692,
+        "Sunny Day": 2301.9329079999998,
+        "Rest": 1748.3618680000002,
+        "Metal Sound": 1416.2192440000001,
+        "Hidden Power Ice": 461.3092,
+        "Sleep Talk": 424.40446399999996,
+        "Reflect": 419.791372,
+        "Thunder": 322.91644,
+        "Screech": 295.237888,
+        "Tri Attack": 110.71420799999999,
+        "Refresh": 32.291644,
+        "Hidden Power Water": 4.613092,
+        "Mimic": 4.613092,
+        "Double-Edge": 4.613092
+      },
+      "Natures": {
+        "Modest": 38390.15162399996,
+        "Timid": 7348.655555999998,
+        "Calm": 244.49387599999994,
+        "Bold": 69.19638,
+        "Jolly": 9.226184,
+        "Mild": 13.839276,
+        "Hardy": 9.226184,
+        "Hasty": 4.613092
+      }
+    },
+    "Registeel": {
+      "Raw count": 24986,
+      "usage": 0.1109,
+      "Abilities": {
+        "Clear Body": 43355.246
+      },
+      "Items": {
+        "Leftovers": 43342.2394262,
+        "Nothing": 8.6710492,
+        "Lum Berry": 4.3355246,
+        "Choice Band": 4.3355246
+      },
+      "Moves": {
+        "Seismic Toss": 40558.832633,
+        "Explosion": 40324.7143046,
+        "Thunder Wave": 37610.675905000004,
+        "Counter": 19522.8672738,
+        "Superpower": 7643.529869800001,
+        "Hidden Power Grass": 6858.7999172,
+        "Toxic": 4344.1956492,
+        "Hidden Power Steel": 2744.3870718,
+        "Curse": 2497.2621696,
+        "Rest": 2401.8806283999998,
+        "Earthquake": 1673.5124956,
+        "Hidden Power Dark": 1283.3152816,
+        "Hidden Power Rock": 1187.9337404,
+        "Thunder": 1079.5456253999998,
+        "Amnesia": 819.4141494,
+        "Zap Cannon": 589.6313455999999,
+        "Rain Dance": 572.2892472,
+        "Focus Punch": 359.8485418,
+        "Hidden Power Ghost": 351.1774926,
+        "Protect": 251.46042679999996,
+        "Sunny Day": 134.4012626,
+        "Body Slam": 125.73021339999998,
+        "Rollout": 104.05259039999999,
+        "Iron Defense": 82.3749674,
+        "Return": 78.0394428,
+        "Ice Punch": 47.6907706,
+        "Ancient Power": 39.0197214,
+        "Nothing": 34.6841968,
+        "Hidden Power Bug": 30.3486722,
+        "Thunderbolt": 21.677623,
+        "Mimic": 13.006573799999998,
+        "Hidden Power Psychic": 13.006573799999998,
+        "Rock Slide": 8.6710492,
+        "Sleep Talk": 4.3355246,
+        "Self-Destruct": 4.3355246,
+        "Brick Break": 4.3355246
+      },
+      "Natures": {
+        "Careful": 31103.053480399914,
+        "Sassy": 4422.235092,
+        "Calm": 2735.7160226000015,
+        "Relaxed": 1083.88115,
+        "Adamant": 1534.7757084,
+        "Impish": 1907.630824000001,
+        "Bold": 411.87483699999996,
+        "Quiet": 117.0591642,
+        "Brave": 8.6710492,
+        "Hardy": 21.677623,
+        "Hasty": 4.3355246,
+        "Rash": 4.3355246
+      }
+    },
+    "Jolteon": {
+      "Raw count": 39093,
+      "usage": 0.0773,
+      "Abilities": {
+        "Volt Absorb": 30219.661999999997
+      },
+      "Items": {
+        "Leftovers": 29796.586731999996,
+        "Lum Berry": 335.4382482,
+        "Petaya Berry": 69.5052226,
+        "Magnet": 9.065898599999999,
+        "Chesto Berry": 6.043932399999999,
+        "Nothing": 3.0219661999999996
+      },
+      "Moves": {
+        "Thunderbolt": 30204.552169,
+        "Baton Pass": 22299.088589799998,
+        "Hidden Power Grass": 20501.0187008,
+        "Thunder Wave": 18285.917476199997,
+        "Roar": 11423.032236,
+        "Hidden Power Ice": 9513.1495976,
+        "Substitute": 5575.527638999999,
+        "Wish": 1955.2121313999996,
+        "Bite": 359.6139778,
+        "Toxic": 278.0208904,
+        "Sunny Day": 129.9445466,
+        "Charm": 129.9445466,
+        "Curse": 78.5711212,
+        "Tickle": 75.549155,
+        "Sand Attack": 18.131797199999998,
+        "Rain Dance": 9.065898599999999,
+        "Thunder": 9.065898599999999,
+        "Rest": 6.043932399999999,
+        "Protect": 6.043932399999999,
+        "Double Kick": 3.0219661999999996,
+        "Hidden Power Fire": 3.0219661999999996,
+        "Hidden Power Water": 3.0219661999999996,
+        "Quick Attack": 3.0219661999999996,
+        "Shadow Ball": 3.0219661999999996
+      },
+      "Natures": {
+        "Timid": 30195.48627039998,
+        "Modest": 15.109830999999998,
+        "Hasty": 12.087864799999998
+      }
+    },
+    "Flygon": {
+      "Raw count": 29551,
+      "usage": 0.0732,
+      "Abilities": {
+        "Levitate": 28616.808
+      },
+      "Items": {
+        "Leftovers": 20764.355884800003,
+        "Choice Band": 6796.4919,
+        "Salac Berry": 764.0687736000001,
+        "Liechi Berry": 180.2858904,
+        "Soft Sand": 31.478488800000004,
+        "King's Rock": 31.478488800000004,
+        "Scope Lens": 31.478488800000004,
+        "White Herb": 11.446723200000001,
+        "Lum Berry": 5.7233616000000005
+      },
+      "Moves": {
+        "Earthquake": 28553.851022400002,
+        "Rock Slide": 23634.6217272,
+        "Toxic": 16634.950490400002,
+        "Protect": 13907.768688,
+        "Hidden Power Bug": 10393.6246656,
+        "Quick Attack": 3889.0242072,
+        "Fire Blast": 3602.8561272000006,
+        "Hidden Power Rock": 3465.4954488000003,
+        "Substitute": 3451.1870448,
+        "Flamethrower": 1499.5207392000002,
+        "Double-Edge": 1307.7881256,
+        "Dragon Claw": 772.653816,
+        "Gust": 652.4632224000001,
+        "Rest": 626.7080952,
+        "Endure": 589.5062448,
+        "Hidden Power Ghost": 520.8259056,
+        "Hidden Power Ice": 208.90269840000002,
+        "Hidden Power Grass": 163.11580560000002,
+        "Body Slam": 111.6055512,
+        "Return": 100.158828,
+        "Giga Drain": 77.26538160000001,
+        "Sand Attack": 71.54202000000001,
+        "Screech": 45.786892800000004,
+        "Dragon Breath": 45.786892800000004,
+        "Hidden Power Flying": 40.0635312,
+        "Sunny Day": 37.2018504,
+        "Solar Beam": 34.340169599999996,
+        "Nothing": 11.446723200000001,
+        "Steel Wing": 5.7233616000000005,
+        "Hidden Power Fighting": 2.8616808000000002,
+        "Crunch": 2.8616808000000002
+      },
+      "Natures": {
+        "Impish": 13504.271695199996,
+        "Jolly": 6375.8248224,
+        "Adamant": 4744.6667664,
+        "Relaxed": 1047.3751727999997,
+        "Lax": 818.4407088,
+        "Naive": 784.1005391999998,
+        "Brave": 469.31565119999993,
+        "Careful": 191.7326136,
+        "Naughty": 372.01850400000006,
+        "Hardy": 137.3606784,
+        "Rash": 74.40370079999998,
+        "Modest": 51.5102544,
+        "Hasty": 20.0317656,
+        "Quiet": 8.585042399999999,
+        "Timid": 8.585042399999999,
+        "Lonely": 2.8616808000000002
+      }
+    },
+    "Raikou": {
+      "Raw count": 25508,
+      "usage": 0.0622,
+      "Abilities": {
+        "Pressure": 24316.468
+      },
+      "Items": {
+        "Leftovers": 23441.075152,
+        "Lum Berry": 773.2636824000001,
+        "Chesto Berry": 72.949404,
+        "Petaya Berry": 14.5898808,
+        "Magnet": 12.158234
+      },
+      "Moves": {
+        "Thunderbolt": 24277.561651199998,
+        "Calm Mind": 23915.246278000002,
+        "Hidden Power Grass": 17121.2251188,
+        "Substitute": 11679.1995804,
+        "Crunch": 9626.8896812,
+        "Hidden Power Ice": 4751.4378472,
+        "Rest": 4150.8210876,
+        "Roar": 1026.1549496,
+        "Toxic": 269.91279480000003,
+        "Psych Up": 192.10009720000002,
+        "Thunder Wave": 80.2443444,
+        "Sleep Talk": 80.2443444,
+        "Thunder": 53.49622960000001,
+        "Reflect": 24.316468,
+        "Nothing": 9.7265872,
+        "Rain Dance": 4.8632936
+      },
+      "Natures": {
+        "Timid": 21760.807213199987,
+        "Modest": 2339.2442216000004,
+        "Bold": 206.68997799999997,
+        "Hasty": 4.8632936
+      }
+    },
+    "Heracross": {
+      "Raw count": 30738,
+      "usage": 0.0616,
+      "Abilities": {
+        "Guts": 13844.686609600001,
+        "Swarm": 10237.217390400001
+      },
+      "Items": {
+        "Salac Berry": 8946.427336,
+        "Leftovers": 8590.015156800002,
+        "Choice Band": 6362.4390368,
+        "Chesto Berry": 96.327616,
+        "Nothing": 69.8375216,
+        "Lum Berry": 7.2245712,
+        "Liechi Berry": 7.2245712,
+        "Silver Powder": 2.4081904000000005
+      },
+      "Moves": {
+        "Megahorn": 23845.901340800003,
+        "Rock Slide": 18593.638078400003,
+        "Focus Punch": 11393.148782400001,
+        "Swords Dance": 10819.999467200001,
+        "Brick Break": 10817.5912768,
+        "Substitute": 8635.7707744,
+        "Reversal": 3968.6977792000002,
+        "Endure": 3564.1217920000004,
+        "Hidden Power Ghost": 2545.4572528000003,
+        "Hidden Power Rock": 1155.9313920000002,
+        "Sleep Talk": 332.3302752,
+        "Rain Dance": 139.6750432,
+        "Thief": 137.2668528,
+        "Rest": 96.327616,
+        "Toxic": 79.47028320000001,
+        "Sunny Day": 77.06209280000002,
+        "Double-Edge": 50.5719984,
+        "Earthquake": 40.9392368,
+        "Hidden Power Bug": 21.673713600000003,
+        "Bulk Up": 9.632761600000002,
+        "Nothing": 2.4081904000000005
+      },
+      "Natures": {
+        "Adamant": 18569.556174399993,
+        "Jolly": 5493.082302399999,
+        "Careful": 4.816380800000001
+      }
+    },
+    "Charizard": {
+      "Raw count": 33405,
+      "usage": 0.0533,
+      "Abilities": {
+        "Blaze": 20837.102
+      },
+      "Items": {
+        "Leftovers": 19172.2175502,
+        "Petaya Berry": 1046.0225204,
+        "Salac Berry": 539.6809417999999,
+        "Lum Berry": 58.34388559999999,
+        "Charcoal": 18.7533918,
+        "Choice Band": 4.1674204
+      },
+      "Moves": {
+        "Hidden Power Grass": 17680.281047,
+        "Substitute": 12110.5236824,
+        "Focus Punch": 12106.356262,
+        "Fire Blast": 11087.4219742,
+        "Flamethrower": 9357.9425082,
+        "Beat Up": 7588.8725484,
+        "Dragon Claw": 5684.361425599999,
+        "Hidden Power Ice": 2156.6400569999996,
+        "Overheat": 2067.0405183999997,
+        "Sunny Day": 764.7216434000001,
+        "Brick Break": 752.2193821999999,
+        "Toxic": 652.2012926,
+        "Rock Slide": 458.41624399999995,
+        "Blast Burn": 185.4502078,
+        "Dragon Dance": 170.8642364,
+        "Earthquake": 129.19003239999998,
+        "Hidden Power Flying": 108.35293039999999,
+        "Belly Drum": 104.18551,
+        "Roar": 58.34388559999999,
+        "Hidden Power Dark": 35.42307339999999,
+        "Protect": 22.9208122,
+        "Hidden Power Electric": 14.585971399999998,
+        "Double-Edge": 12.502261199999998,
+        "Fly": 6.251130599999999,
+        "Hyper Beam": 6.251130599999999,
+        "Nothing": 4.1674204,
+        "Swords Dance": 4.1674204,
+        "Seismic Toss": 4.1674204,
+        "Sleep Talk": 4.1674204,
+        "Heat Wave": 4.1674204,
+        "Steel Wing": 2.0837102
+      },
+      "Natures": {
+        "Hasty": 8368.180163200002,
+        "Mild": 4142.4158776,
+        "Timid": 3969.4679310000006,
+        "Modest": 3019.2960797999995,
+        "Rash": 604.275958,
+        "Naive": 387.57009719999996,
+        "Hardy": 135.44116300000002,
+        "Adamant": 43.757914199999995,
+        "Naughty": 56.2601754,
+        "Jolly": 47.9253346,
+        "Lonely": 50.009044799999984
+      }
+    },
+    "Moltres": {
+      "Raw count": 18379,
+      "usage": 0.051,
+      "Abilities": {
+        "Pressure": 19937.94
+      },
+      "Items": {
+        "Leftovers": 19758.498539999997,
+        "Choice Band": 175.453872
+      },
+      "Moves": {
+        "Hidden Power Grass": 18695.806338,
+        "Flamethrower": 17732.803836,
+        "Will-O-Wisp": 14137.993253999997,
+        "Roar": 10124.485932,
+        "Overheat": 6230.60625,
+        "Protect": 4579.744817999999,
+        "Toxic": 2187.192018,
+        "Fire Blast": 2015.7257339999999,
+        "Rest": 1130.481198,
+        "Substitute": 743.685162,
+        "Sunny Day": 643.995462,
+        "Morning Sun": 422.684328,
+        "Hidden Power Ice": 328.97601,
+        "Hidden Power Fighting": 297.07530599999996,
+        "Aerial Ace": 171.466284,
+        "Sleep Talk": 137.57178599999997,
+        "Agility": 59.81382,
+        "Extrasensory": 37.882085999999994,
+        "Sky Attack": 27.913116,
+        "Double-Edge": 25.919321999999998,
+        "Hyper Beam": 5.981381999999999,
+        "Hidden Power Electric": 5.981381999999999,
+        "Fire Spin": 1.993794,
+        "Steel Wing": 1.993794
+      },
+      "Natures": {
+        "Timid": 7530.559937999998,
+        "Modest": 11763.3846,
+        "Calm": 273.14977799999997,
+        "Lonely": 163.49110799999997,
+        "Rash": 87.726936,
+        "Bold": 53.83243799999999,
+        "Naughty": 33.894498,
+        "Mild": 13.956558,
+        "Naive": 5.981381999999999,
+        "Gentle": 1.993794,
+        "Hasty": 1.993794
+      }
+    },
+    "Gyarados": {
+      "Raw count": 24204,
+      "usage": 0.0474,
+      "Abilities": {
+        "Intimidate": 18530.556
+      },
+      "Items": {
+        "Leftovers": 16955.458740000002,
+        "Liechi Berry": 952.4705784,
+        "Lum Berry": 492.9127896,
+        "Choice Band": 85.2405576,
+        "White Herb": 18.530556,
+        "Salac Berry": 12.9713892,
+        "Silk Scarf": 11.1183336
+      },
+      "Moves": {
+        "Dragon Dance": 17174.1193008,
+        "Earthquake": 17103.703188,
+        "Hidden Power Flying": 12176.4283476,
+        "Thunder Wave": 6411.572376,
+        "Double-Edge": 5594.3748564,
+        "Taunt": 4117.4895432,
+        "Hidden Power Rock": 3917.3595384,
+        "Rest": 2247.7564428,
+        "Hidden Power Ghost": 1462.0608684,
+        "Substitute": 1430.5589232000002,
+        "Flail": 945.058356,
+        "Body Slam": 491.059734,
+        "Rain Dance": 290.9297292,
+        "Roar": 216.8075052,
+        "Hydro Pump": 124.1547252,
+        "Leer": 96.3588912,
+        "Return": 70.41611280000001,
+        "Surf": 55.591668000000006,
+        "Ice Beam": 38.9141676,
+        "Fire Blast": 33.3550008,
+        "Endure": 33.3550008,
+        "Thunderbolt": 16.6775004,
+        "Sleep Talk": 14.824444800000002,
+        "Hidden Power Fighting": 14.824444800000002,
+        "Frustration": 12.9713892,
+        "Facade": 11.1183336,
+        "Hyper Beam": 9.265278,
+        "Protect": 3.7061112000000005,
+        "Hidden Power Ice": 1.8530556000000002,
+        "Toxic": 1.8530556000000002,
+        "Thunder": 1.8530556000000002
+      },
+      "Natures": {
+        "Adamant": 11513.034442799984,
+        "Jolly": 5770.4151384,
+        "Impish": 969.1480788,
+        "Careful": 74.122224,
+        "Lonely": 124.15472519999999,
+        "Naughty": 33.3550008,
+        "Modest": 16.6775004,
+        "Hasty": 12.971389200000003,
+        "Hardy": 9.265278,
+        "Naive": 3.7061112000000005
+      }
+    },
+    "Medicham": {
+      "Raw count": 23208,
+      "usage": 0.0452,
+      "Abilities": {
+        "Pure Power": 17670.487999999998
+      },
+      "Items": {
+        "Salac Berry": 5511.425207199999,
+        "Leftovers": 4315.1331696,
+        "Lum Berry": 3984.6950439999996,
+        "Choice Band": 3806.2231151999995,
+        "Liechi Berry": 31.806878399999995,
+        "Black Belt": 12.369341599999998,
+        "White Herb": 8.835244
+      },
+      "Moves": {
+        "Shadow Ball": 16295.724033599998,
+        "Brick Break": 15055.255775999998,
+        "Focus Punch": 13417.201538399997,
+        "Rock Slide": 12869.416410399997,
+        "Substitute": 4097.786167199999,
+        "Reversal": 3191.2901328,
+        "Fake Out": 2260.0554152,
+        "Bulk Up": 1293.4797216,
+        "Recover": 1120.3089391999997,
+        "Baton Pass": 427.6258095999999,
+        "Hidden Power Bug": 176.70487999999997,
+        "Psychic": 88.35243999999999,
+        "Calm Mind": 88.35243999999999,
+        "Hidden Power Flying": 84.81834239999998,
+        "Endure": 65.38080559999999,
+        "High Jump Kick": 30.039829599999994,
+        "Hidden Power Ground": 26.505732,
+        "Protect": 26.505732,
+        "Counter": 19.4375368,
+        "Body Slam": 12.369341599999998,
+        "Hidden Power Rock": 8.835244,
+        "Return": 7.068195199999999,
+        "Sleep Talk": 7.068195199999999,
+        "Hidden Power Ghost": 5.301146399999999,
+        "Light Screen": 3.5340975999999995,
+        "Double-Edge": 3.5340975999999995,
+        "Fire Punch": 1.7670487999999998,
+        "Ice Punch": 1.7670487999999998
+      },
+      "Natures": {
+        "Jolly": 8923.596439999998,
+        "Adamant": 7985.293527199999,
+        "Careful": 266.82436879999995,
+        "Impish": 395.8189311999999,
+        "Hasty": 90.1194888,
+        "Naughty": 3.5340975999999995
+      }
+    },
+    "Cloyster": {
+      "Raw count": 12927,
+      "usage": 0.0439,
+      "Abilities": {
+        "Shell Armor": 17162.266
+      },
+      "Items": {
+        "Leftovers": 16973.481074,
+        "Salac Berry": 132.1494482,
+        "Lum Berry": 42.905665,
+        "Petaya Berry": 3.4324532,
+        "Nothing": 3.4324532,
+        "Choice Band": 3.4324532,
+        "Mystic Water": 1.7162266,
+        "Focus Band": 1.7162266
+      },
+      "Moves": {
+        "Spikes": 17157.1173202,
+        "Explosion": 17018.1029656,
+        "Rapid Spin": 15760.1088678,
+        "Surf": 13661.163736,
+        "Ice Beam": 4388.391416199999,
+        "Screech": 199.08228559999998,
+        "Rain Dance": 118.41963539999999,
+        "Hidden Power Fighting": 116.70340879999999,
+        "Rest": 80.6626502,
+        "Hidden Power Fire": 48.054344799999996,
+        "Hidden Power Grass": 37.7569852,
+        "Toxic": 13.7298128,
+        "Barrier": 13.7298128,
+        "Nothing": 8.581133,
+        "Protect": 8.581133,
+        "Icy Wind": 5.148679799999999,
+        "Self-Destruct": 3.4324532,
+        "Hidden Power Ground": 3.4324532,
+        "Double-Edge": 1.7162266,
+        "Blizzard": 1.7162266
+      },
+      "Natures": {
+        "Timid": 10395.184516199988,
+        "Modest": 4304.296312799998,
+        "Bold": 883.856699,
+        "Calm": 801.4778222,
+        "Hasty": 250.56908360000003,
+        "Impish": 116.7034088,
+        "Naive": 89.24378320000002,
+        "Hardy": 65.2166108,
+        "Relaxed": 66.9328374,
+        "Sassy": 44.621891600000005,
+        "Jolly": 32.6083054,
+        "Mild": 24.027172399999998,
+        "Naughty": 15.4460394,
+        "Adamant": 12.013586199999999,
+        "Quiet": 8.581133,
+        "Lax": 18.8784926,
+        "Gentle": 6.8649064,
+        "Rash": 5.1486798
+      }
+    },
+    "Milotic": {
+      "Raw count": 15373,
+      "usage": 0.0417,
+      "Abilities": {
+        "Marvel Scale": 16302.198
+      },
+      "Items": {
+        "Leftovers": 16215.796350600001,
+        "Lum Berry": 70.0994514,
+        "Salac Berry": 14.6719782
+      },
+      "Moves": {
+        "Recover": 16276.114483199999,
+        "Surf": 14062.2759948,
+        "Toxic": 11207.761125,
+        "Refresh": 10945.2957372,
+        "Ice Beam": 6877.8973362,
+        "Hypnosis": 3051.7714656000003,
+        "Hydro Pump": 2205.6873894,
+        "Hidden Power Electric": 283.6582452,
+        "Mirror Coat": 200.5170354,
+        "Icy Wind": 17.932417800000003,
+        "Rest": 16.302198,
+        "Sleep Talk": 14.6719782,
+        "Hidden Power Grass": 13.0417584,
+        "Nothing": 11.4115386,
+        "Wrap": 9.7813188,
+        "Hidden Power Fire": 8.151099,
+        "Light Screen": 3.2604396,
+        "Protect": 3.2604396
+      },
+      "Natures": {
+        "Bold": 12374.998501799984,
+        "Modest": 3439.763778,
+        "Calm": 200.5170354,
+        "Timid": 264.0956076,
+        "Hardy": 11.4115386
+      }
+    },
+    "Breloom": {
+      "Raw count": 20044,
+      "usage": 0.0383,
+      "Abilities": {
+        "Effect Spore": 14973.002
+      },
+      "Items": {
+        "Leftovers": 11386.968020999999,
+        "Black Belt": 3457.2661618,
+        "Spell Tag": 46.4163062,
+        "Lum Berry": 31.4433042,
+        "Salac Berry": 29.946004000000002,
+        "Liechi Berry": 7.4865010000000005,
+        "Choice Band": 7.4865010000000005,
+        "Leppa Berry": 2.9946004000000004
+      },
+      "Moves": {
+        "Spore": 14964.0181988,
+        "Focus Punch": 13195.7066626,
+        "Mach Punch": 10773.074939,
+        "Brick Break": 4854.2472484,
+        "Sky Uppercut": 4357.143582,
+        "Hidden Power Ghost": 3803.1425080000004,
+        "Substitute": 3166.789923,
+        "Leech Seed": 2509.4751352,
+        "Stun Spore": 1052.6020406,
+        "Swords Dance": 745.6554996,
+        "Hidden Power Rock": 239.56803200000002,
+        "Hidden Power Bug": 203.6328272,
+        "Sludge Bomb": 10.4811014,
+        "Hidden Power Grass": 7.4865010000000005,
+        "Giga Drain": 5.989200800000001,
+        "Bulk Up": 1.4973002000000002,
+        "Hidden Power Flying": 1.4973002000000002
+      },
+      "Natures": {
+        "Jolly": 8027.026372199999,
+        "Adamant": 6803.732108799997,
+        "Hardy": 47.9136064,
+        "Impish": 85.34611140000001,
+        "Naive": 7.4865010000000005,
+        "Naughty": 5.989200800000001,
+        "Careful": 1.4973002000000002
+      }
+    },
+    "Vaporeon": {
+      "Raw count": 10143,
+      "usage": 0.0273,
+      "Abilities": {
+        "Water Absorb": 10672.662
+      },
+      "Items": {
+        "Leftovers": 10635.307683,
+        "Salac Berry": 21.345324,
+        "Lum Berry": 9.6053958,
+        "Petaya Berry": 5.336331
+      },
+      "Moves": {
+        "Ice Beam": 6781.4094348,
+        "Wish": 6212.5565502,
+        "Hydro Pump": 5846.4842436,
+        "Baton Pass": 5211.4608546,
+        "Surf": 4816.5723606,
+        "Substitute": 4169.8090434,
+        "Protect": 3269.0363706000003,
+        "Hidden Power Grass": 2140.9359972,
+        "Haze": 1624.3791564,
+        "Roar": 1019.239221,
+        "Acid Armor": 546.4402944000001,
+        "Rain Dance": 399.15755880000006,
+        "Hidden Power Electric": 359.6687094,
+        "Toxic": 262.5474852,
+        "Rest": 12.807194399999998,
+        "Hidden Power Fire": 10.672662,
+        "Icy Wind": 4.269064800000001,
+        "Shadow Ball": 1.0672662000000002
+      },
+      "Natures": {
+        "Bold": 3047.045000999999,
+        "Modest": 6408.933530999994,
+        "Calm": 619.0143960000001,
+        "Sassy": 127.00467780000001,
+        "Timid": 324.4489248,
+        "Relaxed": 117.399282,
+        "Hardy": 22.4125902,
+        "Mild": 1.0672662000000002
+      }
+    },
+    "Regirock": {
+      "Raw count": 9099,
+      "usage": 0.0221,
+      "Abilities": {
+        "Clear Body": 8639.774000000001
+      },
+      "Items": {
+        "Leftovers": 5987.3633820000005,
+        "Choice Band": 2048.4904154000005,
+        "Lum Berry": 412.11721980000004,
+        "White Herb": 140.82831620000002,
+        "Chesto Berry": 23.327389800000006,
+        "Liechi Berry": 20.7354576,
+        "Salac Berry": 6.911819200000001,
+        "Hard Stone": 0.8639774000000001
+      },
+      "Moves": {
+        "Explosion": 7950.320034800001,
+        "Rock Slide": 5991.683269000001,
+        "Superpower": 5282.357823600001,
+        "Thunder Wave": 4757.0595644,
+        "Earthquake": 4028.7266162000005,
+        "Hidden Power Rock": 2507.2624148000004,
+        "Curse": 934.8235468000001,
+        "Hidden Power Bug": 886.4408124000001,
+        "Counter": 646.2550952000001,
+        "Self-Destruct": 584.9126998,
+        "Focus Punch": 430.26074520000003,
+        "Toxic": 134.7804744,
+        "Ancient Power": 115.77297160000002,
+        "Hidden Power Ghost": 107.99717500000003,
+        "Body Slam": 101.08535580000002,
+        "Rest": 33.6951186,
+        "Seismic Toss": 20.7354576,
+        "Rollout": 13.823638400000002,
+        "Defense Curl": 13.823638400000002,
+        "Substitute": 12.959661000000002,
+        "Protect": 0.8639774000000001,
+        "Hidden Power Grass": 0.8639774000000001,
+        "Sunny Day": 0.8639774000000001,
+        "Brick Break": 0.8639774000000001
+      },
+      "Natures": {
+        "Adamant": 8524.865005799998,
+        "Impish": 100.22137839999999,
+        "Careful": 11.231706200000003,
+        "Brave": 0.8639774000000001
+      }
+    },
+    "Hariyama": {
+      "Raw count": 9680,
+      "usage": 0.0206,
+      "Abilities": {
+        "Guts": 7162.6619416,
+        "Thick Fat": 890.7020584
+      },
+      "Items": {
+        "Leftovers": 8035.6465992,
+        "Choice Band": 12.885382400000001,
+        "Leppa Berry": 4.026682,
+        "Lum Berry": 0.8053364000000001
+      },
+      "Moves": {
+        "Knock Off": 7814.984425600001,
+        "Brick Break": 7148.1658864,
+        "Rock Slide": 4988.2536616,
+        "Hidden Power Bug": 3673.9446568000003,
+        "Focus Punch": 2873.4402752,
+        "Rest": 2489.2948124,
+        "Whirlwind": 1139.551006,
+        "Cross Chop": 986.53709,
+        "Hidden Power Ghost": 666.0132028,
+        "Counter": 124.82714200000001,
+        "Hidden Power Flying": 92.613686,
+        "Bulk Up": 45.098838400000005,
+        "Sleep Talk": 37.850810800000005,
+        "Hidden Power Rock": 23.3547556,
+        "Substitute": 22.549419200000003,
+        "Seismic Toss": 20.9387464,
+        "Earthquake": 20.9387464,
+        "Toxic": 17.717400800000004,
+        "Protect": 7.2480276,
+        "Refresh": 5.637354800000001,
+        "Revenge": 4.8320184,
+        "Body Slam": 4.026682,
+        "Fake Out": 4.026682,
+        "Facade": 1.6106728000000001
+      },
+      "Natures": {
+        "Impish": 2840.4214828,
+        "Adamant": 4885.170602399995,
+        "Careful": 132.07516959999998,
+        "Brave": 116.773778,
+        "Sassy": 67.6482576,
+        "Bold": 6.4426912000000005,
+        "Jolly": 1.6106728000000001,
+        "Calm": 0.8053364000000001
+      }
+    },
+    "Regice": {
+      "Raw count": 11341,
+      "usage": 0.0204,
+      "Abilities": {
+        "Clear Body": 7975.176
+      },
+      "Items": {
+        "Leftovers": 7948.857919200001,
+        "Choice Band": 14.3553168,
+        "Black Belt": 7.1776584,
+        "Lum Berry": 3.1900704,
+        "Chesto Berry": 1.5950352
+      },
+      "Moves": {
+        "Ice Beam": 7972.7834472,
+        "Thunderbolt": 7614.6980448,
+        "Explosion": 7203.1789632,
+        "Thunder Wave": 6108.984816,
+        "Hidden Power Fire": 728.1335688,
+        "Seismic Toss": 544.7045208000001,
+        "Counter": 297.4740648,
+        "Psych Up": 281.5237128,
+        "Rest": 228.09003360000003,
+        "Rain Dance": 222.50741040000003,
+        "Thunder": 157.90848480000002,
+        "Hidden Power Grass": 117.2350872,
+        "Curse": 86.9294184,
+        "Superpower": 82.9418304,
+        "Toxic": 82.9418304,
+        "Hail": 75.764172,
+        "Sleep Talk": 43.065950400000006,
+        "Focus Punch": 19.93794,
+        "Earthquake": 14.3553168,
+        "Hidden Power Dark": 7.975176,
+        "Blizzard": 2.3925528,
+        "Substitute": 2.3925528,
+        "Zap Cannon": 1.5950352,
+        "Dynamic Punch": 1.5950352,
+        "Protect": 1.5950352,
+        "Mimic": 0.7975176
+      },
+      "Natures": {
+        "Quiet": 6332.289744000001,
+        "Bold": 287.9038536,
+        "Modest": 1149.2228616000002,
+        "Sassy": 156.3134496,
+        "Naughty": 14.3553168,
+        "Relaxed": 11.962764,
+        "Brave": 11.962764,
+        "Naive": 3.1900704,
+        "Hardy": 1.5950352,
+        "Mild": 1.5950352,
+        "Calm": 1.5950352
+      }
+    },
+    "Smeargle": {
+      "Raw count": 13319,
+      "usage": 0.0199,
+      "Abilities": {
+        "Own Tempo": 7779.706
+      },
+      "Items": {
+        "Salac Berry": 4240.7177406,
+        "Leftovers": 2550.9655974,
+        "Lum Berry": 605.2611267999999,
+        "Choice Band": 289.4050632,
+        "Nothing": 40.4544712,
+        "Silk Scarf": 32.674765199999996,
+        "Petaya Berry": 9.335647199999999,
+        "Focus Band": 6.2237648000000005,
+        "Mental Herb": 2.3339117999999996,
+        "Sitrus Berry": 1.5559412000000001,
+        "White Herb": 0.7779706000000001
+      },
+      "Moves": {
+        "Spore": 7775.038176399999,
+        "Spikes": 6763.6763964,
+        "Encore": 3675.1331144,
+        "Destiny Bond": 2124.6377086,
+        "Agility": 2084.961208,
+        "Whirlwind": 1522.4884642000002,
+        "Explosion": 1306.2126374,
+        "Endeavor": 1123.3895464,
+        "Substitute": 753.8535114,
+        "Will-O-Wisp": 628.6002448,
+        "Baton Pass": 607.5950386000001,
+        "Belly Drum": 481.5638014,
+        "Transform": 451.22294800000003,
+        "Rapid Spin": 338.417211,
+        "Trick": 289.4050632,
+        "Dragon Dance": 150.9262964,
+        "Memento": 141.5906492,
+        "Extreme Speed": 123.69732540000001,
+        "Endure": 108.915884,
+        "Knock Off": 101.136178,
+        "Seismic Toss": 86.35473660000001,
+        "Taunt": 80.1309718,
+        "Thunder Wave": 67.6834422,
+        "Roar": 63.79358920000001,
+        "Leech Seed": 62.237648,
+        "Swords Dance": 42.0104124,
+        "Recycle": 40.4544712,
+        "Super Fang": 27.228971,
+        "Reflect": 21.7831768,
+        "Pain Split": 20.2272356,
+        "Wish": 13.225500199999999,
+        "Aromatherapy": 11.669559,
+        "Fake Out": 10.1136178,
+        "Heal Bell": 5.4457942,
+        "Sunny Day": 4.667823599999999,
+        "Tail Glow": 3.1118824000000003,
+        "Torment": 1.5559412000000001,
+        "Mean Look": 0.7779706000000001,
+        "Perish Song": 0.7779706000000001,
+        "Protect": 0.7779706000000001,
+        "Bulk Up": 0.7779706000000001
+      },
+      "Natures": {
+        "Jolly": 4751.0664541999995,
+        "Timid": 2949.2865446,
+        "Bold": 42.788382999999996,
+        "Adamant": 32.6747652,
+        "Impish": 3.889853,
+        "Calm": 0.7779706000000001
+      }
+    },
+    "Kingdra": {
+      "Raw count": 12918,
+      "usage": 0.0179,
+      "Abilities": {
+        "Swift Swim": 6997.826
+      },
+      "Items": {
+        "Leftovers": 3709.5475626,
+        "Lum Berry": 2720.0549662,
+        "Petaya Berry": 527.6360804,
+        "Mystic Water": 19.5939128,
+        "Choice Band": 6.997826,
+        "Nothing": 6.2980434,
+        "Chesto Berry": 4.1986956,
+        "Liechi Berry": 2.7991304
+      },
+      "Moves": {
+        "Ice Beam": 6869.7657842,
+        "Rain Dance": 6865.5670886,
+        "Surf": 3806.8173440000005,
+        "Hydro Pump": 3215.501047,
+        "Hidden Power Electric": 2762.7417047999998,
+        "Substitute": 1829.931499,
+        "Hidden Power Grass": 1722.1649786,
+        "Smokescreen": 209.2349974,
+        "Toxic": 164.448911,
+        "Hidden Power Fighting": 128.7599984,
+        "Dragon Dance": 126.66065060000001,
+        "Waterfall": 120.3626072,
+        "Blizzard": 95.1704336,
+        "Body Slam": 27.991304,
+        "Rest": 15.395217200000001,
+        "Hidden Power Dragon": 10.496739,
+        "Double-Edge": 6.2980434,
+        "Flail": 2.7991304,
+        "Hidden Power Ghost": 2.7991304,
+        "Protect": 2.7991304,
+        "Dragon Breath": 2.0993478,
+        "Hidden Power Ground": 0.6997826,
+        "Octazooka": 0.6997826
+      },
+      "Natures": {
+        "Modest": 6771.096437599998,
+        "Mild": 114.76434639999998,
+        "Lonely": 73.47717300000001,
+        "Quiet": 16.0949998,
+        "Naughty": 5.5982608,
+        "Timid": 10.496739,
+        "Adamant": 2.7991304
+      }
+    },
+    "Houndoom": {
+      "Raw count": 9125,
+      "usage": 0.0176,
+      "Abilities": {
+        "Flash Fire": 5613.8358496,
+        "Early Bird": 1266.7081504000002
+      },
+      "Items": {
+        "Leftovers": 6053.5026112000005,
+        "Salac Berry": 646.0830816,
+        "Lum Berry": 125.91395520000002,
+        "Black Glasses": 24.769958400000004,
+        "Chesto Berry": 13.761088000000003,
+        "Miracle Seed": 10.320816,
+        "Focus Band": 4.1283264,
+        "Nothing": 0.6880544000000001,
+        "Petaya Berry": 0.6880544000000001
+      },
+      "Moves": {
+        "Pursuit": 6818.619104,
+        "Fire Blast": 5374.392918400001,
+        "Crunch": 5127.3813888,
+        "Will-O-Wisp": 4254.2403552000005,
+        "Hidden Power Grass": 1666.4677568000002,
+        "Flamethrower": 972.2208672000002,
+        "Taunt": 605.487872,
+        "Hidden Power Ice": 601.3595456000002,
+        "Reversal": 574.525424,
+        "Overheat": 553.8837920000001,
+        "Beat Up": 363.98077760000007,
+        "Sunny Day": 239.4429312,
+        "Solar Beam": 126.60200960000002,
+        "Endure": 114.90508480000001,
+        "Roar": 105.2723232,
+        "Substitute": 8.9447072,
+        "Howl": 6.880544000000001,
+        "Toxic": 6.192489600000001,
+        "Hidden Power Fighting": 1.3761088000000001
+      },
+      "Natures": {
+        "Timid": 3382.4754304000003,
+        "Modest": 2920.1028735999994,
+        "Mild": 575.2134784,
+        "Calm": 2.0641632,
+        "Hasty": 1.3761088000000001
+      }
+    },
+    "Venusaur": {
+      "Raw count": 7141,
+      "usage": 0.0163,
+      "Abilities": {
+        "Overgrow": 6372.321999999999
+      },
+      "Items": {
+        "Leftovers": 6365.949677999999,
+        "Petaya Berry": 2.5489287999999997,
+        "Nothing": 1.9116965999999995,
+        "Lum Berry": 1.2744643999999998
+      },
+      "Moves": {
+        "Sleep Powder": 6287.5701174,
+        "Leech Seed": 6251.247881999999,
+        "Giga Drain": 5889.937224599999,
+        "Hidden Power Fire": 4085.9328663999995,
+        "Hidden Power Ice": 1532.5434409999998,
+        "Roar": 458.1699518,
+        "Razor Leaf": 292.4895798,
+        "Sludge Bomb": 274.0098459999999,
+        "Earthquake": 115.97626039999999,
+        "Swords Dance": 114.06456379999999,
+        "Protect": 61.174291199999985,
+        "Substitute": 40.145628599999995,
+        "Toxic": 18.479733799999995,
+        "Synthesis": 16.568037199999996,
+        "Hidden Power Grass": 14.656340599999998,
+        "Charm": 11.470179599999998,
+        "Frenzy Plant": 7.646786399999998,
+        "Hidden Power Electric": 4.4606254,
+        "Growth": 4.4606254,
+        "Hidden Power Bug": 4.4606254,
+        "Sunny Day": 3.186161,
+        "Body Slam": 0.6372321999999999
+      },
+      "Natures": {
+        "Timid": 4787.5255185999995,
+        "Calm": 555.6664784,
+        "Modest": 721.3468504000001,
+        "Jolly": 88.57527579999997,
+        "Sassy": 107.69224179999998,
+        "Careful": 43.96902179999999,
+        "Lonely": 29.312681199999997,
+        "Bold": 13.381876199999997,
+        "Impish": 8.284018599999998,
+        "Gentle": 3.8233932,
+        "Adamant": 3.8233932,
+        "Hasty": 3.823393199999999,
+        "Naive": 1.9116966,
+        "Hardy": 1.2744643999999998,
+        "Quiet": 1.2744643999999998,
+        "Relaxed": 0.6372321999999999
+      }
+    },
+    "Umbreon": {
+      "Raw count": 9744,
+      "usage": 0.0155,
+      "Abilities": {
+        "Synchronize": 6059.57
+      },
+      "Items": {
+        "Leftovers": 6033.513849,
+        "White Herb": 25.450193999999996,
+        "Lum Berry": 0.605957
+      },
+      "Moves": {
+        "Wish": 5476.033409,
+        "Baton Pass": 3806.6218739999995,
+        "Protect": 3638.771785,
+        "Pursuit": 2969.7952569999998,
+        "Curse": 1704.5570409999998,
+        "Toxic": 1628.206459,
+        "Taunt": 1490.048263,
+        "Tickle": 1304.625421,
+        "Charm": 984.0741679999999,
+        "Rest": 464.769019,
+        "Sand Attack": 198.753896,
+        "Quick Attack": 90.89354999999999,
+        "Psychic": 85.439937,
+        "Substitute": 63.625485,
+        "Confuse Ray": 63.019527999999994,
+        "Hidden Power Ground": 57.565915,
+        "Mean Look": 52.112302,
+        "Snatch": 46.052732,
+        "Moonlight": 39.993162,
+        "Hidden Power Dark": 29.691892999999997,
+        "Psych Up": 12.725096999999998,
+        "Hidden Power Fire": 9.089355,
+        "Mimic": 7.271483999999999,
+        "Rain Dance": 3.029785,
+        "Shadow Ball": 3.029785,
+        "Return": 2.423828,
+        "Body Slam": 1.8178709999999998,
+        "Bite": 0.605957,
+        "Sunny Day": 0.605957,
+        "Hidden Power Ice": 0.605957,
+        "Hidden Power Fighting": 0.605957
+      },
+      "Natures": {
+        "Sassy": 3310.3430909999993,
+        "Calm": 1790.6029349999994,
+        "Modest": 275.71043499999996,
+        "Bold": 432.0473410000001,
+        "Careful": 187.24071300000003,
+        "Relaxed": 55.74804399999999,
+        "Impish": 4.2416990000000006
+      }
+    },
+    "Jynx": {
+      "Raw count": 7051,
+      "usage": 0.0153,
+      "Abilities": {
+        "Oblivious": 5981.382
+      },
+      "Items": {
+        "Leftovers": 4447.7556552,
+        "Salac Berry": 517.9876812,
+        "Nothing": 456.3794466,
+        "Never-Melt Ice": 417.5004636,
+        "Lum Berry": 139.9643388,
+        "Twisted Spoon": 1.7944145999999996
+      },
+      "Moves": {
+        "Ice Beam": 5961.6434394,
+        "Lovely Kiss": 5939.512325999999,
+        "Calm Mind": 3611.5584516,
+        "Substitute": 3487.7438441999993,
+        "Perish Song": 1101.1724262,
+        "Hidden Power Grass": 923.5253808,
+        "Taunt": 785.3554565999999,
+        "Endure": 515.5951283999999,
+        "Mean Look": 491.6696003999999,
+        "Thief": 455.7813084,
+        "Hidden Power Fire": 305.6486202,
+        "Psychic": 190.2079476,
+        "Wish": 71.776584,
+        "Icy Wind": 54.4305762,
+        "Seismic Toss": 20.336698799999997,
+        "Fake Tears": 6.5795202,
+        "Dream Eater": 1.7944145999999996,
+        "Blizzard": 1.1962764,
+        "Hidden Power Electric": 1.1962764
+      },
+      "Natures": {
+        "Timid": 5105.109536999998,
+        "Modest": 798.514497,
+        "Bold": 76.5616896
+      }
+    },
+    "Machamp": {
+      "Raw count": 7195,
+      "usage": 0.0145,
+      "Abilities": {
+        "Guts": 5668.63
+      },
+      "Items": {
+        "Leftovers": 5402.771253,
+        "Choice Band": 243.18422700000002,
+        "Scope Lens": 13.604712,
+        "Lum Berry": 5.101767,
+        "Chesto Berry": 2.834315,
+        "Sitrus Berry": 0.566863
+      },
+      "Moves": {
+        "Rock Slide": 5579.632509,
+        "Bulk Up": 4769.018419,
+        "Hidden Power Ghost": 4097.285764,
+        "Cross Chop": 3999.785328,
+        "Low Kick": 1803.191203,
+        "Hidden Power Bug": 1399.0178839999999,
+        "Focus Punch": 479.56609799999995,
+        "Brick Break": 126.977312,
+        "Rest": 83.895724,
+        "Earthquake": 80.494546,
+        "Sleep Talk": 72.558464,
+        "Encore": 54.418848,
+        "Revenge": 45.915903,
+        "Substitute": 26.075698,
+        "Hidden Power Rock": 19.273342,
+        "Double-Edge": 17.572753,
+        "Light Screen": 8.502945,
+        "Dynamic Punch": 5.101767,
+        "Facade": 4.534904,
+        "Counter": 1.700589,
+        "Fire Punch": 0.566863,
+        "Thunder Punch": 0.566863
+      },
+      "Natures": {
+        "Adamant": 5642.554301999998,
+        "Careful": 16.439027,
+        "Jolly": 9.636671,
+        "Relaxed": 1.133726
+      }
+    },
+    "Porygon2": {
+      "Raw count": 8844,
+      "usage": 0.0135,
+      "Abilities": {
+        "Trace": 5277.69
+      },
+      "Items": {
+        "Leftovers": 5129.386911,
+        "Nothing": 105.026031,
+        "Lum Berry": 39.582674999999995,
+        "Choice Band": 3.6943829999999998
+      },
+      "Moves": {
+        "Recover": 5263.968005999999,
+        "Ice Beam": 5177.41389,
+        "Thunder Wave": 3128.086863,
+        "Thunderbolt": 2856.813597,
+        "Toxic": 1457.1702089999999,
+        "Hidden Power Fire": 1281.423132,
+        "Hidden Power Grass": 1055.010231,
+        "Hidden Power Fighting": 307.689327,
+        "Rain Dance": 250.16250599999998,
+        "Thief": 106.08156899999999,
+        "Thunder": 74.41542899999999,
+        "Return": 16.888607999999998,
+        "Sharpen": 16.888607999999998,
+        "Conversion 2": 16.360839,
+        "Flash": 15.305300999999998,
+        "Icy Wind": 15.305300999999998,
+        "Sunny Day": 13.194225,
+        "Agility": 12.138687,
+        "Recycle": 10.55538,
+        "Hyper Beam": 9.499842,
+        "Rest": 5.27769,
+        "Psych Up": 4.2221519999999995,
+        "Shadow Ball": 3.6943829999999998,
+        "Double-Edge": 3.6943829999999998,
+        "Zap Cannon": 2.1110759999999997,
+        "Iron Tail": 2.1110759999999997,
+        "Blizzard": 2.1110759999999997,
+        "Substitute": 1.5833069999999998,
+        "Psychic": 1.5833069999999998,
+        "Protect": 1.0555379999999999
+      },
+      "Natures": {
+        "Bold": 4638.033972,
+        "Modest": 243.82927800000007,
+        "Relaxed": 307.1615579999999,
+        "Calm": 52.776899999999976,
+        "Timid": 10.55538,
+        "Impish": 16.360839,
+        "Brave": 3.6943829999999998,
+        "Sassy": 2.1110759999999997,
+        "Careful": 0.5277689999999999
+      }
+    },
+    "Blaziken": {
+      "Raw count": 8139,
+      "usage": 0.013,
+      "Abilities": {
+        "Blaze": 5082.219999999999
+      },
+      "Items": {
+        "Salac Berry": 3520.9620159999995,
+        "Leftovers": 1337.6403039999998,
+        "Lum Berry": 100.627956,
+        "White Herb": 53.871531999999995,
+        "Liechi Berry": 47.26464599999999,
+        "Choice Band": 10.672661999999997,
+        "Charcoal": 9.656217999999999,
+        "Petaya Berry": 0.508222,
+        "Black Belt": 0.508222
+      },
+      "Moves": {
+        "Fire Blast": 4160.305291999999,
+        "Substitute": 3373.577635999999,
+        "Focus Punch": 2980.213808,
+        "Reversal": 2630.0488499999997,
+        "Sky Uppercut": 1463.6793599999996,
+        "Hidden Power Ice": 1413.873604,
+        "Hidden Power Grass": 977.8191279999999,
+        "Thunder Punch": 963.5889119999998,
+        "Flamethrower": 757.2507799999998,
+        "Brick Break": 652.5570479999999,
+        "Rock Slide": 284.0960979999999,
+        "Swords Dance": 242.42189399999995,
+        "Endure": 202.27235599999997,
+        "Overheat": 139.252828,
+        "Toxic": 42.18242599999999,
+        "Hidden Power Ghost": 28.460431999999997,
+        "Quick Attack": 6.0986639999999985,
+        "Blaze Kick": 5.5904419999999995,
+        "Earthquake": 2.5411099999999998,
+        "Bulk Up": 2.032888,
+        "Double-Edge": 0.508222,
+        "Roar": 0.508222
+      },
+      "Natures": {
+        "Mild": 2503.5015719999997,
+        "Hasty": 1158.237938,
+        "Rash": 1041.8550999999998,
+        "Naive": 134.67882999999995,
+        "Lonely": 104.69373199999998,
+        "Jolly": 72.167524,
+        "Naughty": 41.674203999999996,
+        "Adamant": 19.820657999999998,
+        "Timid": 4.573998,
+        "Hardy": 1.016444
+      }
+    },
+    "Dusclops": {
+      "Raw count": 8764,
+      "usage": 0.0121,
+      "Abilities": {
+        "Pressure": 4730.374
+      },
+      "Items": {
+        "Leftovers": 4626.305772,
+        "Nothing": 80.8893954,
+        "Chesto Berry": 23.65187
+      },
+      "Moves": {
+        "Will-O-Wisp": 4684.9624096,
+        "Rest": 3705.3019541999997,
+        "Shadow Ball": 2363.2948503999996,
+        "Curse": 2048.7249794,
+        "Mean Look": 1746.4540807999997,
+        "Pain Split": 1222.3286416,
+        "Focus Punch": 852.4133948,
+        "Night Shade": 673.1322202,
+        "Imprison": 394.04015419999996,
+        "Sleep Talk": 374.6456208,
+        "Seismic Toss": 374.1725834,
+        "Torment": 185.4306608,
+        "Thief": 106.433415,
+        "Psych Up": 59.129675,
+        "Protect": 31.220468399999998,
+        "Psychic": 26.4900944,
+        "Memento": 16.0832716,
+        "Ice Beam": 12.298972399999998,
+        "Toxic": 12.298972399999998,
+        "Calm Mind": 11.825935,
+        "Pursuit": 7.095561,
+        "Destiny Bond": 3.3112618,
+        "Substitute": 2.8382243999999996,
+        "Hidden Power Fighting": 2.365187,
+        "Mud-Slap": 1.8921496,
+        "Earthquake": 0.9460748,
+        "Rock Slide": 0.4730374,
+        "Hidden Power Ghost": 0.4730374,
+        "Bind": 0.4730374,
+        "Disable": 0.4730374,
+        "Thunder Punch": 0.4730374,
+        "Leer": 0.4730374
+      },
+      "Natures": {
+        "Careful": 2559.132333999999,
+        "Bold": 1059.1307385999999,
+        "Impish": 663.6714721999997,
+        "Calm": 408.7043136,
+        "Sassy": 21.7597204,
+        "Modest": 14.664159399999999,
+        "Adamant": 2.365187,
+        "Relaxed": 0.4730374
+      }
+    },
+    "Marowak": {
+      "Raw count": 5279,
+      "usage": 0.0108,
+      "Abilities": {
+        "Rock Head": 4222.152
+      },
+      "Items": {
+        "Thick Club": 4222.152
+      },
+      "Moves": {
+        "Earthquake": 4184.9970624,
+        "Rock Slide": 3893.2463592000004,
+        "Swords Dance": 3173.3694432,
+        "Hidden Power Bug": 2983.7948184,
+        "Double-Edge": 908.6071104,
+        "Focus Punch": 883.6964136,
+        "Rest": 267.6844368,
+        "Hidden Power Rock": 250.7958288,
+        "Substitute": 78.95424240000001,
+        "Hidden Power Ghost": 72.6210144,
+        "Bonemerang": 71.35436879999999,
+        "Ancient Power": 39.266013599999994,
+        "Brick Break": 37.154937600000004,
+        "Perish Song": 18.577468800000002,
+        "Belly Drum": 13.9331016,
+        "Icy Wind": 5.0665824,
+        "Facade": 2.111076,
+        "Sing": 1.2666456,
+        "Hidden Power Flying": 0.4222152,
+        "Bone Club": 0.4222152,
+        "Protect": 0.4222152
+      },
+      "Natures": {
+        "Jolly": 2692.0441152,
+        "Adamant": 1250.1792072000003,
+        "Careful": 206.0410176,
+        "Brave": 37.5771528,
+        "Impish": 35.0438616
+      }
+    },
+    "Donphan": {
+      "Raw count": 5247,
+      "usage": 0.0101,
+      "Abilities": {
+        "Sturdy": 3948.4939999999997
+      },
+      "Items": {
+        "Leftovers": 3916.906048,
+        "Choice Band": 30.798253199999998,
+        "Chesto Berry": 0.7896987999999999
+      },
+      "Moves": {
+        "Earthquake": 3948.4939999999997,
+        "Rapid Spin": 3572.2025217999994,
+        "Hidden Power Rock": 2363.9633578,
+        "Rest": 1761.4231733999998,
+        "Hidden Power Ghost": 1341.6982612,
+        "Protect": 1328.6682309999999,
+        "Rock Slide": 540.943678,
+        "Roar": 396.823647,
+        "Toxic": 390.90090599999996,
+        "Double-Edge": 64.7553016,
+        "Hidden Power Bug": 30.798253199999998,
+        "Return": 21.716716999999996,
+        "Counter": 11.055783199999999,
+        "Hidden Power Fighting": 6.317590399999999,
+        "Hidden Power Flying": 3.9484939999999997,
+        "Odor Sleuth": 3.5536445999999997,
+        "Body Slam": 2.7639457999999997,
+        "Mimic": 1.5793975999999998,
+        "Substitute": 1.1845481999999998,
+        "Hidden Power Electric": 0.7896987999999999,
+        "Ancient Power": 0.39484939999999996
+      },
+      "Natures": {
+        "Impish": 3569.043726599999,
+        "Adamant": 274.0254836,
+        "Bold": 82.918374,
+        "Careful": 22.506415799999996,
+        "Modest": 0.7896987999999999
+      }
+    },
+    "Sceptile": {
+      "Raw count": 6025,
+      "usage": 0.0097,
+      "Abilities": {
+        "Overgrow": 3792.118
+      },
+      "Items": {
+        "Leftovers": 3461.8245222,
+        "Petaya Berry": 256.7263886,
+        "Lum Berry": 56.881769999999996,
+        "Salac Berry": 7.2050241999999995,
+        "Lansat Berry": 5.3089652,
+        "Scope Lens": 3.0336944,
+        "Miracle Seed": 0.3792118
+      },
+      "Moves": {
+        "Leaf Blade": 3733.3401710000003,
+        "Hidden Power Ice": 2866.841208,
+        "Endeavor": 2612.0108784,
+        "Focus Punch": 2261.2399634000003,
+        "Substitute": 1297.6627796,
+        "Leech Seed": 1079.2367828000001,
+        "Hidden Power Fire": 761.8365061999999,
+        "Thunder Punch": 187.709841,
+        "Crunch": 68.258124,
+        "Roar": 63.3283706,
+        "Pursuit": 32.233003000000004,
+        "Toxic": 29.199308600000002,
+        "Seismic Toss": 26.544826,
+        "Hidden Power Dark": 20.4774372,
+        "Dragon Claw": 20.0982254,
+        "Swords Dance": 16.3061074,
+        "Brick Break": 16.3061074,
+        "Hidden Power Electric": 14.7892602,
+        "Solar Beam": 14.410048399999999,
+        "Sunny Day": 14.410048399999999,
+        "Hidden Power Flying": 8.342659600000001,
+        "Hidden Power Grass": 7.2050241999999995,
+        "Giga Drain": 6.825812399999999,
+        "Rest": 4.1713298000000005,
+        "Mud-Slap": 2.6544826,
+        "Hidden Power Water": 1.896059,
+        "Hidden Power Rock": 0.3792118,
+        "Earthquake": 0.3792118,
+        "Protect": 0.3792118
+      },
+      "Natures": {
+        "Hasty": 2294.23139,
+        "Timid": 1424.6987325999999,
+        "Modest": 65.9828532,
+        "Jolly": 7.2050241999999995,
+        "Hardy": 0.3792118
+      }
+    },
+    "Steelix": {
+      "Raw count": 5153,
+      "usage": 0.0077,
+      "Abilities": {
+        "Rock Head": 2481.6402072,
+        "Sturdy": 528.5977928000001
+      },
+      "Items": {
+        "Leftovers": 2865.746576,
+        "Choice Band": 143.5883526,
+        "Chesto Berry": 1.2040952000000003
+      },
+      "Moves": {
+        "Earthquake": 2885.9151706000002,
+        "Explosion": 2458.7623984,
+        "Roar": 1954.8485572000002,
+        "Hidden Power Rock": 1161.951868,
+        "Rock Slide": 1027.9962770000002,
+        "Toxic": 781.4577848,
+        "Protect": 595.4250764000001,
+        "Rest": 239.31392100000002,
+        "Iron Tail": 198.37468420000002,
+        "Hidden Power Bug": 180.91530380000003,
+        "Block": 159.54261400000001,
+        "Double-Edge": 157.13442360000002,
+        "Taunt": 149.6088286,
+        "Hidden Power Steel": 30.102380000000004,
+        "Sunny Day": 21.673713600000003,
+        "Body Slam": 12.341975800000002,
+        "Hidden Power Ghost": 10.535833000000002,
+        "Dragon Breath": 8.428666400000001,
+        "Torment": 3.010238,
+        "Frustration": 3.010238,
+        "Psych Up": 0.30102380000000006,
+        "Nothing": 0.30102380000000006,
+        "Crunch": 0.30102380000000006
+      },
+      "Natures": {
+        "Adamant": 1557.1961173999998,
+        "Impish": 1382.6023134000004,
+        "Careful": 48.464831800000006,
+        "Brave": 16.857332800000002,
+        "Hardy": 3.3112618000000005,
+        "Relaxed": 0.9030714000000002
+      }
+    },
+    "Alakazam": {
+      "Raw count": 8033,
+      "usage": 0.0076,
+      "Abilities": {
+        "Synchronize": 2968.4699704,
+        "Inner Focus": 2.6740296
+      },
+      "Items": {
+        "Leftovers": 2548.3502088,
+        "Lum Berry": 203.2262496,
+        "Choice Band": 139.34665359999997,
+        "Focus Band": 42.7844736,
+        "Petaya Berry": 19.6095504,
+        "Salac Berry": 8.913432,
+        "Twisted Spoon": 3.5653727999999996,
+        "Nothing": 1.7826863999999998,
+        "Scope Lens": 1.485572,
+        "King's Rock": 1.1884576,
+        "Never-Melt Ice": 0.5942288
+      },
+      "Moves": {
+        "Psychic": 2800.30322,
+        "Fire Punch": 2697.2045232,
+        "Hidden Power Grass": 2081.5834864,
+        "Encore": 1269.8669456,
+        "Ice Punch": 1013.7543327999999,
+        "Calm Mind": 448.64274399999994,
+        "Recover": 424.5764776,
+        "Knock Off": 382.68334719999996,
+        "Thunder Punch": 180.6455552,
+        "Thunder Wave": 142.31779759999998,
+        "Trick": 139.0495392,
+        "Taunt": 54.371935199999996,
+        "Light Screen": 51.995020000000004,
+        "Hidden Power Water": 47.835418399999995,
+        "Toxic": 42.7844736,
+        "Seismic Toss": 30.899897599999996,
+        "Substitute": 27.334524799999997,
+        "Focus Punch": 23.4720376,
+        "Reflect": 8.913432,
+        "Torment": 4.7538304,
+        "Endure": 2.971144,
+        "Thief": 2.3769152,
+        "Future Sight": 2.0798007999999997,
+        "Hidden Power Bug": 2.0798007999999997,
+        "Disable": 0.5942288,
+        "Hidden Power Fire": 0.5942288,
+        "Shadow Ball": 0.5942288,
+        "Dynamic Punch": 0.2971144
+      },
+      "Natures": {
+        "Timid": 2757.8158607999994,
+        "Modest": 166.97829280000002,
+        "Hasty": 38.32775759999999,
+        "Lonely": 5.6451736,
+        "Mild": 0.8913431999999999,
+        "Hardy": 0.5942288
+      }
+    },
+    "Ludicolo": {
+      "Raw count": 8658,
+      "usage": 0.0074,
+      "Abilities": {
+        "Swift Swim": 2823.525056,
+        "Rain Dish": 69.43094400000001
+      },
+      "Items": {
+        "Leftovers": 2283.4101708000003,
+        "Lum Berry": 572.2266968,
+        "King's Rock": 26.325899600000003,
+        "Mystic Water": 10.993232800000001
+      },
+      "Moves": {
+        "Ice Beam": 2613.4964504,
+        "Rain Dance": 2388.4244736,
+        "Surf": 2306.8431144,
+        "Leech Seed": 2046.4770744000002,
+        "Hidden Power Grass": 673.7694524,
+        "Hydro Pump": 581.7734516,
+        "Substitute": 407.32820480000004,
+        "Giga Drain": 391.1276512,
+        "Synthesis": 74.3489692,
+        "Counter": 32.979698400000004,
+        "Seismic Toss": 27.483082,
+        "Toxic": 21.1185788,
+        "Protect": 3.4715472,
+        "Fire Punch": 0.5785912000000001,
+        "Hidden Power Electric": 0.5785912000000001,
+        "Thunder Punch": 0.5785912000000001,
+        "Razor Leaf": 0.28929560000000004,
+        "Fake Out": 0.28929560000000004,
+        "Icy Wind": 0.28929560000000004
+      },
+      "Natures": {
+        "Modest": 2711.8569544,
+        "Calm": 170.9736996,
+        "Bold": 3.4715472000000003,
+        "Timid": 5.496616400000001
+      }
+    },
+    "Ursaring": {
+      "Raw count": 1437,
+      "usage": 0.0073,
+      "Abilities": {
+        "Guts": 2853.862
+      },
+      "Items": {
+        "Leftovers": 1437.4902894000002,
+        "Choice Band": 1416.0863244,
+        "Cheri Berry": 0.28538620000000003
+      },
+      "Moves": {
+        "Hidden Power Ghost": 2743.1321544,
+        "Focus Punch": 1435.492586,
+        "Facade": 1363.0044912,
+        "Return": 1270.8247486,
+        "Earthquake": 1219.7406188,
+        "Swords Dance": 1014.2625548,
+        "Double-Edge": 823.6245732000001,
+        "Bulk Up": 420.37387259999997,
+        "Rest": 420.0884864,
+        "Body Slam": 378.4221012,
+        "Brick Break": 210.32962940000002,
+        "Rock Slide": 61.9288054,
+        "Sleep Talk": 41.380999,
+        "Frustration": 9.132358400000001,
+        "Counter": 2.8538620000000003,
+        "Snore": 0.5707724000000001,
+        "Hidden Power Fighting": 0.28538620000000003
+      },
+      "Natures": {
+        "Adamant": 2827.8918558,
+        "Hardy": 7.4200412,
+        "Impish": 7.4200412,
+        "Careful": 6.278496400000001,
+        "Jolly": 4.5661792
+      }
+    },
+    "Weezing": {
+      "Raw count": 6653,
+      "usage": 0.0071,
+      "Abilities": {
+        "Levitate": 2775.674
+      },
+      "Items": {
+        "Leftovers": 2735.7042944,
+        "Lum Berry": 31.920251,
+        "Nothing": 4.9962132,
+        "Charcoal": 2.775674
+      },
+      "Moves": {
+        "Will-O-Wisp": 2706.8372848,
+        "Sludge Bomb": 2388.467477,
+        "Explosion": 1267.9278832,
+        "Haze": 825.2078802,
+        "Pain Split": 801.0595164,
+        "Hidden Power Fighting": 637.2947504,
+        "Memento": 502.95212879999997,
+        "Fire Blast": 449.9367554,
+        "Taunt": 373.32815300000004,
+        "Flamethrower": 316.7044034,
+        "Hidden Power Grass": 193.1869104,
+        "Rest": 169.8712488,
+        "Thunderbolt": 145.1677502,
+        "Hidden Power Ice": 89.3767028,
+        "Protect": 65.5059064,
+        "Rain Dance": 62.7302324,
+        "Sleep Talk": 58.8442888,
+        "Shadow Ball": 23.3156616,
+        "Toxic": 15.8213418,
+        "Thief": 4.9962132,
+        "Thunder": 2.775674,
+        "Self-Destruct": 0.5551348,
+        "Hidden Power Bug": 0.2775674,
+        "Destiny Bond": 0.2775674
+      },
+      "Natures": {
+        "Impish": 1785.0359494,
+        "Lax": 168.4834118,
+        "Brave": 204.56717379999998,
+        "Modest": 130.456678,
+        "Naughty": 64.9507716,
+        "Bold": 106.86344900000003,
+        "Adamant": 126.0155996,
+        "Naive": 49.962132,
+        "Relaxed": 92.70751160000002,
+        "Hardy": 23.0380942,
+        "Timid": 9.4372916,
+        "Careful": 8.049454599999999,
+        "Quiet": 3.0532414,
+        "Rash": 1.1102696,
+        "Sassy": 1.6654044000000001,
+        "Calm": 0.5551348
+      }
+    },
+    "Camerupt": {
+      "Raw count": 2429,
+      "usage": 0.0068,
+      "Abilities": {
+        "Magma Armor": 2658.392
+      },
+      "Items": {
+        "Leftovers": 2498.6226407999998,
+        "Focus Band": 136.1096704,
+        "Choice Band": 18.3429048,
+        "Charcoal": 2.658392,
+        "Lum Berry": 1.329196,
+        "Salac Berry": 1.329196
+      },
+      "Moves": {
+        "Explosion": 2584.4887023999995,
+        "Earthquake": 2545.1445008,
+        "Fire Blast": 2172.1721032,
+        "Toxic": 1583.8699536,
+        "Hidden Power Grass": 768.8069664,
+        "Flamethrower": 411.7849208,
+        "Substitute": 170.93460559999997,
+        "Hidden Power Ice": 101.55057439999999,
+        "Roar": 87.99277519999998,
+        "Overheat": 72.5741016,
+        "Protect": 44.395146399999994,
+        "Rest": 25.520563199999994,
+        "Sleep Talk": 24.1913672,
+        "Rock Slide": 23.925527999999996,
+        "Sunny Day": 8.2410152,
+        "Eruption": 7.975175999999999,
+        "Hidden Power Rock": 0.5316784
+      },
+      "Natures": {
+        "Hasty": 981.7441656,
+        "Brave": 919.803632,
+        "Sassy": 231.81178239999994,
+        "Quiet": 175.45387200000005,
+        "Mild": 148.3382736,
+        "Lonely": 112.98166,
+        "Calm": 57.95294559999999,
+        "Naughty": 9.5702112,
+        "Modest": 14.621155999999997,
+        "Rash": 2.658392,
+        "Hardy": 2.1267136,
+        "Naive": 2.1267136
+      }
+    },
+    "Glalie": {
+      "Raw count": 4592,
+      "usage": 0.0067,
+      "Abilities": {
+        "Inner Focus": 2619.2980000000002
+      },
+      "Items": {
+        "Salac Berry": 1302.3149656,
+        "Iapapa Berry": 705.1150216000001,
+        "Leftovers": 410.18206680000003,
+        "Lum Berry": 163.1822654,
+        "Choice Band": 38.5036806
+      },
+      "Moves": {
+        "Spikes": 2619.0360702000003,
+        "Explosion": 2617.9883510000004,
+        "Ice Beam": 2469.9980140000002,
+        "Taunt": 1574.4600278,
+        "Hidden Power Fighting": 887.9420220000002,
+        "Light Screen": 124.94051460000001,
+        "Earthquake": 102.15262200000001,
+        "Substitute": 72.2926248,
+        "Icy Wind": 2.3573682000000002,
+        "Torment": 1.8335086,
+        "Hidden Power Grass": 1.5715788,
+        "Protect": 1.5715788,
+        "Endure": 0.7857894,
+        "Toxic": 0.26192980000000005,
+        "Blizzard": 0.26192980000000005
+      },
+      "Natures": {
+        "Adamant": 847.8667626,
+        "Timid": 1055.0532343999998,
+        "Calm": 306.19593620000006,
+        "Jolly": 143.5375304,
+        "Hasty": 133.58419800000001,
+        "Naive": 68.101748,
+        "Bold": 35.0985932,
+        "Gentle": 16.2396476,
+        "Modest": 12.310700600000002,
+        "Hardy": 0.26192980000000005
+      }
+    },
+    "Quagsire": {
+      "Raw count": 1932,
+      "usage": 0.0066,
+      "Abilities": {
+        "Water Absorb": 2573.7534900000005,
+        "Damp": 6.45051
+      },
+      "Items": {
+        "Leftovers": 2580.204
+      },
+      "Moves": {
+        "Earthquake": 2566.2708984,
+        "Curse": 2248.3897656,
+        "Rest": 1954.7625504000002,
+        "Ice Beam": 1073.3648640000001,
+        "Sludge Bomb": 762.450282,
+        "Hidden Power Rock": 638.60049,
+        "Protect": 585.9643284,
+        "Surf": 301.3678272,
+        "Haze": 77.92216080000001,
+        "Hidden Power Bug": 54.442304400000005,
+        "Hidden Power Ghost": 24.511938,
+        "Toxic": 22.9638156,
+        "Focus Punch": 3.8703060000000002,
+        "Substitute": 3.8703060000000002,
+        "Tail Whip": 1.290102,
+        "Counter": 0.5160408000000001
+      },
+      "Natures": {
+        "Impish": 1097.6187816000001,
+        "Relaxed": 1389.9558948,
+        "Careful": 42.31534560000001,
+        "Sassy": 35.6068152,
+        "Brave": 8.7726936,
+        "Adamant": 4.6443672000000005,
+        "Bold": 0.5160408000000001
+      }
+    },
+    "Armaldo": {
+      "Raw count": 3368,
+      "usage": 0.0065,
+      "Abilities": {
+        "Battle Armor": 2541.1099999999997
+      },
+      "Items": {
+        "Leftovers": 2524.592785,
+        "Choice Band": 15.500770999999999,
+        "Lum Berry": 0.7623329999999998,
+        "Salac Berry": 0.508222
+      },
+      "Moves": {
+        "Hidden Power Bug": 2420.9154969999995,
+        "Knock Off": 2347.4774179999995,
+        "Rest": 1643.5899479999998,
+        "Rock Slide": 1469.778024,
+        "Rock Blast": 992.0493439999999,
+        "Swords Dance": 737.176011,
+        "Earthquake": 179.65647699999997,
+        "Rapid Spin": 118.66983699999999,
+        "Harden": 78.520299,
+        "Seismic Toss": 45.994091,
+        "Protect": 37.862539,
+        "Brick Break": 34.813207,
+        "Hidden Power Rock": 25.156989,
+        "Toxic": 14.992548999999999,
+        "Ancient Power": 6.860996999999999,
+        "Aerial Ace": 3.5575539999999997,
+        "Metal Claw": 3.5575539999999997,
+        "Strength": 3.5575539999999997
+      },
+      "Natures": {
+        "Careful": 1439.5388149999994,
+        "Adamant": 990.270567,
+        "Hardy": 25.411099999999998,
+        "Impish": 40.40364899999999,
+        "Calm": 21.345324,
+        "Bold": 15.500770999999999,
+        "Brave": 5.0822199999999995,
+        "Jolly": 2.286999,
+        "Relaxed": 0.7623329999999998
+      }
+    },
+    "Articuno": {
+      "Raw count": 4972,
+      "usage": 0.0064,
+      "Abilities": {
+        "Pressure": 2502.016
+      },
+      "Items": {
+        "Leftovers": 2454.2274944,
+        "Never-Melt Ice": 47.7885056
+      },
+      "Moves": {
+        "Ice Beam": 2501.5155968,
+        "Rest": 2268.8281088000003,
+        "Heal Bell": 1485.1966976,
+        "Haze": 1366.8513408000001,
+        "Sleep Talk": 773.8735488000001,
+        "Roar": 636.7630720000001,
+        "Reflect": 582.969728,
+        "Toxic": 183.6479744,
+        "Hidden Power Fire": 180.3953536,
+        "Mimic": 15.762700800000001,
+        "Hidden Power Grass": 3.2526208,
+        "Substitute": 2.5020160000000002,
+        "Hidden Power Electric": 2.5020160000000002,
+        "Protect": 1.5012096,
+        "Agility": 1.0008064,
+        "Extrasensory": 0.5004032,
+        "Sunny Day": 0.5004032,
+        "Blizzard": 0.5004032,
+        "Hidden Power Flying": 0.2502016
+      },
+      "Natures": {
+        "Calm": 2371.911167999999,
+        "Timid": 126.35180799999999,
+        "Modest": 1.2510080000000001,
+        "Bold": 0.7506048000000001,
+        "Mild": 0.2502016
+      }
+    },
+    "Slaking": {
+      "Raw count": 7080,
+      "usage": 0.0057,
+      "Abilities": {
+        "Truant": 2228.358
+      },
+      "Items": {
+        "Choice Band": 2228.1351642000004,
+        "Leftovers": 0.22283580000000003
+      },
+      "Moves": {
+        "Earthquake": 2109.8093544000003,
+        "Shadow Ball": 1664.3605902000002,
+        "Return": 1439.7421038000002,
+        "Focus Punch": 1127.1034764,
+        "Double-Edge": 684.5515776,
+        "Fury Swipes": 520.5444288,
+        "Brick Break": 365.45071200000007,
+        "Encore": 354.08608620000007,
+        "Hyper Beam": 250.0217676,
+        "Rain Dance": 191.1931164,
+        "Pursuit": 103.61864700000001,
+        "Frustration": 57.268800600000006,
+        "Rest": 22.729251600000005,
+        "Rock Slide": 7.3535814,
+        "Aerial Ace": 3.5653728000000005,
+        "Slack Off": 3.3425370000000005,
+        "Body Slam": 2.4511938000000004,
+        "Hidden Power Steel": 2.0055222,
+        "Hidden Power Flying": 1.5598506,
+        "Facade": 1.3370148,
+        "Flamethrower": 0.44567160000000006,
+        "Fire Blast": 0.44567160000000006,
+        "Seismic Toss": 0.22283580000000003,
+        "Roar": 0.22283580000000003
+      },
+      "Natures": {
+        "Adamant": 1985.0213064,
+        "Jolly": 239.77132079999998,
+        "Naughty": 2.8968654000000003,
+        "Mild": 0.44567160000000006,
+        "Impish": 0.22283580000000003
+      }
+    },
+    "Misdreavus": {
+      "Raw count": 2812,
+      "usage": 0.0055,
+      "Abilities": {
+        "Levitate": 2150.17
+      },
+      "Items": {
+        "Leftovers": 2150.17
+      },
+      "Moves": {
+        "Perish Song": 2130.388436,
+        "Mean Look": 2091.040325,
+        "Rest": 1985.6819950000001,
+        "Taunt": 1113.358026,
+        "Thunderbolt": 766.105571,
+        "Protect": 116.754231,
+        "Destiny Bond": 106.00338099999999,
+        "Hidden Power Grass": 97.61771800000001,
+        "Pain Split": 80.416358,
+        "Toxic": 55.044352,
+        "Shadow Ball": 19.996581,
+        "Thunder Wave": 14.406139000000001,
+        "Calm Mind": 11.610918000000002,
+        "Hidden Power Ice": 10.105799000000001,
+        "Psychic": 1.505119,
+        "Substitute": 0.215017
+      },
+      "Natures": {
+        "Calm": 2109.746804,
+        "Careful": 28.382244,
+        "Timid": 9.890782,
+        "Hardy": 1.720136
+      }
+    },
+    "Gardevoir": {
+      "Raw count": 5008,
+      "usage": 0.005,
+      "Abilities": {
+        "Trace": 1928.1160800000002,
+        "Synchronize": 26.58392
+      },
+      "Items": {
+        "Leftovers": 1825.49433,
+        "Lum Berry": 83.66116,
+        "Salac Berry": 40.07135,
+        "Mental Herb": 3.32299,
+        "Nothing": 1.9547,
+        "Magnet": 0.39094,
+        "Twisted Spoon": 0.19547
+      },
+      "Moves": {
+        "Fire Punch": 1493.58627,
+        "Wish": 1470.12987,
+        "Protect": 1469.3479900000002,
+        "Torment": 1469.3479900000002,
+        "Memento": 410.09605999999997,
+        "Will-O-Wisp": 289.68654,
+        "Thunderbolt": 249.41971999999998,
+        "Psychic": 246.68314,
+        "Icy Wind": 245.70579,
+        "Reflect": 157.93976,
+        "Light Screen": 127.64191,
+        "Calm Mind": 53.16784,
+        "Safeguard": 32.83896,
+        "Destiny Bond": 21.30623,
+        "Hypnosis": 19.93794,
+        "Taunt": 19.35153,
+        "Substitute": 16.61495,
+        "Rest": 10.359910000000001,
+        "Ice Punch": 9.187090000000001,
+        "Thunder Wave": 3.12752,
+        "Rain Dance": 1.56376,
+        "Hidden Power Grass": 1.36829,
+        "Hidden Power Fire": 0.58641,
+        "Toxic": 0.19547
+      },
+      "Natures": {
+        "Timid": 1666.96816,
+        "Modest": 247.07407999999992,
+        "Calm": 31.079729999999994,
+        "Bold": 5.8641000000000005,
+        "Jolly": 2.5411099999999998,
+        "Naive": 0.39094,
+        "Hardy": 0.39094
+      }
+    },
+    "Dragonite": {
+      "Raw count": 5248,
+      "usage": 0.0039,
+      "Abilities": {
+        "Inner Focus": 1524.666
+      },
+      "Items": {
+        "Leftovers": 1073.8222638,
+        "Choice Band": 360.583509,
+        "Lum Berry": 61.13910659999999,
+        "Liechi Berry": 20.1255912,
+        "Black Belt": 5.183864399999999,
+        "Dragon Fang": 3.6591983999999997,
+        "Shell Bell": 0.1524666
+      },
+      "Moves": {
+        "Hidden Power Flying": 1249.0063872,
+        "Focus Punch": 979.1405052,
+        "Heal Bell": 796.3330517999999,
+        "Earthquake": 727.265682,
+        "Ice Beam": 551.166759,
+        "Dragon Dance": 441.8482068,
+        "Brick Break": 388.94229659999996,
+        "Thunder Wave": 133.7132082,
+        "Fire Blast": 125.022612,
+        "Hyper Beam": 112.825284,
+        "Substitute": 76.3857666,
+        "Double-Edge": 70.74450239999999,
+        "Hidden Power Rock": 68.45750340000001,
+        "Thunderbolt": 67.085304,
+        "Roar": 58.547174399999996,
+        "Flamethrower": 58.547174399999996,
+        "Sunny Day": 35.5247178,
+        "Thunder": 25.766855399999997,
+        "Sleep Talk": 25.156989,
+        "Hidden Power Grass": 24.547122599999998,
+        "Wing Attack": 18.9058584,
+        "Return": 17.8385922,
+        "Toxic": 13.2645942,
+        "Aerial Ace": 9.6053958,
+        "Dragon Claw": 5.7937308,
+        "Outrage": 3.6591983999999997,
+        "Rest": 3.2017985999999996,
+        "Surf": 2.286999,
+        "Fly": 2.1345324,
+        "Hidden Power Bug": 2.1345324,
+        "Iron Tail": 2.1345324,
+        "Body Slam": 1.0672662,
+        "Agility": 0.1524666,
+        "Steel Wing": 0.1524666,
+        "Blizzard": 0.1524666,
+        "Hidden Power Ghost": 0.1524666
+      },
+      "Natures": {
+        "Brave": 554.0636244000001,
+        "Adamant": 776.2074605999998,
+        "Sassy": 42.5381814,
+        "Modest": 35.6771844,
+        "Hasty": 34.609918199999996,
+        "Jolly": 31.103186399999995,
+        "Naughty": 6.5560637999999996,
+        "Lonely": 19.9731246,
+        "Naive": 5.183864399999999,
+        "Hardy": 5.7937308,
+        "Timid": 4.7264646,
+        "Calm": 1.9820657999999998,
+        "Careful": 1.9820658000000002,
+        "Bold": 0.762333,
+        "Mild": 0.6098664,
+        "Rash": 1.0672662000000002,
+        "Quiet": 0.9147996,
+        "Gentle": 0.3049332
+      }
+    },
+    "Sableye": {
+      "Raw count": 1614,
+      "usage": 0.0034,
+      "Abilities": {
+        "Keen Eye": 1329.196
+      },
+      "Items": {
+        "Leftovers": 1329.196
+      },
+      "Moves": {
+        "Recover": 1329.0630804,
+        "Knock Off": 1328.531402,
+        "Seismic Toss": 1304.8717132,
+        "Psych Up": 1189.7633395999999,
+        "Counter": 58.48462399999999,
+        "Toxic": 43.464709199999994,
+        "Fake Out": 30.837347199999996,
+        "Shadow Ball": 18.2099852,
+        "Substitute": 11.0323268,
+        "Night Shade": 0.9304372,
+        "Taunt": 0.5316784,
+        "Mean Look": 0.5316784,
+        "Confuse Ray": 0.2658392,
+        "Moonlight": 0.1329196,
+        "Rain Dance": 0.1329196
+      },
+      "Natures": {
+        "Bold": 1198.4031135999996,
+        "Impish": 114.31085599999999,
+        "Careful": 11.4310856,
+        "Relaxed": 4.519266399999999,
+        "Calm": 0.7975176
+      }
+    },
+    "Lapras": {
+      "Raw count": 3650,
+      "usage": 0.0032,
+      "Abilities": {
+        "Water Absorb": 1248.2557824,
+        "Shell Armor": 2.7522176000000003
+      },
+      "Items": {
+        "Leftovers": 1248.6310848,
+        "Mystic Water": 2.2518144,
+        "Shell Bell": 0.1251008
+      },
+      "Moves": {
+        "Ice Beam": 1207.3478208,
+        "Heal Bell": 1195.963648,
+        "Thunderbolt": 707.1948224,
+        "Hydro Pump": 634.7614592,
+        "Perish Song": 472.0053184,
+        "Toxic": 407.5784064,
+        "Roar": 170.51239040000002,
+        "Nightmare": 41.283264,
+        "Substitute": 39.1565504,
+        "Hidden Power Fighting": 37.2800384,
+        "Dragon Dance": 37.2800384,
+        "Surf": 16.7635072,
+        "Rest": 11.5092736,
+        "Sleep Talk": 7.8813504000000005,
+        "Thunder": 7.255846399999999,
+        "Body Slam": 2.6271168,
+        "Curse": 2.6271168,
+        "Rain Dance": 2.2518144,
+        "Hail": 1.8765120000000002,
+        "Hidden Power Ghost": 0.5004032,
+        "Protect": 0.1251008,
+        "Psychic": 0.1251008
+      },
+      "Natures": {
+        "Bold": 471.50491519999997,
+        "Modest": 691.0568192000001,
+        "Calm": 48.2889088,
+        "Adamant": 37.2800384,
+        "Relaxed": 2.6271168,
+        "Hardy": 0.1251008
+      }
+    },
+    "Wailord": {
+      "Raw count": 1575,
+      "usage": 0.0027,
+      "Abilities": {
+        "Water Veil": 863.6411916000001,
+        "Oblivious": 191.8968084
+      },
+      "Items": {
+        "Choice Band": 397.6211646,
+        "Leftovers": 310.53927960000004,
+        "Lum Berry": 200.024451,
+        "Salac Berry": 115.89807239999999,
+        "Mystic Water": 31.4550324
+      },
+      "Moves": {
+        "Self-Destruct": 1005.6110526,
+        "Water Spout": 656.4390822,
+        "Ice Beam": 584.5569443999999,
+        "Sleep Talk": 397.6211646,
+        "Double-Edge": 397.6211646,
+        "Hidden Power Ghost": 397.6211646,
+        "Hydro Pump": 382.4214174,
+        "Surf": 131.73114239999998,
+        "Curse": 72.83212200000001,
+        "Whirlpool": 72.83212200000001,
+        "Hidden Power Electric": 50.4547164,
+        "Toxic": 46.8658872,
+        "Roar": 11.399810400000002,
+        "Earthquake": 8.233196399999999,
+        "Hidden Power Grass": 4.4332595999999995,
+        "Blizzard": 0.527769,
+        "Amnesia": 0.527769,
+        "Substitute": 0.4222152
+      },
+      "Natures": {
+        "Adamant": 397.6211646,
+        "Mild": 393.18790499999994,
+        "Rash": 100.27611000000002,
+        "Modest": 84.7597014,
+        "Hasty": 50.243608800000004,
+        "Timid": 20.1607758,
+        "Naughty": 5.5943514,
+        "Naive": 2.6388449999999994,
+        "Quiet": 0.6333228000000001,
+        "Calm": 0.4222152
+      }
+    },
+    "Duskull": {
+      "Raw count": 1482,
+      "usage": 0.0026,
+      "Abilities": {
+        "Levitate": 1016.444
+      },
+      "Items": {
+        "Leftovers": 970.2974424,
+        "Nothing": 44.1136696,
+        "Lum Berry": 2.032888
+      },
+      "Moves": {
+        "Pain Split": 1016.444,
+        "Will-O-Wisp": 1016.3423556,
+        "Curse": 1010.345336,
+        "Protect": 537.2922983999999,
+        "Night Shade": 417.4535508,
+        "Thief": 44.1136696,
+        "Mean Look": 21.6502572,
+        "Substitute": 2.032888,
+        "Rest": 0.2032888
+      },
+      "Natures": {
+        "Careful": 444.89753879999995,
+        "Calm": 570.0217951999999,
+        "Impish": 1.524666
+      }
+    },
+    "Rhydon": {
+      "Raw count": 1887,
+      "usage": 0.0023,
+      "Abilities": {
+        "Lightning Rod": 633.5495452,
+        "Rock Head": 265.6124548
+      },
+      "Items": {
+        "Leftovers": 827.9483696,
+        "Choice Band": 56.0177926,
+        "Lum Berry": 13.307597600000001,
+        "Hard Stone": 1.798324
+      },
+      "Moves": {
+        "Earthquake": 892.5082012,
+        "Rock Slide": 891.6090392000001,
+        "Substitute": 798.455856,
+        "Megahorn": 696.5808014,
+        "Swords Dance": 217.95686880000002,
+        "Focus Punch": 50.7127368,
+        "Double-Edge": 35.157234200000005,
+        "Rock Blast": 6.743715,
+        "Hidden Power Flying": 4.4058938,
+        "Thunder": 1.5285754,
+        "Hidden Power Rock": 0.8092458,
+        "Brick Break": 0.0899162
+      },
+      "Natures": {
+        "Adamant": 897.5435084000001,
+        "Naughty": 1.5285754,
+        "Hardy": 0.0899162
+      }
+    },
+    "Scizor": {
+      "Raw count": 6478,
+      "usage": 0.0023,
+      "Abilities": {
+        "Swarm": 899.162
+      },
+      "Items": {
+        "Leftovers": 441.7582906,
+        "Liechi Berry": 211.84256720000002,
+        "Lum Berry": 111.496088,
+        "Salac Berry": 78.4069264,
+        "Choice Band": 33.4488264,
+        "White Herb": 10.9697764,
+        "Shell Bell": 9.8008658,
+        "Focus Band": 1.2588268
+      },
+      "Moves": {
+        "Swords Dance": 660.7042376,
+        "Silver Wind": 538.8677866,
+        "Agility": 523.4921164000001,
+        "Hidden Power Rock": 479.1634298000001,
+        "Hidden Power Bug": 230.09555580000003,
+        "Baton Pass": 188.19460660000001,
+        "Steel Wing": 176.5055006,
+        "Substitute": 174.7071766,
+        "Reversal": 165.80547280000002,
+        "Hidden Power Fighting": 113.20449580000002,
+        "Toxic": 106.2809484,
+        "Endure": 88.4775408,
+        "Quick Attack": 56.7371222,
+        "Hidden Power Ghost": 18.5227372,
+        "Double-Edge": 13.8470948,
+        "Focus Energy": 12.768100400000002,
+        "Iron Defense": 11.868938400000001,
+        "Hidden Power Ground": 11.239525,
+        "Hidden Power Steel": 10.2504468,
+        "Return": 6.024385400000001,
+        "Wing Attack": 2.2479050000000003,
+        "Counter": 1.4386592,
+        "Fury Cutter": 1.4386592,
+        "Rain Dance": 1.4386592,
+        "Light Screen": 1.2588268,
+        "Morning Sun": 1.1689106,
+        "Aerial Ace": 0.8092458,
+        "Hidden Power Flying": 0.0899162
+      },
+      "Natures": {
+        "Adamant": 600.1906350000002,
+        "Careful": 101.24564120000001,
+        "Jolly": 195.3879026,
+        "Calm": 0.899162,
+        "Impish": 0.6294134,
+        "Bold": 0.5394972,
+        "Brave": 0.0899162
+      }
+    },
+    "Miltank": {
+      "Raw count": 1958,
+      "usage": 0.0022,
+      "Abilities": {
+        "Thick Fat": 860.0680000000001
+      },
+      "Items": {
+        "Leftovers": 858.0038368000002,
+        "Choice Band": 1.8061428000000002,
+        "White Herb": 0.2580204
+      },
+      "Moves": {
+        "Milk Drink": 860.0680000000001,
+        "Heal Bell": 690.2045700000001,
+        "Thunder Wave": 551.9916424,
+        "Seismic Toss": 524.64148,
+        "Curse": 188.4408988,
+        "Body Slam": 162.72486560000002,
+        "Counter": 157.7364712,
+        "Brick Break": 151.45797480000002,
+        "Shadow Ball": 108.6265884,
+        "Double-Edge": 20.125591200000002,
+        "Earthquake": 13.9331016,
+        "Psych Up": 4.042319600000001,
+        "Toxic": 3.0962448000000005,
+        "Return": 1.4621156000000002,
+        "Dynamic Punch": 0.8600680000000002,
+        "Rock Slide": 0.5160408,
+        "Protect": 0.2580204,
+        "Hidden Power Ghost": 0.08600680000000001
+      },
+      "Natures": {
+        "Bold": 344.887268,
+        "Impish": 411.4565312,
+        "Careful": 76.63205880000002,
+        "Adamant": 24.769958400000004,
+        "Jolly": 2.3221836
+      }
+    },
+    "Slowbro": {
+      "Raw count": 1533,
+      "usage": 0.0022,
+      "Abilities": {
+        "Oblivious": 746.7970444,
+        "Own Tempo": 113.27095560000002
+      },
+      "Items": {
+        "Leftovers": 855.0796056,
+        "Lum Berry": 3.1822516000000003,
+        "Nothing": 1.8061428000000002
+      },
+      "Moves": {
+        "Surf": 851.9833608000001,
+        "Ice Beam": 832.8038444000001,
+        "Flamethrower": 712.8243584,
+        "Hidden Power Grass": 624.8394020000001,
+        "Thunder Wave": 208.05044920000003,
+        "Fire Blast": 112.92692840000001,
+        "Rest": 33.112618000000005,
+        "Calm Mind": 20.383611600000002,
+        "Rain Dance": 9.7187684,
+        "Sleep Talk": 9.116720800000001,
+        "Amnesia": 6.106482800000001,
+        "Confusion": 6.106482800000001,
+        "Yawn": 5.762455600000001,
+        "Psychic": 5.246414800000001,
+        "Future Sight": 1.290102,
+        "Earthquake": 0.08600680000000001,
+        "Curse": 0.08600680000000001
+      },
+      "Natures": {
+        "Modest": 824.9772256000001,
+        "Bold": 35.17678120000001,
+        "Quiet": 0.08600680000000001
+      }
+    },
+    "Linoone": {
+      "Raw count": 2892,
+      "usage": 0.0021,
+      "Abilities": {
+        "Pickup": 820.9739999999999
+      },
+      "Items": {
+        "Leftovers": 505.4736918,
+        "Salac Berry": 282.41505599999994,
+        "Lum Berry": 29.226674399999997,
+        "Choice Band": 1.1493635999999998,
+        "Silk Scarf": 0.9851687999999998,
+        "Sitrus Berry": 0.9030714,
+        "Shell Bell": 0.9030714
+      },
+      "Moves": {
+        "Belly Drum": 819.8246363999999,
+        "Extreme Speed": 539.2978206,
+        "Hidden Power Ground": 522.960438,
+        "Shadow Ball": 452.1103817999999,
+        "Substitute": 391.8508902,
+        "Flail": 281.3477898,
+        "Return": 161.321391,
+        "Frustration": 96.3002502,
+        "Hidden Power Fighting": 14.0386554,
+        "Protect": 2.3808245999999995,
+        "Double-Edge": 1.231461,
+        "Trick": 0.410487,
+        "Mud-Slap": 0.24629219999999996,
+        "Toxic": 0.24629219999999996,
+        "Attract": 0.1641948,
+        "Slash": 0.0820974,
+        "Hidden Power Fire": 0.0820974,
+        "Thunder Wave": 0.0820974,
+        "Endure": 0.0820974
+      },
+      "Natures": {
+        "Adamant": 811.9432859999997,
+        "Jolly": 8.866519199999999,
+        "Naive": 0.24629219999999996,
+        "Hardy": 0.0820974
+      }
+    },
+    "Banette": {
+      "Raw count": 2051,
+      "usage": 0.0019,
+      "Abilities": {
+        "Insomnia": 742.786
+      },
+      "Items": {
+        "Leftovers": 705.8695358,
+        "Choice Band": 35.3566136,
+        "Salac Berry": 1.5598505999999999
+      },
+      "Moves": {
+        "Shadow Ball": 740.6319206,
+        "Hidden Power Fighting": 686.1857067999999,
+        "Will-O-Wisp": 682.4717767999999,
+        "Taunt": 607.2275549999999,
+        "Knock Off": 85.19755419999998,
+        "Curse": 71.0103416,
+        "Destiny Bond": 51.623627,
+        "Thunder Wave": 32.9796984,
+        "Double-Edge": 12.553083399999998,
+        "Snatch": 0.6685074,
+        "Substitute": 0.371393,
+        "Endure": 0.1485572,
+        "Body Slam": 0.1485572
+      },
+      "Natures": {
+        "Adamant": 656.7713811999997,
+        "Careful": 53.62914919999999,
+        "Jolly": 30.082832999999997,
+        "Hardy": 2.3026365999999996,
+        "Naughty": 0.0742786
+      }
+    },
+    "Entei": {
+      "Raw count": 1403,
+      "usage": 0.0019,
+      "Abilities": {
+        "Pressure": 742.786
+      },
+      "Items": {
+        "Leftovers": 738.4035626,
+        "Choice Band": 1.9312435999999997,
+        "Lum Berry": 1.114179,
+        "Chesto Berry": 0.8913431999999999,
+        "Salac Berry": 0.371393
+      },
+      "Moves": {
+        "Substitute": 711.3661522,
+        "Calm Mind": 556.9409428,
+        "Flamethrower": 489.79308839999993,
+        "Hidden Power Grass": 414.02891639999996,
+        "Protect": 275.202213,
+        "Fire Blast": 251.28450379999998,
+        "Toxic": 174.183317,
+        "Sunny Day": 33.796763,
+        "Rest": 24.214823599999995,
+        "Roar": 19.4609932,
+        "Hidden Power Fighting": 6.016566599999999,
+        "Body Slam": 4.308158799999999,
+        "Double-Edge": 3.0454226,
+        "Solar Beam": 2.599751,
+        "Mud-Slap": 1.7084077999999998,
+        "Return": 1.4112934,
+        "Iron Tail": 1.114179,
+        "Fire Spin": 0.742786
+      },
+      "Natures": {
+        "Timid": 451.61388799999986,
+        "Modest": 283.59569479999993,
+        "Naive": 3.1197011999999997,
+        "Adamant": 1.7084077999999998,
+        "Naughty": 1.4112934,
+        "Relaxed": 0.9656217999999999,
+        "Bold": 0.371393
+      }
+    },
+    "Blastoise": {
+      "Raw count": 2888,
+      "usage": 0.0017,
+      "Abilities": {
+        "Torrent": 664.598
+      },
+      "Items": {
+        "Leftovers": 630.3712029999999,
+        "Salac Berry": 31.435485399999997,
+        "Mystic Water": 2.0602538,
+        "Choice Band": 0.5316784,
+        "Chesto Berry": 0.1329196,
+        "Soft Sand": 0.0664598
+      },
+      "Moves": {
+        "Rapid Spin": 626.1842356,
+        "Surf": 511.34170119999993,
+        "Roar": 480.37143439999994,
+        "Refresh": 245.23666199999997,
+        "Rest": 237.0621066,
+        "Ice Beam": 155.78177119999998,
+        "Hydro Pump": 146.4773992,
+        "Haze": 89.3219712,
+        "Hydro Cannon": 37.9485458,
+        "Focus Punch": 34.559096,
+        "Hidden Power Electric": 34.3597166,
+        "Hidden Power Dark": 17.4124676,
+        "Icy Wind": 10.367728799999998,
+        "Toxic": 8.839153399999999,
+        "Mirror Coat": 6.712439799999999,
+        "Counter": 6.114301599999999,
+        "Yawn": 5.782002599999999,
+        "Protect": 2.9906909999999995,
+        "Hidden Power Fire": 0.8639773999999999,
+        "Rain Dance": 0.3987587999999999,
+        "Earthquake": 0.0664598,
+        "Seismic Toss": 0.0664598
+      },
+      "Natures": {
+        "Modest": 231.5459432,
+        "Bold": 341.0052337999998,
+        "Quiet": 23.991987799999997,
+        "Calm": 53.699518399999995,
+        "Sassy": 13.624258999999997,
+        "Hardy": 0.5981382
+      }
+    },
+    "Electrode": {
+      "Raw count": 2808,
+      "usage": 0.0017,
+      "Abilities": {
+        "Static": 664.598
+      },
+      "Items": {
+        "Leftovers": 532.8746763999999,
+        "Magnet": 94.1070768,
+        "Petaya Berry": 23.925527999999996,
+        "Lum Berry": 9.3708318,
+        "Liechi Berry": 3.9875879999999997,
+        "Nothing": 0.2658392,
+        "Scope Lens": 0.0664598
+      },
+      "Moves": {
+        "Thunderbolt": 664.3321608,
+        "Explosion": 636.5519644,
+        "Hidden Power Grass": 617.0792429999999,
+        "Thunder Wave": 533.9380332,
+        "Rain Dance": 81.08095599999999,
+        "Substitute": 48.0504354,
+        "Hidden Power Ice": 36.55289,
+        "Self-Destruct": 23.8590682,
+        "Light Screen": 6.5795202,
+        "Taunt": 4.984484999999999,
+        "Hidden Power Fighting": 3.9211281999999996,
+        "Hidden Power Fire": 0.5316784,
+        "Thunder": 0.4652186,
+        "Thief": 0.2658392,
+        "Toxic": 0.19937939999999996
+      },
+      "Natures": {
+        "Hasty": 658.4172385999999,
+        "Timid": 5.050944799999999,
+        "Naive": 1.1962764000000001
+      }
+    },
+    "Exeggutor": {
+      "Raw count": 4109,
+      "usage": 0.0016,
+      "Abilities": {
+        "Chlorophyll": 625.504
+      },
+      "Items": {
+        "Leftovers": 388.3754336,
+        "Lum Berry": 232.24963520000003,
+        "Miracle Seed": 2.189264,
+        "Charcoal": 1.7514112,
+        "Salac Berry": 0.6880544000000001,
+        "Shell Bell": 0.1251008,
+        "Liechi Berry": 0.1251008
+      },
+      "Moves": {
+        "Explosion": 470.87941120000005,
+        "Hidden Power Fire": 415.5848576,
+        "Solar Beam": 387.9375808,
+        "Sunny Day": 377.42911360000005,
+        "Sleep Powder": 342.5885408,
+        "Psychic": 301.1176256,
+        "Hidden Power Ice": 119.09596160000001,
+        "Giga Drain": 61.7372448,
+        "Leech Seed": 20.391430399999997,
+        "Substitute": 1.3761088000000001,
+        "Hidden Power Grass": 1.2510080000000001,
+        "Wish": 1.1259072,
+        "Synthesis": 0.7506048,
+        "Psych Up": 0.6880544000000001,
+        "Light Screen": 0.0625504,
+        "Confusion": 0.0625504
+      },
+      "Natures": {
+        "Timid": 137.298128,
+        "Mild": 118.3453568,
+        "Modest": 333.64383359999977,
+        "Adamant": 10.3833664,
+        "Rash": 23.268748800000004,
+        "Quiet": 1.0008064,
+        "Calm": 0.6880544000000001,
+        "Bold": 0.5629536,
+        "Naive": 0.1251008
+      }
+    },
+    "Lanturn": {
+      "Raw count": 1297,
+      "usage": 0.0016,
+      "Abilities": {
+        "Volt Absorb": 625.504
+      },
+      "Items": {
+        "Leftovers": 624.6282944000001,
+        "Lum Berry": 0.8131552,
+        "Petaya Berry": 0.0625504,
+        "Sitrus Berry": 0.0625504
+      },
+      "Moves": {
+        "Thunderbolt": 618.8736576,
+        "Surf": 407.515856,
+        "Ice Beam": 354.09781440000006,
+        "Rest": 280.225792,
+        "Hydro Pump": 207.04182400000002,
+        "Sleep Talk": 164.8828544,
+        "Substitute": 155.37519360000002,
+        "Toxic": 113.528976,
+        "Hidden Power Grass": 108.7751456,
+        "Thunder Wave": 72.1831616,
+        "Thunder": 5.817187199999999,
+        "Confuse Ray": 5.0665824,
+        "Rain Dance": 3.9406752000000003,
+        "Protect": 3.3777216,
+        "Blizzard": 0.7506048,
+        "Charge": 0.5004032
+      },
+      "Natures": {
+        "Modest": 617.6851999999999,
+        "Calm": 6.255040000000001,
+        "Hardy": 0.8131552,
+        "Bold": 0.6255040000000001,
+        "Sassy": 0.0625504
+      }
+    },
+    "Ninjask": {
+      "Raw count": 2066,
+      "usage": 0.0016,
+      "Abilities": {
+        "Speed Boost": 625.504
+      },
+      "Items": {
+        "Choice Band": 462.18490560000004,
+        "Leftovers": 159.37841920000002,
+        "Scope Lens": 2.9398688,
+        "Liechi Berry": 0.5629536,
+        "Lum Berry": 0.4378528
+      },
+      "Moves": {
+        "Shadow Ball": 601.2344448,
+        "Silver Wind": 589.7877215999999,
+        "Hidden Power Rock": 495.1489664,
+        "Snore": 329.7657088,
+        "Swords Dance": 159.8788224,
+        "Giga Drain": 99.2674848,
+        "Sand Attack": 72.49591360000001,
+        "Aerial Ace": 67.4918816,
+        "Hidden Power Bug": 34.40272,
+        "Substitute": 19.891027200000003,
+        "Protect": 19.6408256,
+        "Hidden Power Fighting": 11.0714208,
+        "Hidden Power Flying": 0.4378528,
+        "Hyper Beam": 0.4378528,
+        "Return": 0.4378528,
+        "Hidden Power Ground": 0.3753024,
+        "Double-Edge": 0.2502016
+      },
+      "Natures": {
+        "Adamant": 525.9863136,
+        "Lonely": 99.2674848,
+        "Jolly": 0.3753024
+      }
+    },
+    "Gligar": {
+      "Raw count": 974,
+      "usage": 0.0015,
+      "Abilities": {
+        "Hyper Cutter": 586.41
+      },
+      "Items": {
+        "Nothing": 459.86272199999996,
+        "Leftovers": 71.131533,
+        "Salac Berry": 55.415744999999994
+      },
+      "Moves": {
+        "Earthquake": 586.41,
+        "Hidden Power Flying": 523.66413,
+        "Counter": 465.902745,
+        "Thief": 459.86272199999996,
+        "Protect": 72.59755799999999,
+        "Toxic": 61.338485999999996,
+        "Swords Dance": 59.168769,
+        "Rock Slide": 54.829335,
+        "Substitute": 28.792730999999996,
+        "Endure": 24.863784,
+        "Rest": 4.456716,
+        "Hidden Power Bug": 3.342537,
+        "Quick Attack": 0.35184599999999994
+      },
+      "Natures": {
+        "Impish": 525.892488,
+        "Adamant": 48.67202999999999,
+        "Jolly": 10.496739,
+        "Careful": 1.3487429999999998
+      }
+    },
+    "Shuckle": {
+      "Raw count": 572,
+      "usage": 0.0014,
+      "Abilities": {
+        "Sturdy": 547.316
+      },
+      "Items": {
+        "Leftovers": 547.316
+      },
+      "Moves": {
+        "Rest": 547.316,
+        "Toxic": 547.2612684000001,
+        "Encore": 541.84284,
+        "Wrap": 524.8213124,
+        "Sunny Day": 9.906419600000001,
+        "Protect": 7.334034400000001,
+        "Rollout": 5.3636968000000005,
+        "Defense Curl": 5.3636968000000005,
+        "Substitute": 0.054731600000000005
+      },
+      "Natures": {
+        "Careful": 539.2157232000001,
+        "Calm": 7.115108,
+        "Bold": 0.8757056000000001,
+        "Impish": 0.054731600000000005,
+        "Hardy": 0.054731600000000005
+      }
+    },
+    "Jumpluff": {
+      "Raw count": 952,
+      "usage": 0.0012,
+      "Abilities": {
+        "Chlorophyll": 469.128
+      },
+      "Items": {
+        "Leftovers": 469.128
+      },
+      "Moves": {
+        "Leech Seed": 469.0341744,
+        "Encore": 465.9848424,
+        "Substitute": 465.374976,
+        "Sleep Powder": 448.8616704,
+        "Toxic": 18.9058584,
+        "Protect": 3.9406752,
+        "Hidden Power Grass": 3.0962448,
+        "Stun Spore": 0.938256,
+        "Sunny Day": 0.28147679999999997,
+        "Reflect": 0.0469128
+      },
+      "Natures": {
+        "Jolly": 426.0620495999999,
+        "Timid": 43.01903759999999
+      }
+    },
+    "Golduck": {
+      "Raw count": 1097,
+      "usage": 0.0012,
+      "Abilities": {
+        "Cloud Nine": 466.8761856,
+        "Damp": 2.2518143999999998
+      },
+      "Items": {
+        "Salac Berry": 447.7357632,
+        "Leftovers": 20.5478064,
+        "Lum Berry": 0.7975175999999999,
+        "Mystic Water": 0.0469128
+      },
+      "Moves": {
+        "Calm Mind": 468.3304824,
+        "Ice Beam": 468.0959184,
+        "Endure": 435.5384352,
+        "Surf": 431.83232399999997,
+        "Hydro Pump": 37.295676,
+        "Refresh": 14.496055199999999,
+        "Hidden Power Electric": 12.1504152,
+        "Hidden Power Grass": 2.9555064,
+        "Rest": 2.7209423999999998,
+        "Psychic": 0.8444303999999999,
+        "Cross Chop": 0.7975175999999999,
+        "Protect": 0.5160408,
+        "Sleep Talk": 0.42221519999999996,
+        "Toxic": 0.3283896,
+        "Rain Dance": 0.0938256,
+        "Mud Sport": 0.0469128,
+        "Hypnosis": 0.0469128,
+        "Blizzard": 0.0469128
+      },
+      "Natures": {
+        "Modest": 462.5132952,
+        "Timid": 3.0962448,
+        "Bold": 2.6271168,
+        "Hasty": 0.7975175999999999
+      }
+    },
+    "Kecleon": {
+      "Raw count": 786,
+      "usage": 0.0011,
+      "Abilities": {
+        "Color Change": 430.03400000000005
+      },
+      "Items": {
+        "Lum Berry": 256.2142572,
+        "Leftovers": 134.72965220000003,
+        "Choice Band": 33.327635,
+        "Macho Brace": 5.7194522
+      },
+      "Moves": {
+        "Brick Break": 418.16506160000006,
+        "Thunder Wave": 418.07905480000005,
+        "Shadow Ball": 385.26746060000005,
+        "Body Slam": 256.9883184,
+        "Double-Edge": 108.71259520000002,
+        "Return": 52.55015480000001,
+        "Trick": 39.04708720000001,
+        "Seismic Toss": 6.0634794,
+        "Flamethrower": 6.020476,
+        "Rest": 5.891465800000001,
+        "Sleep Talk": 5.891465800000001,
+        "Toxic": 5.805459000000001,
+        "Counter": 5.7194522,
+        "Frustration": 3.5262788000000005,
+        "Blizzard": 1.3331054,
+        "Thunder": 0.8600680000000002,
+        "Facade": 0.08600680000000001,
+        "Skill Swap": 0.043003400000000004,
+        "Focus Punch": 0.043003400000000004
+      },
+      "Natures": {
+        "Adamant": 405.43605520000006,
+        "Lonely": 12.686003000000001,
+        "Careful": 5.977472600000001,
+        "Impish": 3.6122856000000008,
+        "Bold": 2.2361768000000004
+      }
+    },
+    "Tauros": {
+      "Raw count": 1740,
+      "usage": 0.0011,
+      "Abilities": {
+        "Intimidate": 430.03400000000005
+      },
+      "Items": {
+        "Choice Band": 365.48589660000005,
+        "Leftovers": 34.66074040000001,
+        "Lum Berry": 20.5126218,
+        "Silk Scarf": 8.213649400000001,
+        "Salac Berry": 0.7310578000000001,
+        "White Herb": 0.3010238,
+        "Charcoal": 0.1290102
+      },
+      "Moves": {
+        "Earthquake": 429.90498980000007,
+        "Hidden Power Ghost": 373.82855620000004,
+        "Return": 353.917982,
+        "Hyper Beam": 282.44633120000003,
+        "Double-Edge": 116.15218340000001,
+        "Body Slam": 37.7569852,
+        "Hidden Power Rock": 25.285999200000003,
+        "Hidden Power Fighting": 24.984975400000003,
+        "Refresh": 23.866887000000002,
+        "Sunny Day": 22.791802,
+        "Facade": 11.0948772,
+        "Iron Tail": 10.191805800000001,
+        "Hidden Power Bug": 3.3112618000000005,
+        "Rage": 1.4191122,
+        "Ice Beam": 1.2470986,
+        "Substitute": 1.075085,
+        "Fire Blast": 0.5160408,
+        "Hidden Power Flying": 0.17201360000000002,
+        "Flamethrower": 0.08600680000000001,
+        "Sleep Talk": 0.043003400000000004,
+        "Toxic": 0.043003400000000004,
+        "Take Down": 0.043003400000000004,
+        "Rest": 0.043003400000000004,
+        "Surf": 0.043003400000000004
+      },
+      "Natures": {
+        "Jolly": 370.9903318,
+        "Adamant": 53.41022280000001,
+        "Naive": 5.0744012000000005,
+        "Rash": 0.38703060000000006,
+        "Mild": 0.1290102,
+        "Hardy": 0.043003400000000004,
+        "Hasty": 0.043003400000000004
+      }
+    },
+    "Omastar": {
+      "Raw count": 1017,
+      "usage": 0.001,
+      "Abilities": {
+        "Shell Armor": 263.962688,
+        "Swift Swim": 126.97731199999998
+      },
+      "Items": {
+        "Leftovers": 246.253106,
+        "Nothing": 98.986008,
+        "Lum Berry": 24.551032,
+        "Mystic Water": 20.250692,
+        "Scope Lens": 0.899162
+      },
+      "Moves": {
+        "Spikes": 361.736782,
+        "Surf": 216.18982000000003,
+        "Ice Beam": 201.842322,
+        "Hydro Pump": 174.24195799999998,
+        "Hidden Power Grass": 139.252828,
+        "Tickle": 116.030992,
+        "Rain Dance": 113.450788,
+        "Rest": 111.887028,
+        "Thief": 104.498262,
+        "Hidden Power Electric": 7.466953999999999,
+        "Double-Edge": 7.036919999999999,
+        "Toxic": 4.769468000000001,
+        "Icy Wind": 3.8703060000000002,
+        "Protect": 1.407384,
+        "Bite": 0.07818800000000001
+      },
+      "Natures": {
+        "Timid": 119.62764,
+        "Modest": 143.51407400000002,
+        "Bold": 126.42999600000003,
+        "Calm": 1.329196
+      }
+    },
+    "Arcanine": {
+      "Raw count": 3590,
+      "usage": 0.0009,
+      "Abilities": {
+        "Intimidate": 350.8608312,
+        "Flash Fire": 0.9851688
+      },
+      "Items": {
+        "Leftovers": 254.13836580000003,
+        "White Herb": 42.502996800000005,
+        "Choice Band": 42.045597,
+        "Nothing": 6.333227999999999,
+        "Lum Berry": 3.2017986,
+        "Charcoal": 1.8999684000000001,
+        "Chesto Berry": 0.4925844,
+        "Never-Melt Ice": 0.45739979999999997,
+        "Salac Berry": 0.3166614,
+        "Scope Lens": 0.3166614,
+        "Silk Scarf": 0.10555379999999999
+      },
+      "Moves": {
+        "Extreme Speed": 343.8239112,
+        "Hidden Power Fighting": 240.8737716,
+        "Fire Blast": 229.051746,
+        "Toxic": 217.3704588,
+        "Overheat": 100.9094328,
+        "Hidden Power Grass": 52.0028388,
+        "Iron Tail": 45.4936878,
+        "Thief": 44.2270422,
+        "Hidden Power Ghost": 32.369832,
+        "Flamethrower": 27.971757,
+        "Crunch": 18.471915,
+        "Sunny Day": 13.5812556,
+        "Double-Edge": 13.018302,
+        "Howl": 10.9775952,
+        "Body Slam": 4.222152,
+        "Charm": 2.814768,
+        "Substitute": 2.6740296,
+        "Roar": 1.8647838,
+        "Rest": 1.3721994,
+        "Protect": 1.1962764,
+        "Hidden Power Rock": 1.055538,
+        "Hidden Power Ice": 0.4925844,
+        "Return": 0.42221519999999996,
+        "Aerial Ace": 0.42221519999999996,
+        "Agility": 0.351846,
+        "Safeguard": 0.2462922,
+        "Dig": 0.0351846,
+        "Hidden Power Ground": 0.0351846,
+        "Hidden Power Dark": 0.0351846
+      },
+      "Natures": {
+        "Brave": 155.691855,
+        "Modest": 55.591668,
+        "Naive": 40.2511824,
+        "Adamant": 34.2346158,
+        "Lonely": 31.0328172,
+        "Timid": 5.6647206,
+        "Naughty": 9.2887344,
+        "Hasty": 4.3628903999999995,
+        "Hardy": 6.579520199999999,
+        "Rash": 3.6943829999999998,
+        "Bold": 2.8499526,
+        "Jolly": 0.703692,
+        "Calm": 0.703692,
+        "Relaxed": 0.5629536,
+        "Sassy": 0.351846,
+        "Lax": 0.2462922,
+        "Mild": 0.0351846
+      }
+    },
+    "Hitmontop": {
+      "Raw count": 1260,
+      "usage": 0.0009,
+      "Abilities": {
+        "Intimidate": 351.846
+      },
+      "Items": {
+        "Leftovers": 346.9553406,
+        "Choice Band": 4.398075,
+        "Lum Berry": 0.2462922,
+        "Salac Berry": 0.21110759999999998
+      },
+      "Moves": {
+        "Rapid Spin": 345.5831412,
+        "Mach Punch": 261.6326856,
+        "Hidden Power Ghost": 259.90864020000004,
+        "Revenge": 209.524293,
+        "Brick Break": 126.41826780000001,
+        "Bulk Up": 85.67450099999999,
+        "Rock Slide": 56.471283,
+        "Rest": 36.8030916,
+        "Endeavor": 10.2739032,
+        "Toxic": 2.7443988,
+        "Earthquake": 2.7092142,
+        "Protect": 2.5684758,
+        "High Jump Kick": 2.0758914,
+        "Hidden Power Bug": 1.8295991999999999,
+        "Substitute": 1.5481224,
+        "Counter": 1.3018302000000002,
+        "Body Slam": 0.3166614,
+        "Seismic Toss": 0.0351846
+      },
+      "Natures": {
+        "Adamant": 277.95834,
+        "Careful": 37.3308606,
+        "Impish": 35.1846,
+        "Brave": 0.7740612,
+        "Jolly": 0.4925844,
+        "Relaxed": 0.0351846,
+        "Hardy": 0.0351846
+      }
+    },
+    "Slowking": {
+      "Raw count": 578,
+      "usage": 0.0009,
+      "Abilities": {
+        "Oblivious": 350.5793544,
+        "Own Tempo": 1.2666456
+      },
+      "Items": {
+        "Leftovers": 351.846
+      },
+      "Moves": {
+        "Surf": 351.846,
+        "Fire Blast": 349.4886318,
+        "Thunder Wave": 349.4886318,
+        "Ice Beam": 349.4886318,
+        "Calm Mind": 2.3573682000000002,
+        "Rest": 2.3573682000000002,
+        "Sleep Talk": 2.3221836
+      },
+      "Natures": {
+        "Modest": 351.8108154
+      }
+    },
+    "Kabutops": {
+      "Raw count": 1619,
+      "usage": 0.0009,
+      "Abilities": {
+        "Swift Swim": 331.12227060000004,
+        "Battle Armor": 20.7237294
+      },
+      "Items": {
+        "Salac Berry": 341.50172760000004,
+        "Lum Berry": 6.0165666,
+        "Choice Band": 2.4277374,
+        "Silk Scarf": 1.3370148,
+        "Leftovers": 0.4925844,
+        "Liechi Berry": 0.0703692
+      },
+      "Moves": {
+        "Swords Dance": 348.9256782,
+        "Flail": 331.4037474,
+        "Rock Slide": 328.448241,
+        "Endure": 301.6727604,
+        "Substitute": 39.7234134,
+        "Hidden Power Rock": 20.7940986,
+        "Brick Break": 18.542284199999997,
+        "Hidden Power Ground": 7.03692,
+        "Double-Edge": 2.3573682000000002,
+        "Ancient Power": 2.0758914,
+        "Hidden Power Bug": 1.5129378,
+        "Ice Beam": 1.407384,
+        "Hyper Beam": 1.3370148,
+        "Surf": 0.5629536,
+        "Giga Drain": 0.4925844,
+        "Knock Off": 0.45739979999999997,
+        "Body Slam": 0.45739979999999997,
+        "Aerial Ace": 0.0703692,
+        "Rock Tomb": 0.0703692,
+        "Rapid Spin": 0.0351846
+      },
+      "Natures": {
+        "Jolly": 340.762851,
+        "Adamant": 9.7461342,
+        "Naughty": 0.9147995999999999,
+        "Naive": 0.45739979999999997
+      }
+    },
+    "Sharpedo": {
+      "Raw count": 276,
+      "usage": 0.0008,
+      "Abilities": {
+        "Rough Skin": 312.752
+      },
+      "Items": {
+        "Mystic Water": 304.15132,
+        "Lum Berry": 7.506048000000001,
+        "Leftovers": 1.0633568
+      },
+      "Moves": {
+        "Ice Beam": 311.71991840000004,
+        "Hydro Pump": 305.089576,
+        "Double-Edge": 304.15132,
+        "Toxic": 304.15132,
+        "Crunch": 8.4755792,
+        "Surf": 7.5373232,
+        "Hidden Power Electric": 4.222152,
+        "Hidden Power Grass": 3.2838960000000004,
+        "Agility": 0.9382560000000001,
+        "Hidden Power Fighting": 0.9382560000000001,
+        "Roar": 0.0938256,
+        "Skull Bash": 0.0938256,
+        "Sleep Talk": 0.0938256,
+        "Rest": 0.0938256,
+        "Earthquake": 0.0312752
+      },
+      "Natures": {
+        "Rash": 304.1825952,
+        "Timid": 7.5373232,
+        "Brave": 0.9382560000000001,
+        "Jolly": 0.09382560000000001
+      }
+    },
+    "Nidoqueen": {
+      "Raw count": 1159,
+      "usage": 0.0008,
+      "Abilities": {
+        "Poison Point": 312.752
+      },
+      "Items": {
+        "Leftovers": 271.2185344,
+        "Nothing": 20.891833600000002,
+        "White Herb": 16.41948,
+        "Choice Band": 3.4402719999999998,
+        "Salac Berry": 0.7506048
+      },
+      "Moves": {
+        "Earthquake": 296.1448688,
+        "Ice Beam": 278.59948160000005,
+        "Protect": 260.4911408,
+        "Fire Blast": 258.5833536,
+        "Taunt": 41.6898416,
+        "Thief": 39.2816512,
+        "Superpower": 30.712246399999998,
+        "Roar": 13.823638400000002,
+        "Toxic": 8.131552,
+        "Sludge Bomb": 7.130745600000001,
+        "Hidden Power Grass": 3.5340976,
+        "Rock Slide": 2.8460432000000004,
+        "Shadow Ball": 2.814768,
+        "Brick Break": 2.7209423999999998,
+        "Flamethrower": 2.6271168,
+        "Endure": 0.7506048,
+        "Thunderbolt": 0.6880544000000001,
+        "Icy Wind": 0.1876512,
+        "Counter": 0.15637600000000001,
+        "Facade": 0.0938256,
+        "Focus Punch": 0.0625504,
+        "Seismic Toss": 0.0312752,
+        "Crunch": 0.0312752
+      },
+      "Natures": {
+        "Relaxed": 261.8985248,
+        "Adamant": 25.395462400000003,
+        "Bold": 11.321622399999999,
+        "Impish": 9.976788800000001,
+        "Gentle": 1.8452368000000001,
+        "Brave": 1.3448336,
+        "Naughty": 0.8757056,
+        "Sassy": 0.0938256,
+        "Modest": 0.0312752
+      }
+    },
+    "Solrock": {
+      "Raw count": 385,
+      "usage": 0.0007,
+      "Abilities": {
+        "Levitate": 273.658
+      },
+      "Items": {
+        "Leftovers": 229.87272000000002,
+        "Choice Band": 43.621085199999996,
+        "Lum Berry": 0.136829,
+        "Salac Berry": 0.027365800000000003
+      },
+      "Moves": {
+        "Explosion": 273.43907360000003,
+        "Earthquake": 273.384342,
+        "Rock Slide": 273.32961040000004,
+        "Psych Up": 228.9696486,
+        "Hidden Power Fighting": 41.322358,
+        "Shadow Ball": 1.4777532000000002,
+        "Baton Pass": 0.9304372,
+        "Overheat": 0.6294134,
+        "Hidden Power Bug": 0.24629220000000002,
+        "Calm Mind": 0.21892640000000002,
+        "Substitute": 0.136829,
+        "Psychic": 0.136829,
+        "Flamethrower": 0.10946320000000001,
+        "Cosmic Power": 0.0820974,
+        "Hidden Power Flying": 0.054731600000000005,
+        "Reflect": 0.027365800000000003,
+        "Rest": 0.027365800000000003,
+        "Rock Tomb": 0.027365800000000003
+      },
+      "Natures": {
+        "Adamant": 272.016052,
+        "Lonely": 0.6294134,
+        "Impish": 0.5746818,
+        "Jolly": 0.2189264,
+        "Bold": 0.136829,
+        "Careful": 0.027365800000000003
+      }
+    },
+    "Murkrow": {
+      "Raw count": 258,
+      "usage": 0.0006,
+      "Abilities": {
+        "Insomnia": 234.564
+      },
+      "Items": {
+        "Black Glasses": 225.7209372,
+        "Leftovers": 8.843062799999998
+      },
+      "Moves": {
+        "Thunder Wave": 234.564,
+        "Pursuit": 234.5170872,
+        "Perish Song": 213.687804,
+        "Hidden Power Flying": 213.687804,
+        "Icy Wind": 12.0331332,
+        "Hidden Power Grass": 12.0331332,
+        "Taunt": 8.2566528,
+        "Hidden Power Ice": 4.2690648,
+        "Haze": 3.987588,
+        "Drill Peck": 0.6098663999999999,
+        "Sunny Day": 0.5629535999999999,
+        "Substitute": 0.0234564,
+        "Confuse Ray": 0.0234564
+      },
+      "Natures": {
+        "Hasty": 213.687804,
+        "Modest": 16.0207212,
+        "Timid": 4.2690648,
+        "Naive": 0.5629535999999999,
+        "Adamant": 0.0234564
+      }
+    },
+    "Aggron": {
+      "Raw count": 1022,
+      "usage": 0.0006,
+      "Abilities": {
+        "Rock Head": 143.787732,
+        "Sturdy": 90.776268
+      },
+      "Items": {
+        "Leftovers": 107.430312,
+        "Choice Band": 104.28715439999999,
+        "Salac Berry": 22.682338799999997,
+        "Silk Scarf": 0.117282,
+        "Shell Bell": 0.0469128
+      },
+      "Moves": {
+        "Rock Slide": 234.3059796,
+        "Hidden Power Bug": 138.04091400000001,
+        "Focus Punch": 112.3092432,
+        "Thunder Wave": 107.782158,
+        "Earthquake": 106.1636664,
+        "Double-Edge": 102.55138079999999,
+        "Substitute": 89.0404944,
+        "Endeavor": 22.213210800000002,
+        "Taunt": 22.213210800000002,
+        "Iron Tail": 2.9789627999999997,
+        "Iron Defense": 0.2580204,
+        "Counter": 0.234564,
+        "Thunderbolt": 0.0938256
+      },
+      "Natures": {
+        "Adamant": 211.7409228,
+        "Jolly": 22.682338799999997,
+        "Impish": 0.07036919999999999,
+        "Brave": 0.0469128,
+        "Careful": 0.0234564
+      }
+    },
+    "Magcargo": {
+      "Raw count": 196,
+      "usage": 0.0006,
+      "Abilities": {
+        "Flame Body": 234.564
+      },
+      "Items": {
+        "Leftovers": 234.1183284,
+        "Nothing": 0.4456716
+      },
+      "Moves": {
+        "Flamethrower": 234.1183284,
+        "Self-Destruct": 234.1183284,
+        "Yawn": 158.61217680000001,
+        "Rock Slide": 151.411062,
+        "Toxic": 83.15293799999999,
+        "Protect": 75.4826952,
+        "Fire Blast": 0.4456716,
+        "Hidden Power Grass": 0.4456716,
+        "Rest": 0.4456716
+      },
+      "Natures": {
+        "Sassy": 234.564
+      }
+    },
+    "Stantler": {
+      "Raw count": 471,
+      "usage": 0.0006,
+      "Abilities": {
+        "Intimidate": 234.564
+      },
+      "Items": {
+        "Leftovers": 156.8294904,
+        "Lum Berry": 77.7110532,
+        "Choice Band": 0.0234564
+      },
+      "Moves": {
+        "Hidden Power Fighting": 234.329436,
+        "Double-Edge": 223.56294839999998,
+        "Hypnosis": 217.7457612,
+        "Thunder Wave": 211.0841436,
+        "Thunderbolt": 23.362574399999996,
+        "Shadow Ball": 16.8182388,
+        "Body Slam": 10.8368568,
+        "Earthquake": 0.2580204,
+        "Return": 0.1641948,
+        "Thunder": 0.0938256
+      },
+      "Natures": {
+        "Jolly": 156.85294679999998,
+        "Impish": 54.348478799999995,
+        "Relaxed": 23.1983796,
+        "Lonely": 0.1641948,
+        "Naive": 0.0234564
+      }
+    },
+    "Crawdaunt": {
+      "Raw count": 136,
+      "usage": 0.0005,
+      "Abilities": {
+        "Shell Armor": 195.19634200000002,
+        "Hyper Cutter": 0.273658
+      },
+      "Items": {
+        "Leftovers": 195.430906,
+        "Scope Lens": 0.019547000000000002,
+        "Salac Berry": 0.019547000000000002
+      },
+      "Moves": {
+        "Knock Off": 195.450453,
+        "Endeavor": 195.19634200000002,
+        "Crunch": 195.176795,
+        "Rest": 195.176795,
+        "Ice Beam": 0.273658,
+        "Surf": 0.254111,
+        "Toxic": 0.136829,
+        "Protect": 0.136829,
+        "Crabhammer": 0.019547000000000002,
+        "Brick Break": 0.019547000000000002,
+        "Double-Edge": 0.019547000000000002,
+        "Sludge Bomb": 0.019547000000000002,
+        "Body Slam": 0.019547000000000002,
+        "Counter": 0.019547000000000002,
+        "Endure": 0.019547000000000002
+      },
+      "Natures": {
+        "Calm": 195.176795,
+        "Bold": 0.254111,
+        "Adamant": 0.019547000000000002,
+        "Jolly": 0.019547000000000002
+      }
+    },
+    "Roselia": {
+      "Raw count": 919,
+      "usage": 0.0005,
+      "Abilities": {
+        "Natural Cure": 194.76630799999998,
+        "Poison Point": 0.703692
+      },
+      "Items": {
+        "Leftovers": 194.473103,
+        "Miracle Seed": 0.97735
+      },
+      "Moves": {
+        "Spikes": 195.47,
+        "Leech Seed": 190.876455,
+        "Aromatherapy": 176.822162,
+        "Giga Drain": 171.42719,
+        "Stun Spore": 22.08811,
+        "Hidden Power Fire": 16.067633999999998,
+        "Hidden Power Grass": 4.593545,
+        "Protect": 3.362084,
+        "Rest": 0.6255040000000001,
+        "Toxic": 0.19547,
+        "Substitute": 0.15637600000000001,
+        "Synthesis": 0.097735,
+        "Hidden Power Ice": 0.07818800000000001,
+        "Ingrain": 0.039094000000000004
+      },
+      "Natures": {
+        "Calm": 190.21185699999998,
+        "Bold": 4.222152,
+        "Timid": 0.996897,
+        "Relaxed": 0.019547000000000002
+      }
+    },
+    "Hypno": {
+      "Raw count": 802,
+      "usage": 0.0005,
+      "Abilities": {
+        "Insomnia": 195.47
+      },
+      "Items": {
+        "Leftovers": 195.39181200000002,
+        "Salac Berry": 0.019547000000000002,
+        "Apicot Berry": 0.019547000000000002,
+        "Choice Band": 0.019547000000000002
+      },
+      "Moves": {
+        "Reflect": 157.646555,
+        "Wish": 138.607777,
+        "Toxic": 122.149203,
+        "Skill Swap": 114.310856,
+        "Baton Pass": 56.529924,
+        "Calm Mind": 55.845779,
+        "Taunt": 51.525892,
+        "Psychic": 21.540794,
+        "Protect": 17.201359999999998,
+        "Thunder Wave": 14.073839999999999,
+        "Nightmare": 7.154202,
+        "Seismic Toss": 7.076014000000001,
+        "Hidden Power Grass": 6.880544,
+        "Fire Punch": 5.649083,
+        "Hypnosis": 3.147067,
+        "Substitute": 0.918709,
+        "Light Screen": 0.918709,
+        "Disable": 0.136829,
+        "Ice Punch": 0.136829,
+        "Brick Break": 0.11728199999999998,
+        "Dream Eater": 0.11728199999999998,
+        "Shadow Ball": 0.05864099999999999,
+        "Psych Up": 0.019547000000000002,
+        "Barrier": 0.019547000000000002,
+        "Belly Drum": 0.019547000000000002,
+        "Headbutt": 0.019547000000000002,
+        "Focus Punch": 0.019547000000000002
+      },
+      "Natures": {
+        "Bold": 75.90100099999998,
+        "Timid": 55.044352,
+        "Hardy": 29.242311999999995,
+        "Calm": 32.44802,
+        "Modest": 2.6583919999999996,
+        "Brave": 0.07818800000000001,
+        "Sassy": 0.019547000000000002,
+        "Adamant": 0.039094000000000004
+      }
+    },
+    "Chansey": {
+      "Raw count": 653,
+      "usage": 0.0005,
+      "Abilities": {
+        "Natural Cure": 187.338448,
+        "Serene Grace": 8.131552
+      },
+      "Items": {
+        "Leftovers": 131.727233,
+        "Lucky Punch": 63.723220000000005,
+        "Salac Berry": 0.019547000000000002
+      },
+      "Moves": {
+        "Soft-Boiled": 176.90035,
+        "Seismic Toss": 131.17991700000002,
+        "Thunder Wave": 122.89198900000001,
+        "Toxic": 74.2786,
+        "Thunderbolt": 64.250989,
+        "Ice Beam": 63.762313999999996,
+        "Calm Mind": 56.138984,
+        "Aromatherapy": 45.114476,
+        "Substitute": 15.969898999999998,
+        "Counter": 15.403035999999998,
+        "Fire Blast": 8.131552,
+        "Wish": 2.619298,
+        "Protect": 2.423828,
+        "Heal Bell": 2.247905,
+        "Flamethrower": 0.527769,
+        "Blizzard": 0.019547000000000002,
+        "Hidden Power Water": 0.019547000000000002
+      },
+      "Natures": {
+        "Bold": 131.727233,
+        "Modest": 63.684126000000006,
+        "Calm": 0.039094000000000004,
+        "Impish": 0.019547000000000002
+      }
+    },
+    "Poliwrath": {
+      "Raw count": 1911,
+      "usage": 0.0005,
+      "Abilities": {
+        "Water Absorb": 178.757315,
+        "Damp": 16.712685
+      },
+      "Items": {
+        "Leftovers": 137.044017,
+        "Salac Berry": 57.038146,
+        "Nothing": 1.348743,
+        "Choice Band": 0.039094000000000004
+      },
+      "Moves": {
+        "Substitute": 114.076292,
+        "Brick Break": 99.611512,
+        "Focus Punch": 97.168137,
+        "Ice Beam": 91.67542999999999,
+        "Hidden Power Ghost": 81.569631,
+        "Hypnosis": 68.92272200000001,
+        "Belly Drum": 57.624556,
+        "Bulk Up": 45.818168,
+        "Earthquake": 39.48494,
+        "Hydro Pump": 39.28947,
+        "Rest": 22.654973000000002,
+        "Surf": 11.92367,
+        "Hidden Power Bug": 3.7530239999999995,
+        "Toxic": 2.5020160000000002,
+        "Protect": 2.130623,
+        "Rain Dance": 1.133726,
+        "Haze": 0.97735,
+        "Seismic Toss": 0.39094,
+        "Sleep Talk": 0.371393,
+        "Hidden Power Grass": 0.254111,
+        "Thief": 0.19547,
+        "Counter": 0.15637600000000001,
+        "Blizzard": 0.05864099999999999,
+        "Rock Tomb": 0.039094000000000004,
+        "Dynamic Punch": 0.019547000000000002,
+        "Ice Ball": 0.019547000000000002,
+        "Hidden Power Rock": 0.019547000000000002
+      },
+      "Natures": {
+        "Jolly": 55.37665100000001,
+        "Quiet": 37.29567600000001,
+        "Rash": 38.488043000000005,
+        "Adamant": 33.562199,
+        "Impish": 17.768223000000003,
+        "Bold": 8.854791,
+        "Naive": 1.7396829999999999,
+        "Hardy": 1.153273,
+        "Brave": 0.332299,
+        "Lonely": 0.19547,
+        "Modest": 0.254111,
+        "Relaxed": 0.33229899999999996,
+        "Naughty": 0.05864099999999999,
+        "Careful": 0.039094000000000004
+      }
+    },
+    "Magmar": {
+      "Raw count": 460,
+      "usage": 0.0005,
+      "Abilities": {
+        "Flame Body": 195.47
+      },
+      "Items": {
+        "Leftovers": 169.980712,
+        "Charcoal": 21.30623,
+        "Salac Berry": 3.4793659999999997,
+        "Black Belt": 0.703692
+      },
+      "Moves": {
+        "Flamethrower": 172.072241,
+        "Rest": 168.573328,
+        "Seismic Toss": 168.573328,
+        "Toxic": 168.49514,
+        "Cross Chop": 23.417306,
+        "Fire Blast": 23.397759,
+        "Hidden Power Grass": 22.694067,
+        "Thunder Punch": 21.30623,
+        "Confuse Ray": 3.4793659999999997,
+        "Psychic": 3.4793659999999997,
+        "Counter": 3.4793659999999997,
+        "Focus Punch": 1.387837,
+        "Hidden Power Ice": 0.703692,
+        "Body Slam": 0.703692,
+        "Sleep Talk": 0.097735
+      },
+      "Natures": {
+        "Calm": 168.475593,
+        "Hasty": 21.30623,
+        "Mild": 3.4793659999999997,
+        "Lonely": 2.0915290000000004,
+        "Sassy": 0.097735
+      }
+    },
+    "Swellow": {
+      "Raw count": 1608,
+      "usage": 0.0005,
+      "Abilities": {
+        "Guts": 195.47
+      },
+      "Items": {
+        "Choice Band": 106.68752599999999,
+        "Leftovers": 39.934521000000004,
+        "Salac Berry": 25.860681,
+        "Lansat Berry": 11.786840999999999,
+        "Liechi Berry": 10.868132,
+        "Silk Scarf": 0.31275200000000003,
+        "Petaya Berry": 0.019547000000000002,
+        "Focus Band": 0.019547000000000002
+      },
+      "Moves": {
+        "Double-Edge": 114.91681299999999,
+        "Hidden Power Fighting": 102.52401499999999,
+        "Endeavor": 87.160073,
+        "Substitute": 81.295973,
+        "Aerial Ace": 78.520299,
+        "Facade": 75.901001,
+        "Return": 65.267433,
+        "Quick Attack": 62.374477,
+        "Hidden Power Steel": 39.387205,
+        "Hidden Power Ghost": 38.585778,
+        "Baton Pass": 13.057395999999999,
+        "Hyper Beam": 11.317713,
+        "Frustration": 4.476263,
+        "Steel Wing": 2.423828,
+        "Hidden Power Flying": 2.111076,
+        "Sky Attack": 0.605957,
+        "Hidden Power Ground": 0.58641,
+        "Protect": 0.527769,
+        "Pursuit": 0.527769,
+        "Sleep Talk": 0.11728199999999998,
+        "Toxic": 0.07818800000000001,
+        "Agility": 0.05864099999999999,
+        "Endure": 0.039094000000000004,
+        "Wing Attack": 0.019547000000000002
+      },
+      "Natures": {
+        "Jolly": 192.53795,
+        "Adamant": 2.3651869999999997,
+        "Hardy": 0.527769
+      }
+    },
+    "Torkoal": {
+      "Raw count": 791,
+      "usage": 0.0004,
+      "Abilities": {
+        "White Smoke": 156.376
+      },
+      "Items": {
+        "Lum Berry": 121.3321384,
+        "Leftovers": 24.003716,
+        "Choice Band": 11.040145599999999
+      },
+      "Moves": {
+        "Explosion": 145.63296880000001,
+        "Overheat": 145.6173312,
+        "Hidden Power Ice": 134.2957088,
+        "Eruption": 121.3321384,
+        "Protect": 22.1897544,
+        "Rock Slide": 11.3216224,
+        "Hidden Power Fighting": 11.040145599999999,
+        "Flamethrower": 9.6327616,
+        "Body Slam": 9.523298400000002,
+        "Hidden Power Grass": 9.2418216,
+        "Amnesia": 1.2197328,
+        "Rest": 1.2197328,
+        "Curse": 1.2197328,
+        "Hidden Power Steel": 1.2197328,
+        "Fire Spin": 0.2971144,
+        "Yawn": 0.2971144,
+        "Fire Blast": 0.1876512,
+        "Sunny Day": 0.0156376
+      },
+      "Natures": {
+        "Quiet": 143.5375304,
+        "Brave": 11.321622399999999,
+        "Impish": 1.2197328,
+        "Relaxed": 0.1876512,
+        "Bold": 0.0938256
+      }
+    },
+    "Shedinja": {
+      "Raw count": 2252,
+      "usage": 0.0004,
+      "Abilities": {
+        "Wonder Guard": 156.376
+      },
+      "Items": {
+        "Spell Tag": 104.5529936,
+        "Scope Lens": 39.7351416,
+        "Lum Berry": 5.692086400000001,
+        "Choice Band": 5.5357104,
+        "King's Rock": 0.78188,
+        "Focus Band": 0.07818800000000001
+      },
+      "Moves": {
+        "Shadow Ball": 156.376,
+        "Swords Dance": 144.7572632,
+        "Toxic": 111.5899136,
+        "Hidden Power Fighting": 108.1965544,
+        "Silver Wind": 45.36467760000001,
+        "Hidden Power Rock": 39.7351416,
+        "Protect": 4.9258440000000006,
+        "Baton Pass": 3.8781248,
+        "Hidden Power Bug": 3.3308088000000002,
+        "Aerial Ace": 3.0806071999999998,
+        "Hyper Beam": 1.1259072,
+        "Fury Cutter": 1.094632,
+        "Dig": 0.9382560000000001,
+        "Sleep Talk": 0.8913432000000001,
+        "Confuse Ray": 0.07818800000000001,
+        "Hidden Power Steel": 0.07818800000000001,
+        "Return": 0.0625504,
+        "Frustration": 0.0156376
+      },
+      "Natures": {
+        "Adamant": 109.52575039999999,
+        "Lonely": 44.723535999999996,
+        "Jolly": 1.9859752,
+        "Hardy": 0.07818800000000001,
+        "Hasty": 0.0469128,
+        "Naughty": 0.0312752
+      }
+    },
+    "Nosepass": {
+      "Raw count": 206,
+      "usage": 0.0004,
+      "Abilities": {
+        "Magnet Pull": 156.376
+      },
+      "Items": {
+        "Leftovers": 97.6098992,
+        "Pecha Berry": 58.719188,
+        "Lum Berry": 0.0469128
+      },
+      "Moves": {
+        "Taunt": 150.1522352,
+        "Fire Punch": 95.45191040000002,
+        "Rest": 91.323584,
+        "Torment": 85.4125712,
+        "Explosion": 64.7240264,
+        "Thunder Wave": 62.878789600000005,
+        "Thunderbolt": 62.878789600000005,
+        "Toxic": 6.176852,
+        "Zap Cannon": 2.1579888,
+        "Dynamic Punch": 2.0954384,
+        "Rock Tomb": 2.0641632,
+        "Earthquake": 0.0469128,
+        "Thunder": 0.0312752,
+        "Body Slam": 0.0312752,
+        "Rock Slide": 0.0312752,
+        "Block": 0.0156376
+      },
+      "Natures": {
+        "Modest": 79.8768608,
+        "Relaxed": 63.2384544,
+        "Bold": 5.5200727999999994,
+        "Quiet": 5.848462400000001,
+        "Sassy": 1.8608744000000002,
+        "Timid": 0.0156376
+      }
+    },
+    "Espeon": {
+      "Raw count": 2602,
+      "usage": 0.0003,
+      "Abilities": {
+        "Synchronize": 117.282
+      },
+      "Items": {
+        "Leftovers": 107.5593222,
+        "Lum Berry": 9.1597242,
+        "Nothing": 0.4925844,
+        "Petaya Berry": 0.058641
+      },
+      "Moves": {
+        "Calm Mind": 116.7776874,
+        "Baton Pass": 115.8277032,
+        "Psychic": 113.8456374,
+        "Substitute": 66.2877864,
+        "Hidden Power Fire": 47.6868612,
+        "Hidden Power Ice": 4.456716,
+        "Wish": 1.4425686,
+        "Morning Sun": 1.17282,
+        "Hidden Power Electric": 0.7740612,
+        "Rain Dance": 0.5394972,
+        "Attract": 0.14073839999999999,
+        "Hidden Power Grass": 0.07036919999999999,
+        "Psybeam": 0.035184599999999996,
+        "Hidden Power Water": 0.0234564,
+        "Bite": 0.0234564,
+        "Reflect": 0.0234564
+      },
+      "Natures": {
+        "Timid": 111.72283319999997,
+        "Bold": 3.6122856,
+        "Modest": 1.8999684000000003,
+        "Calm": 0.0117282
+      }
+    },
+    "Mantine": {
+      "Raw count": 731,
+      "usage": 0.0003,
+      "Abilities": {
+        "Water Absorb": 65.2205202,
+        "Swift Swim": 52.0614798
+      },
+      "Items": {
+        "Leftovers": 117.282
+      },
+      "Moves": {
+        "Surf": 87.17571059999999,
+        "Toxic": 84.6893322,
+        "Haze": 67.6365294,
+        "Rest": 61.690332,
+        "Rain Dance": 55.181180999999995,
+        "Hidden Power Grass": 49.0590606,
+        "Hydro Pump": 30.106289399999998,
+        "Ice Beam": 30.059376599999997,
+        "Hidden Power Ice": 2.5684758,
+        "Substitute": 0.4808562,
+        "Confuse Ray": 0.34011779999999997,
+        "Sleep Talk": 0.14073839999999999
+      },
+      "Natures": {
+        "Modest": 49.035604199999995,
+        "Calm": 65.56063799999998,
+        "Bold": 2.6740296
+      }
+    },
+    "Zangoose": {
+      "Raw count": 734,
+      "usage": 0.0003,
+      "Abilities": {
+        "Immunity": 117.282
+      },
+      "Items": {
+        "Salac Berry": 59.5557996,
+        "Leftovers": 41.036971799999996,
+        "Choice Band": 15.7861572,
+        "Silk Scarf": 0.8327022000000001,
+        "Liechi Berry": 0.07036919999999999
+      },
+      "Moves": {
+        "Swords Dance": 101.49584279999999,
+        "Shadow Ball": 79.282632,
+        "Flail": 57.4329954,
+        "Endure": 57.362626199999994,
+        "Quick Attack": 53.9731764,
+        "Return": 40.157356799999995,
+        "Brick Break": 30.5754174,
+        "Double-Edge": 14.1676656,
+        "Focus Punch": 13.0300302,
+        "Hidden Power Steel": 5.805459,
+        "Hidden Power Ghost": 4.8202902,
+        "Substitute": 3.8703060000000002,
+        "Body Slam": 3.7882086000000004,
+        "Rock Slide": 3.0376038,
+        "Hidden Power Bug": 0.34011779999999997
+      },
+      "Natures": {
+        "Adamant": 79.86904199999998,
+        "Jolly": 37.29567600000001,
+        "Lonely": 0.10555379999999999
+      }
+    },
+    "Golem": {
+      "Raw count": 620,
+      "usage": 0.0003,
+      "Abilities": {
+        "Rock Head": 117.0591642,
+        "Sturdy": 0.2228358
+      },
+      "Items": {
+        "Choice Band": 115.55795459999999,
+        "Lum Berry": 1.3839276,
+        "Black Belt": 0.21110759999999998,
+        "Leftovers": 0.07036919999999999,
+        "Salac Berry": 0.0469128
+      },
+      "Moves": {
+        "Explosion": 117.0591642,
+        "Earthquake": 108.4975782,
+        "Rock Slide": 98.04775199999999,
+        "Double-Edge": 74.6265366,
+        "Hidden Power Bug": 32.1469962,
+        "Rock Blast": 9.675765,
+        "Hidden Power Rock": 9.488113799999999,
+        "Counter": 8.8313346,
+        "Sleep Talk": 8.725780799999999,
+        "Hidden Power Ghost": 0.8796149999999999,
+        "Focus Punch": 0.5746817999999999,
+        "Protect": 0.21110759999999998,
+        "Nothing": 0.1876512,
+        "Brick Break": 0.07036919999999999,
+        "Block": 0.0469128,
+        "Substitute": 0.0469128,
+        "Hidden Power Fighting": 0.0117282
+      },
+      "Natures": {
+        "Adamant": 100.29956639999997,
+        "Careful": 8.725780799999999,
+        "Jolly": 6.720258599999999,
+        "Impish": 1.3252865999999999,
+        "Relaxed": 0.21110759999999998
+      }
+    },
+    "Pupitar": {
+      "Raw count": 120,
+      "usage": 0.0003,
+      "Abilities": {
+        "Shed Skin": 117.282
+      },
+      "Items": {
+        "Silver Powder": 72.480276,
+        "Soft Sand": 44.684442,
+        "Leftovers": 0.117282
+      },
+      "Moves": {
+        "Dragon Dance": 117.282,
+        "Earthquake": 117.282,
+        "Rock Slide": 117.282,
+        "Hidden Power Bug": 117.282
+      },
+      "Natures": {
+        "Jolly": 100.8156072,
+        "Adamant": 10.3090878,
+        "Hardy": 6.157305
+      }
+    },
+    "Cradily": {
+      "Raw count": 1630,
+      "usage": 0.0003,
+      "Abilities": {
+        "Suction Cups": 117.282
+      },
+      "Items": {
+        "Leftovers": 113.1419454,
+        "Chesto Berry": 3.9054906000000003,
+        "Lum Berry": 0.1876512,
+        "Salac Berry": 0.0469128
+      },
+      "Moves": {
+        "Earthquake": 96.6051834,
+        "Rock Slide": 75.95182319999999,
+        "Recover": 74.122224,
+        "Toxic": 44.2035858,
+        "Rest": 42.3270738,
+        "Hidden Power Rock": 24.3477432,
+        "Sleep Talk": 24.3008304,
+        "Substitute": 20.3601552,
+        "Amnesia": 18.155253599999998,
+        "Giga Drain": 17.5219308,
+        "Hidden Power Fire": 13.9917426,
+        "Mirror Coat": 7.6936992,
+        "Barrier": 5.6529924,
+        "Ancient Power": 2.873409,
+        "Ingrain": 0.4808562,
+        "Hidden Power Grass": 0.39875879999999997,
+        "Hidden Power Bug": 0.0469128,
+        "Confuse Ray": 0.0469128,
+        "Sludge Bomb": 0.0234564,
+        "Psych Up": 0.0117282,
+        "Protect": 0.0117282,
+        "Stockpile": 0.0117282,
+        "Spit Up": 0.0117282
+      },
+      "Natures": {
+        "Adamant": 52.6713462,
+        "Careful": 37.6709784,
+        "Modest": 11.8337538,
+        "Brave": 6.825812399999999,
+        "Impish": 3.9054906000000003,
+        "Quiet": 2.1462606,
+        "Calm": 1.7475018,
+        "Sassy": 0.22283580000000003,
+        "Hardy": 0.175923,
+        "Jolly": 0.0469128
+      }
+    },
+    "Delcatty": {
+      "Raw count": 41,
+      "usage": 0.0003,
+      "Abilities": {
+        "Cute Charm": 117.282
+      },
+      "Items": {
+        "Leftovers": 110.56174139999999,
+        "Nothing": 5.676448799999999,
+        "Lum Berry": 1.0320816
+      },
+      "Moves": {
+        "Thunder Wave": 116.2499184,
+        "Baton Pass": 110.56174139999999,
+        "Calm Mind": 110.56174139999999,
+        "Substitute": 110.56174139999999,
+        "Wish": 6.720258599999999,
+        "Covet": 5.676448799999999,
+        "Toxic": 5.676448799999999,
+        "Double-Edge": 1.0320816,
+        "Rest": 1.0320816,
+        "Sleep Talk": 1.0320816
+      },
+      "Natures": {
+        "Bold": 110.56174139999999,
+        "Careful": 5.676448799999999,
+        "Adamant": 1.0320816
+      }
+    },
+    "Muk": {
+      "Raw count": 1101,
+      "usage": 0.0002,
+      "Abilities": {
+        "Sticky Hold": 56.5377428,
+        "Stench": 21.6502572
+      },
+      "Items": {
+        "Leftovers": 49.946494400000006,
+        "Choice Band": 25.2234488,
+        "Lum Berry": 3.0180568
+      },
+      "Moves": {
+        "Sludge Bomb": 74.904104,
+        "Explosion": 56.647206000000004,
+        "Hidden Power Ghost": 43.5038032,
+        "Focus Punch": 41.8774928,
+        "Substitute": 27.443988,
+        "Curse": 22.3539492,
+        "Fire Blast": 17.670488000000002,
+        "Brick Break": 15.481224000000001,
+        "Flamethrower": 3.1353388,
+        "Ice Punch": 3.0180568,
+        "Thunderbolt": 3.0180568,
+        "Giga Drain": 3.0180568,
+        "Hidden Power Flying": 0.1407384,
+        "Body Slam": 0.11728200000000001,
+        "Acid Armor": 0.11728200000000001,
+        "Disable": 0.11728200000000001,
+        "Hidden Power Ground": 0.08600680000000001,
+        "Memento": 0.039094000000000004,
+        "Thunder": 0.0156376,
+        "Taunt": 0.0156376,
+        "Rest": 0.0078188
+      },
+      "Natures": {
+        "Adamant": 54.418848,
+        "Sassy": 17.7955888,
+        "Modest": 3.0180568,
+        "Brave": 2.93205,
+        "Careful": 0.0156376,
+        "Impish": 0.0078188
+      }
+    },
+    "Hitmonlee": {
+      "Raw count": 1117,
+      "usage": 0.0002,
+      "Abilities": {
+        "Limber": 78.188
+      },
+      "Items": {
+        "Choice Band": 36.9907428,
+        "Salac Berry": 30.7044276,
+        "Leftovers": 10.16444,
+        "Lum Berry": 0.32057080000000004
+      },
+      "Moves": {
+        "Hidden Power Ghost": 76.0300112,
+        "Rapid Spin": 45.505416,
+        "Brick Break": 44.49679080000001,
+        "Mach Punch": 39.758598,
+        "Bulk Up": 30.9468104,
+        "Reversal": 30.6731524,
+        "Substitute": 30.6262396,
+        "Rock Slide": 11.9002136,
+        "Rest": 1.0008064,
+        "Focus Punch": 0.7975176,
+        "Earthquake": 0.3753024,
+        "Hidden Power Flying": 0.32057080000000004,
+        "High Jump Kick": 0.2580204,
+        "Endure": 0.039094000000000004,
+        "Double-Edge": 0.0156376
+      },
+      "Natures": {
+        "Jolly": 40.376283199999996,
+        "Adamant": 37.7960792
+      }
+    },
+    "Pikachu": {
+      "Raw count": 1142,
+      "usage": 0.0002,
+      "Abilities": {
+        "Static": 78.188
+      },
+      "Items": {
+        "Light Ball": 77.8517916,
+        "Leftovers": 0.3283896
+      },
+      "Moves": {
+        "Substitute": 68.9070844,
+        "Thunderbolt": 56.076433599999994,
+        "Hidden Power Grass": 46.787699200000006,
+        "Encore": 44.215314,
+        "Hidden Power Ice": 30.8529848,
+        "Surf": 30.6653336,
+        "Volt Tackle": 27.342343600000003,
+        "Agility": 1.6184916,
+        "Toxic": 1.3995652,
+        "Rain Dance": 0.8835244,
+        "Brick Break": 0.7975176,
+        "Attract": 0.7662424,
+        "Focus Punch": 0.5942288,
+        "Thunder Wave": 0.46912800000000004,
+        "Light Screen": 0.3987588,
+        "Sweet Kiss": 0.3283896,
+        "Wish": 0.1641948,
+        "Hidden Power Fire": 0.15637600000000001,
+        "Quick Attack": 0.1407384,
+        "Reversal": 0.0625504,
+        "Thunder": 0.0625504,
+        "Protect": 0.0547316
+      },
+      "Natures": {
+        "Timid": 52.3546848,
+        "Mild": 15.559411999999998,
+        "Hasty": 8.287928,
+        "Modest": 1.6497668,
+        "Calm": 0.3283896,
+        "Naive": 0.0078188
+      }
+    },
+    "Qwilfish": {
+      "Raw count": 483,
+      "usage": 0.0002,
+      "Abilities": {
+        "Swift Swim": 65.1149664,
+        "Poison Point": 13.073033599999999
+      },
+      "Items": {
+        "Leftovers": 70.4552068,
+        "Salac Berry": 5.3089652,
+        "Lum Berry": 1.5950352,
+        "Choice Band": 0.6333228,
+        "Silk Scarf": 0.15637600000000001,
+        "Mystic Water": 0.0234564,
+        "Black Belt": 0.0156376,
+        "Starf Berry": 0.0078188
+      },
+      "Moves": {
+        "Self-Destruct": 77.12464320000001,
+        "Spikes": 76.8666228,
+        "Rain Dance": 56.4204608,
+        "Hydro Pump": 56.2015344,
+        "Destiny Bond": 14.3396792,
+        "Thunder Wave": 10.633568,
+        "Haze": 9.077626799999999,
+        "Sludge Bomb": 7.826618799999999,
+        "Toxic": 1.5403035999999999,
+        "Shadow Ball": 0.6411416000000001,
+        "Hidden Power Bug": 0.6333228,
+        "Return": 0.6333228,
+        "Endure": 0.6020476,
+        "Surf": 0.19547,
+        "Hidden Power Fighting": 0.0156376,
+        "Ice Beam": 0.0078188
+      },
+      "Natures": {
+        "Naughty": 56.0373396,
+        "Jolly": 21.063847199999998,
+        "Adamant": 0.7193296,
+        "Naive": 0.31275200000000003,
+        "Modest": 0.039094000000000004,
+        "Careful": 0.0078188,
+        "Timid": 0.0078188
+      }
+    },
+    "Walrein": {
+      "Raw count": 916,
+      "usage": 0.0002,
+      "Abilities": {
+        "Thick Fat": 78.188
+      },
+      "Items": {
+        "Leftovers": 60.501874400000005,
+        "Salac Berry": 17.2560916,
+        "Mystic Water": 0.4222152,
+        "Chesto Berry": 0.0078188
+      },
+      "Moves": {
+        "Ice Beam": 78.1332684,
+        "Surf": 77.8830668,
+        "Encore": 46.396759200000005,
+        "Yawn": 41.048700000000004,
+        "Substitute": 34.5903712,
+        "Toxic": 27.842746800000004,
+        "Protect": 3.4950036,
+        "Hidden Power Electric": 1.3370148000000002,
+        "Body Slam": 0.4222152,
+        "Rock Slide": 0.4222152,
+        "Rest": 0.4143964,
+        "Curse": 0.3049332,
+        "Earthquake": 0.3049332,
+        "Sleep Talk": 0.1094632,
+        "Blizzard": 0.0312752,
+        "Roar": 0.0078188
+      },
+      "Natures": {
+        "Modest": 53.8558944,
+        "Timid": 20.891833600000002,
+        "Calm": 3.1353388000000004,
+        "Sassy": 0.3049332
+      }
+    },
+    "Shiftry": {
+      "Raw count": 744,
+      "usage": 0.0002,
+      "Abilities": {
+        "Chlorophyll": 61.838889200000004,
+        "Early Bird": 16.349110800000002
+      },
+      "Items": {
+        "Leftovers": 60.087478,
+        "Nothing": 9.1167208,
+        "Choice Band": 6.528698,
+        "Lum Berry": 2.3925528,
+        "Miracle Seed": 0.0625504,
+        "Black Glasses": 0.0078188
+      },
+      "Moves": {
+        "Explosion": 78.1723624,
+        "Sunny Day": 54.8019692,
+        "Leech Seed": 43.7930988,
+        "Hidden Power Ghost": 25.5127444,
+        "Hidden Power Fire": 19.9692152,
+        "Solar Beam": 17.9128708,
+        "Hidden Power Bug": 14.910451600000002,
+        "Giga Drain": 14.417867200000002,
+        "Brick Break": 14.277128800000002,
+        "Shadow Ball": 12.4631672,
+        "Thief": 9.1167208,
+        "Hidden Power Grass": 4.2065144000000005,
+        "Swords Dance": 2.3690964,
+        "Quick Attack": 0.45349039999999996,
+        "Hidden Power Dark": 0.2111076,
+        "Fake Out": 0.1485572,
+        "Feint Attack": 0.0078188,
+        "Synthesis": 0.0078188
+      },
+      "Natures": {
+        "Adamant": 46.959712800000005,
+        "Modest": 12.572630399999998,
+        "Hasty": 6.8179936,
+        "Rash": 7.584236,
+        "Naughty": 4.2065144000000005,
+        "Lonely": 0.0234564,
+        "Mild": 0.0078188
+      }
+    },
+    "Politoed": {
+      "Raw count": 477,
+      "usage": 0.0002,
+      "Abilities": {
+        "Water Absorb": 40.970512,
+        "Damp": 37.217488
+      },
+      "Items": {
+        "Nothing": 69.40748760000001,
+        "Leftovers": 8.678868,
+        "Lum Berry": 0.0938256
+      },
+      "Moves": {
+        "Ice Beam": 78.0863556,
+        "Hypnosis": 76.1238368,
+        "Thief": 72.49591360000001,
+        "Hydro Pump": 50.1654208,
+        "Surf": 27.928753600000004,
+        "Hidden Power Grass": 5.5904419999999995,
+        "Perish Song": 2.0563444,
+        "Belly Drum": 0.0938256,
+        "Earthquake": 0.0938256,
+        "Return": 0.0938256
+      },
+      "Natures": {
+        "Timid": 39.0470872,
+        "Modest": 36.62325920000001,
+        "Bold": 2.4316468,
+        "Adamant": 0.0938256
+      }
+    },
+    "Victreebel": {
+      "Raw count": 211,
+      "usage": 0.0002,
+      "Abilities": {
+        "Chlorophyll": 78.188
+      },
+      "Items": {
+        "Leftovers": 78.14890600000001,
+        "Miracle Seed": 0.0312752,
+        "Focus Band": 0.0078188
+      },
+      "Moves": {
+        "Sludge Bomb": 78.1567248,
+        "Encore": 78.1567248,
+        "Sleep Powder": 78.14890600000001,
+        "Substitute": 77.9768924,
+        "Swords Dance": 0.17201360000000002,
+        "Solar Beam": 0.039094000000000004,
+        "Sunny Day": 0.039094000000000004,
+        "Giga Drain": 0.0312752,
+        "Razor Leaf": 0.0312752
+      },
+      "Natures": {
+        "Adamant": 78.148906,
+        "Hardy": 0.0312752,
+        "Rash": 0.0078188
+      }
+    },
+    "Tentacruel": {
+      "Raw count": 1043,
+      "usage": 0.0002,
+      "Abilities": {
+        "Liquid Ooze": 75.3497756,
+        "Clear Body": 2.8382244
+      },
+      "Items": {
+        "Leftovers": 66.06886,
+        "Nothing": 12.0253144,
+        "Lum Berry": 0.0703692,
+        "Poison Barb": 0.0312752
+      },
+      "Moves": {
+        "Ice Beam": 75.38886959999999,
+        "Surf": 54.598680400000006,
+        "Rapid Spin": 49.774480800000006,
+        "Giga Drain": 43.0268564,
+        "Sludge Bomb": 24.066266400000004,
+        "Hydro Pump": 22.948178,
+        "Toxic": 21.595525600000002,
+        "Thief": 12.126958799999999,
+        "Mirror Coat": 2.8773184,
+        "Rest": 2.6662108,
+        "Haze": 2.15017,
+        "Hidden Power Electric": 0.78188,
+        "Waterfall": 0.6411416000000001,
+        "Hidden Power Fire": 0.0312752,
+        "Rain Dance": 0.0312752,
+        "Hidden Power Grass": 0.0234564,
+        "Mimic": 0.0156376,
+        "Substitute": 0.0078188
+      },
+      "Natures": {
+        "Hasty": 22.705795200000004,
+        "Modest": 19.7581076,
+        "Bold": 18.335086,
+        "Timid": 15.012096000000003,
+        "Calm": 2.3221836000000002,
+        "Gentle": 0.0625504
+      }
+    },
+    "Absol": {
+      "Raw count": 954,
+      "usage": 0.0002,
+      "Abilities": {
+        "Pressure": 78.188
+      },
+      "Items": {
+        "Leftovers": 71.0494356,
+        "Choice Band": 7.083832800000001,
+        "Lum Berry": 0.039094000000000004,
+        "Silk Scarf": 0.0078188,
+        "Nothing": 0.0078188
+      },
+      "Moves": {
+        "Baton Pass": 64.0281532,
+        "Swords Dance": 50.23579,
+        "Protect": 49.8683064,
+        "Rest": 40.016618400000006,
+        "Quick Attack": 27.2719744,
+        "Shadow Ball": 14.3318604,
+        "Hidden Power Fighting": 14.2849476,
+        "Taunt": 14.0034708,
+        "Psych Up": 13.6359872,
+        "Return": 13.6125308,
+        "Substitute": 9.8595068,
+        "Double-Edge": 0.3753024,
+        "Perish Song": 0.2814768,
+        "Thunder Wave": 0.2814768,
+        "Ice Beam": 0.273658,
+        "Magic Coat": 0.1016444,
+        "Counter": 0.0703692,
+        "Rock Slide": 0.0625504,
+        "Calm Mind": 0.0312752,
+        "Rain Dance": 0.0312752,
+        "Aerial Ace": 0.0234564,
+        "Slash": 0.0156376,
+        "Body Slam": 0.0156376,
+        "Iron Tail": 0.0156376,
+        "Sunny Day": 0.0078188,
+        "Bite": 0.0078188
+      },
+      "Natures": {
+        "Impish": 40.016618400000006,
+        "Jolly": 27.287612,
+        "Careful": 9.8595068,
+        "Adamant": 0.508222,
+        "Lax": 0.273658,
+        "Hardy": 0.1798324,
+        "Bold": 0.0312752,
+        "Sassy": 0.0234564
+      }
+    },
+    "Lunatone": {
+      "Raw count": 897,
+      "usage": 0.0002,
+      "Abilities": {
+        "Levitate": 78.188
+      },
+      "Items": {
+        "Leftovers": 75.55306440000001,
+        "Salac Berry": 2.6349356
+      },
+      "Moves": {
+        "Ice Beam": 75.6625276,
+        "Calm Mind": 74.6460836,
+        "Baton Pass": 69.8922532,
+        "Hypnosis": 57.155428,
+        "Explosion": 9.077626799999999,
+        "Psychic": 8.5303108,
+        "Hidden Power Grass": 5.5591668,
+        "Substitute": 4.10487,
+        "Hidden Power Electric": 2.6818484,
+        "Reflect": 2.4316468,
+        "Sleep Talk": 1.6419480000000002,
+        "Psych Up": 1.0008064,
+        "Rain Dance": 0.1641948,
+        "Mimic": 0.1016444,
+        "Self-Destruct": 0.1016444,
+        "Cosmic Power": 0.0078188
+      },
+      "Natures": {
+        "Modest": 52.58142999999999,
+        "Bold": 16.263104,
+        "Timid": 5.1682268,
+        "Relaxed": 2.2987272,
+        "Hardy": 1.1180884000000002,
+        "Calm": 0.7506048,
+        "Gentle": 0.0078188
+      }
+    },
+    "Marshtomp": {
+      "Raw count": 83,
+      "usage": 0.0002,
+      "Abilities": {
+        "Torrent": 78.188
+      },
+      "Items": {
+        "Leftovers": 78.1332684,
+        "Choice Band": 0.0547316
+      },
+      "Moves": {
+        "Hydro Pump": 77.8205164,
+        "Toxic": 77.6641404,
+        "Counter": 77.3513884,
+        "Protect": 77.3513884,
+        "Earthquake": 0.8366116,
+        "Rock Slide": 0.5238596,
+        "Return": 0.5160408,
+        "Ice Beam": 0.32057080000000004,
+        "Refresh": 0.31275200000000003,
+        "Hidden Power Fighting": 0.0547316
+      },
+      "Natures": {
+        "Impish": 77.3513884,
+        "Brave": 0.78188,
+        "Jolly": 0.0469128
+      }
+    },
+    "Nidoking": {
+      "Raw count": 1134,
+      "usage": 0.0002,
+      "Abilities": {
+        "Poison Point": 78.188
+      },
+      "Items": {
+        "Choice Band": 44.4342404,
+        "Leftovers": 33.0031548,
+        "Lum Berry": 0.7115108000000001,
+        "Poison Barb": 0.039094000000000004
+      },
+      "Moves": {
+        "Earthquake": 71.5967516,
+        "Megahorn": 59.8450952,
+        "Sludge Bomb": 48.554748000000004,
+        "Rock Slide": 43.6758168,
+        "Ice Beam": 23.1592856,
+        "Thunderbolt": 22.580694400000002,
+        "Brick Break": 9.3669224,
+        "Shadow Ball": 8.757056,
+        "Fire Blast": 7.42786,
+        "Hidden Power Grass": 6.3175904,
+        "Flamethrower": 6.3175904,
+        "Substitute": 3.6591984,
+        "Thunder": 1.1024508,
+        "Surf": 0.2658392,
+        "Beat Up": 0.0469128,
+        "Strength": 0.039094000000000004,
+        "Taunt": 0.0156376,
+        "Blizzard": 0.0078188,
+        "Toxic": 0.0078188,
+        "Roar": 0.0078188
+      },
+      "Natures": {
+        "Adamant": 40.634303599999996,
+        "Lonely": 16.7478696,
+        "Brave": 6.3019528000000005,
+        "Jolly": 7.076014,
+        "Hardy": 3.2135268,
+        "Timid": 2.3612775999999998,
+        "Rash": 0.8757055999999999,
+        "Hasty": 0.39093999999999995,
+        "Mild": 0.23456400000000002,
+        "Modest": 0.2580204,
+        "Naughty": 0.0547316,
+        "Naive": 0.0469128
+      }
+    },
+    "Haunter": {
+      "Raw count": 183,
+      "usage": 0.0002,
+      "Abilities": {
+        "Levitate": 78.188
+      },
+      "Items": {
+        "Leftovers": 78.14890600000001,
+        "Never-Melt Ice": 0.039094000000000004
+      },
+      "Moves": {
+        "Thunderbolt": 78.188,
+        "Destiny Bond": 77.9612548,
+        "Giga Drain": 77.9612548,
+        "Curse": 77.953436,
+        "Explosion": 0.1876512,
+        "Hidden Power Grass": 0.1876512,
+        "Rain Dance": 0.1876512,
+        "Will-O-Wisp": 0.039094000000000004,
+        "Hidden Power Ice": 0.039094000000000004,
+        "Shadow Ball": 0.039094000000000004
+      },
+      "Natures": {
+        "Timid": 77.9612548,
+        "Naive": 0.1876512,
+        "Hasty": 0.039094000000000004
+      }
+    },
+    "Altaria": {
+      "Raw count": 569,
+      "usage": 0.0002,
+      "Abilities": {
+        "Natural Cure": 78.188
+      },
+      "Items": {
+        "Leftovers": 77.5312208,
+        "Nothing": 0.4847656,
+        "Lum Berry": 0.1641948,
+        "Apicot Berry": 0.0078188,
+        "Chesto Berry": 0.0078188
+      },
+      "Moves": {
+        "Rest": 70.1268172,
+        "Heal Bell": 59.696538,
+        "Hidden Power Flying": 54.9583452,
+        "Flamethrower": 36.5607088,
+        "Dragon Dance": 22.916902800000003,
+        "Earthquake": 22.525962800000002,
+        "Roar": 18.139616,
+        "Dragon Breath": 17.475018000000002,
+        "Toxic": 4.417622000000001,
+        "Perish Song": 2.7365800000000005,
+        "Sunny Day": 0.6724168,
+        "Thief": 0.4847656,
+        "Dragon Claw": 0.4847656,
+        "Sing": 0.39094,
+        "Sky Attack": 0.39094,
+        "Substitute": 0.39094,
+        "Return": 0.1329196,
+        "Fire Blast": 0.08600680000000001,
+        "Hidden Power Grass": 0.08600680000000001,
+        "Aerial Ace": 0.039094000000000004,
+        "Haze": 0.0312752,
+        "Ice Beam": 0.0234564
+      },
+      "Natures": {
+        "Relaxed": 32.5965772,
+        "Calm": 22.1584792,
+        "Adamant": 22.518144,
+        "Timid": 0.4847656,
+        "Careful": 0.39094,
+        "Modest": 0.0234564,
+        "Hardy": 0.0078188
+      }
+    },
+    "Typhlosion": {
+      "Raw count": 845,
+      "usage": 0.0002,
+      "Abilities": {
+        "Blaze": 78.188
+      },
+      "Items": {
+        "Leftovers": 38.8750736,
+        "Petaya Berry": 24.472844000000002,
+        "Charcoal": 10.359910000000001,
+        "Salac Berry": 4.183058,
+        "Lum Berry": 0.2971144
+      },
+      "Moves": {
+        "Fire Blast": 52.8238128,
+        "Thunder Punch": 50.783106,
+        "Sunny Day": 49.2428024,
+        "Hidden Power Ice": 45.427228,
+        "Hidden Power Grass": 29.1015736,
+        "Flamethrower": 25.364187200000003,
+        "Substitute": 20.641632,
+        "Focus Punch": 13.643806,
+        "Overheat": 11.008870400000001,
+        "Toxic": 6.606886,
+        "Reversal": 4.1361452000000005,
+        "Earthquake": 3.010238,
+        "Brick Break": 0.3987588,
+        "Body Slam": 0.2502016,
+        "Quick Attack": 0.2502016,
+        "Fire Punch": 0.0312752,
+        "Protect": 0.0156376,
+        "Roar": 0.0078188
+      },
+      "Natures": {
+        "Timid": 30.938991600000005,
+        "Modest": 35.5833588,
+        "Mild": 4.1361452000000005,
+        "Rash": 3.9563128,
+        "Naive": 2.111076,
+        "Hasty": 1.4542967999999998
+      }
+    },
+    "Rapidash": {
+      "Raw count": 344,
+      "usage": 0.0001,
+      "Abilities": {
+        "Flash Fire": 39.094
+      },
+      "Items": {
+        "Leftovers": 38.9845368,
+        "Mail": 0.0547316,
+        "Lum Berry": 0.0234564,
+        "Charcoal": 0.0156376,
+        "Choice Band": 0.0117282
+      },
+      "Moves": {
+        "Baton Pass": 20.250692,
+        "Substitute": 20.188141599999998,
+        "Overheat": 20.145138199999998,
+        "Toxic": 18.9293148,
+        "Flamethrower": 18.882402,
+        "Double Kick": 18.808123400000003,
+        "Hypnosis": 18.808123400000003,
+        "Quick Attack": 18.7885764,
+        "Hidden Power Grass": 1.290102,
+        "Fire Blast": 0.0625504,
+        "Hidden Power Bug": 0.0547316,
+        "Hidden Power Ice": 0.0547316,
+        "Hidden Power Fighting": 0.0351846,
+        "Return": 0.0234564,
+        "Agility": 0.0234564,
+        "Double-Edge": 0.0117282,
+        "Sunny Day": 0.0078188,
+        "Solar Beam": 0.0078188
+      },
+      "Natures": {
+        "Timid": 20.160775800000003,
+        "Naughty": 18.7885764,
+        "Lonely": 0.08600680000000001,
+        "Modest": 0.0273658,
+        "Hasty": 0.023456400000000002,
+        "Naive": 0.0039094
+      }
+    },
+    "Meganium": {
+      "Raw count": 662,
+      "usage": 0.0001,
+      "Abilities": {
+        "Overgrow": 39.094
+      },
+      "Items": {
+        "Leftovers": 39.094
+      },
+      "Moves": {
+        "Leech Seed": 37.393411,
+        "Giga Drain": 31.865519400000004,
+        "Grass Whistle": 31.744328000000003,
+        "Counter": 30.907716399999998,
+        "Swords Dance": 6.7007116,
+        "Earthquake": 6.665527000000001,
+        "Return": 5.0040320000000005,
+        "Body Slam": 2.3182742,
+        "Mimic": 1.2822832000000002,
+        "Hidden Power Fire": 0.6255040000000001,
+        "Hidden Power Grass": 0.6137758,
+        "Toxic": 0.5903194,
+        "Hidden Power Bug": 0.2697486,
+        "Substitute": 0.2658392,
+        "Synthesis": 0.058641000000000006,
+        "Razor Leaf": 0.0351846,
+        "Hidden Power Ghost": 0.0234564,
+        "Ancient Power": 0.0039094,
+        "Frenzy Plant": 0.0039094
+      },
+      "Natures": {
+        "Calm": 31.470670000000002,
+        "Adamant": 5.0313978,
+        "Quiet": 1.6693138,
+        "Bold": 0.6489604,
+        "Jolly": 0.2658392,
+        "Modest": 0.0039094
+      }
+    },
+    "Flareon": {
+      "Raw count": 693,
+      "usage": 0.0001,
+      "Abilities": {
+        "Flash Fire": 39.094
+      },
+      "Items": {
+        "Leftovers": 38.2964824,
+        "Choice Band": 0.7936082,
+        "Lum Berry": 0.0039094
+      },
+      "Moves": {
+        "Toxic": 30.5949644,
+        "Shadow Ball": 26.321990200000002,
+        "Hidden Power Fighting": 23.163195,
+        "Fire Blast": 21.067756600000003,
+        "Baton Pass": 12.678184199999999,
+        "Wish": 10.1527118,
+        "Overheat": 9.965060600000001,
+        "Hidden Power Rock": 7.6741522,
+        "Flamethrower": 4.6091826000000005,
+        "Hidden Power Grass": 4.0892324,
+        "Return": 3.4129062,
+        "Quick Attack": 0.7936082,
+        "Hidden Power Ground": 0.7936082,
+        "Roar": 0.5238596,
+        "Protect": 0.3987588,
+        "Curse": 0.039094000000000004,
+        "Rest": 0.039094000000000004,
+        "Frustration": 0.039094000000000004,
+        "Iron Tail": 0.0078188,
+        "Body Slam": 0.0039094,
+        "Double-Edge": 0.0039094
+      },
+      "Natures": {
+        "Lonely": 28.077310800000003,
+        "Modest": 4.0892324,
+        "Adamant": 3.4441814,
+        "Sassy": 2.4355561999999997,
+        "Relaxed": 0.5238596,
+        "Calm": 0.3987588,
+        "Quiet": 0.08600680000000001,
+        "Careful": 0.039094000000000004
+      }
+    },
+    "Crobat": {
+      "Raw count": 1097,
+      "usage": 0.0001,
+      "Abilities": {
+        "Inner Focus": 39.094
+      },
+      "Items": {
+        "Leftovers": 22.7448892,
+        "Choice Band": 15.129378,
+        "Liechi Berry": 0.7857894,
+        "White Herb": 0.21501699999999999,
+        "Lum Berry": 0.1798324,
+        "King's Rock": 0.0273658,
+        "Nothing": 0.0039094,
+        "Poison Barb": 0.0039094,
+        "Scope Lens": 0.0039094
+      },
+      "Moves": {
+        "Sludge Bomb": 32.745134400000005,
+        "Shadow Ball": 31.6739588,
+        "Hidden Power Ground": 20.387521,
+        "Giga Drain": 15.422583000000001,
+        "Aerial Ace": 14.953455,
+        "Hidden Power Fighting": 9.1401772,
+        "Whirlwind": 5.4184284,
+        "Nothing": 5.199502000000001,
+        "Sleep Talk": 3.7686616,
+        "Taunt": 3.6396514,
+        "Toxic": 2.3886434000000003,
+        "Steel Wing": 1.7865958,
+        "Hidden Power Ice": 1.7631394,
+        "Confuse Ray": 1.7240454,
+        "Substitute": 1.6693138,
+        "Rest": 1.6106728000000001,
+        "Hidden Power Flying": 1.0985414,
+        "Bite": 0.7193296,
+        "Protect": 0.6098664,
+        "Mimic": 0.4183058,
+        "Double-Edge": 0.0820974,
+        "Air Cutter": 0.0625504,
+        "Haze": 0.0312752,
+        "Facade": 0.0273658,
+        "Poison Fang": 0.0078188,
+        "Hidden Power Bug": 0.0078188,
+        "Thief": 0.0039094,
+        "Sunny Day": 0.0039094
+      },
+      "Natures": {
+        "Naive": 13.6477154,
+        "Jolly": 22.498597,
+        "Timid": 1.9234248,
+        "Adamant": 1.0320816
+      }
+    },
+    "Persian": {
+      "Raw count": 401,
+      "usage": 0.0001,
+      "Abilities": {
+        "Limber": 39.094
+      },
+      "Items": {
+        "Nothing": 38.8320702,
+        "White Herb": 0.2502016,
+        "Leftovers": 0.0117282
+      },
+      "Moves": {
+        "Shadow Ball": 39.0861812,
+        "Hypnosis": 38.843798400000004,
+        "Thief": 38.8320702,
+        "Double-Edge": 38.8242514,
+        "Slash": 0.2502016,
+        "Aerial Ace": 0.2502016,
+        "Psych Up": 0.2502016,
+        "Return": 0.0117282,
+        "Iron Tail": 0.0117282,
+        "Taunt": 0.0039094,
+        "Rain Dance": 0.0039094
+      },
+      "Natures": {
+        "Adamant": 38.8242514,
+        "Jolly": 0.26583920000000005
+      }
+    },
+    "Kingler": {
+      "Raw count": 418,
+      "usage": 0.0001,
+      "Abilities": {
+        "Shell Armor": 36.8421856,
+        "Hyper Cutter": 2.2518144
+      },
+      "Items": {
+        "Leftovers": 39.094
+      },
+      "Moves": {
+        "Knock Off": 37.100206,
+        "Hidden Power Fighting": 37.0962966,
+        "Harden": 36.8421856,
+        "Rest": 36.8421856,
+        "Swords Dance": 2.2518144,
+        "Double-Edge": 1.9977034,
+        "Hidden Power Ground": 1.9937939999999998,
+        "Substitute": 1.9937939999999998,
+        "Body Slam": 0.254111
+      },
+      "Natures": {
+        "Impish": 36.8421856,
+        "Adamant": 2.247905
+      }
+    },
+    "Sunflora": {
+      "Raw count": 135,
+      "usage": 0.0001,
+      "Abilities": {
+        "Chlorophyll": 39.094
+      },
+      "Items": {
+        "Leftovers": 39.094
+      },
+      "Moves": {
+        "Leech Seed": 38.1244688,
+        "Sunny Day": 36.435608,
+        "Endeavor": 35.4543486,
+        "Substitute": 35.4543486,
+        "Giga Drain": 2.6544826,
+        "Growth": 2.6544826,
+        "Ingrain": 2.6544826,
+        "Solar Beam": 0.9812594000000001,
+        "Hidden Power Fire": 0.9695312,
+        "Encore": 0.9695312,
+        "Hidden Power Ice": 0.0156376
+      },
+      "Natures": {
+        "Timid": 36.42778920000001,
+        "Modest": 2.6701202
+      }
+    },
+    "Ninetales": {
+      "Raw count": 469,
+      "usage": 0.0001,
+      "Abilities": {
+        "Flash Fire": 39.094
+      },
+      "Items": {
+        "Leftovers": 39.0900906,
+        "Choice Band": 0.0039094
+      },
+      "Moves": {
+        "Will-O-Wisp": 39.094,
+        "Fire Blast": 38.011096200000004,
+        "Grudge": 32.428473000000004,
+        "Toxic": 15.457767599999999,
+        "Hidden Power Grass": 12.588268000000001,
+        "Roar": 11.1144242,
+        "Sunny Day": 4.3902562,
+        "Hypnosis": 1.1180884,
+        "Flamethrower": 1.0829038,
+        "Confuse Ray": 1.0829038,
+        "Hyper Beam": 0.0039094
+      },
+      "Natures": {
+        "Timid": 39.015812,
+        "Calm": 0.0703692,
+        "Modest": 0.0039094
+      }
+    },
+    "Electabuzz": {
+      "Raw count": 694,
+      "usage": 0.0001,
+      "Abilities": {
+        "Static": 39.094
+      },
+      "Items": {
+        "Scope Lens": 32.2603688,
+        "Leftovers": 4.1791485999999995,
+        "Lum Berry": 1.798324,
+        "Magnet": 0.46912800000000004,
+        "Salac Berry": 0.36357419999999996,
+        "Choice Band": 0.0273658
+      },
+      "Moves": {
+        "Ice Punch": 39.054906,
+        "Thunderbolt": 37.8859954,
+        "Cross Chop": 36.4864302,
+        "Substitute": 32.2838252,
+        "Hidden Power Grass": 4.613092,
+        "Thunder Wave": 1.6145822,
+        "Brick Break": 1.2275516,
+        "Thunder": 1.2080046,
+        "Fire Punch": 1.055538,
+        "Focus Punch": 0.879615,
+        "Quick Attack": 0.0273658,
+        "Hidden Power Flying": 0.0273658,
+        "Psychic": 0.0117282
+      },
+      "Natures": {
+        "Hasty": 35.829651000000005,
+        "Modest": 1.974247,
+        "Timid": 0.957803,
+        "Mild": 0.2814768,
+        "Hardy": 0.0273658,
+        "Lonely": 0.019547000000000002,
+        "Naive": 0.0039094
+      }
+    },
+    "Dunsparce": {
+      "Raw count": 309,
+      "usage": 0.0001,
+      "Abilities": {
+        "Serene Grace": 39.094
+      },
+      "Items": {
+        "Leftovers": 39.094
+      },
+      "Moves": {
+        "Headbutt": 39.0900906,
+        "Body Slam": 39.054906,
+        "Ancient Power": 39.0470872,
+        "Rest": 39.0314496,
+        "Thunder Wave": 0.039094000000000004,
+        "Rock Slide": 0.0273658,
+        "Earthquake": 0.0234564,
+        "Fire Blast": 0.0234564,
+        "Substitute": 0.0156376,
+        "Thunder": 0.0156376,
+        "Astonish": 0.0078188
+      },
+      "Natures": {
+        "Careful": 39.0470872,
+        "Hardy": 0.0234564,
+        "Adamant": 0.023456400000000002
+      }
+    },
+    "Vileplume": {
+      "Raw count": 669,
+      "usage": 0.0001,
+      "Abilities": {
+        "Chlorophyll": 39.094
+      },
+      "Items": {
+        "Leftovers": 39.0861812,
+        "Lum Berry": 0.0078188
+      },
+      "Moves": {
+        "Sleep Powder": 34.1720654,
+        "Aromatherapy": 33.5270144,
+        "Leech Seed": 33.4292794,
+        "Giga Drain": 23.823883600000002,
+        "Solar Beam": 5.5865326,
+        "Hidden Power Fire": 5.4809788,
+        "Sunny Day": 5.4653412,
+        "Hidden Power Grass": 4.7460116,
+        "Stun Spore": 4.7460116,
+        "Toxic": 4.6951894,
+        "Sludge Bomb": 0.4417622,
+        "Moonlight": 0.097735,
+        "Hidden Power Water": 0.0625504,
+        "Synthesis": 0.0625504,
+        "Hidden Power Ice": 0.043003400000000004
+      },
+      "Natures": {
+        "Calm": 28.362696999999997,
+        "Modest": 5.5904419999999995,
+        "Timid": 4.671733,
+        "Careful": 0.37530240000000004,
+        "Mild": 0.043003400000000004,
+        "Quiet": 0.0312752,
+        "Hardy": 0.019547000000000002
+      }
+    },
+    "Pelipper": {
+      "Raw count": 116,
+      "usage": 0.0001,
+      "Abilities": {
+        "Keen Eye": 39.094
+      },
+      "Items": {
+        "Leftovers": 36.0954902,
+        "Mystic Water": 2.4081904,
+        "Nothing": 0.5903194
+      },
+      "Moves": {
+        "Rest": 30.075014200000002,
+        "Surf": 27.6707332,
+        "Toxic": 27.6668238,
+        "Sleep Talk": 27.0765044,
+        "Ice Beam": 11.4271762,
+        "Hydro Pump": 11.4232668,
+        "Agility": 9.0189858,
+        "Hidden Power Grass": 8.5146732,
+        "Stockpile": 1.8921496,
+        "Hidden Power Electric": 1.016444,
+        "Thief": 0.5903194
+      },
+      "Natures": {
+        "Bold": 27.0765044,
+        "Modest": 11.4232668,
+        "Calm": 0.5903194
+      }
+    },
+    "Kangaskhan": {
+      "Raw count": 819,
+      "usage": 0.0001,
+      "Abilities": {
+        "Early Bird": 39.094
+      },
+      "Items": {
+        "Leftovers": 37.432505,
+        "Choice Band": 1.6458574,
+        "Silk Scarf": 0.0078188,
+        "Scope Lens": 0.0039094
+      },
+      "Moves": {
+        "Shadow Ball": 38.5584122,
+        "Earthquake": 23.006819,
+        "Rest": 22.768345600000004,
+        "Double-Edge": 15.9268956,
+        "Focus Punch": 14.476508200000001,
+        "Sing": 14.4413236,
+        "Return": 11.931488800000002,
+        "Body Slam": 9.6444898,
+        "Rock Slide": 1.6654044000000001,
+        "Seismic Toss": 1.0985414,
+        "Toxic": 1.0985414,
+        "Fake Out": 0.34402720000000003,
+        "Crush Claw": 0.332299,
+        "Dynamic Punch": 0.332299,
+        "Yawn": 0.1915606,
+        "Wish": 0.1641948,
+        "Thief": 0.15637600000000001,
+        "Counter": 0.097735,
+        "Fire Punch": 0.0820974,
+        "Brick Break": 0.039094000000000004,
+        "Hidden Power Bug": 0.0078188,
+        "Protect": 0.0078188,
+        "Facade": 0.0039094
+      },
+      "Natures": {
+        "Adamant": 37.94072700000001,
+        "Careful": 1.1063602,
+        "Jolly": 0.039094000000000004
+      }
+    }
+  }
+}

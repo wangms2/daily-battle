@@ -3,6 +3,7 @@ dist
 coverage
 DESIGN.md
 packages/data/sources
+packages/data/gen3ou
 packages/data/gen4ou
 packages/data/gen5ou
 packages/data/gen6ou

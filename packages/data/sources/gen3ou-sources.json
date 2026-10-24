@@ -1,0 +1,17 @@
+{
+  "sets": {
+    "url": "https://raw.githubusercontent.com/pkmn/smogon/main/data/sets/gen3ou.json",
+    "fetchedAt": "2026-10-24T16:40:44.517Z"
+  },
+  "uuSets": {
+    "url": "https://raw.githubusercontent.com/pkmn/smogon/main/data/sets/gen3uu.json",
+    "fetchedAt": "2026-10-24T16:40:44.517Z"
+  },
+  "stats": {
+    "url": "https://raw.githubusercontent.com/pkmn/smogon/main/data/stats/gen3ou.json",
+    "month": "2026-09",
+    "cutoff": null,
+    "battles": 195470,
+    "fetchedAt": "2026-10-24T16:40:44.517Z"
+  }
+}

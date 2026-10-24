@@ -36,7 +36,12 @@ export function poolProblems(species: string[], data: SetsFile = defaultSets): s
   if (belowOu < pool.belowOuMin || belowOu > pool.belowOuMax) {
     problems.push(`${belowOu} below-OU species`);
   }
-  if (!count((t) => t.sr)) problems.push('no Stealth Rock setter');
+  // Stealth Rock arrived in Gen 4; Gen 3's one hazard, Spikes, takes its place.
+  if (genOf(data.meta.format) >= 4) {
+    if (!count((t) => t.sr)) problems.push('no Stealth Rock setter');
+  } else if (!count((t) => t.spikes)) {
+    problems.push('no Spikes setter');
+  }
   if (count((t) => t.categories.has('offense')) < pool.minOffense) {
     problems.push('too few offensive');
   }
@@ -84,7 +89,8 @@ export function poolProblems(species: string[], data: SetsFile = defaultSets): s
  * below-OU species is drawn separately (by their own usage) so they show up
  * despite low usage overall. Stealth Rock is required. Each week decides up
  * front whether it gets a Spikes/Toxic Spikes setter, so about `spikesRate`
- * of pools do. A pool without a hazard remover is accepted only part of the time.
+ * of pools do. Gen 3 has no Stealth Rock, so every Gen 3 pool has a Spikes
+ * setter instead. A pool without a hazard remover is accepted only part of the time.
  */
 export function generatePool(
   week: string,
@@ -111,7 +117,7 @@ export function generatePool(
     ];
     if (poolProblems(species, data).length) continue;
     const traits = species.map((s) => speciesTraits(data.species[s]!));
-    if (traits.some((t) => t.spikes) !== wantSpikes) continue;
+    if (genOf(data.meta.format) >= 4 && traits.some((t) => t.spikes) !== wantSpikes) continue;
     if (!traits.some((t) => t.remover) && rng() >= pool.acceptWithoutRemover) continue;
     return { generatorVersion: GENERATOR_VERSION, week, species, attempts };
   }

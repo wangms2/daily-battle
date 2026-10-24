@@ -10,7 +10,7 @@ export { BACKGROUNDS };
 /** The background for a day (`YYYY-MM-DD`): the same for every try, and on resume. */
 export function backgroundFor(day: string, format = 'gen4ou'): string {
   const list = BACKGROUNDS[format] ?? BACKGROUNDS.gen4ou!;
-  // Gen 6 on hash the format in too, so they don't share Gen 5's day-by-day order.
+  // Gen 3 and Gen 6 on hash the format in too, so they don't share Gen 5's day-by-day order.
   const key = format === 'gen4ou' || format === 'gen5ou' ? day : `${format}:${day}`;
   let h = 0;
   for (const ch of key) h = (h * 31 + ch.charCodeAt(0)) >>> 0;

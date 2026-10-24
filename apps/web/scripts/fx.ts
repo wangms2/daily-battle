@@ -1,4 +1,4 @@
-// Downloads the battle effects the client ships: Gen 4, 5, and 6 backgrounds, hazard
+// Downloads the battle effects the client ships: Gen 3 to 6 backgrounds, hazard
 // sprites, weather and terrain overlays, the Poké Ball team mark, and every image the move
 // animations draw with (the table in src/battle/anim/vendor/effects.ts), from
 // Pokémon Showdown's fx/ folder at a pinned commit. Showdown dedicates the fx/

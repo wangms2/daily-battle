@@ -448,7 +448,7 @@ describe('home', () => {
     vi.stubGlobal(
       'fetch',
       vi.fn(async (url: string) =>
-        // Gen 4 and 5 need a pool of their own; Gen 6 is never opened here.
+        // Gen 4 and 5 need a pool of their own; Gen 3 and 6 are never opened here.
         String(url).includes('gen5ou/')
           ? new Response(JSON.stringify(gen5Schedule), { status: 200 })
           : new Response(JSON.stringify(schedule), { status: 200 }),
@@ -474,7 +474,7 @@ describe('home', () => {
     const user = userEvent.setup();
     renderApp(seeded());
     await user.click(await screen.findByRole('button', { name: /^Daily Battle/ }));
-    for (const gen of ['Gen 4 OU', 'Gen 5 OU', 'Gen 6 OU'])
+    for (const gen of ['Gen 3 OU', 'Gen 4 OU', 'Gen 5 OU', 'Gen 6 OU'])
       expect(screen.getByRole('button', { name: new RegExp(gen) })).toBeInTheDocument();
     expect(window.location.hash).toBe('#daily');
     await user.click(screen.getByRole('button', { name: /Gen 5 OU/ }));
