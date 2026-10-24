@@ -595,3 +595,22 @@ describe('practice runs', () => {
     ).toContainEqual(swap.to);
   });
 });
+
+describe('sound defaults', () => {
+  it('starts on for a new player, a little quieter than half volume', () => {
+    const { settings } = initialState();
+    expect(settings.sound).toBe(true);
+    expect(settings.musicVolume).toBeLessThan(0.5);
+    expect(settings.effectsVolume).toBeLessThan(0.5);
+  });
+
+  it('keeps what a returning player saved', () => {
+    const saved = {
+      ...initialState(),
+      settings: { ...initialState().settings, sound: false, musicVolume: 0.8 },
+    };
+    const { settings } = migrate(JSON.parse(JSON.stringify(saved)));
+    expect(settings.sound).toBe(false);
+    expect(settings.musicVolume).toBe(0.8);
+  });
+});
