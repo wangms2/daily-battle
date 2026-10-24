@@ -42,7 +42,7 @@ This doc is written to be split into implementation chunks. Section 13 lists mil
 ## 3. Non-goals
 
 - No accounts, server-side storage, or leaderboards in v1.
-- No multiplayer or PvP.
+- No multiplayer or PvP in the daily games. Versus rooms with friends are a separate mode (§18).
 - No formats beyond Gen 4 OU and Gen 5 OU for now. The format is a parameter throughout (`packages/data/src/formats.ts`), so another one is mostly data, sets, and a schedule run (§17).
 - No minimizing-turns scoring.
 - No Showdown server, websockets, or ladder integration.
@@ -524,3 +524,46 @@ A second daily game beside Gen 4 OU, built in phases G1–G6 on the `gen5` branc
 - **Hidden blocks.** Imprison blocks moves without the request saying so. The sim rejects the choice as unavailable and sends an updated request, and the side chooses again. The rejected choice isn't recorded, and the player sees "That move can't be used right now. Choose another."
 - **Schedules** live in `schedule/gen5ou/` and `reports/gen5ou/`, built with `schedule --format gen5ou`. A trial week met the existing bands with no AI retuning. Gen 5 opponents come out too hard more often (the resampling absorbs it), and its pools are weaker against random probes (about 60% of sampled teams viable, against Gen 4's 85%).
 - **Web.** The title (`Gen 5 · Wed, Oct 28 ▾`) opens a picker with each game's streak and today's status. A first-time player picks a game on the welcome sheet; returning players land on the last one played. Gen 5 battles use Showdown's 15 Gen 5 backgrounds, and the sprites are shared. With hints on, the brief notes that the opponent sees your six too.
+
+## 18. Versus rooms (planned, Oct 2026)
+
+A room where friends play live battles against each other, Super Auto Pets style. Same pools, sets, builder, and battle screen as the daily games; the opponent is a friend instead of the AI.
+
+### 18.1 Rules
+
+- **Room.** The host creates a room and shares its short code; friends join with the code and a display name. No accounts: a token in localStorage reconnects you. The host picks the game (any supported format, §17), the lives, the turn timer, and handicaps, then starts.
+- **Pool.** A new random pool of 12 per room, drawn by `generatePool` from the room's seed. The host can redraw it before starting, or pick the current week's daily pool for that game instead.
+- **Build.** Everyone builds 6 from the 12 at once, on a timer, with the daily builder.
+- **Rounds.** Each round pairs living players at random, avoiding last round's rematch where possible. Then:
+  1. **Swap phase.** You see who you face and their current six species (never their sets, even ones revealed in earlier rounds). You may make one change: replace one Pokémon from the 12 (choosing a set) or change one set, the same rule as the daily change (§4.2). Both players swap at once, on a timer, and swaps stay hidden until the battle starts. Unused changes don't accumulate.
+  2. **Lead.** You pick your lead, as on the daily brief.
+  3. **Battle.** A live battle with a turn timer.
+- **Your team carries over** from round to round, changes included.
+- **Lives.** 2 by default (host setting). A loss costs one; a tie (the turn cap, or both sides' last Pokémon fainting together) costs both players one. At 0 you're out and can spectate.
+- **Odd counts.** One living player each round faces the AI with a generated opponent team. A loss to it costs a life, the same as any other.
+- **End.** The last player standing wins. If the last players all reach 0 in the same round, they share the win.
+- **Handicaps.** A team size per player (6, 5, 4, or 3), set by the host. The sim doesn't require six in these formats.
+
+### 18.2 Live play
+
+- **Turn timer.** Like Showdown's: a time bank plus a cap per turn. Running out loses the battle.
+- **Disconnects.** The battle waits a grace period (about 60 s) for a reconnect, then counts it as a forfeit. A reconnect resumes the battle where it was.
+- **Length.** A live 6v6 takes 10–20 minutes, so a room of four with 2 lives runs several rounds. The timer, the lives default, and handicap teams keep it in bounds.
+
+### 18.3 Architecture
+
+- **Server.** A Cloudflare Worker with one Durable Object per room, deployed with the existing `wrangler` config. The room object holds the room state and each player's websocket, and runs the battles itself on `@pkmn/sim` through `BattleSession`, so a player's browser never receives the other side's sets or request (the same hiding rule as §7). Hosting a battle in one player's browser would expose the other player's sets to them.
+- **Messages.** After each choice the room sends each player a `SideUpdate`: that side's new protocol lines, its pending request, and whether the battle is over (`apps/web/src/battle/presenter.ts`). It never sends the spectator log to players in the battle.
+- **Client.** `SidePresenter` turns one side's updates into the battle screen's frames, team, and controls. The daily engine uses it for p1 in the worker; a versus battle uses it for whichever side you are, fed from the websocket. The battle screen doesn't know which.
+- **Resume.** The room stores each battle's seed and both sides' choices, and rebuilds the battle by replaying them when the object restarts (the §7 design, on the server).
+- **Daily mode is unaffected.** The daily games stay client-side and work without the server.
+
+### 18.4 Phases
+
+| Phase | What                                                                                                                   | Done when                                                           |
+| ----- | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| V1    | Split the frame building out of `BattleEngine` into `SidePresenter`, working from either side                          | Daily battles unchanged; tests drive a battle from both sides (done) |
+| V2    | Worker, room Durable Object, websocket protocol, lobby (create, join, settings), reconnect tokens                       | Friends can join a room and see each other                          |
+| V3    | One live battle between two players in a room: server-side sim, turn timer, disconnect grace, resume                    | Two browsers play a battle to the end                               |
+| V4    | The room loop: pool and build phase, pairing, swap phase, lives, elimination, the AI for odd counts, results            | A room of three plays to a winner                                    |
+| V5    | Handicaps, spectating, a share card                                                                                     |                                                                     |
