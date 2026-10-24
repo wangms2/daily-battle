@@ -28,6 +28,8 @@ export function TeamBuilder({
   onLock,
   topBar,
   notice,
+  size = 6,
+  lockBody = 'It’s yours for the week. You get 1 change per day.',
 }: {
   schedule: ScheduleFile;
   hints: boolean;
@@ -35,6 +37,10 @@ export function TeamBuilder({
   topBar: ReactNode;
   /** A one-off message above the builder, e.g. that the week was refreshed. */
   notice?: string;
+  /** How many to pick: 6, or fewer for a handicapped versus player. */
+  size?: number;
+  /** What locking in means, on the confirmation. */
+  lockBody?: string;
 }) {
   const wide = useWide();
   const [noticeShown, setNoticeShown] = useState(true);
@@ -75,7 +81,7 @@ export function TeamBuilder({
 
   const pool = schedule.pool.species;
   const index = (species: string) => team.findIndex((s) => s.species === species);
-  const full = team.length === 6;
+  const full = team.length === size;
   /** A form of a species already on the team (Species Clause allows one Rotom). */
   const clashOf = (species: string) =>
     index(species) < 0 ? team.find((s) => sameSpecies(s.species, species))?.species : undefined;
@@ -218,7 +224,7 @@ export function TeamBuilder({
 
   const lockButton = (
     <Button className="h-12 w-full shrink-0" disabled={!full} onClick={() => setConfirmOpen(true)}>
-      {full ? 'Lock in team' : `Pick ${6 - team.length} more`}
+      {full ? 'Lock in team' : `Pick ${size - team.length} more`}
     </Button>
   );
 
@@ -276,7 +282,7 @@ export function TeamBuilder({
     </div>
   );
 
-  const traySlots = Array.from({ length: 6 }, (_, i) => team[i]);
+  const traySlots = Array.from({ length: size }, (_, i) => team[i]);
 
   return (
     <div className="flex h-full flex-col">
@@ -304,7 +310,11 @@ export function TeamBuilder({
             {noticeBar}
             {suggestions}
             <SectionLabel
-              right={<span className="text-[13px] font-semibold text-muted">{team.length}/6</span>}
+              right={
+                <span className="text-[13px] font-semibold text-muted">
+                  {team.length}/{size}
+                </span>
+              }
             >
               Your team
             </SectionLabel>
@@ -428,7 +438,7 @@ export function TeamBuilder({
         open={confirmOpen}
         onOpenChange={setConfirmOpen}
         title="Lock in this team?"
-        body="It’s yours for the week. You get 1 change per day."
+        body={lockBody}
         confirm="Lock in"
         cancel="Keep editing"
         onConfirm={() => {

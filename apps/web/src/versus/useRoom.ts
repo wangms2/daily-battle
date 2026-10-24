@@ -5,8 +5,10 @@ import {
   ERROR_TEXT,
   parseServerMessage,
   type ClientMessage,
+  type Change,
   type ErrorCode,
   type MatchView,
+  type Slot,
   type RoomCommand,
   type RoomView,
   type ServerMessage,
@@ -27,7 +29,8 @@ export type RoomStatus =
   | { kind: 'connecting' }
   /** Connected; pick a name to join (again, if the last one was taken). */
   | { kind: 'name'; error?: ErrorCode }
-  | { kind: 'joined'; you: string; room: RoomView; connected: boolean }
+  /** `at`: when the room was last heard from (its timers count from then). */
+  | { kind: 'joined'; you: string; room: RoomView; at: number; connected: boolean }
   | { kind: 'ended'; reason: EndReason };
 
 const ENDS: Partial<Record<number, EndReason>> = {
@@ -57,6 +60,8 @@ export function useRoom(code: string, autoJoinAs?: string) {
   const [session, setSession] = useState(0);
   /** Your battle this round; kept after it ends, until a new round replaces it. */
   const [match, setMatch] = useState<LocalMatch | null>(null);
+  /** Your team in this game, as the room has it. */
+  const [team, setTeam] = useState<Slot[] | null>(null);
   /** Each battle's lines, by match id. */
   const feeds = useRef(new Map<string, Feed<SideMessage>>());
   const feedFor = useCallback((id: string) => {
@@ -95,9 +100,20 @@ export function useRoom(code: string, autoJoinAs?: string) {
           joined = true;
           saveToken(code, msg.token);
           joinAs.current = undefined;
-          setStatus({ kind: 'joined', you: msg.you, room: msg.room, connected: true });
+          setStatus({
+            kind: 'joined',
+            you: msg.you,
+            room: msg.room,
+            at: Date.now(),
+            connected: true,
+          });
         } else if (msg.type === 'room') {
-          setStatus((s) => (s.kind === 'joined' ? { ...s, room: msg.room, connected: true } : s));
+          const at = Date.now();
+          setStatus((s) =>
+            s.kind === 'joined' ? { ...s, room: msg.room, at, connected: true } : s,
+          );
+        } else if (msg.type === 'team') {
+          setTeam(msg.team);
         } else if (msg.type === 'match') {
           const next = msg.match && { ...msg.match, receivedAt: Date.now() };
           // A finished battle stays up until you go back to the room.
@@ -173,7 +189,13 @@ export function useRoom(code: string, autoJoinAs?: string) {
     feedFor,
     /** Back to the room from a finished battle. */
     dismissMatch: () => setMatch((m) => (m?.stage === 'over' ? null : m)),
+    team,
+    redraw: () => send({ type: 'redraw' }),
     start: () => send({ type: 'start' }),
+    playAgain: () => send({ type: 'playAgain' }),
+    submitTeam: (slots: Slot[]) => send({ type: 'team', team: slots }),
+    change: (change: Change | null) => send({ type: 'change', change }),
+    ready: () => send({ type: 'ready' }),
     lead: (species: string) => send({ type: 'lead', species }),
     choose: (choice: string) => send({ type: 'choose', choice }),
     forfeit: () => send({ type: 'forfeit' }),
