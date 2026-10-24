@@ -308,7 +308,7 @@ export function TeamBuilder({
     <div className="flex h-full flex-col">
       {topBar}
       {wide ? (
-        <main className="grid min-h-0 flex-1 grid-cols-[1fr_380px] items-start gap-6 px-6 pb-6">
+        <main className="grid min-h-0 flex-1 grid-cols-[1fr_380px] items-start gap-6 px-6 pb-6 pt-4">
           <section className="flex max-h-full flex-col gap-3 overflow-y-auto">
             <SectionLabel>This week’s pool · pick 6</SectionLabel>
             {poolGrid}
@@ -389,7 +389,7 @@ export function TeamBuilder({
           </aside>
         </main>
       ) : (
-        <main className="flex min-h-0 flex-1 flex-col gap-2 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+        <main className="flex min-h-0 flex-1 flex-col gap-2 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3">
           {noticeBar}
           {suggestions}
           {poolGrid}

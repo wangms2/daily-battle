@@ -362,7 +362,7 @@ export function DailyBrief({
     <div className="flex h-full flex-col">
       {topBar}
       {wide ? (
-        <main className="flex min-h-0 flex-1 flex-col gap-4 px-6 pb-6">
+        <main className="flex min-h-0 flex-1 flex-col gap-4 px-6 pb-6 pt-4">
           {/* Stacked as on phones: the opponent on top, your team nearer you. */}
           <div className="mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col justify-center gap-3">
             {opponentSection}
@@ -375,7 +375,7 @@ export function DailyBrief({
           </div>
         </main>
       ) : (
-        <main className="flex min-h-0 flex-1 flex-col gap-2 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+        <main className="flex min-h-0 flex-1 flex-col gap-2 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3">
           {opponentSection}
           {vs}
           {teamSection}
