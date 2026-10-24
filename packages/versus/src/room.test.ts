@@ -185,3 +185,19 @@ describe('upgradeRoom', () => {
     expect(upgradeRoom(current)).toBe(current);
   });
 });
+
+describe('upgradeRoom from version 4', () => {
+  it('keeps the game going, adding spectators and fainted counts', () => {
+    const v4 = {
+      ...createRoom('BCDFG', 0),
+      version: 4,
+      phase: 'playing',
+      matches: [{ id: '1-0', stage: 'battle' }],
+    } as unknown as RoomState;
+    delete (v4 as Partial<RoomState>).spectators;
+    const room = upgradeRoom(v4);
+    expect(room.phase).toBe('playing');
+    expect(room.spectators).toEqual([]);
+    expect(room.matches[0]!.fainted).toEqual({ p1: 0, p2: 0 });
+  });
+});

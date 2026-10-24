@@ -30,7 +30,27 @@ export type ClientMessage =
   | { type: 'ready' }
   /** In your battle: make a choice (`move 2`, `switch 4`), or give up. */
   | { type: 'choose'; choice: string }
-  | { type: 'forfeit' };
+  | { type: 'forfeit' }
+  /** Watching: a reaction to a battle. */
+  | { type: 'react'; match: string; emoji: Reaction };
+
+/** The reactions spectators can send. */
+export const REACTIONS = ['😮', '🔥', '😂', '💀'] as const;
+export type Reaction = (typeof REACTIONS)[number];
+
+/**
+ * A battle as spectators see it since `from` lines in: its public log (no
+ * hidden sets, HP as percentages), and the end. `resync` when it's the whole
+ * battle so far.
+ */
+export interface WatchUpdate {
+  match: string;
+  from: number;
+  lines: string[];
+  ended: boolean;
+  winner: Side | null;
+  resync?: boolean;
+}
 
 /**
  * One side's view of its battle since `from` lines in: new protocol lines,
@@ -57,6 +77,10 @@ export type ServerMessage =
   | { type: 'match'; match: MatchView | null }
   /** Battle lines for your side; `resync` when it's the whole battle so far, after a reconnect. */
   | { type: 'side'; match: string; from: number; update: WireUpdate; resync?: boolean }
+  /** Watching (out of the game, or a spectator): a battle's public log. */
+  | ({ type: 'watch' } & WatchUpdate)
+  /** A spectator's reaction to a battle, for the battle's players and everyone watching. */
+  | { type: 'reaction'; match: string; emoji: Reaction; from: string }
   | { type: 'error'; code: ErrorCode }
   /** The host removed you; the socket closes after this. */
   | { type: 'kicked' };
@@ -145,6 +169,10 @@ export function parseClientMessage(raw: unknown): ClientMessage | null {
     case 'choose':
       return typeof msg.choice === 'string' && CHOICE.test(msg.choice)
         ? { type: 'choose', choice: msg.choice }
+        : null;
+    case 'react':
+      return isId(msg.match) && REACTIONS.includes(msg.emoji as Reaction)
+        ? { type: 'react', match: msg.match, emoji: msg.emoji as Reaction }
         : null;
     default:
       return null;

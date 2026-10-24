@@ -16,6 +16,7 @@ import { AI_ID, newMatch, type Match, type Slot } from './match';
 import {
   alive,
   applyCommand,
+  canWatch,
   createRoom,
   joinRoom,
   type Player,
@@ -203,5 +204,44 @@ describe('rounds', () => {
       ['Ash', 1, null, null],
       ['Misty', 1, null, null],
     ]);
+  });
+});
+
+describe('spectators', () => {
+  const started = () => startBuild(room(['Ash', 'Misty']), 0);
+
+  it('lets someone join a game under way as a spectator, with a unique name', () => {
+    let s = started();
+    s = ok(joinRoom(s, { id: 'sp', name: 'Oak', token: 'tsp' }));
+    expect(s.players).toHaveLength(2);
+    expect(s.spectators.map((x) => x.name)).toEqual(['Oak']);
+    expect(joinRoom(s, { id: 'x', name: 'oak', token: 'x' })).toEqual({
+      ok: false,
+      error: 'nameTaken',
+    });
+    expect(joinRoom(s, { id: 'x', name: 'ash', token: 'x' })).toEqual({
+      ok: false,
+      error: 'nameTaken',
+    });
+  });
+
+  it('lets spectators and players who are out watch, but not players still in', () => {
+    let s = ok(joinRoom(started(), { id: 'sp', name: 'Oak', token: 'tsp' }));
+    s = { ...s, players: s.players.map((p, i) => (i === 1 ? { ...p, place: 2 } : p)) };
+    expect(canWatch(s, 'sp')).toBe(true);
+    expect(canWatch(s, 'id1')).toBe(true);
+    expect(canWatch(s, 'id0')).toBe(false);
+  });
+
+  it('seats spectators in the next game while there’s room, and lets them leave', () => {
+    let s = ok(joinRoom(started(), { id: 'sp', name: 'Oak', token: 'tsp' }));
+    s = ok(applyCommand(s, 'sp', { type: 'leave' }));
+    expect(s.spectators).toEqual([]);
+    s = ok(joinRoom(s, { id: 'sp2', name: 'Elm', token: 't2' }));
+    s = { ...s, phase: 'over', players: s.players.map((p) => ({ ...p, place: 1 })) };
+    s = ok(playAgain(s, 'id0'));
+    expect(s.players.map((p) => p.name)).toEqual(['Ash', 'Misty', 'Elm']);
+    expect(s.spectators).toEqual([]);
+    expect(s.players[2]!.lives).toBe(2);
   });
 });

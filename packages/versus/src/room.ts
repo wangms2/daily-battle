@@ -6,6 +6,8 @@ import { DEFAULT_FORMAT, FORMATS, type FormatId } from '@daily-battle/data/forma
 import type { Match, MatchEnd, Side, Slot } from './match';
 
 export const MAX_PLAYERS = 8;
+/** People watching a game they joined after it started. */
+export const MAX_SPECTATORS = 8;
 export const NAME_MAX = 16;
 export const LIVES_MIN = 1;
 export const LIVES_MAX = 5;
@@ -71,6 +73,14 @@ export interface Player {
   aiRounds: number;
 }
 
+/** Someone who joined after the game started: they watch, and play in the next game. */
+export interface Spectator {
+  id: string;
+  name: string;
+  /** Secret that lets them back in after a disconnect. Never sent to others. */
+  token: string;
+}
+
 /** How a finished battle went, by name (players may have left since). */
 export interface MatchSummary {
   names: Record<Side, string>;
@@ -86,7 +96,7 @@ export interface Pairing {
 }
 
 /** Bumped when the stored shape of a room changes; older rooms start over in the lobby. */
-export const ROOM_VERSION = 4;
+export const ROOM_VERSION = 5;
 
 export interface RoomState {
   version: number;
@@ -100,6 +110,7 @@ export interface RoomState {
   /** The first player to join; passes to the next when the host leaves. */
   hostId: string | null;
   players: Player[];
+  spectators: Spectator[];
   settings: RoomSettings;
   pool: Pool | null;
   /** When the build or the break between rounds ends. */
@@ -132,6 +143,7 @@ export interface RoomView {
     wins: number;
     losses: number;
   }[];
+  spectators: { id: string; name: string; online: boolean }[];
   settings: RoomSettings;
   pool: Pool | null;
   /** Time left in the build or the break; null otherwise. */
@@ -143,6 +155,9 @@ export interface RoomView {
     names: Record<Side, string>;
     stage: Match['stage'];
     winner: Side | null;
+    /** Each side's team size and how many have fainted: Poké Balls, never species. */
+    sizes: Record<Side, number>;
+    fainted: Record<Side, number>;
   }[];
   next: Pairing[];
   lastRound: RoomState['lastRound'];
@@ -207,6 +222,7 @@ export function createRoom(code: string, now: number): RoomState {
     phase: 'lobby',
     hostId: null,
     players: [],
+    spectators: [],
     settings: { ...DEFAULT_SETTINGS },
     pool: null,
     deadline: null,
@@ -223,6 +239,15 @@ export function createRoom(code: string, now: number): RoomState {
  */
 export function upgradeRoom(saved: RoomState): RoomState {
   if (saved.version === ROOM_VERSION) return saved;
+  // Version 4 only lacked spectators and fainted counts; its game carries on.
+  if (saved.version === 4) {
+    return {
+      ...saved,
+      version: ROOM_VERSION,
+      spectators: [],
+      matches: saved.matches.map((m) => ({ ...m, fainted: m.fainted ?? { p1: 0, p2: 0 } })),
+    };
+  }
   const old = saved as Partial<RoomState> & Pick<RoomState, 'code' | 'createdAt' | 'players'>;
   const room = createRoom(old.code, old.createdAt);
   const settings = { ...room.settings, ...old.settings };
@@ -269,18 +294,23 @@ export const freshPlayer = (
   aiRounds: 0,
 });
 
-/** Adds a player. The first one in becomes the host. Joining is for the lobby only. */
+/**
+ * Adds someone. In the lobby they're a player (the first one in becomes the
+ * host); once a game has started they watch it, and play in the next one.
+ */
 export function joinRoom(
   state: RoomState,
   input: { id: string; name: string; token: string },
 ): Result {
-  if (state.phase !== 'lobby') return fail('started');
-  if (state.players.length >= MAX_PLAYERS) return fail('full');
   const name = cleanName(input.name);
   if (!name) return fail('badName');
-  if (state.players.some((p) => p.name.toLowerCase() === name.toLowerCase())) {
-    return fail('nameTaken');
+  const taken = [...state.players, ...state.spectators];
+  if (taken.some((p) => p.name.toLowerCase() === name.toLowerCase())) return fail('nameTaken');
+  if (state.phase !== 'lobby') {
+    if (state.spectators.length >= MAX_SPECTATORS) return fail('full');
+    return { ok: true, state: { ...state, spectators: [...state.spectators, { ...input, name }] } };
   }
+  if (state.players.length >= MAX_PLAYERS) return fail('full');
   const player = freshPlayer({ ...input, name, teamSize: 6 }, state.settings.lives);
   return {
     ok: true,
@@ -290,6 +320,17 @@ export function joinRoom(
 
 export const playerByToken = (state: RoomState, token: string): Player | undefined =>
   state.players.find((p) => p.token === token);
+
+export const spectatorByToken = (state: RoomState, token: string): Spectator | undefined =>
+  state.spectators.find((p) => p.token === token);
+
+/**
+ * Who may watch battles in progress: spectators, and players already out of
+ * the game. Players still in can't (as in Showdown tournaments).
+ */
+export const canWatch = (state: RoomState, id: string) =>
+  state.spectators.some((s) => s.id === id) ||
+  state.players.some((p) => p.id === id && p.place !== null && !p.left);
 
 /** Players still in the game: they have lives and haven't left. */
 export const alive = (state: RoomState): Player[] =>
@@ -301,6 +342,9 @@ export const alive = (state: RoomState): Player[] =>
  * battle first). The host passes to the next player still here.
  */
 export function removePlayer(state: RoomState, id: string): RoomState {
+  if (state.spectators.some((s) => s.id === id)) {
+    return { ...state, spectators: state.spectators.filter((s) => s.id !== id) };
+  }
   const players =
     state.phase === 'lobby'
       ? state.players.filter((p) => p.id !== id)
@@ -319,7 +363,9 @@ export type RoomCommand =
 
 /** Applies a command from player `by`. */
 export function applyCommand(state: RoomState, by: string, command: RoomCommand): Result {
-  if (!state.players.some((p) => p.id === by)) return fail('notJoined');
+  if (!state.players.some((p) => p.id === by) && !state.spectators.some((s) => s.id === by)) {
+    return fail('notJoined');
+  }
   if (command.type === 'leave') return { ok: true, state: removePlayer(state, by) };
   if (state.hostId !== by) return fail('notHost');
   // Removing works mid-game too (the room server forfeits their battle first).
@@ -339,7 +385,10 @@ export function applyCommand(state: RoomState, by: string, command: RoomCommand)
     }
     case 'kick':
       // The host leaves with "leave", not by kicking themselves.
-      if (command.player === by || !state.players.some((p) => p.id === command.player)) {
+      if (
+        command.player === by ||
+        ![...state.players, ...state.spectators].some((p) => p.id === command.player)
+      ) {
         return fail('badMessage');
       }
       return { ok: true, state: removePlayer(state, command.player) };
@@ -364,6 +413,11 @@ export function roomView(state: RoomState, online: ReadonlySet<string>, now: num
       wins: p.wins,
       losses: p.losses,
     })),
+    spectators: state.spectators.map((s) => ({
+      id: s.id,
+      name: s.name,
+      online: online.has(s.id),
+    })),
     settings: state.settings,
     pool: state.pool,
     timeLeftMs: state.deadline === null ? null : Math.max(0, state.deadline - now),
@@ -374,6 +428,8 @@ export function roomView(state: RoomState, online: ReadonlySet<string>, now: num
       names: m.names,
       stage: m.stage,
       winner: m.result?.winner ?? null,
+      sizes: { p1: m.slots.p1.length, p2: m.slots.p2.length },
+      fainted: m.fainted,
     })),
     next: state.next,
     lastRound: state.lastRound,
