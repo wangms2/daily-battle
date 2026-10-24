@@ -21,6 +21,7 @@ import { CheckIcon, CloseIcon } from '../ui/icons';
 const GAME_BLURB: Record<FormatId, string> = {
   gen4ou: 'Diamond and Pearl',
   gen5ou: 'Black and White, with Team Preview',
+  gen6ou: 'X and Y, with Mega Evolution and Fairy types',
 };
 
 export function WelcomeSheet({

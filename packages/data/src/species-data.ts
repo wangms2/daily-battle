@@ -21,3 +21,23 @@ export function speciesDataFor(format: string): SpeciesFile {
   if (!found) throw new Error(`No species data for ${format}`);
   return found;
 }
+
+/** The message the team builder shows when a second Mega would join a team. */
+export const ONE_MEGA_MESSAGE = 'Only one Mega per team.';
+
+/** How many of a team's sets hold their species' Mega Stone. */
+export function megaCount(format: string, team: { species: string; item: string }[]): number {
+  const { species } = speciesDataFor(format);
+  return team.filter((s) => species[s.species]?.megas?.[s.item]).length;
+}
+
+/**
+ * Our own team rule from Gen 6 (Showdown's Gen 6 OU has no such clause): at
+ * most one Mega per side. Returns the problem, or null if the team is fine.
+ */
+export function oneMegaProblem(
+  format: string,
+  team: { species: string; item: string }[],
+): string | null {
+  return megaCount(format, team) > 1 ? ONE_MEGA_MESSAGE : null;
+}

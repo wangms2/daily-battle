@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { FORMATS, genOf, type FormatId } from './formats';
 import { setsFor } from './index';
 import { buildSpecies } from './species';
-import { speciesDataFor } from './species-data';
+import { megaCount, ONE_MEGA_MESSAGE, oneMegaProblem, speciesDataFor } from './species-data';
 
 describe.each(Object.keys(FORMATS) as FormatId[])('%s/species.json', (format) => {
   const speciesData = speciesDataFor(format);
@@ -71,5 +71,26 @@ describe('gen6ou Megas', () => {
 
   it("plays a species at the higher of its own and its Mega's tier", () => {
     expect(species['Venusaur']!.tier).toBe('OU');
+  });
+});
+
+describe('one Mega per team', () => {
+  const team = (...items: [string, string][]) =>
+    items.map(([species, item]) => ({ species, item }));
+
+  it('counts sets that hold their own Mega Stone', () => {
+    expect(
+      megaCount('gen6ou', team(['Charizard', 'Charizardite X'], ['Garchomp', 'Leftovers'])),
+    ).toBe(1);
+    expect(megaCount('gen4ou', team(['Garchomp', 'Leftovers']))).toBe(0);
+  });
+
+  it('rejects two Mega Stones on one side', () => {
+    expect(
+      oneMegaProblem('gen6ou', team(['Charizard', 'Charizardite X'], ['Scizor', 'Scizorite'])),
+    ).toBe(ONE_MEGA_MESSAGE);
+    expect(
+      oneMegaProblem('gen6ou', team(['Charizard', 'Charizardite Y'], ['Scizor', 'Choice Band'])),
+    ).toBeNull();
   });
 });

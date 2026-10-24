@@ -29,6 +29,8 @@ export function legalChoices(request: SideView['request']): string[] {
   const moves = active.moves.flatMap((m, i) =>
     ('disabled' in m && m.disabled) || ('pp' in m && m.pp <= 0) ? [] : [`move ${i + 1}`],
   );
+  // From Gen 6, each move can also be used while Mega Evolving (`move 1 mega`).
+  if (active.canMegaEvo) moves.push(...moves.map((m) => `${m} mega`));
   return active.trapped || active.maybeTrapped ? moves : [...moves, ...switches];
 }
 
