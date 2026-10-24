@@ -154,6 +154,11 @@ export class BattleSession {
     return lines;
   }
 
+  /** Every protocol line the side has received so far (a reconnecting player's catch-up). */
+  log(side: SideID): readonly string[] {
+    return this.sides[side].log;
+  }
+
   /** The side's client-side battle state (its own perspective). */
   client(side: SideID): ClientBattle {
     return this.sides[side].client;

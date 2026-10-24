@@ -2,7 +2,7 @@
   "name": "@daily-battle/versus",
   "version": "0.0.0",
   "private": true,
-  "description": "Versus rooms: the messages between the room server and the client, and the room's rules (DESIGN.md §18)",
+  "description": "Versus rooms: the messages between the room server and the client, and the room's rules (DESIGN.md \u00a718)",
   "type": "module",
   "exports": {
     ".": "./src/index.ts"
@@ -12,5 +12,8 @@
   },
   "dependencies": {
     "@daily-battle/data": "workspace:*"
+  },
+  "devDependencies": {
+    "@pkmn/sim": "catalog:"
   }
 }
