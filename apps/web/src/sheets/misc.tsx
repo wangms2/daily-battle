@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import clsx from 'clsx';
 import type { SetEntry } from '@daily-battle/data';
 import {
   CHECK_ITEMS,

@@ -36,7 +36,7 @@ function state(sound?: object) {
       beginnerHints: false,
       battleSpeed: 'fast',
       animations: false,
-      shownExplainers: ['welcome', 'gen5-news', 'gen6-news', 'gen3-news'],
+      shownExplainers: ['welcome'],
       format: 'gen3ou',
       ...sound,
     },
@@ -53,7 +53,7 @@ async function open(page: Page, saved: object) {
     if (!localStorage.getItem('daily-battle:state')) localStorage.setItem('daily-battle:state', s);
   }, JSON.stringify(saved));
   await page.clock.setFixedTime(TODAY);
-  await page.goto('/');
+  await page.goto('/#play');
   return audio;
 }
 
