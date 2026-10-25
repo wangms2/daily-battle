@@ -1,0 +1,331 @@
+{
+  "version": 1,
+  "generatorVersion": 4,
+  "dataBuiltAt": "2026-10-24T02:55:39.964Z",
+  "week": "2027-03-22",
+  "pool": {
+    "species": [
+      "Tornadus-Therian",
+      "Latios",
+      "Heatran",
+      "Slowbro",
+      "Bisharp",
+      "Serperior",
+      "Kyurem-Black",
+      "Tyranitar",
+      "Diggersby",
+      "Donphan",
+      "Quagsire",
+      "Lucario"
+    ],
+    "candidate": 0
+  },
+  "suggestedTeams": [
+    {
+      "archetype": "Balanced",
+      "team": [
+        {
+          "species": "Tornadus-Therian",
+          "setId": "tornadustherian-life-orb"
+        },
+        {
+          "species": "Quagsire",
+          "setId": "quagsire-unaware-wall"
+        },
+        {
+          "species": "Kyurem-Black",
+          "setId": "kyuremblack-choice-item-attacker"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-bulky-support"
+        },
+        {
+          "species": "Slowbro",
+          "setId": "slowbro-calm-mind"
+        },
+        {
+          "species": "Serperior",
+          "setId": "serperior-dual-screens"
+        }
+      ]
+    },
+    {
+      "archetype": "Offense",
+      "team": [
+        {
+          "species": "Lucario",
+          "setId": "lucario-swords-dance"
+        },
+        {
+          "species": "Kyurem-Black",
+          "setId": "kyuremblack-choice-item-attacker"
+        },
+        {
+          "species": "Latios",
+          "setId": "latios-life-orb-attacker"
+        },
+        {
+          "species": "Serperior",
+          "setId": "serperior-stallbreaker"
+        },
+        {
+          "species": "Heatran",
+          "setId": "heatran-fast-utility"
+        },
+        {
+          "species": "Tornadus-Therian",
+          "setId": "tornadustherian-assault-vest-pivot"
+        }
+      ]
+    },
+    {
+      "archetype": "Stall",
+      "team": [
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-bulky-support"
+        },
+        {
+          "species": "Donphan",
+          "setId": "donphan-defensive-spinner"
+        },
+        {
+          "species": "Heatran",
+          "setId": "heatran-specially-defensive"
+        },
+        {
+          "species": "Serperior",
+          "setId": "serperior-stallbreaker"
+        },
+        {
+          "species": "Quagsire",
+          "setId": "quagsire-curse"
+        },
+        {
+          "species": "Slowbro",
+          "setId": "slowbro-defensive"
+        }
+      ]
+    }
+  ],
+  "days": [
+    {
+      "day": "2027-03-22",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Cloyster",
+          "setId": "cloyster-shell-smash"
+        },
+        {
+          "species": "Rotom-Wash",
+          "setId": "rotomwash-physically-defensive-pivot"
+        },
+        {
+          "species": "Amoonguss",
+          "setId": "amoonguss-pivot"
+        },
+        {
+          "species": "Gyarados",
+          "setId": "gyarados-offensive-dragon-dance"
+        },
+        {
+          "species": "Keldeo",
+          "setId": "keldeo-substitute-calm-mind"
+        },
+        {
+          "species": "Excadrill",
+          "setId": "excadrill-fast-utility"
+        }
+      ],
+      "candidate": 10
+    },
+    {
+      "day": "2027-03-23",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Gardevoir",
+          "setId": "gardevoir-choice-specs"
+        },
+        {
+          "species": "Amoonguss",
+          "setId": "amoonguss-pivot"
+        },
+        {
+          "species": "Bisharp",
+          "setId": "bisharp-swords-dance"
+        },
+        {
+          "species": "Azelf",
+          "setId": "azelf-lead"
+        },
+        {
+          "species": "Volcanion",
+          "setId": "volcanion-choice-scarf"
+        },
+        {
+          "species": "Skarmory",
+          "setId": "skarmory-defog"
+        }
+      ],
+      "candidate": 0
+    },
+    {
+      "day": "2027-03-24",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Starmie",
+          "setId": "starmie-utility"
+        },
+        {
+          "species": "Alakazam",
+          "setId": "alakazam-utility-attacker"
+        },
+        {
+          "species": "Ferrothorn",
+          "setId": "ferrothorn-utility"
+        },
+        {
+          "species": "Chansey",
+          "setId": "chansey-de-blob"
+        },
+        {
+          "species": "Excadrill",
+          "setId": "excadrill-fast-utility"
+        },
+        {
+          "species": "Azumarill",
+          "setId": "azumarill-choice-band"
+        }
+      ],
+      "candidate": 8
+    },
+    {
+      "day": "2027-03-25",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Infernape",
+          "setId": "infernape-swords-dance"
+        },
+        {
+          "species": "Tangrowth",
+          "setId": "tangrowth-defensive"
+        },
+        {
+          "species": "Amoonguss",
+          "setId": "amoonguss-pivot"
+        },
+        {
+          "species": "Whimsicott",
+          "setId": "whimsicott-applaud-attack-offensive"
+        },
+        {
+          "species": "Charizard",
+          "setId": "charizard-wallbreaker"
+        },
+        {
+          "species": "Rotom-Wash",
+          "setId": "rotomwash-fast-utility"
+        }
+      ],
+      "candidate": 5
+    },
+    {
+      "day": "2027-03-26",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Tornadus-Therian",
+          "setId": "tornadustherian-assault-vest-pivot"
+        },
+        {
+          "species": "Hippowdon",
+          "setId": "hippowdon-special-wall"
+        },
+        {
+          "species": "Keldeo",
+          "setId": "keldeo-choice-specs"
+        },
+        {
+          "species": "Chansey",
+          "setId": "chansey-de-blob"
+        },
+        {
+          "species": "Lopunny",
+          "setId": "lopunny-all-out-attacker"
+        },
+        {
+          "species": "Latios",
+          "setId": "latios-choice-specs"
+        }
+      ],
+      "candidate": 4
+    },
+    {
+      "day": "2027-03-27",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Sharpedo",
+          "setId": "sharpedo-cleaner"
+        },
+        {
+          "species": "Dragonite",
+          "setId": "dragonite-bulky-roost-dragon-dance"
+        },
+        {
+          "species": "Cloyster",
+          "setId": "cloyster-shell-smash"
+        },
+        {
+          "species": "Rotom-Wash",
+          "setId": "rotomwash-fast-utility"
+        },
+        {
+          "species": "Thundurus",
+          "setId": "thundurus-offensive-pivot"
+        },
+        {
+          "species": "Clefable",
+          "setId": "clefable-calm-mind"
+        }
+      ],
+      "candidate": 3
+    },
+    {
+      "day": "2027-03-28",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Kyurem-Black",
+          "setId": "kyuremblack-assault-vest"
+        },
+        {
+          "species": "Espeon",
+          "setId": "espeon-calm-mind-sweeper"
+        },
+        {
+          "species": "Tangrowth",
+          "setId": "tangrowth-defensive"
+        },
+        {
+          "species": "Metagross",
+          "setId": "metagross-offensive"
+        },
+        {
+          "species": "Magnezone",
+          "setId": "magnezone-choice-scarf"
+        },
+        {
+          "species": "Talonflame",
+          "setId": "talonflame-bulky-swords-dance"
+        }
+      ],
+      "candidate": 17
+    }
+  ]
+}
