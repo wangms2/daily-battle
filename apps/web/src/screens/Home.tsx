@@ -1,6 +1,7 @@
-// The first screens, a Poké Ball split: Play (Daily Battle) in the top half,
-// With friends below. Play opens the game picker (Gen 3 to 6), where each game
-// keeps its own weekly team, tries, and streak. A shared link lands on the picker.
+// The first screens, a Poké Ball split: the Pokémon Daily logo, a mascot for each
+// generation, and Play in the (larger) top half, With friends below. Play opens the
+// game picker (Gen 3 to 6), where each game keeps its own weekly team, tries, and
+// streak; a mascot opens its generation directly. A shared link lands on the picker.
 //
 // The landing and the picker are one screen in two states, so tapping Play is a
 // curtain: the clay top rises, the ball glides up the seam and shrinks, the
@@ -9,7 +10,7 @@ import type { FormatId } from '@daily-battle/data/formats';
 import { Fragment, type CSSProperties } from 'react';
 import { getSprite } from '../lib/sprites';
 import { Friends } from '../ui/Friends';
-import { ChevronIcon, FlameIcon, GearIcon } from '../ui/icons';
+import { CheckIcon, ChevronIcon, FlameIcon, GearIcon } from '../ui/icons';
 
 export interface GameRow {
   id: FormatId;
@@ -20,6 +21,8 @@ export interface GameRow {
   streak: number;
   /** Today's status, e.g. "First try!" or "Not played yet". */
   today: string;
+  /** Today's battle is won (first try or later). */
+  cleared: boolean;
 }
 
 /** One Pokémon for each game, on its cartridge. Gen 3 shows the games' own Emerald sprite. */
@@ -40,7 +43,6 @@ const LABEL: Record<FormatId, string> = {
 
 export function Home({
   view,
-  lead,
   games,
   onPlay,
   onFriends,
@@ -49,8 +51,6 @@ export function Home({
   onSettings,
 }: {
   view: 'landing' | 'picker';
-  /** Today's opponent's lead, shown as a mystery silhouette. */
-  lead?: string;
   games: GameRow[];
   onPlay: () => void;
   onFriends: () => void;
@@ -93,31 +93,46 @@ export function Home({
           </h1>
         </div>
 
-        {/* The landing's top half borrows the anime's "Who's that Pokémon?" card. It keeps
-            its size while the top rises, so the curtain hides it and it never squashes. */}
-        <div className="home-landing home-burst" inert={!landing} aria-hidden={!landing}>
-          {lead && (
-            <>
-              {/* Centered on the burst, so the rays come from behind it. */}
-              <span
-                aria-hidden
-                className="home-silhouette pointer-events-none absolute left-[var(--burst-x)] top-[var(--burst-y)] -translate-x-1/2 -translate-y-1/2"
-                style={{ '--sprite': `url(${getSprite(lead, 'front', 'still')})` } as CSSProperties}
-              />
-              <span
-                aria-hidden
-                className="home-question home-serif pointer-events-none absolute left-[calc(var(--burst-x)+11cqh)] top-[16%] -rotate-[8deg] leading-none"
-              >
-                ?
-              </span>
-            </>
-          )}
-          <div className="relative mx-auto flex h-full w-full max-w-[520px] flex-col justify-end px-[22px] pb-[clamp(34px,5.3cqh,70px)] pt-12">
-            <button
-              type="button"
-              onClick={onPlay}
-              className="home-btn home-play home-serif ml-auto after:absolute after:inset-0 after:content-['']"
-            >
+        {/* The landing's top half: the logo, a mascot for each generation (a tap opens
+            it, and a check says it's cleared today), and Play. It keeps its size while
+            the top rises, so the curtain hides it and it never squashes. */}
+        <div className="home-landing" inert={!landing} aria-hidden={!landing}>
+          <div className="relative mx-auto flex h-full w-full max-w-[520px] flex-col items-center justify-between px-[22px] pb-[clamp(30px,5cqh,70px)] pt-[max(10px,env(safe-area-inset-top))]">
+            <img
+              src={`${import.meta.env.BASE_URL}logo.webp`}
+              alt="Pokémon Daily"
+              className="home-logo"
+              draggable={false}
+            />
+            <div className="home-mascots" role="group" aria-label="Generations">
+              {games.map((g, i) => {
+                const mascot = MASCOT[g.id];
+                return (
+                  <button
+                    key={g.id}
+                    type="button"
+                    onClick={() => onPick(g.id)}
+                    aria-label={`Play ${g.name} OU${g.cleared ? ', cleared today' : ''}`}
+                    className="home-mascot"
+                    style={{ '--i': i } as CSSProperties}
+                  >
+                    <span aria-hidden className="home-mascot-ground" />
+                    <img
+                      alt=""
+                      draggable={false}
+                      src={getSprite(mascot.species, 'front', undefined, mascot.gen)}
+                      className={mascot.gen === 3 ? '[image-rendering:pixelated]' : undefined}
+                    />
+                    {g.cleared && (
+                      <span aria-hidden className="home-mascot-check">
+                        <CheckIcon />
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+            <button type="button" onClick={onPlay} className="home-btn home-play home-serif">
               Play
             </button>
           </div>

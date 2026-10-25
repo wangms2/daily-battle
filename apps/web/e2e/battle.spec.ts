@@ -371,7 +371,10 @@ test('a lost first try breaks the streak, and the result copies to share', async
   await expect(page.getByRole('status')).toContainText('Text copied');
   const copied = await page.evaluate(() => (window as unknown as { copied: string }).copied);
   const lines = copied.split('\n');
-  expect(lines.slice(0, 2)).toEqual(['Daily Battle · Gen 4 · Oct 21', 'Not cleared yet · 3 tries']);
+  expect(lines.slice(0, 2)).toEqual([
+    'Pokémon Daily · Gen 4 OU · Oct 21',
+    'Not cleared yet · 3 tries',
+  ]);
   for (const row of lines.slice(2, 5)) expect(row).toMatch(/^❌ ⬜+⬛*$/u); // given up: grey
   expect(copied).toContain('🔥 Streak reset');
   for (const s of schedule.days.find((d) => d.day === '2026-10-21')!.team) {

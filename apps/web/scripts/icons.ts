@@ -1,5 +1,6 @@
 // Renders the app icons and the link-preview image from public/favicon.svg
-// with Playwright's Chromium, so no image tools are needed.
+// with Playwright's Chromium, so no image tools are needed. CHROMIUM_PATH points it
+// at a browser other than Playwright's own.
 //   pnpm --filter web icons
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -11,15 +12,10 @@ const uri = (s: string) => `data:image/svg+xml;base64,${Buffer.from(s).toString(
 const svgUri = uri(svg);
 // iOS rounds home-screen icons itself and fills transparency with black: square it off.
 const squareUri = uri(svg.replace('rx="14"', 'rx="0"'));
-const plex = fileURLToPath(
-  new URL(
-    '../node_modules/@fontsource/ibm-plex-sans/files/ibm-plex-sans-latin-700-normal.woff2',
-    import.meta.url,
-  ),
-);
-const plexUri = `data:font/woff2;base64,${readFileSync(plex).toString('base64')}`;
 
-const browser = await chromium.launch();
+const browser = await chromium.launch(
+  process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {},
+);
 const page = await browser.newPage();
 
 for (const [file, size] of [
@@ -35,22 +31,19 @@ for (const [file, size] of [
   console.log('icon', file);
 }
 
-// The link preview card: 1200×630, the mark and the name on the steel-blue gradient.
+// The link preview card: 1200×630, the Pokémon Daily logo on the home screens' clay.
+const logoUri = `data:image/webp;base64,${readFileSync(pub('logo.webp')).toString('base64')}`;
 await page.setViewportSize({ width: 1200, height: 630 });
 await page.setContent(`
   <style>
-    @font-face { font-family: Plex; src: url(${plexUri}) format('woff2'); font-weight: 700; }
     html, body { margin: 0; }
     body {
-      width: 1200px; height: 630px; display: flex; align-items: center; gap: 56px; padding: 0 96px;
-      box-sizing: border-box; background: linear-gradient(160deg, #4a6c99, #26405f); color: #fff;
-      font-family: Plex, sans-serif;
+      width: 1200px; height: 630px; display: flex; align-items: center; justify-content: center;
+      box-sizing: border-box; background: linear-gradient(165deg, #a3646a, #8a4f58);
     }
-    h1 { font-size: 104px; line-height: 1; margin: 0; letter-spacing: -1px; }
-    p { font-size: 40px; margin: 22px 0 0; color: #d2ae63; font-weight: 700; }
+    img { width: 920px; filter: drop-shadow(0 6px 0 rgb(0 0 0 / 0.18)); }
   </style>
-  <img src="${svgUri}" width="260" height="260">
-  <div><h1>Daily Battle</h1><p>A new battle every day</p></div>
+  <img src="${logoUri}">
 `);
 await page.screenshot({ path: pub('og.png') });
 console.log('og.png');

@@ -122,7 +122,7 @@ export function Lobby({
   const invite = async () => {
     try {
       if (navigator.share) {
-        await navigator.share({ title: 'Daily Battle versus room', url: link });
+        await navigator.share({ title: 'Pokémon Daily versus room', url: link });
         return;
       }
       await navigator.clipboard.writeText(link);

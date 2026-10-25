@@ -1,4 +1,4 @@
-// The formats Daily Battle plays. Everything format-specific (the sim's
+// The formats Pokémon Daily plays. Everything format-specific (the sim's
 // format id, its dex generation, the lower tier its extra sets come from)
 // hangs off this, so another format is a new entry rather than new code.
 

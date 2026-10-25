@@ -37,23 +37,23 @@ function text(
 }
 
 describe('share text', () => {
-  it('names the game after Daily Battle, with the link to that game', () => {
+  it('names the game after Pokémon Daily, with the link to that game', () => {
     const day: DayState = { swapUsed: false, attempts: [a('win', 4)] };
     const out = shareText({
       day: DAY,
       summary: summarizeDay(day, true),
       streak: 1,
-      game: 'Gen 5',
+      game: 'Gen 5 OU',
       url: 'https://battle.example/#gen5',
     }).split('\n');
-    expect(out[0]).toBe('Daily Battle · Gen 5 · Oct 21');
+    expect(out[0]).toBe('Pokémon Daily · Gen 5 OU · Oct 21');
     expect(out.at(-1)).toBe('https://battle.example/#gen5');
   });
 
   it('celebrates a first-try win', () => {
     expect(text([a('win', 4)], 5)).toBe(
       [
-        'Daily Battle · Oct 21',
+        'Pokémon Daily · Oct 21',
         '⭐ First try! 4/6 left',
         '✅ 🟩🟩🟩🟩⬛⬛',
         'Hippowdon, Azelf, Celebi, Heatran, Jirachi, Lucario',
@@ -65,7 +65,7 @@ describe('share text', () => {
   it('shows each try that counted when won on try 3, with the swap marked', () => {
     expect(text([a('loss', 0), a('forfeit', 1), a('win', 2)], 0, { change: swap })).toBe(
       [
-        'Daily Battle · Oct 21',
+        'Pokémon Daily · Oct 21',
         '✅ Won on try 3 · 2/6 left',
         '❌ ⬛⬛⬛⬛⬛⬛',
         '❌ ⬜⬛⬛⬛⬛⬛', // given up: grey
@@ -79,7 +79,7 @@ describe('share text', () => {
   it('says when a past day was never cleared', () => {
     expect(text([a('loss', 2), a('loss', 0), a('loss', 1)], 0, { isToday: false })).toBe(
       [
-        'Daily Battle · Oct 21',
+        'Pokémon Daily · Oct 21',
         '❌ Not cleared',
         '❌ 🟩🟩⬛⬛⬛⬛',
         '❌ ⬛⬛⬛⬛⬛⬛',
@@ -120,7 +120,7 @@ describe('share text', () => {
   it('shares a day still in progress, the streak already reset', () => {
     expect(text([a('loss', 1)], 0)).toBe(
       [
-        'Daily Battle · Oct 21',
+        'Pokémon Daily · Oct 21',
         'Not cleared yet · 1 try',
         '❌ 🟩⬛⬛⬛⬛⬛',
         'Hippowdon, Azelf, Celebi, Heatran, Jirachi, Lucario',
@@ -134,7 +134,7 @@ describe('share text', () => {
     const tries = [a('win', 4), a('loss', 0), practice];
     expect(text(tries, 5)).toBe(
       [
-        'Daily Battle · Oct 21',
+        'Pokémon Daily · Oct 21',
         '⭐ First try! 4/6 left',
         '✅ 🟩🟩🟩🟩⬛⬛',
         'Hippowdon, Azelf, Celebi, Heatran, Jirachi, Lucario',

@@ -984,38 +984,86 @@ button {
   box-shadow: 0 2px 0 color-mix(in srgb, var(--border) 80%, black);
 }
 
-/* The landing's top half borrows the anime's "Who's that Pokémon?" card: a burst of rays,
-   a blue silhouette with a dark offset edge, and a big outlined question mark, all muted. */
-.home-burst {
-  --burst-x: max(30%, calc(50% - 104px));
-  --burst-y: 58%;
-  background:
-    radial-gradient(
-      circle at var(--burst-x) var(--burst-y),
-      rgb(255 255 255 / 0.8) 0,
-      rgb(224 237 241 / 0.5) 22%,
-      transparent 58%
-    ),
-    repeating-conic-gradient(
-      from 3deg at var(--burst-x) var(--burst-y),
-      rgb(255 255 255 / 0.18) 0 5deg,
-      rgb(0 0 0 / 0.05) 5deg 10deg
-    ),
-    linear-gradient(95deg, #b9d1d7 0%, #aeb1b9 36%, #a3646a 64%, #8a4f58 100%);
+/* The landing's top half: the logo, the generations' mascots on little platforms,
+   and Play. Sizes follow the screen's height (cqh), so it fits short phones too. */
+.home-logo {
+  max-height: 20cqh;
+  /* Clear of the Settings button in the corner. */
+  max-width: calc(100% - 80px);
+  width: auto;
+  filter: drop-shadow(0 3px 0 rgb(0 0 0 / 0.18));
+  user-select: none;
 }
-.home-silhouette {
-  height: 34.4cqh;
-  width: 28.8cqh;
-  background-color: #43677f;
-  mask: var(--sprite) center / contain no-repeat;
-  -webkit-mask: var(--sprite) center / contain no-repeat;
-  filter: drop-shadow(-4px 3px 0 #223847);
+.home-mascots {
+  display: flex;
+  justify-content: center;
+  gap: clamp(4px, 2cqh, 24px);
+  width: 100%;
 }
-.home-question {
-  font-size: 13cqh;
-  color: #d9b75c;
-  -webkit-text-stroke: 5px #3b2f25;
-  paint-order: stroke fill;
+.home-mascot {
+  position: relative;
+  display: flex;
+  flex: 0 1 25%;
+  max-width: clamp(76px, 13cqh, 132px);
+  height: clamp(64px, 12cqh, 128px);
+  align-items: flex-end;
+  justify-content: center;
+  border-radius: 12px;
+}
+.home-mascot:active {
+  transform: translateY(1px);
+}
+.home-mascot img {
+  position: relative;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  object-position: bottom;
+  margin-bottom: 6%;
+  animation: home-bob 2.6s ease-in-out calc(var(--i) * -0.65s) infinite;
+  user-select: none;
+}
+/* A soft platform, like the battle field's. */
+.home-mascot-ground {
+  position: absolute;
+  inset-inline: 6%;
+  bottom: 0;
+  height: 22%;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    rgb(255 255 255 / 0.32),
+    rgb(255 255 255 / 0.08) 70%,
+    transparent 72%
+  );
+}
+/* Cleared today: a small check at its feet. Nothing at all before then. */
+.home-mascot-check {
+  position: absolute;
+  right: 4%;
+  bottom: 2%;
+  display: grid;
+  place-items: center;
+  width: clamp(20px, 3.4cqh, 30px);
+  height: clamp(20px, 3.4cqh, 30px);
+  border-radius: 9999px;
+  background: var(--good);
+  color: #fff;
+  box-shadow: 0 0 0 2px #fff;
+}
+.home-mascot-check svg {
+  width: 62%;
+  height: 62%;
+}
+@keyframes home-bob {
+  50% {
+    translate: 0 -4%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-mascot img {
+    animation: none;
+  }
 }
 
 /* ---- Landing to picker: one screen, two states (data-view on .home) ----
@@ -1027,7 +1075,7 @@ button {
   container-type: size;
 }
 .home .home-top {
-  height: calc(50cqh - 6px);
+  height: calc(56cqh - 6px);
   transition: height 460ms var(--ease);
 }
 .home[data-view='picker'] .home-top {
@@ -1041,12 +1089,12 @@ button {
   scale: 0.66;
 }
 
-/* Landing art (the burst, silhouette, date, Play): fades up and away. */
+/* Landing art (the logo, mascots, and Play): fades up and away. */
 .home-landing {
   position: absolute;
   inset-inline: 0;
   top: 0;
-  height: calc(50cqh - 6px);
+  height: calc(56cqh - 6px);
   transition:
     opacity 220ms ease,
     translate 460ms var(--ease);
@@ -1078,7 +1126,7 @@ button {
   position: absolute;
   inset-inline: 0;
   bottom: 0;
-  height: calc(50cqh - 6px);
+  height: calc(44cqh - 6px);
   transition:
     opacity 200ms ease,
     translate 400ms var(--ease);
@@ -1179,8 +1227,5 @@ button {
   font-size: clamp(25px, 3.9cqh, 46px);
 }
 .home-friend {
-  height: clamp(82px, 13.5cqh, 170px);
-}
-.home-friend.is-big {
-  height: clamp(104px, 17.2cqh, 216px);
+  height: clamp(60px, 9.5cqh, 128px);
 }
