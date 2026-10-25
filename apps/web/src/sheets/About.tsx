@@ -29,6 +29,7 @@ const CREDITS: [string, string][] = [
   ],
   ['Pokémon cries', 'PokeAPI’s cries collection: the games’ own cries.'],
   ['Damage calculations', '@smogon/calc, MIT licensed.'],
+  ['Hard AI', 'poke-engine by pmariglia, MIT licensed, compiled to WebAssembly.'],
 ];
 
 export function AboutSheet({

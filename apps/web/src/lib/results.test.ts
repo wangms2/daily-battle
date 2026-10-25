@@ -46,6 +46,31 @@ describe('day status', () => {
   });
 });
 
+describe('difficulties', () => {
+  const hard = (a: Attempt): Attempt => ({ ...a, difficulty: 'hard' });
+  const easy = (a: Attempt): Attempt => ({ ...a, difficulty: 'easy' });
+
+  it('gives each difficulty its own tries and first try', () => {
+    const d = day(L, hard(W), easy(L), W);
+    expect(summarizeDay(d, true)).toMatchObject({ status: 'won', winTry: 2 });
+    expect(summarizeDay(d, true, 'hard')).toMatchObject({ status: 'firstTry', winTry: 1 });
+    expect(summarizeDay(d, true, 'easy').status).toBe('pending');
+  });
+
+  it('keeps separate streaks; a missed day at one difficulty breaks only that one', () => {
+    const h = history(day(W, hard(W)), day(W), day(W, hard(W)));
+    expect(computeStats(h, TODAY).streak).toBe(3);
+    expect(computeStats(h, TODAY, 'hard').streak).toBe(1);
+    expect(computeStats(h, TODAY, 'hard').bestStreak).toBe(1);
+    expect(computeStats(h, TODAY, 'easy').daysPlayed).toBe(0);
+  });
+
+  it('ends every streak when the team is ditched', () => {
+    const h = history(day(hard(W)), { ...day(hard(W)), ditched: true });
+    expect(computeStats(h, TODAY, 'hard').streak).toBe(0);
+  });
+});
+
 describe('streak (first tries)', () => {
   it('counts tries only up to the first win; the rest are practice', () => {
     expect(summarizeDay(day(W, L, W), true).counted).toHaveLength(1);

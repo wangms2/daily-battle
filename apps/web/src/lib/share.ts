@@ -1,5 +1,6 @@
 // The share text (DESIGN.md §11) and the share action. Plain text that pastes
 // anywhere; never opponent species, sets, or turn counts.
+import type { Difficulty } from '@daily-battle/ai/version';
 import type { FormatId } from '@daily-battle/data/formats';
 import type { Attempt, DayChange } from '../state/schema';
 import { condenseTries, streakBroken, tryCount, type DaySummary } from './results';
@@ -16,6 +17,8 @@ export interface ShareArgs {
   game?: string;
   /** The game played; the image card's header takes its colour. */
   format?: FormatId;
+  /** The CPU difficulty; only Easy and Hard show. */
+  difficulty?: Difficulty;
 }
 
 export interface ShareRow {
@@ -29,6 +32,8 @@ export interface ShareModel {
   /** "Gen 5", or nothing. */
   game?: string;
   format?: FormatId;
+  /** "Easy" or "Hard"; nothing for Normal. */
+  level?: string;
   date: string;
   status: DaySummary['status'];
   /** "First try! 4/6 left", "Won on try 2 · 3/6 left", … (no emoji). */
@@ -44,6 +49,16 @@ export interface ShareModel {
   url?: string;
 }
 
+export const DIFFICULTY_NAME: Record<Difficulty, string> = {
+  easy: 'Easy',
+  normal: 'Normal',
+  hard: 'Hard',
+};
+
+/** What follows "Pokémon Daily": "Gen 4 OU · Hard · Oct 21". */
+export const shareHeader = (m: Pick<ShareModel, 'game' | 'level' | 'date'>) =>
+  [m.game, m.level, m.date].filter(Boolean).join(' · ');
+
 const row = (a: Attempt): ShareRow => ({
   result: a.result === 'inProgress' ? 'loss' : a.result,
   remaining: a.remaining,
@@ -57,6 +72,7 @@ export function shareModel({
   url,
   game,
   format,
+  difficulty,
 }: ShareArgs): ShareModel {
   const { status, counted, tries, winTry } = summary;
   const date = new Date(`${day}T12:00:00`).toLocaleDateString('en-US', {
@@ -83,6 +99,7 @@ export function shareModel({
   return {
     ...(game && { game }),
     ...(format && { format }),
+    ...(difficulty && difficulty !== 'normal' && { level: DIFFICULTY_NAME[difficulty] }),
     date,
     status,
     headline,
@@ -105,7 +122,7 @@ export function shareText(args: ShareArgs): string {
 }
 
 export function formatShareText(m: ShareModel): string {
-  const lines = [`Pokémon Daily · ${m.game ? `${m.game} · ` : ''}${m.date}`];
+  const lines = [`Pokémon Daily · ${shareHeader(m)}`];
   const icon =
     m.status === 'firstTry' ? '⭐ ' : m.cleared ? '✅ ' : m.status === 'failed' ? '❌ ' : '';
   lines.push(`${icon}${m.headline}`);

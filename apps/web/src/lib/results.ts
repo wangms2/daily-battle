@@ -5,6 +5,7 @@
 // counts) breaks it straight away, and so does a missed day. There's no limit
 // on tries: every try counts until the day is won, and runs after a win are
 // practice.
+import type { Difficulty } from '@daily-battle/ai/version';
 import { addDays } from '@daily-battle/gen/dates';
 import type { Attempt, DayState } from '../state/schema';
 
@@ -31,8 +32,19 @@ export interface DaySummary {
 
 const won = (a: Attempt) => a.result === 'win';
 
-export function summarizeDay(day: DayState | undefined, isToday: boolean): DaySummary {
-  const tries = (day?.attempts ?? []).filter((a) => a.result !== 'inProgress');
+/** Attempts saved before difficulties (and all Normal ones) have none. */
+export const attemptDifficulty = (a: Pick<Attempt, 'difficulty'>): Difficulty =>
+  a.difficulty ?? 'normal';
+
+/** One difficulty's day: each has its own tries, first try, and streak (§4.4). */
+export function summarizeDay(
+  day: DayState | undefined,
+  isToday: boolean,
+  difficulty: Difficulty = 'normal',
+): DaySummary {
+  const tries = (day?.attempts ?? []).filter(
+    (a) => a.result !== 'inProgress' && attemptDifficulty(a) === difficulty,
+  );
   const first = tries.findIndex(won);
   const winTry = first >= 0 ? first + 1 : null;
   const counted = winTry === null ? tries : tries.slice(0, winTry);
@@ -61,10 +73,15 @@ export interface Stats {
   triesPerClear: number | null;
 }
 
-export function computeStats(days: Record<string, DayState>, today: string): Stats {
+export function computeStats(
+  days: Record<string, DayState>,
+  today: string,
+  difficulty: Difficulty = 'normal',
+): Stats {
   // A ditched team ends the streak, even on a first-try win or before any try.
+  // The team is shared, so that's every difficulty's streak.
   const status = (key: string): DayStatus => {
-    const s = summarizeDay(days[key], key === today).status;
+    const s = summarizeDay(days[key], key === today, difficulty).status;
     if (!days[key]?.ditched) return s;
     return s === 'none' || s === 'firstTry' ? 'pending' : s;
   };
@@ -91,7 +108,7 @@ export function computeStats(days: Record<string, DayState>, today: string): Sta
   let clears = 0;
   let triesToClear = 0;
   for (const key of keys) {
-    const s = summarizeDay(days[key], key === today);
+    const s = summarizeDay(days[key], key === today, difficulty);
     if (s.status === 'none') {
       if (days[key]?.ditched) {
         run = 0;

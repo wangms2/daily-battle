@@ -232,6 +232,9 @@ importers:
       '@daily-battle/data':
         specifier: workspace:*
         version: link:../../packages/data
+      '@daily-battle/engine-wasm':
+        specifier: workspace:*
+        version: link:../../packages/engine-wasm
       '@daily-battle/gen':
         specifier: workspace:*
         version: link:../../packages/gen
@@ -257,6 +260,9 @@ importers:
       '@daily-battle/data':
         specifier: workspace:*
         version: link:../../packages/data
+      '@daily-battle/engine-wasm':
+        specifier: workspace:*
+        version: link:../../packages/engine-wasm
       '@daily-battle/gen':
         specifier: workspace:*
         version: link:../../packages/gen
@@ -360,6 +366,9 @@ importers:
       '@daily-battle/data':
         specifier: workspace:*
         version: link:../data
+      '@daily-battle/engine-wasm':
+        specifier: workspace:*
+        version: link:../engine-wasm
       '@daily-battle/gen':
         specifier: workspace:*
         version: link:../gen
@@ -390,6 +399,12 @@ importers:
         specifier: ^4.23.15
         version: 4.23.15
 
+  packages/engine-wasm:
+    devDependencies:
+      tsx:
+        specifier: ^4.23.15
+        version: 4.23.15
+
   packages/gen:
     dependencies:
       '@daily-battle/data':
@@ -411,6 +426,9 @@ importers:
       '@daily-battle/data':
         specifier: workspace:*
         version: link:../data
+      '@daily-battle/engine-wasm':
+        specifier: workspace:*
+        version: link:../engine-wasm
       '@daily-battle/gen':
         specifier: workspace:*
         version: link:../gen
@@ -449,6 +467,9 @@ importers:
 
   packages/versus:
     dependencies:
+      '@daily-battle/ai':
+        specifier: workspace:*
+        version: link:../ai
       '@daily-battle/data':
         specifier: workspace:*
         version: link:../data

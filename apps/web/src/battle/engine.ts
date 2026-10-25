@@ -1,8 +1,16 @@
 // The battle engine that runs inside the worker: a BattleSession, the
 // opponent AI, and a presenter that turns the player's side into frames.
-import { aiForStyle } from '@daily-battle/ai';
+import { aiFor } from '@daily-battle/ai';
 import { DEFAULT_FORMAT, setsFor } from '@daily-battle/data';
-import { BattleSession, makeRng, type Policy, type Rng } from '@daily-battle/sim-bridge';
+import type { Engine } from '@daily-battle/engine-wasm';
+import {
+  BattleSession,
+  deriveSeed,
+  legalChoices,
+  makeRng,
+  type Policy,
+  type Rng,
+} from '@daily-battle/sim-bridge';
 import type { PokemonSet, PRNGSeed } from '@pkmn/sim';
 import type { EngineStart, TurnPackage } from './frames';
 import { SidePresenter } from './presenter';
@@ -18,8 +26,19 @@ export class BattleEngine {
   private readonly aiRng: Rng;
   private readonly presenter: SidePresenter;
   private readonly sets: PokemonSet[];
+  private readonly hard: boolean;
+  /** Hard: every AI choice so far; those past `reported` are new since the last package. */
+  private readonly aiLog: string[] = [];
+  private reported: number;
+  /** Hard: saved AI choices still to replay (cleared if one stops fitting). */
+  private replay: string[];
 
-  constructor(readonly start: EngineStart) {
+  /** Hard needs `engine`, poke-engine for the format's gen; `budget` is for tests. */
+  constructor(
+    readonly start: EngineStart,
+    engine?: Engine,
+    budget?: { iterations: number; worlds: number },
+  ) {
     const format = start.format ?? DEFAULT_FORMAT;
     this.sets = start.playerTeam as PokemonSet[];
     this.session = new BattleSession({
@@ -28,8 +47,19 @@ export class BattleEngine {
       p1: { team: start.playerTeam as PokemonSet[], name: 'You' },
       p2: { team: start.opponentTeam as PokemonSet[], name: 'The opponent' },
     });
-    this.ai = aiForStyle(start.style, { data: setsFor(format) });
+    const difficulty = start.difficulty ?? 'normal';
+    this.ai = aiFor({
+      difficulty,
+      style: start.style,
+      data: setsFor(format),
+      ...(engine ? { engine } : {}),
+      ...(start.pool ? { pool: start.pool } : {}),
+      ...(budget ? { hard: budget } : {}),
+    });
     this.aiRng = makeRng(start.aiSeed as PRNGSeed);
+    this.hard = difficulty === 'hard';
+    this.replay = this.hard ? [...(start.aiChoices ?? [])] : [];
+    this.reported = this.replay.length;
     this.presenter = new SidePresenter('p1', this.sets, format);
   }
 
@@ -71,12 +101,29 @@ export class BattleEngine {
       view && !this.session.ended;
       view = this.session.view('p2')
     ) {
-      this.session.choose('p2', this.ai.choose(view, this.aiRng));
+      if (!this.hard) {
+        this.session.choose('p2', this.ai.choose(view, this.aiRng));
+        continue;
+      }
+      // Hard: a saved choice skips the search (a resume would otherwise redo every
+      // one). Each decision gets its own rng, so skipping one doesn't shift the rest.
+      const saved = this.replay.shift();
+      let choice: string;
+      if (saved !== undefined && legalChoices(view.request).includes(saved)) choice = saved;
+      else {
+        // Searched from here on; the saved tail (if any) is replaced from this point.
+        if (saved !== undefined) this.reported = Math.min(this.reported, this.aiLog.length);
+        this.replay = [];
+        const rng = makeRng(deriveSeed(this.start.aiSeed, this.aiLog.length));
+        choice = this.ai.choose(view, rng);
+      }
+      this.aiLog.push(choice);
+      this.session.choose('p2', choice);
     }
   }
 
   private package(resumed: boolean, note?: string): TurnPackage {
-    return this.presenter.present(
+    const pkg = this.presenter.present(
       {
         lines: this.session.drain('p1'),
         request: this.session.request('p1'),
@@ -86,5 +133,10 @@ export class BattleEngine {
       resumed,
       note,
     );
+    if (this.aiLog.length > this.reported) {
+      pkg.aiChoices = { from: this.reported, choices: this.aiLog.slice(this.reported) };
+      this.reported = this.aiLog.length;
+    }
+    return pkg;
   }
 }

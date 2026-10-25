@@ -1,5 +1,7 @@
 // Client state, versioned (DESIGN.md §10). Bump `version` and add a migration
 // in storage.ts for any breaking change.
+// Optional fields (like difficulties) are added without a bump: old saves just lack them.
+import type { Difficulty } from '@daily-battle/ai/version';
 import { FORMATS, type FormatId } from '@daily-battle/data/formats';
 import type { Slot } from '../lib/data';
 
@@ -19,6 +21,13 @@ export interface Attempt {
   choices: string[];
   /** Simulator and AI versions; a mismatch on resume records a forfeit (§15). */
   engine: string;
+  /** Easy or Hard; absent for Normal (and for every attempt saved before difficulties). */
+  difficulty?: 'easy' | 'hard';
+  /**
+   * Hard only: the AI's choices so far. A resume replays them instead of searching
+   * again; with the seeds they reproduce the same battle.
+   */
+  aiChoices?: string[];
   /** A practice run's one-off change; if the run is won, it carries over to the team. */
   practiceChange?: DayChange;
 }
@@ -69,6 +78,8 @@ export interface Settings {
   shownExplainers: string[];
   /** The game to show (Gen 4 OU or Gen 5 OU); unset until the player picks one. */
   format?: FormatId;
+  /** The CPU difficulty picked for each game; Normal when unset. */
+  difficulty?: Partial<Record<FormatId, Difficulty>>;
 }
 
 /**

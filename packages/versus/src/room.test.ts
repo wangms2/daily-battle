@@ -135,6 +135,10 @@ describe('parseClientMessage', () => {
       type: 'settings',
       settings: { format: 'gen5ou', pool: 'weekly' },
     });
+    expect(parse({ type: 'settings', settings: { rivalDifficulty: 'hard' } })).toEqual({
+      type: 'settings',
+      settings: { rivalDifficulty: 'hard' },
+    });
     expect(parse({ type: 'teamSize', player: 'id1', size: 3 })).toEqual({
       type: 'teamSize',
       player: 'id1',
@@ -151,6 +155,7 @@ describe('parseClientMessage', () => {
     expect(parse({ type: 'settings', settings: { format: 'gen9ou' } })).toBeNull();
     expect(parse({ type: 'settings', settings: { format: 'toString' } })).toBeNull();
     expect(parse({ type: 'settings', settings: { hostId: 'me' } })).toBeNull();
+    expect(parse({ type: 'settings', settings: { rivalDifficulty: 'expert' } })).toBeNull();
     expect(parse({ type: 'teamSize', player: 'id1', size: 2 })).toBeNull();
     expect(parse({ type: 'rejoin', token: 42 })).toBeNull();
     expect(parse(['join'])).toBeNull();

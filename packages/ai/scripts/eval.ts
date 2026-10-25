@@ -1,5 +1,6 @@
 // Plays the AI against comparison bots on generated content (DESIGN.md §13 M4).
 //   pnpm --filter @daily-battle/ai eval [--n 200] [--assert] [--debug] [--styles] [--format gen4ou]
+//     [--hard] [--hard-n 30] [--hard-iterations 40000] [--hard-worlds 8] [--only-hard]
 // Each matchup pairs a team drawn from a weekly pool with that week's daily
 // opponent, and is played twice with the policies swapped between the teams.
 import { setsFor } from '@daily-battle/data';
@@ -11,10 +12,13 @@ import {
   teamSets,
   toPokemonSet,
 } from '@daily-battle/gen';
+import { engineBuilt, loadEngine } from '@daily-battle/engine-wasm/node';
 import { deriveSeed, RandomPolicy, runBattle, type Policy } from '@daily-battle/sim-bridge';
 type PokemonSet = ReturnType<typeof toPokemonSet>;
 import {
+  aiFor,
   aiForStyle,
+  HardPolicy,
   midBot,
   NaivePolicy,
   strongBot,
@@ -35,6 +39,18 @@ const START = '2026-01-05';
 /** The format to play, Gen 4 OU unless `--format` says otherwise. */
 const FORMAT = arg('format') ?? 'gen4ou';
 const sets = setsFor(FORMAT);
+/** Hard pairings (needs pnpm --filter @daily-battle/engine-wasm build:wasm); slower, so fewer matchups. */
+const HARD = process.argv.includes('--hard');
+/** Skip the non-Hard pairings (for tuning Hard). */
+const ONLY_HARD = HARD && process.argv.includes('--only-hard');
+const HARD_N = Math.min(N, Number(arg('hard-n') ?? 30));
+const GEN = Number(FORMAT.slice(3, 4));
+if (HARD && !engineBuilt(GEN)) throw new Error(`no engine for ${FORMAT}: run build:wasm first`);
+const engine = HARD ? loadEngine(GEN) : undefined;
+const hardBudget = {
+  ...(arg('hard-iterations') ? { iterations: Number(arg('hard-iterations')) } : {}),
+  ...(arg('hard-worlds') ? { worlds: Number(arg('hard-worlds')) } : {}),
+};
 
 /** A pool team: 6 of the week's 12, sets drawn by weight. */
 function poolTeam(i: number, week: string): PokemonSet[] {
@@ -54,7 +70,12 @@ function poolTeam(i: number, week: string): PokemonSet[] {
 const matchups = Array.from({ length: N }, (_, i) => {
   const week = addDays(START, 7 * Math.floor(i / 7));
   const day = addDays(week, i % 7);
-  return { i, a: poolTeam(i, week), b: teamSets(sets, generateOpponent(day, sets).team) };
+  return {
+    i,
+    pool: generatePool(week, sets).species,
+    a: poolTeam(i, week),
+    b: teamSets(sets, generateOpponent(day, sets).team),
+  };
 });
 
 interface Totals {
@@ -66,9 +87,14 @@ interface Totals {
   stats: PolicyStats[];
   ms: number;
   decisions: number;
+  /** Hard only: decisions made by search, and engine errors. */
+  searched: number;
+  errors: string[];
 }
 
-function play(label: string, makeA: () => Policy, makeB: () => Policy): Totals {
+type Make = (pool: readonly string[]) => Policy;
+
+function play(label: string, makeA: Make, makeB: Make, n = N): Totals {
   const t: Totals = {
     wins: 0,
     losses: 0,
@@ -78,11 +104,13 @@ function play(label: string, makeA: () => Policy, makeB: () => Policy): Totals {
     stats: [],
     ms: 0,
     decisions: 0,
+    searched: 0,
+    errors: [],
   };
-  for (const { i, a, b } of matchups) {
+  for (const { i, pool, a, b } of matchups.slice(0, n)) {
     for (const swap of [false, true]) {
-      const pa = makeA();
-      const pb = makeB();
+      const pa = makeA(pool);
+      const pb = makeB(pool);
       const timed: Policy = {
         choose(view, rng) {
           const t0 = performance.now();
@@ -105,6 +133,10 @@ function play(label: string, makeA: () => Policy, makeB: () => Policy): Totals {
       else if (result.winner === 'p2') t.losses++;
       else t.ties++;
       if (pa instanceof UtilityPolicy) t.stats.push(pa.stats);
+      if (pa instanceof HardPolicy) {
+        t.searched += pa.stats.searched;
+        t.errors.push(...pa.stats.errors);
+      }
     }
   }
   return t;
@@ -114,44 +146,89 @@ const rate = (t: Totals) => (t.wins + t.ties / 2) / t.battles;
 const pct = (x: number) => `${(100 * x).toFixed(1)}%`;
 
 const t0 = performance.now();
-const rows: [string, Totals, number | null][] = [
-  [
-    'mid vs random',
-    play(
-      'mid-random',
-      () => midBot({ data: sets }),
-      () => new RandomPolicy(),
-    ),
-    0.9,
-  ],
-  [
-    'mid vs naive',
-    play(
-      'mid-naive',
-      () => midBot({ data: sets }),
-      () => new NaivePolicy(sets),
-    ),
-    0.6,
-  ],
-  [
-    'strong vs mid',
-    play(
-      'strong-mid',
-      () => strongBot({ data: sets }),
-      () => midBot({ data: sets }),
-    ),
-    0.5,
-  ],
-  [
-    'naive vs random',
-    play(
-      'naive-random',
-      () => new NaivePolicy(sets),
-      () => new RandomPolicy(),
-    ),
-    null,
-  ],
-];
+const rows: [string, Totals, number | null][] = ONLY_HARD
+  ? []
+  : [
+      [
+        'mid vs random',
+        play(
+          'mid-random',
+          () => midBot({ data: sets }),
+          () => new RandomPolicy(),
+        ),
+        0.9,
+      ],
+      [
+        'mid vs naive',
+        play(
+          'mid-naive',
+          () => midBot({ data: sets }),
+          () => new NaivePolicy(sets),
+        ),
+        0.6,
+      ],
+      [
+        'strong vs mid',
+        play(
+          'strong-mid',
+          () => strongBot({ data: sets }),
+          () => midBot({ data: sets }),
+        ),
+        0.5,
+      ],
+      [
+        'naive vs random',
+        play(
+          'naive-random',
+          () => new NaivePolicy(sets),
+          () => new RandomPolicy(),
+        ),
+        null,
+      ],
+      // Easy should feel like a beginner: clearly weaker than Normal, still far better than random.
+      [
+        'mid vs easy',
+        play(
+          'mid-easy',
+          () => midBot({ data: sets }),
+          () => aiFor({ difficulty: 'easy', style: 'balance', data: sets }),
+        ),
+        0.7,
+      ],
+      [
+        'easy vs random',
+        play(
+          'easy-random',
+          () => aiFor({ difficulty: 'easy', style: 'balance', data: sets }),
+          () => new RandomPolicy(),
+        ),
+        0.85,
+      ],
+      [
+        'naive vs easy',
+        play(
+          'naive-easy',
+          () => new NaivePolicy(sets),
+          () => aiFor({ difficulty: 'easy', style: 'balance', data: sets }),
+        ),
+        null,
+      ],
+    ];
+const hard = (pool: readonly string[]) =>
+  aiFor({
+    difficulty: 'hard',
+    style: 'balance',
+    data: sets,
+    engine: engine!,
+    pool,
+    hard: hardBudget,
+  });
+if (HARD) {
+  rows.push(
+    ['hard vs mid', play('hard-mid', hard, () => midBot({ data: sets }), HARD_N), 0.7],
+    ['hard vs strong', play('hard-strong', hard, () => strongBot({ data: sets }), HARD_N), 0.6],
+  );
+}
 
 console.log(
   `${N} matchups x 2 sides per pairing (${((performance.now() - t0) / 1000).toFixed(1)}s)`,
@@ -163,21 +240,31 @@ for (const [label, t, min] of rows) {
   console.log(
     `  ${label.padEnd(16)} win ${pct(rate(t)).padStart(6)}  (${t.wins}-${t.losses}-${t.ties})` +
       `  avg turns ${(t.turns / t.battles).toFixed(1)}` +
-      (min === null ? '' : `  [need >= ${pct(min)}${ok ? '' : ' FAILED'}]`),
+      (min === null ? '' : `  [need >= ${pct(min)}${ok ? '' : ' FAILED'}]`) +
+      (label.startsWith('hard')
+        ? `  ${(t.ms / t.decisions).toFixed(0)} ms/decision, searched ${t.searched}/${t.decisions}`
+        : ''),
   );
+  for (const e of new Set(t.errors)) console.log(`    error: ${e}`);
 }
 
-const mid = rows[1]![1];
-const sum = (f: (s: PolicyStats) => number) => mid.stats.reduce((a, s) => a + f(s), 0);
-const hazardTurns = mid.stats.map((s) => s.firstHazardTurn).filter((x): x is number => x !== null);
-console.log('Mid AI behavior (vs naive):');
-console.log(`  switch rate ${pct(sum((s) => s.switches) / sum((s) => s.moveDecisions))}`);
-console.log(`  max-damage move rate ${pct(sum((s) => s.maxDamage) / sum((s) => s.moveDecisions))}`);
-console.log(
-  `  hazard set in ${pct(hazardTurns.length / mid.stats.length)} of battles, ` +
-    `first on turn ${(hazardTurns.reduce((a, b) => a + b, 0) / Math.max(1, hazardTurns.length)).toFixed(1)} on average`,
-);
-console.log(`  ${(mid.ms / mid.decisions).toFixed(1)} ms per decision`);
+const mid = rows.find(([label]) => label === 'mid vs naive')?.[1];
+if (mid) {
+  const sum = (f: (s: PolicyStats) => number) => mid.stats.reduce((a, s) => a + f(s), 0);
+  const hazardTurns = mid.stats
+    .map((s) => s.firstHazardTurn)
+    .filter((x): x is number => x !== null);
+  console.log('Mid AI behavior (vs naive):');
+  console.log(`  switch rate ${pct(sum((s) => s.switches) / sum((s) => s.moveDecisions))}`);
+  console.log(
+    `  max-damage move rate ${pct(sum((s) => s.maxDamage) / sum((s) => s.moveDecisions))}`,
+  );
+  console.log(
+    `  hazard set in ${pct(hazardTurns.length / mid.stats.length)} of battles, ` +
+      `first on turn ${(hazardTurns.reduce((a, b) => a + b, 0) / Math.max(1, hazardTurns.length)).toFixed(1)} on average`,
+  );
+  console.log(`  ${(mid.ms / mid.decisions).toFixed(1)} ms per decision`);
+}
 
 // The opponent AI's style presets against hand-set mid-ladder targets (DESIGN.md §8.5).
 // Reported, not asserted: they're estimates to tune toward, not hard limits.

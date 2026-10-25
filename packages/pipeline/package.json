@@ -8,14 +8,16 @@
   "scripts": {
     "calibrate": "tsx scripts/calibrate.ts",
     "schedule": "tsx scripts/schedule.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "difficulty-report": "tsx scripts/difficulty-report.ts"
   },
   "dependencies": {
     "@daily-battle/ai": "workspace:*",
     "@daily-battle/data": "workspace:*",
     "@daily-battle/gen": "workspace:*",
     "@daily-battle/sim-bridge": "workspace:*",
-    "@pkmn/sim": "catalog:"
+    "@pkmn/sim": "catalog:",
+    "@daily-battle/engine-wasm": "workspace:*"
   },
   "devDependencies": {
     "tsx": "^4.23.15"

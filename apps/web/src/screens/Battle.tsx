@@ -14,14 +14,16 @@ import {
 import type * as AnimPlay from '../battle/anim/play';
 import { useBattleBackend } from '../battle/backend';
 import { playCry, startMusic, stopMusic } from '../lib/audio';
-import type {
-  Controls,
-  EngineStart,
-  Frame,
-  TeamMember,
-  TurnPackage,
-  View,
-  Who,
+import {
+  mergeAiChoices,
+  type AiChoices,
+  type Controls,
+  type EngineStart,
+  type Frame,
+  type TeamMember,
+  type TurnPackage,
+  type View,
+  type Who,
 } from '../battle/frames';
 import { ControlPanel } from '../battle/ui/Controls';
 import { Field, type Anim, type Float, type Stage } from '../battle/ui/Field';
@@ -35,6 +37,7 @@ import { Button } from '../ui/bits';
 import type { ShareModel } from '../lib/share';
 import { ShareButton, TryRows } from '../ui/results';
 import { CloseIcon, InfoIcon } from '../ui/icons';
+import { DifficultyBadge } from '../ui/Difficulty';
 import { OtherGames } from '../ui/OtherGames';
 import { useWide } from '../ui/useWide';
 
@@ -46,6 +49,8 @@ const DELAY: Record<Settings['battleSpeed'], number> = {
   instant: 0,
 };
 const SPEEDS: Settings['battleSpeed'][] = ['slow', 'normal', 'fast'];
+/** A daily foe still choosing after this long gets a "thinking" note. */
+const THINKING_MS = 300;
 /** How much faster than Showdown's own pace its move animations run at each speed. */
 const ACCEL: Record<Settings['battleSpeed'], number> = {
   slow: 1,
@@ -108,8 +113,8 @@ export function Battle({
   settings: Settings;
   onSetting: <K extends keyof Settings>(key: K, value: Settings[K]) => void;
   onExplainerSeen: (id: string) => void;
-  /** A choice the engine accepted; saved so the battle can resume. */
-  onChoice: (choice: string) => void;
+  /** A choice the engine accepted (and Hard's new AI choices); saved so the battle can resume. */
+  onChoice: (choice: string, ai?: AiChoices) => void;
   onEnd: (outcome: BattleOutcome) => void;
   onExit: () => void;
   onRunItBack?: () => void;
@@ -145,6 +150,11 @@ export function Battle({
   const [floats, setFloats] = useState<Float[]>([]);
   // Showdown's move animations, loaded on demand when animations are on.
   const [anims, setAnims] = useState<typeof AnimPlay | null>(null);
+  // A daily foe taking a while to choose (Hard's search): say so.
+  const [thinking, setThinking] = useState(false);
+  const thinkTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  /** Hard: AI choices not saved yet (they go with your next choice). */
+  const unsavedAi = useRef<AiChoices | undefined>(undefined);
 
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pending = useRef<{ frames: Frame[]; index: number; pkg: TurnPackage } | null>(null);
@@ -291,6 +301,7 @@ export function Battle({
     Promise.all([backend.start(start), loaded]).then(
       ([pkg, mod]) => {
         if (cancelled) return;
+        unsavedAi.current = pkg.aiChoices;
         animsRef.current = mod;
         setAnims(mod);
         play(pkg);
@@ -300,6 +311,7 @@ export function Battle({
     return () => {
       cancelled = true;
       if (timer.current) clearTimeout(timer.current);
+      if (thinkTimer.current) clearTimeout(thinkTimer.current);
       running.current?.cancel();
     };
   }, [backend, start, play]);
@@ -318,12 +330,26 @@ export function Battle({
     (choice: string) => {
       setControls(null);
       setPlaying(true);
+      if (thinkTimer.current) clearTimeout(thinkTimer.current);
+      thinkTimer.current = setTimeout(() => setThinking(true), THINKING_MS);
+      const settle = () => {
+        if (thinkTimer.current) clearTimeout(thinkTimer.current);
+        thinkTimer.current = null;
+        setThinking(false);
+      };
       backend.choose(choice).then(
         (pkg) => {
-          onChoiceRef.current(choice);
+          settle();
+          const ai = mergeAiChoices(unsavedAi.current, pkg.aiChoices);
+          unsavedAi.current = undefined;
+          if (ai) onChoiceRef.current(choice, ai);
+          else onChoiceRef.current(choice);
           play(pkg);
         },
-        (e: unknown) => setError(String(e)),
+        (e: unknown) => {
+          settle();
+          setError(String(e));
+        },
       );
     },
     [backend, play],
@@ -448,13 +474,15 @@ export function Battle({
 
   // A live battle: your choice is in, and the foe hasn't made theirs.
   // It sits over the (dimmed) controls, where your next choice will appear.
-  const waitingNote = live && !end && !playing && !controls && view && (
+  // A daily foe that takes a moment (Hard) gets the same note.
+  const waitingText = live ? live.waiting : thinking ? 'The opponent is thinking…' : null;
+  const waitingNote = waitingText && !end && !controls && view && (live ? !playing : true) && (
     <div className="pointer-events-none absolute inset-0 z-10 grid place-items-center">
       <p
         role="status"
         className="rounded-full bg-ink px-4 py-1.5 text-[14px] font-semibold text-surface shadow-card"
       >
-        {live.waiting}
+        {waitingText}
       </p>
     </div>
   );
@@ -571,8 +599,11 @@ export function Battle({
   );
   const topBar = (
     <header className="flex h-12 shrink-0 items-center justify-between gap-2 px-3 pt-[env(safe-area-inset-top)] wide:px-6">
-      <div className="display text-[16px] tabular-nums">
-        {view ? `Turn ${Math.max(1, view.turn)}` : 'Battle'}
+      <div className="flex items-center gap-2">
+        <span className="display text-[16px] tabular-nums">
+          {view ? `Turn ${Math.max(1, view.turn)}` : 'Battle'}
+        </span>
+        <DifficultyBadge difficulty={start.difficulty} />
       </div>
       <div className="flex items-center gap-1">
         {topBarRight}

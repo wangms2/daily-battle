@@ -1,9 +1,10 @@
 import { setsFor } from '@daily-battle/data';
+import { engineBuilt, loadEngine } from '@daily-battle/engine-wasm/node';
 import { Dex } from '@pkmn/sim';
 import { deriveSeed, makeRng, randomTeam } from '@daily-battle/sim-bridge';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { BattleEngine, cleanText, effectiveness, moveDesc } from './engine';
-import type { EngineStart, TurnPackage } from './frames';
+import { mergeAiChoices, type AiChoices, type EngineStart, type TurnPackage } from './frames';
 
 function start(i: number, extra: Partial<EngineStart> = {}): EngineStart {
   const rng = makeRng(deriveSeed('engine:teams', i));
@@ -311,4 +312,53 @@ describe('BattleEngine on Gen 5 OU (Team Preview)', () => {
     expect(resumed.controls).toEqual(last.controls);
     expect(resumed.team).toEqual(last.team);
   });
+});
+
+describe.skipIf(!engineBuilt(4))('BattleEngine on Hard', () => {
+  const budget = { iterations: 300, worlds: 2 };
+  const s = start(80, { difficulty: 'hard' });
+
+  it('saves its choices, and a resume replays them to the same battle without searching', () => {
+    const engine = new BattleEngine(s, loadEngine(4), budget);
+    const packages = [engine.begin()];
+    const choices: string[] = [];
+    let ai: AiChoices | undefined = packages[0]!.aiChoices;
+    const pick = makeRng('3,3,3,3');
+    while (!packages.at(-1)!.end && choices.length < 12) {
+      const c = packages.at(-1)!.controls!;
+      const options = [
+        ...c.moves.filter((m) => !m.disabled).map((m) => m.choice),
+        ...c.switches.map((x) => x.choice),
+      ];
+      const choice = c.only ?? options[Math.floor(pick() * options.length)]!;
+      choices.push(choice);
+      packages.push(engine.choose(choice));
+      ai = mergeAiChoices(ai, packages.at(-1)!.aiChoices);
+    }
+    expect(ai?.from).toBe(0);
+    expect(ai!.choices.length).toBeGreaterThan(5);
+
+    const wasm = loadEngine(4);
+    const search = vi.spyOn(wasm, 'search');
+    const resumed = new BattleEngine(
+      { ...s, choices, aiChoices: ai!.choices },
+      wasm,
+      budget,
+    ).begin();
+    const last = packages.at(-1)!;
+    expect(resumed.frames.at(-1)!.view).toEqual(last.frames.at(-1)!.view);
+    expect(resumed.controls).toEqual(last.controls);
+    expect(search).not.toHaveBeenCalled();
+    expect(resumed.aiChoices).toBeUndefined();
+  }, 60_000);
+
+  it('searches again from a saved choice that no longer fits', () => {
+    const resumed = new BattleEngine(
+      { ...s, aiChoices: ['switch 9'] },
+      loadEngine(4),
+      budget,
+    ).begin();
+    expect(resumed.aiChoices?.from).toBe(0);
+    expect(resumed.aiChoices?.choices[0]).not.toBe('switch 9');
+  }, 30_000);
 });

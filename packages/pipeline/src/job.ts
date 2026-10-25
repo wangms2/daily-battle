@@ -1,7 +1,9 @@
 // One simulated battle: a player bot on a pool team (p1) against the opponent
 // AI on a daily opponent (p2). Plain data, so jobs can be sent to workers.
-import { aiForStyle, midBot, NaivePolicy, strongBot, type KnownSets } from '@daily-battle/ai';
-import { setsFor, type SetsFile } from '@daily-battle/data';
+import { aiFor, midBot, NaivePolicy, strongBot, type KnownSets } from '@daily-battle/ai';
+import type { Difficulty } from '@daily-battle/ai/version';
+import { genOf, setsFor, type SetsFile } from '@daily-battle/data';
+import { loadEngine } from '@daily-battle/engine-wasm/node';
 import type { Style } from '@daily-battle/gen';
 import { deriveSeed, runBattle, type Policy } from '@daily-battle/sim-bridge';
 import type { PokemonSet } from '@pkmn/sim';
@@ -20,6 +22,12 @@ export interface Job {
   known?: KnownSets;
   seed: string;
   index: number;
+  /** The opponent AI's difficulty; Normal when omitted (schedule validation). */
+  difficulty?: Difficulty;
+  /** Hard: the week's pool species (prior for unseen foes). */
+  pool?: string[];
+  /** Hard: search iterations per decision (default: the shipped budget). */
+  hardIterations?: number;
 }
 
 export interface JobResult {
@@ -47,6 +55,19 @@ function playerPolicy(job: Job, data: SetsFile): Policy {
   }
 }
 
+function opponentPolicy(job: Job, data: SetsFile): Policy {
+  const difficulty = job.difficulty ?? 'normal';
+  if (difficulty !== 'hard') return aiFor({ difficulty, style: job.style, data });
+  return aiFor({
+    difficulty,
+    style: job.style,
+    data,
+    engine: loadEngine(genOf(job.format)),
+    ...(job.pool ? { pool: job.pool } : {}),
+    ...(job.hardIterations ? { hard: { iterations: job.hardIterations } } : {}),
+  });
+}
+
 export function runJob(job: Job): JobResult {
   const data = setsFor(job.format);
   const result = runBattle({
@@ -60,7 +81,7 @@ export function runJob(job: Job): JobResult {
     },
     p2: {
       team: job.opponent,
-      policy: aiForStyle(job.style, { data }),
+      policy: opponentPolicy(job, data),
       seed: deriveSeed(`${job.seed}:p2`, job.index),
     },
   });

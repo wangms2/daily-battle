@@ -50,6 +50,22 @@ describe('share text', () => {
     expect(out.at(-1)).toBe('https://battle.example/#gen5');
   });
 
+  it('names Easy and Hard after the game, and Normal not at all', () => {
+    const header = (difficulty: 'easy' | 'normal' | 'hard') => {
+      const attempts = [{ ...a('win', 4), ...(difficulty !== 'normal' && { difficulty }) }];
+      return shareText({
+        day: DAY,
+        summary: summarizeDay({ swapUsed: false, attempts }, true, difficulty),
+        streak: 1,
+        game: 'Gen 4 OU',
+        difficulty,
+      }).split('\n')[0];
+    };
+    expect(header('hard')).toBe('Pokémon Daily · Gen 4 OU · Hard · Oct 21');
+    expect(header('easy')).toBe('Pokémon Daily · Gen 4 OU · Easy · Oct 21');
+    expect(header('normal')).toBe('Pokémon Daily · Gen 4 OU · Oct 21');
+  });
+
   it('celebrates a first-try win', () => {
     expect(text([a('win', 4)], 5)).toBe(
       [

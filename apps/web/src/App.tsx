@@ -1,3 +1,4 @@
+import type { Difficulty } from '@daily-battle/ai/version';
 import { DEFAULT_FORMAT, FORMATS, formatInfo, type FormatId } from '@daily-battle/data/formats';
 import { addDays, dayKey, weekKey } from '@daily-battle/gen/dates';
 import { Fragment, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
@@ -12,13 +13,21 @@ import { setActiveFormat } from './lib/data';
 import { setSpriteStyle } from './lib/sprites';
 import { useMediaQuery } from './ui/useWide';
 import { reportText } from './lib/report';
-import { computeStats, dayHeadline, summarizeDay } from './lib/results';
+import { attemptDifficulty, computeStats, dayHeadline, summarizeDay } from './lib/results';
 import { useSchedule } from './lib/schedule';
 import type { ScheduleFile } from '@daily-battle/gen/schedule';
+import { hardAvailable } from './battle/hardEngine';
+import { currentDifficulty } from './lib/difficulty';
 import { ENGINE_VERSION, randomSeed } from './lib/seed';
-import { shareModel } from './lib/share';
+import { DIFFICULTY_NAME, shareModel } from './lib/share';
 import { GamesProvider } from './ui/OtherGames';
-import { attemptInProgress, dayDecided, withChange, type GameAction } from './state/reducer';
+import {
+  attemptEngine,
+  attemptInProgress,
+  dayDecided,
+  withChange,
+  type GameAction,
+} from './state/reducer';
 import { emptyDay, type Settings } from './state/schema';
 import { useNow, useStore } from './state/context';
 import { Button } from './ui/bits';
@@ -102,6 +111,9 @@ function useHashRoute(): [string, (r: string) => void] {
 }
 
 /** An older share link's `#gen5` (or `#gen4`, `#gen6`): the game it was shared from. */
+/** Attempts are identified by ts, so keep it unique even if the clock repeats. */
+const nextTs = (last: number | undefined) => Math.max(Date.now(), (last ?? 0) + 1);
+
 const formatFromHash = (hash: string): FormatId | undefined =>
   (Object.keys(FORMATS) as FormatId[]).find((f) => f === `${hash}ou`);
 
@@ -150,9 +162,11 @@ export function App() {
   const { weeks, days } = state.games[format];
   const weekState = weeks[week];
   const dayState = days[day] ?? emptyDay();
+  // Each difficulty has its own tries and streak; the team is shared.
+  const difficulty = currentDifficulty(settings, format, days[day]);
   // Streaks and stats come from the saved attempts (lib/results.ts).
-  const stats = useMemo(() => computeStats(days, day), [days, day]);
-  const summary = useMemo(() => summarizeDay(days[day], true), [days, day]);
+  const stats = useMemo(() => computeStats(days, day, difficulty), [days, day, difficulty]);
+  const summary = useMemo(() => summarizeDay(days[day], true, difficulty), [days, day, difficulty]);
   const share = shareModel({
     day,
     summary,
@@ -161,6 +175,7 @@ export function App() {
     url: shareUrl(),
     game: `${game.name} OU`,
     format,
+    difficulty,
   });
   const countdown = countdownTo(now, addDays(day, 1));
   // The other games, for the "Play another generation" row on the result and share screens.
@@ -170,7 +185,11 @@ export function App() {
       .map((id) => ({
         id,
         name: `${formatInfo(id).name} OU`,
-        status: summarizeDay(state.games[id].days[day], true).status,
+        status: summarizeDay(
+          state.games[id].days[day],
+          true,
+          currentDifficulty(settings, id, state.games[id].days[day]),
+        ).status,
       })),
     onPlay: (id: FormatId) => {
       dispatchAny({ type: 'setSetting', key: 'format', value: id });
@@ -179,6 +198,8 @@ export function App() {
   };
   const setSetting = <K extends keyof Settings>(key: K, value: Settings[K]) =>
     dispatchAny({ type: 'setSetting', key, value });
+  const setDifficulty = (d: Difficulty) =>
+    setSetting('difficulty', { ...settings.difficulty, [format]: d });
 
   // An unfinished battle from an earlier day, or from an older engine, counts as a loss.
   useEffect(() => {
@@ -207,12 +228,14 @@ export function App() {
     setOpenEdit(false);
     if (!weekState) return;
     if (inProgress) {
+      // Resuming keeps the battle's difficulty picked, so its result shows after.
+      const resumed = attemptDifficulty(inProgress);
+      if (resumed !== (settings.difficulty?.[format] ?? 'normal')) setDifficulty(resumed);
       setBattleTs(inProgress.ts);
     } else {
       const team = runTeam;
       const lead = team.find((s) => s.species === dayState.lead) ?? team[0]!;
-      // Attempts are identified by ts, so keep it unique even if the clock repeats.
-      const ts = Math.max(Date.now(), (dayState.attempts.at(-1)?.ts ?? 0) + 1);
+      const ts = nextTs(dayState.attempts.at(-1)?.ts);
       dispatch({
         type: 'startAttempt',
         day,
@@ -225,7 +248,8 @@ export function App() {
           battleSeed: randomSeed(),
           aiSeed: randomSeed(),
           choices: [],
-          engine: ENGINE_VERSION,
+          engine: attemptEngine(ENGINE_VERSION, difficulty),
+          ...(difficulty !== 'normal' && { difficulty }),
           ...(practiceChange && { practiceChange }),
         },
       });
@@ -239,7 +263,9 @@ export function App() {
 
   const renderTopBar = (title: string) => (left?: ReactNode) => (
     <TopBar
-      title={`${game.name} · ${title}`}
+      title={[game.name, difficulty !== 'normal' && DIFFICULTY_NAME[difficulty], title]
+        .filter(Boolean)
+        .join(' · ')}
       onTitle={() => go('daily')}
       left={left}
       streak={stats.streak}
@@ -260,14 +286,17 @@ export function App() {
       <Home
         view={route === 'daily' ? 'picker' : 'landing'}
         games={(Object.keys(FORMATS) as FormatId[]).map((id) => {
-          const today = summarizeDay(state.games[id].days[day], true);
+          const gameDays = state.games[id].days;
+          const level = currentDifficulty(settings, id, gameDays[day]);
+          const today = summarizeDay(gameDays[day], true, level);
           return {
             id,
             name: formatInfo(id).name,
             blurb: GAME_BLURB[id],
-            streak: computeStats(state.games[id].days, day).streak,
+            streak: computeStats(gameDays, day, level).streak,
             today: dayHeadline(today),
             cleared: today.status === 'firstTry' || today.status === 'won',
+            ...(level !== 'normal' && { difficulty: level }),
           };
         })}
         onPlay={() => go('daily')}
@@ -333,7 +362,11 @@ export function App() {
         day={day}
         schedule={schedule.schedule}
         attempt={shownAttempt}
-        tryNumber={dayState.attempts.indexOf(shownAttempt) + 1}
+        tryNumber={
+          dayState.attempts
+            .filter((a) => attemptDifficulty(a) === attemptDifficulty(shownAttempt))
+            .indexOf(shownAttempt) + 1
+        }
         settings={settings}
         dispatch={dispatchAny}
         format={format}
@@ -380,6 +413,9 @@ export function App() {
         }}
         inProgress={!!inProgress}
         onStart={startBattle}
+        difficulty={difficulty}
+        onDifficulty={setDifficulty}
+        hardAvailable={hardAvailable(format)}
         result={{ summary, streak: stats.streak, share, countdown }}
       />
     );
@@ -418,7 +454,9 @@ export function App() {
         open={statsOpen}
         onOpenChange={setStatsOpen}
         stats={stats}
-        game={`${game.name} OU`}
+        game={[`${game.name} OU`, difficulty !== 'normal' && DIFFICULTY_NAME[difficulty]]
+          .filter(Boolean)
+          .join(' · ')}
         todayLabel={dayHeadline(summary)}
         countdown={countdown}
       />

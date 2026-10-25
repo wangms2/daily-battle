@@ -6,9 +6,11 @@
 // The landing and the picker are one screen in two states, so tapping Play is a
 // curtain: the clay top rises, the ball glides up the seam and shrinks, the
 // landing art fades, and the cartridges rise in one by one (see styles.css).
+import type { Difficulty } from '@daily-battle/ai/version';
 import type { FormatId } from '@daily-battle/data/formats';
 import { Fragment, type CSSProperties } from 'react';
 import { getSprite } from '../lib/sprites';
+import { DifficultyBadge } from '../ui/Difficulty';
 import { Friends } from '../ui/Friends';
 import { CheckIcon, ChevronIcon, FlameIcon, GearIcon } from '../ui/icons';
 
@@ -23,6 +25,8 @@ export interface GameRow {
   today: string;
   /** Today's battle is won (first try or later). */
   cleared: boolean;
+  /** Easy or Hard when picked; the streak and today's status are that difficulty's. */
+  difficulty?: Difficulty;
 }
 
 /** One Pokémon for each game, on its cartridge. Gen 3 shows the games' own Emerald sprite. */
@@ -191,7 +195,10 @@ export function Home({
                   />
                 </span>
                 <span className="min-w-0">
-                  <span className="block text-[17px] font-semibold">{g.name}</span>
+                  <span className="flex items-center gap-2">
+                    <span className="text-[17px] font-semibold">{g.name}</span>
+                    <DifficultyBadge difficulty={g.difficulty} />
+                  </span>
                   <span className="flex flex-wrap items-center text-[12.5px] leading-snug text-muted">
                     {g.blurb.map((game, j) => (
                       <Fragment key={game}>

@@ -35,6 +35,16 @@ Each opponent candidate (`generateOpponent(day, data, candidate)`) plays 200 tea
 - **Fallback:** if a candidate fails, try the next one (up to 20); if none pass, keep the closest and mark it `"accepted": "closest"`.
 - **Thresholds and sample sizes:** all in `src/config.ts`.
 
+## Difficulty report (informational)
+
+Schedules are validated against Normal only. To see how a week plays on every difficulty (DESIGN.md §4.6):
+
+```sh
+pnpm --filter @daily-battle/pipeline difficulty-report --week 2026-10-19 --format gen3ou [--n 20] [--hard-iterations 150000] [--difficulties easy,normal,hard]
+```
+
+It plays the mid bot on `n` sampled pool teams against each day's opponent, prints a Markdown table of win rates per day and difficulty, and skips Hard if the format's WASM isn't built. A smoke run (Gen 3, week of Oct 19, n=6, Hard at 20k iterations) gave Easy 76%, Normal 48%, Hard 12%.
+
 ## Current schedule
 
 8 weeks are published, Oct 19 to Dec 7, 2026. Every pool and every day passed (no closest-candidate fallbacks). Details are in `reports/`.

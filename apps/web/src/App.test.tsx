@@ -7,6 +7,7 @@ import scheduleJson from '../public/schedule/2026-10-19.json';
 import gen5Schedule from '../public/schedule/gen5ou/2026-10-26.json';
 import { App } from './App';
 import { ENGINE_VERSION } from './lib/seed';
+import { attemptEngine } from './state/reducer';
 import { initialState, type State } from './state/schema';
 import { createStorage, STORAGE_KEY } from './state/storage';
 import { StoreProvider } from './state/store';
@@ -390,6 +391,48 @@ describe('results and streak', () => {
     renderApp(seeded({ team: { week: WEEK } }));
     await screen.findByRole('button', { name: /^Start · / });
     expect(screen.queryByRole('region', { name: 'Today’s result' })).not.toBeInTheDocument();
+  });
+
+  it('keeps each difficulty’s day apart, and remembers the pick', async () => {
+    const user = userEvent.setup();
+    const state = seeded({ team: { week: WEEK } });
+    state.games.gen4ou.days['2026-10-21'] = { swapUsed: false, attempts: [finished('win', 4, 3)] };
+    renderApp(state);
+    await screen.findByRole('region', { name: 'Today’s result' });
+    const picker = screen.getByRole('radiogroup', { name: 'Difficulty' });
+    expect(within(picker).getByRole('radio', { name: 'Normal' })).toBeChecked();
+
+    await user.click(within(picker).getByRole('radio', { name: 'Easy' }));
+    expect(within(picker).getByRole('radio', { name: 'Easy' })).toBeChecked();
+    // Today's Normal win doesn't count at Easy.
+    expect(screen.queryByRole('region', { name: 'Today’s result' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^Start · / })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Stats. Streak 0' })).toBeInTheDocument();
+
+    await user.click(within(picker).getByRole('radio', { name: 'Normal' }));
+    expect(await screen.findByRole('region', { name: 'Today’s result' })).toHaveTextContent(
+      'First try!',
+    );
+  });
+
+  it('holds the difficulty of a battle in progress', async () => {
+    const state = seeded({ team: { week: WEEK } });
+    state.games.gen4ou.days['2026-10-21'] = {
+      swapUsed: false,
+      attempts: [
+        {
+          ...finished('win', 6, 1),
+          result: 'inProgress',
+          difficulty: 'easy',
+          engine: attemptEngine(ENGINE_VERSION, 'easy'),
+        },
+      ],
+    };
+    renderApp(state);
+    expect(await screen.findByRole('button', { name: 'Resume battle' })).toBeInTheDocument();
+    const picker = screen.getByRole('radiogroup', { name: 'Difficulty' });
+    expect(within(picker).getByRole('radio', { name: 'Easy' })).toBeChecked();
+    expect(within(picker).getByRole('radio', { name: 'Normal' })).toBeDisabled();
   });
 });
 

@@ -1,5 +1,6 @@
 // What the battle worker sends the UI: plain data describing only what the
 // player's side can see. No simulator types cross this boundary.
+import type { Difficulty } from '@daily-battle/ai/version';
 
 export type Who = 'you' | 'foe';
 
@@ -160,7 +161,27 @@ export interface TurnPackage {
   end: { winner: Who | null; youLeft: number; foeLeft: number } | null;
   /** True when this package rebuilds a resumed battle (show it without playback). */
   resumed: boolean;
+  /** Hard: the AI's new choices, to save (they replace any saved from index `from`). */
+  aiChoices?: AiChoices;
 }
+
+export interface AiChoices {
+  from: number;
+  choices: string[];
+}
+
+/** Two batches of AI choices as one, the later winning where they overlap. */
+export function mergeAiChoices(a: AiChoices | undefined, b: AiChoices | undefined) {
+  if (!a || !b) return a ?? b;
+  if (b.from <= a.from) return b;
+  return { from: a.from, choices: [...a.choices.slice(0, b.from - a.from), ...b.choices] };
+}
+
+/** Saved AI choices with a batch applied. */
+export const applyAiChoices = (saved: string[] = [], { from, choices }: AiChoices) => [
+  ...saved.slice(0, from),
+  ...choices,
+];
 
 export interface EngineStart {
   /** The sim format, e.g. `gen5ou`; Gen 4 OU if left out (attempts saved before Gen 5). */
@@ -173,6 +194,12 @@ export interface EngineStart {
   aiSeed: string;
   /** Your recorded choices, for resume. */
   choices: string[];
+  /** Normal when left out. */
+  difficulty?: Difficulty;
+  /** Hard: the week's pool species (its prior for your unseen Pokémon). */
+  pool?: string[];
+  /** Hard: the AI's saved choices, replayed on resume instead of searched again. */
+  aiChoices?: string[];
 }
 
 export type ToWorker =

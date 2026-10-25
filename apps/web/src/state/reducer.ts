@@ -1,7 +1,9 @@
+import { difficultyTag, type Difficulty } from '@daily-battle/ai/version';
 import type { FormatId } from '@daily-battle/data/formats';
 import { mondayOf } from '@daily-battle/gen/dates';
+import { applyAiChoices, type AiChoices } from '../battle/frames';
 import { sameSpecies } from '../lib/data';
-import { summarizeDay } from '../lib/results';
+import { attemptDifficulty, summarizeDay } from '../lib/results';
 import {
   emptyDay,
   type Attempt,
@@ -21,7 +23,7 @@ export type GameAction =
   /** A change for the next practice run only (after today's counted tries). */
   | { type: 'setPracticeChange'; day: string; week: string; change: DayChange | null }
   | { type: 'startAttempt'; day: string; attempt: Attempt }
-  | { type: 'recordChoice'; day: string; choice: string }
+  | { type: 'recordChoice'; day: string; choice: string; ai?: AiChoices }
   | { type: 'endAttempt'; day: string; result: 'win' | 'loss' | 'forfeit'; remaining: number }
   /** Unfinished attempts from past days, or from another engine version, become forfeits. */
   | { type: 'expireAttempts'; today: string; engine: string }
@@ -48,6 +50,10 @@ export function attemptInProgress(day: DayState | undefined): Attempt | undefine
   return last?.result === 'inProgress' ? last : undefined;
 }
 
+/** The engine string an attempt at `difficulty` is saved with, given Normal's. */
+export const attemptEngine = (normal: string, difficulty: Difficulty): string =>
+  normal + difficultyTag(difficulty);
+
 /** The team with a change applied. */
 export function withChange(team: Slot[], change: DayChange | undefined): Slot[] {
   return change ? team.map((s, i) => (i === change.slot ? change.to : s)) : team;
@@ -66,6 +72,9 @@ function changeFits(team: Slot[], change: DayChange): boolean {
     i === slot ? s.species === to.species : sameSpecies(s.species, to.species),
   );
 }
+
+// Team rules follow Normal's tries only: the team is shared, and an Easy or Hard
+// loss doesn't free it up (DESIGN.md §4.5).
 
 /** Tried today and not won yet: the streak is over for today, so the team may change freely. */
 export function dayLost(day: DayState | undefined): boolean {
@@ -214,7 +223,12 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         ...state,
         days: {
           ...state.days,
-          [action.day]: updateLast(day!, (a) => ({ ...a, choices: [...a.choices, action.choice] })),
+          [action.day]: updateLast(day!, (a) => ({
+            ...a,
+            choices: [...a.choices, action.choice],
+            // The AI's choices so far (Hard saves them, to resume without searching again).
+            ...(action.ai ? { aiChoices: applyAiChoices(a.aiChoices, action.ai) } : {}),
+          })),
         },
       };
     }
@@ -247,7 +261,10 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       let days = state.days;
       for (const [key, day] of Object.entries(state.days)) {
         const a = attemptInProgress(day);
-        if (a && (key < action.today || a.engine !== action.engine)) {
+        if (
+          a &&
+          (key < action.today || a.engine !== attemptEngine(action.engine, attemptDifficulty(a)))
+        ) {
           days = { ...days, [key]: updateLast(day, (x) => ({ ...x, result: 'forfeit' })) };
         }
       }
