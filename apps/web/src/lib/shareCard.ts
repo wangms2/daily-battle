@@ -1,8 +1,10 @@
 // The share image: the same facts as the share text (lib/share.ts), drawn as
-// a card in the home screens' look (clay lid, seam and ball, stone ground), with
-// team sprites in place of names.
+// a card in the home screens' look (a lid, seam and ball, stone ground), with
+// team sprites in place of names. The lid takes the colour of the game played,
+// so a glance tells the generation.
 // Drawn on a canvas in the browser from self-hosted assets, so nothing leaves
 // the device until the player shares it.
+import type { FormatId } from '@daily-battle/data/formats';
 import { condenseTries, tryCount } from './results';
 import type { ShareModel, ShareRow } from './share';
 import { getSprite } from './sprites';
@@ -31,6 +33,20 @@ const C = {
   seam: '#2b2d36',
   stone: '#f4f3f1',
 };
+/**
+ * Each game's lid: one colour from its games, deep enough for white text, and
+ * the ball's centre button. Emerald for Gen 3, Diamond's steel blue for Gen 4,
+ * Black for Gen 5 (with a white button), and Y's red for Gen 6.
+ */
+export const LIDS: Record<FormatId, { lid: string; deep: string; button: string }> = {
+  gen3ou: { lid: '#2f7a5c', deep: '#24624a', button: '#2f7a5c' },
+  gen4ou: { lid: '#4a6890', deep: '#3a5578', button: '#4a6890' },
+  gen5ou: { lid: '#2a2b31', deep: '#1c1d22', button: '#e2e2e8' },
+  gen6ou: { lid: '#a83a48', deep: '#8c2e3b', button: '#a83a48' },
+};
+/** The home screens' clay, for a share without a game. */
+const CLAY = { lid: C.clay, deep: C.clayDeep, button: C.clay };
+
 const FONT = '"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif';
 const EMOJI = '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji"';
 const font = (weight: number, size: number) => `${weight} ${size}px ${FONT}, ${EMOJI}`;
@@ -163,10 +179,11 @@ export async function drawShareCard(m: ShareModel): Promise<HTMLCanvasElement> {
   const left = 96;
   const right = CARD_W - 96;
 
-  // Header: the clay lid, the dark seam, and the ball on it.
+  // Header: the game's lid, the dark seam, and the ball on it.
+  const colors = m.format ? LIDS[m.format] : CLAY;
   const lid = ctx.createLinearGradient(0, 0, CARD_W, 150);
-  lid.addColorStop(0, C.clay);
-  lid.addColorStop(1, C.clayDeep);
+  lid.addColorStop(0, colors.lid);
+  lid.addColorStop(1, colors.deep);
   ctx.fillStyle = lid;
   ctx.fillRect(0, 0, CARD_W, 150);
   ctx.fillStyle = C.seam;
@@ -187,7 +204,7 @@ export async function drawShareCard(m: ShareModel): Promise<HTMLCanvasElement> {
   ctx.stroke();
   ctx.beginPath();
   ctx.arc(CARD_W / 2, 156, 9, 0, Math.PI * 2);
-  ctx.fillStyle = C.clay;
+  ctx.fillStyle = colors.button;
   ctx.fill();
   ctx.lineWidth = 4;
   ctx.stroke();
