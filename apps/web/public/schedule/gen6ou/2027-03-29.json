@@ -1,0 +1,331 @@
+{
+  "version": 1,
+  "generatorVersion": 4,
+  "dataBuiltAt": "2026-10-24T02:55:39.964Z",
+  "week": "2027-03-29",
+  "pool": {
+    "species": [
+      "Heatran",
+      "Rotom-Wash",
+      "Raikou",
+      "Tyranitar",
+      "Jirachi",
+      "Garchomp",
+      "Kyurem-Black",
+      "Lopunny",
+      "Serperior",
+      "Zapdos",
+      "Victini",
+      "Politoed"
+    ],
+    "candidate": 0
+  },
+  "suggestedTeams": [
+    {
+      "archetype": "Balanced",
+      "team": [
+        {
+          "species": "Rotom-Wash",
+          "setId": "rotomwash-physically-defensive-pivot"
+        },
+        {
+          "species": "Zapdos",
+          "setId": "zapdos-physically-defensive"
+        },
+        {
+          "species": "Kyurem-Black",
+          "setId": "kyuremblack-choice-item-attacker"
+        },
+        {
+          "species": "Garchomp",
+          "setId": "garchomp-offensive-stealth-rock"
+        },
+        {
+          "species": "Serperior",
+          "setId": "serperior-dual-screens"
+        },
+        {
+          "species": "Raikou",
+          "setId": "raikou-calm-mind"
+        }
+      ]
+    },
+    {
+      "archetype": "Offense",
+      "team": [
+        {
+          "species": "Kyurem-Black",
+          "setId": "kyuremblack-choice-item-attacker"
+        },
+        {
+          "species": "Jirachi",
+          "setId": "jirachi-choice-scarf"
+        },
+        {
+          "species": "Heatran",
+          "setId": "heatran-fast-utility"
+        },
+        {
+          "species": "Lopunny",
+          "setId": "lopunny-all-out-attacker"
+        },
+        {
+          "species": "Garchomp",
+          "setId": "garchomp-substitute-swords-dance"
+        },
+        {
+          "species": "Politoed",
+          "setId": "politoed-choice-scarf"
+        }
+      ]
+    },
+    {
+      "archetype": "Stall",
+      "team": [
+        {
+          "species": "Zapdos",
+          "setId": "zapdos-physically-defensive"
+        },
+        {
+          "species": "Rotom-Wash",
+          "setId": "rotomwash-fast-utility"
+        },
+        {
+          "species": "Heatran",
+          "setId": "heatran-specially-defensive"
+        },
+        {
+          "species": "Garchomp",
+          "setId": "garchomp-tank-chomp"
+        },
+        {
+          "species": "Jirachi",
+          "setId": "jirachi-specially-defensive"
+        },
+        {
+          "species": "Serperior",
+          "setId": "serperior-stallbreaker"
+        }
+      ]
+    }
+  ],
+  "days": [
+    {
+      "day": "2027-03-29",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Serperior",
+          "setId": "serperior-substitute-attacker"
+        },
+        {
+          "species": "Landorus-Therian",
+          "setId": "landorustherian-suicide-lead"
+        },
+        {
+          "species": "Venusaur",
+          "setId": "venusaur-defensive"
+        },
+        {
+          "species": "Latios",
+          "setId": "latios-choice-scarf"
+        },
+        {
+          "species": "Gliscor",
+          "setId": "gliscor-stallbreaker"
+        },
+        {
+          "species": "Slowbro",
+          "setId": "slowbro-calm-mind"
+        }
+      ],
+      "candidate": 1
+    },
+    {
+      "day": "2027-03-30",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Landorus-Therian",
+          "setId": "landorustherian-choice-scarf"
+        },
+        {
+          "species": "Haxorus",
+          "setId": "haxorus-dragon-dance"
+        },
+        {
+          "species": "Skarmory",
+          "setId": "skarmory-physically-defensive"
+        },
+        {
+          "species": "Garchomp",
+          "setId": "garchomp-tank-chomp"
+        },
+        {
+          "species": "Lopunny",
+          "setId": "lopunny-all-out-attacker"
+        },
+        {
+          "species": "Raikou",
+          "setId": "raikou-calm-mind"
+        }
+      ],
+      "candidate": 1
+    },
+    {
+      "day": "2027-03-31",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Garchomp",
+          "setId": "garchomp-tank-chomp"
+        },
+        {
+          "species": "Tornadus-Therian",
+          "setId": "tornadustherian-assault-vest-pivot"
+        },
+        {
+          "species": "Kyurem-Black",
+          "setId": "kyuremblack-mixed-wallbreaker"
+        },
+        {
+          "species": "Keldeo",
+          "setId": "keldeo-substitute-calm-mind"
+        },
+        {
+          "species": "Tangrowth",
+          "setId": "tangrowth-defensive"
+        },
+        {
+          "species": "Charizard",
+          "setId": "charizard-dragon-dance"
+        }
+      ],
+      "candidate": 2
+    },
+    {
+      "day": "2027-04-01",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Magnezone",
+          "setId": "magnezone-choice-scarf"
+        },
+        {
+          "species": "Alakazam",
+          "setId": "alakazam-utility-attacker"
+        },
+        {
+          "species": "Raikou",
+          "setId": "raikou-calm-mind"
+        },
+        {
+          "species": "Scizor",
+          "setId": "scizor-choice-band"
+        },
+        {
+          "species": "Kyurem-Black",
+          "setId": "kyuremblack-mixed-wallbreaker"
+        },
+        {
+          "species": "Heatran",
+          "setId": "heatran-specially-defensive"
+        }
+      ],
+      "candidate": 4
+    },
+    {
+      "day": "2027-04-02",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Victini",
+          "setId": "victini-choice-band"
+        },
+        {
+          "species": "Gliscor",
+          "setId": "gliscor-swords-dance-wallbreaker"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-choice-scarf"
+        },
+        {
+          "species": "Latios",
+          "setId": "latios-life-orb-attacker"
+        },
+        {
+          "species": "Excadrill",
+          "setId": "excadrill-fast-utility"
+        },
+        {
+          "species": "Landorus-Therian",
+          "setId": "landorustherian-defensive"
+        }
+      ],
+      "candidate": 1
+    },
+    {
+      "day": "2027-04-03",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Amoonguss",
+          "setId": "amoonguss-specially-defensive"
+        },
+        {
+          "species": "Excadrill",
+          "setId": "excadrill-sand-rush"
+        },
+        {
+          "species": "Aerodactyl",
+          "setId": "aerodactyl-suicide-lead"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-dragon-dance"
+        },
+        {
+          "species": "Thundurus",
+          "setId": "thundurus-bulky-pivot"
+        },
+        {
+          "species": "Zapdos",
+          "setId": "zapdos-physically-defensive"
+        }
+      ],
+      "candidate": 8
+    },
+    {
+      "day": "2027-04-04",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Latias",
+          "setId": "latias-defensive"
+        },
+        {
+          "species": "Tangrowth",
+          "setId": "tangrowth-defensive"
+        },
+        {
+          "species": "Serperior",
+          "setId": "serperior-substitute-attacker"
+        },
+        {
+          "species": "Heatran",
+          "setId": "heatran-specially-defensive"
+        },
+        {
+          "species": "Weavile",
+          "setId": "weavile-choice-band"
+        },
+        {
+          "species": "Manaphy",
+          "setId": "manaphy-tail-glow-3-attacks"
+        }
+      ],
+      "candidate": 7
+    }
+  ]
+}

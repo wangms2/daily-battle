@@ -1,0 +1,302 @@
+{
+  "version": 1,
+  "generatorVersion": 4,
+  "dataBuiltAt": "2026-10-24T02:55:39.964Z",
+  "week": "2026-12-21",
+  "pool": {
+    "species": [
+      "Talonflame",
+      "Excadrill",
+      "Clefable",
+      "Medicham",
+      "Serperior",
+      "Dragonite",
+      "Latios",
+      "Gardevoir",
+      "Slowbro",
+      "Krookodile",
+      "Alakazam",
+      "Reuniclus"
+    ],
+    "candidate": 0
+  },
+  "suggestedTeams": [
+    {
+      "archetype": "Balanced",
+      "team": [
+        {
+          "species": "Serperior",
+          "setId": "serperior-substitute-attacker"
+        },
+        {
+          "species": "Dragonite",
+          "setId": "dragonite-choice-band"
+        },
+        {
+          "species": "Excadrill",
+          "setId": "excadrill-fast-utility"
+        },
+        {
+          "species": "Slowbro",
+          "setId": "slowbro-calm-mind"
+        },
+        {
+          "species": "Talonflame",
+          "setId": "talonflame-choice-band"
+        },
+        {
+          "species": "Clefable",
+          "setId": "clefable-calm-mind"
+        }
+      ]
+    },
+    {
+      "archetype": "Offense",
+      "team": [
+        {
+          "species": "Reuniclus",
+          "setId": "reuniclus-trick-room"
+        },
+        {
+          "species": "Dragonite",
+          "setId": "dragonite-choice-band"
+        },
+        {
+          "species": "Alakazam",
+          "setId": "alakazam-utility-attacker"
+        },
+        {
+          "species": "Serperior",
+          "setId": "serperior-stallbreaker"
+        },
+        {
+          "species": "Krookodile",
+          "setId": "krookodile-choice-scarf"
+        },
+        {
+          "species": "Excadrill",
+          "setId": "excadrill-fast-utility"
+        }
+      ]
+    }
+  ],
+  "days": [
+    {
+      "day": "2026-12-21",
+      "style": "stall",
+      "team": [
+        {
+          "species": "Tornadus-Therian",
+          "setId": "tornadustherian-assault-vest-pivot"
+        },
+        {
+          "species": "Tangrowth",
+          "setId": "tangrowth-defensive"
+        },
+        {
+          "species": "Clefable",
+          "setId": "clefable-stealth-rock"
+        },
+        {
+          "species": "Manaphy",
+          "setId": "manaphy-tail-glow-3-attacks"
+        },
+        {
+          "species": "Skarmory",
+          "setId": "skarmory-defog"
+        },
+        {
+          "species": "Zygarde",
+          "setId": "zygarde-dragon-dance"
+        }
+      ],
+      "candidate": 2
+    },
+    {
+      "day": "2026-12-22",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Rotom-Wash",
+          "setId": "rotomwash-fast-utility"
+        },
+        {
+          "species": "Weavile",
+          "setId": "weavile-choice-band"
+        },
+        {
+          "species": "Infernape",
+          "setId": "infernape-lead"
+        },
+        {
+          "species": "Garchomp",
+          "setId": "garchomp-substitute-swords-dance"
+        },
+        {
+          "species": "Serperior",
+          "setId": "serperior-stallbreaker"
+        },
+        {
+          "species": "Hippowdon",
+          "setId": "hippowdon-special-wall"
+        }
+      ],
+      "candidate": 1
+    },
+    {
+      "day": "2026-12-23",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Landorus-Therian",
+          "setId": "landorustherian-suicide-lead"
+        },
+        {
+          "species": "Excadrill",
+          "setId": "excadrill-fast-utility"
+        },
+        {
+          "species": "Serperior",
+          "setId": "serperior-dual-screens"
+        },
+        {
+          "species": "Blastoise",
+          "setId": "blastoise-all-out-attacker"
+        },
+        {
+          "species": "Talonflame",
+          "setId": "talonflame-specially-defensive"
+        },
+        {
+          "species": "Thundurus",
+          "setId": "thundurus-bulky-pivot"
+        }
+      ],
+      "candidate": 6
+    },
+    {
+      "day": "2026-12-24",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Swampert",
+          "setId": "swampert-rain-sweeper"
+        },
+        {
+          "species": "Thundurus",
+          "setId": "thundurus-nasty-plot"
+        },
+        {
+          "species": "Ferrothorn",
+          "setId": "ferrothorn-utility"
+        },
+        {
+          "species": "Zapdos",
+          "setId": "zapdos-physically-defensive"
+        },
+        {
+          "species": "Azelf",
+          "setId": "azelf-expert-belt"
+        },
+        {
+          "species": "Gastrodon",
+          "setId": "gastrodon-curse"
+        }
+      ],
+      "candidate": 0
+    },
+    {
+      "day": "2026-12-25",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Volcanion",
+          "setId": "volcanion-physically-defensive"
+        },
+        {
+          "species": "Heatran",
+          "setId": "heatran-offensive-stallbreaker"
+        },
+        {
+          "species": "Alakazam",
+          "setId": "alakazam-utility-attacker"
+        },
+        {
+          "species": "Sylveon",
+          "setId": "sylveon-cleric"
+        },
+        {
+          "species": "Mew",
+          "setId": "mew-lead"
+        },
+        {
+          "species": "Mamoswine",
+          "setId": "mamoswine-life-orb-attacker"
+        }
+      ],
+      "candidate": 13
+    },
+    {
+      "day": "2026-12-26",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Excadrill",
+          "setId": "excadrill-specially-defensive"
+        },
+        {
+          "species": "Tornadus-Therian",
+          "setId": "tornadustherian-assault-vest-pivot"
+        },
+        {
+          "species": "Clefable",
+          "setId": "clefable-stealth-rock"
+        },
+        {
+          "species": "Bisharp",
+          "setId": "bisharp-swords-dance"
+        },
+        {
+          "species": "Lucario",
+          "setId": "lucario-swords-dance"
+        },
+        {
+          "species": "Gengar",
+          "setId": "gengar-hex"
+        }
+      ],
+      "candidate": 9
+    },
+    {
+      "day": "2026-12-27",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Lopunny",
+          "setId": "lopunny-all-out-attacker"
+        },
+        {
+          "species": "Victini",
+          "setId": "victini-choice-band"
+        },
+        {
+          "species": "Weavile",
+          "setId": "weavile-swords-dance"
+        },
+        {
+          "species": "Skarmory",
+          "setId": "skarmory-defog"
+        },
+        {
+          "species": "Scizor",
+          "setId": "scizor-choice-band"
+        },
+        {
+          "species": "Dragonite",
+          "setId": "dragonite-bulky-roost-dragon-dance"
+        }
+      ],
+      "candidate": 3
+    }
+  ]
+}

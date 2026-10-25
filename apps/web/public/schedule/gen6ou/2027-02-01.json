@@ -1,0 +1,331 @@
+{
+  "version": 1,
+  "generatorVersion": 4,
+  "dataBuiltAt": "2026-10-24T02:55:39.964Z",
+  "week": "2027-02-01",
+  "pool": {
+    "species": [
+      "Charizard",
+      "Metagross",
+      "Heatran",
+      "Excadrill",
+      "Skarmory",
+      "Clefable",
+      "Magnezone",
+      "Kyurem-Black",
+      "Dragonite",
+      "Amoonguss",
+      "Mandibuzz",
+      "Crawdaunt"
+    ],
+    "candidate": 0
+  },
+  "suggestedTeams": [
+    {
+      "archetype": "Balanced",
+      "team": [
+        {
+          "species": "Mandibuzz",
+          "setId": "mandibuzz-physically-defensive"
+        },
+        {
+          "species": "Charizard",
+          "setId": "charizard-wallbreaker"
+        },
+        {
+          "species": "Clefable",
+          "setId": "clefable-stealth-rock"
+        },
+        {
+          "species": "Amoonguss",
+          "setId": "amoonguss-pivot"
+        },
+        {
+          "species": "Dragonite",
+          "setId": "dragonite-bulky-roost-dragon-dance"
+        },
+        {
+          "species": "Magnezone",
+          "setId": "magnezone-choice-scarf"
+        }
+      ]
+    },
+    {
+      "archetype": "Offense",
+      "team": [
+        {
+          "species": "Heatran",
+          "setId": "heatran-fast-utility"
+        },
+        {
+          "species": "Metagross",
+          "setId": "metagross-offensive"
+        },
+        {
+          "species": "Dragonite",
+          "setId": "dragonite-choice-band"
+        },
+        {
+          "species": "Kyurem-Black",
+          "setId": "kyuremblack-mixed-wallbreaker"
+        },
+        {
+          "species": "Excadrill",
+          "setId": "excadrill-sand-rush"
+        },
+        {
+          "species": "Crawdaunt",
+          "setId": "crawdaunt-choice-band"
+        }
+      ]
+    },
+    {
+      "archetype": "Stall",
+      "team": [
+        {
+          "species": "Clefable",
+          "setId": "clefable-stealth-rock"
+        },
+        {
+          "species": "Mandibuzz",
+          "setId": "mandibuzz-physically-defensive"
+        },
+        {
+          "species": "Skarmory",
+          "setId": "skarmory-defog"
+        },
+        {
+          "species": "Heatran",
+          "setId": "heatran-specially-defensive"
+        },
+        {
+          "species": "Excadrill",
+          "setId": "excadrill-fast-utility"
+        },
+        {
+          "species": "Amoonguss",
+          "setId": "amoonguss-pivot"
+        }
+      ]
+    }
+  ],
+  "days": [
+    {
+      "day": "2027-02-01",
+      "style": "stall",
+      "team": [
+        {
+          "species": "Gyarados",
+          "setId": "gyarados-defensive"
+        },
+        {
+          "species": "Clefable",
+          "setId": "clefable-stealth-rock"
+        },
+        {
+          "species": "Keldeo",
+          "setId": "keldeo-substitute-calm-mind"
+        },
+        {
+          "species": "Politoed",
+          "setId": "politoed-support"
+        },
+        {
+          "species": "Excadrill",
+          "setId": "excadrill-sand-rush"
+        },
+        {
+          "species": "Talonflame",
+          "setId": "talonflame-specially-defensive"
+        }
+      ],
+      "candidate": 7
+    },
+    {
+      "day": "2027-02-02",
+      "style": "stall",
+      "team": [
+        {
+          "species": "Suicune",
+          "setId": "suicune-defensive-calm-mind"
+        },
+        {
+          "species": "Slowbro",
+          "setId": "slowbro-calm-mind"
+        },
+        {
+          "species": "Latios",
+          "setId": "latios-life-orb-attacker"
+        },
+        {
+          "species": "Ferrothorn",
+          "setId": "ferrothorn-utility"
+        },
+        {
+          "species": "Nidoking",
+          "setId": "nidoking-wallbreaker"
+        },
+        {
+          "species": "Whimsicott",
+          "setId": "whimsicott-support"
+        }
+      ],
+      "candidate": 3
+    },
+    {
+      "day": "2027-02-03",
+      "style": "stall",
+      "team": [
+        {
+          "species": "Politoed",
+          "setId": "politoed-support"
+        },
+        {
+          "species": "Kyurem-Black",
+          "setId": "kyuremblack-mixed-wallbreaker"
+        },
+        {
+          "species": "Weavile",
+          "setId": "weavile-choice-band"
+        },
+        {
+          "species": "Volcarona",
+          "setId": "volcarona-bulkarona"
+        },
+        {
+          "species": "Bisharp",
+          "setId": "bisharp-swords-dance"
+        },
+        {
+          "species": "Slowbro",
+          "setId": "slowbro-calm-mind"
+        }
+      ],
+      "candidate": 1
+    },
+    {
+      "day": "2027-02-04",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Blissey",
+          "setId": "blissey-special-wall"
+        },
+        {
+          "species": "Garchomp",
+          "setId": "garchomp-offensive-stealth-rock"
+        },
+        {
+          "species": "Kyurem-Black",
+          "setId": "kyuremblack-choice-item-attacker"
+        },
+        {
+          "species": "Chansey",
+          "setId": "chansey-de-blob"
+        },
+        {
+          "species": "Keldeo",
+          "setId": "keldeo-choice-specs"
+        },
+        {
+          "species": "Volcarona",
+          "setId": "volcarona-offensive-quiver-dance"
+        }
+      ],
+      "candidate": 0
+    },
+    {
+      "day": "2027-02-05",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Manaphy",
+          "setId": "manaphy-tail-glow-3-attacks"
+        },
+        {
+          "species": "Conkeldurr",
+          "setId": "conkeldurr-assault-vest"
+        },
+        {
+          "species": "Tangrowth",
+          "setId": "tangrowth-assault-vest"
+        },
+        {
+          "species": "Bisharp",
+          "setId": "bisharp-swords-dance"
+        },
+        {
+          "species": "Jirachi",
+          "setId": "jirachi-choice-scarf"
+        },
+        {
+          "species": "Weavile",
+          "setId": "weavile-choice-band"
+        }
+      ],
+      "candidate": 9
+    },
+    {
+      "day": "2027-02-06",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Chansey",
+          "setId": "chansey-de-blob"
+        },
+        {
+          "species": "Garchomp",
+          "setId": "garchomp-tank-chomp"
+        },
+        {
+          "species": "Tornadus-Therian",
+          "setId": "tornadustherian-assault-vest-pivot"
+        },
+        {
+          "species": "Medicham",
+          "setId": "medicham-all-out-attacker"
+        },
+        {
+          "species": "Keldeo",
+          "setId": "keldeo-taunt"
+        },
+        {
+          "species": "Latios",
+          "setId": "latios-life-orb-attacker"
+        }
+      ],
+      "candidate": 3
+    },
+    {
+      "day": "2027-02-07",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Diancie",
+          "setId": "diancie-offensive"
+        },
+        {
+          "species": "Thundurus",
+          "setId": "thundurus-nasty-plot"
+        },
+        {
+          "species": "Clefable",
+          "setId": "clefable-calm-mind"
+        },
+        {
+          "species": "Skarmory",
+          "setId": "skarmory-physically-defensive"
+        },
+        {
+          "species": "Magnezone",
+          "setId": "magnezone-choice-scarf"
+        },
+        {
+          "species": "Tornadus-Therian",
+          "setId": "tornadustherian-assault-vest-pivot"
+        }
+      ],
+      "candidate": 1
+    }
+  ]
+}

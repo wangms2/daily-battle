@@ -1,0 +1,302 @@
+{
+  "version": 1,
+  "generatorVersion": 4,
+  "dataBuiltAt": "2026-10-24T02:55:39.964Z",
+  "week": "2026-12-28",
+  "pool": {
+    "species": [
+      "Talonflame",
+      "Starmie",
+      "Gengar",
+      "Lopunny",
+      "Excadrill",
+      "Metagross",
+      "Garchomp",
+      "Venusaur",
+      "Gyarados",
+      "Cresselia",
+      "Sharpedo",
+      "Cobalion"
+    ],
+    "candidate": 0
+  },
+  "suggestedTeams": [
+    {
+      "archetype": "Balanced",
+      "team": [
+        {
+          "species": "Excadrill",
+          "setId": "excadrill-fast-utility"
+        },
+        {
+          "species": "Talonflame",
+          "setId": "talonflame-bulky-swords-dance"
+        },
+        {
+          "species": "Metagross",
+          "setId": "metagross-offensive-stealth-rock"
+        },
+        {
+          "species": "Cresselia",
+          "setId": "cresselia-calm-mind"
+        },
+        {
+          "species": "Cobalion",
+          "setId": "cobalion-offensive-pivot"
+        },
+        {
+          "species": "Garchomp",
+          "setId": "garchomp-tank-chomp"
+        }
+      ]
+    },
+    {
+      "archetype": "Offense",
+      "team": [
+        {
+          "species": "Excadrill",
+          "setId": "excadrill-fast-utility"
+        },
+        {
+          "species": "Cresselia",
+          "setId": "cresselia-defensive"
+        },
+        {
+          "species": "Gengar",
+          "setId": "gengar-life-orb-attacker"
+        },
+        {
+          "species": "Metagross",
+          "setId": "metagross-offensive"
+        },
+        {
+          "species": "Talonflame",
+          "setId": "talonflame-offensive-swords-dance"
+        },
+        {
+          "species": "Garchomp",
+          "setId": "garchomp-substitute-swords-dance"
+        }
+      ]
+    }
+  ],
+  "days": [
+    {
+      "day": "2026-12-28",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Azumarill",
+          "setId": "azumarill-belly-drum"
+        },
+        {
+          "species": "Talonflame",
+          "setId": "talonflame-bulky-swords-dance"
+        },
+        {
+          "species": "Skarmory",
+          "setId": "skarmory-defog"
+        },
+        {
+          "species": "Magnezone",
+          "setId": "magnezone-choice-scarf"
+        },
+        {
+          "species": "Excadrill",
+          "setId": "excadrill-fast-utility"
+        },
+        {
+          "species": "Gyarados",
+          "setId": "gyarados-offensive-dragon-dance"
+        }
+      ],
+      "candidate": 15
+    },
+    {
+      "day": "2026-12-29",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Keldeo",
+          "setId": "keldeo-substitute-calm-mind"
+        },
+        {
+          "species": "Thundurus-Therian",
+          "setId": "thundurustherian-nasty-plot"
+        },
+        {
+          "species": "Serperior",
+          "setId": "serperior-stallbreaker"
+        },
+        {
+          "species": "Lopunny",
+          "setId": "lopunny-all-out-attacker"
+        },
+        {
+          "species": "Victini",
+          "setId": "victini-choice-band"
+        },
+        {
+          "species": "Shuckle",
+          "setId": "shuckle-sticky-web"
+        }
+      ],
+      "candidate": 0
+    },
+    {
+      "day": "2026-12-30",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Thundurus",
+          "setId": "thundurus-offensive-pivot"
+        },
+        {
+          "species": "Gliscor",
+          "setId": "gliscor-swords-dance-wallbreaker"
+        },
+        {
+          "species": "Latias",
+          "setId": "latias-utility"
+        },
+        {
+          "species": "Serperior",
+          "setId": "serperior-stallbreaker"
+        },
+        {
+          "species": "Excadrill",
+          "setId": "excadrill-fast-utility"
+        },
+        {
+          "species": "Cofagrigus",
+          "setId": "cofagrigus-toxic-spikes-support"
+        }
+      ],
+      "candidate": 3
+    },
+    {
+      "day": "2026-12-31",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Alakazam",
+          "setId": "alakazam-utility-attacker"
+        },
+        {
+          "species": "Volcanion",
+          "setId": "volcanion-physically-defensive"
+        },
+        {
+          "species": "Manaphy",
+          "setId": "manaphy-tail-glow-rain-dance"
+        },
+        {
+          "species": "Latias",
+          "setId": "latias-utility"
+        },
+        {
+          "species": "Mew",
+          "setId": "mew-lead"
+        },
+        {
+          "species": "Espeon",
+          "setId": "espeon-choice-specs"
+        }
+      ],
+      "candidate": 12
+    },
+    {
+      "day": "2027-01-01",
+      "style": "stall",
+      "team": [
+        {
+          "species": "Chansey",
+          "setId": "chansey-de-blob"
+        },
+        {
+          "species": "Tangrowth",
+          "setId": "tangrowth-defensive"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-bulky-support"
+        },
+        {
+          "species": "Talonflame",
+          "setId": "talonflame-specially-defensive"
+        },
+        {
+          "species": "Heatran",
+          "setId": "heatran-specially-defensive"
+        },
+        {
+          "species": "Dragonite",
+          "setId": "dragonite-dragon-dance-three-attacks"
+        }
+      ],
+      "candidate": 5
+    },
+    {
+      "day": "2027-01-02",
+      "style": "stall",
+      "team": [
+        {
+          "species": "Talonflame",
+          "setId": "talonflame-choice-band"
+        },
+        {
+          "species": "Gliscor",
+          "setId": "gliscor-swords-dance-wallbreaker"
+        },
+        {
+          "species": "Victini",
+          "setId": "victini-choice-band"
+        },
+        {
+          "species": "Metagross",
+          "setId": "metagross-utility"
+        },
+        {
+          "species": "Skarmory",
+          "setId": "skarmory-defog"
+        },
+        {
+          "species": "Ferrothorn",
+          "setId": "ferrothorn-utility"
+        }
+      ],
+      "candidate": 1
+    },
+    {
+      "day": "2027-01-03",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Weavile",
+          "setId": "weavile-choice-band"
+        },
+        {
+          "species": "Hippowdon",
+          "setId": "hippowdon-physically-defensive"
+        },
+        {
+          "species": "Gengar",
+          "setId": "gengar-life-orb-attacker"
+        },
+        {
+          "species": "Manaphy",
+          "setId": "manaphy-tail-glow-rain-dance"
+        },
+        {
+          "species": "Chansey",
+          "setId": "chansey-wish"
+        },
+        {
+          "species": "Shuckle",
+          "setId": "shuckle-red-card"
+        }
+      ],
+      "candidate": 5
+    }
+  ]
+}

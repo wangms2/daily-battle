@@ -1,0 +1,331 @@
+{
+  "version": 1,
+  "generatorVersion": 4,
+  "dataBuiltAt": "2026-10-24T02:55:39.964Z",
+  "week": "2026-12-14",
+  "pool": {
+    "species": [
+      "Mew",
+      "Latias",
+      "Weavile",
+      "Landorus-Therian",
+      "Metagross",
+      "Chansey",
+      "Hippowdon",
+      "Azumarill",
+      "Keldeo",
+      "Excadrill",
+      "Donphan",
+      "Sylveon"
+    ],
+    "candidate": 0
+  },
+  "suggestedTeams": [
+    {
+      "archetype": "Balanced",
+      "team": [
+        {
+          "species": "Weavile",
+          "setId": "weavile-choice-band"
+        },
+        {
+          "species": "Keldeo",
+          "setId": "keldeo-choice-specs"
+        },
+        {
+          "species": "Azumarill",
+          "setId": "azumarill-choice-band"
+        },
+        {
+          "species": "Landorus-Therian",
+          "setId": "landorustherian-defensive"
+        },
+        {
+          "species": "Excadrill",
+          "setId": "excadrill-fast-utility"
+        },
+        {
+          "species": "Sylveon",
+          "setId": "sylveon-cleric"
+        }
+      ]
+    },
+    {
+      "archetype": "Offense",
+      "team": [
+        {
+          "species": "Keldeo",
+          "setId": "keldeo-substitute-calm-mind"
+        },
+        {
+          "species": "Azumarill",
+          "setId": "azumarill-choice-band"
+        },
+        {
+          "species": "Landorus-Therian",
+          "setId": "landorustherian-suicide-lead"
+        },
+        {
+          "species": "Metagross",
+          "setId": "metagross-offensive"
+        },
+        {
+          "species": "Weavile",
+          "setId": "weavile-choice-band"
+        },
+        {
+          "species": "Chansey",
+          "setId": "chansey-de-blob"
+        }
+      ]
+    },
+    {
+      "archetype": "Stall",
+      "team": [
+        {
+          "species": "Latias",
+          "setId": "latias-defensive"
+        },
+        {
+          "species": "Landorus-Therian",
+          "setId": "landorustherian-defensive"
+        },
+        {
+          "species": "Donphan",
+          "setId": "donphan-defensive-spinner"
+        },
+        {
+          "species": "Sylveon",
+          "setId": "sylveon-cleric"
+        },
+        {
+          "species": "Hippowdon",
+          "setId": "hippowdon-special-wall"
+        },
+        {
+          "species": "Excadrill",
+          "setId": "excadrill-fast-utility"
+        }
+      ]
+    }
+  ],
+  "days": [
+    {
+      "day": "2026-12-14",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Tornadus-Therian",
+          "setId": "tornadustherian-assault-vest-pivot"
+        },
+        {
+          "species": "Absol",
+          "setId": "absol-all-out-attacker"
+        },
+        {
+          "species": "Quagsire",
+          "setId": "quagsire-unaware-wall"
+        },
+        {
+          "species": "Scizor",
+          "setId": "scizor-choice-band"
+        },
+        {
+          "species": "Keldeo",
+          "setId": "keldeo-choice-specs"
+        },
+        {
+          "species": "Talonflame",
+          "setId": "talonflame-offensive-swords-dance"
+        }
+      ],
+      "candidate": 4
+    },
+    {
+      "day": "2026-12-15",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Shuckle",
+          "setId": "shuckle-sticky-web"
+        },
+        {
+          "species": "Manaphy",
+          "setId": "manaphy-tail-glow-3-attacks"
+        },
+        {
+          "species": "Keldeo",
+          "setId": "keldeo-substitute-calm-mind"
+        },
+        {
+          "species": "Venusaur",
+          "setId": "venusaur-offensive"
+        },
+        {
+          "species": "Tangrowth",
+          "setId": "tangrowth-assault-vest"
+        },
+        {
+          "species": "Jirachi",
+          "setId": "jirachi-choice-scarf"
+        }
+      ],
+      "candidate": 3
+    },
+    {
+      "day": "2026-12-16",
+      "style": "offense",
+      "team": [
+        {
+          "species": "Gliscor",
+          "setId": "gliscor-stallbreaker"
+        },
+        {
+          "species": "Gastrodon",
+          "setId": "gastrodon-curse"
+        },
+        {
+          "species": "Volcanion",
+          "setId": "volcanion-bulky-offensive"
+        },
+        {
+          "species": "Hydreigon",
+          "setId": "hydreigon-choice-specs"
+        },
+        {
+          "species": "Charizard",
+          "setId": "charizard-dragon-dance"
+        },
+        {
+          "species": "Manaphy",
+          "setId": "manaphy-tail-glow-3-attacks"
+        }
+      ],
+      "candidate": 2
+    },
+    {
+      "day": "2026-12-17",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Landorus-Therian",
+          "setId": "landorustherian-defensive"
+        },
+        {
+          "species": "Hippowdon",
+          "setId": "hippowdon-physically-defensive"
+        },
+        {
+          "species": "Keldeo",
+          "setId": "keldeo-taunt"
+        },
+        {
+          "species": "Latios",
+          "setId": "latios-life-orb-attacker"
+        },
+        {
+          "species": "Venusaur",
+          "setId": "venusaur-sun-sweeper"
+        },
+        {
+          "species": "Heracross",
+          "setId": "heracross-bulky-wallbreaker"
+        }
+      ],
+      "candidate": 6
+    },
+    {
+      "day": "2026-12-18",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Cresselia",
+          "setId": "cresselia-support"
+        },
+        {
+          "species": "Medicham",
+          "setId": "medicham-all-out-attacker"
+        },
+        {
+          "species": "Ferrothorn",
+          "setId": "ferrothorn-utility"
+        },
+        {
+          "species": "Scolipede",
+          "setId": "scolipede-bulky-sweeper"
+        },
+        {
+          "species": "Latios",
+          "setId": "latios-choice-specs"
+        },
+        {
+          "species": "Starmie",
+          "setId": "starmie-utility"
+        }
+      ],
+      "candidate": 2
+    },
+    {
+      "day": "2026-12-19",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Victini",
+          "setId": "victini-choice-band"
+        },
+        {
+          "species": "Manaphy",
+          "setId": "manaphy-tail-glow-3-attacks"
+        },
+        {
+          "species": "Medicham",
+          "setId": "medicham-all-out-attacker"
+        },
+        {
+          "species": "Excadrill",
+          "setId": "excadrill-fast-utility"
+        },
+        {
+          "species": "Sylveon",
+          "setId": "sylveon-cleric"
+        },
+        {
+          "species": "Rotom-Wash",
+          "setId": "rotomwash-physically-defensive-pivot"
+        }
+      ],
+      "candidate": 0
+    },
+    {
+      "day": "2026-12-20",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Volcanion",
+          "setId": "volcanion-assault-vest"
+        },
+        {
+          "species": "Swampert",
+          "setId": "swampert-rain-sweeper"
+        },
+        {
+          "species": "Latias",
+          "setId": "latias-utility"
+        },
+        {
+          "species": "Dragonite",
+          "setId": "dragonite-dragon-dance-three-attacks"
+        },
+        {
+          "species": "Crawdaunt",
+          "setId": "crawdaunt-swords-dance"
+        },
+        {
+          "species": "Cresselia",
+          "setId": "cresselia-defensive"
+        }
+      ],
+      "candidate": 0
+    }
+  ]
+}

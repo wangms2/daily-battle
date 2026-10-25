@@ -227,12 +227,24 @@ async function tick(page: Page): Promise<boolean> {
     return false;
   }
   const ready = page.getByRole('button', { name: /^Ready with / });
-  if ((await ready.isVisible()) && (await ready.isEnabled())) {
+  // The button can go (the phase ends) between the two checks, and an unbounded
+  // isEnabled() would then wait on it until the test times out, so a player
+  // would miss their turns and lose on the clock.
+  if ((await ready.isVisible()) && (await ready.isEnabled({ timeout: 1_000 }).catch(() => false))) {
     await ready.click({ timeout: 2_000 }).catch(() => {});
     return false;
   }
   await step(page);
   return false;
+}
+
+/** Rejects, naming the call, if it takes longer than 20 s. */
+function hung<T>(label: string, work: Promise<T>): Promise<T> {
+  let timer: ReturnType<typeof setTimeout>;
+  const late = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new Error(`${label} hung for 20s`)), 20_000);
+  });
+  return Promise.race([work, late]).finally(() => clearTimeout(timer));
 }
 
 test('a room of three builds teams and plays to a winner', async ({ page, browser, baseURL }) => {
@@ -282,7 +294,7 @@ test('a room of three builds teams and plays to a winner', async ({ page, browse
   // Play every battle out, round after round, until the game ends.
   const done = [false, false, false];
   for (let i = 0; i < 3000 && done.some((d) => !d); i++) {
-    for (const [j, p] of all.entries()) if (!done[j]) done[j] = await tick(p);
+    for (const [j, p] of all.entries()) if (!done[j]) done[j] = await hung(`Player ${j}`, tick(p));
   }
   for (const p of all) {
     await expect(p.getByRole('heading', { name: 'Game over' })).toBeVisible();
