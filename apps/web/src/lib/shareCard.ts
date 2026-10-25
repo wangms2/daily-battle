@@ -214,8 +214,8 @@ export async function drawShareCard(m: ShareModel): Promise<HTMLCanvasElement> {
   ctx.textBaseline = 'middle';
   ctx.fillStyle = '#ffffff';
   ctx.font = serif(38);
-  ctx.fillText('Daily Battle', left, mid);
-  const nameW = ctx.measureText('Daily Battle').width;
+  ctx.fillText('Pokémon Daily', left, mid);
+  const nameW = ctx.measureText('Pokémon Daily').width;
   ctx.fillStyle = 'rgb(255 255 255 / 0.86)';
   ctx.font = font(500, 28);
   ctx.fillText(`· ${m.game ? `${m.game} · ` : ''}${m.date}`, left + nameW + 14, mid + 2);

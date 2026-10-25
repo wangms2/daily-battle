@@ -35,7 +35,7 @@ for (const scheme of ['light', 'dark'] as const) {
     await page.goto('/#play');
 
     // First run: welcome sheet.
-    await expect(page.getByRole('dialog', { name: 'Welcome to Daily Battle' })).toBeVisible();
+    await expect(page.getByRole('dialog', { name: 'Welcome to Pokémon Daily' })).toBeVisible();
     await shot(page, '01-welcome', project);
     await page.getByRole('button', { name: 'Let’s play' }).click();
 
@@ -137,6 +137,6 @@ for (const scheme of ['light', 'dark'] as const) {
     // State survives a reload.
     await page.reload();
     await expect(page.getByText('Change used')).toBeVisible();
-    await expect(page.getByRole('dialog', { name: 'Welcome to Daily Battle' })).toHaveCount(0);
+    await expect(page.getByRole('dialog', { name: 'Welcome to Pokémon Daily' })).toHaveCount(0);
   });
 }

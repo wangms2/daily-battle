@@ -15,6 +15,7 @@ import { fileURLToPath } from 'node:url';
 import { FORMATS, setsFor } from '@daily-battle/data';
 import { speciesDataFor } from '@daily-battle/data/species';
 import { chromium } from '@playwright/test';
+import { FRIENDS } from '../src/lib/friends';
 import { pokeapiId } from './pokeapi';
 
 const RAW = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon';
@@ -59,7 +60,11 @@ async function download(urls: string[], file: string): Promise<boolean> {
 for (const dir of Object.keys(SOURCES)) mkdirSync(out(dir), { recursive: true });
 const missing: string[] = [];
 const allSpecies = [
-  ...new Set(Object.keys(FORMATS).flatMap((f) => Object.keys(setsFor(f).species))),
+  ...new Set([
+    ...Object.keys(FORMATS).flatMap((f) => Object.keys(setsFor(f).species)),
+    // The home screens' With friends crowd (src/lib/friends.ts).
+    ...FRIENDS,
+  ]),
   'Substitute',
 ];
 /** Mega formes need battle art only; the box icon is the base species'. */

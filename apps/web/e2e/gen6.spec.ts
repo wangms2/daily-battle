@@ -70,7 +70,7 @@ const shot = (page: Page, name: string, project: string) =>
 test('a first-time player picks Gen 6 and gets its pool', async ({ page }, info) => {
   await open(page, undefined, '/#daily');
   await page.getByRole('button', { name: /^Gen 6/ }).click();
-  const welcome = page.getByRole('dialog', { name: 'Welcome to Daily Battle' });
+  const welcome = page.getByRole('dialog', { name: 'Welcome to Pokémon Daily' });
   await noScroll(page, 'welcome sheet');
   await shot(page, '01-welcome', info.project.name);
   await welcome.getByRole('button', { name: 'Let’s play' }).click();

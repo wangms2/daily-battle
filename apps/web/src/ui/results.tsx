@@ -262,7 +262,7 @@ export function ShareButton({
                 ready &&
                 finish(
                   await shareImage(ready.blob, {
-                    name: `daily-battle-${share.date.replace(/\s+/g, '-').toLowerCase()}.png`,
+                    name: `pokemon-daily-${share.date.replace(/\s+/g, '-').toLowerCase()}.png`,
                   }),
                   'Image',
                 )

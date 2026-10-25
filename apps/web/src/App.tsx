@@ -159,7 +159,7 @@ export function App() {
     streak: stats.streak,
     change: dayState.change,
     url: shareUrl(),
-    game: game.name,
+    game: `${game.name} OU`,
     format,
   });
   const countdown = countdownTo(now, addDays(day, 1));
@@ -256,22 +256,20 @@ export function App() {
 
   let screen: ReactNode;
   if (!versus && !playing) {
-    // The silhouette is the lead of today's opponent in the game last played.
-    const lead =
-      schedule.status === 'ready'
-        ? schedule.schedule.days.find((d) => d.day === day)?.team[0]?.species
-        : undefined;
     screen = (
       <Home
         view={route === 'daily' ? 'picker' : 'landing'}
-        lead={lead}
-        games={(Object.keys(FORMATS) as FormatId[]).map((id) => ({
-          id,
-          name: formatInfo(id).name,
-          blurb: GAME_BLURB[id],
-          streak: computeStats(state.games[id].days, day).streak,
-          today: dayHeadline(summarizeDay(state.games[id].days[day], true)),
-        }))}
+        games={(Object.keys(FORMATS) as FormatId[]).map((id) => {
+          const today = summarizeDay(state.games[id].days[day], true);
+          return {
+            id,
+            name: formatInfo(id).name,
+            blurb: GAME_BLURB[id],
+            streak: computeStats(state.games[id].days, day).streak,
+            today: dayHeadline(today),
+            cleared: today.status === 'firstTry' || today.status === 'won',
+          };
+        })}
         onPlay={() => go('daily')}
         onFriends={() => go('versus')}
         onPick={(id) => {

@@ -80,7 +80,7 @@ describe('first run', () => {
     const user = userEvent.setup();
     renderApp();
     await user.click(await screen.findByRole('button', { name: 'About and credits' }));
-    const about = await screen.findByRole('dialog', { name: 'About Daily Battle' });
+    const about = await screen.findByRole('dialog', { name: 'About Pokémon Daily' });
     expect(about).toHaveTextContent('not affiliated with or endorsed by Nintendo');
     expect(about).toHaveTextContent('Smogon, used with permission');
     expect(about).toHaveTextContent('No accounts and no tracking');
@@ -97,7 +97,7 @@ describe('settings', () => {
     await user.click(screen.getByRole('button', { name: 'Copy playtest report' }));
     expect(writeText.mock.calls[0]![0]).toMatch(/^#daily-battle-report v1\n\{"v":1,/);
     await user.click(screen.getByRole('button', { name: 'About and credits' }));
-    expect(await screen.findByRole('dialog', { name: 'About Daily Battle' })).toBeInTheDocument();
+    expect(await screen.findByRole('dialog', { name: 'About Pokémon Daily' })).toBeInTheDocument();
   });
 });
 
@@ -456,7 +456,7 @@ describe('home', () => {
     );
   });
 
-  it('lands on Daily Battle or Versus, with no sheet over them', async () => {
+  it('lands on Play or Versus, with no sheet over them', async () => {
     renderApp();
     expect(await screen.findByRole('button', { name: 'Play' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'With friends' })).toBeInTheDocument();

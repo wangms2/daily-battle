@@ -47,7 +47,7 @@ export function WelcomeSheet({
     <Sheet
       open={open}
       onOpenChange={(o) => !o && onDone()}
-      title={review ? 'How to play' : 'Welcome to Daily Battle'}
+      title={review ? 'How to play' : 'Welcome to Pokémon Daily'}
     >
       <ol className="space-y-3">
         {rules.map(([title, body], i) => (

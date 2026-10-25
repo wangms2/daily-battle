@@ -1,6 +1,6 @@
 {
-  "name": "Daily Battle",
-  "short_name": "Daily Battle",
+  "name": "Pokémon Daily",
+  "short_name": "Poké Daily",
   "description": "A new battle every day. Or play with friends.",
   "start_url": "/",
   "display": "standalone",

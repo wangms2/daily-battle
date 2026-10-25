@@ -39,7 +39,7 @@ export function AboutSheet({
   onOpenChange: (open: boolean) => void;
 }) {
   return (
-    <Sheet open={open} onOpenChange={onOpenChange} title="About Daily Battle" scroll>
+    <Sheet open={open} onOpenChange={onOpenChange} title="About Pokémon Daily" scroll>
       <p className="text-[14px] leading-relaxed">
         A daily Gen 4, 5, or 6 OU battle: build a team each week, then beat a new opponent every
         day. Each game has its own team and streak.
@@ -49,7 +49,7 @@ export function AboutSheet({
         Disclaimer
       </h3>
       <p className="mt-1 text-[13.5px] leading-relaxed">
-        Daily Battle is an unofficial, free, non-commercial fan project. It is not affiliated with
+        Pokémon Daily is an unofficial, free, non-commercial fan project. It is not affiliated with
         or endorsed by Nintendo, Creatures Inc., GAME FREAK inc., The Pokémon Company, or Smogon.
         Pokémon, Pokémon character names, and sprites are © Nintendo, Creatures Inc., and GAME FREAK
         inc.

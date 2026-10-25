@@ -12,7 +12,7 @@ export interface ShareArgs {
   change?: DayChange;
   /** Where to play, added as the last line so friends can tap through. */
   url?: string;
-  /** The game's name, "Gen 4" or "Gen 5", shown after "Daily Battle". */
+  /** The game's name, "Gen 4 OU", shown after "Pokémon Daily". */
   game?: string;
   /** The game played; the image card's header takes its colour. */
   format?: FormatId;
@@ -105,7 +105,7 @@ export function shareText(args: ShareArgs): string {
 }
 
 export function formatShareText(m: ShareModel): string {
-  const lines = [`Daily Battle · ${m.game ? `${m.game} · ` : ''}${m.date}`];
+  const lines = [`Pokémon Daily · ${m.game ? `${m.game} · ` : ''}${m.date}`];
   const icon =
     m.status === 'firstTry' ? '⭐ ' : m.cleared ? '✅ ' : m.status === 'failed' ? '❌ ' : '';
   lines.push(`${icon}${m.headline}`);

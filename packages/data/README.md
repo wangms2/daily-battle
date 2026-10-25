@@ -24,7 +24,7 @@ setsFor('gen5ou').species['Politoed'].sets; // any format in src/formats.ts
 
 `@smogon/sets` (the source DESIGN.md first named) isn't used. Its last release was in July 2021, and its stats-derived sets are a single naive set per species.
 
-**Permission:** Smogon granted permission to use its set data in Daily Battle through DMs with Marty, a Smogon engineer. Credit Smogon on the credits page (DESIGN.md §16).
+**Permission:** Smogon granted permission to use its set data in this project (Pokémon Daily, first named Daily Battle) through DMs with Marty, a Smogon engineer. Credit Smogon on the credits page (DESIGN.md §16).
 
 ## How `gen4ou/sets.json` is built
 

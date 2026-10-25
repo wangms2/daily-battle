@@ -1,6 +1,6 @@
 # web
 
-The Daily Battle client: React, Vite, and Tailwind CSS v4, with Radix UI for sheets and dialogs. It covers the weekly team builder, the daily brief, settings, saved state (M6), and the battle screen (M7).
+The Pokémon Daily client: React, Vite, and Tailwind CSS v4, with Radix UI for sheets and dialogs. It covers the weekly team builder, the daily brief, settings, saved state (M6), and the battle screen (M7).
 
 ```sh
 pnpm --filter web dev        # dev server
@@ -70,7 +70,7 @@ The full spec is in DESIGN.md §12 and the M6 and M7 plans.
 
 ## Sprites
 
-The sprites are Showdown-style animated GIFs and Gen 7 box icons from [PokeAPI/sprites](https://github.com/PokeAPI/sprites), downloaded by `scripts/sprites.ts` for exactly the species in the set data and committed here. Nothing is hotlinked. Pokémon and sprites © Nintendo, Creatures Inc., GAME FREAK inc. The animated sprites are by the Smogon sprite community. Daily Battle is an unofficial, free fan project.
+The sprites are Showdown-style animated GIFs and Gen 7 box icons from [PokeAPI/sprites](https://github.com/PokeAPI/sprites), downloaded by `scripts/sprites.ts` for exactly the species in the set data and committed here (plus the With friends crowd on the home screen, `src/lib/friends.ts`). Nothing is hotlinked. Pokémon and sprites © Nintendo, Creatures Inc., GAME FREAK inc. The animated sprites are by the Smogon sprite community. Pokémon Daily is an unofficial, free fan project.
 
 Sound (off by default) lives in `public/audio/`: `cries/legacy/` and `cries/latest/` from [PokeAPI/cries](https://github.com/PokeAPI/cries), converted to MP3 by `scripts/audio.ts`, and one battle track per generation in `music/` (supplied files, prepared as in DESIGN.md §21). `src/lib/audio.ts` plays them. Pokémon music and cries © Nintendo, Creatures Inc., GAME FREAK inc.
 
