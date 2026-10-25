@@ -465,6 +465,28 @@ importers:
         specifier: ^4.23.15
         version: 4.23.15
 
+  packages/tutorial:
+    dependencies:
+      '@daily-battle/ai':
+        specifier: workspace:*
+        version: link:../ai
+      '@daily-battle/data':
+        specifier: workspace:*
+        version: link:../data
+      '@daily-battle/gen':
+        specifier: workspace:*
+        version: link:../gen
+      '@daily-battle/sim-bridge':
+        specifier: workspace:*
+        version: link:../sim-bridge
+      '@pkmn/sim':
+        specifier: 'catalog:'
+        version: 0.10.11
+    devDependencies:
+      tsx:
+        specifier: ^4.23.15
+        version: 4.23.15
+
   packages/versus:
     dependencies:
       '@daily-battle/ai':
