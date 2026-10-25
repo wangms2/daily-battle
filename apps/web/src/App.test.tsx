@@ -485,7 +485,7 @@ describe('home', () => {
   it('opens the game picker from a shared link', async () => {
     window.location.hash = '#daily';
     renderApp();
-    expect(await screen.findByText('Choose a game')).toBeInTheDocument();
+    expect(await screen.findByText('Choose a generation')).toBeInTheDocument();
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
@@ -504,7 +504,7 @@ describe('home', () => {
     await user.click(screen.getByRole('button', { name: 'Play' }));
     await user.click(await screen.findByRole('button', { name: /^Gen 4/ }));
     await user.click(await screen.findByRole('button', { name: /^Gen 4 · Week of/ }));
-    expect(await screen.findByText('Choose a game')).toBeInTheDocument();
+    expect(await screen.findByText('Choose a generation')).toBeInTheDocument();
   });
 });
 

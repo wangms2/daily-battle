@@ -61,6 +61,11 @@ export function MonPopover(props: Props) {
     props.foe && props.hints
       ? possibleSets(base, props.revealed).map((s) => shortLabel(s.label))
       : [];
+  // Until the battle shows its ability, every ability the species can have in this
+  // generation, as on Showdown; once one is shown (an Intimidate, a Levitate
+  // immunity, …) only that one is listed, above. A Mega's ability is its own, so
+  // those wait for it to show.
+  const abilities = props.foe && !ability && !props.mon.base ? speciesInfo(base).abilities : [];
   // Beginner hints, as on Showdown: a foe that hasn't Mega Evolved yet but could.
   const megaHint = props.foe && props.hints && !props.mon.base && canMega(base);
   // Item and ability details open on tap only when the card itself takes taps.
@@ -105,6 +110,12 @@ export function MonPopover(props: Props) {
           {item && withIcon(item, 'Item')}
           {item && ability && ' · '}
           {ability && term(ability, 'Ability')}
+        </p>
+      )}
+      {abilities.length > 0 && (
+        <p className="mt-0.5 text-[12.5px] text-muted">
+          {abilities.length === 1 ? 'Possible ability: ' : 'Possible abilities: '}
+          {abilities.join(' · ')}
         </p>
       )}
       {/* Your own Pokémon: every stat, as the request has them. */}

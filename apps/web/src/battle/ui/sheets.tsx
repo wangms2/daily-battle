@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { ConfirmDialog } from '../../sheets/misc';
 import { Sheet } from '../../ui/Sheet';
 import { Button, Switch } from '../../ui/bits';
-import { BattleText } from './text';
+import { BattleLine } from './text';
 
 export function LogSheet({
   open,
@@ -32,20 +32,11 @@ export function LogList({ lines, className }: { lines: string[]; className?: str
       ref={box}
       className={`overflow-y-auto overscroll-contain text-[13.5px] leading-relaxed ${className ?? ''}`}
     >
-      {lines.map((l, i) =>
-        l.startsWith('== Turn') ? (
-          <p
-            key={i}
-            className="display mt-3 mb-1 text-[12px] tracking-wider text-muted uppercase first:mt-0"
-          >
-            {l.replace(/=/g, '').trim()}
-          </p>
-        ) : (
-          <p key={i} className={l.startsWith('(') ? 'text-muted' : undefined}>
-            <BattleText text={l} />
-          </p>
-        ),
-      )}
+      {lines
+        .filter((l) => l.trim())
+        .map((l, i) => (
+          <BattleLine key={i} text={l} />
+        ))}
     </div>
   );
 }

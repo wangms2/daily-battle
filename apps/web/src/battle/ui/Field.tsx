@@ -18,11 +18,12 @@ import {
   type RefObject,
 } from 'react';
 import { HAZARD_FX, TERRAIN_FX, WEATHER_FX } from '../../lib/fx';
-import { activeFormat } from '../../lib/data';
+import { activeFormat, speciesInfo } from '../../lib/data';
 import { getSprite } from '../../lib/sprites';
 import { genOf } from '@daily-battle/data';
 import type { SceneInit } from '../anim/scene';
 import type { Frame, MonView, SideConds, TeamMark, View, Who } from '../frames';
+import { TypeBadge } from '../../ui/bits';
 import { boostLabels, STATUS_COLOR, STATUS_LABEL } from './labels';
 
 export interface Anim {
@@ -45,8 +46,8 @@ const X = (x: number) => `calc(50cqw + var(--s) * ${x - 370})`;
 const Y = (y: number) => `calc(100cqh - var(--s) * ${385 - y})`;
 /** Top of the foe's stat bar; its details card opens just below it. */
 const FOE_BAR_TOP = `max(6px, calc(${Y(150)} - 58px))`;
-/** The stat bar's height with team marks, and its width (w-[9.75rem]). */
-const FOE_BAR_H = '48px';
+/** The stat bar's height with its types and team marks, and its width (w-[9.75rem]). */
+const FOE_BAR_H = '66px';
 const BAR_W = '9.75rem';
 
 /**
@@ -65,8 +66,8 @@ function foeBarLeft(size: { w: number; h: number } | null): string {
   return `calc(${over} - clamp(0px, ${overlap} * 1000, calc(${over} - ${beside})))`;
 }
 /** Your stat bar's usual top, just above your sprite's platform, and its height. */
-const YOU_BAR_TOP = `calc(${Y(262)} - 42px)`;
-const YOU_BAR_H = '36px';
+const YOU_BAR_TOP = `calc(${Y(262)} - 55px)`;
+const YOU_BAR_H = '49px';
 /** Your back sprite is drawn this much larger (as in the games). */
 const BACK_SCALE = 1.4;
 /**
@@ -219,13 +220,21 @@ function StatBar({
           {mon.hp}%
         </span>
       </span>
+      {/* Its types (as it looks now, so a Mega shows its Mega typing) and any stat changes. */}
+      <span className="mt-0.5 flex items-center gap-1">
+        {speciesInfo(mon.species).types.map((t) => (
+          <TypeBadge key={t} type={t} size="sm" />
+        ))}
+        {boosts.length > 0 && (
+          <span className="min-w-0 truncate text-[10px] leading-3 font-semibold">
+            {boosts.join(' ')}
+          </span>
+        )}
+      </span>
       {/* Only the foe's team shows here; yours is on the bench row below the moves. */}
-      {(who === 'foe' || boosts.length > 0) && (
-        <span className="mt-0.5 flex items-center justify-between gap-1">
-          {who === 'foe' && <TeamMarks marks={marks} />}
-          {boosts.length > 0 && (
-            <span className="truncate text-[10px] leading-3 font-semibold">{boosts.join(' ')}</span>
-          )}
+      {who === 'foe' && (
+        <span className="mt-0.5 flex items-center">
+          <TeamMarks marks={marks} />
         </span>
       )}
     </button>
@@ -664,7 +673,7 @@ export function Field({
         <div
           // Never under the pointer: it must not steal hover from the stat bar.
           className="pointer-events-none absolute right-1.5 z-30"
-          style={info === 'foe' ? { top: `calc(${FOE_BAR_TOP} + 3.5rem)` } : { bottom: '0.375rem' }}
+          style={info === 'foe' ? { top: `calc(${FOE_BAR_TOP} + 4.6rem)` } : { bottom: '0.375rem' }}
         >
           {popover}
         </div>

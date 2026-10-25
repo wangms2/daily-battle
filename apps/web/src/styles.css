@@ -5,11 +5,10 @@
 @import '@fontsource/ibm-plex-sans/latin-700.css';
 /* The home screens' headings and buttons (the Poké Ball split). */
 @import '@fontsource/fraunces/latin-600.css';
-/* The battle text is the only pixel type: a lookalike of each generation's game
-   font (the games' own fonts are Nintendo's, so these are free stand-ins). */
-@import '@fontsource/jersey-10/latin-400.css';
-@import '@fontsource/jersey-15/latin-400.css';
-@import '@fontsource/pixelify-sans/latin-400.css';
+/* The battle text is the only pixel type. The games' own fonts are Nintendo's, so
+   Gens 3 to 5 share a free stand-in: VT323, a narrow terminal face whose pixels are
+   fine enough to read easily. */
+@import '@fontsource/vt323/latin-400.css';
 @import '@fontsource/nunito/latin-700.css';
 
 /*
@@ -38,11 +37,9 @@
 
   --font-body: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
   --font-display: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
-  /* Gen 4 (Diamond/Pearl): chunky and bold. Gen 5 (Black/White): lighter and rounder.
-     Gen 6 (X/Y): the games left pixel type behind for clean rounded text. */
-  --font-pixel-3: 'Jersey 10', ui-monospace, monospace;
-  --font-pixel-4: 'Jersey 15', ui-monospace, monospace;
-  --font-pixel-5: 'Pixelify Sans', ui-monospace, monospace;
+  /* Gens 3 to 5: the pixel stand-in. Gen 6 (X/Y): the games left pixel type behind
+     for clean rounded text. */
+  --font-pixel-retro: 'VT323', ui-monospace, monospace;
   --font-pixel-6: 'Nunito', ui-rounded, ui-sans-serif, system-ui, sans-serif;
   --display-weight: 600;
 
@@ -82,6 +79,9 @@
     color-scheme: dark;
   }
 }
+
+/* Short phones (under 720px tall), where the controls have to give the battle text room. */
+@custom-variant short (@media (max-height: 720px));
 
 @theme inline {
   --font-sans: var(--font-body);
@@ -304,6 +304,10 @@ body {
     0 0 3px #fff,
     0 0 4px rgb(255 255 255 / 0.8);
 }
+/* The halo is for the name; a badge keeps its own colors. */
+.statbar .type-badge {
+  text-shadow: none;
+}
 .statbar-hp {
   background: rgb(255 255 255 / 0.85);
   box-shadow: 0 0 0 1px rgb(0 0 0 / 0.55);
@@ -398,14 +402,10 @@ body {
 }
 
 /* The generation's pixel font, for the battle text and the move names. */
-[data-gen='3'] {
-  --font-pixel: var(--font-pixel-3);
-}
-[data-gen='4'] {
-  --font-pixel: var(--font-pixel-4);
-}
+[data-gen='3'],
+[data-gen='4'],
 [data-gen='5'] {
-  --font-pixel: var(--font-pixel-5);
+  --font-pixel: var(--font-pixel-retro);
 }
 [data-gen='6'] {
   --font-pixel: var(--font-pixel-6);
@@ -413,17 +413,15 @@ body {
 .battle-pixel {
   font-family: var(--font-pixel);
   font-weight: 400;
-  font-size: 17px;
+  font-size: 21px;
 }
-[data-gen='5'] .battle-pixel,
-[data-gen='5'] .battle-textbox {
-  font-size: 14px;
-}
-/* Nunito is a regular-width face: bold, and a touch smaller to fit like the pixel fonts. */
+/* Nunito is a regular-width face: bold, and a touch smaller, with line spacing that
+   matches the pixel font's (21px at 1.2), so every generation's box fits the same
+   number of lines. */
 [data-gen='6'] .battle-pixel,
 [data-gen='6'] .battle-textbox {
   font-weight: 700;
-  font-size: 15px;
+  font-size: 16px;
 }
 
 /* Move chips outside the move buttons (sets, details, battle cards): tinted by
@@ -440,14 +438,12 @@ button.move-chip:hover,
 
 /* The battle text: a card with a subtle double border (a thin line and a softer
    ring inside, like a game text box) and the generation's pixel font. It takes
-   the spare height on phones, showing the latest whole lines. */
+   the spare height on phones and shows the turn just played; earlier turns are
+   above it (BattleLog). The card clips; the scroller inside it scrolls. */
 .battle-textbox {
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
-  gap: 2px;
   overflow: hidden;
-  padding: 10px 40px 10px 14px;
   background: var(--surface);
   color: var(--text);
   border: 2px solid color-mix(in srgb, var(--text) 55%, var(--surface));
@@ -456,13 +452,24 @@ button.move-chip:hover,
     inset 0 0 0 3px color-mix(in srgb, var(--accent) 40%, var(--surface));
   border-radius: 10px;
   font-family: var(--font-pixel);
-  font-size: 17px;
-  line-height: 1.3;
-  cursor: pointer;
+  font-size: 21px;
+  line-height: 1.05;
 }
-[data-gen='5'] .battle-textbox,
 [data-gen='6'] .battle-textbox {
-  line-height: 1.45;
+  line-height: 1.35;
+}
+.battle-textscroll {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.battle-textscroll[data-more-above] {
+  /* Text running off the top fades out rather than being cut mid-letter. */
+  mask-image: linear-gradient(to bottom, transparent, #000 14px);
+}
+.battle-turn {
+  padding: 4px 14px 6px;
 }
 .battle-textbox strong {
   font-weight: 400;
@@ -470,6 +477,99 @@ button.move-chip:hover,
 }
 [data-gen='6'] .battle-textbox strong {
   font-weight: 700;
+}
+/* The arrows to earlier and later turns: small and quiet until you need them. */
+.battle-textcue {
+  position: absolute;
+  right: 6px;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 9999px;
+  color: var(--muted);
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  border: 1px solid var(--border);
+}
+.battle-textcue:hover {
+  color: var(--text);
+}
+
+/* The log, ranked as on Showdown: what happened (moves, who came in or fainted)
+   stands out; the percentages, effectiveness, and small print shrink and gray.
+   Spacing is tight, since the box holds as much of the battle as it can. */
+.battle-line {
+  margin-top: 0.05em;
+}
+.battle-line[data-kind='move'],
+.battle-line[data-kind='switch'],
+.battle-line[data-kind='faint'] {
+  margin-top: 0.3em;
+}
+.battle-line:first-child {
+  margin-top: 0;
+}
+.battle-line[data-kind='damage'],
+.battle-line[data-kind='effect'] {
+  padding-left: 0.9em;
+  font-size: 0.78em;
+  line-height: 1.1;
+}
+.battle-line[data-kind='normal'] {
+  padding-left: 0.9em;
+  font-size: 0.92em;
+}
+.battle-line[data-kind='minor'] {
+  padding-left: 0.9em;
+  font-size: 0.72em;
+  line-height: 1.05;
+  color: var(--muted);
+}
+.battle-pct {
+  font-weight: inherit;
+  color: var(--accent);
+}
+.battle-line[data-kind='turn'] {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  margin-top: 0.4em;
+  font-size: 0.62em;
+  line-height: 1;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.battle-line[data-kind='turn']::before,
+.battle-line[data-kind='turn']::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.35;
+}
+/* Short phones have the least room for the text: a little smaller, and the turn
+   dividers take almost no height. */
+@media (max-height: 720px) {
+  .battle-textbox {
+    font-size: 19px;
+  }
+  [data-gen='6'] .battle-textbox {
+    font-size: 15px;
+  }
+  .battle-turn {
+    padding: 2px 12px 3px;
+  }
+  .battle-line[data-kind='move'],
+  .battle-line[data-kind='switch'],
+  .battle-line[data-kind='faint'] {
+    margin-top: 0.18em;
+  }
+  .battle-line[data-kind='turn'] {
+    margin-top: 0.2em;
+    font-size: 0.56em;
+  }
 }
 
 /* Floating result labels and ability/item pop-ups. */

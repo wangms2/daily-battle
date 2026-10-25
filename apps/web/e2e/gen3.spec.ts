@@ -1,6 +1,6 @@
 // Gen 3 OU as a fourth daily game: picking it on first run, its builder and a
-// battle in the games' own look (Emerald sprites, Gen 3 backgrounds, its pixel
-// font), and older #gen3 links.
+// battle in the games' own look (Emerald sprites, Gen 3 backgrounds, the
+// retro font), and older #gen3 links.
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from '@playwright/test';
 import schedule from '../public/schedule/gen3ou/2026-10-19.json' with { type: 'json' };
@@ -106,7 +106,7 @@ test('a Gen 3 battle uses the Emerald sprites, a Gen 3 background, and its font'
     .locator('[data-gen="3"] .battle-pixel')
     .first()
     .evaluate((el) => getComputedStyle(el).fontFamily);
-  expect(font).toMatch(/Jersey 10/);
+  expect(font).toMatch(/VT323/);
   await page.waitForLoadState('networkidle');
   await noScroll(page, 'gen 3 battle');
   await shot(page, '03-battle', info.project.name);

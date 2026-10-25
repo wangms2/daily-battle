@@ -3,6 +3,7 @@
 // Every attempt gets fresh random seeds (DESIGN.md §6.1), so the helpers here
 // handle whatever happens: moves, forced switches, or the battle ending.
 import { expect, test, type Page } from '@playwright/test';
+import speciesFile from '../../../packages/data/gen4ou/species.json' with { type: 'json' };
 import schedule from '../public/schedule/2026-10-19.json' with { type: 'json' };
 
 const TODAY = new Date('2026-10-21T10:00:00-04:00');
@@ -289,15 +290,6 @@ for (const scheme of ['light', 'dark'] as const) {
       }
     }
 
-    const expand = page.getByRole('button', { name: 'Open the battle log' });
-    if (await expand.isVisible()) {
-      await expand.click();
-      await page.waitForTimeout(250);
-      await noScroll(page, 'log');
-      await page.screenshot({ path: `${dir}/24-battle-log.png` });
-      await page.keyboard.press('Escape');
-    }
-
     await page.getByRole('button', { name: 'Battle menu' }).click();
     await page.waitForTimeout(250);
     await noScroll(page, 'menu');
@@ -462,4 +454,118 @@ test('picking a whole new team goes back to the builder and ends the streak', as
   await page.getByRole('button', { name: 'Pick a whole new team' }).click();
   await page.getByRole('button', { name: 'Pick new team' }).last().click();
   await expect(page.getByRole('button', { name: /^Pick \d more$/ })).toBeVisible();
+});
+
+test('a finished day offers the other games on the brief, the end card, and the share sheet', async ({
+  page,
+}) => {
+  await open(page, 'instant', { '2026-10-21': { swapUsed: false, attempts: [tried('win', 4)] } });
+  const row = page.getByRole('region', { name: 'Play another generation' });
+  await expect(row.getByRole('button')).toHaveText([/Gen 3 OU/, /Gen 5 OU/, /Gen 6 OU/]);
+  await expect(row.getByRole('button', { name: /Gen 5 OU. Not played/ })).toBeVisible();
+  await noScroll(page, 'brief with the other games');
+
+  // The end card of a practice run offers them too, and so does the share sheet.
+  await page.getByRole('button', { name: 'Play again · practice' }).click();
+  await waitForChoice(page);
+  await page.getByRole('button', { name: 'Battle menu' }).click();
+  await page.getByRole('button', { name: 'Give up' }).click();
+  await page
+    .getByRole('dialog', { name: 'Give up this battle?' })
+    .getByRole('button', { name: 'Give up' })
+    .click();
+  const card = page.getByRole('dialog', { name: 'Battle over' });
+  await expect(card.getByRole('region', { name: 'Play another generation' })).toBeVisible();
+  await noScroll(page, 'end card with the other games');
+  await card.getByRole('button', { name: 'Share' }).click();
+  const share = page.getByRole('dialog', { name: 'Share your result' });
+  await expect(share.getByRole('region', { name: 'Play another generation' })).toBeVisible();
+  await noScroll(page, 'share sheet with the other games');
+
+  // One tap starts the other game.
+  await share.getByRole('button', { name: /Play Gen 5 OU/ }).click();
+  await expect(page.getByRole('button', { name: /^Gen 5 · / })).toBeVisible();
+});
+
+test('each stat bar shows its Pokémon’s types', async ({ page }) => {
+  await open(page, 'instant');
+  await page.getByRole('button', { name: /^Start · / }).click();
+  await waitForChoice(page);
+  const types = async (i: number) =>
+    page
+      .locator('.statbar')
+      .nth(i)
+      .locator('[title]')
+      .evaluateAll((els) => els.map((e) => e.getAttribute('title')));
+  // The foe's bar comes first, then yours.
+  expect((await types(0)).length).toBeGreaterThan(0);
+  expect(await types(1)).toEqual(
+    speciesFile.species[TEAM[0]!.species as keyof typeof speciesFile.species]!.types,
+  );
+});
+
+test('the battle text flows from the newest line back through earlier turns', async ({ page }) => {
+  test.skip((page.viewportSize()?.width ?? 0) >= 900, 'wide screens have the log column instead');
+  await open(page, 'instant');
+  await page.getByRole('button', { name: /^Start · / }).click();
+  const box = page.getByRole('log', { name: 'Battle log' });
+  const view = () =>
+    box.evaluate((el) => ({
+      turns: el.querySelectorAll('[data-kind="turn"]').length,
+      top: el.scrollTop,
+      overflow: el.scrollHeight - el.clientHeight,
+      fromEnd: el.scrollHeight - el.scrollTop - el.clientHeight,
+    }));
+  // Play until there's more than the box holds.
+  for (let i = 0; i < 12; i++) {
+    if ((await act(page)) === 'end') return;
+    if ((await waitForChoice(page)) === 'end') return;
+    if ((await view()).overflow > 40) break;
+  }
+  await expect(page.getByRole('button', { name: 'Open the battle log' })).toHaveCount(0);
+  const now = await view();
+  expect(now.turns).toBeGreaterThan(1);
+  // It rests on the newest line, and the arrow goes back through earlier turns.
+  expect(now.fromEnd).toBeLessThan(24);
+  const up = page.getByRole('button', { name: 'Earlier turns' });
+  await expect(up).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Later turns' })).toHaveCount(0);
+  await up.click();
+  await expect.poll(async () => (await view()).top).toBeLessThan(now.top);
+  await expect(page.getByRole('button', { name: 'Later turns' })).toBeVisible();
+  // Forward again to the newest.
+  for (let i = 0; i < 12 && (await view()).fromEnd > 24; i++) {
+    await page.getByRole('button', { name: 'Later turns' }).click();
+    await page.waitForTimeout(250);
+  }
+  expect((await view()).fromEnd).toBeLessThan(24);
+  // A new turn keeps following the newest line.
+  if ((await act(page)) === 'end') return;
+  await waitForChoice(page);
+  await expect.poll(async () => (await view()).fromEnd).toBeLessThan(24);
+});
+
+test('the switch row starts with your Pokémon in battle, which shows its details but can’t be switched to', async ({
+  page,
+}) => {
+  await open(page, 'instant');
+  await page.getByRole('button', { name: /^Start · / }).click();
+  await page.locator(MOVES).first().waitFor();
+  const row = page.getByRole('group', { name: 'Switch' });
+  const tiles = row.getByRole('button');
+  await expect(tiles).toHaveCount(6);
+  // First, marked as the one in battle, and the lead you picked.
+  const current = tiles.first();
+  await expect(current).toHaveAttribute('aria-current', 'true');
+  await expect(current).toHaveAccessibleName(new RegExp(`^${TEAM[0]!.species}, in battle`));
+  // The rest are the ones to switch to.
+  await expect(tiles.nth(1)).toHaveAccessibleName(/^Switch to /);
+  // A tap shows its details, with no Switch button (it is aria-disabled, like a fainted
+  // Pokémon's tile, which Playwright won't click without force).
+  await current.click({ force: true });
+  const card = page.getByRole('tooltip');
+  await expect(card).toContainText(TEAM[0]!.species);
+  await expect(page.getByRole('button', { name: /^(Switch to|Send in) / })).toHaveCount(5);
+  // The turn goes on as before: nothing was switched.
+  await expect(page.locator(MOVES).first()).toBeVisible();
 });

@@ -8,7 +8,7 @@ export function TypeBadge({ type, size = 'md' }: { type: string; size?: 'sm' | '
   return (
     <span
       className={clsx(
-        'inline-flex items-center justify-center rounded-badge font-bold tracking-wide uppercase',
+        'type-badge inline-flex items-center justify-center rounded-badge font-bold tracking-wide uppercase',
         size === 'sm' ? 'h-4 px-1 text-[10px] leading-none' : 'h-6 px-2 text-[12px]',
       )}
       style={{ background: c.bg, color: c.fg }}

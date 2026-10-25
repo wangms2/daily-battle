@@ -75,7 +75,7 @@ test('the title opens the picker to switch games, each with its own team', async
 }, info) => {
   await open(page, gen5State());
   await page.getByRole('button', { name: /^Gen 5 · / }).click();
-  await expect(page.getByText('Choose a game')).toBeVisible();
+  await expect(page.getByText('Choose a generation')).toBeVisible();
   await noScroll(page, 'game picker');
   await shot(page, '03-picker', info.project.name);
   await page.getByRole('button', { name: /^Gen 4/ }).click();

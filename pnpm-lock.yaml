@@ -272,16 +272,10 @@ importers:
       '@fontsource/ibm-plex-sans':
         specifier: ^5.3.0
         version: 5.3.0
-      '@fontsource/jersey-10':
-        specifier: ^5.3.0
-        version: 5.3.0
-      '@fontsource/jersey-15':
-        specifier: ^5.3.0
-        version: 5.3.0
       '@fontsource/nunito':
         specifier: ^5.3.0
         version: 5.3.0
-      '@fontsource/pixelify-sans':
+      '@fontsource/vt323':
         specifier: ^5.3.0
         version: 5.3.0
       '@pkmn/client':
@@ -864,17 +858,11 @@ packages:
   '@fontsource/ibm-plex-sans@5.3.0':
     resolution: {integrity: sha512-CbE4CbbEEZJX860XyUiRpsksXIQR8Rp2XDva2VO53NJox9tVNtusrysd2x5YkUEY3ErQ66W1IiiQL8/wihhw5w==}
 
-  '@fontsource/jersey-10@5.3.0':
-    resolution: {integrity: sha512-1dOTUg3JXm/Ls6j4BEPLRF5DHGadCGQy/sIHS7L0SWauB2rEd2W6614Xufxoc+TVXtrt8kVR6IWh3RFkXmy/Cw==}
-
-  '@fontsource/jersey-15@5.3.0':
-    resolution: {integrity: sha512-S7k74/1Gr6g08m7lF1pNW3ey2GbPyfk5RzOx6xBTfTmjQUeAGaO/U3GsEZrY8BVi5dX0OAwHtvho8i3LaPyO0w==}
-
   '@fontsource/nunito@5.3.0':
     resolution: {integrity: sha512-vw9TaTQJ/zpEpKrsODuPmOvaVjXgdda6B+xXA4YqjrdeJ62MLgVoDerdRXFQHyBnSCt2yQ2nHKCHPP/Pv7Xq4Q==}
 
-  '@fontsource/pixelify-sans@5.3.0':
-    resolution: {integrity: sha512-4RCe9nXbi7wUu5+H0FNX1sgPZ2kJ1MmY1uTkEfvQIzzqhoS8zGKJaJfdK8oreE0OU+5gM+NdurFi3H3FJRBvyw==}
+  '@fontsource/vt323@5.3.0':
+    resolution: {integrity: sha512-3w33Rg/0+R1587HQfz4t7Q7e0GGeCqr3wmzIwqdGInUnrGEwMA5eX39GP4Z9wpTQnwfhVOhYuxuRwRUeIcicbw==}
 
   '@humanfs/core@0.19.2':
     resolution: {integrity: sha512-UhXNm+CFMWcbChXywFwkmhqjs3PRCmcSa/hfBgLIb7oQ5HNb1wS0icWsGtSAUNgefHeI+eBrA8I1fxmbHsGdvA==}
@@ -3042,13 +3030,9 @@ snapshots:
 
   '@fontsource/ibm-plex-sans@5.3.0': {}
 
-  '@fontsource/jersey-10@5.3.0': {}
-
-  '@fontsource/jersey-15@5.3.0': {}
-
   '@fontsource/nunito@5.3.0': {}
 
-  '@fontsource/pixelify-sans@5.3.0': {}
+  '@fontsource/vt323@5.3.0': {}
 
   '@humanfs/core@0.19.2':
     dependencies:

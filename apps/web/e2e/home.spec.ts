@@ -42,7 +42,7 @@ test('the first screen offers Daily Battle and Versus, then the four games', asy
 
 test('a shared link opens the game picker', async ({ page }) => {
   await open(page, '/#daily');
-  await expect(page.getByText('Choose a game')).toBeVisible();
+  await expect(page.getByText('Choose a generation')).toBeVisible();
   await expect(page.getByRole('dialog')).toHaveCount(0);
 });
 

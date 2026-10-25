@@ -28,6 +28,7 @@ import { ItemIcon } from '../ui/ItemIcon';
 import { MoveChips } from '../ui/MoveList';
 import { PokemonTile } from '../ui/PokemonTile';
 import type { ShareModel } from '../lib/share';
+import { OtherGames } from '../ui/OtherGames';
 import { ShareButton } from '../ui/results';
 import { useWide } from '../ui/useWide';
 
@@ -344,6 +345,8 @@ export function DailyBrief({
       <ShareButton share={result.share} variant="secondary" className="h-9 shrink-0 px-4" />
     </section>
   );
+  // Once the day's decided, the other games are one tap away.
+  const others = decided && !editing && <OtherGames compact className="shrink-0" />;
 
   const vs = (
     <div className="flex shrink-0 items-center gap-3 text-[12px] font-bold tracking-[0.2em] text-muted">
@@ -370,6 +373,7 @@ export function DailyBrief({
             {teamSection}
             <div className="mx-auto mt-2 flex w-full max-w-md flex-col gap-2">
               {strip}
+              {others}
               {start}
             </div>
           </div>
@@ -387,6 +391,7 @@ export function DailyBrief({
             </p>
           )}
           {strip}
+          {others}
           {start}
         </main>
       )}
