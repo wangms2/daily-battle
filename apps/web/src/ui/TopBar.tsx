@@ -1,6 +1,9 @@
-// The header of the daily game's screens: the home screens' clay band and seam,
-// so tapping Play carries on in the same place.
+// The header of the daily game's screens: the home screens' band and seam, so
+// tapping Play carries on in the same place, in the color of the generation being
+// played (its share card's color).
+import type { FormatId } from '@daily-battle/data/formats';
 import type { ReactNode } from 'react';
+import { LIDS } from '../lib/genColors';
 import { ChevronIcon, FlameIcon, GearIcon } from './icons';
 
 export function TopBar({
@@ -10,6 +13,7 @@ export function TopBar({
   onSettings,
   onTitle,
   left,
+  format,
 }: {
   title: ReactNode;
   /** Makes the title a button (it goes back to the game picker). */
@@ -20,10 +24,20 @@ export function TopBar({
   onSettings: () => void;
   /** Replaces the title (e.g. edit mode's Cancel). */
   left?: ReactNode;
+  /** The generation being played; its color replaces the clay. */
+  format?: FormatId;
 }) {
+  const colors = format && LIDS[format];
   return (
     <>
-      <header className="home-top flex h-12 shrink-0 items-center justify-between gap-2 px-3 pt-[env(safe-area-inset-top)] wide:px-6">
+      <header
+        style={
+          colors
+            ? { background: `linear-gradient(165deg, ${colors.lid}, ${colors.deep})` }
+            : undefined
+        }
+        className="home-top flex h-12 shrink-0 items-center justify-between gap-2 px-3 pt-[env(safe-area-inset-top)] wide:px-6"
+      >
         {left || !onTitle ? (
           <div className="home-serif min-w-0 truncate text-[16px]">{left ?? title}</div>
         ) : (

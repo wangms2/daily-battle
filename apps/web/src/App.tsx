@@ -245,6 +245,7 @@ export function App() {
       streak={stats.streak}
       onStats={() => setStatsOpen(true)}
       onSettings={() => setSettingsOpen(true)}
+      format={format}
     />
   );
 
