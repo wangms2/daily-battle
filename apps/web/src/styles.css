@@ -5,11 +5,10 @@
 @import '@fontsource/ibm-plex-sans/latin-700.css';
 /* The home screens' headings and buttons (the Poké Ball split). */
 @import '@fontsource/fraunces/latin-600.css';
-/* The battle text is the only pixel type: a lookalike of each generation's game
-   font (the games' own fonts are Nintendo's, so these are free stand-ins). */
-@import '@fontsource/jersey-10/latin-400.css';
-@import '@fontsource/jersey-15/latin-400.css';
-@import '@fontsource/pixelify-sans/latin-400.css';
+/* The battle text is the only pixel type. The games' own fonts are Nintendo's, so
+   Gens 3 to 5 share a free stand-in: VT323, a narrow terminal face whose pixels are
+   fine enough to read easily. */
+@import '@fontsource/vt323/latin-400.css';
 @import '@fontsource/nunito/latin-700.css';
 
 /*
@@ -38,11 +37,9 @@
 
   --font-body: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
   --font-display: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
-  /* Gen 4 (Diamond/Pearl): chunky and bold. Gen 5 (Black/White): lighter and rounder.
-     Gen 6 (X/Y): the games left pixel type behind for clean rounded text. */
-  --font-pixel-3: 'Jersey 10', ui-monospace, monospace;
-  --font-pixel-4: 'Jersey 15', ui-monospace, monospace;
-  --font-pixel-5: 'Pixelify Sans', ui-monospace, monospace;
+  /* Gens 3 to 5: the pixel stand-in. Gen 6 (X/Y): the games left pixel type behind
+     for clean rounded text. */
+  --font-pixel-retro: 'VT323', ui-monospace, monospace;
   --font-pixel-6: 'Nunito', ui-rounded, ui-sans-serif, system-ui, sans-serif;
   --display-weight: 600;
 
@@ -82,6 +79,9 @@
     color-scheme: dark;
   }
 }
+
+/* Short phones (under 720px tall), where the controls have to give the battle text room. */
+@custom-variant short (@media (max-height: 720px));
 
 @theme inline {
   --font-sans: var(--font-body);
@@ -304,6 +304,10 @@ body {
     0 0 3px #fff,
     0 0 4px rgb(255 255 255 / 0.8);
 }
+/* The halo is for the name; a badge keeps its own colors. */
+.statbar .type-badge {
+  text-shadow: none;
+}
 .statbar-hp {
   background: rgb(255 255 255 / 0.85);
   box-shadow: 0 0 0 1px rgb(0 0 0 / 0.55);
@@ -398,14 +402,10 @@ body {
 }
 
 /* The generation's pixel font, for the battle text and the move names. */
-[data-gen='3'] {
-  --font-pixel: var(--font-pixel-3);
-}
-[data-gen='4'] {
-  --font-pixel: var(--font-pixel-4);
-}
+[data-gen='3'],
+[data-gen='4'],
 [data-gen='5'] {
-  --font-pixel: var(--font-pixel-5);
+  --font-pixel: var(--font-pixel-retro);
 }
 [data-gen='6'] {
   --font-pixel: var(--font-pixel-6);
@@ -413,17 +413,15 @@ body {
 .battle-pixel {
   font-family: var(--font-pixel);
   font-weight: 400;
-  font-size: 17px;
+  font-size: 21px;
 }
-[data-gen='5'] .battle-pixel,
-[data-gen='5'] .battle-textbox {
-  font-size: 14px;
-}
-/* Nunito is a regular-width face: bold, and a touch smaller to fit like the pixel fonts. */
+/* Nunito is a regular-width face: bold, and a touch smaller, with line spacing that
+   matches the pixel font's (21px at 1.2), so every generation's box fits the same
+   number of lines. */
 [data-gen='6'] .battle-pixel,
 [data-gen='6'] .battle-textbox {
   font-weight: 700;
-  font-size: 15px;
+  font-size: 16px;
 }
 
 /* Move chips outside the move buttons (sets, details, battle cards): tinted by
@@ -440,14 +438,12 @@ button.move-chip:hover,
 
 /* The battle text: a card with a subtle double border (a thin line and a softer
    ring inside, like a game text box) and the generation's pixel font. It takes
-   the spare height on phones, showing the latest whole lines. */
+   the spare height on phones and shows the turn just played; earlier turns are
+   above it (BattleLog). The card clips; the scroller inside it scrolls. */
 .battle-textbox {
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
-  gap: 2px;
   overflow: hidden;
-  padding: 10px 40px 10px 14px;
   background: var(--surface);
   color: var(--text);
   border: 2px solid color-mix(in srgb, var(--text) 55%, var(--surface));
@@ -456,13 +452,24 @@ button.move-chip:hover,
     inset 0 0 0 3px color-mix(in srgb, var(--accent) 40%, var(--surface));
   border-radius: 10px;
   font-family: var(--font-pixel);
-  font-size: 17px;
-  line-height: 1.3;
-  cursor: pointer;
+  font-size: 21px;
+  line-height: 1.05;
 }
-[data-gen='5'] .battle-textbox,
 [data-gen='6'] .battle-textbox {
-  line-height: 1.45;
+  line-height: 1.35;
+}
+.battle-textscroll {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.battle-textscroll[data-more-above] {
+  /* Text running off the top fades out rather than being cut mid-letter. */
+  mask-image: linear-gradient(to bottom, transparent, #000 14px);
+}
+.battle-turn {
+  padding: 4px 14px 6px;
 }
 .battle-textbox strong {
   font-weight: 400;
@@ -470,6 +477,99 @@ button.move-chip:hover,
 }
 [data-gen='6'] .battle-textbox strong {
   font-weight: 700;
+}
+/* The arrows to earlier and later turns: small and quiet until you need them. */
+.battle-textcue {
+  position: absolute;
+  right: 6px;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 9999px;
+  color: var(--muted);
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  border: 1px solid var(--border);
+}
+.battle-textcue:hover {
+  color: var(--text);
+}
+
+/* The log, ranked as on Showdown: what happened (moves, who came in or fainted)
+   stands out; the percentages, effectiveness, and small print shrink and gray.
+   Spacing is tight, since the box holds as much of the battle as it can. */
+.battle-line {
+  margin-top: 0.05em;
+}
+.battle-line[data-kind='move'],
+.battle-line[data-kind='switch'],
+.battle-line[data-kind='faint'] {
+  margin-top: 0.3em;
+}
+.battle-line:first-child {
+  margin-top: 0;
+}
+.battle-line[data-kind='damage'],
+.battle-line[data-kind='effect'] {
+  padding-left: 0.9em;
+  font-size: 0.78em;
+  line-height: 1.1;
+}
+.battle-line[data-kind='normal'] {
+  padding-left: 0.9em;
+  font-size: 0.92em;
+}
+.battle-line[data-kind='minor'] {
+  padding-left: 0.9em;
+  font-size: 0.72em;
+  line-height: 1.05;
+  color: var(--muted);
+}
+.battle-pct {
+  font-weight: inherit;
+  color: var(--accent);
+}
+.battle-line[data-kind='turn'] {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  margin-top: 0.4em;
+  font-size: 0.62em;
+  line-height: 1;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.battle-line[data-kind='turn']::before,
+.battle-line[data-kind='turn']::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.35;
+}
+/* Short phones have the least room for the text: a little smaller, and the turn
+   dividers take almost no height. */
+@media (max-height: 720px) {
+  .battle-textbox {
+    font-size: 19px;
+  }
+  [data-gen='6'] .battle-textbox {
+    font-size: 15px;
+  }
+  .battle-turn {
+    padding: 2px 12px 3px;
+  }
+  .battle-line[data-kind='move'],
+  .battle-line[data-kind='switch'],
+  .battle-line[data-kind='faint'] {
+    margin-top: 0.18em;
+  }
+  .battle-line[data-kind='turn'] {
+    margin-top: 0.2em;
+    font-size: 0.56em;
+  }
 }
 
 /* Floating result labels and ability/item pop-ups. */
@@ -1062,784 +1162,6 @@ button {
   .animate-sheet-in,
   .animate-fade-in {
     animation: none;
-  }
-}
-
-/* ---- Battle field ---- */
-/* The field is a size container; --s scales the background image so its scene
-   (x 150–590, y 90–385 of 753×500) covers the field, anchored at the bottom.
-   Children place things in image coordinates with it (see Field.tsx). */
-.battle-field {
-  container-type: size;
-  --s: max(calc(100cqw / 440), calc(100cqh / 295));
-  background: #4d6b3a;
-}
-.battle-bg {
-  background-repeat: no-repeat;
-  background-size: calc(var(--s) * 753) calc(var(--s) * 500);
-  background-position: calc(50cqw - var(--s) * 370) calc(100cqh - var(--s) * 385);
-  image-rendering: pixelated;
-}
-:root[data-theme='dark'] .battle-bg {
-  filter: brightness(0.85);
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) .battle-bg {
-    filter: brightness(0.85);
-  }
-}
-
-/* Wide battle layout: the field and controls share the largest width that fits
-   beside the 380px log, leaves room for the controls (~270px) below, and stays
-   at a comfortable size (960px) on big monitors. */
-.battle-main {
-  container-type: size;
-}
-.battle-stage {
-  width: min(960px, calc(100cqw - 380px - 1.25rem), calc((100cqh - 270px) * 440 / 295));
-}
-
-/* Stat bars: Showdown's dark text with a light halo, readable on any background. */
-.statbar {
-  color: #15161c;
-  text-shadow:
-    0 0 2px #fff,
-    0 0 3px #fff,
-    0 0 4px rgb(255 255 255 / 0.8);
-}
-.statbar-hp {
-  background: rgb(255 255 255 / 0.85);
-  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.55);
-}
-.statbar-pill {
-  background: rgb(255 255 255 / 0.85);
-  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.35);
-  text-shadow: none;
-}
-
-/* Reflect and Light Screen as tinted glass in front of the side. */
-.screen-reflect,
-.screen-light {
-  border-radius: 6px;
-  border: 1px solid rgb(255 255 255 / 0.55);
-}
-.screen-reflect {
-  background: rgb(232 160 80 / 0.18);
-}
-.screen-light {
-  background: rgb(240 140 200 / 0.16);
-}
-
-/* Terrain (Gen 6 on): Showdown's overlay, a faint tint over the whole scene. */
-.terrain-fx {
-  background-size: cover;
-  background-position: center;
-  opacity: 0.35;
-}
-/* The Mega mark beside a Mega Evolved Pokémon's name. */
-.mega-badge {
-  color: #fff;
-  background: linear-gradient(135deg, #e94f84, #7c5cd6 55%, #2f80ed);
-}
-
-/* Weather overlays drift slowly; static with animations off or reduced motion. */
-.weather-fx {
-  background-size: calc(var(--s) * 700) calc(var(--s) * 500);
-  background-repeat: repeat;
-  opacity: 0.3;
-}
-.weather-fx-sunnyday {
-  mix-blend-mode: soft-light;
-  opacity: 0.5;
-}
-.weather-fx-animate.weather-fx-sandstorm,
-.weather-fx-animate.weather-fx-hail {
-  animation: weather-drift 18s linear infinite;
-}
-.weather-fx-animate.weather-fx-raindance {
-  animation: weather-rain 2.4s linear infinite;
-}
-.weather-fx-animate.weather-fx-sunnyday {
-  animation: weather-pulse 4s ease-in-out infinite;
-}
-@keyframes weather-drift {
-  to {
-    background-position: calc(var(--s) * -700) calc(var(--s) * 60);
-  }
-}
-@keyframes weather-rain {
-  to {
-    background-position: calc(var(--s) * -140) calc(var(--s) * 500);
-  }
-}
-@keyframes weather-pulse {
-  50% {
-    opacity: 0.3;
-  }
-}
-
-/* Move buttons: Showdown's soft type-tinted gradient, muted to our palette. */
-.move-btn {
-  color: var(--text);
-  border: 2px solid color-mix(in srgb, var(--type) 60%, var(--text) 15%);
-  background: linear-gradient(
-    to bottom,
-    color-mix(in srgb, var(--type) 5%, var(--surface)),
-    color-mix(in srgb, var(--type) 20%, var(--surface))
-  );
-  box-shadow:
-    inset 0 0 0 2px var(--surface),
-    inset 0 0 0 3px color-mix(in srgb, var(--type) 40%, var(--surface)),
-    var(--card-shadow);
-}
-.move-btn:not(:disabled):hover {
-  background: linear-gradient(
-    to bottom,
-    color-mix(in srgb, var(--type) 9%, var(--surface)),
-    color-mix(in srgb, var(--type) 28%, var(--surface))
-  );
-}
-
-/* The generation's pixel font, for the battle text and the move names. */
-[data-gen='3'] {
-  --font-pixel: var(--font-pixel-3);
-}
-[data-gen='4'] {
-  --font-pixel: var(--font-pixel-4);
-}
-[data-gen='5'] {
-  --font-pixel: var(--font-pixel-5);
-}
-[data-gen='6'] {
-  --font-pixel: var(--font-pixel-6);
-}
-.battle-pixel {
-  font-family: var(--font-pixel);
-  font-weight: 400;
-  font-size: 17px;
-}
-[data-gen='5'] .battle-pixel,
-[data-gen='5'] .battle-textbox {
-  font-size: 14px;
-}
-/* Nunito is a regular-width face: bold, and a touch smaller to fit like the pixel fonts. */
-[data-gen='6'] .battle-pixel,
-[data-gen='6'] .battle-textbox {
-  font-weight: 700;
-  font-size: 15px;
-}
-
-/* Move chips outside the move buttons (sets, details, battle cards): tinted by
-   type like the battle buttons, a little lighter. */
-.move-chip {
-  color: var(--text);
-  border: 1px solid color-mix(in srgb, var(--type) 40%, var(--border));
-  background: color-mix(in srgb, var(--type) 14%, var(--surface));
-}
-button.move-chip:hover,
-.move-chip[aria-expanded='true'] {
-  background: color-mix(in srgb, var(--type) 28%, var(--surface));
-}
-
-/* The battle text: a card with a subtle double border (a thin line and a softer
-   ring inside, like a game text box) and the generation's pixel font. It takes
-   the spare height on phones, showing the latest whole lines. */
-.battle-textbox {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  gap: 2px;
-  overflow: hidden;
-  padding: 10px 40px 10px 14px;
-  background: var(--surface);
-  color: var(--text);
-  border: 2px solid color-mix(in srgb, var(--text) 55%, var(--surface));
-  box-shadow:
-    inset 0 0 0 2px var(--surface),
-    inset 0 0 0 3px color-mix(in srgb, var(--accent) 40%, var(--surface));
-  border-radius: 10px;
-  font-family: var(--font-pixel);
-  font-size: 17px;
-  line-height: 1.3;
-  cursor: pointer;
-}
-[data-gen='5'] .battle-textbox,
-[data-gen='6'] .battle-textbox {
-  line-height: 1.45;
-}
-.battle-textbox strong {
-  font-weight: 400;
-  color: var(--accent);
-}
-[data-gen='6'] .battle-textbox strong {
-  font-weight: 700;
-}
-
-/* Floating result labels and ability/item pop-ups. */
-.float-label {
-  font-size: 13px;
-  font-weight: 700;
-  padding: 1px 6px;
-  border-radius: 4px;
-  color: #fff;
-  animation: float-up 1000ms ease-out forwards;
-}
-.float-damage {
-  background: rgb(163 58 70 / 0.92);
-}
-.float-heal {
-  background: rgb(61 122 90 / 0.92);
-}
-.float-info {
-  background: rgb(27 29 38 / 0.82);
-}
-.float-popup {
-  font-size: 12px;
-  font-weight: 600;
-  padding: 2px 8px;
-  border-radius: 4px;
-  color: #fff;
-  background: rgb(63 95 138 / 0.94);
-  border: 1px solid rgb(255 255 255 / 0.35);
-  animation: popup-in-out 1500ms ease-out forwards;
-}
-@keyframes float-up {
-  0% {
-    opacity: 0;
-    transform: translate(-50%, 6px);
-  }
-  15% {
-    opacity: 1;
-  }
-  70% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-    transform: translate(-50%, -40px);
-  }
-}
-@keyframes popup-in-out {
-  0% {
-    opacity: 0;
-    transform: translate(-50%, 4px) scale(0.92);
-  }
-  12%,
-  80% {
-    opacity: 1;
-    transform: translate(-50%, 0) scale(1);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(-50%, 0) scale(1);
-  }
-}
-
-@keyframes hit {
-  0%,
-  100% {
-    transform: translateX(0);
-    filter: none;
-  }
-  15% {
-    transform: translateX(-6px);
-    filter: brightness(2.2);
-  }
-  35% {
-    transform: translateX(6px);
-    filter: none;
-  }
-  55% {
-    transform: translateX(-4px);
-    filter: brightness(1.8);
-  }
-  75% {
-    transform: translateX(3px);
-    filter: none;
-  }
-}
-@keyframes faint {
-  from {
-    transform: translateY(0);
-    opacity: 1;
-  }
-  to {
-    transform: translateY(30%);
-    opacity: 0;
-  }
-}
-@keyframes in-left {
-  from {
-    transform: translateX(-40%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-@keyframes in-right {
-  from {
-    transform: translateX(40%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-@keyframes lunge-right {
-  0%,
-  100% {
-    transform: translate(0, 0);
-  }
-  40% {
-    transform: translate(10%, -6%);
-  }
-}
-@keyframes lunge-left {
-  0%,
-  100% {
-    transform: translate(0, 0);
-  }
-  40% {
-    transform: translate(-10%, 6%);
-  }
-}
-.anim-hit {
-  animation: hit 360ms ease-out;
-}
-.anim-faint {
-  animation: faint 380ms ease-in forwards;
-}
-.anim-in-left {
-  animation: in-left 260ms ease-out;
-}
-.anim-in-right {
-  animation: in-right 260ms ease-out;
-}
-.anim-lunge-right {
-  animation: lunge-right 260ms ease-out;
-}
-.anim-lunge-left {
-  animation: lunge-left 260ms ease-out;
-}
-/* Mega Evolution: the new form bursts out of a rainbow glow, as on Showdown. */
-@keyframes mega {
-  0% {
-    transform: scale(0.85);
-    filter: brightness(6) saturate(0) drop-shadow(0 0 12px #fff);
-  }
-  45% {
-    transform: scale(1.06);
-    filter: brightness(2.4) drop-shadow(0 0 14px #e94f84) drop-shadow(0 0 8px #2f80ed);
-  }
-  100% {
-    transform: scale(1);
-    filter: none;
-  }
-}
-.anim-mega {
-  animation: mega 700ms ease-out;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .anim-hit,
-  .anim-mega,
-  .anim-faint,
-  .anim-in-left,
-  .anim-in-right,
-  .anim-lunge-right,
-  .anim-lunge-left,
-  .weather-fx {
-    animation: none !important;
-  }
-}
-
-/* Touch: no iOS image callout, text selection, or grey tap flash on controls
-   and the field, so taps and long-presses reach the game. */
-button,
-img,
-.battle-field {
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
-}
-img {
-  -webkit-user-drag: none;
-}
-button {
-  touch-action: manipulation;
-}
-
-/* ---- Versus rooms ---- */
-/* A spectator's reaction rises over the battle and fades. */
-@keyframes reaction-rise {
-  0% {
-    opacity: 0;
-    transform: translateY(8px) scale(0.8);
-  }
-  15% {
-    opacity: 1;
-    transform: translateY(0) scale(1.1);
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(-64px) scale(1);
-  }
-}
-.anim-reaction {
-  animation: reaction-rise 2200ms ease-out forwards;
-}
-/* Between rounds: each result slides in, a lost life cracks, the VS names close in. */
-@keyframes slide-in-up {
-  from {
-    opacity: 0;
-    transform: translateY(14px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-.anim-slide-in {
-  animation: slide-in-up 360ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
-}
-@keyframes heart-crack {
-  0%,
-  40% {
-    transform: scale(1);
-    filter: none;
-  }
-  55% {
-    transform: scale(1.35) rotate(-10deg);
-  }
-  70% {
-    transform: scale(1) rotate(8deg);
-  }
-  100% {
-    transform: scale(1) rotate(0);
-    color: var(--border);
-  }
-}
-.anim-heart-crack {
-  display: inline-block;
-  animation: heart-crack 900ms ease-out both;
-}
-@keyframes vs-in-left {
-  from {
-    opacity: 0;
-    transform: translateX(-40px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-@keyframes vs-in-right {
-  from {
-    opacity: 0;
-    transform: translateX(40px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-@keyframes vs-stamp {
-  0% {
-    opacity: 0;
-    transform: scale(2.2);
-  }
-  60% {
-    opacity: 1;
-    transform: scale(0.9);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-.anim-vs-left {
-  animation: vs-in-left 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
-}
-.anim-vs-right {
-  animation: vs-in-right 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
-}
-.anim-vs-stamp {
-  animation: vs-stamp 380ms ease-out both;
-}
-/* The winner's confetti: a few pieces falling once. */
-@keyframes confetti-fall {
-  from {
-    transform: translateY(-20px) rotate(0);
-    opacity: 1;
-  }
-  to {
-    transform: translateY(360px) rotate(540deg);
-    opacity: 0;
-  }
-}
-.confetti-piece {
-  position: absolute;
-  top: 0;
-  width: 8px;
-  height: 12px;
-  border-radius: 2px;
-  animation: confetti-fall 2600ms ease-in forwards;
-}
-@media (prefers-reduced-motion: reduce) {
-  .anim-reaction,
-  .anim-slide-in,
-  .anim-vs-left,
-  .anim-vs-right,
-  .anim-vs-stamp {
-    animation: fade-in 200ms ease-out both;
-  }
-  .anim-heart-crack {
-    animation: none;
-    color: var(--border);
-  }
-  .confetti-piece {
-    display: none;
-  }
-}
-
-/* ---- Home screens: the Poké Ball split (landing and game picker) ---- */
-.home-serif {
-  font-family: 'Fraunces', Georgia, serif;
-  font-weight: 600;
-}
-/* The top half stays a muted clay in both themes, like a Poké Ball's lid. */
-.home-top {
-  position: relative;
-  overflow: hidden;
-  color: #fff;
-  background: linear-gradient(165deg, #a3646a, #8a4f58);
-  view-transition-name: lid;
-}
-.home-seam {
-  position: relative;
-  height: 12px;
-  flex-shrink: 0;
-  background: #2b2d36;
-  view-transition-name: seam;
-  /* Above the sections after it, so the ball isn't cut off where it overlaps them. */
-  z-index: 10;
-}
-/* Inside the game, the seam is just a line under the header. */
-.home-seam.is-thin {
-  height: 6px;
-}
-.home-ball {
-  --ball: 70px;
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  z-index: 5;
-  translate: -50% -50%;
-  display: grid;
-  place-items: center;
-  width: var(--ball);
-  height: var(--ball);
-  box-sizing: border-box;
-  border: calc(var(--ball) * 0.1) solid #2b2d36;
-  border-radius: 50%;
-  background: #f4f3f1;
-  box-shadow: 0 3px 10px rgb(0 0 0 / 0.25);
-  pointer-events: none;
-  view-transition-name: ball;
-}
-.home-ball::after {
-  content: '';
-  box-sizing: border-box;
-  width: calc(var(--ball) * 0.31);
-  height: calc(var(--ball) * 0.31);
-  border: calc(var(--ball) * 0.057) solid #2b2d36;
-  border-radius: 50%;
-  background: #a3646a;
-}
-.home-btn {
-  display: inline-grid;
-  place-items: center;
-  border-radius: 12px;
-  transition: transform 120ms;
-}
-.home-btn:active {
-  transform: translateY(2px);
-}
-.home-play {
-  background: #f7f6f4;
-  color: #2b2d36;
-  box-shadow: 0 4px 0 rgb(0 0 0 / 0.2);
-}
-.home-friends-btn {
-  background: var(--surface);
-  color: var(--text);
-  border: 1px solid var(--border);
-  box-shadow: 0 3px 0 color-mix(in srgb, var(--border) 80%, black);
-}
-.home-cart {
-  position: relative;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: 10px 10px 4px 4px;
-  box-shadow: 0 2px 0 color-mix(in srgb, var(--border) 80%, black);
-}
-
-/* The landing's top half borrows the anime's "Who's that Pokémon?" card: a burst of rays,
-   a blue silhouette with a dark offset edge, and a big outlined question mark, all muted. */
-.home-burst {
-  --burst-x: max(30%, calc(50% - 104px));
-  --burst-y: 58%;
-  background:
-    radial-gradient(
-      circle at var(--burst-x) var(--burst-y),
-      rgb(255 255 255 / 0.8) 0,
-      rgb(224 237 241 / 0.5) 22%,
-      transparent 58%
-    ),
-    repeating-conic-gradient(
-      from 3deg at var(--burst-x) var(--burst-y),
-      rgb(255 255 255 / 0.18) 0 5deg,
-      rgb(0 0 0 / 0.05) 5deg 10deg
-    ),
-    linear-gradient(95deg, #b9d1d7 0%, #aeb1b9 36%, #a3646a 64%, #8a4f58 100%);
-}
-.home-silhouette {
-  height: 34.4cqh;
-  width: 28.8cqh;
-  background-color: #43677f;
-  mask: var(--sprite) center / contain no-repeat;
-  -webkit-mask: var(--sprite) center / contain no-repeat;
-  filter: drop-shadow(-4px 3px 0 #223847);
-}
-.home-question {
-  font-size: 13cqh;
-  color: #d9b75c;
-  -webkit-text-stroke: 5px #3b2f25;
-  paint-order: stroke fill;
-}
-
-/* ---- Landing to picker: one screen, two states (data-view on .home) ----
-   The landing's and the picker's layers each keep a fixed size, so nothing squashes
-   while the top half rises and the ball rides the seam up. */
-.home {
-  --ease: cubic-bezier(0.22, 0.8, 0.2, 1);
-  --picker-top: 94px;
-  container-type: size;
-}
-.home .home-top {
-  height: calc(50cqh - 6px);
-  transition: height 460ms var(--ease);
-}
-.home[data-view='picker'] .home-top {
-  height: var(--picker-top);
-}
-.home-ball {
-  scale: 1;
-  transition: scale 460ms var(--ease);
-}
-.home[data-view='picker'] .home-ball {
-  scale: 0.66;
-}
-
-/* Landing art (the burst, silhouette, date, Play): fades up and away. */
-.home-landing {
-  position: absolute;
-  inset-inline: 0;
-  top: 0;
-  height: calc(50cqh - 6px);
-  transition:
-    opacity 220ms ease,
-    translate 460ms var(--ease);
-}
-.home[data-view='picker'] .home-landing {
-  opacity: 0;
-  translate: 0 -12px;
-  pointer-events: none;
-}
-
-/* Picker title and Back: ease in once the top has mostly risen. */
-.home-fade {
-  opacity: 0;
-  translate: 0 4px;
-  transition:
-    opacity 160ms ease,
-    translate 160ms ease;
-}
-.home[data-view='picker'] .home-fade {
-  opacity: 1;
-  translate: 0 0;
-  transition:
-    opacity 280ms ease 200ms,
-    translate 380ms var(--ease) 200ms;
-}
-
-/* With friends: sinks away as the picker rises into its place. */
-.home-friends {
-  position: absolute;
-  inset-inline: 0;
-  bottom: 0;
-  height: calc(50cqh - 6px);
-  transition:
-    opacity 200ms ease,
-    translate 400ms var(--ease);
-}
-.home[data-view='picker'] .home-friends {
-  opacity: 0;
-  translate: 0 14px;
-  pointer-events: none;
-}
-
-/* The cartridges rise in one after another. */
-.home-games {
-  position: absolute;
-  inset-inline: 0;
-  bottom: 0;
-  height: calc(100cqh - var(--picker-top) - 12px);
-}
-.home:not([data-view='picker']) .home-games {
-  pointer-events: none;
-}
-.home-cart {
-  opacity: 0;
-  translate: 0 16px;
-  transition:
-    opacity 160ms ease,
-    translate 240ms var(--ease);
-}
-.home[data-view='picker'] .home-cart {
-  opacity: 1;
-  translate: 0 0;
-  transition:
-    opacity 320ms ease calc(180ms + var(--i, 0) * 55ms),
-    translate 460ms var(--ease) calc(180ms + var(--i, 0) * 55ms);
-}
-
-/* ---- Between screens (the browser's view transitions, where it has them) ----
-   The seam and the ball are named, so they glide from one screen's place to the next's;
-   everything else gives way with a quick crossfade. */
-::view-transition-group(seam),
-::view-transition-group(ball) {
-  animation-duration: 420ms;
-  animation-timing-function: cubic-bezier(0.22, 0.8, 0.2, 1);
-}
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation-duration: 240ms;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .home *,
-  .home {
-    transition-duration: 0s !important;
-    transition-delay: 0s !important;
-  }
-  ::view-transition-group(*),
-  ::view-transition-old(*),
-  ::view-transition-new(*) {
-    animation: none !important;
   }
 }
 

@@ -144,12 +144,14 @@ function MoveButton({
       disabled={move.disabled}
       aria-label={`${move.name}, ${move.type}, ${move.pp} of ${move.maxpp} PP${tag ? `, ${tag.label}` : ''}`}
       {...press}
-      className="move-btn flex h-full min-h-[3.25rem] flex-col justify-between overflow-hidden rounded-btn px-2 pt-1.5 pb-1 select-none active:translate-y-px disabled:opacity-40"
+      className="move-btn short:min-h-[2.5rem] short:pt-1 short:pb-0.5 flex h-full min-h-[3.25rem] flex-col justify-between overflow-hidden rounded-btn px-2 pt-1.5 pb-1 select-none active:translate-y-px disabled:opacity-40"
       style={{ '--type': color } as CSSProperties}
     >
-      <span className="battle-pixel truncate text-center leading-5">{move.name}</span>
+      <span className="battle-pixel short:leading-[18px] truncate text-center leading-5">
+        {move.name}
+      </span>
       {/* Type on the left; with hints, a short effectiveness tag beside the PP. */}
-      <span className="flex items-baseline justify-between gap-1 text-[11px] leading-4">
+      <span className="short:text-[10.5px] short:leading-3 flex items-baseline justify-between gap-1 text-[11px] leading-4">
         <span className="truncate font-medium text-muted">{move.type}</span>
         <span className="flex shrink-0 items-baseline gap-1 tabular-nums">
           {hints && (
@@ -177,6 +179,7 @@ function BenchButton({
   big = false,
   off = false,
   direct = false,
+  current = false,
 }: {
   member: TeamMember;
   choice?: string;
@@ -191,6 +194,8 @@ function BenchButton({
   off?: boolean;
   /** A touch acts too, without the details card first (the only Pokémon left to send in). */
   direct?: boolean;
+  /** The Pokémon in battle: first in the row, with its details on a tap, but nothing to switch to. */
+  current?: boolean;
 }) {
   const disabled = !choice || off;
   const press = usePressInfo(
@@ -213,36 +218,49 @@ function BenchButton({
       {...press}
       data-bench
       aria-expanded={shown || undefined}
-      aria-label={`Switch to ${member.species}, ${member.hp}% HP${member.fainted ? ', fainted' : ''}`}
+      aria-current={current || undefined}
+      aria-label={
+        current
+          ? `${member.species}, in battle, ${member.hp}% HP`
+          : `Switch to ${member.species}, ${member.hp}% HP${member.fainted ? ', fainted' : ''}`
+      }
       className={clsx(
         'card flex min-w-0 flex-1 flex-col items-center justify-center gap-0.5 px-1 select-none',
-        big ? 'py-2' : 'py-1',
-        disabled && 'opacity-40',
+        // Short phones: the switch cards get shorter (names stay whole) and the bench
+        // row's tiles shrink, to leave the battle text room.
+        big ? 'short:py-1 py-2' : 'short:py-0.5 short:gap-0 py-1',
+        current && 'outline-accent outline-2 -outline-offset-2',
+        disabled && !current && 'opacity-40',
       )}
     >
       <img
         src={getSprite(member.species, big ? 'front' : 'icon')}
         alt=""
         draggable={false}
-        className={clsx('pixelated object-contain', big ? 'h-12 w-14' : 'h-7 w-9')}
-      />
-      {/* Names always on the forced-switch cards; on the bench row only where there's room. */}
-      <span
         className={clsx(
-          'w-full truncate text-center text-[12px] font-semibold',
-          !big && 'hidden wide:block',
+          'pixelated object-contain',
+          big ? 'short:h-8 short:w-10 h-12 w-14' : 'short:h-6 short:w-8 h-7 w-9',
         )}
-      >
-        {member.species}
-      </span>
-      <span className="flex w-full items-center gap-1 px-0.5">
-        <HpBar hp={member.hp} animate={false} className="h-1.5 flex-1" />
-        {member.status && (
-          <span
-            className="size-1.5 shrink-0 rounded-full"
-            style={{ background: STATUS_COLOR[member.status] }}
-          />
-        )}
+      />
+      <span className="flex w-full min-w-0 flex-col gap-0.5">
+        {/* Names always on the forced-switch cards; on the bench row only where there's room. */}
+        <span
+          className={clsx(
+            'short:text-[11.5px] w-full truncate text-center text-[12px] font-semibold',
+            !big && 'hidden wide:block',
+          )}
+        >
+          {member.species}
+        </span>
+        <span className="flex w-full items-center gap-1 px-0.5">
+          <HpBar hp={member.hp} animate={false} className="h-1.5 flex-1" />
+          {member.status && (
+            <span
+              className="size-1.5 shrink-0 rounded-full"
+              style={{ background: STATUS_COLOR[member.status] }}
+            />
+          )}
+        </span>
       </span>
     </button>
   );
@@ -387,12 +405,12 @@ export function ControlPanel({
   if (controls?.kind === 'switch') {
     const last = controls.switches.length === 1;
     return (
-      <div ref={panel} className="relative flex shrink-0 flex-col gap-2">
+      <div ref={panel} className="short:gap-1 relative flex shrink-0 flex-col gap-2">
         {tooltip}
         <p className="display text-[14px]">
           {last ? 'Send in your last Pokémon' : 'Who comes in?'}
         </p>
-        <div className={clsx('grid grid-cols-3 gap-2', disabled && 'opacity-50')}>
+        <div className={clsx('short:gap-1.5 grid grid-cols-3 gap-2', disabled && 'opacity-50')}>
           {bench.map((m) => (
             <BenchButton
               key={m.species}
@@ -420,7 +438,7 @@ export function ControlPanel({
   const mega = !!megaOn && canMega && megaOn.at === controls;
   const withMega = (choice: string) => (mega ? `${choice} mega` : choice);
   return (
-    <div ref={panel} className="relative flex shrink-0 flex-col gap-1.5">
+    <div ref={panel} className="short:gap-1 relative flex shrink-0 flex-col gap-1.5">
       {tooltip}
       <p
         className={clsx(
@@ -466,7 +484,7 @@ export function ControlPanel({
       )}
       <div
         className={clsx(
-          'grid grid-cols-2 grid-rows-2 gap-2',
+          'short:gap-1.5 grid grid-cols-2 grid-rows-2 gap-2',
           off && 'pointer-events-none opacity-50',
         )}
       >
@@ -488,8 +506,9 @@ export function ControlPanel({
           ),
         )}
       </div>
-      <div className="flex gap-1.5" role="group" aria-label="Switch">
-        {bench.map((m) => (
+      <div className="short:gap-1 flex gap-1.5" role="group" aria-label="Switch">
+        {/* As on Showdown: your Pokémon in battle first, then the rest of the team. */}
+        {(active ? [active, ...bench] : bench).map((m) => (
           <BenchButton
             key={m.species}
             member={m}
@@ -499,6 +518,7 @@ export function ControlPanel({
             onPin={setPinned}
             shown={pinnedSlot === m.slot}
             off={off}
+            current={m === active}
           />
         ))}
       </div>

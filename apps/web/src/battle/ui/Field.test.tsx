@@ -64,4 +64,15 @@ describe('Field', () => {
     );
     expect(srcs().some((s) => s.includes('substitute'))).toBe(false);
   });
+
+  it('shows each Pokémon’s types on its stat bar', () => {
+    const { container } = show(view(mon('Heatran'), mon('Gengar')));
+    const types = (who: number) =>
+      [...container.querySelectorAll('.statbar')[who]!.querySelectorAll('[title]')].map((e) =>
+        e.getAttribute('title'),
+      );
+    // The foe's bar comes first.
+    expect(types(0)).toEqual(['Ghost', 'Poison']);
+    expect(types(1)).toEqual(['Fire', 'Steel']);
+  });
 });

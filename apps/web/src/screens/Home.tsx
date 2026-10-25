@@ -89,7 +89,7 @@ export function Home({
           aria-hidden={landing}
         >
           <h1 className="home-serif mx-auto w-full max-w-[520px] px-5 text-[26px] leading-[1.1]">
-            Choose a game
+            Choose a generation
           </h1>
         </div>
 

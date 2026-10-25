@@ -104,13 +104,12 @@ for (const scheme of ['light', 'dark'] as const) {
       await page.getByRole('button', { name: /^Foe .* Details$/ }).click();
       await check(page, 'foe details');
       await page.locator('header').getByText(/^Turn/).click();
-      if (await page.getByRole('button', { name: 'Open the battle log' }).isVisible()) {
-        await page.getByRole('button', { name: 'Open the battle log' }).click();
-        await check(page, 'log sheet');
-        await page.keyboard.press('Escape');
-      }
       await page.getByRole('button', { name: 'Battle menu' }).click();
       await check(page, 'battle menu');
+      await page.getByRole('button', { name: 'Battle log' }).click();
+      await check(page, 'log sheet');
+      await page.keyboard.press('Escape');
+      await page.getByRole('button', { name: 'Battle menu' }).click();
       await page.getByRole('button', { name: 'Give up' }).click();
       await check(page, 'give up dialog');
       await page.getByRole('button', { name: 'Give up' }).last().click();

@@ -26,6 +26,8 @@ export interface SpeciesInfo {
   tier: string;
   /** National Dex number. */
   num: number;
+  /** Every ability the species can have in this generation (hidden ones from Gen 5). */
+  abilities: string[];
   /** Megas its sets can become, by stone. Only present when it has some. */
   megas?: Record<string, MegaInfo>;
 }
@@ -68,6 +70,7 @@ export function buildSpecies(sets: SetsFile): SpeciesFile {
       baseStats: { ...s.baseStats },
       tier: entry.tier,
       num: s.num,
+      abilities: Object.values(s.abilities),
     };
     const megas: Record<string, MegaInfo> = {};
     for (const set of entry.sets) {

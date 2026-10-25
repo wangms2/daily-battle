@@ -14,7 +14,10 @@
         "spe": 61
       },
       "tier": "OU",
-      "num": 248
+      "num": 248,
+      "abilities": [
+        "Sand Stream"
+      ]
     },
     "Latias": {
       "types": [
@@ -30,7 +33,10 @@
         "spe": 110
       },
       "tier": "OU",
-      "num": 380
+      "num": 380,
+      "abilities": [
+        "Levitate"
+      ]
     },
     "Jirachi": {
       "types": [
@@ -46,7 +52,10 @@
         "spe": 100
       },
       "tier": "OU",
-      "num": 385
+      "num": 385,
+      "abilities": [
+        "Serene Grace"
+      ]
     },
     "Gyarados": {
       "types": [
@@ -62,7 +71,10 @@
         "spe": 81
       },
       "tier": "OU",
-      "num": 130
+      "num": 130,
+      "abilities": [
+        "Intimidate"
+      ]
     },
     "Metagross": {
       "types": [
@@ -78,7 +90,10 @@
         "spe": 70
       },
       "tier": "OU",
-      "num": 376
+      "num": 376,
+      "abilities": [
+        "Clear Body"
+      ]
     },
     "Starmie": {
       "types": [
@@ -94,7 +109,11 @@
         "spe": 115
       },
       "tier": "OU",
-      "num": 121
+      "num": 121,
+      "abilities": [
+        "Illuminate",
+        "Natural Cure"
+      ]
     },
     "Scizor": {
       "types": [
@@ -110,7 +129,11 @@
         "spe": 65
       },
       "tier": "OU",
-      "num": 212
+      "num": 212,
+      "abilities": [
+        "Swarm",
+        "Technician"
+      ]
     },
     "Heatran": {
       "types": [
@@ -126,7 +149,10 @@
         "spe": 77
       },
       "tier": "OU",
-      "num": 485
+      "num": 485,
+      "abilities": [
+        "Flash Fire"
+      ]
     },
     "Infernape": {
       "types": [
@@ -142,7 +168,10 @@
         "spe": 108
       },
       "tier": "OU",
-      "num": 392
+      "num": 392,
+      "abilities": [
+        "Blaze"
+      ]
     },
     "Flygon": {
       "types": [
@@ -158,7 +187,10 @@
         "spe": 100
       },
       "tier": "OU",
-      "num": 330
+      "num": 330,
+      "abilities": [
+        "Levitate"
+      ]
     },
     "Dragonite": {
       "types": [
@@ -174,7 +206,10 @@
         "spe": 80
       },
       "tier": "OU",
-      "num": 149
+      "num": 149,
+      "abilities": [
+        "Inner Focus"
+      ]
     },
     "Gengar": {
       "types": [
@@ -190,7 +225,10 @@
         "spe": 110
       },
       "tier": "OU",
-      "num": 94
+      "num": 94,
+      "abilities": [
+        "Levitate"
+      ]
     },
     "Skarmory": {
       "types": [
@@ -206,7 +244,11 @@
         "spe": 70
       },
       "tier": "OU",
-      "num": 227
+      "num": 227,
+      "abilities": [
+        "Keen Eye",
+        "Sturdy"
+      ]
     },
     "Empoleon": {
       "types": [
@@ -222,7 +264,10 @@
         "spe": 60
       },
       "tier": "OU",
-      "num": 395
+      "num": 395,
+      "abilities": [
+        "Torrent"
+      ]
     },
     "Swampert": {
       "types": [
@@ -238,7 +283,10 @@
         "spe": 60
       },
       "tier": "OU",
-      "num": 260
+      "num": 260,
+      "abilities": [
+        "Torrent"
+      ]
     },
     "Zapdos": {
       "types": [
@@ -254,7 +302,10 @@
         "spe": 100
       },
       "tier": "OU",
-      "num": 145
+      "num": 145,
+      "abilities": [
+        "Pressure"
+      ]
     },
     "Lucario": {
       "types": [
@@ -270,7 +321,11 @@
         "spe": 90
       },
       "tier": "OU",
-      "num": 448
+      "num": 448,
+      "abilities": [
+        "Steadfast",
+        "Inner Focus"
+      ]
     },
     "Magnezone": {
       "types": [
@@ -286,7 +341,11 @@
         "spe": 60
       },
       "tier": "OU",
-      "num": 462
+      "num": 462,
+      "abilities": [
+        "Magnet Pull",
+        "Sturdy"
+      ]
     },
     "Azelf": {
       "types": [
@@ -301,7 +360,10 @@
         "spe": 115
       },
       "tier": "OU",
-      "num": 482
+      "num": 482,
+      "abilities": [
+        "Levitate"
+      ]
     },
     "Rotom-Wash": {
       "types": [
@@ -317,7 +379,10 @@
         "spe": 86
       },
       "tier": "OU",
-      "num": 479
+      "num": 479,
+      "abilities": [
+        "Levitate"
+      ]
     },
     "Bronzong": {
       "types": [
@@ -333,7 +398,11 @@
         "spe": 33
       },
       "tier": "OU",
-      "num": 437
+      "num": 437,
+      "abilities": [
+        "Levitate",
+        "Heatproof"
+      ]
     },
     "Kingdra": {
       "types": [
@@ -349,7 +418,11 @@
         "spe": 85
       },
       "tier": "OU",
-      "num": 230
+      "num": 230,
+      "abilities": [
+        "Swift Swim",
+        "Sniper"
+      ]
     },
     "Suicune": {
       "types": [
@@ -364,7 +437,10 @@
         "spe": 85
       },
       "tier": "OU",
-      "num": 245
+      "num": 245,
+      "abilities": [
+        "Pressure"
+      ]
     },
     "Clefable": {
       "types": [
@@ -379,7 +455,11 @@
         "spe": 60
       },
       "tier": "UU",
-      "num": 36
+      "num": 36,
+      "abilities": [
+        "Cute Charm",
+        "Magic Guard"
+      ]
     },
     "Rotom-Heat": {
       "types": [
@@ -395,7 +475,10 @@
         "spe": 86
       },
       "tier": "OU",
-      "num": 479
+      "num": 479,
+      "abilities": [
+        "Levitate"
+      ]
     },
     "Donphan": {
       "types": [
@@ -410,7 +493,10 @@
         "spe": 50
       },
       "tier": "UU",
-      "num": 232
+      "num": 232,
+      "abilities": [
+        "Sturdy"
+      ]
     },
     "Gliscor": {
       "types": [
@@ -426,7 +512,11 @@
         "spe": 95
       },
       "tier": "OU",
-      "num": 472
+      "num": 472,
+      "abilities": [
+        "Hyper Cutter",
+        "Sand Veil"
+      ]
     },
     "Breloom": {
       "types": [
@@ -442,7 +532,11 @@
         "spe": 70
       },
       "tier": "OU",
-      "num": 286
+      "num": 286,
+      "abilities": [
+        "Effect Spore",
+        "Poison Heal"
+      ]
     },
     "Celebi": {
       "types": [
@@ -458,7 +552,10 @@
         "spe": 100
       },
       "tier": "OU",
-      "num": 251
+      "num": 251,
+      "abilities": [
+        "Natural Cure"
+      ]
     },
     "Forretress": {
       "types": [
@@ -474,7 +571,10 @@
         "spe": 40
       },
       "tier": "OU",
-      "num": 205
+      "num": 205,
+      "abilities": [
+        "Sturdy"
+      ]
     },
     "Aerodactyl": {
       "types": [
@@ -490,7 +590,11 @@
         "spe": 130
       },
       "tier": "OU",
-      "num": 142
+      "num": 142,
+      "abilities": [
+        "Rock Head",
+        "Pressure"
+      ]
     },
     "Magneton": {
       "types": [
@@ -506,7 +610,11 @@
         "spe": 70
       },
       "tier": "NU",
-      "num": 82
+      "num": 82,
+      "abilities": [
+        "Magnet Pull",
+        "Sturdy"
+      ]
     },
     "Hippowdon": {
       "types": [
@@ -521,7 +629,10 @@
         "spe": 47
       },
       "tier": "OU",
-      "num": 450
+      "num": 450,
+      "abilities": [
+        "Sand Stream"
+      ]
     },
     "Roserade": {
       "types": [
@@ -537,7 +648,11 @@
         "spe": 90
       },
       "tier": "OU",
-      "num": 407
+      "num": 407,
+      "abilities": [
+        "Natural Cure",
+        "Poison Point"
+      ]
     },
     "Mamoswine": {
       "types": [
@@ -553,7 +668,11 @@
         "spe": 80
       },
       "tier": "(OU)",
-      "num": 473
+      "num": 473,
+      "abilities": [
+        "Oblivious",
+        "Snow Cloak"
+      ]
     },
     "Blissey": {
       "types": [
@@ -568,7 +687,11 @@
         "spe": 55
       },
       "tier": "OU",
-      "num": 242
+      "num": 242,
+      "abilities": [
+        "Natural Cure",
+        "Serene Grace"
+      ]
     },
     "Weavile": {
       "types": [
@@ -584,7 +707,10 @@
         "spe": 125
       },
       "tier": "(OU)",
-      "num": 461
+      "num": 461,
+      "abilities": [
+        "Pressure"
+      ]
     },
     "Abomasnow": {
       "types": [
@@ -600,7 +726,10 @@
         "spe": 60
       },
       "tier": "UUBL",
-      "num": 460
+      "num": 460,
+      "abilities": [
+        "Snow Warning"
+      ]
     },
     "Rhyperior": {
       "types": [
@@ -616,7 +745,11 @@
         "spe": 40
       },
       "tier": "UU",
-      "num": 464
+      "num": 464,
+      "abilities": [
+        "Lightning Rod",
+        "Solid Rock"
+      ]
     },
     "Tentacruel": {
       "types": [
@@ -632,7 +765,11 @@
         "spe": 100
       },
       "tier": "(OU)",
-      "num": 73
+      "num": 73,
+      "abilities": [
+        "Clear Body",
+        "Liquid Ooze"
+      ]
     },
     "Nidoqueen": {
       "types": [
@@ -648,7 +785,11 @@
         "spe": 76
       },
       "tier": "NU",
-      "num": 31
+      "num": 31,
+      "abilities": [
+        "Poison Point",
+        "Rivalry"
+      ]
     },
     "Kabutops": {
       "types": [
@@ -664,7 +805,11 @@
         "spe": 80
       },
       "tier": "UU",
-      "num": 141
+      "num": 141,
+      "abilities": [
+        "Swift Swim",
+        "Battle Armor"
+      ]
     },
     "Quagsire": {
       "types": [
@@ -680,7 +825,11 @@
         "spe": 35
       },
       "tier": "PU",
-      "num": 195
+      "num": 195,
+      "abilities": [
+        "Damp",
+        "Water Absorb"
+      ]
     },
     "Rotom-Frost": {
       "types": [
@@ -696,7 +845,10 @@
         "spe": 86
       },
       "tier": "OU",
-      "num": 479
+      "num": 479,
+      "abilities": [
+        "Levitate"
+      ]
     },
     "Uxie": {
       "types": [
@@ -711,7 +863,10 @@
         "spe": 95
       },
       "tier": "UU",
-      "num": 480
+      "num": 480,
+      "abilities": [
+        "Levitate"
+      ]
     },
     "Gastrodon": {
       "types": [
@@ -727,7 +882,11 @@
         "spe": 39
       },
       "tier": "PU",
-      "num": 423
+      "num": 423,
+      "abilities": [
+        "Sticky Hold",
+        "Storm Drain"
+      ]
     },
     "Snorlax": {
       "types": [
@@ -742,7 +901,11 @@
         "spe": 30
       },
       "tier": "(OU)",
-      "num": 143
+      "num": 143,
+      "abilities": [
+        "Immunity",
+        "Thick Fat"
+      ]
     },
     "Ludicolo": {
       "types": [
@@ -758,7 +921,11 @@
         "spe": 70
       },
       "tier": "UU",
-      "num": 272
+      "num": 272,
+      "abilities": [
+        "Swift Swim",
+        "Rain Dish"
+      ]
     },
     "Hitmontop": {
       "types": [
@@ -773,7 +940,11 @@
         "spe": 70
       },
       "tier": "UU",
-      "num": 237
+      "num": 237,
+      "abilities": [
+        "Intimidate",
+        "Technician"
+      ]
     },
     "Togekiss": {
       "types": [
@@ -789,7 +960,11 @@
         "spe": 80
       },
       "tier": "(OU)",
-      "num": 468
+      "num": 468,
+      "abilities": [
+        "Hustle",
+        "Serene Grace"
+      ]
     },
     "Rotom-Mow": {
       "types": [
@@ -805,7 +980,10 @@
         "spe": 86
       },
       "tier": "OU",
-      "num": 479
+      "num": 479,
+      "abilities": [
+        "Levitate"
+      ]
     },
     "Jolteon": {
       "types": [
@@ -820,7 +998,10 @@
         "spe": 130
       },
       "tier": "(OU)",
-      "num": 135
+      "num": 135,
+      "abilities": [
+        "Volt Absorb"
+      ]
     },
     "Porygon-Z": {
       "types": [
@@ -835,7 +1016,11 @@
         "spe": 90
       },
       "tier": "UUBL",
-      "num": 474
+      "num": 474,
+      "abilities": [
+        "Adaptability",
+        "Download"
+      ]
     },
     "Milotic": {
       "types": [
@@ -850,7 +1035,10 @@
         "spe": 81
       },
       "tier": "UU",
-      "num": 350
+      "num": 350,
+      "abilities": [
+        "Marvel Scale"
+      ]
     },
     "Raikou": {
       "types": [
@@ -865,7 +1053,10 @@
         "spe": 115
       },
       "tier": "UUBL",
-      "num": 243
+      "num": 243,
+      "abilities": [
+        "Pressure"
+      ]
     },
     "Gallade": {
       "types": [
@@ -881,7 +1072,10 @@
         "spe": 80
       },
       "tier": "UUBL",
-      "num": 475
+      "num": 475,
+      "abilities": [
+        "Steadfast"
+      ]
     },
     "Electivire": {
       "types": [
@@ -896,7 +1090,10 @@
         "spe": 95
       },
       "tier": "(OU)",
-      "num": 466
+      "num": 466,
+      "abilities": [
+        "Motor Drive"
+      ]
     },
     "Hariyama": {
       "types": [
@@ -911,7 +1108,11 @@
         "spe": 50
       },
       "tier": "UU",
-      "num": 297
+      "num": 297,
+      "abilities": [
+        "Thick Fat",
+        "Guts"
+      ]
     },
     "Heracross": {
       "types": [
@@ -927,7 +1128,11 @@
         "spe": 85
       },
       "tier": "UUBL",
-      "num": 214
+      "num": 214,
+      "abilities": [
+        "Swarm",
+        "Guts"
+      ]
     },
     "Vaporeon": {
       "types": [
@@ -942,7 +1147,10 @@
         "spe": 65
       },
       "tier": "(OU)",
-      "num": 134
+      "num": 134,
+      "abilities": [
+        "Water Absorb"
+      ]
     },
     "Yanmega": {
       "types": [
@@ -958,7 +1166,11 @@
         "spe": 95
       },
       "tier": "UUBL",
-      "num": 469
+      "num": 469,
+      "abilities": [
+        "Speed Boost",
+        "Tinted Lens"
+      ]
     },
     "Slowbro": {
       "types": [
@@ -974,7 +1186,11 @@
         "spe": 30
       },
       "tier": "UU",
-      "num": 80
+      "num": 80,
+      "abilities": [
+        "Oblivious",
+        "Own Tempo"
+      ]
     },
     "Dusknoir": {
       "types": [
@@ -989,7 +1205,10 @@
         "spe": 45
       },
       "tier": "(OU)",
-      "num": 477
+      "num": 477,
+      "abilities": [
+        "Pressure"
+      ]
     },
     "Registeel": {
       "types": [
@@ -1004,7 +1223,10 @@
         "spe": 50
       },
       "tier": "UU",
-      "num": 379
+      "num": 379,
+      "abilities": [
+        "Clear Body"
+      ]
     },
     "Cresselia": {
       "types": [
@@ -1019,7 +1241,10 @@
         "spe": 85
       },
       "tier": "UUBL",
-      "num": 488
+      "num": 488,
+      "abilities": [
+        "Levitate"
+      ]
     },
     "Shaymin": {
       "types": [
@@ -1034,7 +1259,10 @@
         "spe": 100
       },
       "tier": "(OU)",
-      "num": 492
+      "num": 492,
+      "abilities": [
+        "Natural Cure"
+      ]
     },
     "Spiritomb": {
       "types": [
@@ -1050,7 +1278,10 @@
         "spe": 35
       },
       "tier": "UU",
-      "num": 442
+      "num": 442,
+      "abilities": [
+        "Pressure"
+      ]
     },
     "Qwilfish": {
       "types": [
@@ -1066,7 +1297,11 @@
         "spe": 85
       },
       "tier": "UU",
-      "num": 211
+      "num": 211,
+      "abilities": [
+        "Poison Point",
+        "Swift Swim"
+      ]
     },
     "Alakazam": {
       "types": [
@@ -1081,7 +1316,11 @@
         "spe": 120
       },
       "tier": "UU",
-      "num": 65
+      "num": 65,
+      "abilities": [
+        "Synchronize",
+        "Inner Focus"
+      ]
     },
     "Porygon2": {
       "types": [
@@ -1096,7 +1335,11 @@
         "spe": 60
       },
       "tier": "NU",
-      "num": 233
+      "num": 233,
+      "abilities": [
+        "Trace",
+        "Download"
+      ]
     },
     "Toxicroak": {
       "types": [
@@ -1112,7 +1355,11 @@
         "spe": 85
       },
       "tier": "UU",
-      "num": 454
+      "num": 454,
+      "abilities": [
+        "Anticipation",
+        "Dry Skin"
+      ]
     },
     "Sceptile": {
       "types": [
@@ -1127,7 +1374,10 @@
         "spe": 120
       },
       "tier": "UU",
-      "num": 254
+      "num": 254,
+      "abilities": [
+        "Overgrow"
+      ]
     },
     "Azumarill": {
       "types": [
@@ -1142,7 +1392,11 @@
         "spe": 50
       },
       "tier": "UU",
-      "num": 184
+      "num": 184,
+      "abilities": [
+        "Thick Fat",
+        "Huge Power"
+      ]
     },
     "Blaziken": {
       "types": [
@@ -1158,7 +1412,10 @@
         "spe": 80
       },
       "tier": "UU",
-      "num": 257
+      "num": 257,
+      "abilities": [
+        "Blaze"
+      ]
     },
     "Cloyster": {
       "types": [
@@ -1174,7 +1431,11 @@
         "spe": 70
       },
       "tier": "UU",
-      "num": 91
+      "num": 91,
+      "abilities": [
+        "Shell Armor",
+        "Skill Link"
+      ]
     },
     "Honchkrow": {
       "types": [
@@ -1190,7 +1451,11 @@
         "spe": 71
       },
       "tier": "UUBL",
-      "num": 430
+      "num": 430,
+      "abilities": [
+        "Insomnia",
+        "Super Luck"
+      ]
     },
     "Claydol": {
       "types": [
@@ -1206,7 +1471,10 @@
         "spe": 75
       },
       "tier": "UU",
-      "num": 344
+      "num": 344,
+      "abilities": [
+        "Levitate"
+      ]
     },
     "Crobat": {
       "types": [
@@ -1222,7 +1490,10 @@
         "spe": 130
       },
       "tier": "UUBL",
-      "num": 169
+      "num": 169,
+      "abilities": [
+        "Inner Focus"
+      ]
     },
     "Staraptor": {
       "types": [
@@ -1238,7 +1509,10 @@
         "spe": 100
       },
       "tier": "UUBL",
-      "num": 398
+      "num": 398,
+      "abilities": [
+        "Intimidate"
+      ]
     },
     "Aggron": {
       "types": [
@@ -1254,7 +1528,11 @@
         "spe": 50
       },
       "tier": "UU",
-      "num": 306
+      "num": 306,
+      "abilities": [
+        "Sturdy",
+        "Rock Head"
+      ]
     },
     "Scyther": {
       "types": [
@@ -1270,7 +1548,11 @@
         "spe": 105
       },
       "tier": "UU",
-      "num": 123
+      "num": 123,
+      "abilities": [
+        "Swarm",
+        "Technician"
+      ]
     },
     "Steelix": {
       "types": [
@@ -1286,7 +1568,11 @@
         "spe": 30
       },
       "tier": "UU",
-      "num": 208
+      "num": 208,
+      "abilities": [
+        "Rock Head",
+        "Sturdy"
+      ]
     },
     "Mesprit": {
       "types": [
@@ -1301,7 +1587,10 @@
         "spe": 80
       },
       "tier": "UU",
-      "num": 481
+      "num": 481,
+      "abilities": [
+        "Levitate"
+      ]
     },
     "Lanturn": {
       "types": [
@@ -1317,7 +1606,11 @@
         "spe": 67
       },
       "tier": "UU",
-      "num": 171
+      "num": 171,
+      "abilities": [
+        "Volt Absorb",
+        "Illuminate"
+      ]
     },
     "Feraligatr": {
       "types": [
@@ -1332,7 +1625,10 @@
         "spe": 78
       },
       "tier": "UU",
-      "num": 160
+      "num": 160,
+      "abilities": [
+        "Torrent"
+      ]
     },
     "Moltres": {
       "types": [
@@ -1348,7 +1644,10 @@
         "spe": 90
       },
       "tier": "UU",
-      "num": 146
+      "num": 146,
+      "abilities": [
+        "Pressure"
+      ]
     },
     "Blastoise": {
       "types": [
@@ -1363,7 +1662,10 @@
         "spe": 78
       },
       "tier": "UU",
-      "num": 9
+      "num": 9,
+      "abilities": [
+        "Torrent"
+      ]
     },
     "Omastar": {
       "types": [
@@ -1379,7 +1681,11 @@
         "spe": 55
       },
       "tier": "UU",
-      "num": 139
+      "num": 139,
+      "abilities": [
+        "Swift Swim",
+        "Shell Armor"
+      ]
     },
     "Arcanine": {
       "types": [
@@ -1394,7 +1700,11 @@
         "spe": 95
       },
       "tier": "UU",
-      "num": 59
+      "num": 59,
+      "abilities": [
+        "Intimidate",
+        "Flash Fire"
+      ]
     },
     "Drapion": {
       "types": [
@@ -1410,7 +1720,11 @@
         "spe": 95
       },
       "tier": "UU",
-      "num": 452
+      "num": 452,
+      "abilities": [
+        "Battle Armor",
+        "Sniper"
+      ]
     },
     "Torterra": {
       "types": [
@@ -1426,7 +1740,10 @@
         "spe": 56
       },
       "tier": "UU",
-      "num": 389
+      "num": 389,
+      "abilities": [
+        "Overgrow"
+      ]
     },
     "Hitmonlee": {
       "types": [
@@ -1441,7 +1758,11 @@
         "spe": 87
       },
       "tier": "UU",
-      "num": 106
+      "num": 106,
+      "abilities": [
+        "Limber",
+        "Reckless"
+      ]
     },
     "Ambipom": {
       "types": [
@@ -1456,7 +1777,11 @@
         "spe": 115
       },
       "tier": "UU",
-      "num": 424
+      "num": 424,
+      "abilities": [
+        "Technician",
+        "Pickup"
+      ]
     },
     "Nidoking": {
       "types": [
@@ -1472,7 +1797,11 @@
         "spe": 85
       },
       "tier": "UU",
-      "num": 34
+      "num": 34,
+      "abilities": [
+        "Poison Point",
+        "Rivalry"
+      ]
     },
     "Venusaur": {
       "types": [
@@ -1488,7 +1817,10 @@
         "spe": 80
       },
       "tier": "UU",
-      "num": 3
+      "num": 3,
+      "abilities": [
+        "Overgrow"
+      ]
     },
     "Exeggutor": {
       "types": [
@@ -1504,7 +1836,10 @@
         "spe": 55
       },
       "tier": "UU",
-      "num": 103
+      "num": 103,
+      "abilities": [
+        "Chlorophyll"
+      ]
     },
     "Weezing": {
       "types": [
@@ -1519,7 +1854,10 @@
         "spe": 60
       },
       "tier": "UU",
-      "num": 110
+      "num": 110,
+      "abilities": [
+        "Levitate"
+      ]
     },
     "Ursaring": {
       "types": [
@@ -1534,7 +1872,11 @@
         "spe": 55
       },
       "tier": "UU",
-      "num": 217
+      "num": 217,
+      "abilities": [
+        "Guts",
+        "Quick Feet"
+      ]
     },
     "Tangrowth": {
       "types": [
@@ -1549,7 +1891,11 @@
         "spe": 50
       },
       "tier": "UU",
-      "num": 465
+      "num": 465,
+      "abilities": [
+        "Chlorophyll",
+        "Leaf Guard"
+      ]
     },
     "Mismagius": {
       "types": [
@@ -1564,7 +1910,10 @@
         "spe": 105
       },
       "tier": "UU",
-      "num": 429
+      "num": 429,
+      "abilities": [
+        "Levitate"
+      ]
     },
     "Kangaskhan": {
       "types": [
@@ -1579,7 +1928,11 @@
         "spe": 90
       },
       "tier": "UU",
-      "num": 115
+      "num": 115,
+      "abilities": [
+        "Early Bird",
+        "Scrappy"
+      ]
     }
   },
   "moves": {

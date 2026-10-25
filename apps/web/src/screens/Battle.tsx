@@ -28,13 +28,14 @@ import { Field, type Anim, type Float, type Stage } from '../battle/ui/Field';
 import { EXPLAINERS, textLines } from '../battle/ui/labels';
 import { MonPopover } from '../battle/ui/MonPopover';
 import { GiveUpDialog, LogList, LogSheet, MenuSheet } from '../battle/ui/sheets';
-import { BattleText } from '../battle/ui/text';
+import { BattleLog } from '../battle/ui/BattleLog';
 import type { Settings } from '../state/schema';
 import { streakLine, type DaySummary } from '../lib/results';
 import { Button } from '../ui/bits';
 import type { ShareModel } from '../lib/share';
 import { ShareButton, TryRows } from '../ui/results';
-import { CloseIcon, ExpandIcon, InfoIcon } from '../ui/icons';
+import { CloseIcon, InfoIcon } from '../ui/icons';
+import { OtherGames } from '../ui/OtherGames';
 import { useWide } from '../ui/useWide';
 
 /** Milliseconds per battle line ('instant' is for automated tests only). */
@@ -402,53 +403,15 @@ export function Battle({
     </div>
   );
 
-  // The battle text on phones: the latest lines in a pixel-font box under the field,
-  // taking the spare height. Older lines fade.
-  const recent = log.filter((l) => l.trim() && !l.startsWith('== Turn')).slice(-8);
+  // The battle text on phones: the turn just played, in a pixel-font box under the
+  // field that takes the spare height (see battle/ui/BattleLog.tsx).
   const gen = formatInfo(format).gen;
   const textbox = (
-    <div
-      // It is the log on phones: the full history is read out, and a tap opens it.
-      role="log"
-      aria-label="Battle log"
-      onClick={() => (playing ? skip() : setLogOpen(true))}
-      className="battle-textbox relative min-h-[3.25rem] flex-1 basis-0"
-    >
-      {/* Newest first, laid out from the bottom up: a line that doesn't fit wraps into a
-          second column that is clipped, so only whole lines show (no half-cut text). */}
-      <div
-        className="flex min-h-0 flex-1 flex-col-reverse flex-wrap content-start gap-1 overflow-hidden"
-        aria-hidden
-      >
-        {recent.length ? (
-          [...recent].reverse().map((l, i) => (
-            <p key={log.length - i} className="w-full shrink-0">
-              <BattleText text={l} />
-            </p>
-          ))
-        ) : (
-          <p className="w-full">The battle is starting…</p>
-        )}
-      </div>
-      <div className="sr-only">
-        {log.map((l, i) => (
-          <p key={i}>
-            <BattleText text={l} />
-          </p>
-        ))}
-      </div>
-      <button
-        type="button"
-        onClick={(e) => {
-          e.stopPropagation();
-          setLogOpen(true);
-        }}
-        className="absolute top-1 right-1 grid size-8 place-items-center rounded-full text-white/80 hover:bg-white/15"
-        aria-label="Open the battle log"
-      >
-        <ExpandIcon width={16} height={16} />
-      </button>
-    </div>
+    <BattleLog
+      log={log}
+      onClick={() => playing && skip()}
+      className="min-h-[3.25rem] flex-1 basis-0"
+    />
   );
 
   const popover =
@@ -589,6 +552,8 @@ export function Battle({
           </button>
         )}
       </div>
+      {/* Once the day's decided, the other games are one tap away. */}
+      {r.summary.status !== 'pending' && <OtherGames className="mt-4 text-left" />}
     </>
   );
   const endCard = end && (

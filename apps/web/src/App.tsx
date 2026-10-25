@@ -17,6 +17,7 @@ import { useSchedule } from './lib/schedule';
 import type { ScheduleFile } from '@daily-battle/gen/schedule';
 import { ENGINE_VERSION, randomSeed } from './lib/seed';
 import { shareModel } from './lib/share';
+import { GamesProvider } from './ui/OtherGames';
 import { attemptInProgress, dayDecided, withChange, type GameAction } from './state/reducer';
 import { emptyDay, type Settings } from './state/schema';
 import { useNow, useStore } from './state/context';
@@ -162,6 +163,20 @@ export function App() {
     format,
   });
   const countdown = countdownTo(now, addDays(day, 1));
+  // The other games, for the "Play another generation" row on the result and share screens.
+  const otherGames = {
+    games: (Object.keys(FORMATS) as FormatId[])
+      .filter((id) => id !== format)
+      .map((id) => ({
+        id,
+        name: `${formatInfo(id).name} OU`,
+        status: summarizeDay(state.games[id].days[day], true).status,
+      })),
+    onPlay: (id: FormatId) => {
+      dispatchAny({ type: 'setSetting', key: 'format', value: id });
+      go('play');
+    },
+  };
   const setSetting = <K extends keyof Settings>(key: K, value: Settings[K]) =>
     dispatchAny({ type: 'setSetting', key, value });
 
@@ -391,7 +406,9 @@ export function App() {
           </button>
         </div>
       )}
-      <Fragment key={format}>{screen}</Fragment>
+      <GamesProvider value={otherGames}>
+        <Fragment key={format}>{screen}</Fragment>
+      </GamesProvider>
       <WelcomeSheet
         open={playing && !settings.shownExplainers.includes('welcome')}
         hints={settings.beginnerHints}

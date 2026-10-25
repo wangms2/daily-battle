@@ -15,6 +15,7 @@ import {
   type ShareOutcome,
 } from '../lib/share';
 import { shareCardBlob } from '../lib/shareCard';
+import { OtherGames } from './OtherGames';
 import { Sheet } from './Sheet';
 import { Button } from './bits';
 
@@ -273,6 +274,7 @@ export function ShareButton({
               Copy text
             </Button>
           </div>
+          <OtherGames className="mt-1" onPicked={() => setChoosing(false)} />
         </div>
       </Sheet>
       <ManualCopy text={text} open={manual} onOpenChange={setManual} />
