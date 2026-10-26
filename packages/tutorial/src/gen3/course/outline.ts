@@ -26,9 +26,9 @@ export const gen3Course: CourseUnit[] = [
     title: 'Damage',
     lessons: [
       { number: 2, title: 'Super effective and resisted', star: 'Starmie', id: 'gen3-effective' },
-      { number: 3, title: 'Immune', star: 'Gengar' },
-      { number: 4, title: 'Same-type bonus', star: 'Salamence' },
-      { number: 5, title: 'Physical and special', star: 'Blissey' },
+      { number: 3, title: 'Immune', star: 'Gengar', id: 'gen3-immune' },
+      { number: 4, title: 'Same-type bonus', star: 'Metagross', id: 'gen3-stab' },
+      { number: 5, title: 'Physical and special', star: 'Blissey', id: 'gen3-split-course' },
     ],
   },
   {
@@ -43,7 +43,7 @@ export const gen3Course: CourseUnit[] = [
   {
     title: 'Risk and switching',
     lessons: [
-      { number: 9, title: 'What can the foe do to you?', star: 'Metagross' },
+      { number: 9, title: 'What can the foe do to you?', star: 'Tyranitar' },
       { number: 10, title: 'Switch to take the hit', star: 'Swampert' },
       { number: 11, title: 'Free turns', star: 'Flygon' },
     ],

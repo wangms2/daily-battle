@@ -1,4 +1,7 @@
 import { effective } from './course/effective';
+import { immune } from './course/immune';
+import { split as splitCourse } from './course/split';
+import { stab } from './course/stab';
 import { turn } from './course/turn';
 import type { Lesson } from '../types';
 import { speed } from './speed';
@@ -396,4 +399,7 @@ export const gen3Lessons: Lesson[] = [
   // The redesigned course (step 4b), as drafts until it replaces these.
   turn,
   effective,
+  immune,
+  stab,
+  splitCourse,
 ];
