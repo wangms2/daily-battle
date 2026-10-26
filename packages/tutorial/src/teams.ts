@@ -7,7 +7,10 @@ const NEUTRAL = { hp: 85, atk: 85, def: 85, spa: 85, spd: 85, spe: 85 };
 const MAX_IVS = { hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31 };
 
 export function monSet(format: string, mon: Mon): PokemonSet {
-  if ('setId' in mon) return toPokemonSet(mon.species, findSet(setsFor(format), mon));
+  if ('setId' in mon) {
+    const set = toPokemonSet(mon.species, findSet(setsFor(format), mon));
+    return mon.moves ? { ...set, moves: [...mon.moves] } : set;
+  }
   return {
     name: mon.species,
     species: mon.species,

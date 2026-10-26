@@ -1,4 +1,14 @@
 import type { Lesson } from '../types';
+import { speed } from './speed';
+import { status } from './status';
+import { spikes } from './spikes';
+import { setup } from './setup';
+import { items } from './items';
+import { roles } from './roles';
+import { leads } from './leads';
+import { winning } from './winning';
+import { graduation } from './graduation';
+import { switching } from './switching';
 
 const FORMAT = 'gen3ou';
 
@@ -367,4 +377,18 @@ const split: Lesson = {
 };
 
 /** The Gen 3 lessons, in order. */
-export const gen3Lessons: Lesson[] = [basics, types, split];
+export const gen3Lessons: Lesson[] = [
+  basics,
+  types,
+  split,
+  speed,
+  switching,
+  status,
+  spikes,
+  setup,
+  items,
+  roles,
+  leads,
+  winning,
+  graduation,
+];

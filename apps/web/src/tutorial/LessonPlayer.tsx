@@ -7,6 +7,7 @@ import type {
   CardStep,
   Grade,
   Lesson,
+  PickStep,
   QuizStep,
 } from '@daily-battle/tutorial/lessons';
 import clsx from 'clsx';
@@ -60,7 +61,7 @@ export function LessonPlayer({
   const last = index >= lesson.steps.length - 1;
   const next = () => (last ? onDone() : onStep(index + 1));
   const background = backgroundFor(lesson.id, lesson.format);
-  const title = `${lesson.number}. ${lesson.title}`;
+  const title = lesson.graduation ? lesson.title : `${lesson.number}. ${lesson.title}`;
 
   if (step.kind === 'battle')
     return (
@@ -104,6 +105,8 @@ export function LessonPlayer({
       <main className="mx-auto w-full max-w-[560px] flex-1 overflow-y-auto px-4 pt-4 pb-8">
         {step.kind === 'card' ? (
           <Card key={index} step={step} last={last} onNext={next} />
+        ) : step.kind === 'pick' ? (
+          <Pick key={index} step={step} last={last} onNext={next} />
         ) : (
           <Quiz
             key={index}
@@ -158,6 +161,134 @@ function GradeBadge({ grade }: { grade: Grade }) {
     >
       {GRADE[grade].label}
     </span>
+  );
+}
+
+function Sprite({ species, className }: { species: string; className?: string }) {
+  return (
+    <img
+      src={getSprite(species)}
+      alt={species}
+      className={clsx('object-contain [image-rendering:pixelated]', className)}
+    />
+  );
+}
+
+/** Guided team building: tap Pokémon to add them, with feedback on each. */
+export function Pick({
+  step,
+  last,
+  onNext,
+}: {
+  step: PickStep;
+  last: boolean;
+  onNext: () => void;
+}) {
+  const [chosen, setChosen] = useState<number[]>([]);
+  // The option whose feedback is showing.
+  const [focus, setFocus] = useState<number | null>(null);
+  const full = chosen.length >= step.picks;
+  const tap = (i: number) => {
+    setFocus(i);
+    if (chosen.includes(i)) setChosen(chosen.filter((c) => c !== i));
+    else if (step.options[i]!.grade !== 'wrong' && !full) setChosen([...chosen, i]);
+  };
+  const shown = focus === null ? null : step.options[focus]!;
+  const lead = step.target === 'lead';
+  const team = [
+    ...step.team.map((m) => m.species),
+    ...chosen.map((i) => step.options[i]!.mon.species),
+  ];
+
+  return (
+    <section className="grid gap-3">
+      <h2 className="text-[17px] font-semibold">{step.prompt}</h2>
+      {step.foe && (
+        <div aria-label="Their team" className="card grid gap-1 p-2">
+          <span className="text-[12px] text-muted">Their team</span>
+          <div className="grid grid-cols-6 gap-1">
+            {step.foe.map((s) => (
+              <Sprite key={s} species={s} className="size-12 justify-self-center" />
+            ))}
+          </div>
+        </div>
+      )}
+      <div
+        aria-label={lead ? 'Your lead' : 'Your team'}
+        className="card grid grid-cols-6 gap-1 p-2"
+      >
+        {Array.from({ length: step.team.length + step.picks }, (_, i) =>
+          team[i] ? (
+            <Sprite key={team[i]} species={team[i]} className="size-12 justify-self-center" />
+          ) : (
+            <div
+              key={`empty-${i}`}
+              aria-label="Empty slot"
+              className="size-12 justify-self-center rounded-full border-2 border-dashed border-white/15"
+            />
+          ),
+        )}
+      </div>
+      <p className="text-[13px] text-muted">
+        {lead
+          ? full
+            ? 'Lead chosen.'
+            : 'Pick your lead.'
+          : full
+            ? 'Team complete.'
+            : `Pick ${step.picks - chosen.length} more.`}
+      </p>
+      <ul className="grid grid-cols-2 gap-2">
+        {step.options.map((o, i) => (
+          <li key={o.mon.species}>
+            <button
+              type="button"
+              aria-pressed={chosen.includes(i)}
+              onClick={() => tap(i)}
+              className={clsx(
+                'card flex w-full items-center gap-2 p-2 text-left',
+                chosen.includes(i) && 'ring-2 ring-accent',
+                focus === i && !chosen.includes(i) && 'ring-1 ring-white/30',
+              )}
+            >
+              <Sprite species={o.mon.species} className="size-10 shrink-0" />
+              <span className="grid">
+                <span className="font-medium">{o.mon.species}</span>
+                <span className="text-[12px] text-muted">{o.role}</span>
+              </span>
+            </button>
+          </li>
+        ))}
+      </ul>
+      {shown && (
+        <div role="status" className="card grid gap-2 p-3">
+          <div className="flex items-center gap-2 font-semibold">
+            <GradeBadge grade={shown.grade} />
+            {shown.mon.species}
+            {shown.grade === 'wrong'
+              ? lead
+                ? ': not a good lead'
+                : ': not a good fit'
+              : chosen.includes(focus!)
+                ? lead
+                  ? ': leads'
+                  : ': added'
+                : full
+                  ? lead
+                    ? ': you already picked a lead (tap it to change)'
+                    : ': team is full (tap a pick to remove it)'
+                  : ': removed'}
+          </div>
+          <p className="text-[15px]">{shown.why}</p>
+        </div>
+      )}
+      {full && (
+        <div className="card grid gap-3 p-3">
+          <p className="text-[15px]">{step.done}</p>
+          <Button onClick={onNext}>{last ? 'Finish lesson' : 'Continue'}</Button>
+        </div>
+      )}
+    </section>
   );
 }
 

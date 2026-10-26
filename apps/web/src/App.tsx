@@ -319,6 +319,11 @@ export function App() {
         lessons={lessons}
         progress={progress}
         onOpen={(l) => go(`learn/${l.id}`)}
+        onPlay={() => {
+          if (format !== LEARN_FORMAT)
+            dispatchAny({ type: 'setSetting', key: 'format', value: LEARN_FORMAT });
+          go('play');
+        }}
         onBack={() => go('')}
         onSettings={() => setSettingsOpen(true)}
       />

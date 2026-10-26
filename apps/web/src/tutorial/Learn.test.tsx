@@ -6,7 +6,8 @@ import { BattleBackendContext } from '../battle/backend';
 import { inlineBackend } from '../battle/inline-backend';
 import { initialState } from '../state/schema';
 import { Learn } from './Learn';
-import { LessonPlayer } from './LessonPlayer';
+import { LessonPlayer, Pick } from './LessonPlayer';
+import type { PickStep } from '@daily-battle/tutorial/lessons';
 
 const types = gen3Lessons.find((l) => l.id === 'gen3-types')!;
 const firstQuiz = types.steps.findIndex((s) => s.kind === 'quiz');
@@ -38,6 +39,7 @@ describe('Learn', () => {
         lessons={gen3Lessons}
         progress={{ completed: ['gen3-basics'], current: { lesson: 'gen3-types', step: 2 } }}
         onOpen={() => {}}
+        onPlay={() => {}}
         onBack={() => {}}
         onSettings={() => {}}
       />,
@@ -48,6 +50,61 @@ describe('Learn', () => {
     expect(next.getAttribute('aria-current')).toBe('step');
     expect(within(next).getByText('Resume')).toBeTruthy();
     expect(within(items[2]!).getByRole('button').getAttribute('aria-current')).toBeNull();
+    expect(screen.queryByText(/You graduated/)).toBeNull();
+  });
+
+  it('offers the daily after graduation', async () => {
+    const onPlay = vi.fn();
+    render(
+      <Learn
+        game="Gen 3"
+        lessons={gen3Lessons}
+        progress={{ completed: gen3Lessons.map((l) => l.id) }}
+        onOpen={() => {}}
+        onPlay={onPlay}
+        onBack={() => {}}
+        onSettings={() => {}}
+      />,
+    );
+    await userEvent.click(screen.getByRole('button', { name: 'Play today’s Gen 3 daily' }));
+    expect(onPlay).toHaveBeenCalled();
+  });
+});
+
+function pickStep(id: string) {
+  return gen3Lessons.find((l) => l.id === id)!.steps.find((s) => s.kind === 'pick') as PickStep;
+}
+
+describe('Pick', () => {
+  it('rejects a wrong pick with its reason and finishes once the team is full', async () => {
+    const onNext = vi.fn();
+    render(<Pick step={pickStep('gen3-roles')} last={false} onNext={onNext} />);
+    const option = (name: string) => screen.getByRole('button', { name: new RegExp(name) });
+    await userEvent.click(option('Flygon'));
+    expect(option('Flygon').getAttribute('aria-pressed')).toBe('false');
+    expect(screen.getByRole('status').textContent).toMatch(/not a good fit/);
+    await userEvent.click(option('Blissey'));
+    expect(screen.getByRole('status').textContent).toMatch(/added/);
+    expect(screen.getByText('Pick 1 more.')).toBeTruthy();
+    await userEvent.click(option('Forretress'));
+    expect(screen.getByText('Team complete.')).toBeTruthy();
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+    expect(onNext).toHaveBeenCalled();
+  });
+
+  it('picks a lead against a shown foe team', async () => {
+    render(<Pick step={pickStep('gen3-leads')} last={false} onNext={() => {}} />);
+    expect(within(screen.getByLabelText('Their team')).getAllByRole('img').length).toBe(
+      pickStep('gen3-leads').foe!.length,
+    );
+    const option = (name: string) => screen.getByRole('button', { name: new RegExp(name) });
+    await userEvent.click(option('Salamence'));
+    expect(screen.getByRole('status').textContent).toMatch(/not a good lead/);
+    await userEvent.click(option('Skarmory'));
+    expect(screen.getByText('Lead chosen.')).toBeTruthy();
+    await userEvent.click(option('Starmie'));
+    expect(screen.getByRole('status').textContent).toMatch(/already picked a lead/);
+    expect(option('Starmie').getAttribute('aria-pressed')).toBe('false');
   });
 });
 

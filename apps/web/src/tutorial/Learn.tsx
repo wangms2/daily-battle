@@ -4,6 +4,7 @@ import type { Lesson } from '@daily-battle/tutorial/lessons';
 import clsx from 'clsx';
 import type { TutorialProgress } from '../state/schema';
 import { CheckIcon, ChevronIcon } from '../ui/icons';
+import { Button } from '../ui/bits';
 import { TopBar } from '../ui/TopBar';
 import { nextLesson } from './lesson';
 
@@ -25,6 +26,7 @@ export function Learn({
   lessons,
   progress,
   onOpen,
+  onPlay,
   onBack,
   onSettings,
 }: {
@@ -33,11 +35,14 @@ export function Learn({
   lessons: Lesson[];
   progress: TutorialProgress | undefined;
   onOpen: (lesson: Lesson) => void;
+  /** Opens today's daily for this game (offered after graduation). */
+  onPlay: () => void;
   onBack: () => void;
   onSettings: () => void;
 }) {
   const next = nextLesson(lessons, progress);
   const done = lessons.filter((l) => progress?.completed.includes(l.id)).length;
+  const graduated = lessons.some((l) => l.graduation && progress?.completed.includes(l.id));
   return (
     <div className="flex h-full flex-col">
       <TopBar
@@ -51,6 +56,18 @@ export function Learn({
           Short lessons with quizzes and practice battles, from the basics up to playing {game} OU.{' '}
           {done > 0 && `${done} of ${lessons.length} done.`}
         </p>
+        {graduated && (
+          <div className="card mt-4 p-4">
+            <p className="text-[16px] font-semibold">🎓 You graduated!</p>
+            <p className="mt-1 text-[14px] text-muted">
+              You’re ready for the real thing: build a team from this week’s pool and take on
+              today’s battle.
+            </p>
+            <Button className="mt-3 w-full" onClick={onPlay}>
+              Play today’s {game} daily
+            </Button>
+          </div>
+        )}
         <ol className="mt-4 grid gap-2">
           {lessons.map((lesson) => {
             const complete = !!progress?.completed.includes(lesson.id);
@@ -74,7 +91,13 @@ export function Learn({
                       complete ? 'bg-accent text-on-accent' : 'bg-surface-2 text-muted',
                     )}
                   >
-                    {complete ? <CheckIcon aria-label="Done" /> : lesson.number}
+                    {complete ? (
+                      <CheckIcon aria-label="Done" />
+                    ) : lesson.graduation ? (
+                      <span aria-hidden>🎓</span>
+                    ) : (
+                      lesson.number
+                    )}
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block text-[16px] font-semibold">{lesson.title}</span>
