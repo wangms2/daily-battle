@@ -3,6 +3,7 @@
 //   pnpm --filter @daily-battle/tutorial coach-eval
 //     [--vs easy] [--battles 200] [--first 0] [--r 40] [--cases 60] [--per-battle 3] [--jobs 16]
 //     [--out file.json] [--hard-iterations 150000] [--save-cases f.json] [--load-cases f.json]
+//     [--shown] [--collect-only]
 //
 // Against Hard (--vs hard), --hard-iterations sets the opponent's search
 // budget (Hard's own by default), and --save-cases / --load-cases roll out the
@@ -64,6 +65,10 @@ const MAX_CASES = Number(arg('cases') ?? 60);
 const PER_BATTLE = Number(arg('per-battle') ?? 3);
 const JOBS = Number(arg('jobs') ?? 1);
 const OUT = arg('out');
+/** Only decisions where the coach shows a warning (step 4's check of every message shown). */
+const SHOWN = process.argv.includes('--shown');
+/** Collect (and --save-cases) only: shards of a big run collect in parallel, then roll out together. */
+const COLLECT_ONLY = process.argv.includes('--collect-only');
 /** The judge's budget per search. */
 const JUDGE_ITERATIONS = Number(arg('judge-iterations') ?? JUDGE_DEFAULTS.iterations);
 /** Against Hard: the opponent's search budget (Hard's own when left out). */
@@ -184,13 +189,13 @@ function collect(vs: Difficulty): Case[] {
           room &&
           view.request.requestType === 'move' &&
           legalChoices(view.request).length > 1 &&
-          // Spread the cases over the battle.
-          pick() < 0.4
+          // Spread the cases over the battle (every decision when only shown warnings count).
+          (SHOWN || pick() < 0.4)
         ) {
           judge.begin(view, `eval:${i}:${session.turn}`);
           const v = judge.settle(choice, Infinity);
-          if (v && v.top !== choice) {
-            note = coach.warn(view, v);
+          if (v && v.top !== choice) note = coach.warn(view, v);
+          if (v && v.top !== choice && (note || !SHOWN)) {
             cases.push({
               battle: i,
               turn: session.turn,
@@ -339,6 +344,10 @@ const LOAD = arg('load-cases');
 const cases = LOAD ? (JSON.parse(readFileSync(LOAD, 'utf8')) as Case[]) : collect(VS);
 const SAVE = arg('save-cases');
 if (SAVE) writeFileSync(SAVE, JSON.stringify(cases));
+if (COLLECT_ONLY) {
+  console.log(`${cases.length} cases collected`);
+  process.exit(0);
+}
 console.log(
   `${cases.length} judged cases from up to ${BATTLES} battles vs ${VS}` +
     ` (${((performance.now() - t0) / 1000).toFixed(1)}s)`,

@@ -192,6 +192,15 @@ Built as decided above (Product decisions). The original picker tag and "Play Ge
 - **CI:** a small smoke sample on PRs; the full run as a manual or scheduled job.
 - **Lesson content check:** each quiz's "best" answer must win at least as often as the alternatives against the lesson's own foe, and the same for mini-battle prompts that recommend an action.
 
+### 4b. `tut-lessons-review`: review the lessons with the user, and refactor them
+
+Asked by the user (2026-10-26): they haven't seen the lessons yet, and want them to take up the principles built into the coach. Starts after step 4, before step 5. Walk through each lesson with the user (screenshots), then refactor. Candidates:
+
+- **Grade quizzes with the judge and rollouts**, like the coach: a "best" answer must be the judge's top choice and win at least as often as the others against the lesson's foe (`scripts/quiz-audit.ts`). Audit (2026-10-26, 60 runs each): no "best" answer loses to a lower grade, but several quizzes don't discriminate at all (every answer wins 100%, or all 0%): `gen3-types` 4, `gen3-split` 4, `gen3-switching` 4, `gen3-spikes` 6 and 7, `gen3-winning` 2. There the grade rests only on the immediate effect, which can teach that it doesn't matter.
+- **Risk wording:** answer explanations in the coach's plain risk style, one concept at a time.
+- **Show, don't tell:** replay the answer's turn on the battle screen (review mode), with the same You / Better tags.
+- **Lesson battles:** prompts that recommend an action also pass the judge.
+
 ### 5. `tut-coach-plan`: Advanced coaching with long-term plans and reads
 
 Starts once the Simple coach is trusted (steps 2–4). Decided 2026-10-25.
