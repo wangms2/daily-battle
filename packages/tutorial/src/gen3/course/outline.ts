@@ -35,9 +35,9 @@ export const gen3Course: CourseUnit[] = [
     // Switching comes once types give a reason to switch.
     title: 'Switching and turn order',
     lessons: [
-      { number: 6, title: 'Switching', star: 'Skarmory' },
-      { number: 7, title: 'Speed', star: 'Jolteon' },
-      { number: 8, title: 'Priority', star: 'Breloom' },
+      { number: 6, title: 'Switching', star: 'Skarmory', id: 'gen3-switching-course' },
+      { number: 7, title: 'Speed', star: 'Jolteon', id: 'gen3-speed-course' },
+      { number: 8, title: 'Priority', star: 'Breloom', id: 'gen3-priority' },
     ],
   },
   {

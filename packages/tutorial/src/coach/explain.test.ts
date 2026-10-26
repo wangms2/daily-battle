@@ -3,7 +3,7 @@ import { setsFor } from '@daily-battle/data';
 import { describe, expect, it } from 'vitest';
 import { startPosition } from '../battle';
 import type { Position } from '../types';
-import { explainWarning, QUIET_REASONS, winningAnyway } from './explain';
+import { explainWarning, QUIET_REASONS, winningAnyway, type Scope } from './explain';
 import type { Verdict } from './judge';
 
 const data = setsFor('gen3ou');
@@ -12,10 +12,16 @@ const MENCE = { species: 'Salamence', setId: 'salamence-dragon-dance' };
 const HERACROSS = { species: 'Heracross', setId: 'heracross-standard' };
 
 /** The judge says `choice` is clearly worse than `top`: what does the coach say? */
-const explain = (pos: Omit<Position, 'seed'>, choice: string, top: string, worse = true) => {
+const explain = (
+  pos: Omit<Position, 'seed'>,
+  choice: string,
+  top: string,
+  worse = true,
+  scope: Scope = {},
+) => {
   const view = startPosition('gen3ou', { ...pos, seed: 'explain' }).view('p1')!;
   const verdict: Verdict = { choice, top, worse, gap: 0.2, agree: 1, value: 0.3, topValue: 0.5 };
-  return explainWarning(view, turnFacts(view, data), verdict);
+  return explainWarning(view, turnFacts(view, data), verdict, scope);
 };
 
 describe('Warning explanations', () => {
@@ -39,16 +45,37 @@ describe('Warning explanations', () => {
     );
   });
 
-  it('warns about staying in to be knocked out when the top choice is a safe switch', () => {
+  const STAY = {
+    p1: [HERACROSS, { species: 'Swampert', setId: 'swampert-standard-defensive' }],
+    p2: [MENCE],
+  };
+
+  it('says a faster foe knocks you out first, and who takes its hits', () => {
+    expect(explain(STAY, 'move 1', 'switch 2')).toMatchObject({
+      reason: 'slower',
+      text: 'Salamence is faster and can knock Heracross out before Megahorn lands. Swampert takes Salamence’s hits much better.',
+    });
+  });
+
+  it('says a faster foe knocks you out first, and which move goes first', () => {
     const e = explain(
       {
-        p1: [HERACROSS, { species: 'Swampert', setId: 'swampert-standard-defensive' }],
-        p2: [MENCE],
+        p1: [{ species: 'Breloom', moves: ['Sky Uppercut', 'Mach Punch'] }],
+        p2: [{ species: 'Houndoom', moves: ['Flamethrower', 'Crunch'] }],
+        hp: { p2: [15] },
       },
       'move 1',
-      'switch 2',
+      'move 2',
     );
     expect(e).toMatchObject({
+      reason: 'slower',
+      text: 'Houndoom is faster and can knock Breloom out before Sky Uppercut lands. Mach Punch goes first and knocks Houndoom out.',
+    });
+  });
+
+  it('warns about staying in to be knocked out when the top choice is a safe switch', () => {
+    // As in daily battles, where the speed reason is quiet until checked.
+    expect(explain(STAY, 'move 1', 'switch 2', true, { quiet: ['slower'] })).toMatchObject({
       reason: 'staysKo',
       text: 'Risky: Salamence can knock out Heracross this turn. Swampert takes the hit much better.',
     });

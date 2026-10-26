@@ -6,7 +6,13 @@
 import { turnFacts, type Facts, type MoveFact, type NoEffect } from '@daily-battle/ai';
 import type { SetsFile } from '@daily-battle/data';
 import type { SideView } from '@daily-battle/sim-bridge';
-import { explainWarning, QUIET_REASONS, type Explanation, type WarningReason } from './explain';
+import {
+  explainWarning,
+  QUIET_REASONS,
+  UNCHECKED_REASONS,
+  type Explanation,
+  type WarningReason,
+} from './explain';
 import type { Verdict } from './judge';
 import { TIP_LESSON } from './course';
 import { buildReview, decision, type Decision, type Heeded, type Review } from './review';
@@ -61,6 +67,7 @@ const LESSONS: Record<string, Partial<Record<LessonKey, string>>> = {
     staysKo: 'gen3-switching',
     switchKo: 'gen3-switching',
     koThreat: 'gen3-speed',
+    slower: 'gen3-speed',
     foeAsleep: 'gen3-status',
     locked: 'gen3-items',
     spikes: 'gen3-spikes',
@@ -159,7 +166,8 @@ export class Coach {
     private readonly taught = Infinity,
   ) {
     this.lessons = LESSONS[format] ?? {};
-    this.quiet = QUIET_REASONS[difficulty];
+    // Reasons not checked against the daily opponents yet are for lessons only.
+    this.quiet = [...QUIET_REASONS[difficulty], ...(taught === Infinity ? UNCHECKED_REASONS : [])];
   }
 
   private note(rule: CoachRule, text: string, key: LessonKey = rule): CoachNote {

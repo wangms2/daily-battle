@@ -24,7 +24,7 @@ Working plan for the `tutorial` branch. It records what's built, the decisions b
 
 ## Waiting on the user
 
-Next: step 4b, storyboarding unit 1 (lessons 1–2) for the user's review; the vertical slice (lesson 3 draft, the demo and practice steps, the course map at `#learn/course`) is built. Queued for a quiet night (low concurrency): the targeted Explosion run vs Normal (step 4).
+Next: step 4b, storyboarding unit 4 (lessons 9–11, Risk and switching) for the user's review. Units 1–3 (lessons 1–8) are built as drafts, on the course map at `#learn/course`; lessons 6–8 await the user's look at their screenshots. Queued for a quiet night (low concurrency): the targeted Explosion run vs Normal (step 4).
 
 ## Decided 2026-10-26 (morning answers)
 
@@ -240,6 +240,8 @@ Asked by the user (2026-10-26) after the lesson review page (https://claude.ai/a
 - **The coach in lessons** knows the lesson foe's sets (fixed content), so its facts are true for that foe.
 - **Course map:** the straight list (unit headings with progress, each lesson's star Pokémon in a ringed circle, a Start here / Up next card on top). A winding path was tried and dropped. Every lesson can be opened; the next one in order is suggested.
 - **When the new course ships, everyone starts it fresh** (graduation status stays); no mapping from the old 12 lessons.
+- **Unit 3 (built 2026-10-26).** The walled tip ("a teammate hits this foe much harder") moved to lesson 6, Switching. A new warning reason, `slower`, comes with lesson 7: "Zapdos is faster and can knock Heracross out before Rock Slide lands", then what avoids it (a switch that takes the hit, or a priority move that goes first and knocks the foe out). It's tried before `staysKo`. It hasn't been checked against the daily opponents yet (`UNCHECKED_REASONS`), so the daily coach keeps quiet about it and falls through to its other reasons; lessons use it. Check it with coach-eval before dailies use it.
+- **Practice positions the judge can see.** The judge looks only a few turns ahead. A switch whose payoff is a teammate saved for the foe's next Pokémon shows up in rollouts but not in its values (gap under 0.1). Positions that pass have the cost on the spot: the Pokémon that stays is knocked out from full (Jolteon or Magneton against Swampert's Earthquake, Heracross against Zapdos's 4x Drill Peck).
 
 #### Standards for every lesson
 

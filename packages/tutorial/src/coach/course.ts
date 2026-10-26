@@ -15,6 +15,8 @@ export const REASON_LESSON: Record<WarningReason, number | null> = {
   weaker: 1,
   // 3 Immune (other no-effect kinds: see `NO_EFFECT_LESSON`).
   noEffect: 3,
+  // 7 Speed (and 8 Priority: the move that goes first).
+  slower: 7,
   // 10 Switch to take the hit.
   staysKo: 10,
   switchKo: 10,
@@ -43,7 +45,8 @@ export const NO_EFFECT_LESSON: Record<NoEffect['kind'], number | null> = {
 export const TIP_LESSON: Record<CoachRule, number | null> = {
   canKo: 1,
   koThreat: 7,
-  walled: 11,
+  // 6 Switching: a teammate hits this foe much harder.
+  walled: 6,
   foeAsleep: 13,
   spikes: 14,
   setupWindow: 15,

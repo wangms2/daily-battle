@@ -23,7 +23,8 @@ export type WarningReason =
   | 'weaker'
   | 'selfKo'
   | 'explosion'
-  | 'fails';
+  | 'fails'
+  | 'slower';
 
 /**
  * Reasons the coach keeps quiet about against each opponent, because they
@@ -39,6 +40,12 @@ export const QUIET_REASONS: Record<'easy' | 'normal' | 'hard', readonly WarningR
   normal: ['explosion'],
   hard: ['explosion', 'selfKo'],
 };
+
+/**
+ * Reasons not yet checked offline against the daily opponents (coach-eval):
+ * lessons use them, dailies stay quiet until they pass.
+ */
+export const UNCHECKED_REASONS: readonly WarningReason[] = ['slower'];
 
 export interface Explanation {
   reason: WarningReason;
@@ -196,6 +203,32 @@ function explain(
   if (pm?.noEffect) {
     const e = out('noEffect', noEffectText(foe, pm.name, pm.noEffect) + better());
     return e && { ...e, noEffect: pm.noEffect.kind };
+  }
+
+  // The foe is faster and knocks you out before your move lands.
+  if (
+    !quiet.includes('slower') &&
+    pm &&
+    threat &&
+    threat.ko >= SURE_KO &&
+    pm.first <= 1 - SURE_FIRST &&
+    !PROTECT.has(pm.id) &&
+    !SELF_KO.has(pm.id)
+  ) {
+    const rest =
+      tm && !SELF_KO.has(tm.id) && tm.first >= SURE_FIRST && tm.ko >= SURE_KO
+        ? ` ${tm.name} goes first and knocks ${foe} out.`
+        : ts &&
+            ts.taken.ko < 0.05 &&
+            (f.state.ownActive?.hpFrac ?? 0) >= WORTH_SAVING &&
+            topHit <= Math.max(SAFE_HIT, threat.frac / 2)
+          ? ` ${mine(ts.species, foe)} takes ${foe}’s hits much better.`
+          : '';
+    if (rest)
+      return out(
+        'slower',
+        `${foe} is faster and can knock ${me} out before ${pm.name} lands.${rest}`,
+      );
   }
 
   // A KO the pick passes up.

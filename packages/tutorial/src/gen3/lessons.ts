@@ -1,7 +1,10 @@
 import { effective } from './course/effective';
 import { immune } from './course/immune';
+import { priority } from './course/priority';
+import { speed as speedCourse } from './course/speed';
 import { split as splitCourse } from './course/split';
 import { stab } from './course/stab';
+import { switching as switchingCourse } from './course/switching';
 import { turn } from './course/turn';
 import type { Lesson } from '../types';
 import { speed } from './speed';
@@ -402,4 +405,7 @@ export const gen3Lessons: Lesson[] = [
   immune,
   stab,
   splitCourse,
+  switchingCourse,
+  speedCourse,
+  priority,
 ];
