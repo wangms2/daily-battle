@@ -1,5 +1,5 @@
 import type { CoachNote, Review } from '@daily-battle/tutorial';
-import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { BattleBackendContext, type BattleBackend } from '../battle/backend';
@@ -196,6 +196,7 @@ function renderBattle(
     onChoice: vi.fn(),
     onEnd: vi.fn(),
     onExit: vi.fn(),
+    onDayDone: vi.fn(),
     onRunItBack: vi.fn(),
     onChangeTeam: vi.fn(),
   };
@@ -597,6 +598,24 @@ describe('battle screen', () => {
     const card = await winBattle();
     expect(card).toHaveTextContent('⭐ First try');
     expect(card).toHaveTextContent('🔥 1-day streak');
+  });
+
+  it('goes on to the other games once the day is won, and back to the brief while open', async () => {
+    const user = userEvent.setup();
+    const won = renderBattle(fakeBackend([TURN_1]).backend, {
+      result: dayResult([tried('win', 3, 1)], 1),
+    });
+    await user.click(within(await winBattle()).getByRole('button', { name: 'Back to today' }));
+    expect(won.onDayDone).toHaveBeenCalled();
+    expect(won.onExit).not.toHaveBeenCalled();
+    cleanup();
+
+    const open = renderBattle(fakeBackend([TURN_1]).backend, {
+      result: dayResult([tried('loss', 1, 1)], 0),
+    });
+    await user.click(within(await winBattle()).getByRole('button', { name: 'Back to today' }));
+    expect(open.onExit).toHaveBeenCalled();
+    expect(open.onDayDone).not.toHaveBeenCalled();
   });
 
   it('offers another try while the day is open, and copies when there’s no share sheet', async () => {

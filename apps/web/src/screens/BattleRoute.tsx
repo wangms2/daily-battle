@@ -19,6 +19,7 @@ export function BattleRoute({
   dispatch,
   format,
   onExit,
+  onDayDone,
   onRunItBack,
   onChangeTeam,
   result,
@@ -36,6 +37,8 @@ export function BattleRoute({
   dispatch: (a: Action) => void;
   format: FormatId;
   onExit: () => void;
+  /** "Back to today" once the day is decided: the game picker. */
+  onDayDone: () => void;
   onRunItBack: () => void;
   onChangeTeam: () => void;
 }) {
@@ -82,6 +85,7 @@ export function BattleRoute({
         dispatch({ type: 'endAttempt', day, result, remaining, format })
       }
       onExit={onExit}
+      onDayDone={onDayDone}
       onRunItBack={onRunItBack}
       onChangeTeam={onChangeTeam}
       result={{ ...result, ts: attempt.ts }}

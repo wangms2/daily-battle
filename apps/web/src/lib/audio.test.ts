@@ -42,15 +42,56 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllGlobals());
 
 describe('sound', () => {
-  it('loads and plays nothing while it is off (the default)', async () => {
+  it('plays one builder track in every game, and leaves a battle’s music playing', async () => {
     const audio = await engine();
-    audio.configureAudio(OFF);
-    audio.startMusic('gen4ou');
-    audio.playCry('Skarmory', 'gen4ou');
-    audio.playChime();
-    expect(FakeAudio.made).toEqual([]);
+    audio.configureAudio(ON);
+    audio.startBuilderMusic();
+    expect(FakeAudio.made[0]!.src).toMatch(/\/audio\/music\/teambuilder\.mp3$/);
+    expect(FakeAudio.made[0]!.volume).toBe(0.4);
+    // Locking in opens the battle: its music takes over, and the builder closing after
+    // doesn't stop it.
+    audio.startMusic('gen5ou');
+    audio.stopBuilderMusic();
+    expect(FakeAudio.made[0]!.paused).toBe(true);
+    expect(FakeAudio.made[1]!.src).toMatch(/\/audio\/music\/gen5\.mp3$/);
+    expect(FakeAudio.made[1]!.paused).toBe(false);
   });
 
+  it('plays the select sound on every tap of a control, and nothing elsewhere', async () => {
+    const audio = await engine();
+    audio.configureAudio(ON);
+    document.body.innerHTML =
+      '<button>Play</button><button disabled>Off</button><span id="t">text</span>';
+    const stop = audio.menuSounds();
+    try {
+      document.querySelector('button')!.click();
+      document
+        .querySelector<HTMLButtonElement>('button[disabled]')!
+        .dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      document.getElementById('t')!.click();
+      expect(FakeAudio.made.map((a) => a.src)).toEqual([expect.stringMatching(/select\.mp3$/)]);
+    } finally {
+      stop();
+      document.body.innerHTML = '';
+    }
+  });
+  it('plays the select sound on a menu pick only with sound on and effects above 0', async () => {
+    const audio = await engine();
+    audio.configureAudio(OFF);
+    audio.playSelect();
+    audio.configureAudio({ ...ON, effectsVolume: 0 });
+    audio.playSelect();
+    expect(FakeAudio.made).toEqual([]);
+    audio.configureAudio(ON);
+    audio.playCry('Skarmory', 'gen4ou');
+    audio.playSelect();
+    const [cry, select] = FakeAudio.made;
+    expect(select!.src).toMatch(/\/audio\/sfx\/select\.mp3$/);
+    expect(select!.volume).toBe(0.6);
+    expect(select!.paused).toBe(false);
+    // It doesn't cut off a cry.
+    expect(cry!.paused).toBe(false);
+  });
   it("plays the battle's generation track at the music volume", async () => {
     const audio = await engine();
     audio.configureAudio(ON);

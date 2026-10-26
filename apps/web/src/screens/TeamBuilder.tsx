@@ -15,6 +15,7 @@ import {
   topSet,
   type Slot,
 } from '../lib/data';
+import { startBuilderMusic, stopBuilderMusic } from '../lib/audio';
 import { getSprite } from '../lib/sprites';
 import { ConfirmDialog, TeamCheckSheet } from '../sheets/misc';
 import { InfoSheet } from '../sheets/InfoSheet';
@@ -53,6 +54,11 @@ export function TeamBuilder({
   lockBody?: string;
 }) {
   const wide = useWide();
+  // Its own music, quieter than a battle's, while the team is being picked (DESIGN.md §21).
+  useEffect(() => {
+    startBuilderMusic();
+    return stopBuilderMusic;
+  }, []);
   const [noticeShown, setNoticeShown] = useState(true);
   const noticeBar = notice && noticeShown && (
     <div

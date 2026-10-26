@@ -80,7 +80,13 @@ test('plays a whole battle with only the keyboard', async ({ page }) => {
   await expect(over).toBeVisible();
   // Focus lands on the result card.
   await expect(over).toBeFocused();
+  const won = (await over.textContent())!.includes('First try');
   await tabTo(page, (el) => el.textContent === 'Back to today');
   await page.keyboard.press('Enter');
-  await expect(page.getByRole('region', { name: 'Today’s result' })).toBeVisible();
+  // A win goes on to the game picker; otherwise back to the brief.
+  await expect(
+    won
+      ? page.getByText('Choose a generation')
+      : page.getByRole('region', { name: 'Today’s result' }),
+  ).toBeVisible();
 });

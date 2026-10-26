@@ -120,13 +120,19 @@ test('plays a full battle and stays on our own hosts', async ({ page }) => {
   await noScroll(page, 'end card');
   expect(foreign).toEqual([]);
 
-  await expect(page.getByRole('dialog', { name: 'Battle over' })).toContainText(
-    /Try 1|⭐ First try/,
-  );
+  const over = page.getByRole('dialog', { name: 'Battle over' });
+  await expect(over).toContainText(/Try 1|⭐ First try/);
+  const won = (await over.textContent())!.includes('First try');
   await page.getByRole('button', { name: 'Back to today' }).click();
-  // Today's result now shows on the brief.
-  await expect(page.getByRole('region', { name: 'Today’s result' })).toBeVisible();
-  await expect(page.getByRole('button', { name: /^(Try again|Play again) · / })).toBeVisible();
+  if (won) {
+    // The day's beaten: back to the game picker, with a way to share it.
+    await expect(page.getByText('Choose a generation')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Share today' })).toBeVisible();
+  } else {
+    // Today's result now shows on the brief.
+    await expect(page.getByRole('region', { name: 'Today’s result' })).toBeVisible();
+    await expect(page.getByRole('button', { name: /^Try again · / })).toBeVisible();
+  }
 });
 
 test('on a touch screen, a bench tap opens details and its button switches', async ({

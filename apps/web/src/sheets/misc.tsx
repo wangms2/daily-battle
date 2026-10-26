@@ -249,7 +249,7 @@ export function SettingsSheet({
           checked={settings.sound}
           onCheckedChange={(v) => onChange('sound', v)}
           label="Sound"
-          hint="Battle music and Pokémon cries"
+          hint="Music, Pokémon cries, and select sounds"
         />
         <VolumeSlider
           label="Music volume"

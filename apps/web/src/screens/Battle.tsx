@@ -170,6 +170,7 @@ export function Battle({
   onChoice,
   onEnd,
   onExit,
+  onDayDone,
   onRunItBack,
   onChangeTeam,
   topBarRight,
@@ -203,6 +204,8 @@ export function Battle({
   onChoice: (choice: string, ai?: AiChoices, memo?: CoachMemo) => void;
   onEnd: (outcome: BattleOutcome) => void;
   onExit: () => void;
+  /** "Back to today" once the day is decided (to the game picker); else `onExit`. */
+  onDayDone?: () => void;
   onRunItBack?: () => void;
   /** After a loss: back to the brief with the team open for changes. */
   onChangeTeam?: () => void;
@@ -977,7 +980,7 @@ export function Battle({
               Change team
             </Button>
           ) : (
-            <Button variant="secondary" onClick={onExit}>
+            <Button variant="secondary" onClick={onDayDone ?? onExit}>
               Back to today
             </Button>
           )}

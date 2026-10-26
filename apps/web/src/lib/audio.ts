@@ -1,7 +1,8 @@
 // Sound (DESIGN.md §21): battle music and Pokémon cries, as on Showdown, plus a
-// short chime for versus. Off by default; while it's off nothing is downloaded
-// or played. Music plays in battles only, one track per generation, and loops
-// with a short crossfade (the tracks end in a fade-out). One effect plays at a
+// short chime for versus and a select sound on every tap. Off by default; while it's
+// off nothing is downloaded or played. Music plays in battles (one track per
+// generation) and in the team builder (one track for all), and loops with a
+// short crossfade (the tracks end in a fade-out). One effect plays at a
 // time, so a fast turn doesn't stack cries. All audio access goes through here.
 import { genOf } from '@daily-battle/data';
 import { toId } from './data';
@@ -10,7 +11,7 @@ export interface AudioSettings {
   sound: boolean;
   /** 0 to 1. */
   musicVolume: number;
-  /** 0 to 1. Cries and the versus chime. */
+  /** 0 to 1. Cries, the menu select sound, and the versus chime. */
   effectsVolume: number;
 }
 
@@ -22,7 +23,8 @@ const FADE_OUT_MS = 1200;
 const FAINT_RATE = 0.8;
 
 const base = () => `${import.meta.env.BASE_URL}audio/`;
-const musicUrl = (format: string) => `${base()}music/gen${genOf(format)}.mp3`;
+/** A track by name: `gen3`…`gen6` (battles) or `teambuilder`. */
+const musicUrl = (name: string) => `${base()}music/${name}.mp3`;
 
 /** Gen 3 to 5 use the game-era cries; Gen 6 and every Mega the current ones. */
 export function cryUrl(species: string, format: string): string {
@@ -31,12 +33,13 @@ export function cryUrl(species: string, format: string): string {
 }
 
 let settings: AudioSettings = { sound: false, musicVolume: 0.5, effectsVolume: 0.5 };
-/** The battle music wanted now (a format), whether or not it's playing. */
+/** The track wanted now (its name), whether or not it's playing. */
 let wanted: string | null = null;
-let track: { format: string; now: HTMLAudioElement; next: HTMLAudioElement | null } | null = null;
+let track: { name: string; now: HTMLAudioElement; next: HTMLAudioElement | null } | null = null;
 /** A track fading out after its battle, and its timer. */
 let fading: { els: HTMLAudioElement[]; timer: ReturnType<typeof setInterval> } | null = null;
 let effect: HTMLAudioElement | null = null;
+let select: HTMLAudioElement | null = null;
 let context: AudioContext | null = null;
 
 const play = (el: HTMLAudioElement) => void el.play()?.catch(() => {});
@@ -62,11 +65,30 @@ export function configureAudio(next: AudioSettings): void {
 
 /** A battle's music: its generation's track, from the start, looping until `stopMusic`. */
 export function startMusic(format: string): void {
-  wanted = format;
-  if (settings.sound) startTrack(format);
+  want(`gen${genOf(format)}`);
 }
 
-/** Fades the battle music out (the battle ended, or the screen closed). */
+const BUILDER = 'teambuilder';
+
+/**
+ * The team builder's track, the same in every generation. It's mastered about
+ * 3 dB quieter than the battle tracks, so it sits under the menus.
+ */
+export function startBuilderMusic(): void {
+  want(BUILDER);
+}
+
+/** Fades the builder's track out, unless a battle's music has already taken over. */
+export function stopBuilderMusic(): void {
+  if (wanted === BUILDER) stopMusic();
+}
+
+function want(name: string) {
+  wanted = name;
+  if (settings.sound) startTrack(name);
+}
+
+/** Fades the music out (the battle ended, or the screen closed). */
 export function stopMusic(): void {
   wanted = null;
   if (!track) return;
@@ -99,22 +121,22 @@ function stopTrack() {
   track = null;
 }
 
-function startTrack(format: string) {
-  if (track?.format === format) return;
+function startTrack(name: string) {
+  if (track?.name === name) return;
   stopTrack();
-  const now = loop(format);
-  track = { format, now, next: null };
+  const now = loop(name);
+  track = { name, now, next: null };
   play(now);
 }
 
 /** One pass of a track that starts the next pass shortly before it ends. */
-function loop(format: string): HTMLAudioElement {
-  const el = new Audio(musicUrl(format));
+function loop(name: string): HTMLAudioElement {
+  const el = new Audio(musicUrl(name));
   el.volume = settings.musicVolume;
   el.addEventListener('timeupdate', () => {
     if (!track || track.now !== el || track.next || !el.duration) return;
     if (el.duration - el.currentTime > CROSSFADE) return;
-    const next = loop(format);
+    const next = loop(name);
     next.volume = 0;
     track.next = next;
     play(next);
@@ -127,7 +149,7 @@ function loop(format: string): HTMLAudioElement {
       if (t >= 1) {
         clearInterval(blend);
         el.pause();
-        track = { format, now: next, next: null };
+        track = { name, now: next, next: null };
       }
     }, 50);
   });
@@ -148,6 +170,33 @@ export function playCry(species: string, format: string, { faint = false } = {})
   play(el);
 }
 
+/**
+ * The menu select sound (see `menuSounds`). Its own element, so it never cuts off a cry.
+ */
+export function playSelect(): void {
+  if (!settings.sound || !settings.effectsVolume) return;
+  select?.pause();
+  select = new Audio(`${base()}sfx/select.mp3`);
+  select.volume = settings.effectsVolume;
+  play(select);
+}
+
+/** What counts as a control, for the select sound. */
+const CONTROL = 'button, a[href], [role="button"], [role="radio"], [role="switch"], [role="tab"]';
+
+/**
+ * Plays the select sound on every tap of a control, in menus and battles alike
+ * (moves, switches, sheets). Returns the cleanup.
+ */
+export function menuSounds(root: Document = document): () => void {
+  const onClick = (e: MouseEvent) => {
+    const el = (e.target as Element | null)?.closest?.(CONTROL);
+    if (!el || el.matches(':disabled, [aria-disabled="true"]')) return;
+    playSelect();
+  };
+  root.addEventListener('click', onClick, true);
+  return () => root.removeEventListener('click', onClick, true);
+}
 /** A short two-note chime (versus: your battle started, or it's your turn). Synthesized, no file. */
 export function playChime(): void {
   if (!settings.sound || !settings.effectsVolume) return;

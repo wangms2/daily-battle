@@ -8,7 +8,7 @@ import { Home } from './screens/Home';
 import { TeamBuilder } from './screens/TeamBuilder';
 import { AboutSheet } from './sheets/About';
 import { ConfirmDialog, SettingsSheet, StatsSheet, WelcomeSheet } from './sheets/misc';
-import { configureAudio } from './lib/audio';
+import { configureAudio, menuSounds } from './lib/audio';
 import { setActiveFormat } from './lib/data';
 import { setSpriteStyle } from './lib/sprites';
 import { useMediaQuery } from './ui/useWide';
@@ -155,6 +155,7 @@ export function App() {
   setSpriteStyle(state.settings.animations && !reducedMotion ? 'animated' : 'still');
   const { sound, musicVolume, effectsVolume } = state.settings;
   configureAudio({ sound, musicVolume, effectsVolume });
+  useEffect(menuSounds, []);
   const dispatch = (action: GameAction) => dispatchAny({ ...action, format });
   const [retry, setRetry] = useState(0);
   const schedule = useSchedule(week, format, retry);
@@ -514,6 +515,11 @@ export function App() {
         onExit={() => {
           setBattleTs(null);
           go('play');
+        }}
+        // The day's beaten: on to the other games.
+        onDayDone={() => {
+          setBattleTs(null);
+          go('daily');
         }}
         onRunItBack={startBattle}
         onChangeTeam={() => {
