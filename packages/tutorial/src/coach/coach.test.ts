@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { startPosition } from '../battle';
 import type { Position } from '../types';
 import { buildReview, type Decision } from './review';
-import { Coach, type CoachTurn } from './simple';
+import { Coach, TIP_GAP, type CoachTurn } from './simple';
 
 const data = setsFor('gen3ou');
 const coachAt = (pos: Omit<Position, 'seed'>, seed = 'coach'): CoachTurn =>
@@ -20,6 +20,17 @@ describe('Simple coach warnings', () => {
     expect(t.warnings['move 2']).toMatchObject({ rule: 'noEffect', lesson: 'gen3-types' });
     expect(t.warnings['move 2']!.text).toContain('immune to Ground');
     expect(t.warnings['move 1']).toBeUndefined();
+  });
+
+  it('doesn’t ask again about a warning the player ignored', () => {
+    const coach = new Coach(data);
+    const s = startPosition('gen3ou', { p1: [SWAMPERT], p2: [MENCE], seed: 'coach' });
+    expect(coach.turn(s.view('p1')!).warnings['move 2']).toBeDefined();
+    coach.record(s.view('p1')!, 'move 2');
+    s.choose('p1', 'move 2');
+    s.choose('p2', 'move 1');
+    expect(s.ended).toBe(false);
+    expect(coach.turn(s.view('p1')!).warnings['move 2']).toBeUndefined();
   });
 
   it('warns about Levitate, which every Gengar has', () => {
@@ -143,7 +154,15 @@ describe('Simple coach tips', () => {
       rounds: [{ p1: 'move Sleep Powder', p2: 'move 1' }],
     });
     expect(coach.turn(s.view('p1')!).tip?.rule).toBe('foeAsleep');
-    expect(coach.turn(s.view('p1')!).tip?.rule).not.toBe('foeAsleep');
+    // Asking again about the same turn gives the same answer.
+    expect(coach.turn(s.view('p1')!).tip?.rule).toBe('foeAsleep');
+    for (let i = 0; i < TIP_GAP; i++) {
+      s.choose('p1', 'move 2');
+      s.choose('p2', 'move 1');
+      const v = s.view('p1');
+      if (!v || v.request.requestType !== 'move') break;
+      expect(coach.turn(v).tip?.rule).not.toBe('foeAsleep');
+    }
   });
 
   it('suggests setting up when the foe can barely hurt you', () => {
@@ -169,12 +188,15 @@ describe('Simple coach in real battles', () => {
     expect(turn('salamence-choice-band')).toEqual(turn('salamence-dragon-dance'));
   });
 
-  it('warns rarely, keeps to one-turn wording, and reviews the battle', () => {
+  it('speaks rarely, keeps to one-turn wording, and reviews the battle', () => {
     let decisions = 0;
     let warned = 0;
+    let tips = 0;
     for (let i = 0; i < 4; i++) {
       const coach = new Coach(data);
       const easy = aiFor({ difficulty: 'easy', style: 'balance', data });
+      const ignored = new Set<string>();
+      let lastTip = -Infinity;
       const player: Policy = {
         choose(view, rng) {
           const t = coach.turn(view);
@@ -182,7 +204,20 @@ describe('Simple coach in real battles', () => {
           for (const note of [t.tip, ...Object.values(t.warnings)])
             if (note) expect(note.text).not.toMatch(BANNED);
           if (view.request.requestType === 'move') decisions++;
-          if (t.warnings[choice]) warned++;
+          if (t.tip) {
+            // Never two tips close together.
+            const turn = view.battle.turn;
+            expect(turn - lastTip).toBeGreaterThanOrEqual(TIP_GAP);
+            lastTip = turn;
+            tips++;
+          }
+          const w = t.warnings[choice];
+          if (w) {
+            // A warning the player ignored doesn't ask again.
+            expect(ignored.has(w.text)).toBe(false);
+            ignored.add(w.text);
+            warned++;
+          }
           coach.record(view, choice);
           return choice;
         },
@@ -199,7 +234,8 @@ describe('Simple coach in real battles', () => {
       for (const t of [...review.key, ...review.good]) expect(t.text).not.toMatch(BANNED);
     }
     expect(decisions).toBeGreaterThan(50);
-    expect(warned / decisions).toBeLessThan(0.25);
+    expect(warned / decisions).toBeLessThan(0.1);
+    expect(tips / decisions).toBeLessThan(0.2);
   }, 60_000);
 });
 

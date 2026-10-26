@@ -102,10 +102,19 @@ export function noEffectText(foe: string, move: string, why: NoEffect): string {
   }
 }
 
+/**
+ * Turns between tips, so the coach doesn't talk every turn (a tip on turn 4
+ * means none on turns 5 and 6). A tip held back can still show later.
+ */
+export const TIP_GAP = 3;
+
 /** The coach for one battle. It remembers which one-time tips it has shown. */
 export class Coach {
   private readonly lessons: Partial<Record<LessonKey, string>>;
   private readonly seen = new Set<string>();
+  /** Warnings the player chose to ignore: they don't ask again this battle. */
+  private readonly overridden = new Set<string>();
+  private lastTip = -Infinity;
   private spikesSeen = 0;
   private last?: {
     request: SideView['request'];
@@ -114,6 +123,8 @@ export class Coach {
   };
   private readonly decisions: Decision[] = [];
   private recorded = false;
+  /** The tip given for a request, so asking again about it gives the same answer. */
+  private tipFor?: { request: SideView['request']; tip?: CoachNote };
 
   constructor(
     private readonly data: SetsFile,
@@ -132,8 +143,17 @@ export class Coach {
     if (view.request.requestType === 'wait') return { warnings: {} };
     const facts = this.factsFor(view);
     const warnings = this.warnings(facts);
+    for (const [choice, note] of Object.entries(warnings))
+      if (this.overridden.has(note.text)) delete warnings[choice];
     this.last = { request: view.request, facts, warnings };
-    const tip = this.pickTip(view, facts);
+    const turn = facts.state.turn;
+    if (this.last.request === this.tipFor?.request) {
+      const tip = this.tipFor.tip;
+      return tip ? { tip, warnings } : { warnings };
+    }
+    const tip = turn - this.lastTip >= TIP_GAP ? this.pickTip(view, facts) : undefined;
+    if (tip) this.lastTip = turn;
+    this.tipFor = { request: view.request, tip };
     return tip ? { tip, warnings } : { warnings };
   }
 
@@ -146,6 +166,7 @@ export class Coach {
     if (view.request.requestType === 'wait') return;
     const facts = this.factsFor(view);
     const warning = this.last?.request === view.request ? this.last.warnings[choice] : undefined;
+    if (warning) this.overridden.add(warning.text);
     const d = decision(view, facts, this.data, choice, warning);
     if (d) this.decisions.push(d);
     this.recorded = !!d;

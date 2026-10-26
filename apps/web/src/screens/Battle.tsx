@@ -556,8 +556,10 @@ export function Battle({
       onChoose={pick}
     />
   );
-  // The lesson's own prompt wins over a coach tip on the same turn.
-  const tip = !promptText && controls && !end && !tipHidden ? coach?.tip : undefined;
+  // One message at a time: the lesson's own prompt and a beginner hint both
+  // come before a coach tip.
+  const tip =
+    !promptText && !showExplainer && controls && !end && !tipHidden ? coach?.tip : undefined;
   const panel = (
     <div className="relative flex shrink-0 flex-col gap-2">
       {promptNote}
