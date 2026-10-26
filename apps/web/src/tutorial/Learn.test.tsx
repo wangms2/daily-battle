@@ -7,7 +7,8 @@ import { inlineBackend } from '../battle/inline-backend';
 import { initialState } from '../state/schema';
 import { Learn } from './Learn';
 import { LessonPlayer, Pick } from './LessonPlayer';
-import type { Lesson, PickStep } from '@daily-battle/tutorial/lessons';
+import type { CourseUnit, Lesson, PickStep } from '@daily-battle/tutorial/lessons';
+import { CourseMap } from './CourseMap';
 import { nextLesson } from './lesson';
 
 const types = gen3Lessons.find((l) => l.id === 'gen3-types')!;
@@ -106,6 +107,40 @@ describe('Pick', () => {
     await userEvent.click(option('Starmie'));
     expect(screen.getByRole('status').textContent).toMatch(/already picked a lead/);
     expect(option('Starmie').getAttribute('aria-pressed')).toBe('false');
+  });
+});
+
+describe('CourseMap', () => {
+  const course: CourseUnit[] = [
+    {
+      title: 'Damage',
+      lessons: [
+        { number: 1, title: 'Types', star: 'Swampert', id: 'gen3-types' },
+        { number: 2, title: 'Immune', star: 'Gengar', id: 'gen3-basics' },
+        { number: 3, title: 'Not built', star: 'Starmie' },
+      ],
+    },
+  ];
+  it('walks the course by unit, checks done lessons, and starts the next', async () => {
+    const onOpen = vi.fn();
+    render(
+      <CourseMap
+        game="Gen 3"
+        course={course}
+        lessons={gen3Lessons}
+        progress={{ completed: ['gen3-types'] }}
+        onOpen={onOpen}
+        onBack={() => {}}
+        onSettings={() => {}}
+      />,
+    );
+    expect(screen.getByRole('heading', { name: /Unit 1 · Damage/ })).toHaveTextContent('1 of 3');
+    expect(screen.getByRole('button', { name: 'Lesson 1: Types, done' })).toBeEnabled();
+    const next = screen.getByRole('button', { name: 'Lesson 2: Immune' });
+    expect(next).toHaveAttribute('aria-current', 'step');
+    expect(screen.getByRole('button', { name: 'Lesson 3: Not built, coming soon' })).toBeDisabled();
+    await userEvent.click(screen.getByRole('button', { name: /Up next · Lesson 2/ }));
+    expect(onOpen).toHaveBeenCalledWith(gen3Lessons.find((l) => l.id === 'gen3-basics'));
   });
 });
 
