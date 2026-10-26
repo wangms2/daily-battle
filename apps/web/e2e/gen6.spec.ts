@@ -34,7 +34,7 @@ function gen6State({ locked = true } = {}) {
       beginnerHints: true,
       battleSpeed: 'instant',
       animations: true,
-      shownExplainers: ['welcome', 'gen5-news', 'gen6-news', 'gen3-news'],
+      shownExplainers: ['welcome', 'gen5-news', 'gen6-news', 'gen3-news', 'tour'],
       format: 'gen6ou',
     },
   };

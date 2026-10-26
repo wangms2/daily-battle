@@ -13,6 +13,13 @@ corepack enable
 pnpm install
 ```
 
+The Hard AI needs its WebAssembly engine, built from Rust (optional; without it, builds just have no Hard):
+
+```sh
+rustup target add wasm32-unknown-unknown
+pnpm --filter @daily-battle/engine-wasm build:wasm
+```
+
 ## Scripts
 
 | Command                    | What it does                               |
@@ -32,6 +39,7 @@ packages/
   data/        set snapshot scripts + JSON            (M1)
   gen/         seeded generation + constraints        (M3)
   ai/          belief model, scoring, policies        (M4)
+  engine-wasm/ poke-engine as WebAssembly (Hard AI)   (§4.6)
   sim-bridge/  wrapper around @pkmn/sim, SideView     (M2)
   pipeline/    offline validation, schedule emitter   (M5)
   versus/      versus room rules and messages         (§18)
@@ -46,4 +54,4 @@ Packages export their TypeScript source directly, and Vite and Vitest consume it
 
 Unofficial fan project, free and non-commercial. Not affiliated with or endorsed by Nintendo, Creatures Inc., GAME FREAK inc., The Pokémon Company, or Smogon. Pokémon, Pokémon character names, and sprites are © Nintendo, Creatures Inc., and GAME FREAK inc.
 
-Source code is MIT licensed (see [LICENSE](LICENSE)). `@pkmn/*` packages and Pokémon Showdown code are MIT licensed by their authors. Set and usage data come from Smogon and are used with Smogon's permission (see [packages/data/README.md](packages/data/README.md)).
+Source code is MIT licensed (see [LICENSE](LICENSE)). `@pkmn/*` packages and Pokémon Showdown code are MIT licensed by their authors. The Hard AI uses [poke-engine](https://github.com/pmariglia/poke-engine) by pmariglia (MIT). Set and usage data come from Smogon and are used with Smogon's permission (see [packages/data/README.md](packages/data/README.md)).

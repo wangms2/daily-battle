@@ -1,0 +1,28 @@
+{
+  "name": "@daily-battle/tutorial",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Learn mode: Gen 3 lessons, quiz positions, scripted mini-battles, and the coach",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./lessons": "./src/lessons.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "coach-eval": "tsx scripts/coach-eval.ts",
+    "judge-bench": "tsx scripts/judge-bench.ts",
+    "coach-rate": "tsx scripts/coach-rate.ts"
+  },
+  "dependencies": {
+    "@daily-battle/ai": "workspace:*",
+    "@daily-battle/data": "workspace:*",
+    "@daily-battle/engine-wasm": "workspace:*",
+    "@daily-battle/gen": "workspace:*",
+    "@daily-battle/sim-bridge": "workspace:*",
+    "@pkmn/sim": "catalog:"
+  },
+  "devDependencies": {
+    "tsx": "^4.23.15"
+  }
+}

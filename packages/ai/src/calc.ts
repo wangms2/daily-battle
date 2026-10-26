@@ -34,10 +34,13 @@ export interface MonSpec {
 
 const STATUSES = new Set(['slp', 'psn', 'brn', 'frz', 'par', 'tox']);
 
+const calcId = (name: string) => (name ?? '').toLowerCase().replace(/[^a-z0-9]/g, '') as never;
+
 export function makeMon(gen: Gen, spec: MonSpec): Pokemon {
+  // A request names items and abilities by id ("levitate"); the calc only knows names.
   const mon = new Pokemon(gen, spec.species, {
-    item: spec.item as never,
-    ability: spec.ability as never,
+    item: (gen.items.get(calcId(spec.item))?.name ?? spec.item) as never,
+    ability: (gen.abilities.get(calcId(spec.ability))?.name ?? spec.ability) as never,
     nature: spec.nature as never,
     evs: spec.evs,
     ivs: spec.ivs,

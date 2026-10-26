@@ -90,7 +90,7 @@ test('a mascot opens its generation, and one cleared today has a check', async (
           battleSpeed: 'fast',
           animations: true,
           sound: false,
-          shownExplainers: ['welcome'],
+          shownExplainers: ['welcome', 'tour'],
         },
       }),
     );

@@ -120,6 +120,56 @@ describe('AI behavior', () => {
     const best = actions.reduce((a, b) => (b.score > a.score ? b : a));
     expect(best.move).toBe('recover');
   });
+
+  it('rates Hidden Power and Return from Gen 3 requests, which carry their power', () => {
+    const gen3 = setsFor('gen3ou');
+    let view: SideView | undefined;
+    const capture: Policy = {
+      choose(v, rng) {
+        view ??= v;
+        return new RandomPolicy().choose(v, rng);
+      },
+    };
+    const mon = (species: string, setId: string) =>
+      toPokemonSet(species, findSet(gen3, { species, setId }));
+    runBattle({
+      format: 'gen3ou',
+      seed: deriveSeed('hp-return', 0),
+      maxTurns: 1,
+      p1: {
+        team: [mon('Swampert', 'swampert-standard-defensive')],
+        policy: new RandomPolicy(),
+        seed: '1,1,1,1',
+      },
+      p2: {
+        team: [
+          {
+            ...mon('Salamence', 'salamence-dragon-dance'),
+            moves: ['Hidden Power Flying', 'Return'],
+          },
+        ],
+        policy: capture,
+        seed: '2,2,2,2',
+      },
+    });
+    const names =
+      view!.request.requestType === 'move' ? view!.request.active[0]!.moves.map((m) => m.name) : [];
+    expect(names).toEqual([
+      expect.stringMatching(/^Hidden Power Flying \d+$/),
+      expect.stringMatching(/^Return \d+$/),
+    ]);
+    const actions = scoreActions(
+      view!,
+      extractState(view!, gen3),
+      PRESETS.balance,
+      () => 0.5,
+      gen3,
+    );
+    expect(actions.filter((a) => a.kind === 'move').map((a) => [a.move, a.damage > 0.1])).toEqual([
+      ['hiddenpowerflying', true],
+      ['return', true],
+    ]);
+  });
 });
 
 describe('AI behavior with Team Preview (Gen 5)', () => {

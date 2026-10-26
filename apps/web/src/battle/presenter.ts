@@ -248,6 +248,7 @@ function teamMarks(dex: ModdedDex, side: ClientSide, order?: string[]): TeamMark
     species: species ?? (p && teamSpecies(dex, p.speciesForme)),
     fainted: !!p?.fainted,
     status: p?.status ?? '',
+    ...(p?.maxhp ? { hp: p.fainted ? 0 : Math.round((100 * p.hp) / p.maxhp) } : {}),
   });
   const marks = order
     ? order.map((s) =>
@@ -287,17 +288,49 @@ function viewOf(
   };
 }
 
-/** Damage multiplier of a move's type against a species by typing; null for status moves. */
+/** Abilities that make a Pokémon immune to a move type. */
+const ABILITY_IMMUNE: Record<string, string> = {
+  Levitate: 'Ground',
+  'Flash Fire': 'Fire',
+  'Volt Absorb': 'Electric',
+  'Water Absorb': 'Water',
+  'Motor Drive': 'Electric',
+  'Dry Skin': 'Water',
+  'Sap Sipper': 'Grass',
+  'Storm Drain': 'Water',
+  'Lightning Rod': 'Electric',
+};
+
+/**
+ * Damage multiplier of a move's type against a species by typing, and by its
+ * ability when that's certain (shown, or the only one it can have); null for
+ * status moves.
+ */
 export function effectiveness(
   dex: ModdedDex,
   moveName: string,
   species: string | undefined,
+  ability?: string,
 ): number | null {
   const move = dex.moves.get(moveName);
   if (!move.exists || move.category === 'Status' || !species) return null;
   const types = dex.species.get(species).types;
   if (!dex.getImmunity(move.type, types)) return 0;
-  return 2 ** dex.getEffectiveness(move.type, types);
+  // Lightning Rod and Storm Drain only grant immunity from Gen 5.
+  const immune = ability && ABILITY_IMMUNE[ability];
+  if (immune === move.type && !(['Lightning Rod', 'Storm Drain'].includes(ability!) && dex.gen < 5))
+    return 0;
+  const mult = 2 ** dex.getEffectiveness(move.type, types);
+  if (ability === 'Wonder Guard' && mult <= 1) return 0;
+  return mult;
+}
+
+/** A foe's ability if it's certain: shown, or the only one its species can have. */
+function sureAbility(dex: ModdedDex, mon: { ability?: string; speciesForme: string } | undefined) {
+  if (!mon) return undefined;
+  if (mon.ability) return dex.abilities.get(mon.ability).name;
+  const all = Object.values(dex.species.get(mon.speciesForme).abilities).filter(Boolean);
+  return new Set(all).size === 1 ? all[0] : undefined;
 }
 
 /** Full descriptions run up to ~900 characters (Substitute); past this, the short one. */
@@ -378,14 +411,24 @@ export class SidePresenter {
     let before = viewOf(this.dex, this.client, me, order, this.spectator);
     for (const line of update.lines) {
       for (const { args, kwArgs } of Protocol.parse(line)) {
-        const text = cleanText(this.formatter.formatText(args, kwArgs));
+        // A `[silent]` line (a lesson setting HP) changes the battle, not its text.
+        const text = (kwArgs as { silent?: unknown }).silent
+          ? ''
+          : cleanText(this.formatter.formatText(args, kwArgs));
         this.client.add(args, kwArgs);
         const a = args as readonly string[];
         const kw = kwArgs as Record<string, unknown>;
         for (const e of explainersOf(a)) if (e) explainers.add(e);
         const event = eventOf(me, a, kw, this.dex);
         const popup = popupOf(me, a, kw);
-        if (!text && !event && !popup) continue;
+        if (!text && !event && !popup) {
+          // A silent change (a lesson's starting HP) shows from the last frame on.
+          if (kw.silent && frames.length) {
+            before = viewOf(this.dex, this.client, me, order, this.spectator);
+            frames[frames.length - 1]!.view = before;
+          }
+          continue;
+        }
         if (text.startsWith('Battle started between')) continue;
         const view = viewOf(this.dex, this.client, me, order, this.spectator);
         const label = labelOf(me, a, kw, before, view);
@@ -469,7 +512,9 @@ export class SidePresenter {
     const switches = legal
       .filter((c) => c.startsWith('switch'))
       .map((choice) => ({ choice, slot: Number(choice.split(' ')[1]) }));
-    const foe = this.client[this.foe].active[0]?.speciesForme;
+    const foeMon = this.client[this.foe].active[0] ?? undefined;
+    const foe = foeMon?.speciesForme;
+    const foeAbility = sureAbility(this.dex, foeMon);
     let moves: MoveOption[] = [];
     if (request.requestType === 'move') {
       moves = (request.active[0]?.moves ?? []).map((m, i) => {
@@ -489,7 +534,7 @@ export class SidePresenter {
           pp: 'pp' in m ? m.pp : 0,
           maxpp: 'maxpp' in m ? m.maxpp : 0,
           disabled: !legal.includes(choice),
-          effectiveness: effectiveness(this.dex, move.name, foe),
+          effectiveness: effectiveness(this.dex, move.name, foe, foeAbility),
         };
       });
     }

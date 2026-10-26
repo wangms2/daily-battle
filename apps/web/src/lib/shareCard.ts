@@ -6,7 +6,7 @@
 // the device until the player shares it.
 import type { FormatId } from '@daily-battle/data/formats';
 import { condenseTries, tryCount } from './results';
-import type { ShareModel, ShareRow } from './share';
+import { shareHeader, type ShareModel, type ShareRow } from './share';
 import { getSprite } from './sprites';
 
 /** Logical size: the common link-preview shape. Drawn at 2× for sharp text. */
@@ -218,7 +218,7 @@ export async function drawShareCard(m: ShareModel): Promise<HTMLCanvasElement> {
   const nameW = ctx.measureText('Pokémon Daily').width;
   ctx.fillStyle = 'rgb(255 255 255 / 0.86)';
   ctx.font = font(500, 28);
-  ctx.fillText(`· ${m.game ? `${m.game} · ` : ''}${m.date}`, left + nameW + 14, mid + 2);
+  ctx.fillText(`· ${shareHeader(m)}`, left + nameW + 14, mid + 2);
   if (m.streak) {
     const reset = m.streak === 'Streak reset';
     const text = reset ? m.streak : `🔥 ${m.streak}`;

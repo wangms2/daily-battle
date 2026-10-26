@@ -1,6 +1,8 @@
 // A room before it starts: who's in, the invite, and the host's settings.
 // Everyone sees the same settings; only the host can change them.
-import { FORMATS, formatInfo, type FormatId } from '@daily-battle/data/formats';
+import { DIFFICULTIES, type Difficulty } from '@daily-battle/ai/version';
+import { FORMATS, formatInfo, genOf, type FormatId } from '@daily-battle/data/formats';
+import { hasEngine } from '@daily-battle/engine-wasm/version';
 import {
   LIVES_MAX,
   LIVES_MIN,
@@ -14,6 +16,7 @@ import {
 } from '@daily-battle/versus';
 import clsx from 'clsx';
 import { useState } from 'react';
+import { DIFFICULTY_NAME } from '../lib/share';
 import { ConfirmDialog } from '../sheets/misc';
 import { Button, SectionLabel } from '../ui/bits';
 import { weekKey } from '@daily-battle/gen/dates';
@@ -91,6 +94,10 @@ const POOL_OPTIONS: Option<RoomSettings['pool']>[] = [
   { value: 'random', label: 'New random pool' },
   { value: 'weekly', label: 'This week’s pool' },
 ];
+const RIVAL_OPTIONS: Option<Difficulty>[] = DIFFICULTIES.map((d) => ({
+  value: d,
+  label: DIFFICULTY_NAME[d],
+}));
 
 export function Lobby({
   room,
@@ -118,6 +125,7 @@ export function Lobby({
   const link = `${window.location.origin}/#versus/${room.code}`;
   const set = (settings: Partial<RoomSettings>) => command({ type: 'settings', settings });
   const nextHost = room.players.find((p) => p.id !== you);
+  const rival = room.settings.rivalDifficulty ?? 'normal';
 
   const invite = async () => {
     try {
@@ -259,6 +267,14 @@ export function Lobby({
                 ? (pool) => set(pool === 'weekly' ? { pool, week: weekKey(new Date()) } : { pool })
                 : undefined
             }
+          />
+          <Choice
+            label="Rival (the AI for an odd player out)"
+            value={rival}
+            options={RIVAL_OPTIONS.filter(
+              (o) => o.value !== 'hard' || hasEngine(genOf(room.settings.format)),
+            )}
+            onChange={editable ? (rivalDifficulty) => set({ rivalDifficulty }) : undefined}
           />
         </div>
       </section>

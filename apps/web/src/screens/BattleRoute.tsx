@@ -22,7 +22,10 @@ export function BattleRoute({
   onRunItBack,
   onChangeTeam,
   result,
+  coach,
 }: {
+  /** The daily coach, where it's offered (see Battle). */
+  coach?: { warning: string | null; onTurnOn: () => void };
   /** Today's result so far, for the end card. */
   result: Omit<DayResult, 'ts'>;
   day: string;
@@ -47,6 +50,14 @@ export function BattleRoute({
       battleSeed: attempt.battleSeed,
       aiSeed: attempt.aiSeed,
       choices: [...attempt.choices],
+      ...(attempt.difficulty && { difficulty: attempt.difficulty }),
+      ...(attempt.coached && { coach: 'simple' as const }),
+      // Hard's prior for your unseen Pokémon, and the coach's for the foe's.
+      ...((attempt.difficulty === 'hard' || attempt.coached) && {
+        pool: [...schedule.pool.species],
+      }),
+      ...(attempt.difficulty === 'hard' && { aiChoices: [...(attempt.aiChoices ?? [])] }),
+      ...(attempt.coachLog && { coachLog: [...attempt.coachLog] }),
     };
   });
   return (
@@ -57,7 +68,16 @@ export function BattleRoute({
       settings={settings}
       onSetting={(key, value) => dispatch({ type: 'setSetting', key, value })}
       onExplainerSeen={(id) => dispatch({ type: 'markExplainer', id })}
-      onChoice={(choice) => dispatch({ type: 'recordChoice', day, choice, format })}
+      onChoice={(choice, ai, memo) =>
+        dispatch({
+          type: 'recordChoice',
+          day,
+          choice,
+          format,
+          ...(ai && { ai }),
+          ...(memo && { memo }),
+        })
+      }
       onEnd={({ result, remaining }) =>
         dispatch({ type: 'endAttempt', day, result, remaining, format })
       }
@@ -65,6 +85,7 @@ export function BattleRoute({
       onRunItBack={onRunItBack}
       onChangeTeam={onChangeTeam}
       result={{ ...result, ts: attempt.ts }}
+      {...(coach && { coach: { ...coach, on: !!attempt.coached } })}
     />
   );
 }

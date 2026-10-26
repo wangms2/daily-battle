@@ -10,8 +10,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Lint, types, unit tests, and the production build (shared with e2e).
-  check:
+  # poke-engine (Rust) compiled to WebAssembly, one module per gen, for the Hard
+  # AI. Built once and shared: tests, the web build, and the room server use it.
+  wasm:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,6 +22,35 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: packages/engine-wasm/rust
+      - run: pnpm --filter @daily-battle/engine-wasm build:wasm
+      - uses: actions/upload-artifact@v4
+        with:
+          name: engine-wasm
+          path: packages/engine-wasm/dist
+          retention-days: 1
+
+  # Lint, types, unit tests, and the production build (shared with e2e).
+  check:
+    needs: wasm
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@v4
+        with:
+          name: engine-wasm
+          path: packages/engine-wasm/dist
       - run: pnpm lint
       - run: pnpm format:check
       - run: pnpm typecheck
@@ -36,6 +66,7 @@ jobs:
 
   # Long-running simulations, in parallel with everything else.
   sims:
+    needs: wasm
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -45,9 +76,20 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@v4
+        with:
+          name: engine-wasm
+          path: packages/engine-wasm/dist
       - run: pnpm --filter @daily-battle/sim-bridge soak --n 1000
       - run: pnpm --filter @daily-battle/gen check --n 10000
       - run: pnpm --filter @daily-battle/ai eval --n 100 --assert
+      # Hard at a small budget: a smoke test that it plays whole battles (win
+      # rates are reported, not asserted; tuning runs are local, at full budget).
+      - run: pnpm --filter @daily-battle/ai eval --hard --only-hard --hard-n 10 --hard-iterations 20000
+      # The coach's warnings (docs/plan-tutorial-coach.md, step 4): a smoke test
+      # that collecting shown warnings and rolling them out works end to end.
+      # Gains are reported, not asserted (too few cases); the full run is local.
+      - run: pnpm --filter @daily-battle/tutorial coach-eval --shown --battles 20 --cases 30 --r 6 --jobs 2
 
   # Playwright on the shared build, split across shards.
   e2e:
@@ -65,6 +107,10 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@v4
+        with:
+          name: engine-wasm
+          path: packages/engine-wasm/dist
       - uses: actions/download-artifact@v4
         with:
           name: web-dist
@@ -94,8 +140,13 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: pnpm
-      # The room server (apps/server) is bundled from source, with the pinned wrangler.
+      # The room server (apps/server) is bundled from source, with the pinned wrangler
+      # and the engine modules (the Hard Rival).
       - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@v4
+        with:
+          name: engine-wasm
+          path: packages/engine-wasm/dist
       - uses: actions/download-artifact@v4
         with:
           name: web-dist

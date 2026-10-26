@@ -37,7 +37,9 @@ function state(sound?: object) {
       beginnerHints: false,
       battleSpeed: 'fast',
       animations: false,
-      shownExplainers: ['welcome'],
+      shownExplainers: ['welcome', 'tour'],
+      // The Gen 3 brief's "Want a coach?" offer, already answered.
+      coachOffered: { gen3ou: true },
       format: 'gen3ou',
       sound: false,
       ...sound,

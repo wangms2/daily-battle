@@ -60,6 +60,8 @@ export interface Match {
   ai: Side | null;
   /** The AI's style (DESIGN.md §8.5), from its generated team. */
   aiStyle?: 'offense' | 'balance' | 'stall';
+  /** The AI's difficulty when it isn't Normal (the room's Rival setting at the round's start). */
+  aiDifficulty?: 'easy' | 'hard';
   format: FormatId;
   /** The battle's PRNG seed. Never sent to players. */
   seed: string;
@@ -84,6 +86,7 @@ export function newMatch(input: {
   names: Record<Side, string>;
   ai?: Side | null;
   aiStyle?: Match['aiStyle'];
+  aiDifficulty?: Match['aiDifficulty'];
   format: FormatId;
   seed: string;
   slots: Record<Side, Slot[]>;
@@ -103,6 +106,7 @@ export function newMatch(input: {
     names: input.names,
     ai,
     ...(input.aiStyle && { aiStyle: input.aiStyle }),
+    ...(input.aiDifficulty && { aiDifficulty: input.aiDifficulty }),
     format: input.format,
     seed: input.seed,
     slots: input.slots,

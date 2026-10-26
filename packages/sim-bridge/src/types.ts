@@ -38,6 +38,12 @@ export interface RunBattleInput {
   seed: PRNGSeed;
   /** Force a tie once this many turns have been played. */
   maxTurns?: number;
+  /**
+   * Tutorial battles: chance rolls of 50% or more always happen and the rest
+   * never do (moves hit, no crits, no full paralysis, no secondary effects).
+   * Damage rolls and durations (sleep turns) stay random.
+   */
+  noLuck?: boolean;
   p1: PlayerInput;
   p2: PlayerInput;
 }

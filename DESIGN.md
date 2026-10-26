@@ -87,6 +87,40 @@ Daily swap (done on the daily brief screen, shown as "1 change left"):
 - A day shows one of: not played, first-try win, won on a later try, not cleared yet (today, tried but not won), or not cleared (a past day never won).
 - Streaks and stats are derived from the saved attempts (`apps/web/src/lib/results.ts`), not stored.
 
+### 4.5 Difficulty, streaks, and the team (added Oct 2026)
+
+- Each game has a CPU difficulty, **Easy**, **Normal** (the default, and the AI of §8), or **Hard**, picked on the daily brief and remembered per game (`settings.difficulty`). An attempt records the difficulty it was played at.
+- **Each difficulty is its own daily**: the same opponent team and the same locked team, but its own first try, tries, streak, and stats. A day's status on Home and the end card is the picked difficulty's. Home shows an Easy or Hard badge on the game.
+- The picker is locked while a battle is in progress; switching difficulty never abandons a try.
+- **Team rules follow Normal's tries only** (`dayLost`, `dayDecided`, the practice change). The team is shared, so an Easy or Hard loss doesn't free it up. Ditching the team (§4.2) breaks every difficulty's streak.
+- Normal is unchanged: same AI, same engine string, same saves, same share text.
+
+### 4.6 CPU difficulty (added Oct 2026)
+
+| | Easy | Normal | Hard |
+| --- | --- | --- | --- |
+| Brain | The utility AI (§8) with the `EASY` preset | The utility AI with the team's style preset | poke-engine's MCTS over sampled worlds |
+| Plays like | A beginner: mostly attacks (not always the best one), rarely switches, no hazards, setup, or predictions | A typical ladder player | A strong player that looks turns ahead and guesses your sets |
+| Cost | < 1 ms a decision | < 1 ms | ~0.3 s a decision on a desktop (≤ 2 s on a slow phone) |
+
+- **API.** `aiFor({ difficulty, style, data, engine?, pool? })` in `@daily-battle/ai`. Normal is exactly `aiForStyle(style)`, so its choices are byte-for-byte as before.
+- **Hard** (`packages/ai/src/hard/`). Each decision:
+  1. Reads the same `SideView` as the utility AI (hidden-info rules hold: the hidden-info test covers Hard).
+  2. Samples 8 **worlds**: full foe teams drawn from the belief model (§8.2) for seen foes, and from the week's pool for unseen ones (Gen 3–4, no Team Preview).
+  3. Translates each world to poke-engine's state string (`translate.ts`, `names.ts`) and runs a **seeded** MCTS on it, 150k iterations split by world weight.
+  4. Sums each of our options' values across worlds, weighted, and plays the best legal one. If the engine can't search (about 3% of decisions, such as a state it can't represent), the STRONG utility preset decides instead.
+- **The engine** is [poke-engine](https://github.com/pmariglia/poke-engine) (MIT), from our fork `wangms2/poke-engine`, which adds a seeded, clock-free search so a decision is reproducible. `packages/engine-wasm` wraps it in a small raw-ABI WebAssembly module per generation (`gen3.wasm` … `gen6.wasm`, 0.65–0.73 MB each, about 170–195 KB gzipped); a later generation needs only its feature flag and translation support. `version.ts` lists the gens built (`ENGINE_GENS`) and the module version.
+- **Budget.** 150k iterations and 8 worlds came from a sweep of 40k to 200k: strength rose until about 150k and then flattened, while time kept growing. Measured at 150k: 6–0 against mid and 6–0 against strong in a small eval, about 270 ms a decision in Node.
+- **Determinism and resume.** Each decision's search seed comes from the attempt's AI seed and the decision index. The AI's choices are also saved on the attempt (`aiChoices`), so a resume replays them instead of searching again; a saved choice that's no longer legal is searched for anew.
+- **Where it runs.** In the battle worker, which fetches and compiles that game's module only for Hard (once per session; Easy and Normal never load it). The CSP allows `'wasm-unsafe-eval'` for it (`public/_headers`). A failed load shows the battle's usual error, and trying again fetches it anew. The picker hides Hard for a game whose module isn't in the build.
+- **Versions.** The engine string gains the difficulty: `sim <v> ai 1` (Normal), `ai 1 easy 1`, `ai 1 hard 1 e1` (`EASY_VERSION`, `HARD_VERSION`, `WASM_VERSION`). Bump them when Easy's preset or Hard's search could choose differently; an in-progress battle then becomes a forfeit (§15).
+- **Testing.**
+  - The eval (`pnpm --filter @daily-battle/ai eval`) has Easy rows; `--hard` adds Hard's.
+  - CI builds the WASM once (Rust stable plus `wasm32-unknown-unknown`) and shares it with every job. The sims job runs a small Hard eval at 20k iterations, reported but not asserted.
+  - A coverage test checks that poke-engine knows every species, move, and ability in each game's sets.
+  - The pipeline's `difficulty-report` plays the mid bot against a week's opponents on each difficulty. It is informational only: schedules are validated on Normal (§9).
+  - An e2e test plays a Hard Gen 3 battle under the production CSP, reloads, and resumes.
+
 ## 5. Data pipeline
 
 ### 5.1 Source
@@ -287,6 +321,7 @@ Attempt = { result: 'win'|'loss'|'forfeit'|'inProgress', remaining: number, ts: 
 ```
 
 - Wrap all reads/writes in try/catch; the game must work if storage is unavailable (in-memory fallback with a notice).
+- **Difficulties (§4.5) added no version:** they're optional fields an older save just lacks. `settings.difficulty: { [format]: 'easy'|'normal'|'hard' }` (Normal when unset); `Attempt.difficulty?: 'easy'|'hard'` (absent means Normal, so every earlier attempt is a Normal one); `Attempt.aiChoices?: string[]` (Hard's choices so far, for resume). The engine string carries the difficulty's versions (§4.6).
 - Migration function per version bump.
 - Export/import of state as JSON (nice-to-have, since there are no accounts).
 
@@ -315,6 +350,8 @@ Hippowdon, Azelf, Celebi, Heatran*, Jirachi, Lucario
 ```
 
 Other headlines: `❌ Not cleared` (a past day never won, with `🔥 Streak reset`) and `Not cleared yet · 3 tries` mid-day. Practice runs after a win are never shared.
+
+Easy and Hard add the difficulty to the header, with that difficulty's tries and streak: `Pokémon Daily · Gen 4 OU · Hard · Oct 21`. Normal's header is unchanged. The image card shows the same header.
 
 - The last line is the link to play (the site's own address), so friends can tap through.
 - Each row shows that try's result and your Pokémon left out of 6 (green = alive; grey ⬜ = still standing on a try that was given up), led by one emoji (✅/❌, a first try too) so the squares line up. A practice run shared from its end card adds `🔁 🟩🟩🟩⬛⬛⬛ practice` (`practice, with Gengar` if it swapped one in). At most 7 lines plus the link.
@@ -508,7 +545,7 @@ See §14.
 
 Unofficial fan project, not affiliated with or endorsed by Nintendo, Creatures Inc., GAME FREAK inc., The Pokémon Company, or Smogon. Pokémon, Pokémon character names, and sprites are © Nintendo, Creatures Inc., and GAME FREAK inc.
 
-- Code: `@pkmn/*` packages and Pokémon Showdown code are MIT licensed. Keep license notices as required.
+- Code: `@pkmn/*` packages and Pokémon Showdown code are MIT licensed. Keep license notices as required. The Hard AI's engine is poke-engine by pmariglia (MIT), built from our fork; credited in About.
 - The Pokémon Showdown _client_ (`smogon/pokemon-showdown-client`) is AGPL-3.0. Pokémon Daily uses none of its AGPL code (no CSS, no UI). It does vendor the animation engine's data files, which are separately licensed: the move animations (`battle-animations-moves.ts`, CC0) and the effect table with the shared and status animations (`battle-animations.ts`, MIT), pinned to one client commit and sliced to Gen 1–6 moves by `scripts/anims.ts` (headers kept, in `src/battle/anim/vendor/`). The battle text comes from `@pkmn/view`'s MIT-licensed `LogFormatter`. The backgrounds, hazard sprites, weather overlays, and effect images are from the client's `fx/` folder (`scripts/fx.ts`), which it dedicates to the public domain (CC0) except `icicle.png` and `lightning.png` (GPL/CC-BY-SA, by Clint Bellanger) and `rock1.png`, `rock2.png`, `rocks.png` (GPLv3, by Gilad); those are credited in About, and `bone.png` (no license) isn't shipped: a plain wisp stands in. Everything is self-hosted. The animations are drawn with the Web Animations API by our own scene adapter (`src/battle/anim/scene.ts`): effects are placed in Showdown's scene space and mapped onto our field, anchored on the two sprites, and run synchronously per `move` event; the turn waits for the animation, tap skips it, speed scales it (Fast uses Showdown's quick generic animations), and Animations off or reduced motion draws none. Showdown's CSS-drawn effects (screens, Protect) are not ported.
 - Data: confirm redistribution terms for Smogon set and usage data; credit Smogon.
 - Sprites: see §12.3a. Credit Nintendo/Game Freak/Creatures and the Smogon sprite community on the credits page.
@@ -562,6 +599,7 @@ A room where friends play live battles against each other, Super Auto Pets style
 - **Battles (V3).** Each battle starts lead first. The room runs each battle on `BattleSession` and records every accepted choice on the match, so the battle is rebuilt by replay when the Durable Object wakes. Choices are checked against the request first; a move hidden information blocks (Imprison) comes back to its player to choose again, as in §17. After each choice both players get their side's new lines and request (`WireUpdate`), so a choice is always answered: waiting for the foe shows as "Waiting for …" over the controls. Clocks are Showdown-style per `TIMERS`: each side's runs while it has a request, and the room's alarm goes off at the next deadline (the swap, a clock, the build, or the break) to move the game on, ending a battle for whoever ran out. Giving up, leaving, or being removed mid-round loses that battle. Each player keeps their end card until they go back to the room.
 - **The game (V4).** The lobby shows the room's 12; the host can redraw a random pool or switch to this week's (read from the published schedule through the Worker's `ASSETS` binding, with the host's week; a week with no schedule keeps a random pool and says so). **Start the game** opens the build: everyone builds their team size from the 12 in the daily builder, for 3 minutes; anyone still building then gets the pool's most used Pokémon with their most used sets. Each round pairs players by lives (fewest rematches first, then the smallest gap in lives, over every possible pairing), and an odd player out faces the AI ("Rival", a daily-style generated team at their team size, played by the daily AI with that team's style), rotating to whoever has faced it least. Before each battle, both players have 60 s to make one change (another Pokémon from the pool, or another set; checked against the set data and the validator), pick a lead, and ready up; the change stays on their team for good. A loss costs a life, a tie costs both, a loss to the AI costs one too. When every battle is over the room shows the round's results, the standings with hearts, and your next opponent for 8 s, then starts the next round. A player out of lives gets a placement (players out in the same round share it); the last one in wins, and if the last ones go out together they share the win. Leaving or being removed mid-game puts you out at once (your battle counts as a loss) and keeps you in the standings. The host can **Play again** with the same players. Rooms carry a version: a room saved by an older server goes back to the lobby with its players and settings.
 - **Cost.** Measured locally, a turn takes about 2 ms of CPU, setting up a battle 3–17 ms, and rebuilding a whole battle from its choices about 100 ms. The Worker bundles the simulator (about 10.6 MB, under the 64 MiB limit). The Durable Objects limit is 30 s of CPU per message; if Workers Free's 10 ms per request applies to Durable Objects too, the setup and rebuild steps would need the paid plan.
+- **Rival difficulty (added Oct 2026).** The host picks the Rival's difficulty in the lobby (`RoomSettings.rivalDifficulty`, Normal by default; Hard only for games with an engine, §4.6). The match records it (`aiDifficulty`), so it holds for the whole battle. The server bundles the four engine modules (`apps/server/src/engines.ts`, loaded on first use so Normal rooms never compile them). The Worker is about 2.3 MB gzipped, under Workers Free's 3 MB. A Hard decision takes about 0.3 s of CPU, within a Durable Object's 30 s per message. The AI's choices are recorded like the players', so rebuilding a battle never searches again. A room whose game has no engine plays the Rival on Normal.
 - **Entry.** The game picker (tap the title) ends with **Versus with friends**, which opens `#versus`; invite links are `#versus/CODE`.
 
 ### 18.3a Elimination, spectating, and between rounds (decided Oct 2026)
@@ -633,3 +671,13 @@ Battle music and Pokémon cries, as on Showdown, across every game. Off by defau
 - **Code.** `src/lib/audio.ts` is the only place audio is touched. Battles call `startMusic` and `stopMusic` and play cries from their frames' events.
 - **Rights.** The music and cries are Nintendo's, like the sprites, and are credited in About. The site stays free and non-commercial (§16).
 
+## 22. Tutorial and coach (Gen 3, added Oct 2026)
+
+A **Learn** mode teaches Gen 3 OU from the basics (12 lessons and a graduation battle, `packages/tutorial`), and a **coach** helps in real battles. EVs, IVs, and natures are out of scope.
+
+- **Finding it.** A small **Battle basics** pill under Play on the landing, a Learn row under Gen 3 in the game picker, and a "New to competitive Pokémon?" card with **Start the tutorial** on the welcome sheet and in How to play (it opens the next unfinished lesson).
+
+- **Coach.** Rule-based, from the player's own view only (it never sees the foe's real sets). It gives an occasional turn tip, asks before a clear blunder ("Do it anyway" / "Pick again"), and reviews up to 3 key turns after the battle. It's paced so it isn't distracting: at most one tip per turn, a gap of 3 turns between tips (2 for urgent ones: "this hit KOs you", "you can KO"), no tip while a lesson prompt or hint is showing, and a warning the player overrode isn't asked again that battle. Warnings only appear when the blunder is picked.
+- **Where.** On in lessons against the Easy foe and in graduation. In the daily, it's offered in Gen 3 on Easy and Normal (not Hard, until its search-based coach exists). Off by default; offered once on a game's first daily brief and again after graduation (`settings.coachOffered`).
+- **Turning it on.** A **Coach** pill beside the difficulty picker on the brief (`settings.coach`, per game), or a switch in the battle menu mid-battle. Either asks first when it costs a streak. Once on, that attempt is `coached: true` for good; mid-battle, the battle restarts with the coach from the same turn.
+- **Coached results.** Coached tries count in their own **Coached** bucket per game, shared across difficulties, with its own streak and stats (a first-try coached win extends it). A coached try before the day is cleared ends the regular streak of the difficulty it was played on; coached practice after a clear doesn't. The header, battle, Home card, and result show **Coached**, and the share header adds it after the level of the deciding try: `Gen 3 OU · Easy · Coached · Oct 21`.

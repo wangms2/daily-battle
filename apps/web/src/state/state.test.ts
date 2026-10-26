@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { computeStats } from '../lib/results';
-import { attemptInProgress, gameReducer, reducer } from './reducer';
+import { attemptEngine, attemptInProgress, dayLost, gameReducer, reducer } from './reducer';
 import {
   emptyGame,
   initialState,
@@ -338,6 +338,22 @@ describe('settings', () => {
     expect(reducer(state, { type: 'markExplainer', id: 'welcome' })).toBe(state);
     expect(state.settings.shownExplainers).toEqual(['welcome']);
   });
+
+  it('saves the lesson step to resume, and finishing a lesson checks it once', () => {
+    const at = (lesson: string, step: number) =>
+      ({ type: 'lessonStep', format: 'gen3ou', lesson, step }) as const;
+    const done = (lesson: string) => ({ type: 'lessonDone', format: 'gen3ou', lesson }) as const;
+    let state = reducer(initialState(), at('gen3-basics', 2));
+    expect(state.settings.tutorial?.gen3ou).toEqual({
+      completed: [],
+      current: { lesson: 'gen3-basics', step: 2 },
+    });
+    state = reducer(reducer(state, done('gen3-basics')), done('gen3-basics'));
+    expect(state.settings.tutorial?.gen3ou).toEqual({ completed: ['gen3-basics'] });
+    state = reducer(state, at('gen3-types', 1));
+    expect(state.settings.tutorial?.gen3ou?.completed).toEqual(['gen3-basics']);
+    expect(state.settings.tutorial?.gen4ou).toBeUndefined();
+  });
 });
 
 describe('attempts', () => {
@@ -374,6 +390,25 @@ describe('attempts', () => {
     );
   });
 
+  it('saves the coach’s memos in step with the choices', () => {
+    let state = gameReducer(started(), { type: 'recordChoice', day: DAY, choice: 'move 1' });
+    const memo = { ignored: 'Earthquake will do nothing.' };
+    state = gameReducer(state, { type: 'recordChoice', day: DAY, choice: 'move 2', memo });
+    state = gameReducer(state, { type: 'recordChoice', day: DAY, choice: 'move 3' });
+    expect(state.days[DAY]!.attempts[0]!.coachLog).toEqual([null, memo, null]);
+    // Without memos, no log.
+    const plain = gameReducer(started(), { type: 'recordChoice', day: DAY, choice: 'move 1' });
+    expect(plain.days[DAY]!.attempts[0]!.coachLog).toBeUndefined();
+  });
+
+  it('marks the battle in progress coached, for good', () => {
+    let state = gameReducer(started(), { type: 'recordChoice', day: DAY, choice: 'move 1' });
+    state = gameReducer(state, { type: 'coachAttempt', day: DAY });
+    expect(state.days[DAY]!.attempts).toEqual([attempt({ choices: ['move 1'], coached: true })]);
+    state = gameReducer(state, { type: 'endAttempt', day: DAY, result: 'win', remaining: 2 });
+    expect(gameReducer(state, { type: 'coachAttempt', day: DAY })).toBe(state);
+  });
+
   it('runs one attempt at a time; a finished one can be run back', () => {
     const state = started();
     expect(
@@ -403,6 +438,58 @@ describe('attempts', () => {
       engine: 'sim 0.10.12 ai 1',
     });
     expect(upgraded.days[DAY]!.attempts[0]!.result).toBe('forfeit');
+  });
+
+  it('expires an Easy or Hard battle against its own engine string', () => {
+    const hard = gameReducer(locked(), {
+      type: 'startAttempt',
+      day: DAY,
+      attempt: attempt({ difficulty: 'hard', engine: attemptEngine(ENGINE, 'hard') }),
+    });
+    expect(gameReducer(hard, { type: 'expireAttempts', today: DAY, engine: ENGINE })).toBe(hard);
+    // Saved under an older Hard (or as Normal's string): forfeited.
+    const stale = gameReducer(locked(), {
+      type: 'startAttempt',
+      day: DAY,
+      attempt: attempt({ difficulty: 'hard', engine: `${ENGINE} hard 0 e1` }),
+    });
+    const expired = gameReducer(stale, { type: 'expireAttempts', today: DAY, engine: ENGINE });
+    expect(expired.days[DAY]!.attempts[0]!.result).toBe('forfeit');
+  });
+
+  it("saves Hard's AI choices, replacing any from where a batch starts", () => {
+    let state = started();
+    state = gameReducer(state, {
+      type: 'recordChoice',
+      day: DAY,
+      choice: 'move 1',
+      ai: { from: 0, choices: ['move 2', 'move 3'] },
+    });
+    state = gameReducer(state, {
+      type: 'recordChoice',
+      day: DAY,
+      choice: 'move 1',
+      ai: { from: 1, choices: ['switch 2'] },
+    });
+    state = gameReducer(state, { type: 'recordChoice', day: DAY, choice: 'move 4' });
+    expect(state.days[DAY]!.attempts[0]).toMatchObject({
+      choices: ['move 1', 'move 1', 'move 4'],
+      aiChoices: ['move 2', 'switch 2'],
+    });
+  });
+
+  it('frees the team only after a Normal loss', () => {
+    const lose = (difficulty?: 'easy' | 'hard') => {
+      const s = gameReducer(locked(), {
+        type: 'startAttempt',
+        day: DAY,
+        attempt: attempt(difficulty ? { difficulty } : {}),
+      });
+      return gameReducer(s, { type: 'endAttempt', day: DAY, result: 'loss', remaining: 0 });
+    };
+    expect(dayLost(lose().days[DAY])).toBe(true);
+    expect(dayLost(lose('hard').days[DAY])).toBe(false);
+    expect(dayLost(lose('easy').days[DAY])).toBe(false);
   });
 
   it('locks the daily change mid-battle', () => {

@@ -4,8 +4,10 @@
 // nothing; the state lives in storage and is read back when the room wakes,
 // and a battle is rebuilt from its recorded choices the first time it's needed
 // after that.
-import { aiForStyle } from '@daily-battle/ai';
+import { aiFor } from '@daily-battle/ai';
 import { setsFor } from '@daily-battle/data';
+import { genOf } from '@daily-battle/data/formats';
+import type { Engine } from '@daily-battle/engine-wasm';
 import { deriveSeed, makeRng, type Policy } from '@daily-battle/sim-bridge';
 import { DurableObject } from 'cloudflare:workers';
 import {
@@ -383,7 +385,7 @@ export class Room extends DurableObject<Env> {
   /** Starts a round from its pairings: each pair's match, in the swap. */
   private async beginRound(pairs: Pairing[], now: number) {
     const room = this.room!;
-    const { format, timer } = room.settings;
+    const { format, timer, rivalDifficulty = 'normal' } = room.settings;
     const round = room.round + 1;
     const player = (id: string) => room.players.find((p) => p.id === id)!;
     this.battles.clear();
@@ -400,6 +402,7 @@ export class Room extends DurableObject<Env> {
         names: { p1: a.name, p2: ai ? AI_NAME : player(p2).name },
         ai: ai ? 'p2' : null,
         aiStyle: ai?.style,
+        ...(ai && rivalDifficulty !== 'normal' && { aiDifficulty: rivalDifficulty }),
         format,
         seed: randomSeed(),
         slots: { p1: a.team!, p2: ai ? ai.slots : player(p2).team! },
@@ -464,7 +467,7 @@ export class Room extends DurableObject<Env> {
     const battle = new LiveBattle(m);
     this.battles.set(m.id, battle);
     this.sent.set(m.id, { p1: 0, p2: 0 });
-    m = this.runAi(m, battle);
+    m = await this.runAi(m, battle);
     m = withFainted(this.runClocks(m, battle, now), battle);
     await this.save(putMatch(room, m));
     this.broadcast();
@@ -487,7 +490,7 @@ export class Room extends DurableObject<Env> {
       return this.sendSide(match, side, outcome === 'blocked');
     }
     let m = record(match, side, choice);
-    m = this.runAi(m, battle);
+    m = await this.runAi(m, battle);
     if (battle.ended) return this.endMatch(m, battle.winner ? 'win' : 'tie', now);
     m = withFainted(this.runClocks(m, battle, now), battle);
     await this.save(putMatch(this.room!, m));
@@ -499,14 +502,10 @@ export class Room extends DurableObject<Env> {
   }
 
   /** The AI answers everything the battle asks of it; its choices are recorded like a player's. */
-  private runAi(match: Match, battle: LiveBattle): Match {
+  private async runAi(match: Match, battle: LiveBattle): Promise<Match> {
     const side = match.ai;
     if (!side) return match;
-    let policy = this.policies.get(match.id);
-    if (!policy) {
-      policy = aiForStyle(match.aiStyle ?? 'balance', { data: setsFor(match.format) });
-      this.policies.set(match.id, policy);
-    }
+    const policy = await this.policyFor(match);
     let m = match;
     for (let view = battle.view(side); view && !battle.ended; view = battle.view(side)) {
       const rng = makeRng(deriveSeed(m.seed, m.choices[side].length) as PRNGSeed);
@@ -514,6 +513,27 @@ export class Room extends DurableObject<Env> {
       if (battle.choose(side, choice) === 'ok') m = record(m, side, choice);
     }
     return m;
+  }
+
+  /** The Rival's AI for a battle, at the difficulty it started with (Hard needs its engine). */
+  private async policyFor(match: Match): Promise<Policy> {
+    let policy = this.policies.get(match.id);
+    if (policy) return policy;
+    const style = match.aiStyle ?? 'balance';
+    const data = setsFor(match.format);
+    let engine: Engine | null = null;
+    if (match.aiDifficulty === 'hard') {
+      engine = (await import('./engines')).hardEngine(genOf(match.format));
+    }
+    const difficulty = match.aiDifficulty === 'hard' && !engine ? 'normal' : match.aiDifficulty;
+    policy = aiFor({
+      difficulty: difficulty ?? 'normal',
+      style,
+      data,
+      ...(engine && { engine, pool: this.room?.pool?.species ?? [] }),
+    });
+    this.policies.set(match.id, policy);
+    return policy;
   }
 
   /** Ends `player`'s battle this round as a loss for them: they gave up, or they're leaving. */

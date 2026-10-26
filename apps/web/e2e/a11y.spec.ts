@@ -29,7 +29,9 @@ async function seed(page: Page, { team = true, welcome = false } = {}) {
             beginnerHints: true,
             battleSpeed: 'instant',
             animations: true,
-            shownExplainers: welcome ? [] : ['welcome', 'gen5-news', 'gen6-news', 'gen3-news'],
+            shownExplainers: welcome
+              ? []
+              : ['welcome', 'gen5-news', 'gen6-news', 'gen3-news', 'tour'],
           },
         }),
       );

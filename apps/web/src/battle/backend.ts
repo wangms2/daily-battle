@@ -1,7 +1,17 @@
 // How the UI talks to a battle: by default a Web Worker running the engine.
 // Tests swap in the engine directly on the main thread.
 import { createContext, useContext } from 'react';
-import type { EngineStart, FromWorker, ToWorker, TurnPackage } from './frames';
+import type { CoachNote, Review } from '@daily-battle/tutorial';
+import type { Position } from '@daily-battle/tutorial/lessons';
+import type {
+  EngineStart,
+  FromWorker,
+  LessonTurn,
+  PositionPackage,
+  ToWorker,
+  TurnPackage,
+  TurnReplay,
+} from './frames';
 
 export interface BattleBackend {
   start(start: EngineStart): Promise<TurnPackage>;
@@ -12,6 +22,34 @@ export interface BattleBackend {
    * giving up, or your clock running out. Returns an unsubscribe.
    */
   subscribe?(onPackage: (pkg: TurnPackage) => void): () => void;
+  /**
+   * Coach on: its warning on a choice you picked, or null (DESIGN.md §22). The
+   * judge gets up to `waitMs` to finish; if it hasn't, there's no warning.
+   */
+  coachCheck?(choice: string, waitMs: number): Promise<CoachNote | null>;
+  /**
+   * Coach on: tips that waited for the judge, as they're confirmed (after the
+   * controls show). Returns an unsubscribe.
+   */
+  onCoachTip?(onTip: (note: CoachNote) => void): () => void;
+  /**
+   * After a battle played without the coach (Gen 3): the coach's review of it,
+   * judged on request; `onProgress` follows the choices judged.
+   */
+  review?(onProgress: (done: number, total: number) => void): Promise<Review>;
+  /** Coach review: one of your past decisions in this battle, replayed. */
+  replay?(decision: number): Promise<TurnReplay | null>;
+  /** A lesson turn (Learn mode): a demo, or a practice answer played out. */
+  turn?(
+    format: string,
+    position: Position,
+    turn: { p1?: string; p2?: string },
+    spots?: string[],
+    /** The whole turn (practice), not just your move (a demo). */
+    whole?: boolean,
+  ): Promise<LessonTurn>;
+  /** A quiz position (Learn mode); separate from any battle in progress. */
+  position?(format: string, position: Position, steps: string[]): Promise<PositionPackage>;
 }
 
 let shared: Worker | null = null;
@@ -22,18 +60,31 @@ export function warmBattleWorker(): Worker {
   return shared;
 }
 
+/**
+ * Messages to the shared worker, one at a time: every backend uses this queue,
+ * so an answer can't be taken by another backend's question (a lesson asks for
+ * a position and a turn at once).
+ */
+let queue: Promise<unknown> = Promise.resolve();
+
 /** Sends messages one at a time and resolves each with the worker's answer. */
 export function workerBackend(): BattleBackend {
-  let queue: Promise<unknown> = Promise.resolve();
-  const send = (msg: ToWorker) => {
+  const send = <T = TurnPackage>(msg: ToWorker) => {
     const next = queue.then(
       () =>
-        new Promise<TurnPackage>((resolve, reject) => {
+        new Promise<T>((resolve, reject) => {
           const worker = warmBattleWorker();
           const onMessage = (e: MessageEvent<FromWorker>) => {
+            // Tips and progress come unasked: they aren't this message's answer.
+            if (e.data.type === 'tip' || e.data.type === 'reviewProgress') return;
             worker.removeEventListener('message', onMessage);
-            if (e.data.type === 'package') resolve(e.data.pkg);
-            else reject(new Error(e.data.message));
+            if (e.data.type === 'package') resolve(e.data.pkg as T);
+            else if (e.data.type === 'position') resolve(e.data.position as T);
+            else if (e.data.type === 'turn') resolve(e.data.turn as T);
+            else if (e.data.type === 'check') resolve(e.data.note as T);
+            else if (e.data.type === 'replay') resolve(e.data.replay as T);
+            else if (e.data.type === 'review') resolve(e.data.review as T);
+            else if (e.data.type === 'error') reject(new Error(e.data.message));
           };
           worker.addEventListener('message', onMessage);
           worker.postMessage(msg);
@@ -46,6 +97,30 @@ export function workerBackend(): BattleBackend {
     start: (start) => send({ type: 'start', start }),
     choose: (choice) => send({ type: 'choose', choice }),
     forfeit: () => send({ type: 'forfeit' }),
+    coachCheck: (choice, waitMs) => send<CoachNote | null>({ type: 'check', choice, waitMs }),
+    replay: (decision) => send<TurnReplay | null>({ type: 'replay', decision }),
+    review: (onProgress) => {
+      const worker = warmBattleWorker();
+      const onMessage = (e: MessageEvent<FromWorker>) => {
+        if (e.data.type === 'reviewProgress') onProgress(e.data.done, e.data.total);
+      };
+      worker.addEventListener('message', onMessage);
+      return send<Review>({ type: 'review' }).finally(() =>
+        worker.removeEventListener('message', onMessage),
+      );
+    },
+    onCoachTip: (onTip) => {
+      const worker = warmBattleWorker();
+      const onMessage = (e: MessageEvent<FromWorker>) => {
+        if (e.data.type === 'tip') onTip(e.data.note);
+      };
+      worker.addEventListener('message', onMessage);
+      return () => worker.removeEventListener('message', onMessage);
+    },
+    turn: (format, position, turn, spots = [], whole = false) =>
+      send<LessonTurn>({ type: 'turn', format, position, turn, spots, whole }),
+    position: (format, position, steps) =>
+      send<PositionPackage>({ type: 'position', format, position, steps }),
   };
 }
 

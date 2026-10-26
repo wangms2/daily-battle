@@ -1,6 +1,8 @@
 // The battle screen (DESIGN.md §12.2b): field, this-turn log, and controls on
 // one screen; turns play back line by line at the chosen speed, tap to skip.
 import { DEFAULT_FORMAT, formatInfo } from '@daily-battle/data/formats';
+import type { CoachNote, Review } from '@daily-battle/tutorial';
+import type { Mon } from '@daily-battle/tutorial/lessons';
 import clsx from 'clsx';
 import {
   useCallback,
@@ -12,30 +14,42 @@ import {
   type ReactNode,
 } from 'react';
 import type * as AnimPlay from '../battle/anim/play';
-import { useBattleBackend } from '../battle/backend';
+import { BattleBackendContext, useBattleBackend } from '../battle/backend';
+import { replayBackend } from '../battle/replay-backend';
 import { playCry, startMusic, stopMusic } from '../lib/audio';
-import type {
-  Controls,
-  EngineStart,
-  Frame,
-  TeamMember,
-  TurnPackage,
-  View,
-  Who,
+import {
+  mergeAiChoices,
+  type AiChoices,
+  type CoachMemo,
+  type Controls,
+  type EngineStart,
+  type Frame,
+  type MonView,
+  type TeamMember,
+  type TurnPackage,
+  type TurnReplay,
+  type View,
+  type Who,
 } from '../battle/frames';
-import { ControlPanel } from '../battle/ui/Controls';
+import { CoachReview, CoachTip, CoachWarning } from '../battle/ui/Coach';
+import { ControlPanel, type Mark } from '../battle/ui/Controls';
 import { Field, type Anim, type Float, type Stage } from '../battle/ui/Field';
 import { EXPLAINERS, textLines } from '../battle/ui/labels';
 import { MonPopover } from '../battle/ui/MonPopover';
+import { Spotlight } from '../battle/ui/Spotlight';
 import { GiveUpDialog, LogList, LogSheet, MenuSheet } from '../battle/ui/sheets';
 import { BattleLog } from '../battle/ui/BattleLog';
 import type { Settings } from '../state/schema';
+import { possibleSets } from '../lib/data';
 import { streakLine, type DaySummary } from '../lib/results';
 import { Button } from '../ui/bits';
 import type { ShareModel } from '../lib/share';
+import { battleSpeed, foeSpeed, lessonSet, type SpeedCheck } from '../lib/speed';
 import { ShareButton, TryRows } from '../ui/results';
-import { CloseIcon, InfoIcon } from '../ui/icons';
+import { ChevronIcon, CloseIcon, InfoIcon } from '../ui/icons';
+import { CoachBadge, DifficultyBadge } from '../ui/Difficulty';
 import { OtherGames } from '../ui/OtherGames';
+import { ConfirmDialog } from '../sheets/misc';
 import { useWide } from '../ui/useWide';
 
 /** Milliseconds per battle line ('instant' is for automated tests only). */
@@ -46,6 +60,12 @@ const DELAY: Record<Settings['battleSpeed'], number> = {
   instant: 0,
 };
 const SPEEDS: Settings['battleSpeed'][] = ['slow', 'normal', 'fast'];
+/** A daily foe still choosing after this long gets a "thinking" note. */
+const THINKING_MS = 300;
+/** How long the coach may check a pick before it goes through unwarned (DESIGN.md §22). */
+const COACH_CHECK_MS = 1000;
+/** A coach check still going after this long gets a "checking" note. */
+const CHECKING_MS = 150;
 /** How much faster than Showdown's own pace its move animations run at each speed. */
 const ACCEL: Record<Settings['battleSpeed'], number> = {
   slow: 1,
@@ -76,6 +96,60 @@ export interface LiveOptions {
   exitLabel: string;
 }
 
+/**
+ * A staged turn (DESIGN.md §22): the battle frozen at a decision, with choices
+ * tagged on the controls and a coach card, then one turn played as scripted.
+ * The coach's review shows past turns this way, and lessons show their demos
+ * and practice answers this way.
+ */
+export interface StagedTurn {
+  /**
+   * The choice the turn plays. Left out, the player picks it on the controls
+   * (a lesson's practice), and `onPick` hears which.
+   */
+  choice?: string;
+  onPick?: (choice: string) => void;
+  /** After the turn, offer "Again" (on unless false). */
+  again?: boolean;
+  /** After the turn, the buttons go in a row under the text (for two or more), not beside it. */
+  stack?: boolean;
+  /** Tags on the controls; the other choices fade. */
+  marks?: Record<string, Mark>;
+  /** The top bar's contents. */
+  header: ReactNode;
+  /** The coach card: its words before the turn plays, and after (the same if left out). */
+  before: ReactNode;
+  after?: ReactNode;
+  /** The card's accessible name. */
+  label: string;
+  /** Parts of the screen to point at before the turn and after it (`data-spot` keys, Spotlight.tsx). */
+  spotlight?: { before?: readonly string[]; after?: readonly string[] };
+  /** The play button's label before the turn. */
+  playLabel?: string;
+  /** After the turn, beside "Again": the way on (a lesson's Next). */
+  next?: ReactNode;
+  /** Show the turn again from the decision. */
+  onReplay: () => void;
+  /**
+   * Details open from the start (a lesson pointing at them): the foe's card
+   * (`foe`), or a choice's (`move 2`: the move's details; `switch 2`: the
+   * teammate's card).
+   */
+  card?: string;
+  /** No turn to play: `next` shows at once (a lesson's look at the position). */
+  look?: boolean;
+}
+
+/** The first-battle tour (DESIGN.md §22): one step per control a new player might miss. */
+const TOUR: { spots: string[]; text: string }[] = [
+  { spots: ['your-moves'], text: 'Tap a move to use it. Press and hold one to see what it does.' },
+  {
+    spots: ['your-team'],
+    text: 'Your team. Tap a Pokémon to see its moves and stats, or to switch to it.',
+  },
+  { spots: ['foe-plate'], text: 'Tap the foe to see its ability, base stats, and Speed.' },
+];
+
 export interface BattleOutcome {
   result: 'win' | 'loss' | 'forfeit';
   remaining: number;
@@ -96,7 +170,17 @@ export function Battle({
   background,
   result,
   live,
+  prompt,
+  coach: dailyCoach,
+  staged,
 }: {
+  /** Show one staged turn instead of playing (see `StagedTurn`). */
+  staged?: StagedTurn;
+  /**
+   * The daily coach (DESIGN.md §22), where it's offered: on, or a switch in the
+   * menu to turn it on (after `warning`, what it costs, if anything).
+   */
+  coach?: { on: boolean; warning: string | null; onTurnOn: () => void };
   /** The day's result, for the end card (daily battles). */
   result?: DayResult;
   live?: LiveOptions;
@@ -108,14 +192,17 @@ export function Battle({
   settings: Settings;
   onSetting: <K extends keyof Settings>(key: K, value: Settings[K]) => void;
   onExplainerSeen: (id: string) => void;
-  /** A choice the engine accepted; saved so the battle can resume. */
-  onChoice: (choice: string) => void;
+  /** A choice the engine accepted (and Hard's new AI choices); saved so the battle can resume. */
+  /** A choice was made: save it, with the AI's new choices (Hard) and the coach's memo. */
+  onChoice: (choice: string, ai?: AiChoices, memo?: CoachMemo) => void;
   onEnd: (outcome: BattleOutcome) => void;
   onExit: () => void;
   onRunItBack?: () => void;
   /** After a loss: back to the brief with the team open for changes. */
   onChangeTeam?: () => void;
   topBarRight?: ReactNode;
+  /** Learn mode: a lesson's callout for the turn about to be chosen. */
+  prompt?: (turn: number) => string | undefined;
 }) {
   const wide = useWide();
   const createBackend = useBattleBackend();
@@ -141,10 +228,63 @@ export function Battle({
   const [logOpen, setLogOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [giveUpOpen, setGiveUpOpen] = useState(false);
-  const [monFor, setMonFor] = useState<Who | null>(null);
+  const [coachAsk, setCoachAsk] = useState<string | null>(null);
+  const [monFor, setMonFor] = useState<Who | null>(staged?.card === 'foe' ? 'foe' : null);
+  const [tourAt, setTourAt] = useState(0);
+  // A foe team icon tapped: its card shows instead of the active foe's.
+  const [foePick, setFoePick] = useState<string | null>(null);
   const [floats, setFloats] = useState<Float[]>([]);
   // Showdown's move animations, loaded on demand when animations are on.
   const [anims, setAnims] = useState<typeof AnimPlay | null>(null);
+  // A daily foe taking a while to choose (Hard's search): say so.
+  const [thinking, setThinking] = useState(false);
+  const thinkTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  /** Hard: AI choices not saved yet (they go with your next choice). */
+  const unsavedAi = useRef<AiChoices | undefined>(undefined);
+  // The coach (when on): this turn's tip and warnings, a choice awaiting
+  // confirmation, rules silenced for this battle, and the end-of-battle review.
+  const [coach, setCoach] = useState<TurnPackage['coach'] | null>(null);
+  // A pick the coach is checking (controls held), and whether to say so yet.
+  const [checking, setChecking] = useState(false);
+  const [checkingNote, setCheckingNote] = useState(false);
+  const [tipHidden, setTipHidden] = useState(false);
+  const [warning, setWarning] = useState<{ choice: string; note: CoachNote } | null>(null);
+  // A review turn being replayed (its index in the review's turns).
+  const [replayAt, setReplayAt] = useState<number | null>(null);
+  const replayTurn = useCallback(
+    (decision: number) => backend.replay?.(decision) ?? Promise.resolve(null),
+    [backend],
+  );
+  const silenced = useRef(new Set<string>());
+  // A battle played without the coach (Gen 3 dailies) can still be reviewed
+  // once it's over, on request: the coach judges its choices then.
+  const canReview =
+    !start.coach &&
+    !live &&
+    !start.tutorial &&
+    !staged &&
+    (start.format ?? DEFAULT_FORMAT) === 'gen3ou' &&
+    // Not against Hard: its warnings aren't checked there yet (step 5).
+    start.difficulty !== 'hard' &&
+    !!backend.review;
+  const [reviewProgress, setReviewProgress] = useState<{ done: number; total: number } | null>(
+    null,
+  );
+  const startReview = () => {
+    setReviewProgress({ done: 0, total: 0 });
+    backend.review!((done, total) => setReviewProgress({ done, total })).then(
+      (r) => {
+        setReview(r);
+        setReviewProgress(null);
+      },
+      () => setReviewProgress(null),
+    );
+  };
+  const [review, setReview] = useState<Review | null>(null);
+  // Review mode: the decision's controls (kept, marked, while and after the turn
+  // plays), and whether the turn has been played.
+  const [decision, setDecision] = useState<{ controls: Controls; team: TeamMember[] } | null>(null);
+  const [played, setPlayed] = useState(false);
 
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pending = useRef<{ frames: Frame[]; index: number; pkg: TurnPackage } | null>(null);
@@ -169,12 +309,15 @@ export function Battle({
     onChoiceRef.current = onChoice;
   });
   const ended = useRef(false);
+  const rootRef = useRef<HTMLDivElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
   // The generation's battle music, from the start of the battle to its end.
+  const reviewing = !!staged;
   useEffect(() => {
+    if (reviewing) return;
     startMusic(format);
     return () => stopMusic();
-  }, [format]);
+  }, [format, reviewing]);
   useEffect(() => {
     if (end) stopMusic();
   }, [end]);
@@ -225,6 +368,10 @@ export function Battle({
     running.current?.cancel();
     setTeam(pkg.team);
     setControls(pkg.controls);
+    setDecision((d) => d ?? (pkg.controls && { controls: pkg.controls, team: pkg.team }));
+    setCoach(pkg.coach ?? null);
+    setTipHidden(false);
+    if (pkg.review) setReview(pkg.review);
     setPlaying(false);
     setAnim(null);
     if (settingsRef.current.beginnerHints) {
@@ -291,6 +438,7 @@ export function Battle({
     Promise.all([backend.start(start), loaded]).then(
       ([pkg, mod]) => {
         if (cancelled) return;
+        unsavedAi.current = pkg.aiChoices;
         animsRef.current = mod;
         setAnims(mod);
         play(pkg);
@@ -300,9 +448,16 @@ export function Battle({
     return () => {
       cancelled = true;
       if (timer.current) clearTimeout(timer.current);
+      if (thinkTimer.current) clearTimeout(thinkTimer.current);
       running.current?.cancel();
     };
   }, [backend, start, play]);
+
+  // A coach tip that waited for the judge arrives late, while you choose.
+  useEffect(
+    () => backend.onCoachTip?.((note) => setCoach((c) => (c && !c.tip ? { ...c, tip: note } : c))),
+    [backend],
+  );
 
   // A live foe's turn (or the end) can arrive while it's your move or between turns.
   useEffect(
@@ -317,17 +472,56 @@ export function Battle({
   const choose = useCallback(
     (choice: string) => {
       setControls(null);
+      setCoach(null);
       setPlaying(true);
+      if (thinkTimer.current) clearTimeout(thinkTimer.current);
+      thinkTimer.current = setTimeout(() => setThinking(true), THINKING_MS);
+      const settle = () => {
+        if (thinkTimer.current) clearTimeout(thinkTimer.current);
+        thinkTimer.current = null;
+        setThinking(false);
+      };
       backend.choose(choice).then(
         (pkg) => {
-          onChoiceRef.current(choice);
+          settle();
+          const ai = mergeAiChoices(unsavedAi.current, pkg.aiChoices);
+          unsavedAi.current = undefined;
+          if (pkg.coachMemo) onChoiceRef.current(choice, ai, pkg.coachMemo);
+          else if (ai) onChoiceRef.current(choice, ai);
+          else onChoiceRef.current(choice);
           play(pkg);
         },
-        (e: unknown) => setError(String(e)),
+        (e: unknown) => {
+          settle();
+          setError(String(e));
+        },
       );
     },
     [backend, play],
   );
+
+  // The coach checks a choice first; a flagged one asks before it's sent. If
+  // the check takes too long, the choice goes through unwarned.
+  const pick = (choice: string) => {
+    if (staged) {
+      // Practice: the player's pick plays the turn.
+      if (staged.choice !== undefined || played) return;
+      setPlayed(true);
+      staged.onPick?.(choice);
+      return choose(choice);
+    }
+    if (!coach || !backend.coachCheck) return choose(choice);
+    setChecking(true);
+    const slow = setTimeout(() => setCheckingNote(true), CHECKING_MS);
+    const done = (note: CoachNote | null) => {
+      clearTimeout(slow);
+      setChecking(false);
+      setCheckingNote(false);
+      if (note && !silenced.current.has(note.rule)) setWarning({ choice, note });
+      else choose(choice);
+    };
+    backend.coachCheck(choice, COACH_CHECK_MS).then(done, () => done(null));
+  };
 
   const giveUp = () => {
     setGiveUpOpen(false);
@@ -407,20 +601,75 @@ export function Battle({
   // field that takes the spare height (see battle/ui/BattleLog.tsx).
   const gen = formatInfo(format).gen;
   const textbox = (
-    <BattleLog
-      log={log}
-      onClick={() => playing && skip()}
-      className="min-h-[3.25rem] flex-1 basis-0"
-    />
+    <div data-spot="log" className="flex min-h-[3.25rem] flex-1 basis-0 flex-col">
+      <BattleLog
+        log={log}
+        onClick={() => playing && skip()}
+        className="min-h-[3.25rem] flex-1 basis-0"
+      />
+    </div>
   );
 
+  // The foe whose card is open: the one in battle, or one tapped in its team row.
+  const picked =
+    foePick && foePick !== (view?.foe?.base ?? view?.foe?.species)
+      ? view?.foeTeam.find((m) => m.species === foePick)
+      : undefined;
+  const shownFoe: MonView | null = picked
+    ? {
+        species: picked.species!,
+        hp: picked.fainted ? 0 : (picked.hp ?? 100),
+        status: picked.status,
+        boosts: {},
+        substitute: false,
+        fainted: picked.fainted,
+      }
+    : (view?.foe ?? null);
+  // A lesson's foe is fixed content: its set is known, so its Speed is exact.
+  const foeSpecies = shownFoe ? (shownFoe.base ?? shownFoe.species) : '';
+  const lessonFoe = start.tutorial
+    ? (start.opponentTeam as Mon[]).find((m) => m.species === foeSpecies)
+    : undefined;
+  // Who moves first: shown with beginner hints, and always in lessons.
+  const speedCheck: SpeedCheck | undefined =
+    view && shownFoe && (settings.beginnerHints || lessonFoe || staged?.card)
+      ? {
+          ...foeSpeed(
+            shownFoe.species,
+            lessonFoe
+              ? [lessonSet(lessonFoe)]
+              : possibleSets(foeSpecies, view.revealed[foeSpecies]),
+            { boost: shownFoe.boosts.spe, status: shownFoe.status, weather: view.weather },
+          ),
+          ...(active?.stats.spe && view.you
+            ? {
+                mine: {
+                  species: view.you.species,
+                  speed: battleSpeed(active.stats.spe, {
+                    boost: view.you.boosts.spe,
+                    status: view.you.status,
+                    item: active.item,
+                    ability: active.ability,
+                    weather: view.weather,
+                  }),
+                },
+              }
+            : {}),
+        }
+      : undefined;
+
   const popover =
-    monFor === 'foe' && view?.foe ? (
+    monFor === 'foe' && view && shownFoe ? (
       <MonPopover
         foe
-        mon={view.foe}
-        revealed={view.revealed[view.foe.base ?? view.foe.species]}
+        mon={shownFoe}
+        // Not in battle: its HP isn't on a plate, so the card has it.
+        benched={!!picked}
+        revealed={view.revealed[foeSpecies]}
         hints={settings.beginnerHints}
+        {...(speedCheck && { speed: speedCheck })}
+        // The card sits above the spotlight, so it rings its own parts.
+        {...(staged && !played && { pointAt: staged.spotlight?.before ?? [] })}
       />
     ) : monFor === 'you' && active ? (
       <MonPopover foe={false} member={active} mon={view?.you} />
@@ -448,13 +697,15 @@ export function Battle({
 
   // A live battle: your choice is in, and the foe hasn't made theirs.
   // It sits over the (dimmed) controls, where your next choice will appear.
-  const waitingNote = live && !end && !playing && !controls && view && (
+  // A daily foe that takes a moment (Hard) gets the same note.
+  const waitingText = live ? live.waiting : thinking ? 'The opponent is thinking…' : null;
+  const waitingNote = waitingText && !end && !controls && view && (live ? !playing : true) && (
     <div className="pointer-events-none absolute inset-0 z-10 grid place-items-center">
       <p
         role="status"
         className="rounded-full bg-ink px-4 py-1.5 text-[14px] font-semibold text-surface shadow-card"
       >
-        {live.waiting}
+        {waitingText}
       </p>
     </div>
   );
@@ -475,7 +726,16 @@ export function Battle({
         onFloatDone={floatDone}
         onTap={skip}
         info={monFor}
-        onInfo={setMonFor}
+        onInfo={(who) => {
+          setFoePick(null);
+          setMonFor(who);
+        }}
+        onPick={(species) => {
+          // A second tap on the same one closes it.
+          const open = monFor === 'foe' && foePick === species;
+          setFoePick(open ? null : species);
+          setMonFor(open ? null : 'foe');
+        }}
         busy={playing}
         popover={popover}
       />
@@ -483,22 +743,162 @@ export function Battle({
     </div>
   );
 
-  const controlPanel = (
+  // Shown once the turn's playback is over, while you choose.
+  const promptText =
+    prompt && view && controls && !end ? prompt(Math.max(1, view.turn)) : undefined;
+  const promptNote = promptText && (
+    <p
+      role="note"
+      aria-label="Lesson tip"
+      className="animate-fade-in flex items-start gap-2 rounded-card bg-accent-soft px-3 py-2 text-[14px] leading-snug"
+    >
+      <span aria-hidden>🎓</span>
+      <span className="flex-1">{promptText}</span>
+    </p>
+  );
+
+  const controlPanel = staged ? (
+    <ControlPanel
+      controls={decision?.controls ?? null}
+      team={decision?.team ?? team}
+      hints={settings.beginnerHints}
+      disabled={playing}
+      onChoose={pick}
+      {...(staged.card && staged.card !== 'foe' && !played && { show: staged.card })}
+      // Practice: the controls work until the player picks; then the tags show.
+      {...(staged.marks && (staged.choice !== undefined || played) && { marks: staged.marks })}
+    />
+  ) : (
     <ControlPanel
       controls={controls}
       team={team}
       hints={settings.beginnerHints}
-      disabled={playing || !!end}
-      onChoose={choose}
+      disabled={playing || !!end || checking}
+      onChoose={pick}
     />
   );
-  const panel = live ? (
-    <div className="relative flex shrink-0 flex-col">
-      {controlPanel}
-      {waitingNote}
+  // A staged turn: what the coach says, and the way to play the turn.
+  const stagedNote = staged && (
+    <div
+      role="note"
+      aria-label={staged.label}
+      data-spot="coach"
+      className={clsx(
+        'animate-fade-in flex gap-2 rounded-card bg-accent-soft px-3 py-2 text-[14px] leading-snug',
+        // Several buttons go under the text; one sits beside it, so the card stays short.
+        staged.stack && played && !playing ? 'flex-col' : 'items-center',
+      )}
+    >
+      <div className="min-w-0 flex-1">
+        {played && !playing ? (staged.after ?? staged.before) : staged.before}
+      </div>
+      {!playing && (
+        // Side by side, so the card is only as tall as its text.
+        <div className="flex shrink-0 items-center justify-end gap-1.5">
+          {played
+            ? staged.again !== false && (
+                <button
+                  type="button"
+                  aria-label="Again"
+                  title="Again"
+                  onClick={staged.onReplay}
+                  className="btn btn-secondary grid size-9 place-items-center p-0 text-[17px]"
+                >
+                  <span aria-hidden>↺</span>
+                </button>
+              )
+            : staged.choice !== undefined && (
+                <Button
+                  className="h-9 px-3 text-[13.5px]"
+                  onClick={() => {
+                    setPlayed(true);
+                    choose(staged.choice!);
+                  }}
+                >
+                  {staged.playLabel ?? '▶ Play'}
+                </Button>
+              )}
+          {(played || staged.look) && staged.next}
+        </div>
+      )}
     </div>
-  ) : (
-    controlPanel
+  );
+  // The first-battle tour, once: where the moves, your team, and the foe's card are.
+  const touring =
+    !start.tutorial &&
+    !staged &&
+    !live &&
+    !settings.shownExplainers.includes('tour') &&
+    tourAt < TOUR.length &&
+    !!controls &&
+    controls.kind === 'move' &&
+    !playing &&
+    !end;
+  const endTour = () => {
+    setTourAt(TOUR.length);
+    onExplainerSeen('tour');
+  };
+  const tourNote = touring && (
+    <div
+      role="note"
+      aria-label="Tour"
+      data-spot="tour"
+      className="animate-fade-in flex items-center gap-2 rounded-card bg-accent-soft px-3 py-2 text-[14px] leading-snug"
+    >
+      <p className="min-w-0 flex-1">
+        <span className="text-[12px] font-semibold text-muted tabular-nums">
+          {tourAt + 1}/{TOUR.length}{' '}
+        </span>
+        {TOUR[tourAt]!.text}
+      </p>
+      <div className="flex shrink-0 items-center gap-1.5">
+        {tourAt < TOUR.length - 1 && (
+          <Button variant="ghost" className="h-9 px-2 text-[13.5px]" onClick={endTour}>
+            Skip
+          </Button>
+        )}
+        <Button
+          className="h-9 px-3 text-[13.5px]"
+          onClick={() => (tourAt < TOUR.length - 1 ? setTourAt(tourAt + 1) : endTour())}
+        >
+          {tourAt < TOUR.length - 1 ? 'Next' : 'Got it'}
+        </Button>
+      </div>
+    </div>
+  );
+  const lit = touring
+    ? TOUR[tourAt]!.spots
+    : !staged || playing
+      ? []
+      : ((played ? staged.spotlight?.after : staged.spotlight?.before) ?? []);
+  // The coach's card and the top bar stay lit (unringed): they say what to look at, and how to go on.
+  const spotlight = lit;
+  // One message at a time: the lesson's own prompt and a beginner hint both
+  // come before a coach tip.
+  const tip =
+    !touring && !promptText && !showExplainer && controls && !end && !tipHidden
+      ? coach?.tip
+      : undefined;
+  const coachChecking = checkingNote && (
+    <div className="pointer-events-none absolute inset-0 z-10 grid place-items-center">
+      <p
+        role="status"
+        className="rounded-full bg-ink px-4 py-1.5 text-[14px] font-semibold text-surface shadow-card"
+      >
+        Coach is checking…
+      </p>
+    </div>
+  );
+  const panel = (
+    <div className="relative flex shrink-0 flex-col gap-2">
+      {tourNote}
+      {stagedNote}
+      {promptNote}
+      {tip && <CoachTip text={tip.text} onDismiss={() => setTipHidden(true)} />}
+      <div data-spot="controls">{controlPanel}</div>
+      {waitingNote}
+      {coachChecking}
+    </div>
   );
 
   // Which of today's tries this battle was (known once its result is saved).
@@ -556,23 +956,55 @@ export function Battle({
       {r.summary.status !== 'pending' && <OtherGames className="mt-4 text-left" />}
     </>
   );
-  const endCard = end && (
+  const endCard = end && !staged && (
     <div className="animate-fade-in absolute inset-0 z-20 grid place-items-center bg-black/35 p-4">
       <div
         ref={endRef}
         tabIndex={-1}
-        className="card animate-sheet-in w-full max-w-sm p-5 text-center outline-none"
+        className="card animate-sheet-in max-h-full w-full max-w-sm overflow-y-auto p-5 text-center outline-none"
         role="dialog"
         aria-label="Battle over"
       >
         {live ? live.renderEnd(end, gaveUp) : result && dailyEnd(end, result)}
+        {review && !gaveUp && (
+          <CoachReview review={review} {...(backend.replay && { onShow: setReplayAt })} />
+        )}
+        {review && !gaveUp && !review.key.length && !review.good.length && (
+          <p className="mt-4 text-[14px] text-muted">The coach found nothing to point out.</p>
+        )}
+        {!review && !gaveUp && canReview && (
+          <div className="mt-4">
+            {reviewProgress ? (
+              <p role="status" className="text-[14px] text-muted">
+                The coach is reviewing your choices…
+                {reviewProgress.total > 0 && ` ${reviewProgress.done} of ${reviewProgress.total}`}
+              </p>
+            ) : (
+              <Button variant="secondary" className="w-full" onClick={startReview}>
+                Review this battle
+              </Button>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
-  const topBar = (
+  const topBar = staged ? (
+    <header
+      data-spot="header"
+      className="flex h-12 shrink-0 items-center justify-between gap-2 px-3 pt-[env(safe-area-inset-top)] wide:px-6"
+    >
+      {staged.header}
+    </header>
+  ) : (
     <header className="flex h-12 shrink-0 items-center justify-between gap-2 px-3 pt-[env(safe-area-inset-top)] wide:px-6">
-      <div className="display text-[16px] tabular-nums">
-        {view ? `Turn ${Math.max(1, view.turn)}` : 'Battle'}
+      <div className="flex items-center gap-2">
+        <span className="display text-[16px] tabular-nums">
+          {view ? `Turn ${Math.max(1, view.turn)}` : 'Battle'}
+        </span>
+        {/* A lesson's foe follows its script, whatever AI fills in. */}
+        <DifficultyBadge difficulty={start.tutorial ? undefined : start.difficulty} />
+        {dailyCoach?.on && <CoachBadge />}
       </div>
       <div className="flex items-center gap-1">
         {topBarRight}
@@ -616,8 +1048,20 @@ export function Battle({
   }
 
   return (
-    <div className="flex h-full flex-col" data-gen={gen}>
+    <div ref={rootRef} className="relative flex h-full flex-col" data-gen={gen}>
       {topBar}
+      <Spotlight
+        root={rootRef}
+        targets={spotlight}
+        // While the player picks (practice), the controls stay lit too.
+        keep={
+          touring
+            ? ['tour']
+            : staged && staged.choice === undefined && !staged.look && !played
+              ? ['coach', 'header', 'controls']
+              : ['coach', 'header']
+        }
+      />
       {wide ? (
         // A size container: the stage (field + controls) and the log sit side by side,
         // the stage as wide as fits (up to a comfortable 960px) with room for the
@@ -656,6 +1100,49 @@ export function Battle({
         onLeave={onExit}
         onGiveUp={() => setGiveUpOpen(true)}
         canGiveUp={!end}
+        {...(dailyCoach &&
+          !end && {
+            coach: {
+              on: dailyCoach.on,
+              onTurnOn: () => {
+                if (dailyCoach.warning) return setCoachAsk(dailyCoach.warning);
+                setMenuOpen(false);
+                dailyCoach.onTurnOn();
+              },
+            },
+          })}
+      />
+      <ConfirmDialog
+        open={!!coachAsk}
+        onOpenChange={(o) => !o && setCoachAsk(null)}
+        title="Turn on the coach?"
+        body={coachAsk ?? ''}
+        confirm="Turn on"
+        onConfirm={() => {
+          setCoachAsk(null);
+          setMenuOpen(false);
+          dailyCoach?.onTurnOn();
+        }}
+      />
+      {review && backend.replay && replayAt !== null && (
+        <ReviewTurnScreen
+          review={review}
+          index={replayAt}
+          load={replayTurn}
+          battle={{ start, background, settings }}
+          onIndex={setReplayAt}
+          onClose={() => setReplayAt(null)}
+        />
+      )}
+      <CoachWarning
+        note={warning?.note ?? null}
+        onPickAgain={() => setWarning(null)}
+        onConfirm={(silence) => {
+          if (!warning) return;
+          if (silence) silenced.current.add(warning.note.rule);
+          setWarning(null);
+          choose(warning.choice);
+        }}
       />
       <GiveUpDialog
         open={giveUpOpen}
@@ -665,6 +1152,115 @@ export function Battle({
         practice={!!result && !end && !['none', 'pending'].includes(result.summary.status)}
         body={live?.giveUpBody}
       />
+    </div>
+  );
+}
+
+const noop = () => {};
+
+/**
+ * A turn from the coach's review, on the battle screen in review mode, over
+ * the finished battle. Each turn (and each "Watch again") starts fresh.
+ */
+function ReviewTurnScreen({
+  review,
+  index,
+  load,
+  battle,
+  onIndex,
+  onClose,
+}: {
+  review: Review;
+  index: number;
+  load: (decision: number) => Promise<TurnReplay | null>;
+  battle: { start: EngineStart; background: string; settings: Settings };
+  onIndex: (index: number) => void;
+  onClose: () => void;
+}) {
+  const turns = [...review.key, ...review.good];
+  const turn = turns[index]!;
+  const [round, setRound] = useState(0);
+  const decision = turn.decision;
+  const factory = useCallback(() => replayBackend(() => load(decision)), [load, decision]);
+  const marks: Record<string, Mark> = {
+    ...(turn.first ? { [turn.first]: 'first' as const } : {}),
+    [turn.choice]: turn.top || turn.first ? 'you' : 'best',
+    ...(turn.top ? { [turn.top]: 'better' as const } : {}),
+  };
+  const nav = (label: string, to: number, icon: ReactNode) => (
+    <button
+      type="button"
+      aria-label={label}
+      disabled={to < 0 || to >= turns.length}
+      onClick={() => onIndex(to)}
+      className="grid size-10 place-items-center rounded-full text-muted hover:bg-surface-2 disabled:opacity-30"
+    >
+      {icon}
+    </button>
+  );
+  const header = (
+    <>
+      <span className="display text-[16px] tabular-nums">Review · Turn {turn.turn}</span>
+      <div className="flex items-center gap-1">
+        {nav(
+          'Previous turn',
+          index - 1,
+          <ChevronIcon className="rotate-180" width={18} height={18} />,
+        )}
+        <span className="text-[13px] text-muted tabular-nums">
+          {index + 1} of {turns.length}
+        </span>
+        {nav('Next turn', index + 1, <ChevronIcon width={18} height={18} />)}
+        <button
+          type="button"
+          aria-label="Close review"
+          onClick={onClose}
+          className="grid size-10 place-items-center rounded-full text-muted hover:bg-surface-2"
+        >
+          <CloseIcon width={18} height={18} />
+        </button>
+      </div>
+    </>
+  );
+  const note = (
+    <p>
+      {turn.better ? (
+        <>
+          <b>{turn.better}</b> was better.{' '}
+        </>
+      ) : null}
+      <span className="text-soft-ink">{turn.text}</span>
+    </p>
+  );
+  return (
+    <div
+      role="dialog"
+      aria-modal
+      aria-label={`Review: turn ${turn.turn}`}
+      className="fixed inset-0 z-50 bg-[var(--bg)]"
+    >
+      <BattleBackendContext.Provider value={factory}>
+        <Battle
+          key={`${index}:${round}`}
+          start={battle.start}
+          background={battle.background}
+          // No beginner explainers over the review.
+          settings={{ ...battle.settings, beginnerHints: false }}
+          onSetting={noop}
+          onExplainerSeen={noop}
+          onChoice={noop}
+          onEnd={noop}
+          onExit={onClose}
+          staged={{
+            choice: turn.choice,
+            marks,
+            header,
+            before: note,
+            label: 'Coach review',
+            onReplay: () => setRound((r) => r + 1),
+          }}
+        />
+      </BattleBackendContext.Provider>
     </div>
   );
 }

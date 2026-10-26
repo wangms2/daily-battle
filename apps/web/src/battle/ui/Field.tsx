@@ -47,7 +47,7 @@ const Y = (y: number) => `calc(100cqh - var(--s) * ${385 - y})`;
 /** Top of the foe's stat bar; its details card opens just below it. */
 const FOE_BAR_TOP = `max(6px, calc(${Y(150)} - 58px))`;
 /** The stat bar's height with its types and team marks, and its width (w-[9.75rem]). */
-const FOE_BAR_H = '66px';
+const FOE_BAR_H = '70px';
 const BAR_W = '9.75rem';
 
 /**
@@ -134,21 +134,46 @@ export function HpBar({
   );
 }
 
-function TeamMarks({ marks }: { marks: TeamMark[] }) {
+/**
+ * The foe's team: a Pokémon it has shown, by its icon (tap for its card), and
+ * one not seen yet as a ball.
+ */
+function TeamMarks({ marks, onPick }: { marks: TeamMark[]; onPick?: (species: string) => void }) {
   return (
-    <span className="flex items-center gap-px" aria-hidden>
-      {marks.map((m, i) => (
-        <img
-          key={i}
-          src={m.species ? getSprite(m.species, 'icon') : HAZARD_FX.pokeball}
-          alt=""
-          className={clsx(
-            'pixelated object-contain',
-            m.species ? 'h-[15px] w-5' : 'mx-[3px] size-[13px]',
-            m.fainted && 'opacity-35 grayscale',
-          )}
-        />
-      ))}
+    <span className="flex items-center gap-0.5">
+      {marks.map((m, i) => {
+        const img = (
+          <img
+            src={m.species ? getSprite(m.species, 'icon') : HAZARD_FX.pokeball}
+            alt=""
+            className={clsx(
+              'pixelated object-contain',
+              m.species ? 'h-[19px] w-[25px]' : 'mx-[5px] size-[15px]',
+              m.fainted && 'opacity-35 grayscale',
+            )}
+          />
+        );
+        const species = m.species;
+        return species && onPick ? (
+          <button
+            key={i}
+            type="button"
+            data-mon
+            className="-my-1 rounded-[3px] py-1"
+            aria-label={`Foe's ${species}${m.fainted ? ', fainted' : m.hp !== undefined ? `, ${m.hp}% HP` : ''}. Details`}
+            onClick={(e) => {
+              e.stopPropagation();
+              onPick(species);
+            }}
+          >
+            {img}
+          </button>
+        ) : (
+          <span key={i} aria-hidden>
+            {img}
+          </span>
+        );
+      })}
     </span>
   );
 }
@@ -160,6 +185,7 @@ function StatBar({
   animate,
   style,
   onInfo,
+  onPick,
 }: {
   mon: MonView;
   who: Who;
@@ -167,77 +193,92 @@ function StatBar({
   animate: boolean;
   style: CSSProperties;
   onInfo: (who: Who | null, how: 'tap' | 'hover') => void;
+  /** A foe team icon tapped: that Pokémon's card. */
+  onPick?: (species: string) => void;
 }) {
   const boosts = boostLabels(mon.boosts);
   const left = marks.filter((m) => !m.fainted).length;
   return (
-    <button
-      type="button"
-      data-mon
-      onClick={(e) => {
-        e.stopPropagation();
-        onInfo(who, 'tap');
-      }}
-      onPointerEnter={(e) => e.pointerType === 'mouse' && onInfo(who, 'hover')}
-      onPointerLeave={(e) => e.pointerType === 'mouse' && onInfo(null, 'hover')}
-      aria-label={`${who === 'foe' ? 'Foe' : 'Your'} ${mon.base ? `Mega ${mon.base}` : mon.species}, ${mon.hp}% HP${mon.status ? `, ${STATUS_LABEL[mon.status]}` : ''}, ${left} of ${marks.length} left. Details`}
+    <div
       className="statbar absolute z-10 w-[9.75rem] text-left"
       style={style}
+      // Lesson demos point at parts of the screen by these (Spotlight.tsx).
+      data-spot={`${who}-plate`}
     >
-      <span className="flex items-center gap-1">
-        <span className="truncate text-[13px] leading-4 font-bold">{mon.base ?? mon.species}</span>
-        {mon.base && (
-          <span
-            className="mega-badge shrink-0 rounded-[3px] px-1 text-[9.5px] leading-[14px] font-bold"
-            title={mon.species}
-          >
-            Mega
+      <button
+        type="button"
+        data-mon
+        onClick={(e) => {
+          e.stopPropagation();
+          onInfo(who, 'tap');
+        }}
+        onPointerEnter={(e) => e.pointerType === 'mouse' && onInfo(who, 'hover')}
+        onPointerLeave={(e) => e.pointerType === 'mouse' && onInfo(null, 'hover')}
+        aria-label={`${who === 'foe' ? 'Foe' : 'Your'} ${mon.base ? `Mega ${mon.base}` : mon.species}, ${mon.hp}% HP${mon.status ? `, ${STATUS_LABEL[mon.status]}` : ''}, ${left} of ${marks.length} left. Details`}
+        className="statbar-btn block w-full text-left"
+      >
+        <span className="flex items-center gap-1">
+          <span className="truncate text-[13px] leading-4 font-bold">
+            {mon.base ?? mon.species}
           </span>
-        )}
-        {/* Every Pokémon here is level 100, as on Showdown's ladder. */}
-        <span className="shrink-0 text-[10px] leading-4 font-semibold text-muted">L100</span>
-        {mon.status && (
-          <span
-            className="rounded-[3px] px-1 text-[9.5px] leading-[14px] font-bold text-white"
-            style={{ background: STATUS_COLOR[mon.status] }}
-          >
-            {STATUS_LABEL[mon.status]}
-          </span>
-        )}
-      </span>
-      <span className="mt-0.5 flex items-center gap-1">
-        <span className="statbar-hp h-[7px] flex-1 overflow-hidden rounded-[3px]">
-          <span
-            className="block h-full"
-            style={{
-              width: `${mon.hp}%`,
-              background: hpColor(mon.hp),
-              transition: animate ? 'width 420ms ease-out, background-color 420ms' : 'none',
-            }}
-          />
+          {mon.base && (
+            <span
+              className="mega-badge shrink-0 rounded-[3px] px-1 text-[9.5px] leading-[14px] font-bold"
+              title={mon.species}
+            >
+              Mega
+            </span>
+          )}
+          {/* Every Pokémon here is level 100, as on Showdown's ladder. */}
+          <span className="shrink-0 text-[10px] leading-4 font-semibold text-muted">L100</span>
+          {mon.status && (
+            <span
+              className="rounded-[3px] px-1 text-[9.5px] leading-[14px] font-bold text-white"
+              style={{ background: STATUS_COLOR[mon.status] }}
+            >
+              {STATUS_LABEL[mon.status]}
+            </span>
+          )}
         </span>
-        <span className="statbar-pill rounded-[3px] px-1 text-[10px] leading-[13px] font-semibold tabular-nums">
-          {mon.hp}%
-        </span>
-      </span>
-      {/* Its types (as it looks now, so a Mega shows its Mega typing) and any stat changes. */}
-      <span className="mt-0.5 flex items-center gap-1">
-        {speciesInfo(mon.species).types.map((t) => (
-          <TypeBadge key={t} type={t} size="sm" />
-        ))}
-        {boosts.length > 0 && (
-          <span className="min-w-0 truncate text-[10px] leading-3 font-semibold">
-            {boosts.join(' ')}
+        <span className="mt-0.5 flex items-center gap-1">
+          <span
+            data-spot={`${who}-hp`}
+            className="statbar-hp h-[7px] flex-1 overflow-hidden rounded-[3px]"
+          >
+            <span
+              className="block h-full"
+              style={{
+                width: `${mon.hp}%`,
+                background: hpColor(mon.hp),
+                transition: animate ? 'width 420ms ease-out, background-color 420ms' : 'none',
+              }}
+            />
           </span>
-        )}
-      </span>
+          <span className="statbar-pill rounded-[3px] px-1 text-[10px] leading-[13px] font-semibold tabular-nums">
+            {mon.hp}%
+          </span>
+        </span>
+        {/* Its types (as it looks now, so a Mega shows its Mega typing) and any stat changes. */}
+        <span className="mt-0.5 flex items-center gap-1">
+          <span data-spot={`${who}-types`} className="flex items-center gap-1">
+            {speciesInfo(mon.species).types.map((t) => (
+              <TypeBadge key={t} type={t} size="sm" />
+            ))}
+          </span>
+          {boosts.length > 0 && (
+            <span className="min-w-0 truncate text-[10px] leading-3 font-semibold">
+              {boosts.join(' ')}
+            </span>
+          )}
+        </span>
+      </button>
       {/* Only the foe's team shows here; yours is on the bench row below the moves. */}
       {who === 'foe' && (
-        <span className="mt-0.5 flex items-center">
-          <TeamMarks marks={marks} />
+        <span data-spot="foe-team" className="mt-0.5 flex items-center">
+          <TeamMarks marks={marks} {...(onPick && { onPick })} />
         </span>
       )}
-    </button>
+    </div>
   );
 }
 
@@ -445,6 +486,7 @@ export function Field({
   onTap,
   info,
   onInfo,
+  onPick,
   popover,
   className,
   busy = false,
@@ -471,6 +513,8 @@ export function Field({
   /** Whose details card is open. */
   info: Who | null;
   onInfo: (who: Who | null) => void;
+  /** A foe team icon tapped: open that Pokémon's card (as `info` 'foe'). */
+  onPick?: (species: string) => void;
   /** The details card for `info`. */
   popover: ReactNode;
 }) {
@@ -607,6 +651,7 @@ export function Field({
           marks={view.foeTeam}
           animate={animate}
           onInfo={handleInfo}
+          {...(onPick && { onPick })}
           style={{ left: foeLeft, top: FOE_BAR_TOP }}
         />
       )}
@@ -616,10 +661,10 @@ export function Field({
         <span
           className="statbar absolute z-10 rounded-[4px] px-1 py-0.5"
           style={{ left: foeBarLeft(null), top: FOE_BAR_TOP }}
-          role="img"
+          role="group"
           aria-label={`Foe has ${view.foeTeam.filter((m) => !m.fainted).length} of ${view.foeTeam.length} left`}
         >
-          <TeamMarks marks={view.foeTeam} />
+          <TeamMarks marks={view.foeTeam} {...(onPick && { onPick })} />
         </span>
       )}
       {view?.you && (
@@ -673,9 +718,21 @@ export function Field({
         <div
           // Never under the pointer: it must not steal hover from the stat bar.
           className="pointer-events-none absolute right-1.5 z-30"
-          style={info === 'foe' ? { top: `calc(${FOE_BAR_TOP} + 4.6rem)` } : { bottom: '0.375rem' }}
+          style={info === 'foe' ? { top: '0.375rem', bottom: '0.375rem' } : { bottom: '0.375rem' }}
         >
-          {popover}
+          {info === 'foe' ? (
+            // Just under the foe's stat bar, unless the card is too tall for the field:
+            // the spacer above it gives way, and the card rides up over the bar.
+            <div className="flex h-full flex-col">
+              <div
+                className="shrink"
+                style={{ flexBasis: `calc(${FOE_BAR_TOP} + 4.6rem - 0.375rem)` }}
+              />
+              <div className="shrink-0">{popover}</div>
+            </div>
+          ) : (
+            popover
+          )}
         </div>
       )}
     </div>
