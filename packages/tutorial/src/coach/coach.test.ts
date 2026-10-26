@@ -88,6 +88,17 @@ describe('Simple coach warnings', () => {
     expect(t.warnings['switch 2']).toMatchObject({ rule: 'switchKo', lesson: 'gen3-switching' });
   });
 
+  it('knows our own abilities: Levitate takes no Earthquake on the way in', () => {
+    const t = coachAt({
+      p1: [
+        { species: 'Forretress', setId: 'forretress-standard' },
+        { species: 'Gengar', setId: 'gengar-offensive' },
+      ],
+      p2: [{ species: 'Tyranitar', moves: ['Earthquake', 'Rock Slide'] }],
+    });
+    expect(t.warnings['switch 2']?.text ?? '').not.toContain('Earthquake');
+  });
+
   it('warns about staying in to be knocked out when a safe switch exists', () => {
     const t = coachAt({
       p1: [
@@ -127,8 +138,9 @@ describe('Simple coach tips', () => {
   it('notices a Choice lock, and Spikes with a spinner on the team', () => {
     const locked = coachAt({
       p1: [{ species: 'Heracross', moves: ['Megahorn', 'Rock Slide'], item: 'Choice Band' }],
-      p2: [{ species: 'Blissey', setId: 'blissey-utility' }],
-      rounds: [{ p1: 'move Megahorn', p2: 'move 1' }],
+      // Skarmory resists Megahorn, so no knockout tip comes first.
+      p2: [{ species: 'Skarmory', moves: ['Drill Peck', 'Toxic'] }],
+      rounds: [{ p1: 'move Megahorn', p2: 'move Toxic' }],
     });
     expect(locked.tip?.text).toBe(
       'Choice Band locks Heracross into Megahorn until it switches out.',
