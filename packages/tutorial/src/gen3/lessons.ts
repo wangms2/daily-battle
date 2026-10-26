@@ -2,10 +2,14 @@
 // lessons on the battle screen, in course order. The course map
 // (course/outline.ts) lists all 18; the rest are still being made.
 import { effective } from './course/effective';
+import { freeTurns } from './course/free-turns';
 import { immune } from './course/immune';
 import { priority } from './course/priority';
 import { reviewDamage } from './course/review-damage';
+import { reviewRisk } from './course/review-risk';
 import { reviewSwitching } from './course/review-switching';
+import { risk } from './course/risk';
+import { takeHit } from './course/take-hit';
 import { speed } from './course/speed';
 import { split } from './course/split';
 import { stab } from './course/stab';
@@ -25,4 +29,8 @@ export const gen3Lessons: Lesson[] = [
   speed,
   priority,
   reviewSwitching,
+  risk,
+  takeHit,
+  freeTurns,
+  reviewRisk,
 ];

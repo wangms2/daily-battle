@@ -35,6 +35,13 @@ export interface JudgeOptions {
   margin: number;
   /** The share of worlds (by weight) where the top choice must be ahead. */
   agree: number;
+  /**
+   * Worlds where the two values are within this of each other are near-ties
+   * (say both choices are about equally lost): they count for neither side of
+   * `agree`. 0 counts every world (daily battles, until the offline check);
+   * lessons use `LESSON_TIE`.
+   */
+  tie?: number;
   /** The week's pool: the prior for foes not seen yet. */
   pool?: readonly string[];
   /**
@@ -51,6 +58,30 @@ export const JUDGE_DEFAULTS: JudgeOptions = {
   margin: 0.1,
   agree: 0.9,
 };
+
+/** The near-tie tolerance lessons use (see `JudgeOptions.tie`). */
+export const LESSON_TIE = 0.02;
+
+/**
+ * The share of worlds' weight where `top` is ahead of `choice`, leaving out
+ * near-ties (values within `tie`). 0 when every world is a near-tie.
+ */
+export function agreement(
+  top: readonly number[],
+  choice: readonly number[],
+  weights: readonly number[],
+  tie = 0,
+): number {
+  let total = 0;
+  let ahead = 0;
+  for (let w = 0; w < weights.length; w++) {
+    const diff = top[w]! - choice[w]!;
+    if (tie > 0 && Math.abs(diff) < tie) continue;
+    total += weights[w]!;
+    if (diff > 0) ahead += weights[w]!;
+  }
+  return total ? ahead / total : 0;
+}
 
 export interface Verdict {
   /** The choice judged. */
@@ -245,7 +276,9 @@ export class Judge {
     let total = 0;
     let sumA = 0;
     let sumB = 0;
-    let ahead = 0;
+    const tops: number[] = [];
+    const picks: number[] = [];
+    const weights: number[] = [];
     for (let w = 0; w < this.worlds.length; w++) {
       const va = a[w];
       const vb = b[w];
@@ -255,13 +288,16 @@ export class Judge {
       total += weight;
       sumA += weight * va;
       sumB += weight * vb;
-      if (va > vb) ahead += weight;
+      tops.push(va);
+      picks.push(vb);
+      weights.push(weight);
     }
     const top = this.top;
     if (!total) return { choice, top, worse: false, gap: 0, agree: 0, value: 0, topValue: 0 };
     const value = sumB / total;
     const topValue = sumA / total;
-    const v = { choice, top, gap: topValue - value, agree: ahead / total, value, topValue };
+    const agree = agreement(tops, picks, weights, this.options.tie ?? 0);
+    const v = { choice, top, gap: topValue - value, agree, value, topValue };
     return {
       ...v,
       worse: choice !== top && v.gap >= this.options.margin && v.agree >= this.options.agree,

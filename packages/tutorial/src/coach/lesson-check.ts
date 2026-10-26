@@ -13,7 +13,7 @@ import type { BattleStep, PracticeStep } from '../types';
 import { answerOutcomes } from '../validate';
 import { TIP_LESSON } from './course';
 import { explainWarning, inScope, type WarningReason } from './explain';
-import { Judge } from './judge';
+import { Judge, LESSON_TIE } from './judge';
 import { Coach, type CoachRule } from './simple';
 
 export interface PracticeRow {
@@ -43,7 +43,7 @@ export function practiceCheck(
   const told = withLessonSets(format, step.position.p2);
   const view = startPosition(format, step.position).view('p1')!;
   const facts = turnFacts(view, told);
-  const judge = new Judge(engine, told, { knownSets: known });
+  const judge = new Judge(engine, told, { knownSets: known, tie: LESSON_TIE });
   judge.begin(view, `lesson:${step.position.seed}`);
   const outcomes = answerOutcomes(format, step, runs);
   const best = step.answers.findIndex((a) => a.grade === 'best');
@@ -99,7 +99,7 @@ export function battlePressure(
     const bot =
       kind === 'strong' ? strongBot({ data }) : aiFor({ difficulty: kind, style: 'balance', data });
     const full = new Coach(data, format, 'easy');
-    const judge = new Judge(engine, data, { iterations: 8000, knownSets: known });
+    const judge = new Judge(engine, data, { iterations: 8000, knownSets: known, tie: LESSON_TIE });
     const player: Policy = {
       choose(view, rng) {
         const choice = bot.choose(view, rng);

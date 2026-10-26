@@ -17,10 +17,13 @@ export const REASON_LESSON: Record<WarningReason, number | null> = {
   noEffect: 3,
   // 7 Speed (and 8 Priority: the move that goes first).
   slower: 7,
+  // 9 What can the foe do to you? (check what it could hit your switch-in with)
+  switchKo: 9,
+  bigHit: 9,
   // 10 Switch to take the hit.
   staysKo: 10,
-  switchKo: 10,
-  bigHit: 10,
+  // 11 Free turns (healing on one).
+  noHeal: 11,
   // 14 Spikes and Rapid Spin.
   noSpikes: 14,
   // 15 Setting up.
