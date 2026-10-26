@@ -129,11 +129,25 @@ export interface StagedTurn {
   next?: ReactNode;
   /** Show the turn again from the decision. */
   onReplay: () => void;
-  /** Open a Pokémon's details card from the start (a lesson pointing at it). */
-  card?: 'foe';
+  /**
+   * Details open from the start (a lesson pointing at them): the foe's card
+   * (`foe`), or a choice's (`move 2`: the move's details; `switch 2`: the
+   * teammate's card).
+   */
+  card?: string;
   /** No turn to play: `next` shows at once (a lesson's look at the position). */
   look?: boolean;
 }
+
+/** The first-battle tour (DESIGN.md §22): one step per control a new player might miss. */
+const TOUR: { spots: string[]; text: string }[] = [
+  { spots: ['your-moves'], text: 'Tap a move to use it. Press and hold one to see what it does.' },
+  {
+    spots: ['your-team'],
+    text: 'Your team. Tap a Pokémon to see its moves and stats, or to switch to it.',
+  },
+  { spots: ['foe-plate'], text: 'Tap the foe to see its ability, base stats, and Speed.' },
+];
 
 export interface BattleOutcome {
   result: 'win' | 'loss' | 'forfeit';
@@ -214,7 +228,8 @@ export function Battle({
   const [menuOpen, setMenuOpen] = useState(false);
   const [giveUpOpen, setGiveUpOpen] = useState(false);
   const [coachAsk, setCoachAsk] = useState<string | null>(null);
-  const [monFor, setMonFor] = useState<Who | null>(staged?.card ?? null);
+  const [monFor, setMonFor] = useState<Who | null>(staged?.card === 'foe' ? 'foe' : null);
+  const [tourAt, setTourAt] = useState(0);
   const [floats, setFloats] = useState<Float[]>([]);
   // Showdown's move animations, loaded on demand when animations are on.
   const [anims, setAnims] = useState<typeof AnimPlay | null>(null);
@@ -634,8 +649,8 @@ export function Battle({
         hints={settings.beginnerHints}
         {...(speedCheck && { speed: speedCheck })}
         known={!!lessonFoe}
-        // The card sits above the spotlight, so it rings its own Speed lines.
-        pointAtSpeed={!played && !!staged?.spotlight?.before?.includes('foe-speed')}
+        // The card sits above the spotlight, so it rings its own parts.
+        {...(staged && !played && { pointAt: staged.spotlight?.before ?? [] })}
       />
     ) : monFor === 'you' && active ? (
       <MonPopover foe={false} member={active} mon={view?.you} />
@@ -721,6 +736,7 @@ export function Battle({
       hints={settings.beginnerHints}
       disabled={playing}
       onChoose={pick}
+      {...(staged.card && staged.card !== 'foe' && !played && { show: staged.card })}
       // Practice: the controls work until the player picks; then the tags show.
       {...(staged.marks && (staged.choice !== undefined || played) && { marks: staged.marks })}
     />
@@ -779,14 +795,62 @@ export function Battle({
       )}
     </div>
   );
-  const lit =
-    !staged || playing ? [] : ((played ? staged.spotlight?.after : staged.spotlight?.before) ?? []);
+  // The first-battle tour, once: where the moves, your team, and the foe's card are.
+  const touring =
+    !start.tutorial &&
+    !staged &&
+    !live &&
+    !settings.shownExplainers.includes('tour') &&
+    tourAt < TOUR.length &&
+    !!controls &&
+    controls.kind === 'move' &&
+    !playing &&
+    !end;
+  const endTour = () => {
+    setTourAt(TOUR.length);
+    onExplainerSeen('tour');
+  };
+  const tourNote = touring && (
+    <div
+      role="note"
+      aria-label="Tour"
+      data-spot="tour"
+      className="animate-fade-in flex items-center gap-2 rounded-card bg-accent-soft px-3 py-2 text-[14px] leading-snug"
+    >
+      <p className="min-w-0 flex-1">
+        <span className="text-[12px] font-semibold text-muted tabular-nums">
+          {tourAt + 1}/{TOUR.length}{' '}
+        </span>
+        {TOUR[tourAt]!.text}
+      </p>
+      <div className="flex shrink-0 items-center gap-1.5">
+        {tourAt < TOUR.length - 1 && (
+          <Button variant="ghost" className="h-9 px-2 text-[13.5px]" onClick={endTour}>
+            Skip
+          </Button>
+        )}
+        <Button
+          className="h-9 px-3 text-[13.5px]"
+          onClick={() => (tourAt < TOUR.length - 1 ? setTourAt(tourAt + 1) : endTour())}
+        >
+          {tourAt < TOUR.length - 1 ? 'Next' : 'Got it'}
+        </Button>
+      </div>
+    </div>
+  );
+  const lit = touring
+    ? TOUR[tourAt]!.spots
+    : !staged || playing
+      ? []
+      : ((played ? staged.spotlight?.after : staged.spotlight?.before) ?? []);
   // The coach's card and the top bar stay lit (unringed): they say what to look at, and how to go on.
   const spotlight = lit;
   // One message at a time: the lesson's own prompt and a beginner hint both
   // come before a coach tip.
   const tip =
-    !promptText && !showExplainer && controls && !end && !tipHidden ? coach?.tip : undefined;
+    !touring && !promptText && !showExplainer && controls && !end && !tipHidden
+      ? coach?.tip
+      : undefined;
   const coachChecking = checkingNote && (
     <div className="pointer-events-none absolute inset-0 z-10 grid place-items-center">
       <p
@@ -799,6 +863,7 @@ export function Battle({
   );
   const panel = (
     <div className="relative flex shrink-0 flex-col gap-2">
+      {tourNote}
       {stagedNote}
       {promptNote}
       {tip && <CoachTip text={tip.text} onDismiss={() => setTipHidden(true)} />}
@@ -962,9 +1027,11 @@ export function Battle({
         targets={spotlight}
         // While the player picks (practice), the controls stay lit too.
         keep={
-          staged && staged.choice === undefined && !staged.look && !played
-            ? ['coach', 'header', 'controls']
-            : ['coach', 'header']
+          touring
+            ? ['tour']
+            : staged && staged.choice === undefined && !staged.look && !played
+              ? ['coach', 'header', 'controls']
+              : ['coach', 'header']
         }
       />
       {wide ? (

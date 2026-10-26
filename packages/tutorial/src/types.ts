@@ -154,8 +154,12 @@ export interface DemoStep {
   /** The coach card before the turn plays, and after it. One idea, plainly. */
   before: string;
   after?: string;
-  /** Open a Pokémon's details card, as if tapped (`foe-speed` spots its Speed lines). */
-  card?: 'foe';
+  /**
+   * Open details, as if tapped: `foe` (the foe's card: spot `foe-ability`,
+   * `foe-stats` or `foe-speed`), a move (`move Surf`: its details, spot
+   * `move-details`) or a teammate (`switch Celebi`: its card, spot `team-card`).
+   */
+  card?: string;
   /**
    * The foe's set is unknown, as in a real battle: its card shows what its
    * real competitive sets could be (a Speed range), not its lesson set.

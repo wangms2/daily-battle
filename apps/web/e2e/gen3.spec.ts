@@ -26,7 +26,7 @@ function gen3State({ locked = true } = {}) {
       beginnerHints: true,
       battleSpeed: 'instant',
       animations: true,
-      shownExplainers: ['welcome'],
+      shownExplainers: ['welcome', 'tour'],
       format: 'gen3ou',
     },
   };

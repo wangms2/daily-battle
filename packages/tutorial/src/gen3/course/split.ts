@@ -17,6 +17,23 @@ export const split: Lesson = {
   title: 'Physical and special',
   summary: 'In Gen 3, a move’s type decides which stats it uses.',
   steps: [
+    // Where to look: a move's details say physical or special, and the foe's
+    // card has its base stats.
+    {
+      kind: 'demo',
+      position: { p1: [SWAMPERT], p2: [BLISSEY], seed: 'course:split:look1' },
+      card: 'move Surf',
+      before: 'Hold a move to see its details. In Gen 3, Water moves are special: Surf is Special.',
+      spotlight: { before: ['move-details'] },
+    },
+    {
+      kind: 'demo',
+      position: { p1: [SWAMPERT], p2: [BLISSEY], seed: 'course:split:look2' },
+      card: 'foe',
+      before:
+        'Tap the foe for its base stats. Blissey’s Defense is tiny (10), and its Special Defense is huge (135).',
+      spotlight: { before: ['foe-stats'] },
+    },
     {
       kind: 'demo',
       position: { p1: [SWAMPERT], p2: [BLISSEY], seed: 'course:split:demo1' },

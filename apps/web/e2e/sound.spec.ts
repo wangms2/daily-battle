@@ -37,7 +37,7 @@ function state(sound?: object) {
       beginnerHints: false,
       battleSpeed: 'fast',
       animations: false,
-      shownExplainers: ['welcome'],
+      shownExplainers: ['welcome', 'tour'],
       format: 'gen3ou',
       sound: false,
       ...sound,

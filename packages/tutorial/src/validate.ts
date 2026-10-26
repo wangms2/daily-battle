@@ -237,6 +237,8 @@ export function lessonProblems(lesson: Lesson): string[] {
         const session = startPosition(format, step.position);
         const request = session.request('p1')!;
         const turn = step.turn;
+        if (step.card && step.card !== 'foe' && !resolveStep(step.card, request))
+          note(where, [`the card "${step.card}" isn't a legal choice`]);
         const mine = turn?.p1 && resolveStep(turn.p1, request);
         if (!turn) {
           if (step.after) note(where, ['a look (no turn) has no "after" caption']);

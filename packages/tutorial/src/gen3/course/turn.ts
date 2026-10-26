@@ -15,6 +15,29 @@ export const turn: Lesson = {
   title: 'A turn',
   summary: 'Each turn, both sides pick a move. Knock out every foe to win.',
   steps: [
+    // The screen first: where your moves are, and who's left on each side.
+    {
+      kind: 'demo',
+      position: {
+        p1: [SWAMPERT, { species: 'Metagross', moves: ['Meteor Mash'] }],
+        p2: [SNORLAX, { species: 'Blissey', moves: ['Seismic Toss'] }],
+        seed: 'course:turn:look1',
+      },
+      card: 'move Earthquake',
+      before: 'Your moves are below. Tap one to use it, or press and hold it to see what it does.',
+      spotlight: { before: ['move-details', 'move Earthquake'] },
+    },
+    {
+      kind: 'demo',
+      position: {
+        p1: [SWAMPERT, { species: 'Metagross', moves: ['Meteor Mash'] }],
+        p2: [SNORLAX, { species: 'Blissey', moves: ['Seismic Toss'] }],
+        seed: 'course:turn:look2',
+      },
+      before:
+        'Your team is in the bottom row, and the foe’s is under its name. Both show who’s left.',
+      spotlight: { before: ['your-team', 'foe-team'] },
+    },
     {
       kind: 'demo',
       position: { p1: [SWAMPERT], p2: [SNORLAX], seed: 'course:turn:demo1' },

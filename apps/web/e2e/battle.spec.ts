@@ -38,7 +38,7 @@ function seededState(speed: 'normal' | 'fast' | 'instant', days: Record<string, 
       beginnerHints: true,
       battleSpeed: speed,
       animations: true,
-      shownExplainers: ['welcome', 'gen5-news', 'gen6-news', 'gen3-news'],
+      shownExplainers: ['welcome', 'gen5-news', 'gen6-news', 'gen3-news', 'tour'],
     },
   };
 }

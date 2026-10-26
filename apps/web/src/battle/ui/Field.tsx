@@ -240,7 +240,7 @@ function StatBar({
       </span>
       {/* Only the foe's team shows here; yours is on the bench row below the moves. */}
       {who === 'foe' && (
-        <span className="mt-0.5 flex items-center">
+        <span data-spot="foe-team" className="mt-0.5 flex items-center">
           <TeamMarks marks={marks} />
         </span>
       )}

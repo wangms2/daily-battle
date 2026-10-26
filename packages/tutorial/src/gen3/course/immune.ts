@@ -43,6 +43,18 @@ export const immune: Lesson = {
     {
       kind: 'demo',
       position: {
+        p1: [{ species: 'Metagross', moves: ['Meteor Mash', 'Earthquake'] }],
+        p2: [{ species: 'Weezing', moves: ['Sludge Bomb'] }],
+        seed: 'course:immune:look',
+      },
+      card: 'foe',
+      before:
+        'Tap a foe to see its ability. Some abilities change what hurts it: Weezing’s is Levitate.',
+      spotlight: { before: ['foe-ability'] },
+    },
+    {
+      kind: 'demo',
+      position: {
         // Metagross outspeeds Weezing, so its move lands first.
         p1: [{ species: 'Metagross', moves: ['Meteor Mash', 'Earthquake'] }],
         p2: [{ species: 'Weezing', moves: ['Sludge Bomb'] }],

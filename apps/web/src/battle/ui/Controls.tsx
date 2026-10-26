@@ -37,14 +37,13 @@ function effectivenessTag(e: number | null): { label: string; short: string; ton
   return { label: 'Neutral ×1', short: 'Neutral', tone: 'text-muted' };
 }
 
-/** Touch: the details show this soon into a press, and a press this long keeps them. */
-const SHOW_AFTER = 150;
-const HOLD = 450;
+/** Touch: a press this long is a hold. The details open then, and lifting won't act. */
+const HOLD = 400;
 
 /**
- * Hover (mouse) or a press (touch) shows info; a plain tap acts. On touch, as
- * on Showdown, the info appears almost at once: lift quickly and the tap acts
- * (the info goes); hold past HOLD and the info stays open without acting,
+ * Hover (mouse) or a hold (touch) shows info; a plain tap acts. On touch the
+ * two never overlap: lift before HOLD and the tap acts (no details flash by);
+ * at HOLD the details open, and lifting leaves them open without acting,
  * until the next tap anywhere. Without `longPress`, touch only taps.
  */
 function usePressInfo(
@@ -69,8 +68,10 @@ function usePressInfo(
       if (e.pointerType === 'mouse' || !longPress) return;
       clear();
       timers.current = [
-        setTimeout(show, SHOW_AFTER),
-        setTimeout(() => (held.current = true), HOLD),
+        setTimeout(() => {
+          held.current = true;
+          show();
+        }, HOLD),
       ];
     },
     onPointerUp: () => {
@@ -381,6 +382,7 @@ export function ControlPanel({
   disabled,
   onChoose,
   marks,
+  show,
 }: {
   controls: Controls | null;
   team: TeamMember[];
@@ -393,6 +395,11 @@ export function ControlPanel({
    * tagged and the rest fade.
    */
   marks?: Record<string, Mark>;
+  /**
+   * A choice whose details are open from the start (a lesson pointing at them):
+   * a move's details, or a teammate's card.
+   */
+  show?: string;
 }) {
   const marking = !!marks && !disabled;
   // Hover and focus cards belong to the turn they opened in too: a button that
@@ -400,7 +407,9 @@ export function ControlPanel({
   const [hover, setHover] = useState<{ info: Info; at: Controls | null } | null>(null);
   // The Mega toggle belongs to the turn it was set in.
   const [megaOn, setMegaOn] = useState<{ at: Controls | null } | null>(null);
-  const info = hover && hover.at === controls ? hover.info : null;
+  const shownMove =
+    show && controls?.kind === 'move' ? controls.moves.find((m) => m.choice === show) : undefined;
+  const info = hover && hover.at === controls ? hover.info : shownMove ? { move: shownMove } : null;
   const setInfo = (i: Info) => setHover(i && { info: i, at: controls });
   const off = disabled || !controls;
   // The bench card opened by a tap (touch), which carries the Switch button.
@@ -408,7 +417,11 @@ export function ControlPanel({
   const [pin, setPin] = useState<{ member: TeamMember; at: [Controls | null, boolean] } | null>(
     null,
   );
-  const pinned = pin && pin.at[0] === controls && pin.at[1] === off ? pin.member : null;
+  const shownMember = show?.startsWith('switch ')
+    ? team.find((m) => controls?.switches.find((s) => s.slot === m.slot)?.choice === show)
+    : undefined;
+  const pinned =
+    pin && pin.at[0] === controls && pin.at[1] === off ? pin.member : (shownMember ?? null);
   const setPinned = (m: TeamMember | null) => setPin(m && { member: m, at: [controls, off] });
   const active = team.find((m) => m.active);
   const bench = team.filter((m) => !m.active);
@@ -439,7 +452,7 @@ export function ControlPanel({
 
   const pinnedChoice = pinned && !off ? switchFor(pinned) : undefined;
   const tooltip = pinned ? (
-    <div data-bench-card className="absolute bottom-full left-0 z-30 mb-2">
+    <div data-bench-card data-spot="team-card" className="absolute bottom-full left-0 z-30 mb-2">
       <MonPopover foe={false} member={pinned}>
         {pinnedChoice && (
           <Button
@@ -458,8 +471,10 @@ export function ControlPanel({
     info &&
     ('move' in info ? (
       <div
-        className="card animate-fade-in pointer-events-none absolute inset-x-0 bottom-full z-10 mb-2 p-3"
+        // Above a lesson's spotlight, like the other details cards.
+        className="card animate-fade-in pointer-events-none absolute inset-x-0 bottom-full z-30 mb-2 p-3"
         role="tooltip"
+        data-spot="move-details"
       >
         <MoveDetails move={info.move} hints={hints} />
       </div>
@@ -551,6 +566,7 @@ export function ControlPanel({
         </button>
       )}
       <div
+        data-spot="your-moves"
         className={clsx(
           'short:gap-1.5 grid grid-cols-2 grid-rows-2 gap-2',
           off && 'pointer-events-none opacity-50',
@@ -576,7 +592,12 @@ export function ControlPanel({
           ),
         )}
       </div>
-      <div className="short:gap-1 flex gap-1.5" role="group" aria-label="Switch">
+      <div
+        data-spot="your-team"
+        className="short:gap-1 flex gap-1.5"
+        role="group"
+        aria-label="Switch"
+      >
         {/* As on Showdown: your Pokémon in battle first, then the rest of the team. */}
         {(active ? [active, ...bench] : bench).map((m) => (
           <BenchButton

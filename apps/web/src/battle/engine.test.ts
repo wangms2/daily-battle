@@ -425,6 +425,18 @@ describe('lesson turns', () => {
   });
 });
 
+describe('effectiveness hints', () => {
+  const gen3 = Dex.forGen(3);
+  it('counts an ability that makes the foe immune, when it is certain', () => {
+    expect(effectiveness(gen3, 'Earthquake', 'Gengar')).toBe(2);
+    expect(effectiveness(gen3, 'Earthquake', 'Gengar', 'Levitate')).toBe(0);
+    expect(effectiveness(gen3, 'Flamethrower', 'Houndoom', 'Flash Fire')).toBe(0);
+    // Lightning Rod only blocks Electric moves from Gen 5.
+    expect(effectiveness(gen3, 'Thunderbolt', 'Manectric', 'Lightning Rod')).toBe(0.5);
+    expect(effectiveness(gen3, 'Surf', 'Shedinja', 'Wonder Guard')).toBe(0);
+  });
+});
+
 describe('cleanText', () => {
   it('keeps the shown part of exact/shown number markup', () => {
     expect(cleanText('(Hitmontop lost ||−270/304||88.8%|| of its health!)')).toBe(

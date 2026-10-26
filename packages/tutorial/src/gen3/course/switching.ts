@@ -20,6 +20,13 @@ export const switching: Lesson = {
   steps: [
     {
       kind: 'demo',
+      position: { p1: [JOLTEON, CELEBI], p2: [SWAMPERT], seed: 'course:switching:look' },
+      // The player taps it: the card that opens has the Switch button.
+      before: 'Tap Celebi below to see its moves and stats. Its card has the Switch button.',
+      spotlight: { before: ['switch Celebi'] },
+    },
+    {
+      kind: 'demo',
       position: { p1: [JOLTEON, CELEBI], p2: [SWAMPERT], seed: 'course:switching:demo1' },
       turn: { p1: 'switch Celebi', p2: 'move Earthquake' },
       whole: true,

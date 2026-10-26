@@ -593,7 +593,8 @@ function Demo({
           format,
           step.position,
           step.turn ?? {},
-          [...before, ...after],
+          // The card to open goes last, to resolve like the spots.
+          [...before, ...after, ...(step.card ? [step.card] : [])],
           !!step.whole,
         );
         setTurn(t);
@@ -641,7 +642,10 @@ function Demo({
         onExit={onExit}
         staged={{
           ...(step.turn ? { choice: turn?.choice ?? '' } : { look: true }),
-          ...(step.card && { card: step.card }),
+          // The foe's card opens on the first frame; a choice's once it resolves.
+          ...(step.card === 'foe'
+            ? { card: 'foe' }
+            : step.card && turn && { card: spots[before.length + after.length]! }),
           header,
           before: <p>{step.before}</p>,
           ...(step.after && { after: <p>{step.after}</p> }),

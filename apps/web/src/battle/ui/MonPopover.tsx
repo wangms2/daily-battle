@@ -1,7 +1,7 @@
 // A small Showdown-style details card for a Pokémon: the essentials only.
 // Foes show just what the battle has revealed; yours show the set you brought.
 import clsx from 'clsx';
-import type { ReactNode } from 'react';
+import { Fragment, type ReactNode } from 'react';
 import {
   abilityInfo,
   canMega,
@@ -39,8 +39,11 @@ type Props = {
       speed?: SpeedCheck;
       /** A lesson foe: its set is known, so there are no other sets it could be. */
       known?: boolean;
-      /** A lesson points at the Speed lines: ring them. */
-      pointAtSpeed?: boolean;
+      /**
+       * Parts of the card a lesson points at (`foe-ability`, `foe-stats`,
+       * `foe-speed`): the card sits above the spotlight, so it rings them itself.
+       */
+      pointAt?: readonly string[];
     }
   | { foe: false; member: TeamMember; mon?: MonView | null }
 );
@@ -74,6 +77,10 @@ export function MonPopover(props: Props) {
       ? []
       : props.member.moves;
   const speed = props.foe ? props.speed : undefined;
+  const ring = (spot: string) =>
+    props.foe &&
+    props.pointAt?.includes(spot) &&
+    '-mx-1 rounded-badge px-1 py-0.5 ring-2 ring-accent';
   const verdict = speed && speedVerdict(speed);
   // Beginner hints: the sets this foe could still be running, given what it has shown.
   const could =
@@ -111,7 +118,7 @@ export function MonPopover(props: Props) {
       className={clsx(
         'card animate-fade-in z-30',
         !props.children && 'pointer-events-none',
-        'w-[min(15rem,calc(100vw-2rem))] p-2.5 text-left',
+        'w-[min(17rem,calc(100vw-2rem))] p-2.5 text-left',
         props.className,
       )}
     >
@@ -125,14 +132,20 @@ export function MonPopover(props: Props) {
       </div>
       {first.length > 0 && <p className="mt-1 text-[12.5px] tabular-nums">{first.join(' · ')}</p>}
       {(item || ability) && (
-        <p className="mt-0.5 text-[12.5px] text-muted">
+        <p
+          data-spot="foe-ability"
+          className={clsx('mt-0.5 text-[12.5px] text-muted', ring('foe-ability'))}
+        >
           {item && withIcon(item, 'Item')}
           {item && ability && ' · '}
           {ability && term(ability, 'Ability')}
         </p>
       )}
       {abilities.length > 0 && (
-        <p className="mt-0.5 text-[12.5px] text-muted">
+        <p
+          data-spot="foe-ability"
+          className={clsx('mt-0.5 text-[12.5px] text-muted', ring('foe-ability'))}
+        >
           {'Ability: '}
           {abilities.join(' or ')}
         </p>
@@ -158,14 +171,41 @@ export function MonPopover(props: Props) {
           ))}
         </dl>
       )}
+      {/* A foe: its species' base stats on one line, as Showdown shows them (the big ones
+          bold). Speed has its own line below, as it is in battle. */}
+      {props.foe && (
+        <p
+          data-spot="foe-stats"
+          aria-label="Base stats"
+          className={clsx('mt-1 text-[12px] tabular-nums', ring('foe-stats'))}
+        >
+          {(
+            [
+              ['HP', 'hp'],
+              ['Atk', 'atk'],
+              ['Def', 'def'],
+              ['SpA', 'spa'],
+              ['SpD', 'spd'],
+            ] as const
+          ).map(([k, key], i) => (
+            <Fragment key={k}>
+              {/* Between stats, the only place the line may wrap. */}
+              {i > 0 && <span className="text-muted"> / </span>}
+              <span className="whitespace-nowrap">
+                <span className="text-muted">{k} </span>
+                <span className={info.baseStats[key] >= 100 ? 'font-semibold' : ''}>
+                  {info.baseStats[key]}
+                </span>
+              </span>
+            </Fragment>
+          ))}
+        </p>
+      )}
       {moves.length > 0 && <MoveChips moves={moves} className="mt-1.5" />}
       {speed && (
         <div
           data-spot="foe-speed"
-          className={clsx(
-            'mt-1 text-[12.5px] leading-snug tabular-nums',
-            props.foe && props.pointAtSpeed && '-mx-1 rounded-badge px-1 py-0.5 ring-2 ring-accent',
-          )}
+          className={clsx('mt-1 text-[12.5px] leading-snug tabular-nums', ring('foe-speed'))}
         >
           <p>
             <span className="text-muted">Speed </span>

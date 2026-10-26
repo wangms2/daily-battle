@@ -165,6 +165,7 @@ function renderBattle(
     speed = 'instant',
     hints = true,
     tryNumber = 1,
+    tour = false,
     start = START,
     result = {
       summary: summarizeDay(undefined, true),
@@ -178,12 +179,15 @@ function renderBattle(
     tryNumber?: number;
     start?: EngineStart;
     result?: DayResult;
+    /** The first-battle tour not seen yet. */
+    tour?: boolean;
   } = {},
 ) {
   const settings: Settings = {
     ...initialState().settings,
     battleSpeed: speed,
     beginnerHints: hints,
+    shownExplainers: tour ? [] : ['tour'],
   };
   const props = {
     onSetting: vi.fn(),
@@ -210,6 +214,21 @@ function renderBattle(
 }
 
 const thunderbolt = () => screen.findByRole('button', { name: /^Thunderbolt, / });
+
+describe('first-battle tour', () => {
+  it('walks through the moves, your team, and the foe card once, then says it was seen', async () => {
+    const props = renderBattle(fakeBackend([]).backend, { tour: true });
+    const tour = await screen.findByRole('note', { name: 'Tour' });
+    expect(tour.textContent).toMatch(/1\/3.*Tap a move/);
+    await userEvent.click(within(tour).getByRole('button', { name: 'Next' }));
+    expect(tour.textContent).toMatch(/2\/3.*Your team/);
+    await userEvent.click(within(tour).getByRole('button', { name: 'Next' }));
+    expect(tour.textContent).toMatch(/3\/3.*Tap the foe/);
+    await userEvent.click(within(tour).getByRole('button', { name: 'Got it' }));
+    expect(screen.queryByRole('note', { name: 'Tour' })).toBeNull();
+    expect(props.onExplainerSeen).toHaveBeenCalledWith('tour');
+  });
+});
 
 describe('battle screen', () => {
   it('keeps the controls off while a turn plays, and a tap skips to the end', async () => {
@@ -308,12 +327,14 @@ describe('battle screen', () => {
     vi.useFakeTimers();
     try {
       fireEvent.pointerDown(button, { pointerType: 'touch' });
-      act(() => vi.advanceTimersByTime(160)); // almost at once
+      act(() => vi.advanceTimersByTime(350));
+      // Not yet a hold: nothing shows, so a lift now would still choose the move.
+      expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
+      act(() => vi.advanceTimersByTime(60));
       const card = screen.getByRole('tooltip');
       expect(card).toHaveTextContent('10% chance to paralyze the target.');
       expect(card).toHaveTextContent('Power95');
       expect(card).toHaveTextContent('Super effective ×4');
-      act(() => vi.advanceTimersByTime(400));
       fireEvent.pointerUp(button, { pointerType: 'touch' });
       fireEvent.pointerLeave(button, { pointerType: 'touch' });
       fireEvent.click(button);
@@ -327,13 +348,13 @@ describe('battle screen', () => {
     expect(calls).toEqual([]);
   });
 
-  it('chooses the move on a quick tap, even once its details have flashed up', async () => {
+  it('chooses the move on a tap short of a hold, without its details flashing up', async () => {
     const { backend, calls } = fakeBackend([TURN_1]);
     renderBattle(backend);
     const button = await thunderbolt();
     vi.useFakeTimers();
     try {
-      press(button, 250);
+      press(button, 350);
     } finally {
       vi.useRealTimers();
     }
