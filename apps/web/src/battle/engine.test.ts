@@ -410,6 +410,19 @@ describe('lesson turns', () => {
     expect(text).not.toContain('Crunch');
     expect(t.turn.frames.at(-1)!.view.foe!.hp).toBeLessThan(100);
   });
+
+  it('shows a position’s starting HP on the plates from the start', () => {
+    const position = {
+      p1: [{ species: 'Starmie', moves: ['Surf'] }],
+      p2: [{ species: 'Houndoom', moves: ['Crunch'] }],
+      hp: { p1: [40], p2: [25] },
+      seed: 'engine:hp',
+    };
+    const t = presentTurn('gen3ou', position, { p1: 'move Surf', p2: 'move Crunch' });
+    const view = t.before.frames.at(-1)!.view;
+    expect(view.you!.hp).toBe(40);
+    expect(view.foe!.hp).toBe(25);
+  });
 });
 
 describe('cleanText', () => {

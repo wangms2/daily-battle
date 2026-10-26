@@ -412,7 +412,9 @@ export function presentTurn(
     true,
   );
   const resolve = (s: string) => (/^(move|switch) /.test(s) ? (resolveStep(s, request) ?? s) : s);
-  const choice = resolveStep(turn.p1 ?? '', request) ?? '';
+  // A look: the position only, no turn.
+  if (!turn.p1) return { before, turn: before, choice: '', spots: spots.map(resolve) };
+  const choice = resolveStep(turn.p1, request) ?? '';
   session.choose('p1', choice);
   const foe = session.request('p2');
   if (foe && turn.p2) session.choose('p2', resolveStep(turn.p2, foe) ?? '');

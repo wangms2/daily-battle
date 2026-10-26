@@ -1,7 +1,8 @@
 // Course lesson 7, Speed (docs/plan-tutorial-coach.md, step 4b): the faster
 // Pokémon moves first, so a foe that's faster and can knock you out does it
 // before your move lands. Builds on lessons 1–6: the way out here is a switch
-// (lesson 6) to a teammate that takes the hit.
+// (lesson 6) to a teammate that takes the hit. It starts with where to look:
+// the foe's card shows its Speed against yours.
 import type { Lesson, Mon } from '../../types';
 
 const HERACROSS: Mon = { species: 'Heracross', moves: ['Rock Slide', 'Megahorn'] };
@@ -20,6 +21,14 @@ export const speed: Lesson = {
   title: 'Speed',
   summary: 'The faster Pokémon moves first.',
   steps: [
+    {
+      kind: 'demo',
+      position: { p1: [HERACROSS, SNORLAX], p2: [ZAPDOS], seed: 'course:speed:look1' },
+      card: 'foe',
+      before:
+        'Tap a foe to see its Speed. Zapdos’s is 257, and Heracross’s is 227: Zapdos moves first.',
+      spotlight: { before: ['foe-speed'] },
+    },
     {
       kind: 'demo',
       position: {
@@ -43,6 +52,16 @@ export const speed: Lesson = {
       after:
         'Drill Peck is strong against both of Heracross’s types. Heracross went down before Rock Slide could land.',
       spotlight: { before: ['move Rock Slide', 'foe-plate'], after: ['log'] },
+    },
+    {
+      kind: 'demo',
+      // A real Zapdos: its sets run from 237 to 328.
+      position: { p1: [JOLTEON], p2: [ZAPDOS], seed: 'course:speed:look2' },
+      card: 'foe',
+      realSets: true,
+      before:
+        'In a real battle you don’t know the foe’s set, so you see a range. If it could be either, it might go first.',
+      spotlight: { before: ['foe-speed'] },
     },
     {
       kind: 'practice',

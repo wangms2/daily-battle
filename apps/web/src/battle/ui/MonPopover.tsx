@@ -15,19 +15,33 @@ import { Term } from '../../ui/DetailCard';
 import { ItemIcon } from '../../ui/ItemIcon';
 import { MoveChips } from '../../ui/MoveList';
 import type { MonView, Revealed, TeamMember } from '../frames';
+import { scarfFlips, speedVerdict, type SpeedCheck } from '../../lib/speed';
 import { boostLabels, STATUS_LABEL } from './labels';
 
-/** Speed range at level 100 with 31 IVs: no EVs and a hindering nature up to 252 EVs and a boosting one. */
-function speedRange(base: number): [number, number] {
-  return [Math.floor((2 * base + 31 + 5) * 0.9), Math.floor((2 * base + 31 + 63 + 5) * 1.1)];
-}
+const VERDICT = {
+  faster: ['▲', 'Faster than'],
+  slower: ['▼', 'Slower than'],
+  tie: ['=', 'Ties with'],
+  either: ['◆', 'Could be faster or slower than'],
+} as const;
 
 type Props = {
   className?: string;
   /** Actions under the details (e.g. a Switch button); makes the card tappable. */
   children?: ReactNode;
 } & (
-  | { foe: true; mon: MonView; revealed?: Revealed; hints: boolean }
+  | {
+      foe: true;
+      mon: MonView;
+      revealed?: Revealed;
+      hints: boolean;
+      /** Its Speed now against your active Pokémon's (shown when given). */
+      speed?: SpeedCheck;
+      /** A lesson foe: its set is known, so there are no other sets it could be. */
+      known?: boolean;
+      /** A lesson points at the Speed lines: ring them. */
+      pointAtSpeed?: boolean;
+    }
   | { foe: false; member: TeamMember; mon?: MonView | null }
 );
 
@@ -43,7 +57,12 @@ export function MonPopover(props: Props) {
     : props.member.fainted
       ? 'Fainted'
       : `${props.member.hpExact.hp}/${props.member.hpExact.max}`;
-  const first = [hp, status && STATUS_LABEL[status], ...boostLabels(boosts)].filter(Boolean);
+  // A foe's HP is on its plate already: its card keeps to what the plate doesn't show.
+  const first = [
+    props.foe ? '' : hp,
+    status && STATUS_LABEL[status],
+    ...boostLabels(boosts),
+  ].filter(Boolean);
 
   // Foes: what the battle has revealed. Yours: your set, except the moves of the
   // one that's out, which the move buttons already show.
@@ -54,11 +73,11 @@ export function MonPopover(props: Props) {
     : props.member.active
       ? []
       : props.member.moves;
-  const [lo, hi] = speedRange(info.baseStats.spe);
-  const speed = props.foe && props.hints ? `Speed ${lo}–${hi}` : '';
+  const speed = props.foe ? props.speed : undefined;
+  const verdict = speed && speedVerdict(speed);
   // Beginner hints: the sets this foe could still be running, given what it has shown.
   const could =
-    props.foe && props.hints
+    props.foe && props.hints && !props.known
       ? possibleSets(base, props.revealed).map((s) => shortLabel(s.label))
       : [];
   // Until the battle shows its ability, every ability the species can have in this
@@ -104,7 +123,7 @@ export function MonPopover(props: Props) {
           ))}
         </span>
       </div>
-      <p className="mt-1 text-[12.5px] tabular-nums">{first.join(' · ')}</p>
+      {first.length > 0 && <p className="mt-1 text-[12.5px] tabular-nums">{first.join(' · ')}</p>}
       {(item || ability) && (
         <p className="mt-0.5 text-[12.5px] text-muted">
           {item && withIcon(item, 'Item')}
@@ -114,8 +133,8 @@ export function MonPopover(props: Props) {
       )}
       {abilities.length > 0 && (
         <p className="mt-0.5 text-[12.5px] text-muted">
-          {abilities.length === 1 ? 'Possible ability: ' : 'Possible abilities: '}
-          {abilities.join(' · ')}
+          {'Ability: '}
+          {abilities.join(' or ')}
         </p>
       )}
       {/* Your own Pokémon: every stat, as the request has them. */}
@@ -140,7 +159,33 @@ export function MonPopover(props: Props) {
         </dl>
       )}
       {moves.length > 0 && <MoveChips moves={moves} className="mt-1.5" />}
-      {speed && <p className="mt-1 text-[12.5px] text-muted">{speed}</p>}
+      {speed && (
+        <div
+          data-spot="foe-speed"
+          className={clsx(
+            'mt-1 text-[12.5px] leading-snug tabular-nums',
+            props.foe && props.pointAtSpeed && '-mx-1 rounded-badge px-1 py-0.5 ring-2 ring-accent',
+          )}
+        >
+          <p>
+            <span className="text-muted">Speed </span>
+            <span className="font-semibold">
+              {speed.lo === speed.hi ? speed.lo : `${speed.lo}–${speed.hi}`}
+            </span>
+          </p>
+          {verdict && speed.mine && (
+            <p>
+              <span aria-hidden>{VERDICT[verdict][0]} </span>
+              {VERDICT[verdict][1]} {speed.mine.species} ({speed.mine.speed})
+            </p>
+          )}
+          {scarfFlips(speed) && (
+            <p className="text-muted">
+              <span aria-hidden>◆ </span>With a Choice Scarf: {speed.scarf}, faster
+            </p>
+          )}
+        </div>
+      )}
       {megaHint && <p className="mt-0.5 text-[12.5px] text-muted">Can Mega Evolve</p>}
       {could.length > 0 && (
         <p className="mt-0.5 text-[12.5px] text-muted">

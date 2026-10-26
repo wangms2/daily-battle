@@ -236,13 +236,16 @@ export function lessonProblems(lesson: Lesson): string[] {
         note(where, teamIssues(format, step.position.p2));
         const session = startPosition(format, step.position);
         const request = session.request('p1')!;
-        const mine = step.turn.p1 && resolveStep(step.turn.p1, request);
-        if (!mine) note(where, [`the demo's move "${step.turn.p1}" isn't legal`]);
+        const turn = step.turn;
+        const mine = turn?.p1 && resolveStep(turn.p1, request);
+        if (!turn) {
+          if (step.after) note(where, ['a look (no turn) has no "after" caption']);
+        } else if (!mine) note(where, [`the demo's move "${turn.p1}" isn't legal`]);
         else if (!step.whole) {
           // A demo stops before the foe's move, so yours has to land first.
           session.choose('p1', mine);
           const foe = session.request('p2');
-          if (foe && step.turn.p2) session.choose('p2', resolveStep(step.turn.p2, foe)!);
+          if (foe && turn.p2) session.choose('p2', resolveStep(turn.p2, foe)!);
           const log = session.spectatorLog;
           const you = log.findIndex((l) => l.startsWith('|move|p1a:'));
           const them = log.findIndex((l) => l.startsWith('|move|p2a:'));

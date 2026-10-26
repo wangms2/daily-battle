@@ -2,6 +2,7 @@
 // one screen; turns play back line by line at the chosen speed, tap to skip.
 import { DEFAULT_FORMAT, formatInfo } from '@daily-battle/data/formats';
 import type { CoachNote, Review } from '@daily-battle/tutorial';
+import type { Mon } from '@daily-battle/tutorial/lessons';
 import clsx from 'clsx';
 import {
   useCallback,
@@ -38,9 +39,11 @@ import { Spotlight } from '../battle/ui/Spotlight';
 import { GiveUpDialog, LogList, LogSheet, MenuSheet } from '../battle/ui/sheets';
 import { BattleLog } from '../battle/ui/BattleLog';
 import type { Settings } from '../state/schema';
+import { possibleSets } from '../lib/data';
 import { streakLine, type DaySummary } from '../lib/results';
 import { Button } from '../ui/bits';
 import type { ShareModel } from '../lib/share';
+import { battleSpeed, foeSpeed, lessonSet, type SpeedCheck } from '../lib/speed';
 import { ShareButton, TryRows } from '../ui/results';
 import { ChevronIcon, CloseIcon, InfoIcon } from '../ui/icons';
 import { CoachBadge, DifficultyBadge } from '../ui/Difficulty';
@@ -126,6 +129,10 @@ export interface StagedTurn {
   next?: ReactNode;
   /** Show the turn again from the decision. */
   onReplay: () => void;
+  /** Open a Pokémon's details card from the start (a lesson pointing at it). */
+  card?: 'foe';
+  /** No turn to play: `next` shows at once (a lesson's look at the position). */
+  look?: boolean;
 }
 
 export interface BattleOutcome {
@@ -207,7 +214,7 @@ export function Battle({
   const [menuOpen, setMenuOpen] = useState(false);
   const [giveUpOpen, setGiveUpOpen] = useState(false);
   const [coachAsk, setCoachAsk] = useState<string | null>(null);
-  const [monFor, setMonFor] = useState<Who | null>(null);
+  const [monFor, setMonFor] = useState<Who | null>(staged?.card ?? null);
   const [floats, setFloats] = useState<Float[]>([]);
   // Showdown's move animations, loaded on demand when animations are on.
   const [anims, setAnims] = useState<typeof AnimPlay | null>(null);
@@ -585,13 +592,50 @@ export function Battle({
     </div>
   );
 
+  // A lesson's foe is fixed content: its set is known, so its Speed is exact.
+  const foeSpecies = view?.foe ? (view.foe.base ?? view.foe.species) : '';
+  const lessonFoe = start.tutorial
+    ? (start.opponentTeam as Mon[]).find((m) => m.species === foeSpecies)
+    : undefined;
+  // Who moves first: shown with beginner hints, and always in lessons.
+  const speedCheck: SpeedCheck | undefined =
+    view?.foe && (settings.beginnerHints || lessonFoe || staged?.card)
+      ? {
+          ...foeSpeed(
+            view.foe.species,
+            lessonFoe
+              ? [lessonSet(lessonFoe)]
+              : possibleSets(foeSpecies, view.revealed[foeSpecies]),
+            { boost: view.foe.boosts.spe, status: view.foe.status, weather: view.weather },
+          ),
+          ...(active?.stats.spe && view.you
+            ? {
+                mine: {
+                  species: view.you.species,
+                  speed: battleSpeed(active.stats.spe, {
+                    boost: view.you.boosts.spe,
+                    status: view.you.status,
+                    item: active.item,
+                    ability: active.ability,
+                    weather: view.weather,
+                  }),
+                },
+              }
+            : {}),
+        }
+      : undefined;
+
   const popover =
     monFor === 'foe' && view?.foe ? (
       <MonPopover
         foe
         mon={view.foe}
-        revealed={view.revealed[view.foe.base ?? view.foe.species]}
+        revealed={view.revealed[foeSpecies]}
         hints={settings.beginnerHints}
+        {...(speedCheck && { speed: speedCheck })}
+        known={!!lessonFoe}
+        // The card sits above the spotlight, so it rings its own Speed lines.
+        pointAtSpeed={!played && !!staged?.spotlight?.before?.includes('foe-speed')}
       />
     ) : monFor === 'you' && active ? (
       <MonPopover foe={false} member={active} mon={view?.you} />
@@ -730,7 +774,7 @@ export function Battle({
                   {staged.playLabel ?? '▶ Play'}
                 </Button>
               )}
-          {played && staged.next}
+          {(played || staged.look) && staged.next}
         </div>
       )}
     </div>
@@ -918,7 +962,7 @@ export function Battle({
         targets={spotlight}
         // While the player picks (practice), the controls stay lit too.
         keep={
-          staged && staged.choice === undefined && !played
+          staged && staged.choice === undefined && !staged.look && !played
             ? ['coach', 'header', 'controls']
             : ['coach', 'header']
         }

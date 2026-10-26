@@ -145,11 +145,22 @@ export interface PickStep {
 export interface DemoStep {
   kind: 'demo';
   position: Position;
-  /** The turn shown: what each side does (steps as in `Round`). */
-  turn: Round;
+  /**
+   * The turn shown: what each side does (steps as in `Round`). Left out, the
+   * step is a look: the screen stays at the position (often with a card open)
+   * and Next comes at once.
+   */
+  turn?: Round;
   /** The coach card before the turn plays, and after it. One idea, plainly. */
   before: string;
-  after: string;
+  after?: string;
+  /** Open a Pokémon's details card, as if tapped (`foe-speed` spots its Speed lines). */
+  card?: 'foe';
+  /**
+   * The foe's set is unknown, as in a real battle: its card shows what its
+   * real competitive sets could be (a Speed range), not its lesson set.
+   */
+  realSets?: boolean;
   /** Show the foe's move too (normally the demo stops once your move lands). */
   whole?: boolean;
   /**

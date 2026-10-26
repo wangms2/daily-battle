@@ -9,6 +9,7 @@ import type {
   PracticeStep,
   Grade,
   Lesson,
+  Mon,
   PickStep,
   QuizStep,
 } from '@daily-battle/tutorial/lessons';
@@ -591,7 +592,7 @@ function Demo({
         const t = await b.turn(
           format,
           step.position,
-          step.turn,
+          step.turn ?? {},
           [...before, ...after],
           !!step.whole,
         );
@@ -606,7 +607,9 @@ function Demo({
     () => ({
       format,
       playerTeam: [],
-      opponentTeam: [],
+      // The foe's lesson sets: its card shows its exact Speed (unless it stands
+      // for a real foe, whose set is unknown).
+      opponentTeam: step.realSets ? [] : step.position.p2,
       style: 'balance',
       battleSeed: step.position.seed,
       aiSeed: step.position.seed,
@@ -637,10 +640,11 @@ function Demo({
         onEnd={() => {}}
         onExit={onExit}
         staged={{
-          choice: turn?.choice ?? '',
+          ...(step.turn ? { choice: turn?.choice ?? '' } : { look: true }),
+          ...(step.card && { card: step.card }),
           header,
           before: <p>{step.before}</p>,
-          after: <p>{step.after}</p>,
+          ...(step.after && { after: <p>{step.after}</p> }),
           label: 'Lesson',
           spotlight: { before: spots.slice(0, before.length), after: spots.slice(before.length) },
           playLabel: '▶ Watch',
@@ -657,10 +661,10 @@ function Demo({
 }
 
 /** The battle screen's start for a lesson position shown as a staged turn. */
-const stagedStart = (format: string, seed: string): EngineStart => ({
+const stagedStart = (format: string, seed: string, foe: Mon[] = []): EngineStart => ({
   format,
   playerTeam: [],
-  opponentTeam: [],
+  opponentTeam: foe,
   style: 'balance',
   battleSeed: seed,
   aiSeed: seed,
@@ -800,7 +804,10 @@ function Practice({
   );
 
   // One start per step: a new one would restart the battle screen.
-  const start = useMemo(() => stagedStart(format, step.position.seed), [format, step]);
+  const start = useMemo(
+    () => stagedStart(format, step.position.seed, step.position.p2),
+    [format, step],
+  );
   return (
     <BattleBackendContext.Provider value={factory}>
       <Battle

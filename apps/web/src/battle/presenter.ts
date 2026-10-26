@@ -388,7 +388,14 @@ export class SidePresenter {
         for (const e of explainersOf(a)) if (e) explainers.add(e);
         const event = eventOf(me, a, kw, this.dex);
         const popup = popupOf(me, a, kw);
-        if (!text && !event && !popup) continue;
+        if (!text && !event && !popup) {
+          // A silent change (a lesson's starting HP) shows from the last frame on.
+          if (kw.silent && frames.length) {
+            before = viewOf(this.dex, this.client, me, order, this.spectator);
+            frames[frames.length - 1]!.view = before;
+          }
+          continue;
+        }
         if (text.startsWith('Battle started between')) continue;
         const view = viewOf(this.dex, this.client, me, order, this.spectator);
         const label = labelOf(me, a, kw, before, view);
