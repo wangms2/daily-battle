@@ -38,8 +38,9 @@ describe('noLuck', () => {
   }, 60_000);
 
   it('is still deterministic, with damage rolls still varying', () => {
-    const a = runBattle(input(1, true));
-    expect(runBattle(input(1, true)).spectatorLog).toEqual(a.spectatorLog);
+    // The wall-clock `|t:|` lines differ when the two runs straddle a second.
+    const log = () => runBattle(input(1, true)).spectatorLog.filter((l) => !l.startsWith('|t:|'));
+    expect(log()).toEqual(log());
     const damage = new Set(
       [0, 1, 2, 3].map((i) => {
         const s = new BattleSession({ ...input(0, true), seed: deriveSeed('roll', i) });
