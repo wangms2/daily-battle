@@ -11,7 +11,6 @@ const BLISSEY: Mon = { species: 'Blissey', moves: ['Seismic Toss'] };
 
 export const split: Lesson = {
   id: 'gen3-split-course',
-  draft: true,
   format: 'gen3ou',
   number: 5,
   title: 'Physical and special',
@@ -117,10 +116,8 @@ export const split: Lesson = {
       // Both of yours outspeed both foes.
       player: [SWAMPERT, METAGROSS],
       foe: [BLISSEY, { species: 'Forretress', moves: ['Earthquake'] }],
-      foeAi: 'easy',
       seed: 'course:split:battle',
       noLuck: true,
-      prompts: [],
       takeaway:
         'Physical moves hit Defense; special moves hit Special Defense. Aim at the weaker one.',
     },

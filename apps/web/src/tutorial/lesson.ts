@@ -5,10 +5,10 @@ import type { EngineStart } from '../battle/frames';
 
 /**
  * A lesson battle's start: the engine derives its seeds from the lesson's seed
- * label. In the redesigned course (`lesson` given), the coach only talks about
- * what the lessons up to this one teach.
+ * label. The foe is the Easy AI, and the coach only talks about what the
+ * lessons up to this one (`taught`) teach.
  */
-export function lessonStart(step: BattleStep, format: string, taught?: number): EngineStart {
+export function lessonStart(step: BattleStep, format: string, taught: number): EngineStart {
   return {
     format,
     playerTeam: step.player,
@@ -18,19 +18,14 @@ export function lessonStart(step: BattleStep, format: string, taught?: number): 
     aiSeed: step.seed,
     choices: [],
     difficulty: 'easy',
-    tutorial: {
-      noLuck: step.noLuck,
-      ...(step.foeAi !== 'easy' && { foeScript: step.foeAi }),
-      ...(taught !== undefined && { taught }),
-    },
-    // Battles against the Easy AI (lessons 7+, graduation) are coached.
-    ...(step.foeAi === 'easy' && { coach: 'simple' as const }),
+    tutorial: { noLuck: step.noLuck, taught },
+    coach: 'simple',
   };
 }
 
 /** The lesson to do next: the first one not finished (none once all are). */
 export function nextLesson(lessons: Lesson[], progress: TutorialProgress | undefined) {
-  return lessons.find((l) => !l.draft && !progress?.completed.includes(l.id));
+  return lessons.find((l) => !progress?.completed.includes(l.id));
 }
 
 /** "move Ice Beam" → "Ice Beam"; "switch Jolteon" → "Switch to Jolteon". */

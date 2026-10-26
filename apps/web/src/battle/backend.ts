@@ -7,7 +7,6 @@ import type {
   EngineStart,
   FromWorker,
   LessonTurn,
-  PositionPackage,
   ToWorker,
   TurnPackage,
   TurnReplay,
@@ -48,8 +47,6 @@ export interface BattleBackend {
     /** The whole turn (practice), not just your move (a demo). */
     whole?: boolean,
   ): Promise<LessonTurn>;
-  /** A quiz position (Learn mode); separate from any battle in progress. */
-  position?(format: string, position: Position, steps: string[]): Promise<PositionPackage>;
 }
 
 let shared: Worker | null = null;
@@ -79,7 +76,6 @@ export function workerBackend(): BattleBackend {
             if (e.data.type === 'tip' || e.data.type === 'reviewProgress') return;
             worker.removeEventListener('message', onMessage);
             if (e.data.type === 'package') resolve(e.data.pkg as T);
-            else if (e.data.type === 'position') resolve(e.data.position as T);
             else if (e.data.type === 'turn') resolve(e.data.turn as T);
             else if (e.data.type === 'check') resolve(e.data.note as T);
             else if (e.data.type === 'replay') resolve(e.data.replay as T);
@@ -119,8 +115,6 @@ export function workerBackend(): BattleBackend {
     },
     turn: (format, position, turn, spots = [], whole = false) =>
       send<LessonTurn>({ type: 'turn', format, position, turn, spots, whole }),
-    position: (format, position, steps) =>
-      send<PositionPackage>({ type: 'position', format, position, steps }),
   };
 }
 

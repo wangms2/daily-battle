@@ -34,7 +34,7 @@ const MENCE = { species: 'Salamence', setId: 'salamence-dragon-dance' };
 describe('Simple coach warnings', () => {
   it('warns about type immunities, with the lesson', () => {
     const w = warnAt({ p1: [SWAMPERT], p2: [MENCE] }, 'move 2', 'move 1');
-    expect(w).toMatchObject({ rule: 'noEffect', lesson: 'gen3-types' });
+    expect(w).toMatchObject({ rule: 'noEffect', lesson: 'gen3-immune' });
     expect(w!.text).toContain('immune to Ground');
   });
 
@@ -78,7 +78,9 @@ describe('Simple coach warnings', () => {
       'move 1',
       'move 3',
     );
-    expect(steel).toMatchObject({ rule: 'noEffect', lesson: 'gen3-status' });
+    // Status has no course lesson yet, so there's nothing to link.
+    expect(steel).toMatchObject({ rule: 'noEffect' });
+    expect(steel!.lesson).toBeUndefined();
     const ground = warnAt(
       { p1: [jirachi], p2: [{ species: 'Swampert', setId: 'swampert-standard-defensive' }] },
       'move 2',
@@ -117,7 +119,8 @@ describe('Simple coach warnings', () => {
       'move 1',
       'move 2',
     );
-    expect(w).toMatchObject({ rule: 'noEffect', lesson: 'gen3-spikes' });
+    expect(w).toMatchObject({ rule: 'noEffect' });
+    expect(w!.lesson).toBeUndefined();
   });
 
   it('warns about switching into a knockout', () => {
@@ -126,7 +129,8 @@ describe('Simple coach warnings', () => {
       'switch 2',
       'move 1',
     );
-    expect(w).toMatchObject({ rule: 'switchKo', lesson: 'gen3-switching' });
+    expect(w).toMatchObject({ rule: 'switchKo' });
+    expect(w!.lesson).toBeUndefined();
   });
 
   it('knows our own abilities: Levitate takes no Earthquake on the way in', () => {
@@ -182,7 +186,7 @@ describe('Simple coach warnings', () => {
       'move 1',
       'move 4',
     );
-    expect(w).toMatchObject({ rule: 'missedKo', lesson: 'gen3-winning' });
+    expect(w).toMatchObject({ rule: 'missedKo', lesson: 'gen3-turn' });
   });
 });
 
@@ -201,7 +205,7 @@ describe('Simple coach tips', () => {
     expect(coach.turn(view)).toEqual({ pending: true });
     expect(coach.confirm(view, 'switch 2')).toMatchObject({
       rule: 'walled',
-      lesson: 'gen3-switching',
+      lesson: 'gen3-switching-course',
     });
     // Asking again about the same turn gives the same answer.
     expect(coach.turn(view).tip?.rule).toBe('walled');
@@ -283,7 +287,6 @@ describe('Simple coach tips', () => {
     expect(coach.turn(view).pending).toBe(true);
     expect(coach.confirm(view, 'move 2')).toMatchObject({
       rule: 'setupWindow',
-      lesson: 'gen3-setup',
     });
   });
 });

@@ -24,7 +24,7 @@ Working plan for the `tutorial` branch. It records what's built, the decisions b
 
 ## Waiting on the user
 
-Next: step 4b, storyboarding unit 4 (lessons 9–11, Risk and switching) for the user's review. Units 1–3 (lessons 1–8) are built as drafts, on the course map at `#learn/course`; lessons 6–8 await the user's look at their screenshots. Queued for a quiet night (low concurrency): the targeted Explosion run vs Normal (step 4).
+Next: step 4b, storyboarding unit 4 (lessons 9–11, Risk and switching) for the user's review. Units 1–3 (lessons 1–8) are live: since Oct 26 the course map is Learn (`#learn`), and the old 12 lessons, their card, quiz and pick steps, and scripted lesson foes are gone. Queued for a quiet night (low concurrency): the targeted Explosion run vs Normal (step 4).
 
 ## Decided 2026-10-26 (morning answers)
 

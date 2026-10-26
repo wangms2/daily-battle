@@ -10,7 +10,6 @@ const ALAKAZAM: Mon = { species: 'Alakazam', moves: ['Psychic'] };
 
 export const priority: Lesson = {
   id: 'gen3-priority',
-  draft: true,
   format: 'gen3ou',
   number: 8,
   title: 'Priority',
@@ -100,10 +99,8 @@ export const priority: Lesson = {
         { species: 'Linoone', moves: ['Shadow Ball', 'Extreme Speed'] },
       ],
       foe: [HOUNDOOM, ALAKAZAM],
-      foeAi: 'easy',
       seed: 'course:priority:battle',
       noLuck: true,
-      prompts: [],
       takeaway: 'Priority moves go first, whatever the Speed. Use them to finish a faster foe.',
     },
   ],

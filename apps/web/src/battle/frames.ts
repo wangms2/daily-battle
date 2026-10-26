@@ -2,7 +2,7 @@
 // player's side can see. No simulator types cross this boundary.
 import type { Difficulty } from '@daily-battle/ai/version';
 import type { CoachNote, Heeded, Review, Verdict } from '@daily-battle/tutorial';
-import type { FoeScript, Position } from '@daily-battle/tutorial/lessons';
+import type { Position } from '@daily-battle/tutorial/lessons';
 
 export type Who = 'you' | 'foe';
 
@@ -240,26 +240,18 @@ export interface EngineStart {
   /** Hard: the AI's saved choices, replayed on resume instead of searched again. */
   aiChoices?: string[];
   /**
-   * A lesson battle (Learn mode): the teams are lesson `Mon`s, the foe follows
-   * its script (then plays as Easy), and luck can be removed.
+   * A lesson battle (Learn mode): the teams are lesson `Mon`s, the foe is the
+   * Easy AI, and luck can be removed.
    */
   tutorial?: {
     noLuck: boolean;
-    foeScript?: FoeScript;
-    /** The redesigned course: the lesson reached, so the coach only talks about what's been taught. */
+    /** The lesson reached, so the coach only talks about what's been taught. */
     taught?: number;
   };
   /** The coach (DESIGN.md §22): tips and blunder warnings each turn, and a review at the end. */
   coach?: 'simple';
   /** Coach on: a memo per recorded choice (null where there's none), for resume. */
   coachLog?: (CoachMemo | null)[];
-}
-
-/** A quiz position, shown frozen at the player's decision. */
-export interface PositionPackage {
-  pkg: TurnPackage;
-  /** Each quiz answer's step as a choice (`move 3`), or null if it isn't legal. */
-  choices: (string | null)[];
 }
 
 export type ToWorker =
@@ -270,7 +262,6 @@ export type ToWorker =
   | { type: 'replay'; decision: number }
   /** Review a battle played without the coach. */
   | { type: 'review' }
-  | { type: 'position'; format: string; position: Position; steps: string[] }
   | {
       type: 'turn';
       format: string;
@@ -282,7 +273,6 @@ export type ToWorker =
 
 export type FromWorker =
   | { type: 'package'; pkg: TurnPackage }
-  | { type: 'position'; position: PositionPackage }
   | { type: 'turn'; turn: LessonTurn }
   | { type: 'check'; note: CoachNote | null }
   | { type: 'replay'; replay: TurnReplay | null }

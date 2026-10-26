@@ -7,7 +7,7 @@ import { getSprite } from '../lib/sprites';
 import type { TutorialProgress } from '../state/schema';
 import { CheckIcon } from '../ui/icons';
 import { TopBar } from '../ui/TopBar';
-import { BackButton } from './Learn';
+import { BackButton } from './BackButton';
 
 export function CourseMap({
   game,

@@ -1,6 +1,6 @@
 /// <reference lib="webworker" />
 // Runs the simulator and the opponent AI off the main thread (DESIGN.md §7).
-import { BattleEngine, presentPosition, presentTurn } from './engine';
+import { BattleEngine, presentTurn } from './engine';
 import type { Review } from '@daily-battle/tutorial';
 import type { FromWorker, ToWorker } from './frames';
 import { loadHardEngine } from './hardEngine';
@@ -48,8 +48,6 @@ self.onmessage = async (event: MessageEvent<ToWorker>) => {
         type: 'turn',
         turn: presentTurn(msg.format, msg.position, msg.turn, msg.spots, msg.whole),
       });
-    } else if (msg.type === 'position') {
-      post({ type: 'position', position: presentPosition(msg.format, msg.position, msg.steps) });
     } else if (!engine) {
       throw new Error('No battle in progress');
     } else if (msg.type === 'choose') {

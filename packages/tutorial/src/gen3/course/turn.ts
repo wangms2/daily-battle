@@ -9,7 +9,6 @@ const SNORLAX: Mon = { species: 'Snorlax', moves: ['Body Slam'] };
 
 export const turn: Lesson = {
   id: 'gen3-turn',
-  draft: true,
   format: 'gen3ou',
   number: 1,
   title: 'A turn',
@@ -124,10 +123,8 @@ export const turn: Lesson = {
       player: [{ species: 'Swampert', moves: ['Earthquake', 'Surf', 'Rock Slide'] }],
       // Slower than Swampert, with neutral matchups both ways.
       foe: [{ species: 'Ursaring', moves: ['Return'] }],
-      foeAi: 'easy',
       seed: 'course:turn:battle',
       noLuck: true,
-      prompts: [],
       takeaway: 'Stronger moves take more HP. Knock out every foe Pokémon to win.',
     },
   ],

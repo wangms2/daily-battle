@@ -10,7 +10,6 @@ const URSARING: Mon = { species: 'Ursaring', moves: ['Return'] };
 
 export const stab: Lesson = {
   id: 'gen3-stab',
-  draft: true,
   format: 'gen3ou',
   number: 4,
   title: 'Same-type bonus',
@@ -91,10 +90,8 @@ export const stab: Lesson = {
         { species: 'Swampert', moves: ['Surf', 'Ice Beam'] },
       ],
       foe: [URSARING, { species: 'Snorlax', moves: ['Body Slam'] }],
-      foeAi: 'easy',
       seed: 'course:stab:battle',
       noLuck: true,
-      prompts: [],
       takeaway: 'A move of your Pokémon’s own type hits 1.5× as hard. Look for the match.',
     },
   ],

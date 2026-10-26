@@ -8,7 +8,6 @@ const SNORLAX: Mon = { species: 'Snorlax', moves: ['Body Slam', 'Shadow Ball'] }
 
 export const immune: Lesson = {
   id: 'gen3-immune',
-  draft: true,
   format: 'gen3ou',
   number: 3,
   title: 'Immune',
@@ -127,10 +126,8 @@ export const immune: Lesson = {
         { species: 'Swampert', moves: ['Earthquake', 'Surf'] },
         { species: 'Dusclops', moves: ['Seismic Toss'] },
       ],
-      foeAi: 'easy',
       seed: 'course:immune:battle',
       noLuck: true,
-      prompts: [],
       takeaway: 'A move the foe is immune to does nothing at all. Check its types first.',
     },
   ],
