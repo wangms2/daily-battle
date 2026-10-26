@@ -17,7 +17,8 @@ export const immune: Lesson = {
     {
       kind: 'demo',
       position: {
-        p1: [SWAMPERT],
+        // Dugtrio outspeeds Skarmory, so its move lands first.
+        p1: [{ species: 'Dugtrio', moves: ['Earthquake', 'Rock Slide'] }],
         p2: [{ species: 'Skarmory', moves: ['Drill Peck'] }],
         seed: 'course:immune:demo1',
       },
@@ -41,7 +42,8 @@ export const immune: Lesson = {
     {
       kind: 'demo',
       position: {
-        p1: [SWAMPERT],
+        // Metagross outspeeds Weezing, so its move lands first.
+        p1: [{ species: 'Metagross', moves: ['Meteor Mash', 'Earthquake'] }],
         p2: [{ species: 'Weezing', moves: ['Sludge Bomb'] }],
         seed: 'course:immune:demo3',
       },

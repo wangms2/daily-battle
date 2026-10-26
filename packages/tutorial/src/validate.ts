@@ -234,9 +234,21 @@ export function lessonProblems(lesson: Lesson): string[] {
       } else if (step.kind === 'demo') {
         note(where, teamIssues(format, step.position.p1));
         note(where, teamIssues(format, step.position.p2));
-        const request = startPosition(format, step.position).request('p1')!;
-        if (!step.turn.p1 || !resolveStep(step.turn.p1, request))
-          note(where, [`the demo's move "${step.turn.p1}" isn't legal`]);
+        const session = startPosition(format, step.position);
+        const request = session.request('p1')!;
+        const mine = step.turn.p1 && resolveStep(step.turn.p1, request);
+        if (!mine) note(where, [`the demo's move "${step.turn.p1}" isn't legal`]);
+        else if (!step.whole) {
+          // A demo stops before the foe's move, so yours has to land first.
+          session.choose('p1', mine);
+          const foe = session.request('p2');
+          if (foe && step.turn.p2) session.choose('p2', resolveStep(step.turn.p2, foe)!);
+          const log = session.spectatorLog;
+          const you = log.findIndex((l) => l.startsWith('|move|p1a:'));
+          const them = log.findIndex((l) => l.startsWith('|move|p2a:'));
+          if (you < 0 || (them >= 0 && them < you))
+            note(where, ['the foe moves first, so the demo would stop before your move']);
+        }
       } else {
         const data = speciesDataFor(format);
         for (const s of step.sprites ?? [])

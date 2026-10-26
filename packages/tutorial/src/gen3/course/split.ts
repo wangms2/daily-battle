@@ -30,7 +30,7 @@ export const split: Lesson = {
       position: { p1: [SWAMPERT], p2: [BLISSEY], seed: 'course:split:demo2' },
       turn: { p1: 'move Earthquake', p2: 'move Seismic Toss' },
       before: 'Ground moves are physical: they hit Defense. Blissey’s Defense is tiny.',
-      after: 'Earthquake took most of Blissey’s HP. Hit the defense that’s weaker.',
+      after: 'Earthquake took more than half of Blissey’s HP. Hit the defense that’s weaker.',
       spotlight: { before: ['move Earthquake'], after: ['foe-hp'] },
     },
     {
