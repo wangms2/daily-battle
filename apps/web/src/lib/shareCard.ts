@@ -4,7 +4,7 @@
 // so a glance tells the generation.
 // Drawn on a canvas in the browser from self-hosted assets, so nothing leaves
 // the device until the player shares it.
-import type { FormatId } from '@daily-battle/data/formats';
+import { LIDS } from './genColors';
 import { condenseTries, tryCount } from './results';
 import { shareHeader, type ShareModel, type ShareRow } from './share';
 import { getSprite } from './sprites';
@@ -32,17 +32,6 @@ const C = {
   clayDeep: '#8a4f58',
   seam: '#2b2d36',
   stone: '#f4f3f1',
-};
-/**
- * Each game's lid: one colour from its games, deep enough for white text, and
- * the ball's centre button. Emerald for Gen 3, Diamond's steel blue for Gen 4,
- * Black for Gen 5 (with a white button), and Y's red for Gen 6.
- */
-export const LIDS: Record<FormatId, { lid: string; deep: string; button: string }> = {
-  gen3ou: { lid: '#2f7a5c', deep: '#24624a', button: '#2f7a5c' },
-  gen4ou: { lid: '#4a6890', deep: '#3a5578', button: '#4a6890' },
-  gen5ou: { lid: '#2a2b31', deep: '#1c1d22', button: '#e2e2e8' },
-  gen6ou: { lid: '#a83a48', deep: '#8c2e3b', button: '#a83a48' },
 };
 /** The home screens' clay, for a share without a game. */
 const CLAY = { lid: C.clay, deep: C.clayDeep, button: C.clay };

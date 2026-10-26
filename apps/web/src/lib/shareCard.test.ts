@@ -2,7 +2,7 @@ import { FORMATS } from '@daily-battle/data/formats';
 import { describe, expect, it } from 'vitest';
 import { summarizeDay } from './results';
 import { shareModel } from './share';
-import { LIDS } from './shareCard';
+import { LIDS } from './genColors';
 
 /** WCAG contrast of white text on a `#rrggbb` colour. */
 function contrastWithWhite(hex: string): number {

@@ -214,7 +214,10 @@ function renderBattle(
   return props;
 }
 
-const thunderbolt = () => screen.findByRole('button', { name: /^Thunderbolt, / });
+// The first test in a run pays for loading the battle screen; under a full parallel
+// test run that can take longer than findBy's default second.
+const thunderbolt = () =>
+  screen.findByRole('button', { name: /^Thunderbolt, / }, { timeout: 5000 });
 
 describe('the foe team row', () => {
   it('opens the card of a foe Pokémon not in battle, with its HP', async () => {
