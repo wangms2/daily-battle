@@ -1,7 +1,7 @@
 // The battle screen (DESIGN.md §12.2b): field, this-turn log, and controls on
 // one screen; turns play back line by line at the chosen speed, tap to skip.
 import { DEFAULT_FORMAT, formatInfo } from '@daily-battle/data/formats';
-import type { CoachNote, Review } from '@daily-battle/tutorial';
+import type { CoachNote, Review, ReviewTurn } from '@daily-battle/tutorial';
 import clsx from 'clsx';
 import {
   useCallback,
@@ -13,21 +13,24 @@ import {
   type ReactNode,
 } from 'react';
 import type * as AnimPlay from '../battle/anim/play';
-import { useBattleBackend } from '../battle/backend';
+import { BattleBackendContext, useBattleBackend } from '../battle/backend';
+import { replayBackend } from '../battle/replay-backend';
 import { playCry, startMusic, stopMusic } from '../lib/audio';
 import {
   mergeAiChoices,
   type AiChoices,
+  type CoachMemo,
   type Controls,
   type EngineStart,
   type Frame,
   type TeamMember,
   type TurnPackage,
+  type TurnReplay,
   type View,
   type Who,
 } from '../battle/frames';
 import { CoachReview, CoachTip, CoachWarning } from '../battle/ui/Coach';
-import { ControlPanel } from '../battle/ui/Controls';
+import { ControlPanel, type Mark } from '../battle/ui/Controls';
 import { Field, type Anim, type Float, type Stage } from '../battle/ui/Field';
 import { EXPLAINERS, textLines } from '../battle/ui/labels';
 import { MonPopover } from '../battle/ui/MonPopover';
@@ -38,7 +41,7 @@ import { streakLine, type DaySummary } from '../lib/results';
 import { Button } from '../ui/bits';
 import type { ShareModel } from '../lib/share';
 import { ShareButton, TryRows } from '../ui/results';
-import { CloseIcon, InfoIcon } from '../ui/icons';
+import { ChevronIcon, CloseIcon, InfoIcon } from '../ui/icons';
 import { CoachBadge, DifficultyBadge } from '../ui/Difficulty';
 import { OtherGames } from '../ui/OtherGames';
 import { ConfirmDialog } from '../sheets/misc';
@@ -88,6 +91,22 @@ export interface LiveOptions {
   exitLabel: string;
 }
 
+/**
+ * Review mode (the coach's review, DESIGN.md §22): the battle frozen at one of
+ * your past decisions, with the choice made and the better one marked on the
+ * controls, then that turn played as it happened.
+ */
+export interface ReviewMode {
+  turn: ReviewTurn;
+  /** Its place among the review's turns, to step between them. */
+  index: number;
+  count: number;
+  onIndex: (index: number) => void;
+  /** Show the turn again from the decision. */
+  onReplay: () => void;
+  onClose: () => void;
+}
+
 export interface BattleOutcome {
   result: 'win' | 'loss' | 'forfeit';
   remaining: number;
@@ -110,7 +129,10 @@ export function Battle({
   live,
   prompt,
   coach: dailyCoach,
+  reviewOf,
 }: {
+  /** Review mode: show one past decision instead of playing (see `ReviewMode`). */
+  reviewOf?: ReviewMode;
   /**
    * The daily coach (DESIGN.md §22), where it's offered: on, or a switch in the
    * menu to turn it on (after `warning`, what it costs, if anything).
@@ -128,7 +150,8 @@ export function Battle({
   onSetting: <K extends keyof Settings>(key: K, value: Settings[K]) => void;
   onExplainerSeen: (id: string) => void;
   /** A choice the engine accepted (and Hard's new AI choices); saved so the battle can resume. */
-  onChoice: (choice: string, ai?: AiChoices) => void;
+  /** A choice was made: save it, with the AI's new choices (Hard) and the coach's memo. */
+  onChoice: (choice: string, ai?: AiChoices, memo?: CoachMemo) => void;
   onEnd: (outcome: BattleOutcome) => void;
   onExit: () => void;
   onRunItBack?: () => void;
@@ -180,8 +203,40 @@ export function Battle({
   const [checkingNote, setCheckingNote] = useState(false);
   const [tipHidden, setTipHidden] = useState(false);
   const [warning, setWarning] = useState<{ choice: string; note: CoachNote } | null>(null);
+  // A review turn being replayed (its index in the review's turns).
+  const [replayAt, setReplayAt] = useState<number | null>(null);
+  const replayTurn = useCallback(
+    (decision: number) => backend.replay?.(decision) ?? Promise.resolve(null),
+    [backend],
+  );
   const silenced = useRef(new Set<string>());
+  // A battle played without the coach (Gen 3 dailies) can still be reviewed
+  // once it's over, on request: the coach judges its choices then.
+  const canReview =
+    !start.coach &&
+    !live &&
+    !start.tutorial &&
+    !reviewOf &&
+    (start.format ?? DEFAULT_FORMAT) === 'gen3ou' &&
+    !!backend.review;
+  const [reviewProgress, setReviewProgress] = useState<{ done: number; total: number } | null>(
+    null,
+  );
+  const startReview = () => {
+    setReviewProgress({ done: 0, total: 0 });
+    backend.review!((done, total) => setReviewProgress({ done, total })).then(
+      (r) => {
+        setReview(r);
+        setReviewProgress(null);
+      },
+      () => setReviewProgress(null),
+    );
+  };
   const [review, setReview] = useState<Review | null>(null);
+  // Review mode: the decision's controls (kept, marked, while and after the turn
+  // plays), and whether the turn has been played.
+  const [decision, setDecision] = useState<{ controls: Controls; team: TeamMember[] } | null>(null);
+  const [played, setPlayed] = useState(false);
 
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pending = useRef<{ frames: Frame[]; index: number; pkg: TurnPackage } | null>(null);
@@ -208,10 +263,12 @@ export function Battle({
   const ended = useRef(false);
   const endRef = useRef<HTMLDivElement>(null);
   // The generation's battle music, from the start of the battle to its end.
+  const reviewing = !!reviewOf;
   useEffect(() => {
+    if (reviewing) return;
     startMusic(format);
     return () => stopMusic();
-  }, [format]);
+  }, [format, reviewing]);
   useEffect(() => {
     if (end) stopMusic();
   }, [end]);
@@ -262,6 +319,7 @@ export function Battle({
     running.current?.cancel();
     setTeam(pkg.team);
     setControls(pkg.controls);
+    setDecision((d) => d ?? (pkg.controls && { controls: pkg.controls, team: pkg.team }));
     setCoach(pkg.coach ?? null);
     setTipHidden(false);
     if (pkg.review) setReview(pkg.review);
@@ -346,6 +404,12 @@ export function Battle({
     };
   }, [backend, start, play]);
 
+  // A coach tip that waited for the judge arrives late, while you choose.
+  useEffect(
+    () => backend.onCoachTip?.((note) => setCoach((c) => (c && !c.tip ? { ...c, tip: note } : c))),
+    [backend],
+  );
+
   // A live foe's turn (or the end) can arrive while it's your move or between turns.
   useEffect(
     () =>
@@ -359,6 +423,7 @@ export function Battle({
   const choose = useCallback(
     (choice: string) => {
       setControls(null);
+      setCoach(null);
       setPlaying(true);
       if (thinkTimer.current) clearTimeout(thinkTimer.current);
       thinkTimer.current = setTimeout(() => setThinking(true), THINKING_MS);
@@ -372,7 +437,8 @@ export function Battle({
           settle();
           const ai = mergeAiChoices(unsavedAi.current, pkg.aiChoices);
           unsavedAi.current = undefined;
-          if (ai) onChoiceRef.current(choice, ai);
+          if (pkg.coachMemo) onChoiceRef.current(choice, ai, pkg.coachMemo);
+          else if (ai) onChoiceRef.current(choice, ai);
           else onChoiceRef.current(choice);
           play(pkg);
         },
@@ -388,6 +454,7 @@ export function Battle({
   // The coach checks a choice first; a flagged one asks before it's sent. If
   // the check takes too long, the choice goes through unwarned.
   const pick = (choice: string) => {
+    if (reviewOf) return;
     if (!coach || !backend.coachCheck) return choose(choice);
     setChecking(true);
     const slow = setTimeout(() => setCheckingNote(true), CHECKING_MS);
@@ -571,7 +638,21 @@ export function Battle({
     </p>
   );
 
-  const controlPanel = (
+  const marks: Record<string, Mark> | undefined = reviewOf && {
+    ...(reviewOf.turn.first ? { [reviewOf.turn.first]: 'first' as const } : {}),
+    [reviewOf.turn.choice]: reviewOf.turn.top || reviewOf.turn.first ? 'you' : 'best',
+    ...(reviewOf.turn.top ? { [reviewOf.turn.top]: 'better' as const } : {}),
+  };
+  const controlPanel = reviewOf ? (
+    <ControlPanel
+      controls={decision?.controls ?? null}
+      team={decision?.team ?? team}
+      hints={settings.beginnerHints}
+      disabled={playing}
+      onChoose={pick}
+      {...(marks && { marks })}
+    />
+  ) : (
     <ControlPanel
       controls={controls}
       team={team}
@@ -579,6 +660,35 @@ export function Battle({
       disabled={playing || !!end || checking}
       onChoose={pick}
     />
+  );
+  // Review mode: what the coach says about the decision, and the way to play it.
+  const reviewNote = reviewOf && (
+    <div
+      role="note"
+      aria-label="Coach review"
+      className="animate-fade-in flex items-start gap-2 rounded-card bg-accent-soft px-3 py-2 text-[14px] leading-snug"
+    >
+      <p className="flex-1">
+        {reviewOf.turn.better ? (
+          <>
+            <b>{reviewOf.turn.better}</b> was better.{' '}
+          </>
+        ) : null}
+        <span className="text-soft-ink">{reviewOf.turn.text}</span>
+      </p>
+      {!playing && (
+        <Button
+          className="h-9 shrink-0 px-3 text-[13.5px]"
+          onClick={() => {
+            if (played) return reviewOf.onReplay();
+            setPlayed(true);
+            choose(reviewOf.turn.choice);
+          }}
+        >
+          {played ? '↺ Again' : '▶ Play'}
+        </Button>
+      )}
+    </div>
   );
   // One message at a time: the lesson's own prompt and a beginner hint both
   // come before a coach tip.
@@ -596,6 +706,7 @@ export function Battle({
   );
   const panel = (
     <div className="relative flex shrink-0 flex-col gap-2">
+      {reviewNote}
       {promptNote}
       {tip && <CoachTip text={tip.text} onDismiss={() => setTipHidden(true)} />}
       {controlPanel}
@@ -659,7 +770,7 @@ export function Battle({
       {r.summary.status !== 'pending' && <OtherGames className="mt-4 text-left" />}
     </>
   );
-  const endCard = end && (
+  const endCard = end && !reviewOf && (
     <div className="animate-fade-in absolute inset-0 z-20 grid place-items-center bg-black/35 p-4">
       <div
         ref={endRef}
@@ -669,11 +780,65 @@ export function Battle({
         aria-label="Battle over"
       >
         {live ? live.renderEnd(end, gaveUp) : result && dailyEnd(end, result)}
-        {review && !gaveUp && <CoachReview review={review} />}
+        {review && !gaveUp && (
+          <CoachReview review={review} {...(backend.replay && { onShow: setReplayAt })} />
+        )}
+        {review && !gaveUp && !review.key.length && !review.good.length && (
+          <p className="mt-4 text-[14px] text-muted">The coach found nothing to point out.</p>
+        )}
+        {!review && !gaveUp && canReview && (
+          <div className="mt-4">
+            {reviewProgress ? (
+              <p role="status" className="text-[14px] text-muted">
+                The coach is reviewing your choices…
+                {reviewProgress.total > 0 && ` ${reviewProgress.done} of ${reviewProgress.total}`}
+              </p>
+            ) : (
+              <Button variant="secondary" className="w-full" onClick={startReview}>
+                Review this battle
+              </Button>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
-  const topBar = (
+  const topBar = reviewOf ? (
+    <header className="flex h-12 shrink-0 items-center justify-between gap-2 px-3 pt-[env(safe-area-inset-top)] wide:px-6">
+      <span className="display text-[16px] tabular-nums">Review · Turn {reviewOf.turn.turn}</span>
+      <div className="flex items-center gap-1">
+        <button
+          type="button"
+          aria-label="Previous turn"
+          disabled={reviewOf.index === 0}
+          onClick={() => reviewOf.onIndex(reviewOf.index - 1)}
+          className="grid size-10 place-items-center rounded-full text-muted hover:bg-surface-2 disabled:opacity-30"
+        >
+          <ChevronIcon className="rotate-180" width={18} height={18} />
+        </button>
+        <span className="text-[13px] text-muted tabular-nums">
+          {reviewOf.index + 1} of {reviewOf.count}
+        </span>
+        <button
+          type="button"
+          aria-label="Next turn"
+          disabled={reviewOf.index === reviewOf.count - 1}
+          onClick={() => reviewOf.onIndex(reviewOf.index + 1)}
+          className="grid size-10 place-items-center rounded-full text-muted hover:bg-surface-2 disabled:opacity-30"
+        >
+          <ChevronIcon width={18} height={18} />
+        </button>
+        <button
+          type="button"
+          aria-label="Close review"
+          onClick={reviewOf.onClose}
+          className="grid size-10 place-items-center rounded-full text-muted hover:bg-surface-2"
+        >
+          <CloseIcon width={18} height={18} />
+        </button>
+      </div>
+    </header>
+  ) : (
     <header className="flex h-12 shrink-0 items-center justify-between gap-2 px-3 pt-[env(safe-area-inset-top)] wide:px-6">
       <div className="flex items-center gap-2">
         <span className="display text-[16px] tabular-nums">
@@ -789,6 +954,16 @@ export function Battle({
           dailyCoach?.onTurnOn();
         }}
       />
+      {review && backend.replay && replayAt !== null && (
+        <ReviewTurnScreen
+          review={review}
+          index={replayAt}
+          load={replayTurn}
+          battle={{ start, background, settings }}
+          onIndex={setReplayAt}
+          onClose={() => setReplayAt(null)}
+        />
+      )}
       <CoachWarning
         note={warning?.note ?? null}
         onPickAgain={() => setWarning(null)}
@@ -807,6 +982,65 @@ export function Battle({
         practice={!!result && !end && !['none', 'pending'].includes(result.summary.status)}
         body={live?.giveUpBody}
       />
+    </div>
+  );
+}
+
+const noop = () => {};
+
+/**
+ * A turn from the coach's review, on the battle screen in review mode, over
+ * the finished battle. Each turn (and each "Watch again") starts fresh.
+ */
+function ReviewTurnScreen({
+  review,
+  index,
+  load,
+  battle,
+  onIndex,
+  onClose,
+}: {
+  review: Review;
+  index: number;
+  load: (decision: number) => Promise<TurnReplay | null>;
+  battle: { start: EngineStart; background: string; settings: Settings };
+  onIndex: (index: number) => void;
+  onClose: () => void;
+}) {
+  const turns = [...review.key, ...review.good];
+  const turn = turns[index]!;
+  const [round, setRound] = useState(0);
+  const decision = turn.decision;
+  const factory = useCallback(() => replayBackend(() => load(decision)), [load, decision]);
+  return (
+    <div
+      role="dialog"
+      aria-modal
+      aria-label={`Review: turn ${turn.turn}`}
+      className="fixed inset-0 z-50 bg-[var(--bg)]"
+    >
+      <BattleBackendContext.Provider value={factory}>
+        <Battle
+          key={`${index}:${round}`}
+          start={battle.start}
+          background={battle.background}
+          // No beginner explainers over the review.
+          settings={{ ...battle.settings, beginnerHints: false }}
+          onSetting={noop}
+          onExplainerSeen={noop}
+          onChoice={noop}
+          onEnd={noop}
+          onExit={onClose}
+          reviewOf={{
+            turn,
+            index,
+            count: turns.length,
+            onIndex,
+            onReplay: () => setRound((r) => r + 1),
+            onClose,
+          }}
+        />
+      </BattleBackendContext.Provider>
     </div>
   );
 }

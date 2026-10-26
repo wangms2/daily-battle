@@ -6,7 +6,13 @@ import { gen3Lessons } from '@daily-battle/tutorial/lessons';
 import { describe, expect, it, vi } from 'vitest';
 import { lessonStart } from '../tutorial/lesson';
 import { BattleEngine, cleanText, effectiveness, moveDesc } from './engine';
-import { mergeAiChoices, type AiChoices, type EngineStart, type TurnPackage } from './frames';
+import {
+  mergeAiChoices,
+  type AiChoices,
+  type CoachMemo,
+  type EngineStart,
+  type TurnPackage,
+} from './frames';
 
 function start(i: number, extra: Partial<EngineStart> = {}): EngineStart {
   const rng = makeRng(deriveSeed('engine:teams', i));
@@ -297,6 +303,90 @@ describe.skipIf(!engineBuilt(3))('the coach’s judge', () => {
     }
     // Random picks blunder often enough for the judge to back a few warnings.
     expect(warned).toBeGreaterThan(0);
+  }, 120_000);
+  /** A coached Gen 3 battle against Easy, judged; `n` choices in, warnings checked on every pick. */
+  function coached(n: number) {
+    const rng = makeRng(deriveSeed('engine:judge', 1));
+    const data = setsFor('gen3ou');
+    const s = start(1, {
+      format: 'gen3ou',
+      playerTeam: randomTeam(rng, data),
+      opponentTeam: randomTeam(rng, data),
+      difficulty: 'easy',
+      coach: 'simple',
+    });
+    const engine = new BattleEngine(s, undefined, undefined, loadEngine(3));
+    const packages = [engine.begin()];
+    const choices: string[] = [];
+    const memos: (CoachMemo | null)[] = [];
+    const pick = makeRng('2,7,1,8');
+    while (choices.length < n && !packages.at(-1)!.end) {
+      const c = packages.at(-1)!.controls!;
+      const options = [
+        ...c.moves.filter((m) => !m.disabled).map((m) => m.choice),
+        ...c.switches.map((x) => x.choice),
+      ];
+      const choice = c.only ?? options[Math.floor(pick() * options.length)]!;
+      // Asked about the pick (as the app does); a warning is overridden.
+      engine.coachCheck(choice, Infinity);
+      choices.push(choice);
+      const pkg = engine.choose(choice);
+      memos.push(pkg.coachMemo ?? null);
+      packages.push(pkg);
+    }
+    return { s, engine, packages, choices, memos };
+  }
+
+  it('saves the judge’s verdicts and overridden warnings, so a resume neither judges nor asks again', () => {
+    const { s, engine, choices, memos } = coached(12);
+    expect(memos.filter((m) => m?.verdict).length).toBeGreaterThan(5);
+    // Without the judge, the resumed battle reviews the same from its saved verdicts.
+    const resumed = new BattleEngine({ ...s, choices, coachLog: memos });
+    resumed.begin();
+    expect(resumed.coachReview()).toEqual(engine.coachReview());
+    // An overridden warning isn't asked again at the same decision after a reload.
+    const k = memos.findIndex((m) => m?.ignored);
+    expect(k).toBeGreaterThanOrEqual(0);
+    const at = (log?: (CoachMemo | null)[]) => {
+      const e = new BattleEngine(
+        { ...s, choices: choices.slice(0, k), ...(log && { coachLog: log }) },
+        undefined,
+        undefined,
+        loadEngine(3),
+      );
+      e.begin();
+      return e.coachCheck(choices[k]!, Infinity);
+    };
+    expect(at()?.text).toBe(memos[k]!.ignored);
+    expect(at(memos)).toBeNull();
+  }, 120_000);
+
+  it('replays a past decision: the battle as it was, then the turn as played', () => {
+    const { engine, packages, choices } = coached(6);
+    const k = 3;
+    const replay = engine.replayTurn(k)!;
+    expect(replay.before.controls).toEqual(packages[k]!.controls);
+    expect(replay.before.frames.at(-1)!.view).toEqual(packages[k]!.frames.at(-1)!.view);
+    expect(replay.turn.frames.map((f) => f.text)).toEqual(
+      packages[k + 1]!.frames.map((f) => f.text),
+    );
+    expect(engine.replayTurn(choices.length)).toBeNull();
+  }, 120_000);
+
+  it('reviews a battle played without the coach just as the coach would have', () => {
+    const { s, engine, choices } = coached(10);
+    // The same choices played without the coach, then reviewed on request.
+    const { coach: _coach, ...plain } = s;
+    const uncoached = new BattleEngine(plain);
+    uncoached.begin();
+    for (const c of choices) uncoached.choose(c);
+    const job = uncoached.reviewJob(loadEngine(3));
+    let review;
+    while (!(review = job.step(50)));
+    expect(job.done).toBe(choices.length);
+    // The coached battle's review, minus warnings the player listened to (none
+    // here: every warning was overridden).
+    expect(review).toEqual(engine.coachReview());
   }, 120_000);
 });
 

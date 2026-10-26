@@ -1,7 +1,7 @@
 import { difficultyTag, type Difficulty } from '@daily-battle/ai/version';
 import type { FormatId } from '@daily-battle/data/formats';
 import { mondayOf } from '@daily-battle/gen/dates';
-import { applyAiChoices, type AiChoices } from '../battle/frames';
+import { applyAiChoices, type AiChoices, type CoachMemo } from '../battle/frames';
 import { sameSpecies } from '../lib/data';
 import { attemptDifficulty, summarizeDay } from '../lib/results';
 import {
@@ -26,7 +26,7 @@ export type GameAction =
   | { type: 'startAttempt'; day: string; attempt: Attempt }
   /** The coach was turned on mid-battle: the battle in progress is coached from now on. */
   | { type: 'coachAttempt'; day: string }
-  | { type: 'recordChoice'; day: string; choice: string; ai?: AiChoices }
+  | { type: 'recordChoice'; day: string; choice: string; ai?: AiChoices; memo?: CoachMemo }
   | { type: 'endAttempt'; day: string; result: 'win' | 'loss' | 'forfeit'; remaining: number }
   /** Unfinished attempts from past days, or from another engine version, become forfeits. */
   | { type: 'expireAttempts'; today: string; engine: string }
@@ -256,6 +256,15 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
             choices: [...a.choices, action.choice],
             // The AI's choices so far (Hard saves them, to resume without searching again).
             ...(action.ai ? { aiChoices: applyAiChoices(a.aiChoices, action.ai) } : {}),
+            // The coach's memos, one per choice (null where there's none).
+            ...(action.memo || a.coachLog
+              ? {
+                  coachLog: [
+                    ...Array.from({ length: a.choices.length }, (_, i) => a.coachLog?.[i] ?? null),
+                    action.memo ?? null,
+                  ],
+                }
+              : {}),
           })),
         },
       };

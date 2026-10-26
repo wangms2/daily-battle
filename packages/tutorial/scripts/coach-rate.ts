@@ -1,13 +1,11 @@
 // How often the coach would speak (docs/plan-tutorial-coach.md): per player
-// decision, the share of picks that get a warning under each policy, in Gen 3
-// battles (a beginner-ish player against the daily opponent).
+// decision, the share of picks that get a tip or a warning, in Gen 3 battles
+// (a player of the chosen strength against the daily opponent).
 //   pnpm --filter @daily-battle/tutorial coach-rate [--battles 30] [--vs easy] [--player easy|mid|hard]
 //
-// Policies compared:
-//   - rules: the Simple coach's rules alone (before the judge);
-//   - judged rules: a rule warns and the judge agrees (step 2, what ships now);
-//   - judged any: the judge alone, whatever the rules say (what step 3's
-//     generic explanations would allow), at each margin.
+// Warnings: what the coach shows (the judge finds the pick clearly worse and a
+// true reason explains it), and for comparison the judge alone at each margin
+// (any clearly worse pick, explained or not).
 import { aiFor, midBot, type Difficulty } from '@daily-battle/ai';
 import { setsFor } from '@daily-battle/data';
 import { loadEngine } from '@daily-battle/engine-wasm/node';
@@ -53,11 +51,8 @@ function poolTeam(i: number, week: string): PokemonSet[] {
 
 let decisions = 0;
 let tips = 0;
-let rules = 0;
-const judgedRules: Record<number, number> = {};
 const judgedAny: Record<number, number> = {};
-const perBattle: number[] = [];
-/** Per battle: decisions, and judge-alone warnings at the judge's margin. */
+/** Per battle: decisions, and the warnings the coach shows. */
 const battles: { decisions: number; warnings: number; won: boolean }[] = [];
 const t0 = performance.now();
 for (let i = 0; i < BATTLES; i++) {
@@ -82,7 +77,6 @@ for (let i = 0; i < BATTLES; i++) {
     p1: makeRng(deriveSeed('coach-rate:p1', i)),
     p2: makeRng(deriveSeed('coach-rate:p2', i)),
   };
-  let warnedHere = 0;
   const here = { decisions: 0, warnings: 0, won: false };
   while (!session.ended) {
     for (const side of ['p1', 'p2'] as const) {
@@ -98,28 +92,20 @@ for (let i = 0; i < BATTLES; i++) {
       if (view.request.requestType === 'move' && legalChoices(view.request).length > 1) {
         decisions++;
         here.decisions++;
-        if (t.tip) tips++;
-        const note = t.warnings[choice];
-        if (note) rules++;
         judge.begin(view, `rate:${i}:${session.choices('p1').length}`);
         const v = judge.settle(choice, Infinity);
+        const tip =
+          t.tip ?? (t.pending && judge.best ? coach.confirm(view, judge.best) : undefined);
+        if (tip) tips++;
         if (v && v.agree >= 0.9)
-          for (const m of MARGINS)
-            if (v.gap >= m) {
-              judgedAny[m] = (judgedAny[m] ?? 0) + 1;
-              if (note) judgedRules[m] = (judgedRules[m] ?? 0) + 1;
-            }
-        if (v?.worse) here.warnings++;
-        if (note && v && v.agree >= 0.9 && v.gap >= 0.1) {
-          shown = note;
-          warnedHere++;
-        }
+          for (const m of MARGINS) if (v.gap >= m) judgedAny[m] = (judgedAny[m] ?? 0) + 1;
+        shown = (v && coach.warn(view, v)) ?? null;
+        if (shown) here.warnings++;
       }
       coach.record(view, choice, shown);
       if (!session.choose('p1', choice)) coach.forget();
     }
   }
-  perBattle.push(warnedHere);
   here.won = session.winner === 'p1';
   battles.push(here);
   if ((i + 1) % 10 === 0)
@@ -131,18 +117,12 @@ console.log(
   `\n${BATTLES} battles, ${PLAYER} player vs ${VS}: ${decisions} decisions (${(decisions / BATTLES).toFixed(1)} per battle)`,
 );
 console.log(`  tips: ${pct(tips)} of decisions`);
-console.log(`  rules alone would warn on ${pct(rules)} of picks`);
 for (const m of MARGINS)
-  console.log(
-    `  margin ${m}: judged rules ${pct(judgedRules[m] ?? 0)}, judge alone ${pct(judgedAny[m] ?? 0)} of picks`,
-  );
-const sorted = [...perBattle].sort((a, b) => a - b);
-console.log(
-  `  shipped warnings (judged rules, margin 0.1) per battle: median ${sorted[Math.floor(sorted.length / 2)]}, max ${sorted.at(-1)}`,
-);
+  console.log(`  judge alone, margin ${m}: ${pct(judgedAny[m] ?? 0)} of picks`);
+console.log(`  warnings shown: ${pct(battles.reduce((s, b) => s + b.warnings, 0))} of picks`);
 const counts = battles.map((b) => b.warnings).sort((a, b) => a - b);
 console.log(
-  `  judge alone, margin 0.1, per battle: median ${counts[Math.floor(counts.length / 2)]}, max ${counts.at(-1)}, none in ${counts.filter((c) => c === 0).length} of ${counts.length}`,
+  `  warnings shown per battle: median ${counts[Math.floor(counts.length / 2)]}, max ${counts.at(-1)}, none in ${counts.filter((c) => c === 0).length} of ${counts.length}`,
 );
 const rate = (bs: typeof battles) =>
   `${(

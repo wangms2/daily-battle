@@ -3,6 +3,7 @@
 // Optional fields (like difficulties) are added without a bump: old saves just lack them.
 import type { Difficulty } from '@daily-battle/ai/version';
 import { FORMATS, type FormatId } from '@daily-battle/data/formats';
+import type { CoachMemo } from '../battle/frames';
 import type { Slot } from '../lib/data';
 
 export type { Slot };
@@ -33,6 +34,12 @@ export interface Attempt {
    * again; with the seeds they reproduce the same battle.
    */
   aiChoices?: string[];
+  /**
+   * Coach on: the coach's memo per choice (null where there's none), by index
+   * in `choices`: the judge's verdict and any warning you overrode, so a resume
+   * neither judges again nor asks again (DESIGN.md §22).
+   */
+  coachLog?: (CoachMemo | null)[];
   /** A practice run's one-off change; if the run is won, it carries over to the team. */
   practiceChange?: DayChange;
 }

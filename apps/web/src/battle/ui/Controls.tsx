@@ -117,16 +117,54 @@ function usePressInfo(
   };
 }
 
+/** Review mode (the coach's review): the choice made, the better one, and the rest. */
+export type Mark = 'you' | 'better' | 'best' | 'first';
+
+const MARK_LABEL: Record<Mark, string> = {
+  you: 'You',
+  better: 'Better',
+  best: 'You · Best',
+  first: 'Warned',
+};
+
+/** The tag on a marked choice; unmarked ones fade. */
+function MarkTag({ mark }: { mark: Mark }) {
+  return (
+    <span
+      className={clsx(
+        'pointer-events-none absolute -top-2 right-1 z-10 rounded-full px-1.5 text-[11px] leading-[18px] font-bold shadow-card',
+        mark === 'you' || mark === 'first' ? 'bg-ink text-surface' : 'bg-accent text-white',
+      )}
+    >
+      {MARK_LABEL[mark]}
+    </span>
+  );
+}
+
+const markRing = (mark: Mark | undefined, marking: boolean) =>
+  !marking
+    ? undefined
+    : mark === 'you' || mark === 'first'
+      ? 'outline-2 outline-offset-2 outline-ink'
+      : mark
+        ? 'outline-[3px] outline-offset-2 outline-accent'
+        : 'opacity-30 saturate-50';
+
 function MoveButton({
   move,
   hints,
   onChoose,
   onInfo,
+  mark,
+  marking = false,
 }: {
   move: MoveOption;
   hints: boolean;
   onChoose: () => void;
   onInfo: (move: MoveOption | null) => void;
+  mark?: Mark | undefined;
+  /** Review mode: marked choices stand out and the rest fade. */
+  marking?: boolean;
 }) {
   const color = TYPE_COLORS[move.type]?.bg ?? '#888';
   const tag = hints ? effectivenessTag(move.effectiveness) : null;
@@ -139,33 +177,39 @@ function MoveButton({
     },
   );
   return (
-    <button
-      type="button"
-      disabled={move.disabled}
-      aria-label={`${move.name}, ${move.type}, ${move.pp} of ${move.maxpp} PP${tag ? `, ${tag.label}` : ''}`}
-      {...press}
-      className="move-btn short:min-h-[2.5rem] short:pt-1 short:pb-0.5 flex h-full min-h-[3.25rem] flex-col justify-between overflow-hidden rounded-btn px-2 pt-1.5 pb-1 select-none active:translate-y-px disabled:opacity-40"
-      style={{ '--type': color } as CSSProperties}
-    >
-      <span className="battle-pixel short:leading-[18px] truncate text-center leading-5">
-        {move.name}
-      </span>
-      {/* Type on the left; with hints, a short effectiveness tag beside the PP. */}
-      <span className="short:text-[10.5px] short:leading-3 flex items-baseline justify-between gap-1 text-[11px] leading-4">
-        <span className="truncate font-medium text-muted">{move.type}</span>
-        <span className="flex shrink-0 items-baseline gap-1 tabular-nums">
-          {hints && (
-            <span className={clsx('font-semibold', tag ? tag.tone : 'text-muted')}>
-              {tag ? tag.short : 'Status'}
+    <div className={clsx('relative h-full rounded-btn', markRing(mark, marking))}>
+      {mark && <MarkTag mark={mark} />}
+      <button
+        type="button"
+        disabled={move.disabled}
+        aria-label={`${move.name}, ${move.type}, ${move.pp} of ${move.maxpp} PP${tag ? `, ${tag.label}` : ''}${mark ? `, ${MARK_LABEL[mark]}` : ''}`}
+        {...press}
+        className={clsx(
+          'move-btn short:min-h-[2.5rem] short:pt-1 short:pb-0.5 flex h-full min-h-[3.25rem] w-full flex-col justify-between overflow-hidden rounded-btn px-2 pt-1.5 pb-1 select-none',
+          marking ? 'pointer-events-none' : 'active:translate-y-px disabled:opacity-40',
+        )}
+        style={{ '--type': color } as CSSProperties}
+      >
+        <span className="battle-pixel short:leading-[18px] truncate text-center leading-5">
+          {move.name}
+        </span>
+        {/* Type on the left; with hints, a short effectiveness tag beside the PP. */}
+        <span className="short:text-[10.5px] short:leading-3 flex items-baseline justify-between gap-1 text-[11px] leading-4">
+          <span className="truncate font-medium text-muted">{move.type}</span>
+          <span className="flex shrink-0 items-baseline gap-1 tabular-nums">
+            {hints && (
+              <span className={clsx('font-semibold', tag ? tag.tone : 'text-muted')}>
+                {tag ? tag.short : 'Status'}
+              </span>
+            )}
+            {hints && <span className="text-muted">·</span>}
+            <span className="text-muted">
+              {move.pp}/{move.maxpp}
             </span>
-          )}
-          {hints && <span className="text-muted">·</span>}
-          <span className="text-muted">
-            {move.pp}/{move.maxpp}
           </span>
         </span>
-      </span>
-    </button>
+      </button>
+    </div>
   );
 }
 
@@ -180,7 +224,12 @@ function BenchButton({
   off = false,
   direct = false,
   current = false,
+  mark,
+  marking = false,
 }: {
+  mark?: Mark | undefined;
+  /** Review mode: marked choices stand out and the rest fade. */
+  marking?: boolean;
   member: TeamMember;
   choice?: string;
   onChoose: (c: string) => void;
@@ -197,7 +246,7 @@ function BenchButton({
   /** The Pokémon in battle: first in the row, with its details on a tap, but nothing to switch to. */
   current?: boolean;
 }) {
-  const disabled = !choice || off;
+  const disabled = !choice || off || marking;
   const press = usePressInfo(
     () => onInfo(member),
     () => onInfo(null),
@@ -220,19 +269,25 @@ function BenchButton({
       aria-expanded={shown || undefined}
       aria-current={current || undefined}
       aria-label={
-        current
+        (current
           ? `${member.species}, in battle, ${member.hp}% HP`
-          : `Switch to ${member.species}, ${member.hp}% HP${member.fainted ? ', fainted' : ''}`
+          : `Switch to ${member.species}, ${member.hp}% HP${member.fainted ? ', fainted' : ''}`) +
+        (mark ? `, ${MARK_LABEL[mark]}` : '')
       }
       className={clsx(
-        'card flex min-w-0 flex-1 flex-col items-center justify-center gap-0.5 px-1 select-none',
+        'card relative flex min-w-0 flex-1 flex-col items-center justify-center gap-0.5 px-1 select-none',
         // Short phones: the switch cards get shorter (names stay whole) and the bench
         // row's tiles shrink, to leave the battle text room.
         big ? 'short:py-1 py-2' : 'short:py-0.5 short:gap-0 py-1',
-        current && 'outline-accent outline-2 -outline-offset-2',
-        disabled && !current && 'opacity-40',
+        marking
+          ? markRing(mark, marking)
+          : [
+              current && 'outline-accent outline-2 -outline-offset-2',
+              disabled && !current && 'opacity-40',
+            ],
       )}
     >
+      {mark && <MarkTag mark={mark} />}
       <img
         src={getSprite(member.species, big ? 'front' : 'icon')}
         alt=""
@@ -321,6 +376,7 @@ export function ControlPanel({
   hints,
   disabled,
   onChoose,
+  marks,
 }: {
   controls: Controls | null;
   team: TeamMember[];
@@ -328,7 +384,13 @@ export function ControlPanel({
   /** Dimmed while a turn plays out. */
   disabled: boolean;
   onChoose: (choice: string) => void;
+  /**
+   * Review mode (the coach's review): nothing can be chosen; these choices are
+   * tagged and the rest fade.
+   */
+  marks?: Record<string, Mark>;
 }) {
+  const marking = !!marks && !disabled;
   // Hover and focus cards belong to the turn they opened in too: a button that
   // goes away (a forced switch made) never sees the pointer leave.
   const [hover, setHover] = useState<{ info: Info; at: Controls | null } | null>(null);
@@ -423,6 +485,8 @@ export function ControlPanel({
               off={disabled}
               direct={last}
               big
+              mark={marks?.[switchFor(m) ?? '']}
+              marking={marking}
             />
           ))}
         </div>
@@ -496,6 +560,8 @@ export function ControlPanel({
               hints={hints}
               onChoose={() => onChoose(withMega(m.choice))}
               onInfo={(move) => setInfo(move && { move })}
+              mark={marks?.[m.choice]}
+              marking={marking}
             />
           ) : (
             <div
@@ -519,6 +585,8 @@ export function ControlPanel({
             shown={pinnedSlot === m.slot}
             off={off}
             current={m === active}
+            mark={marks?.[switchFor(m) ?? '']}
+            marking={marking}
           />
         ))}
       </div>

@@ -20,10 +20,11 @@ import {
   teamOf,
   type CoachNote,
   type Mon,
+  type Review,
   type Position,
 } from '@daily-battle/tutorial';
 import type { PokemonSet, PRNGSeed } from '@pkmn/sim';
-import type { EngineStart, PositionPackage, TurnPackage } from './frames';
+import type { CoachMemo, EngineStart, PositionPackage, TurnPackage } from './frames';
 import { SidePresenter } from './presenter';
 
 export { cleanText, effectiveness, moveDesc } from './presenter';
@@ -48,12 +49,20 @@ export class BattleEngine {
   private coached?: unknown;
   /**
    * The coach's judge (DESIGN.md §22): the search, from your view, decides which
-   * warnings show. Without it (no engine), the coach gives no warnings.
+   * warnings and action tips show. Without it (no engine), the coach gives only
+   * fact tips: no warnings, no action tips, no review.
    */
   private readonly judge?: Judge;
-  /** This decision's rule warnings (each needs the judge to agree), and those shown. */
-  private warnings: Record<string, CoachNote> = {};
+  /** This decision's warnings shown so far, by choice. */
   private readonly shown = new Map<string, CoachNote>();
+  /** A tip waits for the judge's top choice. */
+  private tipPending = false;
+  /** Your choices so far (resumed ones too): the index of the next one's memo. */
+  private decisions = 0;
+  /** The coach's memo on the choice just made, for the next package. */
+  private memo?: CoachMemo;
+  /** Every choice you've made (resumed ones too, blocked ones included), for replays. */
+  private readonly made: string[] = [];
 
   /**
    * Hard needs `engine`, poke-engine for the format's gen; `budget` is for tests.
@@ -61,8 +70,8 @@ export class BattleEngine {
    */
   constructor(
     readonly start: EngineStart,
-    engine?: Engine,
-    budget?: { iterations: number; worlds: number },
+    private readonly engine?: Engine,
+    private readonly budget?: { iterations: number; worlds: number },
     coachEngine?: Engine,
   ) {
     const format = start.format ?? DEFAULT_FORMAT;
@@ -101,6 +110,8 @@ export class BattleEngine {
         this.judge = new Judge(coachEngine, setsFor(format), {
           ...(start.pool ? { pool: start.pool } : {}),
         });
+      // Warnings you overrode before a reload aren't asked again.
+      this.coach.ignore((start.coachLog ?? []).flatMap((m) => (m?.ignored ? [m.ignored] : [])));
     }
   }
 
@@ -116,8 +127,10 @@ export class BattleEngine {
     }
     for (const choice of this.start.choices) {
       if (this.session.ended) break;
-      // The coach sees each replayed turn too, so its review and one-time tips survive a resume.
-      this.coachSees(choice);
+      // The coach sees each replayed turn too (with the judge's saved verdict),
+      // so its review and one-time tips survive a resume.
+      this.coachSees(choice, this.start.coachLog?.[this.decisions] ?? undefined);
+      this.made.push(choice);
       this.session.choose('p1', choice);
       this.advanceAi();
     }
@@ -126,6 +139,7 @@ export class BattleEngine {
 
   choose(choice: string): TurnPackage {
     this.coachSees(choice);
+    this.made.push(choice);
     // A move hidden information blocks (the foe's Imprison) comes back as
     // unavailable: the controls update to show it disabled, and you choose again.
     if (!this.session.choose('p1', choice)) {
@@ -136,23 +150,45 @@ export class BattleEngine {
     return this.package(false);
   }
 
-  /** Records the player's choice for the review, while the view still shows the decision. */
-  private coachSees(choice: string) {
+  /**
+   * Records the player's choice for the review, while the view still shows the
+   * decision, and keeps a memo of it to save with the attempt: the judge's
+   * verdict, and the warning you overrode. A resumed choice uses its saved memo.
+   */
+  private coachSees(choice: string, saved?: CoachMemo) {
+    const index = this.decisions++;
     const view = this.coach && this.session.view('p1');
+    this.memo = undefined;
     if (!view) return;
     if (this.coached !== view.request) this.coach!.turn(view);
-    // Only a warning you saw and overrode counts (none on a resumed turn).
-    this.coach!.record(view, choice, this.shown.get(choice) ?? null);
+    if (index < this.start.choices.length) {
+      this.coach!.record(view, choice, null, saved?.verdict, saved?.heeded);
+      return;
+    }
+    const verdict = this.judge?.verdict(choice);
+    const shown = this.shown.get(choice);
+    // A warning you listened to: the last one shown on another pick.
+    const other = [...this.shown].filter(([c]) => c !== choice).at(-1);
+    const heeded = other && { choice: other[0], note: other[1] };
+    this.coach!.record(view, choice, shown ?? null, verdict, heeded);
+    if (verdict || shown || heeded)
+      this.memo = {
+        ...(verdict ? { verdict } : {}),
+        ...(shown ? { ignored: shown.text } : {}),
+        ...(heeded ? { heeded } : {}),
+      };
   }
 
   /**
-   * The coach's warning on `choice`, if it has one: a rule explains it and the
-   * judge agrees it's clearly worse. Gives the judge up to `waitMs` to finish.
+   * The coach's warning on `choice`, if it has one: the judge finds it clearly
+   * worse and a true reason explains why. Gives the judge up to `waitMs`.
    */
   coachCheck(choice: string, waitMs: number): CoachNote | null {
-    const note = this.warnings[choice];
-    if (!note || !this.judge) return null;
-    if (!this.judge.settle(choice, waitMs)?.worse) return null;
+    const view = this.session.view('p1');
+    if (!this.coach || !this.judge || !view) return null;
+    const verdict = this.judge.settle(choice, waitMs);
+    const note = verdict && this.coach.warn(view, verdict);
+    if (!note) return null;
     this.shown.set(choice, note);
     return note;
   }
@@ -162,8 +198,67 @@ export class BattleEngine {
     const judge = this.judge;
     if (!judge?.busy) return false;
     const end = performance.now() + ms;
-    while (judge.step() && performance.now() < end);
+    while (judge.step() && performance.now() < end && !(this.tipPending && judge.best));
     return judge.busy;
+  }
+
+  /**
+   * A tip that waited for the judge, once its top choice is known (DESIGN.md
+   * §22): it shows late, after the controls. At most once a decision.
+   */
+  coachTip(): CoachNote | undefined {
+    const top = this.judge?.best;
+    const view = this.session.view('p1');
+    if (!this.tipPending || !top || !view || !this.coach) return undefined;
+    this.tipPending = false;
+    return this.coach.confirm(view, top);
+  }
+
+  /**
+   * One of your past decisions, for the coach's review (DESIGN.md §22): the
+   * battle rebuilt to it (`before`, frozen at the decision) and that turn played
+   * with the choice you made (`turn`). Null if there's no such decision.
+   */
+  replayTurn(decision: number): { before: TurnPackage; turn: TurnPackage } | null {
+    const choice = this.made[decision];
+    if (choice === undefined) return null;
+    const { coach: _coach, coachLog: _log, ...start } = this.start;
+    const e = new BattleEngine(
+      {
+        ...start,
+        choices: this.made.slice(0, decision),
+        // Hard's choices as made, so the replay needs no search.
+        ...(this.hard ? { aiChoices: [...this.aiLog] } : {}),
+      },
+      this.engine,
+      this.budget,
+    );
+    return { before: e.begin(), turn: e.choose(choice) };
+  }
+
+  /**
+   * The coach's review of this battle when it was played without the coach
+   * (DESIGN.md §22): a job that replays it with the judge on, a slice at a time.
+   */
+  reviewJob(judge: Engine): ReviewJob {
+    return new ReviewJob(
+      this.start,
+      [...this.made],
+      this.hard ? [...this.aiLog] : [],
+      judge,
+      this.engine,
+    );
+  }
+
+  /** The judge's verdict on `choice` for this decision, given up to `ms`: true once it's ready (or can't be). */
+  coachSettle(choice: string, ms: number): boolean {
+    if (!this.judge) return true;
+    return !!this.judge.settle(choice, ms) || !this.judge.busy;
+  }
+
+  /** The coach's review so far. */
+  coachReview(): Review | undefined {
+    return this.coach?.review();
   }
 
   forfeit(): TurnPackage {
@@ -215,23 +310,71 @@ export class BattleEngine {
       this.reported = this.aiLog.length;
     }
     if (this.coach) {
+      if (this.memo) pkg.coachMemo = this.memo;
+      this.memo = undefined;
       const view = this.session.view('p1');
+      this.tipPending = false;
       if (view && pkg.controls) {
         const turn = this.coach.turn(view);
         pkg.coach = turn.tip ? { tip: turn.tip } : {};
         this.coached = view.request;
-        this.warnings = turn.warnings;
         this.shown.clear();
         // Seeded by the decision, so a resumed battle judges it the same way.
-        this.judge?.begin(
-          view,
-          `${this.start.battleSeed}:${this.session.choices('p1').length}`,
-          Object.keys(turn.warnings),
-        );
+        this.judge?.begin(view, `${this.start.battleSeed}:${this.session.choices('p1').length}`);
+        this.tipPending = !!turn.pending && !!this.judge;
       }
       if (pkg.end) pkg.review = this.coach.review();
     }
     return pkg;
+  }
+}
+
+/**
+ * Replays a finished battle with the coach and its judge on, judging each of
+ * your choices against the judge's top one, for a review on request.
+ */
+export class ReviewJob {
+  private readonly replay: BattleEngine;
+  private next = 0;
+
+  constructor(
+    start: EngineStart,
+    private readonly made: string[],
+    aiChoices: string[],
+    judge: Engine,
+    hard?: Engine,
+  ) {
+    const { coachLog: _log, ...rest } = start;
+    this.replay = new BattleEngine(
+      { ...rest, choices: [], coach: 'simple', ...(aiChoices.length ? { aiChoices } : {}) },
+      hard,
+      undefined,
+      judge,
+    );
+    this.replay.begin();
+  }
+
+  /** Choices judged so far, of `total`. */
+  get done(): number {
+    return this.next;
+  }
+  get total(): number {
+    return this.made.length;
+  }
+
+  /** Works for up to `ms`; the review once every choice is judged, else undefined. */
+  step(ms: number): Review | undefined {
+    const end = performance.now() + ms;
+    while (this.next < this.made.length) {
+      const choice = this.made[this.next]!;
+      if (!this.replay.coachSettle(choice, end - performance.now())) return undefined;
+      this.replay.choose(choice);
+      this.next++;
+      if (performance.now() >= end) break;
+    }
+    return this.next < this.made.length
+      ? undefined
+      : (this.replay.coachReview() ?? { key: [], good: [] });
   }
 }
 

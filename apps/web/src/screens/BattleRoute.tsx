@@ -57,6 +57,7 @@ export function BattleRoute({
         pool: [...schedule.pool.species],
       }),
       ...(attempt.difficulty === 'hard' && { aiChoices: [...(attempt.aiChoices ?? [])] }),
+      ...(attempt.coachLog && { coachLog: [...attempt.coachLog] }),
     };
   });
   return (
@@ -67,8 +68,15 @@ export function BattleRoute({
       settings={settings}
       onSetting={(key, value) => dispatch({ type: 'setSetting', key, value })}
       onExplainerSeen={(id) => dispatch({ type: 'markExplainer', id })}
-      onChoice={(choice, ai) =>
-        dispatch({ type: 'recordChoice', day, choice, format, ...(ai && { ai }) })
+      onChoice={(choice, ai, memo) =>
+        dispatch({
+          type: 'recordChoice',
+          day,
+          choice,
+          format,
+          ...(ai && { ai }),
+          ...(memo && { memo }),
+        })
       }
       onEnd={({ result, remaining }) =>
         dispatch({ type: 'endAttempt', day, result, remaining, format })

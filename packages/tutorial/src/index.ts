@@ -10,5 +10,17 @@ export {
   type CoachRule,
   type CoachTurn,
 } from './coach/simple';
+export {
+  explainWarning,
+  winningAnyway,
+  type Explanation,
+  type WarningReason,
+} from './coach/explain';
 export { Judge, JUDGE_DEFAULTS, type JudgeOptions, type Verdict } from './coach/judge';
-export { buildReview, KEY_GAP, type Decision, type Review, type ReviewTurn } from './coach/review';
+export {
+  buildReview,
+  type Decision,
+  type Heeded,
+  type Review,
+  type ReviewTurn,
+} from './coach/review';

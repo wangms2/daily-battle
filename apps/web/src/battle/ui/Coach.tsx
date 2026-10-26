@@ -68,8 +68,22 @@ export function CoachWarning({
   );
 }
 
-/** The coach's look back at the battle: up to 3 key turns and a thing or two done well. */
-export function CoachReview({ review }: { review: Review }) {
+/**
+ * The coach's look back at the battle: up to 3 key turns and a thing or two
+ * done well. With `onShow`, each turn can be replayed (its index among
+ * the key turns, then the turns done well).
+ */
+export function CoachReview({ review, onShow }: { review: Review; onShow?: (i: number) => void }) {
+  const show = (i: number) =>
+    onShow && (
+      <button
+        type="button"
+        onClick={() => onShow(i)}
+        className="mt-1 text-[13px] font-semibold text-accent underline underline-offset-2"
+      >
+        Show turn
+      </button>
+    );
   if (!review.key.length && !review.good.length) return null;
   return (
     <section
@@ -77,7 +91,7 @@ export function CoachReview({ review }: { review: Review }) {
       className="mt-4 grid gap-2 text-left text-[14px] leading-snug"
     >
       <h3 className="display text-[14px] tracking-wider text-muted uppercase">Coach review</h3>
-      {review.key.map((t) => (
+      {review.key.map((t, i) => (
         <div key={`k${t.turn}`} className="rounded-card bg-surface-2 px-3 py-2">
           <p className="text-[12px] font-semibold text-muted">
             Turn {t.turn}: {t.me} vs {t.foe}
@@ -92,14 +106,16 @@ export function CoachReview({ review }: { review: Review }) {
             .
           </p>
           <p className="text-soft-ink">{t.text}</p>
+          {show(i)}
         </div>
       ))}
-      {review.good.map((t) => (
+      {review.good.map((t, i) => (
         <div key={`g${t.turn}`} className="rounded-card bg-accent-soft px-3 py-2">
           <p className="text-[12px] font-semibold text-muted">
-            ✓ Turn {t.turn}: {t.chose}
+            ✓ Turn {t.turn}: {t.firstChose ? `${t.firstChose} → ${t.chose}` : t.chose}
           </p>
           <p>{t.text}</p>
+          {show(review.key.length + i)}
         </div>
       ))}
     </section>

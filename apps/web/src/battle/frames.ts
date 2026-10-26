@@ -1,7 +1,7 @@
 // What the battle worker sends the UI: plain data describing only what the
 // player's side can see. No simulator types cross this boundary.
 import type { Difficulty } from '@daily-battle/ai/version';
-import type { CoachNote, Review } from '@daily-battle/tutorial';
+import type { CoachNote, Heeded, Review, Verdict } from '@daily-battle/tutorial';
 import type { FoeScript, Position } from '@daily-battle/tutorial/lessons';
 
 export type Who = 'you' | 'foe';
@@ -167,11 +167,33 @@ export interface TurnPackage {
   aiChoices?: AiChoices;
   /**
    * Coach on: this turn's tip (with controls). Warnings aren't in the package:
-   * the judge decides them when a choice is picked (`BattleBackend.coachCheck`).
+   * the judge decides them when a choice is picked (`BattleBackend.coachCheck`),
+   * and a tip that needs the judge comes late (`BattleBackend.onCoachTip`).
    */
   coach?: { tip?: CoachNote };
+  /** Coach on: the memo on the choice just made, to save with it (`Attempt.coachLog`). */
+  coachMemo?: CoachMemo;
   /** Coach on: the post-battle review (with `end`). */
   review?: Review;
+}
+
+/**
+ * The coach's memo on one of your choices, saved with the attempt so a resume
+ * neither judges it again nor repeats a warning you overrode.
+ */
+export interface CoachMemo {
+  /** The judge's verdict on the choice. */
+  verdict?: Verdict;
+  /** The warning you saw and overrode. */
+  ignored?: string;
+  /** A warning you listened to (you picked again): your first pick and the warning. */
+  heeded?: Heeded;
+}
+
+/** A past decision replayed (the coach's review): frozen at the decision, then the turn as played. */
+export interface TurnReplay {
+  before: TurnPackage;
+  turn: TurnPackage;
 }
 
 export interface AiChoices {
@@ -216,6 +238,8 @@ export interface EngineStart {
   tutorial?: { noLuck: boolean; foeScript?: FoeScript };
   /** The coach (DESIGN.md §22): tips and blunder warnings each turn, and a review at the end. */
   coach?: 'simple';
+  /** Coach on: a memo per recorded choice (null where there's none), for resume. */
+  coachLog?: (CoachMemo | null)[];
 }
 
 /** A quiz position, shown frozen at the player's decision. */
@@ -230,10 +254,19 @@ export type ToWorker =
   | { type: 'choose'; choice: string }
   | { type: 'forfeit' }
   | { type: 'check'; choice: string; waitMs: number }
+  | { type: 'replay'; decision: number }
+  /** Review a battle played without the coach. */
+  | { type: 'review' }
   | { type: 'position'; format: string; position: Position; steps: string[] };
 
 export type FromWorker =
   | { type: 'package'; pkg: TurnPackage }
   | { type: 'position'; position: PositionPackage }
   | { type: 'check'; note: CoachNote | null }
+  | { type: 'replay'; replay: TurnReplay | null }
+  | { type: 'review'; review: Review }
+  /** How far a review has got (sent unasked, between answers). */
+  | { type: 'reviewProgress'; done: number; total: number }
+  /** A coach tip that waited for the judge (sent unasked, between answers). */
+  | { type: 'tip'; note: CoachNote }
   | { type: 'error'; message: string };

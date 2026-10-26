@@ -1,7 +1,7 @@
 // Offline coach-quality check (docs/plan-tutorial-coach.md): does following the
 // coach's advice win more often against the AI the player actually faces?
-//   pnpm --filter @daily-battle/tutorial coach-eval [--mode judge|rule] [--rule switchKo]
-//     [--vs easy] [--battles 200] [--r 40] [--cases 60] [--per-battle 3] [--jobs 16]
+//   pnpm --filter @daily-battle/tutorial coach-eval
+//     [--vs easy] [--battles 200] [--first 0] [--r 40] [--cases 60] [--per-battle 3] [--jobs 16]
 //     [--out file.json] [--hard-iterations 150000] [--save-cases f.json] [--load-cases f.json]
 //
 // Against Hard (--vs hard), --hard-iterations sets the opponent's search
@@ -10,12 +10,9 @@
 //
 // 1. Collect: play Gen 3 battles (a weekly-pool team, played by a beginner-ish
 //    bot, against a daily opponent on the chosen difficulty) and save decisions
-//    as cases: the bot's pick, and the alternative the coach would point to.
-//    - rule mode: decisions where one rule warns (the alternative is the best
-//      other choice by the review's scores);
-//    - judge mode: decisions where the bot's pick isn't the judge's top choice,
-//      with the judged gap, so the report can show how judged gaps turn into
-//      real wins (which margin makes a warning trustworthy).
+//    where the bot's pick isn't the judge's top choice, with the judged gap and
+//    the warning the coach would show (if any), so the report can show how
+//    judged gaps and shown warnings turn into real wins.
 // 2. Roll out: replay each case to its decision, then play it to the end R
 //    times with the alternative (A) and with the pick (B). Each rollout gets
 //    fresh luck (a new battle seed and AI seeds), shared by A and B. The
@@ -28,15 +25,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import {
-  aiFor,
-  extractState,
-  midBot,
-  scoreActions,
-  STRONG,
-  strongBot,
-  type Difficulty,
-} from '@daily-battle/ai';
+import { aiFor, extractState, midBot, strongBot, type Difficulty } from '@daily-battle/ai';
 import { setsFor } from '@daily-battle/data';
 import { loadEngine } from '@daily-battle/engine-wasm/node';
 import {
@@ -58,24 +47,24 @@ import {
 } from '@daily-battle/sim-bridge';
 import type { PRNGSeed } from '@pkmn/sim';
 import { Judge, JUDGE_DEFAULTS } from '../src/coach/judge';
-import { Coach, type CoachRule } from '../src/coach/simple';
+import { Coach, type CoachNote } from '../src/coach/simple';
 
 const arg = (name: string) => {
   const i = process.argv.indexOf(`--${name}`);
   return i > 0 ? process.argv[i + 1] : undefined;
 };
 const FORMAT = 'gen3ou';
-const MODE = (arg('mode') ?? 'judge') as 'judge' | 'rule';
-const RULE = (arg('rule') ?? 'switchKo') as CoachRule;
 const VS = (arg('vs') ?? 'easy') as Difficulty;
 const BATTLES = Number(arg('battles') ?? 200);
+/** The first battle index: a fresh range checks results on battles not used for tuning. */
+const FIRST = Number(arg('first') ?? 0);
 const R = Number(arg('r') ?? 40);
 const MAX_CASES = Number(arg('cases') ?? 60);
 /** Cases taken from one battle at most, so no one battle dominates. */
 const PER_BATTLE = Number(arg('per-battle') ?? 3);
 const JOBS = Number(arg('jobs') ?? 1);
 const OUT = arg('out');
-/** Judge mode: the judge's budget per search. */
+/** The judge's budget per search. */
 const JUDGE_ITERATIONS = Number(arg('judge-iterations') ?? JUDGE_DEFAULTS.iterations);
 /** Against Hard: the opponent's search budget (Hard's own when left out). */
 const HARD_ITERATIONS = arg('hard-iterations') ? Number(arg('hard-iterations')) : undefined;
@@ -138,12 +127,12 @@ interface Case {
   warned: string;
   /** The coach's alternative. */
   alt: string;
-  /** A rule's warning on the pick, if one fired. */
+  /** The coach's warning on the pick, if it would show one. */
   text?: string;
-  rule?: CoachRule;
-  /** Judge mode: the judged gap and the share of worlds agreeing. */
-  gap?: number;
-  agree?: number;
+  rule?: CoachNote['rule'];
+  /** The judged gap and the share of worlds agreeing. */
+  gap: number;
+  agree: number;
   position: string;
 }
 
@@ -165,14 +154,11 @@ function describe(view: SideView): string {
 
 function collect(vs: Difficulty): Case[] {
   const cases: Case[] = [];
-  for (let i = 0; i < BATTLES && cases.length < MAX_CASES; i++) {
+  for (let i = FIRST; i < FIRST + BATTLES && cases.length < MAX_CASES; i++) {
     const m = matchup(i);
     const session = new BattleSession({ format: FORMAT, ...m });
     const coach = new Coach(data, FORMAT);
-    const judge =
-      MODE === 'judge'
-        ? new Judge(engine(), data, { pool: m.pool, iterations: JUDGE_ITERATIONS })
-        : undefined;
+    const judge = new Judge(engine(), data, { pool: m.pool, iterations: JUDGE_ITERATIONS });
     // Beginner-ish players: Easy and the mid bot, alternating.
     const player = i % 2 ? midBot({ data }) : aiFor({ difficulty: 'easy', style: 'balance', data });
     const opponent = foe(m, vs);
@@ -189,36 +175,12 @@ function collect(vs: Difficulty): Case[] {
           session.choose('p2', opponent.choose(view, rngs.p2));
           continue;
         }
-        const t = coach.turn(view);
+        coach.turn(view);
         const choice = player.choose(view, rngs.p1);
         const room =
           cases.length < MAX_CASES && cases.filter((c) => c.battle === i).length < PER_BATTLE;
-        const base = {
-          battle: i,
-          turn: session.turn,
-          p1: [...session.choices('p1')],
-          p2: [...session.choices('p2')],
-        };
-        if (MODE === 'rule' && room) {
-          const warned = Object.entries(t.warnings).filter(([, n]) => n.rule === RULE);
-          if (warned.length) {
-            // One case per decision.
-            const [w, note] = warned[Math.floor(pick() * warned.length)]!;
-            const scored = scoreActions(view, extractState(view, data), STRONG, () => 0.5, data)
-              .filter((s) => !t.warnings[s.choice])
-              .sort((a, b) => b.score - a.score);
-            if (scored[0])
-              cases.push({
-                ...base,
-                warned: w,
-                alt: scored[0].choice,
-                text: note.text,
-                rule: note.rule,
-                position: describe(view),
-              });
-          }
-        } else if (
-          judge &&
+        let note: CoachNote | undefined;
+        if (
           room &&
           view.request.requestType === 'move' &&
           legalChoices(view.request).length > 1 &&
@@ -228,9 +190,12 @@ function collect(vs: Difficulty): Case[] {
           judge.begin(view, `eval:${i}:${session.turn}`);
           const v = judge.settle(choice, Infinity);
           if (v && v.top !== choice) {
-            const note = t.warnings[choice];
+            note = coach.warn(view, v);
             cases.push({
-              ...base,
+              battle: i,
+              turn: session.turn,
+              p1: [...session.choices('p1')],
+              p2: [...session.choices('p2')],
               warned: choice,
               alt: v.top,
               gap: v.gap,
@@ -240,7 +205,7 @@ function collect(vs: Difficulty): Case[] {
             });
           }
         }
-        coach.record(view, choice);
+        coach.record(view, choice, note ?? null);
         if (!session.choose('p1', choice)) coach.forget();
       }
     }
@@ -375,59 +340,59 @@ const cases = LOAD ? (JSON.parse(readFileSync(LOAD, 'utf8')) as Case[]) : collec
 const SAVE = arg('save-cases');
 if (SAVE) writeFileSync(SAVE, JSON.stringify(cases));
 console.log(
-  `${cases.length} ${MODE === 'rule' ? RULE : 'judged'} cases from up to ${BATTLES} battles vs ${VS}` +
+  `${cases.length} judged cases from up to ${BATTLES} battles vs ${VS}` +
     ` (${((performance.now() - t0) / 1000).toFixed(1)}s)`,
 );
 const results = await rollAll(cases, VS);
 const secs = ((performance.now() - t0) / 1000).toFixed(0);
 console.log(
-  `\n${MODE === 'rule' ? RULE : 'Judge'} vs ${VS}: ${results.length} cases x ${R} rollouts per branch (${secs}s, ${JOBS} jobs)`,
+  `\nJudge vs ${VS}: ${results.length} cases x ${R} rollouts per branch (${secs}s, ${JOBS} jobs)`,
 );
-if (MODE === 'rule') {
-  console.log(summary(RULE, results));
-} else {
-  // How judged gaps turn into real wins.
-  const bins: [string, (r: Result) => boolean][] = [
-    ['gap < 0.05', (r) => r.gap! < 0.05],
-    ['gap 0.05-0.10', (r) => r.gap! >= 0.05 && r.gap! < 0.1],
-    ['gap 0.10-0.15', (r) => r.gap! >= 0.1 && r.gap! < 0.15],
-    ['gap 0.15-0.25', (r) => r.gap! >= 0.15 && r.gap! < 0.25],
-    ['gap >= 0.25', (r) => r.gap! >= 0.25],
-  ];
-  console.log('By judged gap (all worlds):');
-  for (const [label, f] of bins) console.log(summary(label, results.filter(f)));
-  console.log('Robust (ahead in >= 90% of worlds), by margin:');
-  for (const m of [0.05, 0.1, 0.15, 0.2])
-    console.log(
-      summary(
-        `gap >= ${m}`,
-        results.filter((r) => r.gap! >= m && r.agree! >= 0.9),
-      ),
-    );
-  console.log('Not robust (ahead in < 90% of worlds), gap >= 0.10:');
+// How judged gaps turn into real wins.
+const bins: [string, (r: Result) => boolean][] = [
+  ['gap < 0.05', (r) => r.gap < 0.05],
+  ['gap 0.05-0.10', (r) => r.gap >= 0.05 && r.gap < 0.1],
+  ['gap 0.10-0.15', (r) => r.gap >= 0.1 && r.gap < 0.15],
+  ['gap 0.15-0.25', (r) => r.gap >= 0.15 && r.gap < 0.25],
+  ['gap >= 0.25', (r) => r.gap >= 0.25],
+];
+console.log('By judged gap (all worlds):');
+for (const [label, f] of bins) console.log(summary(label, results.filter(f)));
+console.log('Robust (ahead in >= 90% of worlds), by margin:');
+for (const m of [0.05, 0.1, 0.15, 0.2])
   console.log(
     summary(
-      'gap >= 0.1',
-      results.filter((r) => r.gap! >= 0.1 && r.agree! < 0.9),
+      `gap >= ${m}`,
+      results.filter((r) => r.gap >= m && r.agree >= 0.9),
     ),
   );
-  console.log('Where a rule also warned:');
+console.log('Not robust (ahead in < 90% of worlds), gap >= 0.10:');
+console.log(
+  summary(
+    'gap >= 0.1',
+    results.filter((r) => r.gap >= 0.1 && r.agree < 0.9),
+  ),
+);
+console.log('Warnings the coach shows, by reason:');
+console.log(
+  summary(
+    'all shown',
+    results.filter((r) => r.rule),
+  ),
+);
+for (const rule of [...new Set(results.map((r) => r.rule).filter(Boolean))])
   console.log(
     summary(
-      'rule warned',
-      results.filter((r) => r.rule),
+      `  ${rule}`,
+      results.filter((r) => r.rule === rule),
     ),
   );
-}
 console.log('\nWorst cases:');
 for (const r of [...results].sort((x, y) => x.diff - y.diff).slice(0, 6))
   console.log(
     `  battle ${r.battle} turn ${r.turn}: ${r.position}` +
-      (r.gap !== undefined
-        ? `  (judged gap ${r.gap.toFixed(2)}, agree ${r.agree!.toFixed(2)})`
-        : '') +
+      `  (judged gap ${r.gap.toFixed(2)}, agree ${r.agree.toFixed(2)})` +
       (r.text ? `\n    "${r.text}"` : '') +
       `\n    ${r.alt} ${pct(r.a)} vs ${r.warned} ${pct(r.b)} (gain ${(100 * r.diff).toFixed(0)} ± ${(196 * r.se).toFixed(0)})`,
   );
-if (OUT)
-  writeFileSync(OUT, JSON.stringify({ mode: MODE, rule: RULE, vs: VS, R, results }, null, 1));
+if (OUT) writeFileSync(OUT, JSON.stringify({ vs: VS, R, results }, null, 1));

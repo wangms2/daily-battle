@@ -131,6 +131,11 @@ export class Judge {
   /** Choices to judge first, once the top choice is known. */
   private first: string[] = [];
 
+  /** The open search's top choice, once it's known (before the held searches finish). */
+  get best(): string | undefined {
+    return this.failed ? undefined : this.top;
+  }
+
   /** Whether there's work left for this decision. */
   get busy(): boolean {
     return !this.failed && this.queue.length > 0;

@@ -1,25 +1,21 @@
 // The Simple coach (DESIGN.md §22): blunder warnings and one-turn tips from
 // what the player can see this turn. It never mentions predictions, reads, or
-// plans over several turns.
+// plans over several turns. The judge (judge.ts) decides: a warning needs it to
+// find the pick clearly worse (explain.ts says why), and a tip that recommends
+// an action needs that action to be its top choice.
 import { turnFacts, type Facts, type MoveFact, type NoEffect } from '@daily-battle/ai';
 import type { SetsFile } from '@daily-battle/data';
 import type { SideView } from '@daily-battle/sim-bridge';
-import { buildReview, decision, type Decision, type Review } from './review';
+import { explainWarning, type Explanation, type WarningReason } from './explain';
+import type { Verdict } from './judge';
+import { buildReview, decision, type Decision, type Heeded, type Review } from './review';
 
+/** The kinds of tip. Warnings have their own reasons (`WarningReason`, explain.ts). */
 export type CoachRule =
-  | 'noEffect'
-  | 'canKo'
-  | 'staysKo'
-  | 'switchKo'
-  | 'koThreat'
-  | 'foeAsleep'
-  | 'locked'
-  | 'spikes'
-  | 'walled'
-  | 'setupWindow';
+  'canKo' | 'koThreat' | 'foeAsleep' | 'locked' | 'spikes' | 'walled' | 'setupWindow';
 
 export interface CoachNote {
-  rule: CoachRule;
+  rule: CoachRule | WarningReason;
   text: string;
   /** The lesson that explains it, if any. */
   lesson?: string;
@@ -28,23 +24,31 @@ export interface CoachNote {
 export interface CoachTurn {
   /** At most one tip a turn. */
   tip?: CoachNote;
-  /** A warning for each choice the coach would stop, by choice (`move 2`, `switch 4`). */
-  warnings: Record<string, CoachNote>;
+  /**
+   * A tip waits for the judge: it shows late, once the judge's top choice is
+   * known (see `Coach.confirm`).
+   */
+  pending?: boolean;
+}
+
+/** A tip candidate. One that recommends `choice` needs the judge's top choice to be it. */
+interface Candidate {
+  note: CoachNote;
+  /** Its one-time key, marked when it shows. */
+  key?: string;
+  choice?: string;
 }
 
 /** Likely enough to call a knockout. */
 const SURE_KO = 0.85;
 /** Sure enough to say who moves first. */
 const SURE_FIRST = 0.95;
-/** A hit this small (fraction of max HP) is one a switch-in takes well. */
-const SAFE_HIT = 0.4;
 
 const SETUP = new Set(['dragondance', 'calmmind', 'swordsdance', 'bulkup', 'curse', 'agility']);
-const PROTECT = new Set(['protect', 'detect', 'endure']);
 /** Moves that knock out the user too: never the move to recommend. */
 const SELF_KO = new Set(['explosion', 'selfdestruct', 'memento', 'healingwish', 'lunardance']);
 
-type LessonKey = CoachRule | 'status' | 'hazard';
+type LessonKey = CoachRule | WarningReason | 'status' | 'hazard';
 
 /** The lesson behind each rule, per game. */
 const LESSONS: Record<string, Partial<Record<LessonKey, string>>> = {
@@ -61,6 +65,11 @@ const LESSONS: Record<string, Partial<Record<LessonKey, string>>> = {
     spikes: 'gen3-spikes',
     walled: 'gen3-switching',
     setupWindow: 'gen3-setup',
+    bigHit: 'gen3-switching',
+    missedKo: 'gen3-winning',
+    weaker: 'gen3-winning',
+    noTime: 'gen3-setup',
+    noSpikes: 'gen3-spikes',
   },
 };
 
@@ -110,8 +119,8 @@ export function noEffectText(foe: string, move: string, why: NoEffect): string {
  */
 export const TIP_GAP = 3;
 const URGENT_GAP = 2;
-const URGENT = new Set<CoachRule>(['koThreat', 'canKo']);
-export const tipGap = (rule: CoachRule) => (URGENT.has(rule) ? URGENT_GAP : TIP_GAP);
+const URGENT = new Set<CoachNote['rule']>(['koThreat', 'canKo']);
+export const tipGap = (rule: CoachNote['rule']) => (URGENT.has(rule) ? URGENT_GAP : TIP_GAP);
 
 /** The coach for one battle. It remembers which one-time tips it has shown. */
 export class Coach {
@@ -121,15 +130,18 @@ export class Coach {
   private readonly overridden = new Set<string>();
   private lastTip = -Infinity;
   private spikesSeen = 0;
-  private last?: {
-    request: SideView['request'];
-    facts: Facts;
-    warnings: Record<string, CoachNote>;
-  };
+  private last?: { request: SideView['request']; facts: Facts };
   private readonly decisions: Decision[] = [];
+  /** Choices recorded so far (each `record` call), so a decision knows its index. */
+  private choices = 0;
   private recorded = false;
   /** The tip given for a request, so asking again about it gives the same answer. */
-  private tipFor?: { request: SideView['request']; tip?: CoachNote };
+  private tipFor?: {
+    request: SideView['request'];
+    tip?: CoachNote;
+    /** Candidates waiting for the judge's top choice, in order. */
+    pending?: Candidate[];
+  };
 
   constructor(
     private readonly data: SetsFile,
@@ -143,47 +155,108 @@ export class Coach {
     return lesson ? { rule, text, lesson } : { rule, text };
   }
 
-  /** Tips and warnings for the player's current request. */
+  /** The tip for the player's current request, or word that one waits for the judge. */
   turn(view: SideView): CoachTurn {
-    if (view.request.requestType === 'wait') return { warnings: {} };
+    if (view.request.requestType === 'wait') return {};
     const facts = this.factsFor(view);
-    const warnings = this.warnings(facts);
-    for (const [choice, note] of Object.entries(warnings))
-      if (this.overridden.has(note.text)) delete warnings[choice];
-    this.last = { request: view.request, facts, warnings };
-    const turn = facts.state.turn;
-    if (this.last.request === this.tipFor?.request) {
-      const tip = this.tipFor.tip;
-      return tip ? { tip, warnings } : { warnings };
-    }
-    const quiet = turn - this.lastTip;
-    const tip =
-      quiet >= URGENT_GAP ? this.pickTip(view, facts, (r) => quiet >= tipGap(r)) : undefined;
-    if (tip) this.lastTip = turn;
-    this.tipFor = { request: view.request, tip };
-    return tip ? { tip, warnings } : { warnings };
+    this.last = { request: view.request, facts };
+    if (view.request === this.tipFor?.request) return this.answer();
+    this.tipFor = { request: view.request };
+    const quiet = facts.state.turn - this.lastTip;
+    if (quiet < URGENT_GAP) return {};
+    const candidates = this.tipCandidates(view, facts, (r) => quiet >= tipGap(r));
+    // A fact tip before any that needs the judge shows now; otherwise they wait.
+    const first = candidates.findIndex((c) => !c.choice);
+    if (first === 0) this.show(candidates[0]!, facts);
+    else if (candidates.length)
+      this.tipFor.pending = first < 0 ? candidates : candidates.slice(0, first + 1);
+    return this.answer();
+  }
+
+  private answer(): CoachTurn {
+    const t = this.tipFor;
+    return t?.tip ? { tip: t.tip } : t?.pending ? { pending: true } : {};
+  }
+
+  private show(c: Candidate, facts: Facts) {
+    if (c.key) this.seen.add(c.key);
+    this.lastTip = facts.state.turn;
+    this.tipFor!.tip = c.note;
+  }
+
+  /**
+   * The judge's top choice for the current request is known: the first waiting
+   * tip that's a fact or recommends `top`, if any. Call it at most once a request.
+   */
+  confirm(view: SideView, top: string): CoachNote | undefined {
+    const t = this.tipFor;
+    if (!t?.pending || t.request !== view.request) return undefined;
+    const hit = t.pending.find((c) => !c.choice || c.choice === top);
+    delete t.pending;
+    if (!hit) return undefined;
+    this.show(hit, this.factsFor(view));
+    return hit.note;
+  }
+
+  /**
+   * The warning on `verdict.choice`, if the judge finds it clearly worse and a
+   * true reason explains why (explain.ts). A warning the player overrode isn't
+   * repeated this battle.
+   */
+  warn(view: SideView, verdict: Verdict): CoachNote | undefined {
+    if (view.request.requestType === 'wait') return undefined;
+    const facts = this.factsFor(view);
+    const e = explainWarning(view, facts, verdict);
+    if (!e || this.overridden.has(e.text)) return undefined;
+    return this.warnNote(e, facts, verdict.choice);
+  }
+
+  private warnNote(e: Explanation, f: Facts, choice: string): CoachNote {
+    const key: LessonKey = e.reason === 'noEffect' ? noEffectLesson(f, choice) : e.reason;
+    const lesson = this.lessons[key];
+    return lesson ? { rule: e.reason, text: e.text, lesson } : { rule: e.reason, text: e.text };
   }
 
   /**
    * Remembers the player's choice for the post-battle review. Call it before
    * the choice is played, while the view still shows the decision. `shown` is
-   * the warning the player saw and overrode, if any (the judge decides which
-   * warnings show); without it, any rule warning on the choice counts.
+   * the warning the player saw and overrode, if any; `verdict` is the judge's
+   * on the choice (the review only uses judged decisions); `heeded`, a warning
+   * on an earlier pick that the player listened to.
    */
-  record(view: SideView, choice: string, shown?: CoachNote | null): void {
+  record(
+    view: SideView,
+    choice: string,
+    shown?: CoachNote | null,
+    verdict?: Verdict,
+    heeded?: Heeded,
+  ): void {
+    const index = this.choices++;
     this.recorded = false;
     if (view.request.requestType === 'wait') return;
     const facts = this.factsFor(view);
-    const warning =
-      shown !== undefined
-        ? (shown ?? undefined)
-        : this.last?.request === view.request
-          ? this.last.warnings[choice]
-          : undefined;
-    if (warning) this.overridden.add(warning.text);
-    const d = decision(view, facts, this.data, choice, warning);
+    if (shown) this.overridden.add(shown.text);
+    const e = verdict && explainWarning(view, facts, verdict);
+    const d = decision(
+      index,
+      facts,
+      choice,
+      verdict,
+      e ? this.warnNote(e, facts, choice) : undefined,
+      heeded,
+    );
     if (d) this.decisions.push(d);
     this.recorded = !!d;
+  }
+
+  /** The warnings the player overrode this battle (saved with the attempt, so a reload doesn't ask again). */
+  get ignored(): string[] {
+    return [...this.overridden];
+  }
+
+  /** Restores the warnings the player overrode before a reload. */
+  ignore(texts: readonly string[]): void {
+    for (const t of texts) this.overridden.add(t);
   }
 
   /** Drops the last recorded choice (the sim turned it down, so the player chooses again). */
@@ -193,10 +266,7 @@ export class Coach {
   }
 
   review(): Review {
-    return buildReview(this.decisions, {
-      switching: this.lessons.switchKo,
-      attacking: this.lessons.canKo,
-    });
+    return buildReview(this.decisions);
   }
 
   private factsFor(view: SideView): Facts {
@@ -211,83 +281,20 @@ export class Coach {
       .sort((a, b) => b.ko - a.ko)[0];
   }
 
-  /** A teammate that takes the foe's best hit well. */
-  private safeSwitch(f: Facts) {
-    return f.switches
-      .filter(
-        (s) =>
-          s.taken.ko < 0.05 &&
-          s.taken.frac + s.entry <= SAFE_HIT &&
-          s.taken.frac + s.entry <= (f.threat?.frac ?? 0) / 2,
-      )
-      .sort((a, b) => a.taken.frac - b.taken.frac)[0];
-  }
-
-  private warnings(f: Facts): Record<string, CoachNote> {
-    const out: Record<string, CoachNote> = {};
-    const { foe, me, threat } = f;
-    if (!foe || !me || f.forced) return out;
-    const ko = this.koMove(f);
-    const myHp = f.state.ownActive?.hpFrac ?? 0;
-    const safe = this.safeSwitch(f);
-
-    for (const m of f.moves) {
-      if (m.noEffect) {
-        const key: LessonKey =
-          m.noEffect.kind === 'hazardMax'
-            ? 'hazard'
-            : m.category === 'Status' && m.noEffect.kind !== 'type'
-              ? 'status'
-              : 'noEffect';
-        out[m.choice] = this.note('noEffect', noEffectText(foe, m.name, m.noEffect), key);
-      } else if (ko && ko !== m && m.ko < 0.5) {
-        out[m.choice] = this.note(
-          'canKo',
-          `${ko.name} can knock out ${foe} this turn. ${m.name} won’t.`,
-        );
-      } else if (
-        threat &&
-        safe &&
-        threat.ko >= 0.9 &&
-        m.first <= 1 - SURE_FIRST &&
-        myHp >= 0.5 &&
-        !PROTECT.has(m.id)
-      ) {
-        out[m.choice] = this.note(
-          'staysKo',
-          `${foe} is faster and can knock out ${me} with ${threat.move} this turn. ${safe.species} takes that hit much better.`,
-        );
-      }
-    }
-    for (const s of f.switches) {
-      if (ko) {
-        out[s.choice] = this.note('canKo', `${ko.name} can knock out ${foe} this turn.`);
-      } else if (s.taken.ko >= SURE_KO) {
-        out[s.choice] = this.note(
-          'switchKo',
-          `${foe}’s ${s.taken.move} can knock out ${s.species} as it switches in.`,
-        );
-      } else if (s.taken.effectiveness >= 4 && s.taken.frac >= 0.5) {
-        out[s.choice] = this.note(
-          'switchKo',
-          `${s.species} takes 4× damage from ${s.taken.type} moves like ${foe}’s ${s.taken.move}.`,
-        );
-      }
-    }
-    return out;
-  }
-
-  private once(key: string): boolean {
-    if (this.seen.has(key)) return false;
-    this.seen.add(key);
-    return true;
-  }
-
-  private pickTip(
-    view: SideView,
-    f: Facts,
-    ok: (rule: CoachRule) => boolean,
-  ): CoachNote | undefined {
+  /**
+   * This turn's tip candidates, in order of importance. A one-time tip already
+   * given is left out; its key is marked when a candidate shows.
+   */
+  private tipCandidates(view: SideView, f: Facts, ok: (rule: CoachRule) => boolean): Candidate[] {
+    const out: Candidate[] = [];
+    const add = (rule: CoachRule, text: string, key?: string, choice?: string) => {
+      if (!ok(rule) || (key && this.seen.has(key))) return;
+      out.push({
+        note: this.note(rule, text),
+        ...(key ? { key } : {}),
+        ...(choice ? { choice } : {}),
+      });
+    };
     const { state } = f;
     // Spikes: once per new layer, and again if they come back after a spin.
     const layers = state.ownSide.spikes;
@@ -295,46 +302,44 @@ export class Coach {
     if (layers > this.spikesSeen && ok('spikes')) {
       this.spikesSeen = layers;
       const spinner = state.own.find((m) => !m.fainted && hasMove(view, m.slot, 'rapidspin'));
-      return this.note(
+      add(
         'spikes',
         'Spikes are on your side: each Pokémon you switch in loses HP, except Flying types and Pokémon with Levitate.' +
           (spinner ? ` ${spinner.species}’s Rapid Spin clears them.` : ''),
       );
     }
     const { foe, me, threat } = f;
-    if (!foe || !me || f.forced) return undefined;
+    if (!foe || !me || f.forced) return out;
 
-    if (
-      threat &&
-      threat.ko >= 0.9 &&
-      f.foeFirst >= SURE_FIRST &&
-      ok('koThreat') &&
-      this.once(`threat:${me}:${foe}`)
-    ) {
-      return this.note('koThreat', `${foe} is faster than ${me} and can knock it out this turn.`);
-    }
+    if (threat && threat.ko >= 0.9 && f.foeFirst >= SURE_FIRST)
+      add(
+        'koThreat',
+        `${foe} is faster than ${me} and can knock it out this turn.`,
+        `threat:${me}:${foe}`,
+      );
     const ko = this.koMove(f);
-    if (ko && ok('canKo') && this.once(`ko:${me}:${foe}:${ko.id}`))
-      return this.note('canKo', `${ko.name} can knock out ${foe} this turn.`);
+    if (ko)
+      add(
+        'canKo',
+        `${ko.name} can knock out ${foe} this turn.`,
+        `ko:${me}:${foe}:${ko.id}`,
+        ko.choice,
+      );
 
-    if (
-      state.foeActive?.status === 'slp' &&
-      (f.foeMoves.sleeptalk ?? 0) < 0.2 &&
-      ok('foeAsleep') &&
-      this.once(`slp:${foe}:${sleepStart(view, foe)}`)
-    ) {
-      return this.note('foeAsleep', `${foe} is asleep and can’t attack while it sleeps.`);
-    }
+    if (state.foeActive?.status === 'slp' && (f.foeMoves.sleeptalk ?? 0) < 0.2)
+      add(
+        'foeAsleep',
+        `${foe} is asleep and can’t attack while it sleeps.`,
+        `slp:${foe}:${sleepStart(view, foe)}`,
+      );
 
     const item = CHOICE_ITEMS[activeItem(view)];
-    if (
-      f.lockedInto &&
-      item &&
-      ok('locked') &&
-      this.once(`lock:${me}:${f.lockedInto}:${switchedIn(view)}`)
-    ) {
-      return this.note('locked', `${item} locks ${me} into ${f.lockedInto} until it switches out.`);
-    }
+    if (f.lockedInto && item)
+      add(
+        'locked',
+        `${item} locks ${me} into ${f.lockedInto} until it switches out.`,
+        `lock:${me}:${f.lockedInto}:${switchedIn(view)}`,
+      );
 
     const attacks = f.moves.filter((m) => m.category !== 'Status');
     const useful = f.moves.filter((m) => m.category === 'Status' && !m.noEffect);
@@ -343,12 +348,13 @@ export class Coach {
       const better = f.switches
         .filter((s) => s.best >= Math.max(0.3, 2.5 * best) && s.taken.ko < 0.05)
         .sort((a, b) => b.best - a.best)[0];
-      if (better && ok('walled') && this.once(`walled:${me}:${foe}`)) {
-        return this.note(
+      if (better)
+        add(
           'walled',
           `${me}’s attacks do little damage to ${foe}. ${better.species} hits it much harder.`,
+          `walled:${me}:${foe}`,
+          better.choice,
         );
-      }
     }
 
     const setup = f.moves.find((m) => SETUP.has(m.id));
@@ -362,17 +368,23 @@ export class Coach {
       threat.frac <= 0.2 &&
       threat.ko === 0 &&
       (state.ownActive?.hpFrac ?? 0) >= 0.6 &&
-      boosted < 2 &&
-      ok('setupWindow') &&
-      this.once(`setup:${me}:${foe}`)
-    ) {
-      return this.note(
+      boosted < 2
+    )
+      add(
         'setupWindow',
         `${foe} can barely hurt ${me}: a good chance to use ${setup.name}.`,
+        `setup:${me}:${foe}`,
+        setup.choice,
       );
-    }
-    return undefined;
+    return out;
   }
+}
+
+/** The lesson for a move that does nothing: types, status, or hazards. */
+function noEffectLesson(f: Facts, choice: string): LessonKey {
+  const m = f.moves.find((x) => x.choice === choice);
+  if (m?.noEffect?.kind === 'hazardMax') return 'hazard';
+  return m?.category === 'Status' && m.noEffect?.kind !== 'type' ? 'status' : 'noEffect';
 }
 
 function hasMove(view: SideView, slot: number, id: string): boolean {

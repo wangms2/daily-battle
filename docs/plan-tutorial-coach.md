@@ -17,12 +17,13 @@ Working plan for the `tutorial` branch. It records what's built, the decisions b
   - `d4a5628` coach fix: our own items and abilities by name in the calc (Levitate, Choice Band were ignored)
   - `f135fd2` coach-eval proof of concept, `BattleSession.reseed`
   - step 2 `tut-coach-judge`: the judge (see "Step 2 results" below)
+  - step 3 `tut-coach-messages`: warnings explained, judged tips, the judged review with turn replays, reviews on request (see "Step 3 results" below)
 - **Engine builds.** `packages/engine-wasm/dist` isn't committed. After pulling the step 2 commit, rebuild it (`search_fixed` is new): `PATH="$HOME/.cargo/bin:$PATH" pnpm --filter @daily-battle/engine-wasm build:wasm` (cargo isn't on the Git Bash PATH by default).
 - **Checks.** Run from the repo root: `pnpm format`, `pnpm lint`, `pnpm typecheck`, `pnpm test` (~45 s). For one package: `npx tsc --noEmit` and `npx vitest run <file>`. `packages/sim-bridge/src/noluck.test.ts` is occasionally flaky.
 
 ## Waiting on the user
 
-Nothing open. Next: step 3, showing the warning texts and the late-tip screen before wiring them.
+Nothing open. Next: step 4 (`tut-coach-eval`), starting with the per-kind check of the warnings shown (watch items in step 4).
 
 ## Decided 2026-10-26 (morning answers)
 
@@ -47,6 +48,15 @@ Nothing open. Next: step 3, showing the warning texts and the late-tip screen be
   - Every warning against Rapid Spin (5) came when the player's side had no Spikes (+22 points for the alternative). Every judged preference _for_ Rapid Spin (5) came with 2 layers on the player's side (+6.5). The text must say why ("No Spikes to clear").
   - Recommending **Spikes** is not proven: 21 warnings where the judge preferred Spikes gained only +1.1 on average, mostly over Explosion (mixed, from −30 to +15). The fixed per-Pokémon penalty is a rough stand-in for Spikes' long-run value.
   - So in step 4, laying Spikes, Rapid Spin, and Explosion are separate message kinds, each with its own larger sample. A kind that doesn't pass stays quiet.
+
+## Decided 2026-10-26 (afternoon, during step 3)
+
+- **Review replay:** each review turn opens the battle screen itself in review mode (not a drawer): frozen at the decision, with the real move and switch buttons. The choice made is tagged **You**, the judge's choice **Better** (**You · Best** on a turn done well), and the rest fade. The coach's reason sits in the tip slot with **▶ Play** (the turn as it happened, with the real log and animations) and **↺ Again**. Arrows step through the review's turns.
+- **Good catch:** a warning the player listened to (picked again) is a turn done well, listed first among them: "Good catch: you changed your pick after the coach's warning." and the reason. The first pick is tagged **Warned** (not "First pick", which read like "best"). Only when the new pick isn't clearly worse too.
+- **Review on request:** after any Gen 3 daily played without the coach, the end card offers **Review this battle**. It judges then (only the choice made and the judge's top choice per decision: 4.4 s for 54 choices on desktop, about 20 s on a mid phone, with "The coach is reviewing your choices… 18 of 54"). Separate from the coach; no effect on streaks or Coached results. Not in Versus or lessons (lessons are coached already).
+- **Explosion praise says the cost** too: "Good choice: Explosion could knock out Zapdos, though it knocks out Metagross too."
+- **An LLM summary of the review:** rejected again (cost, and it could invent reasons, breaking "only true reasons").
+- **Judged tips** (made by Claude, not asked): a tip that recommends an action (a knockout move, a better switch-in, a setup move) shows only when that action is the judge's top choice, not merely "not clearly worse".
 
 ## Product decisions (from the user; don't revisit without asking)
 
@@ -93,17 +103,17 @@ Nothing open. Next: step 3, showing the warning texts and the late-tip screen be
 - **`packages/tutorial`:**
   - `src/types.ts`, `lessons.ts`, `gen3/*.ts`: content model, the 12 lessons, and graduation (`gen3-graduation`, `graduation: true`).
   - `src/validate.ts`, `lessons.test.ts`: content validation.
-  - `src/coach/simple.ts`: the `Coach` class. `CoachRule` is one of `noEffect | canKo | staysKo | switchKo | koThreat | foeAsleep | locked | spikes | walled | setupWindow`. Key methods:
-    - `turn(view)` returns a `CoachTurn` with an optional tip and the warnings keyed by choice.
-    - `record(choice)` notes the player's choice (and any warning they overrode).
+  - `src/coach/simple.ts`: the `Coach` class. `CoachRule` is the tip kinds (`canKo | koThreat | foeAsleep | locked | spikes | walled | setupWindow`); warnings have `WarningReason`s (explain.ts). Key methods:
+    - `turn(view)` returns a `CoachTurn`: a tip now, or `pending` (a tip waits for the judge).
+    - `confirm(view, top)`: the waiting tip, once the judge's top choice is known.
+    - `warn(view, verdict)`: the warning on a pick, if the judge finds it clearly worse and a reason explains it.
+    - `record(view, choice, shown, verdict, heeded)` notes the choice for the review; `ignore` / `ignored` carry overridden warnings across a reload.
     - `forget()` drops the cached result when a choice is blocked.
-
-    The tip is cached per request, and the tip cooldown is applied there too.
-
-  - `src/coach/review.ts`: `decision()` records the scores for each player decision; `buildReview()` picks up to 3 key turns (gap ≥ `KEY_GAP` = 0.3).
-  - `src/coach/coach.test.ts`: rule tests, pacing, and the rate test.
+  - `src/coach/judge.ts`: `Judge` (step 2). `src/coach/explain.ts`: the warning reasons.
+  - `src/coach/review.ts`: `decision()` keeps each judged decision; `buildReview()` picks the key turns and turns done well.
+  - `src/coach/coach.test.ts`, `explain.test.ts`, `judge.test.ts`.
 - **`apps/web`:**
-  - `src/battle/engine.ts`: `EngineStart.coach?: 'simple'`. The engine runs the coach before `session.choose` (in the resume replay too). `TurnPackage` carries `coach` and `review`.
+  - `src/battle/engine.ts`: `EngineStart.coach?: 'simple'` and `coachLog`. The engine runs the coach before `session.choose` (in the resume replay too). `TurnPackage` carries `coach`, `coachMemo` and `review`. `coachCheck`, `coachWork`, `coachTip`, `replayTurn`, `reviewJob`.
   - `src/battle/battle.worker.ts` and `hardEngine.ts`: the worker, and how Hard loads the WASM. Advanced will reuse this.
   - `src/battle/ui/Coach.tsx`: `CoachTip`, `CoachWarning` (with a "don't warn again" option), `CoachReview`.
   - `src/screens/Battle.tsx`: coach UI state, the menu Coach switch, and the turn-on confirmation. `BattleRoute.tsx` passes `coach: 'simple'` when `attempt.coached`.
@@ -145,10 +155,9 @@ Built as decided above (Product decisions). The original picker tag and "Play Ge
   - vs Normal: 134 warnings, **+6.3 points** (CI +4.1 to +8.4), 1.5% clearly worse.
   - The judged gap predicts the real gain: under 0.05, +1 point (quiet is right); 0.10–0.15, +7 to +8; 0.15 and up, +5 to +10.
   - Watch item: steering a player _away from Explosion_ toward setup or a switch was slightly negative on small samples (6 and 2 cases vs Easy). The search lets the foe answer Explosion perfectly (switch to a Ghost, Protect); Easy and Normal don't. Re-check with more samples in step 4.
-- **Provisional settings** (`JUDGE_DEFAULTS`, awaiting the user's OK): 20k iterations per search, 8 worlds, margin 0.1, agree 0.9.
-- **Resume:** a warning the player overrode before a reload can be asked again after it (the shown warnings aren't saved).
+- **Settings** (`JUDGE_DEFAULTS`, agreed): 20k iterations per search, 8 worlds, margin 0.1, agree 0.9.
 
-### 3. `tut-coach-messages`: rules explain, the judge decides
+### 3. `tut-coach-messages`: rules explain, the judge decides — done
 
 - Each rule becomes an **explanation** for a judged gap, not a trigger. A warning needs the judge to say the pick is clearly worse; the rule supplies the plain reason. A judged gap that no rule explains gets a generic reason from the facts ("Swampert takes much less damage here"); keep these rare.
 - **Risk wording (decided).** Name the risk plainly, one concept at a time, no odds: "Risky: if Salamence attacks, Heracross is knocked out. Swampert takes the hit safely." The foe's likely replies come from the search's foe-side visits; what each does comes from the damage calc.
@@ -156,6 +165,15 @@ Built as decided above (Product decisions). The original picker tag and "Play Ge
 - **Review** uses the judge's values instead of the utility scores, so it never contradicts what the coach said in battle.
 - **Simple and Advanced are wording levels.** Simple never mentions reads, predictions, or plans over several turns (keep the banned-words test).
 - Self-KO moves (Explosion, Self-Destruct) don't count as a "switch-in gets knocked out" threat: they knock out whatever stays in too. **Done** (`4a8a9e1`).
+
+#### Step 3 results (built 2026-10-26)
+
+- **Warnings** (`src/coach/explain.ts`, `explainWarning`): the judge decides a pick is clearly worse; a reason template says why, and only if it's true and relevant (the top choice avoids the risk named). Otherwise quiet. Reasons: `noEffect`, `switchKo`, `bigHit`, `staysKo` (not below 30% HP), `missedKo`, `noTime` (status/setup while the foe hits hard), `noSpikes` (Rapid Spin with nothing to clear), `weaker`, `fails` (healing at full HP, Sleep Talk awake), `selfKo` (Explosion that won't take the foe down), `explosion` (the judge prefers Explosion; the text says its cost). A second sentence names what the top choice does, when true. No warning when the player leads by 2 Pokémon's worth of HP (`winningAnyway`). The old rule-triggered warnings are gone (`Coach.warn(view, verdict)`).
+- **Coverage and value** (`scripts/warning-texts.ts` over judged cases, rollouts vs the real AI): on the 283 cases used to write the reasons, 103 warnings shown, +9.4 points (±2.8), 2 clearly worse. On 279 fresh cases from battles never used for tuning (`coach-eval --first 2000`), 93 shown, **+7.5 points (±3.1)**, 1 clearly worse; the judge alone on the fresh set: +5.7 vs Easy, +6.9 vs Normal. About a third of the judge's clear mistakes get a reason; the rest stay quiet (they'd have gained +5.7, so the coach leaves value on the table rather than guess).
+- **Tips:** fact tips (Spikes up, a Choice lock, the foe asleep, the foe is faster and can knock you out) show with the controls. Tips that recommend an action (`canKo`, `walled`, `setupWindow`) wait for the judge's top choice (`Coach.confirm`) and show late (the worker sends them; the log shrinks, so the move buttons don't move). Not shown means not used up.
+- **Saved with the attempt** (`Attempt.coachLog`, one memo per choice): the judge's verdict, the warning overridden, the warning listened to. A resume neither judges again nor asks again.
+- **Review** (`src/coach/review.ts`): built from the judge's verdicts. Key turns are the clearly worse picks with a reason (the warning's own words, so it never contradicts the battle), biggest gaps first, up to 3. Turns done well: good catches, then the judge's top choices with a reason the facts show. Each turn can be replayed (`BattleEngine.replayTurn`, review mode in `Battle.tsx`, `replay-backend.ts`). Uncoached Gen 3 dailies: `ReviewJob` replays the battle with the coach and judge on.
+- `coach-eval` lost its rule mode (the proof of concept); it now records the warning the coach would show, and reports by reason. `coach-rate` measures what's shown, and takes `--player easy|mid|hard`.
 
 ### 4. `tut-coach-eval`: offline check of every message shown
 
@@ -170,6 +188,7 @@ Built as decided above (Product decisions). The original picker tag and "Play Ge
     - Per-case gains correlate 0.65 between the budgets, and have the same sign in 78% of the cases where both moved (about what 20 rollouts allow). 20k Hard is a little weaker: the player wins 19% of rollouts vs 15%.
     - So 20k reproduces the pooled verdict. Use it for the bulk of Hard runs, with a full-budget spot check on each kind of message.
     - Against Hard the player's side loses about 85% either way, so gains are smaller and need more cases to show (this sample isn't enough at full budget). Hard's coaching is Advanced only, so this matters from step 5.
+- **Watch items from step 3** (small samples; each reason gets its own larger run): `weaker` (−5.6 on 4 fresh cases, +6.7 on 8 earlier), `bigHit` (+2.0), `switchKo` (+3.7 fresh, +10.5 earlier), `selfKo` and `explosion` (Explosion either way: 2–4 cases each), `noSpikes`. Laying Spikes isn't a reason yet (judged preferences for Spikes gained only +1.1). A reason that doesn't pass is turned off, not reworded to fit.
 - **CI:** a small smoke sample on PRs; the full run as a manual or scheduled job.
 - **Lesson content check:** each quiz's "best" answer must win at least as often as the alternatives against the lesson's own foe, and the same for mini-battle prompts that recommend an action.
 

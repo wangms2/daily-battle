@@ -390,6 +390,17 @@ describe('attempts', () => {
     );
   });
 
+  it('saves the coach’s memos in step with the choices', () => {
+    let state = gameReducer(started(), { type: 'recordChoice', day: DAY, choice: 'move 1' });
+    const memo = { ignored: 'Earthquake will do nothing.' };
+    state = gameReducer(state, { type: 'recordChoice', day: DAY, choice: 'move 2', memo });
+    state = gameReducer(state, { type: 'recordChoice', day: DAY, choice: 'move 3' });
+    expect(state.days[DAY]!.attempts[0]!.coachLog).toEqual([null, memo, null]);
+    // Without memos, no log.
+    const plain = gameReducer(started(), { type: 'recordChoice', day: DAY, choice: 'move 1' });
+    expect(plain.days[DAY]!.attempts[0]!.coachLog).toBeUndefined();
+  });
+
   it('marks the battle in progress coached, for good', () => {
     let state = gameReducer(started(), { type: 'recordChoice', day: DAY, choice: 'move 1' });
     state = gameReducer(state, { type: 'coachAttempt', day: DAY });
