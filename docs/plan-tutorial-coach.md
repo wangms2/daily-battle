@@ -33,7 +33,7 @@ Working plan for the `tutorial` branch. It records what's built, the decisions b
   - **Simple:** plain wording. It never mentions reads, predictions, or multi-turn plans. It's the only level in lessons, graduation, Easy, and Normal (by default).
   - **Advanced:** adds reads. It's the only level against Hard, and optional on Normal. It's never offered on Easy or in lessons.
 - **Daily coach (built):**
-  - Gen 3 only. Offered on Easy and Normal. **Hidden on Hard until Advanced wording exists**; it's enabled there by `tut-coach-reads`.
+  - Gen 3 only. Offered on Easy and Normal. **Hidden on Hard until Advanced wording exists**; it's enabled there by `tut-coach-plan`.
   - Off by default. Offered once on a game's first daily brief and again after graduation.
   - Coached tries form a separate **Coached** bucket per game, shared across difficulties, with its own streak and stats.
   - A coached try before the day is cleared ends only **that difficulty's** regular streak. Coached practice after a clear doesn't affect it.
@@ -120,11 +120,21 @@ Built as decided above (Product decisions). The original picker tag and "Play Ge
 - **CI:** a small smoke sample on PRs; the full run as a manual or scheduled job.
 - **Lesson content check:** each quiz's "best" answer must win at least as often as the alternatives against the lesson's own foe, and the same for mini-battle prompts that recommend an action.
 
-### 5. `tut-coach-reads`: reads in Advanced wording
+### 5. `tut-coach-plan`: Advanced coaching with long-term plans and reads
 
-- **Reads** from the foe-side visits: "Likely foe move: Earthquake." Only in Advanced wording.
-- **Availability:** Advanced wording on Hard (enable Hard in `coachAvailable`), and opt-in on Normal via `settings.coachLevelNormal: 'simple' | 'advanced'` (the toggle shows the choice only there). Never on Easy or in lessons. The level doesn't affect streaks.
-- The review on Advanced adds the expected foe reply. Reads go through `coach-eval` like any message.
+Starts once the Simple coach is trusted (steps 2–4). Decided 2026-10-25.
+
+- **Why.** The search plans only 2–3 turns ahead, and its position score is material only (alive, HP, boosts, status, screens, Substitute). It doesn't know roles: that a Pokémon is our last check to their sweeper, or that one foe stands between us and a sweep.
+- **Game-plan model** (calc-based, on the phone, milliseconds per turn, updated as sets are revealed and HP drops). Built from both teams (the daily brief shows the foe's six) and the foe's possible sets:
+  - checks and counters: who switches in safely on whom, who outspeeds, who KOs whom in one or two hits;
+  - win conditions: which of ours sweeps once particular foes are gone or weakened;
+  - threats: which foe beats us if a particular check falls;
+  - endgame: with few Pokémon left, give the search more budget so the answer is near-exact.
+- **Same trust bar.** Each plan message must pass the judge in its position; if the plan and the search disagree, the coach is quiet. Plan messages go through `coach-eval` like any other (more rollouts, since long-horizon advice is noisier). Ideas that don't hold up get cut.
+- **Where it shows (Advanced only; mock up before building):** a short game plan on the brief (two or three lines), plan tips in battle when the plan changes, plan warnings ("Pick again?" when a choice throws the plan away), and the plan in the review (where it held, and the turn it was lost).
+- **Reads** from the foe-side visits ("Likely foe move: Earthquake"), Advanced wording only.
+- **Constraints (from the user):** no extra cost or wait, no change to the Simple coach, no inconsistency. A plan-aware engine score (valuing roles in our engine fork) is deferred, and only considered if the plan model proves itself in the eval; it would also change Hard.
+- **Availability:** Advanced on Hard (enable Hard in `coachAvailable`), and opt-in on Normal via `settings.coachLevelNormal: 'simple' | 'advanced'` (the toggle shows the choice only there). Never on Easy or in lessons. The level doesn't affect streaks.
 
 ### 6. `tut-versus-coach`: coach in Versus
 
