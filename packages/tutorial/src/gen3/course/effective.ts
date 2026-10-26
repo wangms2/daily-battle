@@ -24,7 +24,9 @@ export const effective: Lesson = {
       },
       turn: { p1: 'move Surf', p2: 'move Crunch' },
       before: 'Every move has a type. Surf is a Water move, and Houndoom is a Dark and Fire type.',
-      after: 'Water is strong against Fire: Surf is super effective and does double damage.',
+      // The anchor for the whole chart: the starters' triangle.
+      after:
+        'Water is strong against Fire: Surf does double damage. Like the starters, it goes round: Water beats Fire, Fire beats Grass, Grass beats Water.',
       spotlight: { before: ['move Surf', 'foe-types'], after: ['foe-hp'] },
     },
     {
@@ -139,7 +141,7 @@ export const effective: Lesson = {
       seed: 'course:effective:battle',
       noLuck: true,
       takeaway:
-        'Before you attack, check the foe’s types. A super effective move does double damage; a resisted one, half.',
+        'Before you attack, check the foe’s types. To learn the matchups, try the Type trainer at the top of Learn.',
     },
   ],
 };

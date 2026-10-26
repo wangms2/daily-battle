@@ -18,6 +18,7 @@ export function CourseMap({
   lessons,
   progress,
   onOpen,
+  onTrainer,
   onBack,
   onSettings,
 }: {
@@ -27,6 +28,8 @@ export function CourseMap({
   lessons: Lesson[];
   progress: TutorialProgress | undefined;
   onOpen: (lesson: Lesson) => void;
+  /** The type trainer (an optional side practice). */
+  onTrainer: () => void;
   onBack: () => void;
   onSettings: () => void;
 }) {
@@ -59,7 +62,17 @@ export function CourseMap({
         onSettings={onSettings}
       />
       <main className="mx-auto w-full max-w-[560px] flex-1 overflow-y-auto px-4 pt-4 pb-10">
-        <h1 className="display text-[22px]">Learn to battle</h1>
+        <div className="flex items-center justify-between gap-2">
+          <h1 className="display text-[22px]">Learn to battle</h1>
+          {/* Type matchups: an optional side practice, outside the course order. */}
+          <button
+            type="button"
+            onClick={onTrainer}
+            className="flex shrink-0 items-center gap-1 rounded-full border border-line bg-surface px-2.5 py-1 text-[13px] font-semibold hover:bg-surface-2"
+          >
+            <span aria-hidden>🎯</span> Type trainer
+          </button>
+        </div>
         <p className="mt-1 text-[14px] text-muted">
           {all.filter((l) => !l.review).length} short lessons, one idea each.{' '}
           {count > 0 && `${count} done.`}

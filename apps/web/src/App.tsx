@@ -43,6 +43,8 @@ import { VersusRoute } from './versus/VersusRoute';
 import { gen3Course, LESSONS } from '@daily-battle/tutorial/lessons';
 import { LessonPlayer } from './tutorial/LessonPlayer';
 import { CourseMap } from './tutorial/CourseMap';
+import { TypeTrainer } from './tutorial/TypeTrainer';
+import { TypeChartSheet } from './sheets/TypeChart';
 import { nextLesson } from './tutorial/lesson';
 
 /** Shared links open the game picker, so a friend can choose any generation. */
@@ -170,6 +172,7 @@ export function App() {
   // After a loss, the end card's "Change team" opens the brief with the team editable.
   const [openEdit, setOpenEdit] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [typeChartOpen, setTypeChartOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [howToPlayOpen, setHowToPlayOpen] = useState(false);
   const [storageNoticeDismissed, setStorageNoticeDismissed] = useState(false);
@@ -344,42 +347,55 @@ export function App() {
     const progress = settings.tutorial?.[LEARN_FORMAT];
     const lessons = LESSONS[LEARN_FORMAT]!;
     const lesson = lessons.find((l) => route === `learn/${l.id}`);
-    screen = lesson ? (
-      <LessonPlayer
-        key={lesson.id}
-        lesson={lesson}
-        step={progress?.current?.lesson === lesson.id ? progress.current.step : 0}
-        settings={settings}
-        onSetting={setSetting}
-        onExplainerSeen={(id) => dispatchAny({ type: 'markExplainer', id })}
-        onStep={(step) =>
-          dispatchAny({ type: 'lessonStep', format: LEARN_FORMAT, lesson: lesson.id, step })
-        }
-        onDone={() => {
-          dispatchAny({ type: 'lessonDone', format: LEARN_FORMAT, lesson: lesson.id });
-          // Graduates are offered the coach again, on their next daily.
-          if (
-            lesson.graduation &&
-            !settings.tutorial?.[LEARN_FORMAT]?.completed.includes(lesson.id)
-          )
-            setSetting('coachOffered', { ...settings.coachOffered, [LEARN_FORMAT]: false });
-          go('learn');
-        }}
-        onExit={() => go('learn')}
-        onSettings={() => setSettingsOpen(true)}
-      />
-    ) : (
-      // The course map (#learn; #learn/course, its link before it shipped).
-      <CourseMap
-        game={formatInfo(LEARN_FORMAT).name}
-        course={gen3Course}
-        lessons={lessons}
-        progress={progress}
-        onOpen={(l) => go(`learn/${l.id}`)}
-        onBack={() => go('')}
-        onSettings={() => setSettingsOpen(true)}
-      />
-    );
+    // Learn is all Gen 3: its screens and sheets read that game's data.
+    setActiveFormat(LEARN_FORMAT);
+    screen =
+      route === 'learn/types' ? (
+        // The type trainer, for the course's game.
+        <TypeTrainer
+          boxes={settings.typeTrainer?.[LEARN_FORMAT] ?? {}}
+          onBoxes={(b) => setSetting('typeTrainer', { ...settings.typeTrainer, [LEARN_FORMAT]: b })}
+          onBack={() => go('learn')}
+          onChart={() => setTypeChartOpen(true)}
+          onSettings={() => setSettingsOpen(true)}
+        />
+      ) : lesson ? (
+        <LessonPlayer
+          key={lesson.id}
+          lesson={lesson}
+          step={progress?.current?.lesson === lesson.id ? progress.current.step : 0}
+          settings={settings}
+          onSetting={setSetting}
+          onExplainerSeen={(id) => dispatchAny({ type: 'markExplainer', id })}
+          onStep={(step) =>
+            dispatchAny({ type: 'lessonStep', format: LEARN_FORMAT, lesson: lesson.id, step })
+          }
+          onDone={() => {
+            dispatchAny({ type: 'lessonDone', format: LEARN_FORMAT, lesson: lesson.id });
+            // Graduates are offered the coach again, on their next daily.
+            if (
+              lesson.graduation &&
+              !settings.tutorial?.[LEARN_FORMAT]?.completed.includes(lesson.id)
+            )
+              setSetting('coachOffered', { ...settings.coachOffered, [LEARN_FORMAT]: false });
+            go('learn');
+          }}
+          onExit={() => go('learn')}
+          onSettings={() => setSettingsOpen(true)}
+        />
+      ) : (
+        // The course map (#learn; #learn/course, its link before it shipped).
+        <CourseMap
+          game={formatInfo(LEARN_FORMAT).name}
+          course={gen3Course}
+          lessons={lessons}
+          progress={progress}
+          onOpen={(l) => go(`learn/${l.id}`)}
+          onTrainer={() => go('learn/types')}
+          onBack={() => go('')}
+          onSettings={() => setSettingsOpen(true)}
+        />
+      );
   } else if (!versus && !playing) {
     screen = (
       <Home
@@ -591,6 +607,7 @@ export function App() {
         todayLabel={dayHeadline(summary)}
         countdown={countdown}
       />
+      <TypeChartSheet open={typeChartOpen} onOpenChange={setTypeChartOpen} />
       <SettingsSheet
         open={settingsOpen}
         onOpenChange={setSettingsOpen}

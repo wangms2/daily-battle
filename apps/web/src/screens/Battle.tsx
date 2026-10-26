@@ -41,6 +41,7 @@ import { GiveUpDialog, LogList, LogSheet, MenuSheet } from '../battle/ui/sheets'
 import { BattleLog } from '../battle/ui/BattleLog';
 import type { Settings } from '../state/schema';
 import { possibleSets } from '../lib/data';
+import { TypeChartSheet } from '../sheets/TypeChart';
 import { streakLine, type DaySummary } from '../lib/results';
 import { Button } from '../ui/bits';
 import type { ShareModel } from '../lib/share';
@@ -226,6 +227,7 @@ export function Battle({
   const [error, setError] = useState<string | null>(null);
   const [explainer, setExplainer] = useState<string | null>(null);
   const [logOpen, setLogOpen] = useState(false);
+  const [chartOpen, setChartOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [giveUpOpen, setGiveUpOpen] = useState(false);
   const [coachAsk, setCoachAsk] = useState<string | null>(null);
@@ -1086,6 +1088,7 @@ export function Battle({
       )}
 
       <LogSheet open={logOpen} onOpenChange={setLogOpen} lines={log} />
+      <TypeChartSheet open={chartOpen} onOpenChange={setChartOpen} />
       <MenuSheet
         open={menuOpen}
         onOpenChange={setMenuOpen}
@@ -1096,6 +1099,10 @@ export function Battle({
         onLog={() => {
           setMenuOpen(false);
           setLogOpen(true);
+        }}
+        onChart={() => {
+          setMenuOpen(false);
+          setChartOpen(true);
         }}
         onLeave={onExit}
         onGiveUp={() => setGiveUpOpen(true)}

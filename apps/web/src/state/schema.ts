@@ -98,6 +98,8 @@ export interface Settings {
   coach?: Partial<Record<FormatId, boolean>>;
   /** The coach was offered for a game (first daily, or after graduation), so it isn't again. */
   coachOffered?: Partial<Record<FormatId, boolean>>;
+  /** The type trainer's boxes per game: each matchup answered, by key (lib/typeTrainer.ts). */
+  typeTrainer?: Partial<Record<FormatId, Record<string, number>>>;
 }
 
 export interface TutorialProgress {
