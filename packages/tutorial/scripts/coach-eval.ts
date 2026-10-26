@@ -162,7 +162,7 @@ function collect(vs: Difficulty): Case[] {
   for (let i = FIRST; i < FIRST + BATTLES && cases.length < MAX_CASES; i++) {
     const m = matchup(i);
     const session = new BattleSession({ format: FORMAT, ...m });
-    const coach = new Coach(data, FORMAT);
+    const coach = new Coach(data, FORMAT, VS);
     const judge = new Judge(engine(), data, { pool: m.pool, iterations: JUDGE_ITERATIONS });
     // Beginner-ish players: Easy and the mid bot, alternating.
     const player = i % 2 ? midBot({ data }) : aiFor({ difficulty: 'easy', style: 'balance', data });

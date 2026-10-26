@@ -17,7 +17,7 @@ import {
 } from '@daily-battle/gen';
 import { BattleSession, deriveSeed } from '@daily-battle/sim-bridge';
 import { Judge } from '../src/coach/judge';
-import { explainWarning, type WarningReason } from '../src/coach/explain';
+import { explainWarning, QUIET_REASONS, type WarningReason } from '../src/coach/explain';
 
 const data = setsFor('gen3ou');
 const START = '2026-01-05';
@@ -85,6 +85,8 @@ interface Row {
 const engine = loadEngine(3);
 const rows: Row[] = [];
 for (const file of files) {
+  const run = JSON.parse(readFileSync(file, 'utf8')) as { vs: keyof typeof QUIET_REASONS };
+  const vs = run.vs ?? 'normal';
   const cases = (JSON.parse(readFileSync(file, 'utf8')).results as Judged[]).filter(
     (c) => c.gap >= 0.1 && c.agree >= 0.9,
   );
@@ -106,7 +108,7 @@ for (const file of files) {
     const judge = new Judge(engine, data, { pool: m.pool });
     judge.begin(view, `eval:${c.battle}:${c.turn}`);
     const v = judge.settle(c.warned, Infinity);
-    const e = v && explainWarning(view, facts, v);
+    const e = v && explainWarning(view, facts, v, QUIET_REASONS[vs]);
     const name = (ch: string) =>
       ch.startsWith('move')
         ? facts.moves.find((x) => x.choice === ch)?.name

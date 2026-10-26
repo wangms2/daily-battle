@@ -105,7 +105,8 @@ export class BattleEngine {
     this.reported = this.replay.length;
     this.presenter = new SidePresenter('p1', this.sets, format);
     if (start.coach) {
-      this.coach = new Coach(setsFor(format), format);
+      // Lesson foes count as Easy: some warning reasons are quiet against some opponents.
+      this.coach = new Coach(setsFor(format), format, tutorial ? 'easy' : difficulty);
       if (coachEngine)
         this.judge = new Judge(coachEngine, setsFor(format), {
           ...(start.pool ? { pool: start.pool } : {}),

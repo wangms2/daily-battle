@@ -3,7 +3,7 @@ import { setsFor } from '@daily-battle/data';
 import { describe, expect, it } from 'vitest';
 import { startPosition } from '../battle';
 import type { Position } from '../types';
-import { explainWarning, winningAnyway } from './explain';
+import { explainWarning, QUIET_REASONS, winningAnyway } from './explain';
 import type { Verdict } from './judge';
 
 const data = setsFor('gen3ou');
@@ -75,6 +75,27 @@ describe('Warning explanations', () => {
     );
     expect(e).toMatchObject({ reason: 'fails' });
     expect(e!.text).toMatch(/^Starmie is at full HP, so Recover will do nothing\./);
+  });
+
+  it('keeps quiet about reasons that failed the offline check against this opponent', () => {
+    // Explosion into a Skarmory: it resists, so it won't knock it out.
+    const pos = {
+      p1: [{ species: 'Metagross', moves: ['Explosion', 'Earthquake'] }],
+      p2: [{ species: 'Skarmory', setId: 'skarmory-standard' }],
+    };
+    const view = startPosition('gen3ou', { ...pos, seed: 'explain' }).view('p1')!;
+    const verdict: Verdict = {
+      choice: 'move 1',
+      top: 'move 2',
+      worse: true,
+      gap: 0.2,
+      agree: 1,
+      value: 0.3,
+      topValue: 0.5,
+    };
+    const f = turnFacts(view, data);
+    expect(explainWarning(view, f, verdict, QUIET_REASONS.normal)?.reason).toBe('selfKo');
+    expect(explainWarning(view, f, verdict, QUIET_REASONS.easy)).toBeUndefined();
   });
 
   it('stays quiet when no reason is true', () => {

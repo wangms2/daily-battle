@@ -24,6 +24,21 @@ export type WarningReason =
   | 'explosion'
   | 'fails';
 
+/**
+ * Reasons the coach keeps quiet about against each opponent, because they
+ * didn't pass the offline check there (docs/plan-tutorial-coach.md, step 4:
+ * the gain's 95% CI above zero, at most 5% of cases clearly worse).
+ *   - Easy: warning against an Explosion pick (+2.6, CI −0.2 to +5.3; Easy
+ *     rarely answers Explosion, so it works anyway).
+ *   - Normal: recommending Explosion (10 cases; quiet until a bigger run).
+ *   - Hard: not checked yet (step 5); the coach isn't offered there.
+ */
+export const QUIET_REASONS: Record<'easy' | 'normal' | 'hard', readonly WarningReason[]> = {
+  easy: ['selfKo'],
+  normal: ['explosion'],
+  hard: ['explosion', 'selfKo'],
+};
+
 export interface Explanation {
   reason: WarningReason;
   text: string;
@@ -102,6 +117,8 @@ export function explainWarning(
   view: SideView,
   f: Facts,
   verdict: Verdict,
+  /** Reasons to keep quiet about (`QUIET_REASONS` for the opponent). */
+  quiet: readonly WarningReason[] = [],
 ): Explanation | undefined {
   if (!verdict.worse || !f.foe || !f.me || f.forced) return undefined;
   if (winningAnyway(f)) return undefined;
@@ -131,10 +148,18 @@ export function explainWarning(
       return ` ${mine(ts.species, foe)} takes ${foe}’s hits much better.`;
     return '';
   };
-  const out = (reason: WarningReason, text: string) => ({ reason, text });
+  const out = (reason: WarningReason, text: string) =>
+    quiet.includes(reason) ? undefined : { reason, text };
 
   // The top choice is Explosion: say what it costs.
-  if (tm && SELF_KO.has(tm.id) && tm.ko >= SURE_KO && lands(f, tm) && (pm?.ko ?? 0) < 0.5)
+  if (
+    !quiet.includes('explosion') &&
+    tm &&
+    SELF_KO.has(tm.id) &&
+    tm.ko >= SURE_KO &&
+    lands(f, tm) &&
+    (pm?.ko ?? 0) < 0.5
+  )
     return out(
       'explosion',
       `${tm.name} can knock out ${foe}, though it knocks out ${me} too. ` +

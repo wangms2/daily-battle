@@ -6,7 +6,7 @@
 import { turnFacts, type Facts, type MoveFact, type NoEffect } from '@daily-battle/ai';
 import type { SetsFile } from '@daily-battle/data';
 import type { SideView } from '@daily-battle/sim-bridge';
-import { explainWarning, type Explanation, type WarningReason } from './explain';
+import { explainWarning, QUIET_REASONS, type Explanation, type WarningReason } from './explain';
 import type { Verdict } from './judge';
 import { buildReview, decision, type Decision, type Heeded, type Review } from './review';
 
@@ -143,11 +143,17 @@ export class Coach {
     pending?: Candidate[];
   };
 
+  /** Warning reasons the coach keeps quiet about against this opponent. */
+  private readonly quiet: readonly WarningReason[];
+
   constructor(
     private readonly data: SetsFile,
     format: string = data.meta.format,
+    /** The opponent's difficulty (lesson foes count as Easy): some reasons are quiet against some. */
+    difficulty: keyof typeof QUIET_REASONS = 'normal',
   ) {
     this.lessons = LESSONS[format] ?? {};
+    this.quiet = QUIET_REASONS[difficulty];
   }
 
   private note(rule: CoachRule, text: string, key: LessonKey = rule): CoachNote {
@@ -206,7 +212,7 @@ export class Coach {
   warn(view: SideView, verdict: Verdict): CoachNote | undefined {
     if (view.request.requestType === 'wait') return undefined;
     const facts = this.factsFor(view);
-    const e = explainWarning(view, facts, verdict);
+    const e = explainWarning(view, facts, verdict, this.quiet);
     if (!e || this.overridden.has(e.text)) return undefined;
     return this.warnNote(e, facts, verdict.choice);
   }
@@ -236,7 +242,7 @@ export class Coach {
     if (view.request.requestType === 'wait') return;
     const facts = this.factsFor(view);
     if (shown) this.overridden.add(shown.text);
-    const e = verdict && explainWarning(view, facts, verdict);
+    const e = verdict && explainWarning(view, facts, verdict, this.quiet);
     const d = decision(
       index,
       facts,

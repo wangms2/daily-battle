@@ -12,6 +12,7 @@ export {
 } from './coach/simple';
 export {
   explainWarning,
+  QUIET_REASONS,
   winningAnyway,
   type Explanation,
   type WarningReason,

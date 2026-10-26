@@ -218,6 +218,8 @@ export function Battle({
     !start.tutorial &&
     !reviewOf &&
     (start.format ?? DEFAULT_FORMAT) === 'gen3ou' &&
+    // Not against Hard: its warnings aren't checked there yet (step 5).
+    start.difficulty !== 'hard' &&
     !!backend.review;
   const [reviewProgress, setReviewProgress] = useState<{ done: number; total: number } | null>(
     null,

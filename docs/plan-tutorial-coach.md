@@ -18,12 +18,13 @@ Working plan for the `tutorial` branch. It records what's built, the decisions b
   - `f135fd2` coach-eval proof of concept, `BattleSession.reseed`
   - step 2 `tut-coach-judge`: the judge (see "Step 2 results" below)
   - step 3 `tut-coach-messages`: warnings explained, judged tips, the judged review with turn replays, reviews on request (see "Step 3 results" below)
+  - step 4 `tut-coach-eval`: every reason shown checked against Easy and Normal; two turned off where they failed (see "Step 4 results" below)
 - **Engine builds.** `packages/engine-wasm/dist` isn't committed. After pulling the step 2 commit, rebuild it (`search_fixed` is new): `PATH="$HOME/.cargo/bin:$PATH" pnpm --filter @daily-battle/engine-wasm build:wasm` (cargo isn't on the Git Bash PATH by default).
 - **Checks.** Run from the repo root: `pnpm format`, `pnpm lint`, `pnpm typecheck`, `pnpm test` (~45 s). For one package: `npx tsc --noEmit` and `npx vitest run <file>`. `packages/sim-bridge/src/noluck.test.ts` is occasionally flaky.
 
 ## Waiting on the user
 
-Nothing open. Next: step 4 (`tut-coach-eval`), starting with the per-kind check of the warnings shown (watch items in step 4).
+Nothing open. Next: step 4b, walking through the lessons with the user (screenshots), then refactoring them. Queued for a quiet night (low concurrency): the targeted Explosion run vs Normal (step 4).
 
 ## Decided 2026-10-26 (morning answers)
 
@@ -175,7 +176,24 @@ Built as decided above (Product decisions). The original picker tag and "Play Ge
 - **Review** (`src/coach/review.ts`): built from the judge's verdicts. Key turns are the clearly worse picks with a reason (the warning's own words, so it never contradicts the battle), biggest gaps first, up to 3. Turns done well: good catches, then the judge's top choices with a reason the facts show. Each turn can be replayed (`BattleEngine.replayTurn`, review mode in `Battle.tsx`, `replay-backend.ts`). Uncoached Gen 3 dailies: `ReviewJob` replays the battle with the coach and judge on.
 - `coach-eval` lost its rule mode (the proof of concept); it now records the warning the coach would show, and reports by reason. `coach-rate` measures what's shown, and takes `--player easy|mid|hard`.
 
-### 4. `tut-coach-eval`: offline check of every message shown
+### 4. `tut-coach-eval`: offline check of every message shown — done for Easy and Normal
+
+#### Step 4 results (2026-10-26)
+
+- **Run:** 4,147 warnings the coach shows, from 4,000 fresh battles (`coach-eval --shown --first 10000`, 20 shards); at most 80 per reason per difficulty sampled (815 vs Easy, 800 vs Normal), each rolled out 30 times per branch with the real AI (6 workers, 8 min per difficulty). `scripts/eval-report.ts` writes the table and the worst cases.
+- **Overall:** +8.1 points vs Easy (CI +6.9 to +9.3), 2.0% clearly worse; +8.3 vs Normal (CI +7.0 to +9.5), 2.8%. Noise alone gives about 2.3% clearly worse.
+- **By reason** (gain, CI low, clearly worse): every reason is positive on average. `noEffect` +11.6 / +5.5, `fails` +8.0 / +11.8, `missedKo` +6.4 / +7.8, `weaker` +12.4 / +9.4 (the earlier −5.6 on 4 cases was noise), `noTime` +12.8 / +9.6, `switchKo` +8.5 / +7.1, `bigHit` +6.4 / +8.3, `staysKo` +7.1 / +14.4, `noSpikes` +5.5 / +3.1, `selfKo` +2.6 (CI −0.2) / +5.8, `explosion` +7.5 (21 cases) / +5.2 (10 cases).
+- **Bar (decided):** a reason passes for a difficulty when its gain's 95% CI is above zero and at most 5% of its cases are clearly worse; a borderline one gets a bigger sample before it's turned off.
+- **Decided per reason:**
+  - `selfKo` (warning against an Explosion pick) is **quiet vs Easy**: following it instead of Explosion gained +1.4 when the judge preferred another attack; Easy rarely answers Explosion.
+  - `staysKo` vs Easy is **kept** as a core habit (+7.1), an accepted exception to the 5% bar: 6 of 80 cases clearly worse, half with Dugtrio, where Easy didn't use the knockout move.
+  - `explosion` (recommending Explosion) is **quiet vs Normal** until a targeted run (about 10,000 battles, at low concurrency) has enough cases.
+  - `QUIET_REASONS` in `explain.ts` holds this; `Coach` takes the opponent's difficulty (lesson foes count as Easy).
+- **Hard** isn't checked (Advanced, step 5): the coach isn't offered there, and "Review this battle" isn't offered after Hard battles.
+- **CI:** the sims job runs a 41 s smoke of `coach-eval --shown` (reported, not asserted).
+- **Lesson content check:** moved to step 4b (`scripts/quiz-audit.ts`).
+
+#### Step 4 plan (as written before the run)
 
 - `packages/tutorial/scripts/coach-eval.ts` (started; proof of concept for switchKo vs Easy) and `BattleSession.reseed`.
 - **Collect** the messages the coach actually shows (warnings with their alternative, tips that imply an action) in Gen 3 battles: weekly-pool teams, played by beginner-ish bots (Easy, mid), against the daily opponent on Easy, Normal, and Hard.

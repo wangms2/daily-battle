@@ -66,7 +66,7 @@ for (let i = 0; i < BATTLES; i++) {
     p1: { team: poolTeam(i, week) },
     p2: { team: teamSets(data, opp.team) },
   });
-  const coach = new Coach(data, FORMAT);
+  const coach = new Coach(data, FORMAT, VS);
   const judge = new Judge(engine, data, { pool });
   const player =
     PLAYER === 'mid'

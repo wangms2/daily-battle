@@ -86,6 +86,10 @@ jobs:
       # Hard at a small budget: a smoke test that it plays whole battles (win
       # rates are reported, not asserted; tuning runs are local, at full budget).
       - run: pnpm --filter @daily-battle/ai eval --hard --only-hard --hard-n 10 --hard-iterations 20000
+      # The coach's warnings (docs/plan-tutorial-coach.md, step 4): a smoke test
+      # that collecting shown warnings and rolling them out works end to end.
+      # Gains are reported, not asserted (too few cases); the full run is local.
+      - run: pnpm --filter @daily-battle/tutorial coach-eval --shown --battles 20 --cases 30 --r 6 --jobs 2
 
   # Playwright on the shared build, split across shards.
   e2e:
