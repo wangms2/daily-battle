@@ -13,7 +13,8 @@ Working plan for the `tutorial` branch. It records what's built, the decisions b
   - `29c0462` the header title is a back button
   - `1303003`, `a565664` coach pacing (see below)
   - `25a4a54` Coached daily results, streaks, coach toggle, one-time offer
-- **Checks.** Run from the repo root: `pnpm format`, `pnpm lint`, `pnpm typecheck`, `pnpm test` (56 files, 1437 tests, ~40 s). For one package: `npx tsc --noEmit` and `npx vitest run <file>`. `packages/sim-bridge/src/noluck.test.ts` is occasionally flaky.
+  - step 1 `tut-gen3-recommend`: Battle basics on the landing, the tutorial on the welcome sheet
+- **Checks.** Run from the repo root: `pnpm format`, `pnpm lint`, `pnpm typecheck`, `pnpm test` (56 files, 1440 tests, ~40 s). For one package: `npx tsc --noEmit` and `npx vitest run <file>`. `packages/sim-bridge/src/noluck.test.ts` is occasionally flaky.
 
 ## Product decisions (from the user; don't revisit without asking)
 
@@ -31,6 +32,11 @@ Working plan for the `tutorial` branch. It records what's built, the decisions b
   - Turning the coach on mid-battle is sticky for that attempt and needs a confirmation when it would cost a streak.
 - **Versus:** the coach is allowed, and every player in the room clearly sees who has it on.
 - **AI-model coach:** rejected. A paid or token-based LLM is out; the coach is rules plus our own AI's scores and search.
+- **Pointing beginners to the lessons (step 1, decided):**
+  - **Landing:** a small outlined **Battle basics** pill under Play (no emoji), opening `#learn`. Always shown. The landing's split is 63/37 (top/bottom).
+  - **No tag on the game picker.** The picker keeps its existing Learn row under Gen 3.
+  - **Welcome sheet and How to play:** short one-line rules and a "New to competitive Pokémon? Start with Gen 3. It has lessons and a coach." card with one button, **Start the tutorial** (opens the next unfinished lesson). No "Play Gen 3" button. The "Every game uses OU" line moved to About.
+  - **UI process:** show screenshots and settle the design before wiring, tests, or the full check run.
 - **Writing style** (lessons, UI text, comments, docs): plain, short sentences; concrete examples. Each lesson or example teaches one concept without mixing in others. Comments cite `DESIGN.md §N`.
 
 ## How the existing pieces fit
@@ -72,11 +78,9 @@ Working plan for the `tutorial` branch. It records what's built, the decisions b
 
 Each step is a separate commit with tests, and runs format, lint, typecheck, and tests before committing.
 
-### 1. `tut-gen3-recommend`: recommend Gen 3 to beginners (small; good warm-up)
+### 1. `tut-gen3-recommend`: recommend Gen 3 to beginners — done
 
-- **`WelcomeSheet`** (`apps/web/src/sheets/misc.tsx`, both first run and the "How to play" review mode): add a "New to competitive Pokémon? Start with Gen 3" block, with **Start the tutorial** (→ `#learn`, lesson 1) and **Play Gen 3** (set format `gen3ou` → `#play`; the existing one-time offer then appears). Add one line saying Gen 3 has lessons and a coach.
-- **Home / game picker:** add a "Recommended for beginners" tag on the Gen 3 card. It shows until the tutorial is finished (graduation completed) or the player has played 3 Gen 3 dailies, then disappears. This only recommends and links: never change the default format.
-- **Tests:** the welcome and How to play sheets show the block and buttons; the tag hides once either condition is met.
+Built as decided above (Product decisions). The original picker tag and "Play Gen 3" button were dropped.
 
 ### 2. `tut-coach-eval`: offline coach-quality validation (the core quality gate)
 

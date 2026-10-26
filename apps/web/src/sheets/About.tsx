@@ -42,8 +42,8 @@ export function AboutSheet({
   return (
     <Sheet open={open} onOpenChange={onOpenChange} title="About Pokémon Daily" scroll>
       <p className="text-[14px] leading-relaxed">
-        A daily Gen 4, 5, or 6 OU battle: build a team each week, then beat a new opponent every
-        day. Each game has its own team and streak.
+        A daily Gen 3, 4, 5, or 6 battle: build a team each week, then beat a new opponent every
+        day. Each game has its own team and streak. Every game uses the OU (OverUsed) tier.
       </p>
 
       <h3 className="mt-4 text-[13px] font-semibold tracking-wide text-muted uppercase">

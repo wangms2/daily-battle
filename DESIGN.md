@@ -675,6 +675,8 @@ Battle music and Pokémon cries, as on Showdown, across every game. Off by defau
 
 A **Learn** mode teaches Gen 3 OU from the basics (12 lessons and a graduation battle, `packages/tutorial`), and a **coach** helps in real battles. EVs, IVs, and natures are out of scope.
 
+- **Finding it.** A small **Battle basics** pill under Play on the landing, a Learn row under Gen 3 in the game picker, and a "New to competitive Pokémon?" card with **Start the tutorial** on the welcome sheet and in How to play (it opens the next unfinished lesson).
+
 - **Coach.** Rule-based, from the player's own view only (it never sees the foe's real sets). It gives an occasional turn tip, asks before a clear blunder ("Do it anyway" / "Pick again"), and reviews up to 3 key turns after the battle. It's paced so it isn't distracting: at most one tip per turn, a gap of 3 turns between tips (2 for urgent ones: "this hit KOs you", "you can KO"), no tip while a lesson prompt or hint is showing, and a warning the player overrode isn't asked again that battle. Warnings only appear when the blunder is picked.
 - **Where.** On in lessons against the Easy foe and in graduation. In the daily, it's offered in Gen 3 on Easy and Normal (not Hard, until its search-based coach exists). Off by default; offered once on a game's first daily brief and again after graduation (`settings.coachOffered`).
 - **Turning it on.** A **Coach** pill beside the difficulty picker on the brief (`settings.coach`, per game), or a switch in the battle menu mid-battle. Either asks first when it costs a streak. Once on, that attempt is `coached: true` for good; mid-battle, the battle restarts with the coach from the same turn.

@@ -144,9 +144,19 @@ export function Home({
                 );
               })}
             </div>
-            <button type="button" onClick={onPlay} className="home-btn home-play home-serif">
-              Play
-            </button>
+            {/* Learn mode sits with Play: it's the way in for new players. */}
+            <div className="flex flex-col items-center gap-2.5">
+              <button type="button" onClick={onPlay} className="home-btn home-play home-serif">
+                Play
+              </button>
+              <button
+                type="button"
+                onClick={onLearn}
+                className="home-basics rounded-full border border-white/60 bg-white/10 font-semibold text-white hover:bg-white/20"
+              >
+                Battle basics
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -164,14 +174,6 @@ export function Home({
               className="home-btn home-friends-btn home-serif after:absolute after:inset-0 after:content-['']"
             >
               With friends
-            </button>
-            {/* Above the With friends button's full-width tap area. */}
-            <button
-              type="button"
-              onClick={onLearn}
-              className="relative z-10 rounded-full px-4 py-2 text-[15px] font-semibold text-muted underline underline-offset-4 hover:text-ink"
-            >
-              🎓 New to battling? Learn to battle
             </button>
           </div>
           <Friends className="absolute inset-x-0 bottom-6" />

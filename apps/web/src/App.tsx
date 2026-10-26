@@ -43,6 +43,7 @@ import { VersusRoute } from './versus/VersusRoute';
 import { LESSONS } from '@daily-battle/tutorial/lessons';
 import { Learn } from './tutorial/Learn';
 import { LessonPlayer } from './tutorial/LessonPlayer';
+import { nextLesson } from './tutorial/lesson';
 
 /** Shared links open the game picker, so a friend can choose any generation. */
 const shareUrl = () => `${window.location.origin}/#daily`;
@@ -226,6 +227,14 @@ export function App() {
   const setCoach = (on: boolean) => setSetting('coach', { ...settings.coach, [format]: on });
   const setDifficulty = (d: Difficulty) =>
     setSetting('difficulty', { ...settings.difficulty, [format]: d });
+  // The welcome sheet and How to play point beginners to the Gen 3 lessons (DESIGN.md §22).
+  const startTutorial = () => {
+    if (!settings.shownExplainers.includes('welcome'))
+      dispatchAny({ type: 'markExplainer', id: 'welcome' });
+    setHowToPlayOpen(false);
+    const next = nextLesson(LESSONS[LEARN_FORMAT]!, settings.tutorial?.[LEARN_FORMAT]);
+    go(next ? `learn/${next.id}` : 'learn');
+  };
 
   // An unfinished battle from an earlier day, or from an older engine, counts as a loss.
   useEffect(() => {
@@ -557,6 +566,7 @@ export function App() {
         onHints={(v) => setSetting('beginnerHints', v)}
         onDone={() => dispatchAny({ type: 'markExplainer', id: 'welcome' })}
         onAbout={() => setAboutOpen(true)}
+        onTutorial={startTutorial}
       />
       <ConfirmDialog
         open={coachOffer}
@@ -602,6 +612,7 @@ export function App() {
         onHints={() => {}}
         onDone={() => setHowToPlayOpen(false)}
         onAbout={() => setAboutOpen(true)}
+        onTutorial={startTutorial}
       />
       <AboutSheet open={aboutOpen} onOpenChange={setAboutOpen} />
     </div>

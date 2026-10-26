@@ -6,6 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import scheduleJson from '../public/schedule/2026-10-19.json';
 import gen3Schedule from '../public/schedule/gen3ou/2026-10-19.json';
 import gen5Schedule from '../public/schedule/gen5ou/2026-10-26.json';
+import { LESSONS } from '@daily-battle/tutorial/lessons';
 import { App } from './App';
 import { ENGINE_VERSION } from './lib/seed';
 import { attemptEngine } from './state/reducer';
@@ -86,6 +87,20 @@ describe('first run', () => {
     expect(about).toHaveTextContent('not affiliated with or endorsed by Nintendo');
     expect(about).toHaveTextContent('Smogon, used with permission');
     expect(about).toHaveTextContent('No accounts and no tracking');
+    expect(about).toHaveTextContent('Every game uses the OU (OverUsed) tier.');
+  });
+
+  it('points beginners to the tutorial from the welcome sheet', async () => {
+    const user = userEvent.setup();
+    renderApp();
+    const welcome = await screen.findByRole('dialog', { name: 'Welcome to Pokémon Daily' });
+    const block = within(welcome).getByRole('region', { name: 'New to competitive Pokémon?' });
+    expect(block).toHaveTextContent('Start with Gen 3. It has lessons and a coach.');
+    await user.click(within(block).getByRole('button', { name: 'Start the tutorial' }));
+    expect(window.location.hash).toBe(`#learn/${LESSONS.gen3ou![0]!.id}`);
+    expect(
+      screen.queryByRole('dialog', { name: 'Welcome to Pokémon Daily' }),
+    ).not.toBeInTheDocument();
   });
 });
 
@@ -561,6 +576,13 @@ describe('home', () => {
     expect(window.location.hash).toBe('#versus');
   });
 
+  it('opens Learn mode from Battle basics', async () => {
+    const user = userEvent.setup();
+    renderApp(seeded());
+    await user.click(await screen.findByRole('button', { name: 'Battle basics' }));
+    expect(window.location.hash).toBe('#learn');
+  });
+
   it('shows every game with its status and streak, and a pick plays that game', async () => {
     const user = userEvent.setup();
     renderApp(seeded());
@@ -636,6 +658,21 @@ describe('playtest feedback', () => {
     expect(how).toHaveTextContent('Win on your first try');
     expect(within(how).queryByRole('radio')).not.toBeInTheDocument();
     await user.click(within(how).getByRole('button', { name: 'Got it' }));
+    expect(screen.queryByRole('dialog', { name: 'How to play' })).not.toBeInTheDocument();
+  });
+
+  it('opens the next lesson from How to play', async () => {
+    const user = userEvent.setup();
+    const state = seeded();
+    state.settings.tutorial = { gen3ou: { completed: [LESSONS.gen3ou![0]!.id] } };
+    renderApp(state);
+    await user.click(await screen.findByRole('button', { name: 'Settings' }));
+    await user.click(screen.getByRole('button', { name: 'How to play' }));
+    const how = await screen.findByRole('dialog', { name: 'How to play' });
+    expect(how).not.toHaveTextContent('OverUsed');
+    // The tutorial picks up at the first lesson not done yet.
+    await user.click(within(how).getByRole('button', { name: 'Start the tutorial' }));
+    expect(window.location.hash).toBe(`#learn/${LESSONS.gen3ou![1]!.id}`);
     expect(screen.queryByRole('dialog', { name: 'How to play' })).not.toBeInTheDocument();
   });
 

@@ -22,6 +22,7 @@ export function WelcomeSheet({
   onHints,
   onDone,
   onAbout,
+  onTutorial,
   review = false,
 }: {
   open: boolean;
@@ -29,19 +30,15 @@ export function WelcomeSheet({
   onHints: (v: boolean) => void;
   onDone: () => void;
   onAbout: () => void;
+  /** Opens the Gen 3 lessons (DESIGN.md §22). */
+  onTutorial: () => void;
   /** Reopened from Settings as "How to play": the rules only, no hints switch. */
   review?: boolean;
 }) {
   const rules = [
-    ['Build a team', "Pick 6 of this week's 12 Pokémon. Your team carries over all week."],
-    [
-      'Beat today’s opponent',
-      'A new opponent every day. You can see its Pokémon, but not their sets.',
-    ],
-    [
-      'Win on your first try',
-      'That earns a ⭐ and keeps your streak going. You can keep trying until you win.',
-    ],
+    ['Build a team', 'Pick 6 of this week’s 12 for the week.'],
+    ['Beat today’s opponent', 'A new one daily. Its sets stay hidden.'],
+    ['Win on your first try', 'A ⭐ and your streak. Retry till you win.'],
   ];
   return (
     <Sheet
@@ -49,20 +46,31 @@ export function WelcomeSheet({
       onOpenChange={(o) => !o && onDone()}
       title={review ? 'How to play' : 'Welcome to Pokémon Daily'}
     >
-      <ol className="space-y-3">
+      <ol className="space-y-2">
         {rules.map(([title, body], i) => (
           <li key={title} className="flex gap-3">
-            <span className="grid size-7 shrink-0 place-items-center rounded-full bg-accent-soft text-[14px] font-bold text-soft-ink">
+            <span className="grid size-6 shrink-0 place-items-center rounded-full bg-accent-soft text-[13px] font-bold text-soft-ink">
               {i + 1}
             </span>
             <span>
-              <span className="block text-[15px] font-semibold">{title}</span>
-              <span className="block text-[14px] text-muted">{body}</span>
+              <span className="block text-[15px] font-semibold leading-snug">{title}</span>
+              <span className="block text-[13px] leading-snug text-muted">{body}</span>
             </span>
           </li>
         ))}
       </ol>
-      <p className="mt-3 text-[13px] text-muted">Every game uses the OU (OverUsed) tier.</p>
+      <section
+        aria-label="New to competitive Pokémon?"
+        className="mt-3 rounded-card border border-line px-4 py-3"
+      >
+        <p className="text-[15px] font-semibold">New to competitive Pokémon?</p>
+        <p className="text-[13px] leading-snug text-muted">
+          Start with Gen 3. It has lessons and a coach.
+        </p>
+        <Button variant="secondary" className="mt-2 w-full" onClick={onTutorial}>
+          Start the tutorial
+        </Button>
+      </section>
       {review ? (
         <Button className="mt-4 w-full" onClick={onDone}>
           Got it
@@ -77,7 +85,7 @@ export function WelcomeSheet({
               hint="Checklists and tips. You can turn these off in Settings."
             />
           </div>
-          <Button className="mt-4 w-full" onClick={onDone}>
+          <Button className="mt-3 w-full" onClick={onDone}>
             Let’s play
           </Button>
           <p className="mt-3 text-center text-[12px] text-muted">

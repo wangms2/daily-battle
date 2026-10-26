@@ -1075,7 +1075,7 @@ button {
   container-type: size;
 }
 .home .home-top {
-  height: calc(56cqh - 6px);
+  height: calc(63cqh - 6px);
   transition: height 460ms var(--ease);
 }
 .home[data-view='picker'] .home-top {
@@ -1094,7 +1094,7 @@ button {
   position: absolute;
   inset-inline: 0;
   top: 0;
-  height: calc(56cqh - 6px);
+  height: calc(63cqh - 6px);
   transition:
     opacity 220ms ease,
     translate 460ms var(--ease);
@@ -1126,7 +1126,7 @@ button {
   position: absolute;
   inset-inline: 0;
   bottom: 0;
-  height: calc(44cqh - 6px);
+  height: calc(37cqh - 6px);
   transition:
     opacity 200ms ease,
     translate 400ms var(--ease);
@@ -1227,6 +1227,12 @@ button {
   min-width: clamp(230px, 36cqh, 430px);
   padding-inline: clamp(28px, 4.4cqh, 52px);
   font-size: clamp(25px, 3.9cqh, 46px);
+}
+/* "Battle basics" under Play: a small pill on the clay. */
+.home-basics {
+  min-height: clamp(32px, 5cqh, 48px);
+  padding-inline: clamp(14px, 2.2cqh, 22px);
+  font-size: clamp(14px, 2.2cqh, 20px);
 }
 .home-friend {
   height: clamp(60px, 9.5cqh, 128px);
