@@ -2,7 +2,11 @@
 // coach's advice win more often against the AI the player actually faces?
 //   pnpm --filter @daily-battle/tutorial coach-eval [--mode judge|rule] [--rule switchKo]
 //     [--vs easy] [--battles 200] [--r 40] [--cases 60] [--per-battle 3] [--jobs 16]
-//     [--out file.json]
+//     [--out file.json] [--hard-iterations 150000] [--save-cases f.json] [--load-cases f.json]
+//
+// Against Hard (--vs hard), --hard-iterations sets the opponent's search
+// budget (Hard's own by default), and --save-cases / --load-cases roll out the
+// same cases at two budgets, to check a cheaper Hard gives the same answers.
 //
 // 1. Collect: play Gen 3 battles (a weekly-pool team, played by a beginner-ish
 //    bot, against a daily opponent on the chosen difficulty) and save decisions
@@ -73,6 +77,8 @@ const JOBS = Number(arg('jobs') ?? 1);
 const OUT = arg('out');
 /** Judge mode: the judge's budget per search. */
 const JUDGE_ITERATIONS = Number(arg('judge-iterations') ?? JUDGE_DEFAULTS.iterations);
+/** Against Hard: the opponent's search budget (Hard's own when left out). */
+const HARD_ITERATIONS = arg('hard-iterations') ? Number(arg('hard-iterations')) : undefined;
 const START = '2026-01-05';
 const data = setsFor(FORMAT);
 type PokemonSet = ReturnType<typeof toPokemonSet>;
@@ -106,8 +112,21 @@ function matchup(i: number) {
 }
 type Matchup = ReturnType<typeof matchup>;
 
-/** The opponent as the app plays it. */
-const foe = (m: Matchup, vs: Difficulty): Policy => aiFor({ difficulty: vs, style: m.style, data });
+let engine3: ReturnType<typeof loadEngine> | undefined;
+const engine = () => (engine3 ??= loadEngine(3));
+
+/** The opponent as the app plays it (Hard with the week's pool, as in the daily). */
+const foe = (m: Matchup, vs: Difficulty): Policy =>
+  aiFor({
+    difficulty: vs,
+    style: m.style,
+    data,
+    ...(vs === 'hard' && {
+      engine: engine(),
+      pool: m.pool,
+      ...(HARD_ITERATIONS ? { hard: { iterations: HARD_ITERATIONS } } : {}),
+    }),
+  });
 
 interface Case {
   battle: number;
@@ -146,14 +165,14 @@ function describe(view: SideView): string {
 
 function collect(vs: Difficulty): Case[] {
   const cases: Case[] = [];
-  const engine = MODE === 'judge' ? loadEngine(3) : undefined;
   for (let i = 0; i < BATTLES && cases.length < MAX_CASES; i++) {
     const m = matchup(i);
     const session = new BattleSession({ format: FORMAT, ...m });
     const coach = new Coach(data, FORMAT);
-    const judge = engine
-      ? new Judge(engine, data, { pool: m.pool, iterations: JUDGE_ITERATIONS })
-      : undefined;
+    const judge =
+      MODE === 'judge'
+        ? new Judge(engine(), data, { pool: m.pool, iterations: JUDGE_ITERATIONS })
+        : undefined;
     // Beginner-ish players: Easy and the mid bot, alternating.
     const player = i % 2 ? midBot({ data }) : aiFor({ difficulty: 'easy', style: 'balance', data });
     const opponent = foe(m, vs);
@@ -312,7 +331,16 @@ async function rollAll(cases: Case[], vs: Difficulty): Promise<Result[]> {
         new Promise<Result[]>((resolve, reject) => {
           const p = fork(
             self,
-            ['--child', file, String(shard), String(JOBS), vs, '--r', String(R)],
+            [
+              '--child',
+              file,
+              String(shard),
+              String(JOBS),
+              vs,
+              '--r',
+              String(R),
+              ...(HARD_ITERATIONS ? ['--hard-iterations', String(HARD_ITERATIONS)] : []),
+            ],
             {
               execArgv: process.execArgv,
             },
@@ -342,7 +370,10 @@ function summary(label: string, rs: Result[]): string {
 }
 
 const t0 = performance.now();
-const cases = collect(VS);
+const LOAD = arg('load-cases');
+const cases = LOAD ? (JSON.parse(readFileSync(LOAD, 'utf8')) as Case[]) : collect(VS);
+const SAVE = arg('save-cases');
+if (SAVE) writeFileSync(SAVE, JSON.stringify(cases));
 console.log(
   `${cases.length} ${MODE === 'rule' ? RULE : 'judged'} cases from up to ${BATTLES} battles vs ${VS}` +
     ` (${((performance.now() - t0) / 1000).toFixed(1)}s)`,
