@@ -139,6 +139,11 @@ export interface StagedTurn {
   card?: string;
   /** No turn to play: `next` shows at once (a lesson's look at the position). */
   look?: boolean;
+  /**
+   * The player plays the turn by tapping `choice` itself (a lesson demo): the
+   * other choices are off, and there's no play button.
+   */
+  tap?: boolean;
 }
 
 /** The first-battle tour (DESIGN.md §22): one step per control a new player might miss. */
@@ -506,6 +511,12 @@ export function Battle({
   // the check takes too long, the choice goes through unwarned.
   const pick = (choice: string) => {
     if (staged) {
+      // A demo: tapping its choice plays the turn.
+      if (staged.tap) {
+        if (choice !== staged.choice || played) return;
+        setPlayed(true);
+        return choose(choice);
+      }
       // Practice: the player's pick plays the turn.
       if (staged.choice !== undefined || played) return;
       setPlayed(true);
@@ -771,16 +782,30 @@ export function Battle({
     </p>
   );
 
+  // A demo the player taps through: only its choice is on.
+  const stagedControls =
+    staged?.tap && decision?.controls && !played
+      ? {
+          ...decision.controls,
+          moves: decision.controls.moves.map((m) => ({
+            ...m,
+            disabled: m.disabled || m.choice !== staged.choice,
+          })),
+          switches: decision.controls.switches.filter((s) => s.choice === staged.choice),
+        }
+      : (decision?.controls ?? null);
   const controlPanel = staged ? (
     <ControlPanel
-      controls={decision?.controls ?? null}
+      controls={stagedControls}
       team={decision?.team ?? team}
       hints={settings.beginnerHints}
       disabled={playing}
       onChoose={pick}
       {...(staged.card && staged.card !== 'foe' && !played && { show: staged.card })}
-      // Practice: the controls work until the player picks; then the tags show.
-      {...(staged.marks && (staged.choice !== undefined || played) && { marks: staged.marks })}
+      // Practice: the controls work until the player picks; then the tags show. A turn the
+      // player taps through shows them once it's played.
+      {...(staged.marks &&
+        (staged.tap ? played : staged.choice !== undefined || played) && { marks: staged.marks })}
     />
   ) : (
     <ControlPanel
@@ -821,7 +846,8 @@ export function Battle({
                   <span aria-hidden>↺</span>
                 </button>
               )
-            : staged.choice !== undefined && (
+            : !staged.tap &&
+              staged.choice !== undefined && (
                 <Button
                   className="h-9 px-3 text-[13.5px]"
                   onClick={() => {
