@@ -235,6 +235,10 @@ Asked by the user (2026-10-26) after the lesson review page (https://claude.ai/a
 #### Standards for every lesson
 
 - One concept per lesson and per step; each builds on earlier lessons only.
+- **Decisions in scope (from the user, 2026-10-26):** every decision a lesson asks for (demos, practice, its battle) must turn on that lesson's idea or earlier ones, never a later one. Designed in: practice positions where the best choice is best because of the lesson's idea; no later mechanics in play (equal or irrelevant Speed before lesson 7, no switching before lesson 2, no items or abilities before theirs, no status, Spikes or setup moves before theirs), using custom lesson sets with small movesets; small battles whose teams keep later concepts from deciding the game. Checked by machine:
+  - each warning reason and tip kind is tagged with the lesson that teaches it (e.g. `noEffect` immunity: lesson 4; `switchKo`: 10; `noTime`: 15; Explosion's reasons: never in this course);
+  - a practice position passes when the best answer is the judge's top choice, wins clearly more often in rollouts, and every wrong answer is explained by a reason already taught (if only a later reason explains it, the position fails);
+  - a lesson battle passes when, over many games by bots of several strengths, the full coach rarely wants to say something the player hasn't learned (out-of-scope pressure).
 - Every demo and practice position passes the judge (the "best" answer is its top choice) **and** the rollouts against the lesson's foe (the best answer wins clearly more often, not 100% vs 100%): `scripts/lesson-judge.ts`, `scripts/quiz-audit.ts`, then content tests.
 - The same words as the coach: explanations reuse the coach's reasons (`explain.ts`) where they fit.
 - Phone first, no page scrolling; polished visuals, with each lesson's own Pokémon and backgrounds.
