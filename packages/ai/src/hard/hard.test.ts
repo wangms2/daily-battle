@@ -9,6 +9,15 @@ import { HardPolicy } from './policy';
 
 const FORMATS = ['gen3ou', 'gen4ou', 'gen5ou', 'gen6ou'].filter((f) => engineBuilt(Number(f[3])));
 
+describe('engineMove', () => {
+  it('drops the power older gens’ requests put on Return, but keeps Hidden Power’s', () => {
+    expect(engineMove('return102', 3)).toBe('RETURN');
+    expect(engineMove('Return 102', 3)).toBe('RETURN');
+    expect(engineMove('hiddenpowerrock70', 3)).toBe('HIDDENPOWERROCK70');
+    expect(engineMove('Hidden Power Ice', 6)).toBe('HIDDENPOWERICE60');
+  });
+});
+
 /** Wraps an engine to record every state it's asked to search. */
 function recording(engine: Engine): { engine: Engine; states: string[] } {
   const states: string[] = [];

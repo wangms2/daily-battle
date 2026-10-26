@@ -1,6 +1,7 @@
 // What the battle worker sends the UI: plain data describing only what the
 // player's side can see. No simulator types cross this boundary.
 import type { Difficulty } from '@daily-battle/ai/version';
+import type { CoachTurn, Review } from '@daily-battle/tutorial';
 import type { FoeScript, Position } from '@daily-battle/tutorial/lessons';
 
 export type Who = 'you' | 'foe';
@@ -164,6 +165,10 @@ export interface TurnPackage {
   resumed: boolean;
   /** Hard: the AI's new choices, to save (they replace any saved from index `from`). */
   aiChoices?: AiChoices;
+  /** Coach on: this turn's tip and warnings (with controls). */
+  coach?: CoachTurn;
+  /** Coach on: the post-battle review (with `end`). */
+  review?: Review;
 }
 
 export interface AiChoices {
@@ -206,6 +211,8 @@ export interface EngineStart {
    * its script (then plays as Easy), and luck can be removed.
    */
   tutorial?: { noLuck: boolean; foeScript?: FoeScript };
+  /** The coach (DESIGN.md §22): tips and blunder warnings each turn, and a review at the end. */
+  coach?: 'simple';
 }
 
 /** A quiz position, shown frozen at the player's decision. */

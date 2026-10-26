@@ -1,6 +1,7 @@
 // The battle screen (DESIGN.md §12.2b): field, this-turn log, and controls on
 // one screen; turns play back line by line at the chosen speed, tap to skip.
 import { DEFAULT_FORMAT, formatInfo } from '@daily-battle/data/formats';
+import type { CoachNote, CoachTurn, Review } from '@daily-battle/tutorial';
 import clsx from 'clsx';
 import {
   useCallback,
@@ -25,6 +26,7 @@ import {
   type View,
   type Who,
 } from '../battle/frames';
+import { CoachReview, CoachTip, CoachWarning } from '../battle/ui/Coach';
 import { ControlPanel } from '../battle/ui/Controls';
 import { Field, type Anim, type Float, type Stage } from '../battle/ui/Field';
 import { EXPLAINERS, textLines } from '../battle/ui/labels';
@@ -158,6 +160,13 @@ export function Battle({
   const thinkTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   /** Hard: AI choices not saved yet (they go with your next choice). */
   const unsavedAi = useRef<AiChoices | undefined>(undefined);
+  // The coach (when on): this turn's tip and warnings, a choice awaiting
+  // confirmation, rules silenced for this battle, and the end-of-battle review.
+  const [coach, setCoach] = useState<CoachTurn | null>(null);
+  const [tipHidden, setTipHidden] = useState(false);
+  const [warning, setWarning] = useState<{ choice: string; note: CoachNote } | null>(null);
+  const silenced = useRef(new Set<string>());
+  const [review, setReview] = useState<Review | null>(null);
 
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pending = useRef<{ frames: Frame[]; index: number; pkg: TurnPackage } | null>(null);
@@ -238,6 +247,9 @@ export function Battle({
     running.current?.cancel();
     setTeam(pkg.team);
     setControls(pkg.controls);
+    setCoach(pkg.coach ?? null);
+    setTipHidden(false);
+    if (pkg.review) setReview(pkg.review);
     setPlaying(false);
     setAnim(null);
     if (settingsRef.current.beginnerHints) {
@@ -357,6 +369,13 @@ export function Battle({
     },
     [backend, play],
   );
+
+  // The coach checks a choice first; a flagged one asks before it's sent.
+  const pick = (choice: string) => {
+    const note = coach?.warnings[choice];
+    if (note && !silenced.current.has(note.rule)) setWarning({ choice, note });
+    else choose(choice);
+  };
 
   const giveUp = () => {
     setGiveUpOpen(false);
@@ -534,17 +553,18 @@ export function Battle({
       team={team}
       hints={settings.beginnerHints}
       disabled={playing || !!end}
-      onChoose={choose}
+      onChoose={pick}
     />
   );
-  const panel = live ? (
+  // The lesson's own prompt wins over a coach tip on the same turn.
+  const tip = !promptText && controls && !end && !tipHidden ? coach?.tip : undefined;
+  const panel = (
     <div className="relative flex shrink-0 flex-col gap-2">
       {promptNote}
+      {tip && <CoachTip text={tip.text} onDismiss={() => setTipHidden(true)} />}
       {controlPanel}
       {waitingNote}
     </div>
-  ) : (
-    controlPanel
   );
 
   // Which of today's tries this battle was (known once its result is saved).
@@ -607,11 +627,12 @@ export function Battle({
       <div
         ref={endRef}
         tabIndex={-1}
-        className="card animate-sheet-in w-full max-w-sm p-5 text-center outline-none"
+        className="card animate-sheet-in max-h-full w-full max-w-sm overflow-y-auto p-5 text-center outline-none"
         role="dialog"
         aria-label="Battle over"
       >
         {live ? live.renderEnd(end, gaveUp) : result && dailyEnd(end, result)}
+        {review && !gaveUp && <CoachReview review={review} />}
       </div>
     </div>
   );
@@ -706,6 +727,16 @@ export function Battle({
         onLeave={onExit}
         onGiveUp={() => setGiveUpOpen(true)}
         canGiveUp={!end}
+      />
+      <CoachWarning
+        note={warning?.note ?? null}
+        onPickAgain={() => setWarning(null)}
+        onConfirm={(silence) => {
+          if (!warning) return;
+          if (silence) silenced.current.add(warning.note.rule);
+          setWarning(null);
+          choose(warning.choice);
+        }}
       />
       <GiveUpDialog
         open={giveUpOpen}

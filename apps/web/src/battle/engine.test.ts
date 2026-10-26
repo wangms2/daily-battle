@@ -238,6 +238,30 @@ describe('lesson battles', () => {
     expect(pkg.end.winner).toBe('you');
     expect(line.moves).toEqual([]);
   });
+
+  it('coaches battles against the Easy AI, and only those', () => {
+    const scripted = gen3Lessons.find((l) => l.id === 'gen3-types')!;
+    const step = scripted.steps.find((s) => s.kind === 'battle')!;
+    expect(new BattleEngine(lessonStart(step, scripted.format)).begin().coach).toBeUndefined();
+
+    const grad = gen3Lessons.find((l) => l.graduation)!;
+    const s = lessonStart(
+      grad.steps.find((x) => x.kind === 'battle')!,
+      grad.format,
+    );
+    expect(s.coach).toBe('simple');
+    const { packages, choices } = play(s);
+    for (const p of packages) expect(!!p.coach).toBe(!!p.controls);
+    const review = packages.at(-1)!.review!;
+    expect(review).toBeDefined();
+    expect(review.key.length).toBeLessThanOrEqual(3);
+    expect(packages.slice(0, -1).every((p) => !p.review)).toBe(true);
+
+    // A resumed battle replays its turns through the coach: same review.
+    const resumed = new BattleEngine({ ...s, choices }).begin();
+    expect(resumed.end).not.toBeNull();
+    expect(resumed.review).toEqual(review);
+  }, 60_000);
 });
 
 describe('cleanText', () => {

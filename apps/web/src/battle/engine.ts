@@ -13,7 +13,7 @@ import {
   type Policy,
   type Rng,
 } from '@daily-battle/sim-bridge';
-import { startPosition, teamOf, type Mon, type Position } from '@daily-battle/tutorial';
+import { Coach, startPosition, teamOf, type Mon, type Position } from '@daily-battle/tutorial';
 import type { PokemonSet, PRNGSeed } from '@pkmn/sim';
 import type { EngineStart, PositionPackage, TurnPackage } from './frames';
 import { SidePresenter } from './presenter';
@@ -35,6 +35,9 @@ export class BattleEngine {
   private reported: number;
   /** Hard: saved AI choices still to replay (cleared if one stops fitting). */
   private replay: string[];
+  private readonly coach?: Coach;
+  /** The request the coach last spoke on, so it isn't asked twice about one turn. */
+  private coached?: unknown;
 
   /** Hard needs `engine`, poke-engine for the format's gen; `budget` is for tests. */
   constructor(
@@ -72,6 +75,7 @@ export class BattleEngine {
     this.replay = this.hard ? [...(start.aiChoices ?? [])] : [];
     this.reported = this.replay.length;
     this.presenter = new SidePresenter('p1', this.sets, format);
+    if (start.coach) this.coach = new Coach(setsFor(format), format);
   }
 
   /** Starts (or resumes, replaying recorded choices) and returns the first package. */
@@ -86,6 +90,8 @@ export class BattleEngine {
     }
     for (const choice of this.start.choices) {
       if (this.session.ended) break;
+      // The coach sees each replayed turn too, so its review and one-time tips survive a resume.
+      this.coachSees(choice);
       this.session.choose('p1', choice);
       this.advanceAi();
     }
@@ -93,11 +99,23 @@ export class BattleEngine {
   }
 
   choose(choice: string): TurnPackage {
+    this.coachSees(choice);
     // A move hidden information blocks (the foe's Imprison) comes back as
     // unavailable: the controls update to show it disabled, and you choose again.
-    if (!this.session.choose('p1', choice)) return this.package(false, BLOCKED);
+    if (!this.session.choose('p1', choice)) {
+      this.coach?.forget();
+      return this.package(false, BLOCKED);
+    }
     this.advanceAi();
     return this.package(false);
+  }
+
+  /** Records the player's choice for the review, while the view still shows the decision. */
+  private coachSees(choice: string) {
+    const view = this.coach && this.session.view('p1');
+    if (!view) return;
+    if (this.coached !== view.request) this.coach!.turn(view);
+    this.coach!.record(view, choice);
   }
 
   forfeit(): TurnPackage {
@@ -147,6 +165,14 @@ export class BattleEngine {
     if (this.aiLog.length > this.reported) {
       pkg.aiChoices = { from: this.reported, choices: this.aiLog.slice(this.reported) };
       this.reported = this.aiLog.length;
+    }
+    if (this.coach) {
+      const view = this.session.view('p1');
+      if (view && pkg.controls) {
+        pkg.coach = this.coach.turn(view);
+        this.coached = view.request;
+      }
+      if (pkg.end) pkg.review = this.coach.review();
     }
     return pkg;
   }

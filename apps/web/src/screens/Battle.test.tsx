@@ -1,4 +1,5 @@
-import { act, fireEvent, render, screen, within } from '@testing-library/react';
+import type { CoachNote, Review } from '@daily-battle/tutorial';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { BattleBackendContext, type BattleBackend } from '../battle/backend';
@@ -564,5 +565,81 @@ describe('battle screen', () => {
     } finally {
       vi.unstubAllGlobals();
     }
+  });
+});
+
+describe('coach', () => {
+  const swampert: CoachNote = {
+    rule: 'noEffect',
+    text: 'Earthquake has no effect on Gyarados.',
+    lesson: 'gen3-types',
+  };
+  const coached = (over: Partial<TurnPackage> = {}) =>
+    pkg({
+      ...OPENING,
+      coach: {
+        tip: { rule: 'canKo', text: 'Thunderbolt can knock out Gyarados.' },
+        warnings: { 'move 2': swampert },
+      },
+      ...over,
+    });
+
+  it('shows the turn tip, which you can dismiss', async () => {
+    const { backend } = fakeBackend([], coached());
+    renderBattle(backend);
+    const tip = await screen.findByRole('note', { name: 'Coach tip' });
+    expect(tip).toHaveTextContent('Thunderbolt can knock out Gyarados.');
+    await userEvent.click(within(tip).getByRole('button', { name: 'Dismiss tip' }));
+    expect(screen.queryByRole('note', { name: 'Coach tip' })).not.toBeInTheDocument();
+  });
+
+  it('asks before a flagged choice: pick again, or do it anyway and silence the rule', async () => {
+    const { backend, calls } = fakeBackend([coached({ frames: TURN_1.frames })], coached());
+    renderBattle(backend);
+    await userEvent.click(await screen.findByRole('button', { name: /^Earthquake, / }));
+    expect(await screen.findByText('Earthquake has no effect on Gyarados.')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Pick again' }));
+    expect(calls).toEqual([]);
+
+    await userEvent.click(await screen.findByRole('button', { name: /^Earthquake, / }));
+    await userEvent.click(await screen.findByRole('checkbox', { name: /Don’t warn/ }));
+    await userEvent.click(screen.getByRole('button', { name: 'Do it anyway' }));
+    await within(screen.getByRole('banner')).findByText('Turn 2');
+    expect(calls).toEqual(['move 2']);
+
+    // Silenced for the rest of the battle.
+    await userEvent.click(await screen.findByRole('button', { name: /^Earthquake, / }));
+    await waitFor(() => expect(calls).toEqual(['move 2', 'move 2']));
+    expect(screen.queryByText('Earthquake has no effect on Gyarados.')).not.toBeInTheDocument();
+  });
+
+  it('sends unflagged choices straight away', async () => {
+    const { backend, calls } = fakeBackend([TURN_1], coached());
+    renderBattle(backend);
+    await userEvent.click(await thunderbolt());
+    await waitFor(() => expect(calls).toEqual(['move 1']));
+  });
+
+  it('reviews the battle on the end card', async () => {
+    const review: Review = {
+      key: [
+        {
+          turn: 3,
+          me: 'Heatran',
+          foe: 'Gyarados',
+          chose: 'Earthquake',
+          better: 'Thunderbolt',
+          text: 'Thunderbolt did 4× damage.',
+        },
+      ],
+      good: [{ turn: 1, me: 'Heatran', foe: 'Gyarados', chose: 'Thunderbolt', text: 'A KO.' }],
+    };
+    const { backend } = fakeBackend([{ ...WON, review }], coached());
+    renderBattle(backend);
+    await userEvent.click(await thunderbolt());
+    const section = await screen.findByRole('region', { name: 'Coach review' });
+    expect(section).toHaveTextContent('Turn 3: Heatran vs Gyarados');
+    expect(section).toHaveTextContent('You chose Earthquake; Thunderbolt was better.');
+    expect(section).toHaveTextContent('✓ Turn 1: Thunderbolt');
   });
 });

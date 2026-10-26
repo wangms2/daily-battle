@@ -1,5 +1,5 @@
 // Names as poke-engine spells them: Showdown ids, upper-cased.
-import { toId } from '../state';
+import { moveId, toId } from '../state';
 
 // The client keeps some revealed effects with their kind prefix ("item: Leftovers").
 export const engineId = (name: string): string =>
@@ -13,7 +13,8 @@ export function engineMove(name: string, gen: number): string {
   const id = toId(name);
   const hp = /^hiddenpower([a-z]+?)\d*$/.exec(id);
   if (hp?.[1]) return `HIDDENPOWER${hp[1].toUpperCase()}${gen >= 6 ? 60 : 70}`;
-  return id.toUpperCase() || 'NONE';
+  // Return and Frustration's power, from older gens' requests ("return102").
+  return moveId(id).toUpperCase() || 'NONE';
 }
 
 const STATUS: Record<string, string> = {

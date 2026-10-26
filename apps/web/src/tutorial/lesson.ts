@@ -18,6 +18,8 @@ export function lessonStart(step: BattleStep, format: string): EngineStart {
       noLuck: step.noLuck,
       ...(step.foeAi !== 'easy' && { foeScript: step.foeAi }),
     },
+    // Battles against the Easy AI (lessons 7+, graduation) are coached.
+    ...(step.foeAi === 'easy' && { coach: 'simple' as const }),
   };
 }
 
