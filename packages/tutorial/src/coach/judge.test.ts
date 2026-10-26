@@ -49,6 +49,7 @@ describe.skipIf(!engineBuilt(3))('Judge', () => {
       'switch 2',
     );
     expect(v).toMatchObject({ worse: true });
+    expect(v!.topValue - v!.value).toBeCloseTo(v!.gap);
   });
 
   it('names the foe’s likely replies to a pick, from its possible sets', () => {

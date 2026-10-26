@@ -20,28 +20,28 @@ Working plan for the `tutorial` branch. It records what's built, the decisions b
 - **Engine builds.** `packages/engine-wasm/dist` isn't committed. After pulling the step 2 commit, rebuild it (`search_fixed` is new): `PATH="$HOME/.cargo/bin:$PATH" pnpm --filter @daily-battle/engine-wasm build:wasm` (cargo isn't on the Git Bash PATH by default).
 - **Checks.** Run from the repo root: `pnpm format`, `pnpm lint`, `pnpm typecheck`, `pnpm test` (~45 s). For one package: `npx tsc --noEmit` and `npx vitest run <file>`. `packages/sim-bridge/src/noluck.test.ts` is occasionally flaky.
 
-## Waiting on the user (2026-10-26 morning)
+## Waiting on the user (2026-10-26, second round)
 
-Questions prepared overnight, with the data behind them in "Step 2 results" below:
+1. **Warning frequency.** The user's intent: the coach steps in more when the player blunders more. A fixed bar already does this, because warnings only follow mistakes (`coach-rate`, 40 battles each, judge alone at margin 0.1, ahead in 90% of worlds):
 
-1. **Judge settings.** Keep margin 0.1, agree 0.9, 20k iterations per search? (0.15 halves the warnings with about the same real gain per warning; 0.1 catches twice as many real mistakes.)
-2. **How often warnings may appear once every judged mistake can be explained (step 3).** Warning rate per decision (`coach-rate`, 40 battles each, decisions with a real choice):
+   | player                   | warned picks | per battle (median, max) | battles with none |
+   | ------------------------ | ------------ | ------------------------ | ----------------- |
+   | beginner (Easy bot)      | 16.7%        | 4, 10                    | 2 of 40           |
+   | mid (Normal bot)         | 7.7%         | 2, 7                     | 8 of 40           |
+   | strong (Hard search bot) | 0.6%         | 0, 1                     | 34 of 40          |
 
-   |                                              | beginner (Easy-like) vs Easy    | mid player vs Normal   |
-   | -------------------------------------------- | ------------------------------- | ---------------------- |
-   | rules alone (before the judge)               | 7.9%                            | 5.7%                   |
-   | shipped now: rule + judge, margin 0.1        | 3.6% (median 1 a battle, max 4) | 1.3% (median 0, max 2) |
-   | judge alone, margin 0.1 (what step 3 allows) | 16.7% (about 4 a battle)        | 7.7%                   |
-   | judge alone, margin 0.15                     | 9.9% (about 2.4 a battle)       | 3.9%                   |
+   For comparison, the old rules alone warned the strong player on 6.2% of picks. What the margin means: the search's estimate of the pick is at least 0.1 below its best choice, in nearly every sampled foe set. In rollouts against the real AI, warnings at 0.10–0.15 gained +7 points of win rate each (Easy and Normal alike), the same as bigger gaps; under 0.10 they gained +1 to +3. Proposal: keep margin 0.1 with no cap or pacing, so frequency follows the player's mistakes. Alternative: a stricter bar (0.15) that drops to 0.1 after the player's first warned blunder in a battle.
 
-   Each judged warning is worth +6 to +8 points of win rate on average. Show every one, only the bigger ones (0.15), or pace them like tips? (Tips run at 20–23% of decisions, as before.)
+2. **Resume (still open).** Since the judge's values are saved with the attempt (decided below), save the overridden warnings with them too, so a reload never asks again?
 
-3. **Explosion.** Quiet on picks of Explosion / Self-Destruct until step 4 has enough samples, or keep judging them? And may the coach _recommend_ Explosion? The judge often prefers it (e.g. a 44% Cloyster exploding on a 53% Starmie: 100% vs 61% in rollouts). If so, the text must say the cost ("Explosion knocks out Cloyster too").
-4. **Resume.** After a reload, a warning the player already overrode can be asked again. Acceptable, or save the overridden warnings with the attempt?
-5. **Only true, relevant reasons.** In wording drafts (`scripts/wording-demo.ts` on real judged warnings), most read well, e.g. "Risky: if Donphan uses Earthquake, Raikou is knocked out as it comes in. Heracross takes Donphan's hits much better." But some judged gaps have no reason the facts show (Moltres's Fire Blast vs a Substitute Smeargle: the draft "Sceptile takes Smeargle's hits much better" is invented). Proposal: warn only when a template's reason is true and relevant; otherwise stay quiet.
-6. **Won either way.** Some judged warnings change nothing (rollouts 100% vs 100%: the player wins anyway). Skip warnings when both choices already look winning (say both values ≥ 0.85)?
-7. **Tips that need the judge** (setup window, walled, switch tips). A tip shows with the controls, but the judge finishes a moment later (during playback, usually). Should a judged tip appear a second or so after the controls, or wait for the next turn, or only show when the judge was already done? And "the judge agrees" with "use Calm Mind now": the setup move is the judge's top choice, or just not clearly worse than it?
-8. **Review on resume.** A review judged by the search needs each of the player's decisions judged. Judging them again on resume costs about 0.6 s each on a mid phone (30 decisions: about 18 s in the background). Save the judged values with the attempt instead (a few numbers per turn), or accept a slower review after a reload?
+## Decided 2026-10-26 (morning answers)
+
+- **Explosion:** the coach may recommend Explosion / Self-Destruct, and the text must say the cost ("Explosion knocks out Cloyster too").
+- **Only true reasons:** warn only when a template's reason is true and relevant in the position; otherwise stay quiet.
+- **Won anyway:** skip warnings when the player is already winning. The judge's values can't tell this (they sit at 0.3–0.6 even in won positions; 1 of 149 warnings vs Easy had a pick valued ≥ 0.85). A board measure works: **skip when the player leads by at least 2 Pokémon's worth of HP** (sum of HP fractions, own minus foe's, from the player's view). Of the 149 robust warnings vs Easy, it skips 9 whose rollout gain was 0.0 (8 were won either way); vs Normal, 3 with gain 0.0. Most "won either way" cases vs Easy (63 of 149, gain +2.1) are won because Easy plays badly, which the board can't show; they stay.
+- **Judged tips:** appear late (when the judge finishes after the controls show).
+- **Review on resume:** save the judge's values with the attempt.
+- `Verdict` now carries `value` and `topValue` (search values) for saving and the review.
 
 ## Product decisions (from the user; don't revisit without asking)
 

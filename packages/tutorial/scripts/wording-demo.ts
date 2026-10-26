@@ -1,6 +1,6 @@
 // Draft risk wording for judged warnings (docs/plan-tutorial-coach.md, step 3),
 // on real positions from a coach-eval run, to review before building it.
-//   pnpm --filter @daily-battle/tutorial exec tsx scripts/wording-demo.ts <coach-eval --out file> [count]
+//   pnpm --filter @daily-battle/tutorial exec tsx scripts/wording-demo.ts <coach-eval --out file> [count] [min gap] [max gap]
 import { readFileSync } from 'node:fs';
 import { turnFacts, type Facts } from '@daily-battle/ai';
 import { setsFor } from '@daily-battle/data';
@@ -119,6 +119,8 @@ function draft(f: Facts, pick: string, top: string, reply?: string): string {
 
 const file = process.argv[2]!;
 const count = Number(process.argv[3] ?? 12);
+const MIN = Number(process.argv[4] ?? 0.1);
+const MAX = Number(process.argv[5] ?? Infinity);
 /** The fields of a coach-eval judge-mode result this uses. */
 interface Judged {
   battle: number;
@@ -133,7 +135,7 @@ interface Judged {
   b: number;
 }
 const cases = (JSON.parse(readFileSync(file, 'utf8')).results as Judged[])
-  .filter((c) => c.gap >= 0.1 && c.agree >= 0.9)
+  .filter((c) => c.gap >= MIN && c.gap < MAX && c.agree >= 0.9 && c.b < 0.85)
   // A spread: a few of each kind of pick, best-supported first.
   .sort((a, b) => b.gap - a.gap);
 const engine = loadEngine(3);

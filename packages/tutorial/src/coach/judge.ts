@@ -52,6 +52,14 @@ export interface Verdict {
   gap: number;
   /** The share of the worlds' weight where top is ahead. */
   agree: number;
+  /**
+   * The judged choice's value, weighted over the worlds. A search value, not a
+   * win chance: the search sees 2–3 turns ahead and scores material, so values
+   * sit near the middle (most between 0.3 and 0.6) even in won positions.
+   */
+  value: number;
+  /** The top choice's value. */
+  topValue: number;
 }
 
 type Task = { world: number; fixed?: string };
@@ -214,12 +222,12 @@ export class Judge {
   /** The verdict on `choice`, or undefined while it isn't ready (or the search failed). */
   verdict(choice: string): Verdict | undefined {
     if (this.failed || !this.top || !this.legal.has(choice)) return undefined;
-    if (choice === this.top) return { choice, top: this.top, worse: false, gap: 0, agree: 0 };
     const a = this.held.get(this.top);
     const b = this.held.get(choice);
     if (!a || !b) return undefined;
     let total = 0;
-    let gap = 0;
+    let sumA = 0;
+    let sumB = 0;
     let ahead = 0;
     for (let w = 0; w < this.worlds.length; w++) {
       const va = a[w];
@@ -228,12 +236,19 @@ export class Judge {
       if (va === null || vb === null) continue;
       const weight = this.worlds[w]!.weight;
       total += weight;
-      gap += weight * (va - vb);
+      sumA += weight * va;
+      sumB += weight * vb;
       if (va > vb) ahead += weight;
     }
-    if (!total) return { choice, top: this.top, worse: false, gap: 0, agree: 0 };
-    const v = { choice, top: this.top, gap: gap / total, agree: ahead / total };
-    return { ...v, worse: v.gap >= this.options.margin && v.agree >= this.options.agree };
+    const top = this.top;
+    if (!total) return { choice, top, worse: false, gap: 0, agree: 0, value: 0, topValue: 0 };
+    const value = sumB / total;
+    const topValue = sumA / total;
+    const v = { choice, top, gap: topValue - value, agree: ahead / total, value, topValue };
+    return {
+      ...v,
+      worse: choice !== top && v.gap >= this.options.margin && v.agree >= this.options.agree,
+    };
   }
 
   /**
