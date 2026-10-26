@@ -5,7 +5,7 @@ import { deriveSeed, makeRng, randomTeam } from '@daily-battle/sim-bridge';
 import { gen3Lessons } from '@daily-battle/tutorial/lessons';
 import { describe, expect, it, vi } from 'vitest';
 import { lessonStart } from '../tutorial/lesson';
-import { BattleEngine, cleanText, effectiveness, moveDesc } from './engine';
+import { BattleEngine, cleanText, effectiveness, moveDesc, presentTurn } from './engine';
 import {
   mergeAiChoices,
   type AiChoices,
@@ -388,6 +388,28 @@ describe.skipIf(!engineBuilt(3))('the coach’s judge', () => {
     // here: every warning was overridden).
     expect(review).toEqual(engine.coachReview());
   }, 120_000);
+});
+
+describe('lesson turns', () => {
+  it('plays a demo turn: the position, then your move, stopping before the foe’s', () => {
+    const position = {
+      p1: [{ species: 'Starmie', moves: ['Surf', 'Ice Beam'] }],
+      p2: [{ species: 'Houndoom', moves: ['Crunch'] }],
+      seed: 'engine:demo',
+    };
+    const t = presentTurn('gen3ou', position, { p1: 'move Surf', p2: 'move Crunch' }, [
+      'move Ice Beam',
+      'foe-hp',
+    ]);
+    expect(t.choice).toBe('move 1');
+    expect(t.spots).toEqual(['move 2', 'foe-hp']);
+    expect(t.before.controls?.moves.map((m) => m.name)).toEqual(['Surf', 'Ice Beam']);
+    const text = t.turn.frames.map((f) => f.text).join(' / ');
+    expect(text).toContain('Starmie used **Surf**');
+    expect(text).toContain('super effective');
+    expect(text).not.toContain('Crunch');
+    expect(t.turn.frames.at(-1)!.view.foe!.hp).toBeLessThan(100);
+  });
 });
 
 describe('cleanText', () => {

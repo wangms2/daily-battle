@@ -6,7 +6,9 @@ describe('lesson content', () => {
   for (const [format, lessons] of Object.entries(LESSONS)) {
     it(`${format}: ids are unique and numbers run in order`, () => {
       expect(new Set(lessons.map((l) => l.id)).size).toBe(lessons.length);
-      expect(lessons.map((l) => l.number)).toEqual(lessons.map((_, i) => i + 1));
+      // Drafts (the course being redesigned) are numbered for the new course.
+      const listed = lessons.filter((l) => !l.draft);
+      expect(listed.map((l) => l.number)).toEqual(listed.map((_, i) => i + 1));
       for (const l of lessons) expect(l.format).toBe(format);
     });
     for (const lesson of lessons) {

@@ -132,7 +132,28 @@ export interface PickStep {
   done: string;
 }
 
-export type Step = CardStep | QuizStep | BattleStep | PickStep;
+/**
+ * A demo: one turn shown on the battle screen (docs/plan-tutorial-coach.md,
+ * step 4b). The screen points at what matters, the coach card names the idea,
+ * and the turn plays when the player taps Watch.
+ */
+export interface DemoStep {
+  kind: 'demo';
+  position: Position;
+  /** The turn shown: what each side does (steps as in `Round`). */
+  turn: Round;
+  /** The coach card before the turn plays, and after it. One idea, plainly. */
+  before: string;
+  after: string;
+  /**
+   * Parts of the screen to point at, before the turn and after it: `foe-types`,
+   * `foe-hp`, `foe-plate`, the same for `you`, `log` (the battle text), or a
+   * choice as a step (`move Surf`).
+   */
+  spotlight?: { before?: string[]; after?: string[] };
+}
+
+export type Step = CardStep | QuizStep | BattleStep | PickStep | DemoStep;
 
 export interface Lesson {
   /** Stable id, stored in progress (e.g. `gen3-basics`). */
@@ -141,6 +162,8 @@ export interface Lesson {
   number: number;
   /** The final battle: shown with a cap instead of its number. */
   graduation?: boolean;
+  /** Being redesigned (step 4b): opens by its link, but isn't listed or offered as next. */
+  draft?: boolean;
   title: string;
   summary: string;
   steps: Step[];

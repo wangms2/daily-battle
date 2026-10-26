@@ -7,7 +7,8 @@ import { inlineBackend } from '../battle/inline-backend';
 import { initialState } from '../state/schema';
 import { Learn } from './Learn';
 import { LessonPlayer, Pick } from './LessonPlayer';
-import type { PickStep } from '@daily-battle/tutorial/lessons';
+import type { Lesson, PickStep } from '@daily-battle/tutorial/lessons';
+import { nextLesson } from './lesson';
 
 const types = gen3Lessons.find((l) => l.id === 'gen3-types')!;
 const firstQuiz = types.steps.findIndex((s) => s.kind === 'quiz');
@@ -105,6 +106,74 @@ describe('Pick', () => {
     await userEvent.click(option('Starmie'));
     expect(screen.getByRole('status').textContent).toMatch(/already picked a lead/);
     expect(option('Starmie').getAttribute('aria-pressed')).toBe('false');
+  });
+});
+
+describe('demo steps', () => {
+  const demoLesson: Lesson = {
+    id: 'test-demo',
+    format: 'gen3ou',
+    number: 3,
+    title: 'Super effective',
+    summary: '',
+    steps: [
+      {
+        kind: 'demo',
+        position: {
+          p1: [{ species: 'Starmie', moves: ['Surf', 'Ice Beam'] }],
+          p2: [{ species: 'Houndoom', moves: ['Crunch'] }],
+          seed: 'learn:demo',
+        },
+        turn: { p1: 'move Surf', p2: 'move Crunch' },
+        before: 'Surf is a Water move.',
+        after: 'Water is strong against Fire.',
+        spotlight: { before: ['move Surf', 'foe-types'], after: ['foe-hp'] },
+      },
+    ],
+  };
+
+  it('shows the idea, plays the turn on Watch, then offers Again and Next', async () => {
+    const backend = inlineBackend();
+    const onDone = vi.fn();
+    render(
+      <BattleBackendContext.Provider value={() => backend}>
+        <LessonPlayer
+          lesson={demoLesson}
+          step={0}
+          settings={{ ...initialState().settings, battleSpeed: 'instant' }}
+          onSetting={() => {}}
+          onExplainerSeen={() => {}}
+          onStep={() => {}}
+          onDone={onDone}
+          onExit={() => {}}
+          onSettings={() => {}}
+        />
+      </BattleBackendContext.Provider>,
+    );
+    const card = await screen.findByRole('note', { name: 'Lesson' });
+    expect(card).toHaveTextContent('Surf is a Water move.');
+    await userEvent.click(await within(card).findByRole('button', { name: /Watch/ }));
+    const after = await screen.findByText('Water is strong against Fire.');
+    const done = after.closest('[role="note"]') as HTMLElement;
+    expect(within(done).getByRole('button', { name: 'Again' })).toBeInTheDocument();
+    await userEvent.click(within(done).getByRole('button', { name: 'Finish' }));
+    expect(onDone).toHaveBeenCalled();
+  });
+
+  it('keeps draft lessons out of the list', () => {
+    render(
+      <Learn
+        game="Gen 3"
+        lessons={gen3Lessons}
+        progress={undefined}
+        onOpen={() => {}}
+        onPlay={() => {}}
+        onBack={() => {}}
+        onSettings={() => {}}
+      />,
+    );
+    expect(screen.queryByText(/Super effective and resisted/)).not.toBeInTheDocument();
+    expect(nextLesson(gen3Lessons, undefined)?.draft).toBeFalsy();
   });
 });
 

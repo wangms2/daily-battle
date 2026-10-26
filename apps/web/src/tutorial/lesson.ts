@@ -25,7 +25,7 @@ export function lessonStart(step: BattleStep, format: string): EngineStart {
 
 /** The lesson to do next: the first one not finished (none once all are). */
 export function nextLesson(lessons: Lesson[], progress: TutorialProgress | undefined) {
-  return lessons.find((l) => !progress?.completed.includes(l.id));
+  return lessons.find((l) => !l.draft && !progress?.completed.includes(l.id));
 }
 
 /** "move Ice Beam" → "Ice Beam"; "switch Jolteon" → "Switch to Jolteon". */

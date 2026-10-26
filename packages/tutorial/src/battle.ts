@@ -18,8 +18,9 @@ export function startPosition(format: string, position: Position): BattleSession
     format,
     seed: deriveSeed(position.seed, 0),
     noLuck: true,
-    p1: { team: teamOf(format, position.p1) },
-    p2: { team: teamOf(format, position.p2) },
+    // Named as in the app's battles, so the battle text reads the same.
+    p1: { team: teamOf(format, position.p1), name: 'You' },
+    p2: { team: teamOf(format, position.p2), name: 'The opponent' },
   });
   for (const [i, round] of (position.rounds ?? []).entries()) {
     for (const side of SIDES) {

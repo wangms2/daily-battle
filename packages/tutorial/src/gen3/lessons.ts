@@ -1,3 +1,4 @@
+import { effective } from './course/effective';
 import type { Lesson } from '../types';
 import { speed } from './speed';
 import { status } from './status';
@@ -391,4 +392,6 @@ export const gen3Lessons: Lesson[] = [
   leads,
   winning,
   graduation,
+  // Prototype of the redesigned course (step 4b): not in the course yet.
+  effective,
 ];

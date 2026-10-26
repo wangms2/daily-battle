@@ -40,6 +40,8 @@ export function Learn({
   onBack: () => void;
   onSettings: () => void;
 }) {
+  // Lessons being redesigned open by their link only.
+  lessons = lessons.filter((l) => !l.draft);
   const next = nextLesson(lessons, progress);
   const done = lessons.filter((l) => progress?.completed.includes(l.id)).length;
   const graduated = lessons.some((l) => l.graduation && progress?.completed.includes(l.id));

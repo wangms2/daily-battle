@@ -5,15 +5,17 @@ import type {
   Answer,
   BattleStep,
   CardStep,
+  DemoStep,
   Grade,
   Lesson,
   PickStep,
   QuizStep,
 } from '@daily-battle/tutorial/lessons';
 import clsx from 'clsx';
-import { useEffect, useMemo, useState } from 'react';
-import { useBattleBackend } from '../battle/backend';
-import type { PositionPackage, Who } from '../battle/frames';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { BattleBackendContext, useBattleBackend } from '../battle/backend';
+import { replayBackend } from '../battle/replay-backend';
+import type { EngineStart, LessonTurn, PositionPackage, Who } from '../battle/frames';
 import { ControlPanel } from '../battle/ui/Controls';
 import { Field } from '../battle/ui/Field';
 import { MonPopover } from '../battle/ui/MonPopover';
@@ -62,6 +64,23 @@ export function LessonPlayer({
   const next = () => (last ? onDone() : onStep(index + 1));
   const background = backgroundFor(lesson.id, lesson.format);
   const title = lesson.graduation ? lesson.title : `${lesson.number}. ${lesson.title}`;
+
+  if (step.kind === 'demo')
+    return (
+      <Demo
+        key={index}
+        step={step}
+        format={lesson.format}
+        background={background}
+        settings={settings}
+        title={title}
+        index={index}
+        count={lesson.steps.length}
+        last={last}
+        onNext={next}
+        onExit={onExit}
+      />
+    );
 
   if (step.kind === 'battle')
     return (
@@ -502,5 +521,106 @@ function LessonBattle({
         ),
       }}
     />
+  );
+}
+
+/**
+ * A demo step: one turn on the battle screen (DESIGN.md §22). The screen
+ * points at what matters, the coach card names the idea, and the turn plays on
+ * Watch. Then Next, or Again to see it once more.
+ */
+function Demo({
+  step,
+  format,
+  background,
+  settings,
+  title,
+  index,
+  count,
+  last,
+  onNext,
+  onExit,
+}: {
+  step: DemoStep;
+  format: string;
+  background: string;
+  settings: Settings;
+  title: string;
+  index: number;
+  count: number;
+  last: boolean;
+  onNext: () => void;
+  onExit: () => void;
+}) {
+  const createBackend = useBattleBackend();
+  // Bumped by Again: the turn plays from the decision once more.
+  const [round, setRound] = useState(0);
+  const [turn, setTurn] = useState<LessonTurn | null>(null);
+  const before = step.spotlight?.before ?? [];
+  const after = step.spotlight?.after ?? [];
+  const factory = useCallback(
+    () =>
+      replayBackend(async () => {
+        const b = createBackend();
+        if (!b.turn) return null;
+        const t = await b.turn(format, step.position, step.turn, [...before, ...after]);
+        setTurn(t);
+        return t;
+      }),
+    // The step's content is fixed for the lesson.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [createBackend, format, step],
+  );
+  const start: EngineStart = useMemo(
+    () => ({
+      format,
+      playerTeam: [],
+      opponentTeam: [],
+      style: 'balance',
+      battleSeed: step.position.seed,
+      aiSeed: step.position.seed,
+      choices: [],
+      tutorial: { noLuck: true },
+    }),
+    [format, step],
+  );
+  const spots = turn?.spots ?? [];
+  const header = (
+    <>
+      <BackButton label={title} onClick={onExit} />
+      <span className="text-[13px] text-muted tabular-nums">
+        {index + 1} of {count}
+      </span>
+    </>
+  );
+  return (
+    <BattleBackendContext.Provider value={factory}>
+      <Battle
+        key={round}
+        start={start}
+        background={background}
+        settings={{ ...settings, beginnerHints: false }}
+        onSetting={() => {}}
+        onExplainerSeen={() => {}}
+        onChoice={() => {}}
+        onEnd={() => {}}
+        onExit={onExit}
+        staged={{
+          choice: turn?.choice ?? '',
+          header,
+          before: <p>{step.before}</p>,
+          after: <p>{step.after}</p>,
+          label: 'Lesson',
+          spotlight: { before: spots.slice(0, before.length), after: spots.slice(before.length) },
+          playLabel: '▶ Watch',
+          next: (
+            <Button className="h-9 px-3 text-[13.5px]" onClick={onNext}>
+              {last ? 'Finish' : 'Next'}
+            </Button>
+          ),
+          onReplay: () => setRound((r) => r + 1),
+        }}
+      />
+    </BattleBackendContext.Provider>
   );
 }

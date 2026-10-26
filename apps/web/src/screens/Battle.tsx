@@ -1,7 +1,7 @@
 // The battle screen (DESIGN.md §12.2b): field, this-turn log, and controls on
 // one screen; turns play back line by line at the chosen speed, tap to skip.
 import { DEFAULT_FORMAT, formatInfo } from '@daily-battle/data/formats';
-import type { CoachNote, Review, ReviewTurn } from '@daily-battle/tutorial';
+import type { CoachNote, Review } from '@daily-battle/tutorial';
 import clsx from 'clsx';
 import {
   useCallback,
@@ -34,6 +34,7 @@ import { ControlPanel, type Mark } from '../battle/ui/Controls';
 import { Field, type Anim, type Float, type Stage } from '../battle/ui/Field';
 import { EXPLAINERS, textLines } from '../battle/ui/labels';
 import { MonPopover } from '../battle/ui/MonPopover';
+import { Spotlight } from '../battle/ui/Spotlight';
 import { GiveUpDialog, LogList, LogSheet, MenuSheet } from '../battle/ui/sheets';
 import { BattleLog } from '../battle/ui/BattleLog';
 import type { Settings } from '../state/schema';
@@ -92,19 +93,31 @@ export interface LiveOptions {
 }
 
 /**
- * Review mode (the coach's review, DESIGN.md §22): the battle frozen at one of
- * your past decisions, with the choice made and the better one marked on the
- * controls, then that turn played as it happened.
+ * A staged turn (DESIGN.md §22): the battle frozen at a decision, with choices
+ * tagged on the controls and a coach card, then one turn played as scripted.
+ * The coach's review shows past turns this way, and lessons show their demos
+ * and practice answers this way.
  */
-export interface ReviewMode {
-  turn: ReviewTurn;
-  /** Its place among the review's turns, to step between them. */
-  index: number;
-  count: number;
-  onIndex: (index: number) => void;
+export interface StagedTurn {
+  /** The choice the turn plays. */
+  choice: string;
+  /** Tags on the controls; the other choices fade. */
+  marks?: Record<string, Mark>;
+  /** The top bar's contents. */
+  header: ReactNode;
+  /** The coach card: its words before the turn plays, and after (the same if left out). */
+  before: ReactNode;
+  after?: ReactNode;
+  /** The card's accessible name. */
+  label: string;
+  /** Parts of the screen to point at before the turn and after it (`data-spot` keys, Spotlight.tsx). */
+  spotlight?: { before?: readonly string[]; after?: readonly string[] };
+  /** The play button's label before the turn. */
+  playLabel?: string;
+  /** After the turn, beside "Again": the way on (a lesson's Next). */
+  next?: ReactNode;
   /** Show the turn again from the decision. */
   onReplay: () => void;
-  onClose: () => void;
 }
 
 export interface BattleOutcome {
@@ -129,10 +142,10 @@ export function Battle({
   live,
   prompt,
   coach: dailyCoach,
-  reviewOf,
+  staged,
 }: {
-  /** Review mode: show one past decision instead of playing (see `ReviewMode`). */
-  reviewOf?: ReviewMode;
+  /** Show one staged turn instead of playing (see `StagedTurn`). */
+  staged?: StagedTurn;
   /**
    * The daily coach (DESIGN.md §22), where it's offered: on, or a switch in the
    * menu to turn it on (after `warning`, what it costs, if anything).
@@ -216,7 +229,7 @@ export function Battle({
     !start.coach &&
     !live &&
     !start.tutorial &&
-    !reviewOf &&
+    !staged &&
     (start.format ?? DEFAULT_FORMAT) === 'gen3ou' &&
     // Not against Hard: its warnings aren't checked there yet (step 5).
     start.difficulty !== 'hard' &&
@@ -263,9 +276,10 @@ export function Battle({
     onChoiceRef.current = onChoice;
   });
   const ended = useRef(false);
+  const rootRef = useRef<HTMLDivElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
   // The generation's battle music, from the start of the battle to its end.
-  const reviewing = !!reviewOf;
+  const reviewing = !!staged;
   useEffect(() => {
     if (reviewing) return;
     startMusic(format);
@@ -456,7 +470,7 @@ export function Battle({
   // The coach checks a choice first; a flagged one asks before it's sent. If
   // the check takes too long, the choice goes through unwarned.
   const pick = (choice: string) => {
-    if (reviewOf) return;
+    if (staged) return;
     if (!coach || !backend.coachCheck) return choose(choice);
     setChecking(true);
     const slow = setTimeout(() => setCheckingNote(true), CHECKING_MS);
@@ -548,11 +562,13 @@ export function Battle({
   // field that takes the spare height (see battle/ui/BattleLog.tsx).
   const gen = formatInfo(format).gen;
   const textbox = (
-    <BattleLog
-      log={log}
-      onClick={() => playing && skip()}
-      className="min-h-[3.25rem] flex-1 basis-0"
-    />
+    <div data-spot="log" className="flex min-h-[3.25rem] flex-1 basis-0 flex-col">
+      <BattleLog
+        log={log}
+        onClick={() => playing && skip()}
+        className="min-h-[3.25rem] flex-1 basis-0"
+      />
+    </div>
   );
 
   const popover =
@@ -640,19 +656,14 @@ export function Battle({
     </p>
   );
 
-  const marks: Record<string, Mark> | undefined = reviewOf && {
-    ...(reviewOf.turn.first ? { [reviewOf.turn.first]: 'first' as const } : {}),
-    [reviewOf.turn.choice]: reviewOf.turn.top || reviewOf.turn.first ? 'you' : 'best',
-    ...(reviewOf.turn.top ? { [reviewOf.turn.top]: 'better' as const } : {}),
-  };
-  const controlPanel = reviewOf ? (
+  const controlPanel = staged ? (
     <ControlPanel
       controls={decision?.controls ?? null}
       team={decision?.team ?? team}
       hints={settings.beginnerHints}
       disabled={playing}
       onChoose={pick}
-      {...(marks && { marks })}
+      {...(staged.marks && { marks: staged.marks })}
     />
   ) : (
     <ControlPanel
@@ -663,35 +674,50 @@ export function Battle({
       onChoose={pick}
     />
   );
-  // Review mode: what the coach says about the decision, and the way to play it.
-  const reviewNote = reviewOf && (
+  // A staged turn: what the coach says, and the way to play the turn.
+  const stagedNote = staged && (
     <div
       role="note"
-      aria-label="Coach review"
-      className="animate-fade-in flex items-start gap-2 rounded-card bg-accent-soft px-3 py-2 text-[14px] leading-snug"
+      aria-label={staged.label}
+      data-spot="coach"
+      className="animate-fade-in flex items-center gap-2 rounded-card bg-accent-soft px-3 py-2 text-[14px] leading-snug"
     >
-      <p className="flex-1">
-        {reviewOf.turn.better ? (
-          <>
-            <b>{reviewOf.turn.better}</b> was better.{' '}
-          </>
-        ) : null}
-        <span className="text-soft-ink">{reviewOf.turn.text}</span>
-      </p>
+      <div className="min-w-0 flex-1">
+        {played && !playing ? (staged.after ?? staged.before) : staged.before}
+      </div>
       {!playing && (
-        <Button
-          className="h-9 shrink-0 px-3 text-[13.5px]"
-          onClick={() => {
-            if (played) return reviewOf.onReplay();
-            setPlayed(true);
-            choose(reviewOf.turn.choice);
-          }}
-        >
-          {played ? '↺ Again' : '▶ Play'}
-        </Button>
+        // Side by side, so the card is only as tall as its text.
+        <div className="flex shrink-0 items-center gap-1.5">
+          {played ? (
+            <button
+              type="button"
+              aria-label="Again"
+              title="Again"
+              onClick={staged.onReplay}
+              className="btn btn-secondary grid size-9 place-items-center p-0 text-[17px]"
+            >
+              <span aria-hidden>↺</span>
+            </button>
+          ) : (
+            <Button
+              className="h-9 px-3 text-[13.5px]"
+              onClick={() => {
+                setPlayed(true);
+                choose(staged.choice);
+              }}
+            >
+              {staged.playLabel ?? '▶ Play'}
+            </Button>
+          )}
+          {played && staged.next}
+        </div>
       )}
     </div>
   );
+  const lit =
+    !staged || playing ? [] : ((played ? staged.spotlight?.after : staged.spotlight?.before) ?? []);
+  // The coach's card and the top bar stay lit (unringed): they say what to look at, and how to go on.
+  const spotlight = lit;
   // One message at a time: the lesson's own prompt and a beginner hint both
   // come before a coach tip.
   const tip =
@@ -708,7 +734,7 @@ export function Battle({
   );
   const panel = (
     <div className="relative flex shrink-0 flex-col gap-2">
-      {reviewNote}
+      {stagedNote}
       {promptNote}
       {tip && <CoachTip text={tip.text} onDismiss={() => setTipHidden(true)} />}
       {controlPanel}
@@ -772,7 +798,7 @@ export function Battle({
       {r.summary.status !== 'pending' && <OtherGames className="mt-4 text-left" />}
     </>
   );
-  const endCard = end && !reviewOf && (
+  const endCard = end && !staged && (
     <div className="animate-fade-in absolute inset-0 z-20 grid place-items-center bg-black/35 p-4">
       <div
         ref={endRef}
@@ -805,40 +831,12 @@ export function Battle({
       </div>
     </div>
   );
-  const topBar = reviewOf ? (
-    <header className="flex h-12 shrink-0 items-center justify-between gap-2 px-3 pt-[env(safe-area-inset-top)] wide:px-6">
-      <span className="display text-[16px] tabular-nums">Review · Turn {reviewOf.turn.turn}</span>
-      <div className="flex items-center gap-1">
-        <button
-          type="button"
-          aria-label="Previous turn"
-          disabled={reviewOf.index === 0}
-          onClick={() => reviewOf.onIndex(reviewOf.index - 1)}
-          className="grid size-10 place-items-center rounded-full text-muted hover:bg-surface-2 disabled:opacity-30"
-        >
-          <ChevronIcon className="rotate-180" width={18} height={18} />
-        </button>
-        <span className="text-[13px] text-muted tabular-nums">
-          {reviewOf.index + 1} of {reviewOf.count}
-        </span>
-        <button
-          type="button"
-          aria-label="Next turn"
-          disabled={reviewOf.index === reviewOf.count - 1}
-          onClick={() => reviewOf.onIndex(reviewOf.index + 1)}
-          className="grid size-10 place-items-center rounded-full text-muted hover:bg-surface-2 disabled:opacity-30"
-        >
-          <ChevronIcon width={18} height={18} />
-        </button>
-        <button
-          type="button"
-          aria-label="Close review"
-          onClick={reviewOf.onClose}
-          className="grid size-10 place-items-center rounded-full text-muted hover:bg-surface-2"
-        >
-          <CloseIcon width={18} height={18} />
-        </button>
-      </div>
+  const topBar = staged ? (
+    <header
+      data-spot="header"
+      className="flex h-12 shrink-0 items-center justify-between gap-2 px-3 pt-[env(safe-area-inset-top)] wide:px-6"
+    >
+      {staged.header}
     </header>
   ) : (
     <header className="flex h-12 shrink-0 items-center justify-between gap-2 px-3 pt-[env(safe-area-inset-top)] wide:px-6">
@@ -892,8 +890,9 @@ export function Battle({
   }
 
   return (
-    <div className="flex h-full flex-col" data-gen={gen}>
+    <div ref={rootRef} className="relative flex h-full flex-col" data-gen={gen}>
       {topBar}
+      <Spotlight root={rootRef} targets={spotlight} keep={['coach', 'header']} />
       {wide ? (
         // A size container: the stage (field + controls) and the log sit side by side,
         // the stage as wide as fits (up to a comfortable 960px) with room for the
@@ -1014,6 +1013,56 @@ function ReviewTurnScreen({
   const [round, setRound] = useState(0);
   const decision = turn.decision;
   const factory = useCallback(() => replayBackend(() => load(decision)), [load, decision]);
+  const marks: Record<string, Mark> = {
+    ...(turn.first ? { [turn.first]: 'first' as const } : {}),
+    [turn.choice]: turn.top || turn.first ? 'you' : 'best',
+    ...(turn.top ? { [turn.top]: 'better' as const } : {}),
+  };
+  const nav = (label: string, to: number, icon: ReactNode) => (
+    <button
+      type="button"
+      aria-label={label}
+      disabled={to < 0 || to >= turns.length}
+      onClick={() => onIndex(to)}
+      className="grid size-10 place-items-center rounded-full text-muted hover:bg-surface-2 disabled:opacity-30"
+    >
+      {icon}
+    </button>
+  );
+  const header = (
+    <>
+      <span className="display text-[16px] tabular-nums">Review · Turn {turn.turn}</span>
+      <div className="flex items-center gap-1">
+        {nav(
+          'Previous turn',
+          index - 1,
+          <ChevronIcon className="rotate-180" width={18} height={18} />,
+        )}
+        <span className="text-[13px] text-muted tabular-nums">
+          {index + 1} of {turns.length}
+        </span>
+        {nav('Next turn', index + 1, <ChevronIcon width={18} height={18} />)}
+        <button
+          type="button"
+          aria-label="Close review"
+          onClick={onClose}
+          className="grid size-10 place-items-center rounded-full text-muted hover:bg-surface-2"
+        >
+          <CloseIcon width={18} height={18} />
+        </button>
+      </div>
+    </>
+  );
+  const note = (
+    <p>
+      {turn.better ? (
+        <>
+          <b>{turn.better}</b> was better.{' '}
+        </>
+      ) : null}
+      <span className="text-soft-ink">{turn.text}</span>
+    </p>
+  );
   return (
     <div
       role="dialog"
@@ -1033,13 +1082,13 @@ function ReviewTurnScreen({
           onChoice={noop}
           onEnd={noop}
           onExit={onClose}
-          reviewOf={{
-            turn,
-            index,
-            count: turns.length,
-            onIndex,
+          staged={{
+            choice: turn.choice,
+            marks,
+            header,
+            before: note,
+            label: 'Coach review',
             onReplay: () => setRound((r) => r + 1),
-            onClose,
           }}
         />
       </BattleBackendContext.Provider>

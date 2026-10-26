@@ -253,6 +253,15 @@ body {
   animation: fade-in 160ms ease-out;
 }
 
+/* Lesson demos (Spotlight.tsx): the rest of the screen dims, the targets keep a soft ring. */
+.spotlight-dim {
+  fill: color-mix(in srgb, var(--bg) 72%, transparent);
+}
+.spotlight-ring {
+  stroke: var(--accent);
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--accent) 55%, transparent));
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-pop,
   .animate-shake,

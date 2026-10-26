@@ -219,6 +219,12 @@ export function lessonProblems(lesson: Lesson): string[] {
         } else if (step.foeAi !== 'easy') {
           note(where, ['a scripted battle needs an intended line']);
         }
+      } else if (step.kind === 'demo') {
+        note(where, teamIssues(format, step.position.p1));
+        note(where, teamIssues(format, step.position.p2));
+        const request = startPosition(format, step.position).request('p1')!;
+        if (!step.turn.p1 || !resolveStep(step.turn.p1, request))
+          note(where, [`the demo's move "${step.turn.p1}" isn't legal`]);
       } else {
         const data = speciesDataFor(format);
         for (const s of step.sprites ?? [])

@@ -196,6 +196,12 @@ export interface TurnReplay {
   turn: TurnPackage;
 }
 
+/** A lesson turn (a demo, or a practice answer played out), with the choice it plays and its spotlight keys resolved. */
+export interface LessonTurn extends TurnReplay {
+  choice: string;
+  spots: string[];
+}
+
 export interface AiChoices {
   from: number;
   choices: string[];
@@ -257,11 +263,19 @@ export type ToWorker =
   | { type: 'replay'; decision: number }
   /** Review a battle played without the coach. */
   | { type: 'review' }
-  | { type: 'position'; format: string; position: Position; steps: string[] };
+  | { type: 'position'; format: string; position: Position; steps: string[] }
+  | {
+      type: 'turn';
+      format: string;
+      position: Position;
+      turn: { p1?: string; p2?: string };
+      spots: string[];
+    };
 
 export type FromWorker =
   | { type: 'package'; pkg: TurnPackage }
   | { type: 'position'; position: PositionPackage }
+  | { type: 'turn'; turn: LessonTurn }
   | { type: 'check'; note: CoachNote | null }
   | { type: 'replay'; replay: TurnReplay | null }
   | { type: 'review'; review: Review }

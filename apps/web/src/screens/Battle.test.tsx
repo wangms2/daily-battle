@@ -757,7 +757,7 @@ describe('coach', () => {
       'Thunderbolt was better. Gyarados is immune to Ground moves',
     );
     await userEvent.click(within(turn).getByRole('button', { name: '▶ Play' }));
-    expect(await within(turn).findByRole('button', { name: '↺ Again' })).toBeInTheDocument();
+    expect(await within(turn).findByRole('button', { name: 'Again' })).toBeInTheDocument();
     expect(within(turn).getAllByText(/super effective/).length).toBeGreaterThan(0);
     // The next turn in the review: a warning listened to.
     await userEvent.click(within(turn).getByRole('button', { name: 'Next turn' }));

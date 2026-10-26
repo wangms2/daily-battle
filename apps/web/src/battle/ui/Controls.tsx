@@ -177,7 +177,10 @@ function MoveButton({
     },
   );
   return (
-    <div className={clsx('relative h-full rounded-btn', markRing(mark, marking))}>
+    <div
+      data-spot={move.choice}
+      className={clsx('relative h-full rounded-btn', markRing(mark, marking))}
+    >
       {mark && <MarkTag mark={mark} />}
       <button
         type="button"
@@ -266,6 +269,7 @@ function BenchButton({
       aria-disabled={disabled}
       {...press}
       data-bench
+      data-spot={choice}
       aria-expanded={shown || undefined}
       aria-current={current || undefined}
       aria-label={

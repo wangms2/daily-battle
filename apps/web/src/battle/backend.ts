@@ -6,6 +6,7 @@ import type { Position } from '@daily-battle/tutorial/lessons';
 import type {
   EngineStart,
   FromWorker,
+  LessonTurn,
   PositionPackage,
   ToWorker,
   TurnPackage,
@@ -38,6 +39,13 @@ export interface BattleBackend {
   review?(onProgress: (done: number, total: number) => void): Promise<Review>;
   /** Coach review: one of your past decisions in this battle, replayed. */
   replay?(decision: number): Promise<TurnReplay | null>;
+  /** A lesson turn (Learn mode): a demo, or a practice answer played out. */
+  turn?(
+    format: string,
+    position: Position,
+    turn: { p1?: string; p2?: string },
+    spots?: string[],
+  ): Promise<LessonTurn>;
   /** A quiz position (Learn mode); separate from any battle in progress. */
   position?(format: string, position: Position, steps: string[]): Promise<PositionPackage>;
 }
@@ -64,6 +72,7 @@ export function workerBackend(): BattleBackend {
             worker.removeEventListener('message', onMessage);
             if (e.data.type === 'package') resolve(e.data.pkg as T);
             else if (e.data.type === 'position') resolve(e.data.position as T);
+            else if (e.data.type === 'turn') resolve(e.data.turn as T);
             else if (e.data.type === 'check') resolve(e.data.note as T);
             else if (e.data.type === 'replay') resolve(e.data.replay as T);
             else if (e.data.type === 'review') resolve(e.data.review as T);
@@ -100,6 +109,8 @@ export function workerBackend(): BattleBackend {
       worker.addEventListener('message', onMessage);
       return () => worker.removeEventListener('message', onMessage);
     },
+    turn: (format, position, turn, spots = []) =>
+      send<LessonTurn>({ type: 'turn', format, position, turn, spots }),
     position: (format, position, steps) =>
       send<PositionPackage>({ type: 'position', format, position, steps }),
   };

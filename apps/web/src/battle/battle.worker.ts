@@ -1,6 +1,6 @@
 /// <reference lib="webworker" />
 // Runs the simulator and the opponent AI off the main thread (DESIGN.md §7).
-import { BattleEngine, presentPosition } from './engine';
+import { BattleEngine, presentPosition, presentTurn } from './engine';
 import type { Review } from '@daily-battle/tutorial';
 import type { FromWorker, ToWorker } from './frames';
 import { loadHardEngine } from './hardEngine';
@@ -43,6 +43,8 @@ self.onmessage = async (event: MessageEvent<ToWorker>) => {
       const judge = start.coach ? await loadHardEngine(format).catch(() => undefined) : undefined;
       engine = new BattleEngine(start, hard, undefined, judge);
       post({ type: 'package', pkg: engine.begin() });
+    } else if (msg.type === 'turn') {
+      post({ type: 'turn', turn: presentTurn(msg.format, msg.position, msg.turn, msg.spots) });
     } else if (msg.type === 'position') {
       post({ type: 'position', position: presentPosition(msg.format, msg.position, msg.steps) });
     } else if (!engine) {

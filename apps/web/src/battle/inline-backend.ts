@@ -4,7 +4,7 @@
 import type { Engine } from '@daily-battle/engine-wasm';
 import type { CoachNote } from '@daily-battle/tutorial';
 import type { BattleBackend } from './backend';
-import { BattleEngine, presentPosition } from './engine';
+import { BattleEngine, presentPosition, presentTurn } from './engine';
 
 export function inlineBackend(hardEngine?: (format: string) => Engine): BattleBackend {
   let engine: BattleEngine | null = null;
@@ -52,6 +52,7 @@ export function inlineBackend(hardEngine?: (format: string) => Engine): BattleBa
       tipListeners.add(onTip);
       return () => tipListeners.delete(onTip);
     },
+    turn: async (format, position, turn, spots) => presentTurn(format, position, turn, spots),
     position: async (format, position, steps) => presentPosition(format, position, steps),
   };
 }

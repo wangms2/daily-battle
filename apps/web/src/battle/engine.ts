@@ -24,7 +24,7 @@ import {
   type Position,
 } from '@daily-battle/tutorial';
 import type { PokemonSet, PRNGSeed } from '@pkmn/sim';
-import type { CoachMemo, EngineStart, PositionPackage, TurnPackage } from './frames';
+import type { CoachMemo, EngineStart, PositionPackage, TurnPackage, TurnReplay } from './frames';
 import { SidePresenter } from './presenter';
 
 export { cleanText, effectiveness, moveDesc } from './presenter';
@@ -377,6 +377,44 @@ export class ReviewJob {
       ? undefined
       : (this.replay.coachReview() ?? { key: [], good: [] });
   }
+}
+
+/**
+ * A lesson demo or a practice answer (Learn mode): the position frozen at the
+ * player's decision, then the turn played with `turn`'s steps. `spots` are
+ * spotlight keys, with steps (`move Surf`) resolved to choices (`move 1`).
+ */
+export function presentTurn(
+  format: string,
+  position: Position,
+  turn: { p1?: string; p2?: string },
+  spots: string[] = [],
+): TurnReplay & { choice: string; spots: string[] } {
+  const session = startPosition(format, position);
+  const request = session.request('p1')!;
+  const presenter = new SidePresenter('p1', teamOf(format, position.p1), format);
+  const before = presenter.present(
+    { lines: session.drain('p1'), request, ended: false, winner: null },
+    true,
+  );
+  const resolve = (s: string) => (/^(move|switch) /.test(s) ? (resolveStep(s, request) ?? s) : s);
+  const choice = resolveStep(turn.p1 ?? '', request) ?? '';
+  session.choose('p1', choice);
+  const foe = session.request('p2');
+  if (foe && turn.p2) session.choose('p2', resolveStep(turn.p2, foe) ?? '');
+  const lines = session.drain('p1');
+  // A demo shows your move: the turn stops before the foe's (it moves second).
+  const foeMoves = lines.findIndex((l) => l.startsWith('|move|p2a:'));
+  const after = presenter.present(
+    {
+      lines: foeMoves < 0 ? lines : lines.slice(0, foeMoves),
+      request: session.request('p1'),
+      ended: session.ended,
+      winner: session.winner,
+    },
+    false,
+  );
+  return { before, turn: after, choice, spots: spots.map(resolve) };
 }
 
 /** A quiz position (Learn mode), frozen at the player's decision, with each answer's step resolved. */

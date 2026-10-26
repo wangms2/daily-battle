@@ -183,6 +183,8 @@ function StatBar({
       aria-label={`${who === 'foe' ? 'Foe' : 'Your'} ${mon.base ? `Mega ${mon.base}` : mon.species}, ${mon.hp}% HP${mon.status ? `, ${STATUS_LABEL[mon.status]}` : ''}, ${left} of ${marks.length} left. Details`}
       className="statbar absolute z-10 w-[9.75rem] text-left"
       style={style}
+      // Lesson demos point at parts of the screen by these (Spotlight.tsx).
+      data-spot={`${who}-plate`}
     >
       <span className="flex items-center gap-1">
         <span className="truncate text-[13px] leading-4 font-bold">{mon.base ?? mon.species}</span>
@@ -206,7 +208,10 @@ function StatBar({
         )}
       </span>
       <span className="mt-0.5 flex items-center gap-1">
-        <span className="statbar-hp h-[7px] flex-1 overflow-hidden rounded-[3px]">
+        <span
+          data-spot={`${who}-hp`}
+          className="statbar-hp h-[7px] flex-1 overflow-hidden rounded-[3px]"
+        >
           <span
             className="block h-full"
             style={{
@@ -222,9 +227,11 @@ function StatBar({
       </span>
       {/* Its types (as it looks now, so a Mega shows its Mega typing) and any stat changes. */}
       <span className="mt-0.5 flex items-center gap-1">
-        {speciesInfo(mon.species).types.map((t) => (
-          <TypeBadge key={t} type={t} size="sm" />
-        ))}
+        <span data-spot={`${who}-types`} className="flex items-center gap-1">
+          {speciesInfo(mon.species).types.map((t) => (
+            <TypeBadge key={t} type={t} size="sm" />
+          ))}
+        </span>
         {boosts.length > 0 && (
           <span className="min-w-0 truncate text-[10px] leading-3 font-semibold">
             {boosts.join(' ')}
