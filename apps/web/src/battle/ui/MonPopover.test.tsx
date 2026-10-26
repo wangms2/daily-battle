@@ -70,6 +70,11 @@ describe('MonPopover (a foe)', () => {
     expect(text).toContain('Could be faster or slower than Snorlax (240)');
   });
 
+  it('lists the moves it likely has, when given', () => {
+    render(<MonPopover foe mon={foe('Tyranitar')} hints likely={['Earthquake', 'Dragon Dance']} />);
+    expect(screen.getByRole('tooltip')).toHaveTextContent('Likely: Earthquake · Dragon Dance');
+  });
+
   it('adds the Choice Scarf line only when a Scarf would make it faster', () => {
     expect(
       card({ lo: 200, hi: 230, scarf: 345, mine: { species: 'Snorlax', speed: 240 } }),

@@ -57,9 +57,16 @@ export const gen3Course: CourseUnit[] = [
   {
     title: 'Risk and switching',
     lessons: [
-      { number: 9, title: 'What can the foe do to you?', star: 'Tyranitar' },
-      { number: 10, title: 'Switch to take the hit', star: 'Swampert' },
-      { number: 11, title: 'Free turns', star: 'Flygon' },
+      { number: 9, title: 'What can the foe do to you?', star: 'Tyranitar', id: 'gen3-risk' },
+      { number: 10, title: 'Switch to take the hit', star: 'Swampert', id: 'gen3-take-hit' },
+      { number: 11, title: 'Free turns', star: 'Flygon', id: 'gen3-free-turns' },
+      {
+        number: 11,
+        title: 'Risk and switching',
+        star: 'Salamence',
+        id: 'gen3-review-risk',
+        review: true,
+      },
     ],
   },
   {

@@ -1069,6 +1069,15 @@ button {
   width: 62%;
   height: 62%;
 }
+/* A lesson's star Pokémon on its opening card, bobbing like the landing's mascots. */
+.lesson-star {
+  animation: home-bob 2.6s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .lesson-star {
+    animation: none;
+  }
+}
 @keyframes home-bob {
   50% {
     translate: 0 -4%;

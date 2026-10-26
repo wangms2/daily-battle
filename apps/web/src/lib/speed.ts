@@ -36,6 +36,12 @@ export function lessonSet(mon: Mon): Pick<SetEntry, 'nature' | 'evs' | 'ivs' | '
   };
 }
 
+/** A lesson Pokémon's moves: its own list, or its named set's. */
+export function lessonMoves(mon: Mon): string[] {
+  if (mon.moves) return [...mon.moves];
+  return 'setId' in mon ? (findSet({ species: mon.species, setId: mon.setId })?.moves ?? []) : [];
+}
+
 /** What changes Speed in battle. */
 export interface SpeedState {
   boost?: number;

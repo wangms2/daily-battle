@@ -1,6 +1,6 @@
 // Lesson helpers shared by Learn mode's screens (no React).
 import type { BattleStep, Lesson } from '@daily-battle/tutorial/lessons';
-import type { TutorialProgress } from '../state/schema';
+import type { Settings, TutorialProgress } from '../state/schema';
 import type { EngineStart } from '../battle/frames';
 
 /**
@@ -27,6 +27,13 @@ export function lessonStart(step: BattleStep, format: string, taught: number): E
 export function nextLesson(lessons: Lesson[], progress: TutorialProgress | undefined) {
   return lessons.find((l) => !progress?.completed.includes(l.id));
 }
+
+/**
+ * Lessons play slowly, so each step of a turn can be followed. Instant (no
+ * playback at all, not offered by the speed toggle) stays instant.
+ */
+export const lessonSpeed = (settings: Pick<Settings, 'battleSpeed'>): Settings['battleSpeed'] =>
+  settings.battleSpeed === 'instant' ? 'instant' : 'slow';
 
 /** "move Ice Beam" → "Ice Beam"; "switch Jolteon" → "Switch to Jolteon". */
 export function choiceLabel(step: string) {

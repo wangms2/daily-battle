@@ -4,7 +4,7 @@ import { engineBuilt, loadEngine } from '@daily-battle/engine-wasm/node';
 import { describe, expect, it } from 'vitest';
 import { startPosition } from '../battle';
 import type { Position } from '../types';
-import { Judge } from './judge';
+import { agreement, Judge } from './judge';
 
 const data = setsFor('gen3ou');
 const SWAMPERT = { species: 'Swampert', moves: ['Surf', 'Earthquake', 'Protect', 'Toxic'] };
@@ -118,5 +118,23 @@ describe('Judge without a working engine', () => {
     judge.begin(viewOf({ p1: [SWAMPERT], p2: [MENCE] }), 'k');
     expect(judge.settle('move 2', Infinity)).toBeUndefined();
     expect(judge.busy).toBe(false);
+  });
+});
+
+describe('agreement', () => {
+  it('is the share of worlds where the top choice is ahead', () => {
+    expect(agreement([0.6, 0.5, 0.4], [0.2, 0.6, 0.1], [1, 1, 2])).toBe(0.75);
+  });
+
+  it('leaves near-ties out, so one world of noise can’t veto a clear call', () => {
+    const top = [0.58, 0.56, 0.35, 0.54, 0.6, 0.45, 0.58, 0.111];
+    const pick = [0.19, 0.18, 0.14, 0.2, 0.11, 0.22, 0.12, 0.116];
+    const weights = Array(8).fill(1);
+    expect(agreement(top, pick, weights)).toBe(7 / 8);
+    expect(agreement(top, pick, weights, 0.02)).toBe(1);
+  });
+
+  it('is 0 when every world is a near-tie', () => {
+    expect(agreement([0.5, 0.5], [0.49, 0.5], [1, 1], 0.02)).toBe(0);
   });
 });

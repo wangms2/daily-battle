@@ -24,7 +24,8 @@ export type WarningReason =
   | 'selfKo'
   | 'explosion'
   | 'fails'
-  | 'slower';
+  | 'slower'
+  | 'noHeal';
 
 /**
  * Reasons the coach keeps quiet about against each opponent, because they
@@ -45,7 +46,7 @@ export const QUIET_REASONS: Record<'easy' | 'normal' | 'hard', readonly WarningR
  * Reasons not yet checked offline against the daily opponents (coach-eval):
  * lessons use them, dailies stay quiet until they pass.
  */
-export const UNCHECKED_REASONS: readonly WarningReason[] = ['slower'];
+export const UNCHECKED_REASONS: readonly WarningReason[] = ['slower', 'noHeal'];
 
 export interface Explanation {
   reason: WarningReason;
@@ -76,6 +77,8 @@ const SURE_FIRST = 0.95;
 const BIG_HIT = 0.4;
 /** A hit this small is one a switch-in takes well. */
 const SAFE_HIT = 0.25;
+/** Worn down enough that a free turn is worth spending on healing. */
+const HEAL_BELOW = 0.6;
 /** An attack this much stronger (fraction of the foe's HP) is worth naming. */
 const STRONGER = 0.2;
 /** Leading by this many Pokémon's worth of HP: the player is winning anyway. */
@@ -278,6 +281,16 @@ function explain(
       'staysKo',
       `Risky: ${foe} can knock out ${me} this turn. ${mine(ts.species, foe)} takes the hit much better.`,
     );
+
+  // A free turn to heal: the foe can barely hurt you, you're worn down, and the better pick heals.
+  if (
+    tm &&
+    HEAL.has(tm.id) &&
+    isAttack(pm) &&
+    (f.state.ownActive?.hpFrac ?? 1) <= HEAL_BELOW &&
+    (!threat || threat.frac <= SAFE_HIT)
+  )
+    return out('noHeal', `${foe} can barely hurt ${me}: a free turn to heal with ${tm.name}.`);
 
   // Rapid Spin with nothing to clear.
   if (pm.id === 'rapidspin' && f.state.ownSide.spikes === 0 && !seeded(view)) {

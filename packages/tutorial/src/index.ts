@@ -17,7 +17,14 @@ export {
   type Explanation,
   type WarningReason,
 } from './coach/explain';
-export { Judge, JUDGE_DEFAULTS, type JudgeOptions, type Verdict } from './coach/judge';
+export {
+  agreement,
+  Judge,
+  JUDGE_DEFAULTS,
+  LESSON_TIE,
+  type JudgeOptions,
+  type Verdict,
+} from './coach/judge';
 export {
   buildReview,
   type Decision,

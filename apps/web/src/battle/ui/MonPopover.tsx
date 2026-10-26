@@ -32,6 +32,8 @@ type Props = {
       speed?: SpeedCheck;
       /** Not in battle (tapped in its team row): show its HP, which no plate shows. */
       benched?: boolean;
+      /** Moves it likely has but hasn't shown (shown when given). */
+      likely?: string[];
       /**
        * Parts of the card a lesson points at (`foe-ability`, `foe-stats`,
        * `foe-speed`): the card sits above the spotlight, so it rings them itself.
@@ -192,6 +194,15 @@ export function MonPopover(props: Props) {
         </p>
       )}
       {moves.length > 0 && <MoveChips moves={moves} className="mt-1.5" />}
+      {props.foe && !!props.likely?.length && (
+        <p
+          data-spot="foe-likely"
+          className={clsx('mt-1 text-[12.5px] text-muted', ring('foe-likely'))}
+        >
+          <span className="font-semibold">Likely: </span>
+          {props.likely.join(' · ')}
+        </p>
+      )}
       {speed && (
         <div
           data-spot="foe-speed"

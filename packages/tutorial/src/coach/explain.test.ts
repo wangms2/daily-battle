@@ -94,6 +94,22 @@ describe('Warning explanations', () => {
     expect(e!.text).toContain('no Spikes on your side');
   });
 
+  it('says a free turn is a chance to heal, when the foe can barely hurt you', () => {
+    const e = explain(
+      {
+        p1: [{ species: 'Blissey', moves: ['Soft-Boiled', 'Seismic Toss'] }],
+        p2: [{ species: 'Starmie', moves: ['Surf'] }],
+        hp: { p1: [25] },
+      },
+      'move 2',
+      'move 1',
+    );
+    expect(e).toMatchObject({
+      reason: 'noHeal',
+      text: 'Starmie can barely hurt Blissey: a free turn to heal with Soft-Boiled.',
+    });
+  });
+
   it('says a healing move fails at full HP', () => {
     const e = explain(
       { p1: [{ species: 'Starmie', moves: ['Recover', 'Surf'] }], p2: [MENCE] },

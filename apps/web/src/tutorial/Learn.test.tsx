@@ -77,6 +77,32 @@ describe('CourseMap', () => {
   });
 });
 
+/** Past a lesson's opening card. */
+const start = async () => userEvent.click(await screen.findByRole('button', { name: 'Start' }));
+
+describe('lesson intro', () => {
+  it('opens a fresh lesson on its card, and lesson 1 welcomes you to the course', async () => {
+    const turn = gen3Lessons.find((l) => l.id === 'gen3-turn')!;
+    render(
+      <LessonPlayer
+        lesson={turn}
+        step={0}
+        settings={initialState().settings}
+        onSetting={() => {}}
+        onExplainerSeen={() => {}}
+        onStep={() => {}}
+        onDone={() => {}}
+        onExit={() => {}}
+        onSettings={() => {}}
+      />,
+    );
+    expect(screen.getByText('Welcome to Learn to battle!')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'A turn' })).toBeInTheDocument();
+    expect(screen.getByText(/8 steps · about \d+ min/)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Let’s go' })).toBeInTheDocument();
+  });
+});
+
 describe('demo steps', () => {
   const demoLesson: Lesson = {
     id: 'test-demo',
@@ -100,7 +126,7 @@ describe('demo steps', () => {
     ],
   };
 
-  it('shows the idea, plays the turn on Watch, then offers Again and Next', async () => {
+  it('shows the idea, plays the turn when you tap its move, then offers Again and Next', async () => {
     const backend = inlineBackend();
     const onDone = vi.fn();
     render(
@@ -118,9 +144,12 @@ describe('demo steps', () => {
         />
       </BattleBackendContext.Provider>,
     );
+    await start();
     const card = await screen.findByRole('note', { name: 'Lesson' });
     expect(card).toHaveTextContent('Surf is a Water move.');
-    await userEvent.click(await within(card).findByRole('button', { name: /Watch/ }));
+    // Only the demo's move can be tapped.
+    expect(await screen.findByRole('button', { name: /^Ice Beam, / })).toBeDisabled();
+    await userEvent.click(screen.getByRole('button', { name: /^Surf, / }));
     const after = await screen.findByText('Water is strong against Fire.');
     const done = after.closest('[role="note"]') as HTMLElement;
     expect(within(done).getByRole('button', { name: 'Again' })).toBeInTheDocument();
@@ -166,12 +195,14 @@ describe('demo steps', () => {
         />
       </BattleBackendContext.Provider>,
     );
+    await start();
     await userEvent.click(await screen.findByRole('button', { name: /^Psychic, / }));
     expect(await screen.findByText('Steel resists Psychic.')).toBeInTheDocument();
     // The answer waits for Show better.
     expect(screen.queryByRole('button', { name: /, Better$/ })).not.toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: 'Show better' }));
-    await userEvent.click(await screen.findByRole('button', { name: /Watch/ }));
+    // You tap the better move yourself to see it play.
+    await userEvent.click(await screen.findByRole('button', { name: /^Thunderbolt, / }));
     expect(
       await screen.findByRole('button', { name: /^Thunderbolt, .*, Better$/ }),
     ).toBeInTheDocument();
@@ -212,6 +243,7 @@ describe('demo steps', () => {
         />
       </BattleBackendContext.Provider>,
     );
+    await start();
     const card = await screen.findByRole('note', { name: 'Lesson' });
     expect(card).toHaveTextContent('Tap a foe to see its Speed.');
     expect(within(card).queryByRole('button', { name: /Watch/ })).not.toBeInTheDocument();

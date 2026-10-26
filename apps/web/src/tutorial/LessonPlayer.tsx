@@ -8,6 +8,7 @@ import type {
   Lesson,
   Mon,
 } from '@daily-battle/tutorial/lessons';
+import { gen3Course } from '@daily-battle/tutorial/lessons';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { BattleBackendContext, useBattleBackend } from '../battle/backend';
 import { replayBackend } from '../battle/replay-backend';
@@ -21,7 +22,8 @@ import type { Settings } from '../state/schema';
 import { Button } from '../ui/bits';
 import { TopBar } from '../ui/TopBar';
 import { BackButton } from './BackButton';
-import { choiceLabel, lessonStart } from './lesson';
+import { choiceLabel, lessonSpeed, lessonStart } from './lesson';
+import { LessonIntro } from './LessonIntro';
 
 export function LessonPlayer({
   lesson,
@@ -56,6 +58,20 @@ export function LessonPlayer({
     : lesson.review
       ? `Review: ${lesson.title}`
       : `${lesson.number}. ${lesson.title}`;
+
+  // A fresh start opens on the lesson's card; resuming goes straight to the step.
+  const [started, setStarted] = useState(index > 0);
+  if (!started)
+    return (
+      <LessonIntro
+        lesson={lesson}
+        title={title}
+        star={gen3Course.flatMap((u) => u.lessons).find((l) => l.id === lesson.id)?.star}
+        onStart={() => setStarted(true)}
+        onExit={onExit}
+        onSettings={onSettings}
+      />
+    );
 
   if (step.kind === 'practice')
     return (
@@ -164,7 +180,7 @@ function LessonBattle({
       key={round}
       start={start}
       background={background}
-      settings={settings}
+      settings={{ ...settings, battleSpeed: lessonSpeed(settings) }}
       onSetting={onSetting}
       onExplainerSeen={onExplainerSeen}
       onChoice={() => {}}
@@ -279,14 +295,15 @@ function Demo({
         key={round}
         start={start}
         background={background}
-        settings={{ ...settings, beginnerHints: false }}
+        settings={{ ...settings, beginnerHints: false, battleSpeed: lessonSpeed(settings) }}
         onSetting={() => {}}
         onExplainerSeen={() => {}}
         onChoice={() => {}}
         onEnd={() => {}}
         onExit={onExit}
         staged={{
-          ...(step.turn ? { choice: turn?.choice ?? '' } : { look: true }),
+          // The player taps the demo's choice to play the turn.
+          ...(step.turn ? { choice: turn?.choice ?? '', tap: true } : { look: true }),
           // The foe's card opens on the first frame; a choice's once it resolves.
           ...(step.card === 'foe'
             ? { card: 'foe' }
@@ -295,8 +312,14 @@ function Demo({
           before: <p>{step.before}</p>,
           ...(step.after && { after: <p>{step.after}</p> }),
           label: 'Lesson',
-          spotlight: { before: spots.slice(0, before.length), after: spots.slice(before.length) },
-          playLabel: '▶ Watch',
+          spotlight: {
+            // The choice to tap is always lit.
+            before: [
+              ...spots.slice(0, before.length),
+              ...(turn?.choice && !spots.includes(turn.choice) ? [turn.choice] : []),
+            ],
+            after: spots.slice(before.length, before.length + after.length),
+          },
           next: (
             <Button className="h-9 px-3 text-[13.5px]" onClick={onNext}>
               {last ? 'Finish' : 'Next'}
@@ -466,7 +489,7 @@ function Practice({
         key={round}
         start={start}
         background={background}
-        settings={{ ...settings, beginnerHints: false }}
+        settings={{ ...settings, beginnerHints: false, battleSpeed: lessonSpeed(settings) }}
         onSetting={() => {}}
         onExplainerSeen={() => {}}
         onChoice={() => {}}
@@ -486,7 +509,9 @@ function Practice({
                   </p>
                 ),
                 label: 'Practice',
-                playLabel: '▶ Watch',
+                // The player taps the better choice to see it play; it's lit, as in a demo.
+                tap: true,
+                ...(bestChoice && { spotlight: { before: [bestChoice] } }),
                 stack: true,
                 next: (
                   <>

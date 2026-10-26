@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  likelyMoves,
   abilityInfo,
   defenseGaps,
   findSet,
@@ -13,6 +14,27 @@ import {
 // Gen 4 OU, the default active format.
 const labels = (species: string, revealed?: Parameters<typeof possibleSets>[1]) =>
   possibleSets(species, revealed).map((s) => s.label);
+
+describe('likelyMoves', () => {
+  const sets = [
+    { moves: ['Rock Slide', 'Earthquake', 'Dragon Dance', 'Hidden Power Bug'], weight: 0.6 },
+    { moves: ['Rock Slide', 'Earthquake', 'Focus Punch', 'Crunch'], weight: 0.3 },
+    { moves: ['Pursuit', 'Crunch', 'Fire Blast', 'Brick Break'], weight: 0.1 },
+  ];
+  it('lists the moves not shown yet, most common across the sets first', () => {
+    expect(likelyMoves(sets, ['Rock Slide'])).toEqual([
+      'Earthquake',
+      'Dragon Dance',
+      'Hidden Power Bug',
+      'Crunch',
+    ]);
+  });
+  it('counts a shown Hidden Power of any type as shown', () => {
+    expect(likelyMoves(sets, ['Rock Slide', 'Earthquake', 'Hidden Power'])).not.toContain(
+      'Hidden Power Bug',
+    );
+  });
+});
 
 describe('possibleSets', () => {
   it('lists every set until the foe shows something', () => {

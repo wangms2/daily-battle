@@ -40,12 +40,12 @@ import { Spotlight } from '../battle/ui/Spotlight';
 import { GiveUpDialog, LogList, LogSheet, MenuSheet } from '../battle/ui/sheets';
 import { BattleLog } from '../battle/ui/BattleLog';
 import type { Settings } from '../state/schema';
-import { possibleSets } from '../lib/data';
+import { likelyMoves, possibleSets } from '../lib/data';
 import { TypeChartSheet } from '../sheets/TypeChart';
 import { streakLine, type DaySummary } from '../lib/results';
 import { Button } from '../ui/bits';
 import type { ShareModel } from '../lib/share';
-import { battleSpeed, foeSpeed, lessonSet, type SpeedCheck } from '../lib/speed';
+import { battleSpeed, foeSpeed, lessonMoves, lessonSet, type SpeedCheck } from '../lib/speed';
 import { ShareButton, TryRows } from '../ui/results';
 import { ChevronIcon, CloseIcon, InfoIcon } from '../ui/icons';
 import { CoachBadge, DifficultyBadge } from '../ui/Difficulty';
@@ -139,6 +139,11 @@ export interface StagedTurn {
   card?: string;
   /** No turn to play: `next` shows at once (a lesson's look at the position). */
   look?: boolean;
+  /**
+   * The player plays the turn by tapping `choice` itself (a lesson demo): the
+   * other choices are off, and there's no play button.
+   */
+  tap?: boolean;
 }
 
 /** The first-battle tour (DESIGN.md §22): one step per control a new player might miss. */
@@ -506,6 +511,12 @@ export function Battle({
   // the check takes too long, the choice goes through unwarned.
   const pick = (choice: string) => {
     if (staged) {
+      // A demo: tapping its choice plays the turn.
+      if (staged.tap) {
+        if (choice !== staged.choice || played) return;
+        setPlayed(true);
+        return choose(choice);
+      }
       // Practice: the player's pick plays the turn.
       if (staged.choice !== undefined || played) return;
       setPlayed(true);
@@ -632,6 +643,17 @@ export function Battle({
   const lessonFoe = start.tutorial
     ? (start.opponentTeam as Mon[]).find((m) => m.species === foeSpecies)
     : undefined;
+  const hinted = settings.beginnerHints || !!lessonFoe || !!staged?.card;
+  // What it likely has but hasn't shown: with beginner hints, and in lessons.
+  const likely =
+    shownFoe && hinted
+      ? likelyMoves(
+          lessonFoe
+            ? [{ moves: lessonMoves(lessonFoe), weight: 1 }]
+            : possibleSets(foeSpecies, view?.revealed[foeSpecies]),
+          view?.revealed[foeSpecies]?.moves ?? [],
+        )
+      : undefined;
   // Who moves first: shown with beginner hints, and always in lessons.
   const speedCheck: SpeedCheck | undefined =
     view && shownFoe && (settings.beginnerHints || lessonFoe || staged?.card)
@@ -670,6 +692,7 @@ export function Battle({
         revealed={view.revealed[foeSpecies]}
         hints={settings.beginnerHints}
         {...(speedCheck && { speed: speedCheck })}
+        {...(likely?.length && { likely })}
         // The card sits above the spotlight, so it rings its own parts.
         {...(staged && !played && { pointAt: staged.spotlight?.before ?? [] })}
       />
@@ -759,16 +782,30 @@ export function Battle({
     </p>
   );
 
+  // A demo the player taps through: only its choice is on.
+  const stagedControls =
+    staged?.tap && decision?.controls && !played
+      ? {
+          ...decision.controls,
+          moves: decision.controls.moves.map((m) => ({
+            ...m,
+            disabled: m.disabled || m.choice !== staged.choice,
+          })),
+          switches: decision.controls.switches.filter((s) => s.choice === staged.choice),
+        }
+      : (decision?.controls ?? null);
   const controlPanel = staged ? (
     <ControlPanel
-      controls={decision?.controls ?? null}
+      controls={stagedControls}
       team={decision?.team ?? team}
       hints={settings.beginnerHints}
       disabled={playing}
       onChoose={pick}
       {...(staged.card && staged.card !== 'foe' && !played && { show: staged.card })}
-      // Practice: the controls work until the player picks; then the tags show.
-      {...(staged.marks && (staged.choice !== undefined || played) && { marks: staged.marks })}
+      // Practice: the controls work until the player picks; then the tags show. A turn the
+      // player taps through shows them once it's played.
+      {...(staged.marks &&
+        (staged.tap ? played : staged.choice !== undefined || played) && { marks: staged.marks })}
     />
   ) : (
     <ControlPanel
@@ -809,7 +846,8 @@ export function Battle({
                   <span aria-hidden>↺</span>
                 </button>
               )
-            : staged.choice !== undefined && (
+            : !staged.tap &&
+              staged.choice !== undefined && (
                 <Button
                   className="h-9 px-3 text-[13.5px]"
                   onClick={() => {

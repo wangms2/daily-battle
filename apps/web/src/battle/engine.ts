@@ -15,6 +15,7 @@ import {
 import {
   Coach,
   Judge,
+  LESSON_TIE,
   knownSets,
   startPosition,
   teamOf,
@@ -118,7 +119,8 @@ export class BattleEngine {
       if (coachEngine)
         this.judge = new Judge(coachEngine, data, {
           ...(start.pool ? { pool: start.pool } : {}),
-          ...(lessonFoe ? { knownSets: knownSets(format, lessonFoe) } : {}),
+          // Lessons leave near-ties out of the judge's agreement (daily battles don't, yet).
+          ...(lessonFoe ? { knownSets: knownSets(format, lessonFoe), tie: LESSON_TIE } : {}),
         });
       // Warnings you overrode before a reload aren't asked again.
       this.coach.ignore((start.coachLog ?? []).flatMap((m) => (m?.ignored ? [m.ignored] : [])));
