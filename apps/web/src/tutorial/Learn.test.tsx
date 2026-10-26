@@ -41,6 +41,38 @@ describe('CourseMap', () => {
     await userEvent.click(screen.getByRole('button', { name: /Up next · Lesson 2/ }));
     expect(onOpen).toHaveBeenCalledWith(gen3Lessons.find((l) => l.id === 'gen3-immune'));
   });
+
+  it('folds units: finished ones closed with a check, the next lesson’s open, a tap toggles', async () => {
+    const units: CourseUnit[] = [
+      {
+        title: 'The battle',
+        lessons: [{ number: 1, title: 'A turn', star: 'Swampert', id: 'gen3-turn' }],
+      },
+      {
+        title: 'Damage',
+        lessons: [{ number: 2, title: 'Immune', star: 'Gengar', id: 'gen3-immune' }],
+      },
+      { title: 'Later', lessons: [{ number: 3, title: 'Not built', star: 'Starmie' }] },
+    ];
+    render(
+      <CourseMap
+        game="Gen 3"
+        course={units}
+        lessons={gen3Lessons}
+        progress={{ completed: ['gen3-turn'] }}
+        onOpen={() => {}}
+        onBack={() => {}}
+        onSettings={() => {}}
+      />,
+    );
+    const unit = (n: RegExp) => screen.getByRole('button', { name: n });
+    expect(unit(/Unit 1 · The battle/)).toHaveAttribute('aria-expanded', 'false');
+    expect(unit(/Unit 2 · Damage/)).toHaveAttribute('aria-expanded', 'true');
+    expect(unit(/Unit 3 · Later/)).toHaveTextContent('1 lesson');
+    expect(screen.queryByRole('button', { name: /Lesson 1: A turn/ })).not.toBeInTheDocument();
+    await userEvent.click(unit(/Unit 1 · The battle/));
+    expect(screen.getByRole('button', { name: 'Lesson 1: A turn, done' })).toBeInTheDocument();
+  });
 });
 
 describe('demo steps', () => {

@@ -130,6 +130,11 @@ export interface Lesson {
   number: number;
   /** The final battle: shown with a cap instead of its number. */
   graduation?: boolean;
+  /**
+   * A unit review: practice positions only, mixing the unit's ideas with
+   * earlier ones. Its `number` is the last lesson it covers (the coach's scope).
+   */
+  review?: boolean;
   title: string;
   summary: string;
   steps: Step[];

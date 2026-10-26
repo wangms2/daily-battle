@@ -51,7 +51,11 @@ export function LessonPlayer({
   const last = index >= lesson.steps.length - 1;
   const next = () => (last ? onDone() : onStep(index + 1));
   const background = backgroundFor(lesson.id, lesson.format);
-  const title = lesson.graduation ? lesson.title : `${lesson.number}. ${lesson.title}`;
+  const title = lesson.graduation
+    ? lesson.title
+    : lesson.review
+      ? `Review: ${lesson.title}`
+      : `${lesson.number}. ${lesson.title}`;
 
   if (step.kind === 'practice')
     return (

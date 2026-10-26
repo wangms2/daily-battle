@@ -4,6 +4,8 @@
 import { effective } from './course/effective';
 import { immune } from './course/immune';
 import { priority } from './course/priority';
+import { reviewDamage } from './course/review-damage';
+import { reviewSwitching } from './course/review-switching';
 import { speed } from './course/speed';
 import { split } from './course/split';
 import { stab } from './course/stab';
@@ -11,14 +13,16 @@ import { switching } from './course/switching';
 import { turn } from './course/turn';
 import type { Lesson } from '../types';
 
-/** The Gen 3 lessons, in order. */
+/** The Gen 3 lessons and unit reviews, in course order. */
 export const gen3Lessons: Lesson[] = [
   turn,
   effective,
   immune,
   stab,
   split,
+  reviewDamage,
   switching,
   speed,
   priority,
+  reviewSwitching,
 ];

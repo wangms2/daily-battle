@@ -10,6 +10,11 @@ export interface CourseLesson {
   star: string;
   /** The built lesson's id, once it exists. */
   id?: string;
+  /**
+   * A unit review: practice positions mixing the unit's ideas with earlier
+   * ones. Its `number` is the last lesson it covers (not shown).
+   */
+  review?: boolean;
 }
 
 export interface CourseUnit {
@@ -29,6 +34,8 @@ export const gen3Course: CourseUnit[] = [
       { number: 3, title: 'Immune', star: 'Gengar', id: 'gen3-immune' },
       { number: 4, title: 'Same-type bonus', star: 'Metagross', id: 'gen3-stab' },
       { number: 5, title: 'Physical and special', star: 'Blissey', id: 'gen3-split-course' },
+      // Unit 1 has one lesson, so its ideas are reviewed here.
+      { number: 5, title: 'Damage', star: 'Gyarados', id: 'gen3-review-damage', review: true },
     ],
   },
   {
@@ -38,6 +45,13 @@ export const gen3Course: CourseUnit[] = [
       { number: 6, title: 'Switching', star: 'Skarmory', id: 'gen3-switching-course' },
       { number: 7, title: 'Speed', star: 'Jolteon', id: 'gen3-speed-course' },
       { number: 8, title: 'Priority', star: 'Breloom', id: 'gen3-priority' },
+      {
+        number: 8,
+        title: 'Switching and turn order',
+        star: 'Aerodactyl',
+        id: 'gen3-review-switching',
+        review: true,
+      },
     ],
   },
   {

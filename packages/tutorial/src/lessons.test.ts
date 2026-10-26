@@ -8,7 +8,9 @@ describe('lesson content', () => {
   for (const [format, lessons] of Object.entries(LESSONS)) {
     it(`${format}: ids are unique and numbers run in order`, () => {
       expect(new Set(lessons.map((l) => l.id)).size).toBe(lessons.length);
-      expect(lessons.map((l) => l.number)).toEqual(lessons.map((_, i) => i + 1));
+      // Reviews carry the number of the last lesson they cover.
+      const numbered = lessons.filter((l) => !l.review);
+      expect(numbered.map((l) => l.number)).toEqual(numbered.map((_, i) => i + 1));
       for (const l of lessons) expect(l.format).toBe(format);
     });
     for (const lesson of lessons) {
