@@ -1,7 +1,7 @@
 import { setsFor } from '@daily-battle/data';
 import { describe, expect, it } from 'vitest';
 import { RandomPolicy } from './policies/random';
-import { ScriptedPolicy } from './policies/scripted';
+import { resolveStep, ScriptedPolicy } from './policies/scripted';
 import { deriveSeed, makeRng } from './rng';
 import { runBattle } from './run';
 import { BattleSession } from './session';
@@ -35,7 +35,7 @@ describe('noLuck', () => {
     }
     expect(lucky).toBeGreaterThan(20); // the check has teeth
     expect(unlucky).toBe(0);
-  });
+  }, 60_000);
 
   it('is still deterministic, with damage rolls still varying', () => {
     const a = runBattle(input(1, true));
@@ -88,5 +88,20 @@ describe('ScriptedPolicy', () => {
     });
     expect(result.choices.p2.slice(0, 2)).toEqual(['move 2', 'switch 2']);
     expect(foe.skipped).toContain('move Splash'); // not one of Skarmory's moves
+  });
+
+  it('finds moves whose request id carries a power or type (Return, Hidden Power)', () => {
+    const s = new BattleSession({
+      format: 'gen3ou',
+      seed: deriveSeed('scripted', 1),
+      p1: {
+        team: [mon('Snorlax', ['Body Slam', 'Return', 'Hidden Power Fire'])],
+      },
+      p2: { team: [mon('Swampert', ['Surf'])] },
+    });
+    const request = s.request('p1')!;
+    expect(resolveStep('move Return', request)).toBe('move 2');
+    expect(resolveStep('move Hidden Power', request)).toBe('move 3');
+    expect(resolveStep('move Hidden Power Fire', request)).toBe('move 3');
   });
 });

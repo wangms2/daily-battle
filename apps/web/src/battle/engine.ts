@@ -8,11 +8,14 @@ import {
   deriveSeed,
   legalChoices,
   makeRng,
+  resolveStep,
+  ScriptedPolicy,
   type Policy,
   type Rng,
 } from '@daily-battle/sim-bridge';
+import { startPosition, teamOf, type Mon, type Position } from '@daily-battle/tutorial';
 import type { PokemonSet, PRNGSeed } from '@pkmn/sim';
-import type { EngineStart, TurnPackage } from './frames';
+import type { EngineStart, PositionPackage, TurnPackage } from './frames';
 import { SidePresenter } from './presenter';
 
 export { cleanText, effectiveness, moveDesc } from './presenter';
@@ -40,15 +43,20 @@ export class BattleEngine {
     budget?: { iterations: number; worlds: number },
   ) {
     const format = start.format ?? DEFAULT_FORMAT;
-    this.sets = start.playerTeam as PokemonSet[];
+    const { tutorial } = start;
+    // Lesson teams are written as `Mon`s; daily teams are already full sets.
+    const team = (t: unknown[]) => (tutorial ? teamOf(format, t as Mon[]) : (t as PokemonSet[]));
+    this.sets = team(start.playerTeam);
     this.session = new BattleSession({
       format,
-      seed: start.battleSeed as PRNGSeed,
-      p1: { team: start.playerTeam as PokemonSet[], name: 'You' },
-      p2: { team: start.opponentTeam as PokemonSet[], name: 'The opponent' },
+      // A lesson's seed is a label; its battle and foe seeds come from it as in the content tests.
+      seed: tutorial ? deriveSeed(start.battleSeed, 0) : (start.battleSeed as PRNGSeed),
+      ...(tutorial?.noLuck && { noLuck: true }),
+      p1: { team: this.sets, name: 'You' },
+      p2: { team: team(start.opponentTeam), name: 'The opponent' },
     });
     const difficulty = start.difficulty ?? 'normal';
-    this.ai = aiFor({
+    const ai = aiFor({
       difficulty,
       style: start.style,
       data: setsFor(format),
@@ -56,7 +64,10 @@ export class BattleEngine {
       ...(start.pool ? { pool: start.pool } : {}),
       ...(budget ? { hard: budget } : {}),
     });
-    this.aiRng = makeRng(start.aiSeed as PRNGSeed);
+    this.ai = tutorial?.foeScript
+      ? new ScriptedPolicy({ ...tutorial.foeScript, fallback: ai })
+      : ai;
+    this.aiRng = makeRng(tutorial ? deriveSeed(start.battleSeed, 2) : (start.aiSeed as PRNGSeed));
     this.hard = difficulty === 'hard';
     this.replay = this.hard ? [...(start.aiChoices ?? [])] : [];
     this.reported = this.replay.length;
@@ -139,4 +150,20 @@ export class BattleEngine {
     }
     return pkg;
   }
+}
+
+/** A quiz position (Learn mode), frozen at the player's decision, with each answer's step resolved. */
+export function presentPosition(
+  format: string,
+  position: Position,
+  steps: string[],
+): PositionPackage {
+  const session = startPosition(format, position);
+  const request = session.request('p1')!;
+  const presenter = new SidePresenter('p1', teamOf(format, position.p1), format);
+  const pkg = presenter.present(
+    { lines: session.drain('p1'), request, ended: false, winner: null },
+    true,
+  );
+  return { pkg, choices: steps.map((s) => resolveStep(s, request) ?? null) };
 }

@@ -338,6 +338,22 @@ describe('settings', () => {
     expect(reducer(state, { type: 'markExplainer', id: 'welcome' })).toBe(state);
     expect(state.settings.shownExplainers).toEqual(['welcome']);
   });
+
+  it('saves the lesson step to resume, and finishing a lesson checks it once', () => {
+    const at = (lesson: string, step: number) =>
+      ({ type: 'lessonStep', format: 'gen3ou', lesson, step }) as const;
+    const done = (lesson: string) => ({ type: 'lessonDone', format: 'gen3ou', lesson }) as const;
+    let state = reducer(initialState(), at('gen3-basics', 2));
+    expect(state.settings.tutorial?.gen3ou).toEqual({
+      completed: [],
+      current: { lesson: 'gen3-basics', step: 2 },
+    });
+    state = reducer(reducer(state, done('gen3-basics')), done('gen3-basics'));
+    expect(state.settings.tutorial?.gen3ou).toEqual({ completed: ['gen3-basics'] });
+    state = reducer(state, at('gen3-types', 1));
+    expect(state.settings.tutorial?.gen3ou?.completed).toEqual(['gen3-basics']);
+    expect(state.settings.tutorial?.gen4ou).toBeUndefined();
+  });
 });
 
 describe('attempts', () => {

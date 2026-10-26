@@ -1,6 +1,7 @@
 // What the battle worker sends the UI: plain data describing only what the
 // player's side can see. No simulator types cross this boundary.
 import type { Difficulty } from '@daily-battle/ai/version';
+import type { FoeScript, Position } from '@daily-battle/tutorial/lessons';
 
 export type Who = 'you' | 'foe';
 
@@ -200,9 +201,27 @@ export interface EngineStart {
   pool?: string[];
   /** Hard: the AI's saved choices, replayed on resume instead of searched again. */
   aiChoices?: string[];
+  /**
+   * A lesson battle (Learn mode): the teams are lesson `Mon`s, the foe follows
+   * its script (then plays as Easy), and luck can be removed.
+   */
+  tutorial?: { noLuck: boolean; foeScript?: FoeScript };
+}
+
+/** A quiz position, shown frozen at the player's decision. */
+export interface PositionPackage {
+  pkg: TurnPackage;
+  /** Each quiz answer's step as a choice (`move 3`), or null if it isn't legal. */
+  choices: (string | null)[];
 }
 
 export type ToWorker =
-  { type: 'start'; start: EngineStart } | { type: 'choose'; choice: string } | { type: 'forfeit' };
+  | { type: 'start'; start: EngineStart }
+  | { type: 'choose'; choice: string }
+  | { type: 'forfeit' }
+  | { type: 'position'; format: string; position: Position; steps: string[] };
 
-export type FromWorker = { type: 'package'; pkg: TurnPackage } | { type: 'error'; message: string };
+export type FromWorker =
+  | { type: 'package'; pkg: TurnPackage }
+  | { type: 'position'; position: PositionPackage }
+  | { type: 'error'; message: string };

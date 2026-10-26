@@ -1,6 +1,6 @@
 /// <reference lib="webworker" />
 // Runs the simulator and the opponent AI off the main thread (DESIGN.md §7).
-import { BattleEngine } from './engine';
+import { BattleEngine, presentPosition } from './engine';
 import type { FromWorker, ToWorker } from './frames';
 import { loadHardEngine } from './hardEngine';
 
@@ -19,6 +19,8 @@ self.onmessage = async (event: MessageEvent<ToWorker>) => {
         start.difficulty === 'hard' ? await loadHardEngine(start.format ?? 'gen4ou') : undefined;
       engine = new BattleEngine(start, hard);
       post({ type: 'package', pkg: engine.begin() });
+    } else if (msg.type === 'position') {
+      post({ type: 'position', position: presentPosition(msg.format, msg.position, msg.steps) });
     } else if (!engine) {
       throw new Error('No battle in progress');
     } else if (msg.type === 'choose') {

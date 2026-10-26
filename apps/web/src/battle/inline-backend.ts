@@ -2,7 +2,7 @@
 // to supply poke-engine for the format (tests load it from disk).
 import type { Engine } from '@daily-battle/engine-wasm';
 import type { BattleBackend } from './backend';
-import { BattleEngine } from './engine';
+import { BattleEngine, presentPosition } from './engine';
 
 export function inlineBackend(hardEngine?: (format: string) => Engine): BattleBackend {
   let engine: BattleEngine | null = null;
@@ -18,5 +18,6 @@ export function inlineBackend(hardEngine?: (format: string) => Engine): BattleBa
     },
     choose: async (choice) => need().choose(choice),
     forfeit: async () => need().forfeit(),
+    position: async (format, position, steps) => presentPosition(format, position, steps),
   };
 }

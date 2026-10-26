@@ -33,6 +33,9 @@ import { useNow, useStore } from './state/context';
 import { Button } from './ui/bits';
 import { TopBar } from './ui/TopBar';
 import { VersusRoute } from './versus/VersusRoute';
+import { LESSONS } from '@daily-battle/tutorial/lessons';
+import { Learn } from './tutorial/Learn';
+import { LessonPlayer } from './tutorial/LessonPlayer';
 
 /** Shared links open the game picker, so a friend can choose any generation. */
 const shareUrl = () => `${window.location.origin}/#daily`;
@@ -56,15 +59,17 @@ function countdownTo(now: Date, nextDay: string): string {
   return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
 
-/** The part of the app a route is in: the home screens, versus, today's game, or the battle. */
+/** The part of the app a route is in: the home screens, versus, Learn, today's game, or the battle. */
 const area = (route: string) =>
   route === '' || route === 'daily'
     ? 'home'
     : route === 'versus' || route.startsWith('versus/')
       ? 'versus'
-      : route === 'battle'
-        ? 'battle'
-        : 'play';
+      : route === 'learn' || route.startsWith('learn/')
+        ? 'learn'
+        : route === 'battle'
+          ? 'battle'
+          : 'play';
 
 type ViewTransitions = { startViewTransition?: (update: () => Promise<void>) => unknown };
 
@@ -113,6 +118,9 @@ function useHashRoute(): [string, (r: string) => void] {
 /** An older share link's `#gen5` (or `#gen4`, `#gen6`): the game it was shared from. */
 /** Attempts are identified by ts, so keep it unique even if the clock repeats. */
 const nextTs = (last: number | undefined) => Math.max(Date.now(), (last ?? 0) + 1);
+
+/** The game Learn mode teaches (the only one with lessons so far). */
+const LEARN_FORMAT: FormatId = 'gen3ou';
 
 const formatFromHash = (hash: string): FormatId | undefined =>
   (Object.keys(FORMATS) as FormatId[]).find((f) => f === `${hash}ou`);
@@ -279,9 +287,43 @@ export function App() {
   // Today's game is #play (and #battle); anything else is the landing screen,
   // or #daily, the picker a shared link opens.
   const playing = route === 'play' || route === 'battle';
+  // Learn mode (#learn, #learn/LESSON): the Gen 3 tutorial, apart from the daily.
+  const learning = area(route) === 'learn';
 
   let screen: ReactNode;
-  if (!versus && !playing) {
+  if (learning) {
+    const progress = settings.tutorial?.[LEARN_FORMAT];
+    const lessons = LESSONS[LEARN_FORMAT]!;
+    const lesson = lessons.find((l) => route === `learn/${l.id}`);
+    screen = lesson ? (
+      <LessonPlayer
+        key={lesson.id}
+        lesson={lesson}
+        step={progress?.current?.lesson === lesson.id ? progress.current.step : 0}
+        settings={settings}
+        onSetting={setSetting}
+        onExplainerSeen={(id) => dispatchAny({ type: 'markExplainer', id })}
+        onStep={(step) =>
+          dispatchAny({ type: 'lessonStep', format: LEARN_FORMAT, lesson: lesson.id, step })
+        }
+        onDone={() => {
+          dispatchAny({ type: 'lessonDone', format: LEARN_FORMAT, lesson: lesson.id });
+          go('learn');
+        }}
+        onExit={() => go('learn')}
+        onSettings={() => setSettingsOpen(true)}
+      />
+    ) : (
+      <Learn
+        game={formatInfo(LEARN_FORMAT).name}
+        lessons={lessons}
+        progress={progress}
+        onOpen={(l) => go(`learn/${l.id}`)}
+        onBack={() => go('')}
+        onSettings={() => setSettingsOpen(true)}
+      />
+    );
+  } else if (!versus && !playing) {
     screen = (
       <Home
         view={route === 'daily' ? 'picker' : 'landing'}
@@ -301,6 +343,7 @@ export function App() {
         })}
         onPlay={() => go('daily')}
         onFriends={() => go('versus')}
+        onLearn={() => go('learn')}
         onPick={(id) => {
           if (id !== format) dispatchAny({ type: 'setSetting', key: 'format', value: id });
           go('play');
@@ -423,7 +466,7 @@ export function App() {
 
   return (
     <div
-      className={`mx-auto h-dvh overflow-hidden ${route === 'battle' ? 'max-w-[1440px]' : !versus && !playing ? '' : 'max-w-[1280px]'}`}
+      className={`mx-auto h-dvh overflow-hidden ${route === 'battle' ? 'max-w-[1440px]' : !versus && !playing && !learning ? '' : 'max-w-[1280px]'}`}
     >
       {!storageAvailable && !storageNoticeDismissed && (
         <div

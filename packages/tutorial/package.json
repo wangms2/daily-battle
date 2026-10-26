@@ -5,7 +5,8 @@
   "description": "Learn mode: Gen 3 lessons, quiz positions, scripted mini-battles, and the coach",
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./lessons": "./src/lessons.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit"

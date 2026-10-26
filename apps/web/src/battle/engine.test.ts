@@ -2,7 +2,9 @@ import { setsFor } from '@daily-battle/data';
 import { engineBuilt, loadEngine } from '@daily-battle/engine-wasm/node';
 import { Dex } from '@pkmn/sim';
 import { deriveSeed, makeRng, randomTeam } from '@daily-battle/sim-bridge';
+import { gen3Lessons } from '@daily-battle/tutorial/lessons';
 import { describe, expect, it, vi } from 'vitest';
+import { lessonStart } from '../tutorial/lesson';
 import { BattleEngine, cleanText, effectiveness, moveDesc } from './engine';
 import { mergeAiChoices, type AiChoices, type EngineStart, type TurnPackage } from './frames';
 
@@ -212,6 +214,30 @@ describe('field effects', () => {
     expect(view.foeTeam.filter((m) => !m.fainted)).toHaveLength(last.end!.foeLeft);
     expect(view.yourTeam.every((m) => m.species)).toBe(true);
   }, 60_000);
+});
+
+describe('lesson battles', () => {
+  it('plays a lesson as its content tests do: scripted foe, its seed, no luck', () => {
+    const lesson = gen3Lessons.find((l) => l.id === 'gen3-types')!;
+    const step = lesson.steps.find((s) => s.kind === 'battle')!;
+    const line = { moves: [...step.intended!.moves!], switches: [...step.intended!.switches!] };
+    const engine = new BattleEngine(lessonStart(step, lesson.format));
+    let pkg = engine.begin();
+    expect(pkg.team.map((m) => m.species)).toEqual(['Swampert', 'Jolteon']);
+    while (!pkg.end) {
+      const c = pkg.controls!;
+      const [verb, ...name] = (c.kind === 'switch' ? line.switches : line.moves)
+        .shift()!
+        .split(' ');
+      const choice =
+        verb === 'switch'
+          ? c.switches.find((s) => pkg.team[s.slot - 1]?.species === name.join(' '))?.choice
+          : c.moves.find((m) => m.name === name.join(' '))?.choice;
+      pkg = engine.choose(choice!);
+    }
+    expect(pkg.end.winner).toBe('you');
+    expect(line.moves).toEqual([]);
+  });
 });
 
 describe('cleanText', () => {

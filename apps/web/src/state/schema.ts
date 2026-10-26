@@ -80,6 +80,15 @@ export interface Settings {
   format?: FormatId;
   /** The CPU difficulty picked for each game; Normal when unset. */
   difficulty?: Partial<Record<FormatId, Difficulty>>;
+  /** Learn mode progress, per game that has lessons (Gen 3 so far). */
+  tutorial?: Partial<Record<FormatId, TutorialProgress>>;
+}
+
+export interface TutorialProgress {
+  /** Lesson ids finished (in the order they were finished). */
+  completed: string[];
+  /** The lesson last opened and the step reached, to resume. */
+  current?: { lesson: string; step: number };
 }
 
 /**

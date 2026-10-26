@@ -5,6 +5,8 @@ import {
   ScriptedPolicy,
   teamProblems,
 } from '@daily-battle/sim-bridge';
+import { speciesDataFor } from '@daily-battle/data/species';
+import type { PokemonSet } from '@pkmn/sim';
 import { battleInput, startPosition } from './battle';
 import { teamOf } from './teams';
 import type { Grade, Lesson, Mon, QuizStep } from './types';
@@ -14,7 +16,24 @@ const SIZE = /must bring at least|at least \d+ Pok/i;
 
 function teamIssues(format: string, mons: Mon[]): string[] {
   const team = teamOf(format, mons);
-  return (teamProblems(format, team) ?? []).filter((p) => !SIZE.test(p));
+  return [
+    ...(teamProblems(format, team) ?? []).filter((p) => !SIZE.test(p)),
+    ...dataIssues(format, team),
+  ];
+}
+
+/**
+ * The web shows species and moves from the game's own data (its OU pool), so
+ * lessons may only use what's in it.
+ */
+function dataIssues(format: string, team: PokemonSet[]): string[] {
+  const data = speciesDataFor(format);
+  return team.flatMap((set) => [
+    ...(data.species[set.species] ? [] : [`${set.species} isn't in the game's species data`]),
+    ...set.moves
+      .filter((m) => !data.moves[m])
+      .map((m) => `${set.species}'s ${m} isn't in the game's move data`),
+  ]);
 }
 
 const RANK: Record<Grade, number> = { best: 2, ok: 1, wrong: 0 };
@@ -95,6 +114,10 @@ export function lessonProblems(lesson: Lesson): string[] {
         } else if (step.foeAi !== 'easy') {
           note(where, ['a scripted battle needs an intended line']);
         }
+      } else {
+        const data = speciesDataFor(format);
+        for (const s of step.sprites ?? [])
+          if (!data.species[s]) note(where, [`${s} isn't in the game's species data`]);
       }
     } catch (e) {
       note(where, [(e as Error).message]);

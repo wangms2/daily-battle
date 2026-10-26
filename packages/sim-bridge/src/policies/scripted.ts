@@ -25,8 +25,13 @@ export function resolveStep(step: string, request: SideView['request']): string 
   const name = toId(rest.join(' '));
   let choice: string | undefined;
   if (kind === 'move' && request.requestType === 'move') {
+    // Requests give some moves' power or type in the id: return102, hiddenpowerfire60.
+    const base = (id: string) => toId(id).replace(/\d+$/, '');
     const i = request.active[0]?.moves.findIndex(
-      (m) => toId(m.id) === name || toId(m.name) === name,
+      (m) =>
+        base(m.id) === name ||
+        toId(m.name) === name ||
+        (name === 'hiddenpower' && base(m.id).startsWith(name)),
     );
     if (i !== undefined && i >= 0) choice = `move ${i + 1}`;
   } else if (kind === 'switch') {

@@ -13,6 +13,7 @@ import {
   type Settings,
   type Slot,
   type State,
+  type TutorialProgress,
 } from './schema';
 
 /** Actions on one format's game. */
@@ -41,6 +42,9 @@ export type Action =
   | (GameAction & { format: FormatId })
   | { type: 'setSetting'; key: keyof Settings; value: Settings[keyof Settings] }
   | { type: 'markExplainer'; id: string }
+  /** Learn mode: the player reached a lesson's step (saved to resume). */
+  | { type: 'lessonStep'; format: FormatId; lesson: string; step: number }
+  | { type: 'lessonDone'; format: FormatId; lesson: string }
   /** Expires unfinished attempts in every game. */
   | { type: 'expireAll'; today: string; engine: string };
 
@@ -106,6 +110,20 @@ export function reducer(state: State, action: Action): State {
           shownExplainers: [...state.settings.shownExplainers, action.id],
         },
       };
+    case 'lessonStep':
+    case 'lessonDone': {
+      const progress = state.settings.tutorial?.[action.format] ?? { completed: [] };
+      const next: TutorialProgress =
+        action.type === 'lessonStep'
+          ? { ...progress, current: { lesson: action.lesson, step: action.step } }
+          : {
+              completed: progress.completed.includes(action.lesson)
+                ? progress.completed
+                : [...progress.completed, action.lesson],
+            };
+      const tutorial = { ...state.settings.tutorial, [action.format]: next };
+      return { ...state, settings: { ...state.settings, tutorial } };
+    }
     case 'expireAll': {
       let games = state.games;
       for (const [format, game] of Object.entries(state.games) as [FormatId, GameState][]) {

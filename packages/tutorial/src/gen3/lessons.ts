@@ -36,15 +36,15 @@ const basics: Lesson = {
     },
     {
       kind: 'battle',
-      intro: 'Your first battle: your Swampert against an Arcanine. Pick a move each turn.',
+      intro: 'Your first battle: your Swampert against an Entei. Pick a move each turn.',
       player: [{ species: 'Swampert', moves: ['Surf', 'Earthquake', 'Ice Beam', 'Protect'] }],
-      foe: [{ species: 'Arcanine', moves: ['Flamethrower', 'Bite', 'Roar', 'Take Down'] }],
-      foeAi: { moves: ['move Flamethrower', 'move Bite', 'move Flamethrower'] },
+      foe: [{ species: 'Entei', moves: ['Flamethrower', 'Return', 'Fire Blast', 'Calm Mind'] }],
+      foeAi: { moves: ['move Flamethrower', 'move Return', 'move Flamethrower'] },
       seed: 'tutorial:gen3-basics:battle',
       noLuck: true,
       prompts: [
         { turn: 1, text: 'Tap one of Swampert’s moves to attack. Your opponent is choosing too.' },
-        { turn: 2, text: 'Watch the HP bars. When Arcanine’s reaches zero, it faints.' },
+        { turn: 2, text: 'Watch the HP bars. When Entei’s reaches zero, it faints.' },
       ],
       takeaway:
         'Each turn you pick a move or a switch. Knock out every Pokémon on the other side to win.',
@@ -187,7 +187,7 @@ const types: Lesson = {
         { species: 'Swampert', moves: ['Surf', 'Earthquake', 'Ice Beam', 'Protect'] },
         {
           species: 'Jolteon',
-          moves: ['Thunderbolt', 'Shadow Ball', 'Pin Missile', 'Thunder Wave'],
+          moves: ['Thunderbolt', 'Shadow Ball', 'Baton Pass', 'Thunder Wave'],
         },
       ],
       foe: [

@@ -1,7 +1,8 @@
 // How the UI talks to a battle: by default a Web Worker running the engine.
 // Tests swap in the engine directly on the main thread.
 import { createContext, useContext } from 'react';
-import type { EngineStart, FromWorker, ToWorker, TurnPackage } from './frames';
+import type { Position } from '@daily-battle/tutorial/lessons';
+import type { EngineStart, FromWorker, PositionPackage, ToWorker, TurnPackage } from './frames';
 
 export interface BattleBackend {
   start(start: EngineStart): Promise<TurnPackage>;
@@ -12,6 +13,8 @@ export interface BattleBackend {
    * giving up, or your clock running out. Returns an unsubscribe.
    */
   subscribe?(onPackage: (pkg: TurnPackage) => void): () => void;
+  /** A quiz position (Learn mode); separate from any battle in progress. */
+  position?(format: string, position: Position, steps: string[]): Promise<PositionPackage>;
 }
 
 let shared: Worker | null = null;
@@ -25,14 +28,15 @@ export function warmBattleWorker(): Worker {
 /** Sends messages one at a time and resolves each with the worker's answer. */
 export function workerBackend(): BattleBackend {
   let queue: Promise<unknown> = Promise.resolve();
-  const send = (msg: ToWorker) => {
+  const send = <T = TurnPackage>(msg: ToWorker) => {
     const next = queue.then(
       () =>
-        new Promise<TurnPackage>((resolve, reject) => {
+        new Promise<T>((resolve, reject) => {
           const worker = warmBattleWorker();
           const onMessage = (e: MessageEvent<FromWorker>) => {
             worker.removeEventListener('message', onMessage);
-            if (e.data.type === 'package') resolve(e.data.pkg);
+            if (e.data.type === 'package') resolve(e.data.pkg as T);
+            else if (e.data.type === 'position') resolve(e.data.position as T);
             else reject(new Error(e.data.message));
           };
           worker.addEventListener('message', onMessage);
@@ -46,6 +50,8 @@ export function workerBackend(): BattleBackend {
     start: (start) => send({ type: 'start', start }),
     choose: (choice) => send({ type: 'choose', choice }),
     forfeit: () => send({ type: 'forfeit' }),
+    position: (format, position, steps) =>
+      send<PositionPackage>({ type: 'position', format, position, steps }),
   };
 }
 

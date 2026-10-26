@@ -101,6 +101,7 @@ export function Battle({
   background,
   result,
   live,
+  prompt,
 }: {
   /** The day's result, for the end card (daily battles). */
   result?: DayResult;
@@ -121,6 +122,8 @@ export function Battle({
   /** After a loss: back to the brief with the team open for changes. */
   onChangeTeam?: () => void;
   topBarRight?: ReactNode;
+  /** Learn mode: a lesson's callout for the turn about to be chosen. */
+  prompt?: (turn: number) => string | undefined;
 }) {
   const wide = useWide();
   const createBackend = useBattleBackend();
@@ -511,6 +514,20 @@ export function Battle({
     </div>
   );
 
+  // Shown once the turn's playback is over, while you choose.
+  const promptText =
+    prompt && view && controls && !end ? prompt(Math.max(1, view.turn)) : undefined;
+  const promptNote = promptText && (
+    <p
+      role="note"
+      aria-label="Lesson tip"
+      className="animate-fade-in flex items-start gap-2 rounded-card bg-accent-soft px-3 py-2 text-[14px] leading-snug"
+    >
+      <span aria-hidden>🎓</span>
+      <span className="flex-1">{promptText}</span>
+    </p>
+  );
+
   const controlPanel = (
     <ControlPanel
       controls={controls}
@@ -521,7 +538,8 @@ export function Battle({
     />
   );
   const panel = live ? (
-    <div className="relative flex shrink-0 flex-col">
+    <div className="relative flex shrink-0 flex-col gap-2">
+      {promptNote}
       {controlPanel}
       {waitingNote}
     </div>
@@ -603,7 +621,8 @@ export function Battle({
         <span className="display text-[16px] tabular-nums">
           {view ? `Turn ${Math.max(1, view.turn)}` : 'Battle'}
         </span>
-        <DifficultyBadge difficulty={start.difficulty} />
+        {/* A lesson's foe follows its script, whatever AI fills in. */}
+        <DifficultyBadge difficulty={start.tutorial ? undefined : start.difficulty} />
       </div>
       <div className="flex items-center gap-1">
         {topBarRight}
