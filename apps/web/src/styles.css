@@ -32,6 +32,8 @@
   --gold: #a9842f;
   --gold-soft: #f3ead6;
   --gold-text: #1b1408; /* dark on gold meets AA (5.2:1); white doesn't */
+  /* A lesson's or the tour's highlight: its own hue, so it never reads as a button. */
+  --spot: #e39a1b;
   --good: #3d7a5a;
   --bad: #a33a46;
 
@@ -71,6 +73,7 @@
     --gold: #d2ae63;
     --gold-soft: #3a3021;
     --gold-text: #1b1408;
+    --spot: #f5b544;
     --good: #7cc39c;
     --bad: #e07a85;
     --card-shadow: 0 1px 2px rgb(0 0 0 / 0.35);
@@ -96,6 +99,7 @@
   --color-accent-soft: var(--accent-soft);
   --color-soft-ink: var(--accent-soft-text);
   --color-gold: var(--gold);
+  --color-spot: var(--spot);
   --color-gold-soft: var(--gold-soft);
   --color-on-gold: var(--gold-text);
   --color-on-accent: var(--accent-text);
@@ -258,8 +262,8 @@ body {
   fill: color-mix(in srgb, var(--bg) 72%, transparent);
 }
 .spotlight-ring {
-  stroke: var(--accent);
-  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--accent) 55%, transparent));
+  stroke: var(--spot);
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--spot) 55%, transparent));
 }
 
 @media (prefers-reduced-motion: reduce) {

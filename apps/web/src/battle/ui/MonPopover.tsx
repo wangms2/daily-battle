@@ -80,7 +80,7 @@ export function MonPopover(props: Props) {
   const ring = (spot: string) =>
     props.foe &&
     props.pointAt?.includes(spot) &&
-    '-mx-1 rounded-badge px-1 py-0.5 ring-2 ring-accent';
+    '-mx-1 rounded-badge px-1 py-0.5 ring-2 ring-spot';
   const verdict = speed && speedVerdict(speed);
   // Beginner hints: the sets this foe could still be running, given what it has shown.
   const could =
