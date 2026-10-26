@@ -104,9 +104,14 @@ export function noEffectText(foe: string, move: string, why: NoEffect): string {
 
 /**
  * Turns between tips, so the coach doesn't talk every turn (a tip on turn 4
- * means none on turns 5 and 6). A tip held back can still show later.
+ * means none on turns 5 and 6). A tip held back can still show later. Urgent
+ * tips (a knockout either way) need only one quiet turn. Warnings aren't paced:
+ * they only appear when the player picks the blunder.
  */
 export const TIP_GAP = 3;
+const URGENT_GAP = 2;
+const URGENT = new Set<CoachRule>(['koThreat', 'canKo']);
+export const tipGap = (rule: CoachRule) => (URGENT.has(rule) ? URGENT_GAP : TIP_GAP);
 
 /** The coach for one battle. It remembers which one-time tips it has shown. */
 export class Coach {
@@ -151,7 +156,9 @@ export class Coach {
       const tip = this.tipFor.tip;
       return tip ? { tip, warnings } : { warnings };
     }
-    const tip = turn - this.lastTip >= TIP_GAP ? this.pickTip(view, facts) : undefined;
+    const quiet = turn - this.lastTip;
+    const tip =
+      quiet >= URGENT_GAP ? this.pickTip(view, facts, (r) => quiet >= tipGap(r)) : undefined;
     if (tip) this.lastTip = turn;
     this.tipFor = { request: view.request, tip };
     return tip ? { tip, warnings } : { warnings };
@@ -269,12 +276,16 @@ export class Coach {
     return true;
   }
 
-  private pickTip(view: SideView, f: Facts): CoachNote | undefined {
+  private pickTip(
+    view: SideView,
+    f: Facts,
+    ok: (rule: CoachRule) => boolean,
+  ): CoachNote | undefined {
     const { state } = f;
     // Spikes: once per new layer, and again if they come back after a spin.
     const layers = state.ownSide.spikes;
     if (layers < this.spikesSeen) this.spikesSeen = layers;
-    if (layers > this.spikesSeen) {
+    if (layers > this.spikesSeen && ok('spikes')) {
       this.spikesSeen = layers;
       const spinner = state.own.find((m) => !m.fainted && hasMove(view, m.slot, 'rapidspin'));
       return this.note(
@@ -290,24 +301,31 @@ export class Coach {
       threat &&
       threat.ko >= 0.9 &&
       f.foeFirst >= SURE_FIRST &&
+      ok('koThreat') &&
       this.once(`threat:${me}:${foe}`)
     ) {
       return this.note('koThreat', `${foe} is faster than ${me} and can knock it out this turn.`);
     }
     const ko = this.koMove(f);
-    if (ko && this.once(`ko:${me}:${foe}:${ko.id}`))
+    if (ko && ok('canKo') && this.once(`ko:${me}:${foe}:${ko.id}`))
       return this.note('canKo', `${ko.name} can knock out ${foe} this turn.`);
 
     if (
       state.foeActive?.status === 'slp' &&
       (f.foeMoves.sleeptalk ?? 0) < 0.2 &&
+      ok('foeAsleep') &&
       this.once(`slp:${foe}:${sleepStart(view, foe)}`)
     ) {
       return this.note('foeAsleep', `${foe} is asleep and can’t attack while it sleeps.`);
     }
 
     const item = CHOICE_ITEMS[activeItem(view)];
-    if (f.lockedInto && item && this.once(`lock:${me}:${f.lockedInto}:${switchedIn(view)}`)) {
+    if (
+      f.lockedInto &&
+      item &&
+      ok('locked') &&
+      this.once(`lock:${me}:${f.lockedInto}:${switchedIn(view)}`)
+    ) {
       return this.note('locked', `${item} locks ${me} into ${f.lockedInto} until it switches out.`);
     }
 
@@ -318,7 +336,7 @@ export class Coach {
       const better = f.switches
         .filter((s) => s.best >= Math.max(0.3, 2.5 * best) && s.taken.ko < 0.05)
         .sort((a, b) => b.best - a.best)[0];
-      if (better && this.once(`walled:${me}:${foe}`)) {
+      if (better && ok('walled') && this.once(`walled:${me}:${foe}`)) {
         return this.note(
           'walled',
           `${me}’s attacks do little damage to ${foe}. ${better.species} hits it much harder.`,
@@ -338,6 +356,7 @@ export class Coach {
       threat.ko === 0 &&
       (state.ownActive?.hpFrac ?? 0) >= 0.6 &&
       boosted < 2 &&
+      ok('setupWindow') &&
       this.once(`setup:${me}:${foe}`)
     ) {
       return this.note(

@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { startPosition } from '../battle';
 import type { Position } from '../types';
 import { buildReview, type Decision } from './review';
-import { Coach, TIP_GAP, type CoachTurn } from './simple';
+import { Coach, TIP_GAP, tipGap, type CoachTurn } from './simple';
 
 const data = setsFor('gen3ou');
 const coachAt = (pos: Omit<Position, 'seed'>, seed = 'coach'): CoachTurn =>
@@ -205,9 +205,9 @@ describe('Simple coach in real battles', () => {
             if (note) expect(note.text).not.toMatch(BANNED);
           if (view.request.requestType === 'move') decisions++;
           if (t.tip) {
-            // Never two tips close together.
+            // Never two tips close together (urgent ones may come a little sooner).
             const turn = view.battle.turn;
-            expect(turn - lastTip).toBeGreaterThanOrEqual(TIP_GAP);
+            expect(turn - lastTip).toBeGreaterThanOrEqual(tipGap(t.tip.rule));
             lastTip = turn;
             tips++;
           }
