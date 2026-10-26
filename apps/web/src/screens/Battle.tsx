@@ -668,7 +668,6 @@ export function Battle({
         revealed={view.revealed[foeSpecies]}
         hints={settings.beginnerHints}
         {...(speedCheck && { speed: speedCheck })}
-        known={!!lessonFoe}
         // The card sits above the spotlight, so it rings its own parts.
         {...(staged && !played && { pointAt: staged.spotlight?.before ?? [] })}
       />

@@ -2,14 +2,7 @@
 // Foes show just what the battle has revealed; yours show the set you brought.
 import clsx from 'clsx';
 import { Fragment, type ReactNode } from 'react';
-import {
-  abilityInfo,
-  canMega,
-  itemInfo,
-  possibleSets,
-  shortLabel,
-  speciesInfo,
-} from '../../lib/data';
+import { abilityInfo, canMega, itemInfo, speciesInfo } from '../../lib/data';
 import { TypeBadge } from '../../ui/bits';
 import { Term } from '../../ui/DetailCard';
 import { ItemIcon } from '../../ui/ItemIcon';
@@ -37,8 +30,6 @@ type Props = {
       hints: boolean;
       /** Its Speed now against your active Pokémon's (shown when given). */
       speed?: SpeedCheck;
-      /** A lesson foe: its set is known, so there are no other sets it could be. */
-      known?: boolean;
       /** Not in battle (tapped in its team row): show its HP, which no plate shows. */
       benched?: boolean;
       /**
@@ -86,11 +77,6 @@ export function MonPopover(props: Props) {
     props.pointAt?.includes(spot) &&
     '-mx-1 rounded-badge px-1 py-0.5 ring-2 ring-spot';
   const verdict = speed && speedVerdict(speed);
-  // Beginner hints: the sets this foe could still be running, given what it has shown.
-  const could =
-    props.foe && props.hints && !props.known
-      ? possibleSets(base, props.revealed).map((s) => shortLabel(s.label))
-      : [];
   // Until the battle shows its ability, every ability the species can have in this
   // generation, as on Showdown; once one is shown (an Intimidate, a Levitate
   // immunity, …) only that one is listed, above. A Mega's ability is its own, so
@@ -231,12 +217,6 @@ export function MonPopover(props: Props) {
         </div>
       )}
       {megaHint && <p className="mt-0.5 text-[12.5px] text-muted">Can Mega Evolve</p>}
-      {could.length > 0 && (
-        <p className="mt-0.5 text-[12.5px] text-muted">
-          {could.length === 1 ? 'Set: ' : 'Possible sets: '}
-          {could.join(' · ')}
-        </p>
-      )}
       {props.children}
     </div>
   );
