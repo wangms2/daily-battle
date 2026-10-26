@@ -8,6 +8,7 @@ import type { SetsFile } from '@daily-battle/data';
 import type { SideView } from '@daily-battle/sim-bridge';
 import { explainWarning, QUIET_REASONS, type Explanation, type WarningReason } from './explain';
 import type { Verdict } from './judge';
+import { TIP_LESSON } from './course';
 import { buildReview, decision, type Decision, type Heeded, type Review } from './review';
 
 /** The kinds of tip. Warnings have their own reasons (`WarningReason`, explain.ts). */
@@ -151,6 +152,11 @@ export class Coach {
     format: string = data.meta.format,
     /** The opponent's difficulty (lesson foes count as Easy): some reasons are quiet against some. */
     difficulty: keyof typeof QUIET_REASONS = 'normal',
+    /**
+     * In a lesson: the last lesson the player has reached. The coach then only
+     * talks about ideas taught by then (course.ts).
+     */
+    private readonly taught = Infinity,
   ) {
     this.lessons = LESSONS[format] ?? {};
     this.quiet = QUIET_REASONS[difficulty];
@@ -212,7 +218,7 @@ export class Coach {
   warn(view: SideView, verdict: Verdict): CoachNote | undefined {
     if (view.request.requestType === 'wait') return undefined;
     const facts = this.factsFor(view);
-    const e = explainWarning(view, facts, verdict, this.quiet);
+    const e = explainWarning(view, facts, verdict, { quiet: this.quiet, taught: this.taught });
     if (!e || this.overridden.has(e.text)) return undefined;
     return this.warnNote(e, facts, verdict.choice);
   }
@@ -242,7 +248,8 @@ export class Coach {
     if (view.request.requestType === 'wait') return;
     const facts = this.factsFor(view);
     if (shown) this.overridden.add(shown.text);
-    const e = verdict && explainWarning(view, facts, verdict, this.quiet);
+    const e =
+      verdict && explainWarning(view, facts, verdict, { quiet: this.quiet, taught: this.taught });
     const d = decision(
       index,
       facts,
@@ -295,6 +302,9 @@ export class Coach {
     const out: Candidate[] = [];
     const add = (rule: CoachRule, text: string, key?: string, choice?: string) => {
       if (!ok(rule) || (key && this.seen.has(key))) return;
+      // In a lesson, nothing the player hasn't learned yet.
+      const lesson = TIP_LESSON[rule];
+      if (this.taught !== Infinity && (lesson === null || lesson > this.taught)) return;
       out.push({
         note: this.note(rule, text),
         ...(key ? { key } : {}),

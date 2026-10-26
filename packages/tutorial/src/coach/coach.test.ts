@@ -219,6 +219,19 @@ describe('Simple coach tips', () => {
     expect(coach.confirm(later, 'switch 2')?.rule).toBe('walled');
   });
 
+  it('in a lesson, gives no tip about an idea taught later', () => {
+    // "Salamence is faster and can knock it out": Speed is lesson 7.
+    const pos = {
+      p1: [
+        { species: 'Heracross', setId: 'heracross-standard' },
+        { species: 'Swampert', setId: 'swampert-standard-defensive' },
+      ],
+      p2: [MENCE],
+    };
+    expect(new Coach(data, 'gen3ou', 'easy', 7).turn(viewAt(pos)).tip?.rule).toBe('koThreat');
+    expect(new Coach(data, 'gen3ou', 'easy', 6).turn(viewAt(pos)).tip?.rule).not.toBe('koThreat');
+  });
+
   it('notices a Choice lock, and Spikes with a spinner on the team', () => {
     const locked = coachAt({
       p1: [{ species: 'Heracross', moves: ['Megahorn', 'Rock Slide'], item: 'Choice Band' }],

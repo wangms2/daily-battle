@@ -94,8 +94,40 @@ describe('Warning explanations', () => {
       topValue: 0.5,
     };
     const f = turnFacts(view, data);
-    expect(explainWarning(view, f, verdict, QUIET_REASONS.normal)?.reason).toBe('selfKo');
-    expect(explainWarning(view, f, verdict, QUIET_REASONS.easy)).toBeUndefined();
+    expect(explainWarning(view, f, verdict, { quiet: QUIET_REASONS.normal })?.reason).toBe(
+      'selfKo',
+    );
+    expect(explainWarning(view, f, verdict, { quiet: QUIET_REASONS.easy })).toBeUndefined();
+  });
+
+  it('in a lesson, says nothing the player hasn’t learned yet', () => {
+    const at = (pos: Omit<Position, 'seed'>, choice: string, top: string, taught: number) => {
+      const view = startPosition('gen3ou', { ...pos, seed: 'explain' }).view('p1')!;
+      const verdict: Verdict = {
+        choice,
+        top,
+        worse: true,
+        gap: 0.2,
+        agree: 1,
+        value: 0.3,
+        topValue: 0.5,
+      };
+      return explainWarning(view, turnFacts(view, data), verdict, { taught });
+    };
+    // Immunity to Ground is lesson 4.
+    const immune = {
+      p1: [{ species: 'Swampert', moves: ['Surf', 'Earthquake', 'Ice Beam'] }],
+      p2: [MENCE],
+    };
+    expect(at(immune, 'move 2', 'move 3', 3)).toBeUndefined();
+    expect(at(immune, 'move 2', 'move 3', 4)?.reason).toBe('noEffect');
+    // Steel can't be poisoned: status, lesson 12, even though it's a "does nothing".
+    const steel = {
+      p1: [{ species: 'Jirachi', moves: ['Toxic', 'Psychic'] }],
+      p2: [{ species: 'Skarmory', setId: 'skarmory-standard' }],
+    };
+    expect(at(steel, 'move 1', 'move 2', 4)).toBeUndefined();
+    expect(at(steel, 'move 1', 'move 2', 12)?.noEffect).toBe('statusImmune');
   });
 
   it('stays quiet when no reason is true', () => {

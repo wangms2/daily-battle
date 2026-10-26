@@ -6,8 +6,9 @@
 //
 // A warning is one risk sentence about the pick, then, when one is true, one
 // sentence about the top choice. No odds from the search.
-import type { Facts, MoveFact, SwitchFact } from '@daily-battle/ai';
+import type { Facts, MoveFact, NoEffect, SwitchFact } from '@daily-battle/ai';
 import type { SideView } from '@daily-battle/sim-bridge';
+import { NO_EFFECT_LESSON, REASON_LESSON } from './course';
 import type { Verdict } from './judge';
 import { noEffectText } from './simple';
 
@@ -42,6 +43,22 @@ export const QUIET_REASONS: Record<'easy' | 'normal' | 'hard', readonly WarningR
 export interface Explanation {
   reason: WarningReason;
   text: string;
+  /** For `noEffect`: why the move does nothing. */
+  noEffect?: NoEffect['kind'];
+}
+
+/** What the coach may say: reasons quiet against this opponent, and (in a lesson) the lessons taught so far. */
+export interface Scope {
+  quiet?: readonly WarningReason[];
+  /** In a lesson: the last lesson the player has reached; ideas taught later stay quiet. */
+  taught?: number;
+}
+
+/** Whether an explanation's idea has been taught by lesson `taught` (always, outside lessons). */
+export function inScope(e: Explanation, taught = Infinity): boolean {
+  if (taught === Infinity) return true;
+  const lesson = e.noEffect ? NO_EFFECT_LESSON[e.noEffect] : REASON_LESSON[e.reason];
+  return lesson !== null && lesson <= taught;
 }
 
 /** Likely enough to call a knockout. */
@@ -117,8 +134,18 @@ export function explainWarning(
   view: SideView,
   f: Facts,
   verdict: Verdict,
-  /** Reasons to keep quiet about (`QUIET_REASONS` for the opponent). */
-  quiet: readonly WarningReason[] = [],
+  /** What the coach may say (`QUIET_REASONS` for the opponent, and the lessons taught). */
+  scope: Scope = {},
+): Explanation | undefined {
+  const e = explain(view, f, verdict, scope.quiet ?? []);
+  return e && inScope(e, scope.taught) ? e : undefined;
+}
+
+function explain(
+  view: SideView,
+  f: Facts,
+  verdict: Verdict,
+  quiet: readonly WarningReason[],
 ): Explanation | undefined {
   if (!verdict.worse || !f.foe || !f.me || f.forced) return undefined;
   if (winningAnyway(f)) return undefined;
@@ -166,7 +193,10 @@ export function explainWarning(
         (pm ? `${pm.name} won’t knock ${foe} out.` : `Switching won’t knock ${foe} out.`),
     );
 
-  if (pm?.noEffect) return out('noEffect', noEffectText(foe, pm.name, pm.noEffect) + better());
+  if (pm?.noEffect) {
+    const e = out('noEffect', noEffectText(foe, pm.name, pm.noEffect) + better());
+    return e && { ...e, noEffect: pm.noEffect.kind };
+  }
 
   // A KO the pick passes up.
   if (

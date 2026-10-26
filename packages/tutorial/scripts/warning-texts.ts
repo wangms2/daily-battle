@@ -108,7 +108,7 @@ for (const file of files) {
     const judge = new Judge(engine, data, { pool: m.pool });
     judge.begin(view, `eval:${c.battle}:${c.turn}`);
     const v = judge.settle(c.warned, Infinity);
-    const e = v && explainWarning(view, facts, v, QUIET_REASONS[vs]);
+    const e = v && explainWarning(view, facts, v, { quiet: QUIET_REASONS[vs] });
     const name = (ch: string) =>
       ch.startsWith('move')
         ? facts.moves.find((x) => x.choice === ch)?.name
