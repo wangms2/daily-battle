@@ -77,6 +77,8 @@ export class Judge {
   private open: (Record<string, number> | undefined)[] = [];
   /** Held searches: the held choice's value per world. */
   private held = new Map<string, (number | null | undefined)[]>();
+  /** Held searches: the foe's replies to the held choice (a move's name, or `switch Species`), weighted. */
+  private answers = new Map<string, Record<string, number>>();
   private top?: string;
   private failed = false;
 
@@ -99,6 +101,7 @@ export class Judge {
     this.queue = [];
     this.open = [];
     this.held = new Map();
+    this.answers = new Map();
     this.top = undefined;
     this.failed = false;
     this.worlds = [];
@@ -151,6 +154,17 @@ export class Judge {
       const list = this.held.get(task.fixed) ?? [];
       list[task.world] = values(result, this.request)[task.fixed] ?? null;
       this.held.set(task.fixed, list);
+      const answers = this.answers.get(task.fixed) ?? {};
+      for (const o of result.s2) {
+        const [kind, i] = o.c.split(':');
+        const name =
+          kind === 'switch'
+            ? `switch ${world.foes[Number(i)]?.species ?? '?'}`
+            : world.foes[world.foeActive]?.set.moves[Number(i)];
+        if (name && result.n)
+          answers[name] = (answers[name] ?? 0) + (world.weight * o.v) / result.n;
+      }
+      this.answers.set(task.fixed, answers);
     }
     return this.queue.length > 0;
   }
@@ -178,6 +192,17 @@ export class Judge {
     );
     for (const fixed of order)
       for (let world = 0; world < this.worlds.length; world++) this.queue.push({ world, fixed });
+  }
+
+  /**
+   * The foe's best replies to `choice`, likeliest first, as the held search
+   * found them (a move's name, or `switch Species`), with their share. Empty
+   * until the choice has been searched.
+   */
+  replies(choice: string): { reply: string; share: number }[] {
+    return Object.entries(this.answers.get(choice) ?? {})
+      .map(([reply, share]) => ({ reply, share }))
+      .sort((a, b) => b.share - a.share);
   }
 
   /** Moves a choice's searches (and the top's) to the front of the queue. */

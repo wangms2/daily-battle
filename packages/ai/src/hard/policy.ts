@@ -10,7 +10,7 @@ import { STRONG } from '../presets';
 import { UtilityPolicy } from '../policy';
 import { extractState } from '../state';
 import { toChoice } from './choices';
-import { translate } from './translate';
+import { translate, type WorldFoe } from './translate';
 import { sampleWorlds } from './worlds';
 
 export interface HardPolicyOptions {
@@ -53,6 +53,10 @@ export interface PreparedWorld {
   weight: number;
   /** The engine state, with `view`'s side as side one. */
   state: string;
+  /** The foe's Pokémon as sampled, in the engine's order (`switch:I` indexes it). */
+  foes: WorldFoe[];
+  /** The foe's active Pokémon (its moves, in set order, are `move:I`). */
+  foeActive: number;
   iterations: number;
   seed: number;
 }
@@ -82,9 +86,16 @@ export function prepareWorlds(
     ...(options.knownSets ? { known: options.knownSets } : {}),
   });
   const ownSets = state.own.map((m) => m.set);
+  const foeClient = view.battle[view.side === 'p1' ? 'p2' : 'p1'];
   return worlds.map((world) => ({
     weight: world.weight,
     state: translate(view, world.foes, data, ownSets),
+    foes: world.foes,
+    // As translate finds it.
+    foeActive: Math.max(
+      0,
+      world.foes.findIndex((f) => f.seen && f.seen === foeClient.active[0]),
+    ),
     iterations: Math.max(MIN_WORLD_ITERATIONS, Math.round(total * world.weight)),
     // Two draws make a 52-bit seed.
     seed: Math.floor(rng() * 2 ** 32) + Math.floor(rng() * 2 ** 20) * 2 ** 32,

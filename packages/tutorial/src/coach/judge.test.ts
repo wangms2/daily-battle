@@ -51,6 +51,23 @@ describe.skipIf(!engineBuilt(3))('Judge', () => {
     expect(v).toMatchObject({ worse: true });
   });
 
+  it('names the foe’s likely replies to a pick, from its possible sets', () => {
+    const judge = new Judge(loadEngine(3), data);
+    judge.begin(
+      viewOf({
+        p1: [SWAMPERT, { species: 'Heracross', setId: 'heracross-standard' }],
+        p2: [MENCE],
+      }),
+      'k',
+    );
+    judge.settle('switch 2', Infinity);
+    const replies = judge.replies('switch 2');
+    const moves = new Set(data.species.Salamence!.sets.flatMap((s) => s.moves));
+    expect(replies.length).toBeGreaterThan(0);
+    expect(moves.has(replies[0]!.reply)).toBe(true);
+    expect(replies[0]!.share).toBeGreaterThan(replies.at(-1)!.share - 1e-9);
+  });
+
   it('never calls its own top choice worse', () => {
     const judge = new Judge(loadEngine(3), data);
     judge.begin(viewOf({ p1: [SWAMPERT], p2: [MENCE] }), 'k');

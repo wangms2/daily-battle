@@ -25,9 +25,21 @@ Working plan for the `tutorial` branch. It records what's built, the decisions b
 Questions prepared overnight, with the data behind them in "Step 2 results" below:
 
 1. **Judge settings.** Keep margin 0.1, agree 0.9, 20k iterations per search? (0.15 halves the warnings with about the same real gain per warning; 0.1 catches twice as many real mistakes.)
-2. **How often warnings may appear once every judged mistake can be explained (step 3).** Judge-backed warnings would fire on many of a beginner bot's picks (measure: see "Warning rate" once run). Each is worth +6 to +8 points of win rate on average. Show every one, only the bigger ones, or pace them (like tips)?
-3. **Explosion.** Quiet on picks of Explosion / Self-Destruct until step 4 has enough samples, or keep judging them?
+2. **How often warnings may appear once every judged mistake can be explained (step 3).** Warning rate per decision (`coach-rate`, 40 battles each, decisions with a real choice):
+
+   |                                              | beginner (Easy-like) vs Easy    | mid player vs Normal   |
+   | -------------------------------------------- | ------------------------------- | ---------------------- |
+   | rules alone (before the judge)               | 7.9%                            | 5.7%                   |
+   | shipped now: rule + judge, margin 0.1        | 3.6% (median 1 a battle, max 4) | 1.3% (median 0, max 2) |
+   | judge alone, margin 0.1 (what step 3 allows) | 16.7% (about 4 a battle)        | 7.7%                   |
+   | judge alone, margin 0.15                     | 9.9% (about 2.4 a battle)       | 3.9%                   |
+
+   Each judged warning is worth +6 to +8 points of win rate on average. Show every one, only the bigger ones (0.15), or pace them like tips? (Tips run at 20–23% of decisions, as before.)
+
+3. **Explosion.** Quiet on picks of Explosion / Self-Destruct until step 4 has enough samples, or keep judging them? And may the coach _recommend_ Explosion? The judge often prefers it (e.g. a 44% Cloyster exploding on a 53% Starmie: 100% vs 61% in rollouts). If so, the text must say the cost ("Explosion knocks out Cloyster too").
 4. **Resume.** After a reload, a warning the player already overrode can be asked again. Acceptable, or save the overridden warnings with the attempt?
+5. **Only true, relevant reasons.** In wording drafts (`scripts/wording-demo.ts` on real judged warnings), most read well, e.g. "Risky: if Donphan uses Earthquake, Raikou is knocked out as it comes in. Heracross takes Donphan's hits much better." But some judged gaps have no reason the facts show (Moltres's Fire Blast vs a Substitute Smeargle: the draft "Sceptile takes Smeargle's hits much better" is invented). Proposal: warn only when a template's reason is true and relevant; otherwise stay quiet.
+6. **Won either way.** Some judged warnings change nothing (rollouts 100% vs 100%: the player wins anyway). Skip warnings when both choices already look winning (say both values ≥ 0.85)?
 
 ## Product decisions (from the user; don't revisit without asking)
 
