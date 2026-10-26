@@ -29,6 +29,7 @@ describe('CourseMap', () => {
         lessons={gen3Lessons}
         progress={{ completed: ['gen3-turn'] }}
         onOpen={onOpen}
+        onTrainer={() => {}}
         onBack={() => {}}
         onSettings={() => {}}
       />,
@@ -61,6 +62,7 @@ describe('CourseMap', () => {
         lessons={gen3Lessons}
         progress={{ completed: ['gen3-turn'] }}
         onOpen={() => {}}
+        onTrainer={() => {}}
         onBack={() => {}}
         onSettings={() => {}}
       />,

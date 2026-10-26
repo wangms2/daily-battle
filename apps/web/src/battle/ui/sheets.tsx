@@ -49,6 +49,7 @@ export function MenuSheet({
   onHints,
   onAnimations,
   onLog,
+  onChart,
   onLeave,
   onGiveUp,
   canGiveUp,
@@ -63,6 +64,8 @@ export function MenuSheet({
   onHints: (v: boolean) => void;
   onAnimations: (v: boolean) => void;
   onLog: () => void;
+  /** The type chart, for this battle's game. */
+  onChart: () => void;
   onLeave: () => void;
   onGiveUp: () => void;
   canGiveUp: boolean;
@@ -94,6 +97,9 @@ export function MenuSheet({
       <div className="mt-3 grid gap-2">
         <Button variant="secondary" onClick={onLog}>
           Battle log
+        </Button>
+        <Button variant="secondary" onClick={onChart}>
+          Type chart
         </Button>
         <Button variant="secondary" onClick={onLeave}>
           Back to today (battle is saved)

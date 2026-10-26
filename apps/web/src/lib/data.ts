@@ -41,6 +41,9 @@ export interface Slot {
 
 export const toId = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
 
+/** The game's OU Pokémon: every species with sets. */
+export const ouSpecies = () => Object.keys(sets.species);
+
 export function setsOf(species: string): SetEntry[] {
   return sets.species[species]?.sets ?? [];
 }
@@ -147,6 +150,9 @@ export function multiplier(attacking: string, species: string): number {
 
 /** Every type in the chart (17 in Gens 4 and 5, 18 with Fairy from Gen 6). */
 export const allTypes = () => Object.keys(speciesData.typeChart);
+
+/** typeChart[attacking][defending]: the damage multiplier, for the game being played. */
+export const typeChart = () => speciesData.typeChart;
 
 export interface Matchups {
   weak: { type: string; mult: number }[];
