@@ -153,6 +153,16 @@ export class BattleSession {
     return true;
   }
 
+  /**
+   * Gives the rest of the battle a new random stream (damage rolls, accuracy,
+   * and so on). Offline evaluation forks a battle at a decision and plays it
+   * out many times, each with its own luck (packages/tutorial/scripts/coach-eval.ts).
+   */
+  reseed(seed: PRNGSeed): void {
+    this.battle.resetRNG(seed);
+    this.battle.sendUpdates();
+  }
+
   /** Ends the battle with `side` losing (giving up). */
   forfeit(side: SideID): void {
     if (this.ended) return;

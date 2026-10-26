@@ -9,7 +9,8 @@
     "./lessons": "./src/lessons.ts"
   },
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "coach-eval": "tsx scripts/coach-eval.ts"
   },
   "dependencies": {
     "@daily-battle/ai": "workspace:*",

@@ -56,6 +56,23 @@ describe('BattleSession', () => {
     expect(stable(s.result())).toEqual(stable(run));
   });
 
+  it('plays the same after a reseed with the same seed, and differently with another', () => {
+    const input = { seed: deriveSeed('session', 5), ...teams(5) };
+    const play = (seed: string) => {
+      const s = new BattleSession(input);
+      s.reseed(seed as never);
+      for (let i = 0; i < 30 && !s.ended; i++)
+        for (const side of ['p1', 'p2'] as const) {
+          const req = s.view(side);
+          if (req && !s.ended)
+            s.choose(side, req.request.requestType === 'move' ? 'move 1' : 'default');
+        }
+      return s.spectatorLog.filter((l) => !l.startsWith('|t:|')).join('\n');
+    };
+    expect(play('1,2,3,4')).toBe(play('1,2,3,4'));
+    expect(play('1,2,3,4')).not.toBe(play('9,9,9,9'));
+  });
+
   it('reports the winning side, not its name, when players are named', () => {
     const { p1, p2 } = teams(4);
     const s = new BattleSession({
