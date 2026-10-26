@@ -160,6 +160,11 @@ Built as decided above (Product decisions). The original picker tag and "Play Ge
 - **Bar:** almost no shown message is worse than its alternative. Report the pooled gain with its CI, and the share of messages clearly worse (by more than 2 SE), per message kind and difficulty. Exact targets to agree after the first full run.
 - **Report** (`--report`, Markdown): worst cases first, with the position, the text, and both branches' win rates.
 - **Cost:** Hard rollouts are slow (full search: about 40 CPU-hours per kind of message). Use a reduced Hard budget for the _opponent_ only if it matches full budget on a sample, and say so. Parallelise across processes. Report the run time.
+  - **Sample run (2026-10-26):** 120 judged cases vs Hard, 20 rollouts per branch, the same cases at Hard's own 150k and at 20k (`--save-cases` / `--load-cases`). Full budget: 38 min on 18 processes; 20k: 6 min.
+    - Robust warnings at margin 0.1 (32 cases): **+3.4 points** at full budget (CI −1.4 to +8.1), +3.7 at 20k (CI +0.3 to +7.0); one case clearly worse at full budget, none at 20k.
+    - Per-case gains correlate 0.65 between the budgets, and have the same sign in 78% of the cases where both moved (about what 20 rollouts allow). 20k Hard is a little weaker: the player wins 19% of rollouts vs 15%.
+    - So 20k reproduces the pooled verdict. Use it for the bulk of Hard runs, with a full-budget spot check on each kind of message.
+    - Against Hard the player's side loses about 85% either way, so gains are smaller and need more cases to show (this sample isn't enough at full budget). Hard's coaching is Advanced only, so this matters from step 5.
 - **CI:** a small smoke sample on PRs; the full run as a manual or scheduled job.
 - **Lesson content check:** each quiz's "best" answer must win at least as often as the alternatives against the lesson's own foe, and the same for mini-battle prompts that recommend an action.
 
