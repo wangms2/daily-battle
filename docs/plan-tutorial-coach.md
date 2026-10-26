@@ -24,7 +24,7 @@ Working plan for the `tutorial` branch. It records what's built, the decisions b
 
 ## Waiting on the user
 
-Nothing open. Next: step 4b, walking through the lessons with the user (screenshots), then refactoring them. Queued for a quiet night (low concurrency): the targeted Explosion run vs Normal (step 4).
+Next: step 4b (the course redesign), starting with the toolkit on one lesson as a vertical slice, with design questions to the user along the way. Queued for a quiet night (low concurrency): the targeted Explosion run vs Normal (step 4).
 
 ## Decided 2026-10-26 (morning answers)
 
@@ -210,14 +210,41 @@ Built as decided above (Product decisions). The original picker tag and "Play Ge
 - **CI:** a small smoke sample on PRs; the full run as a manual or scheduled job.
 - **Lesson content check:** each quiz's "best" answer must win at least as often as the alternatives against the lesson's own foe, and the same for mini-battle prompts that recommend an action.
 
-### 4b. `tut-lessons-review`: review the lessons with the user, and refactor them
+### 4b. `tut-course`: redesign the Gen 3 course (show, don't tell)
 
-Asked by the user (2026-10-26): they haven't seen the lessons yet, and want them to take up the principles built into the coach. Starts after step 4, before step 5. Walk through each lesson with the user (screenshots), then refactor. Candidates:
+Asked by the user (2026-10-26) after the lesson review page (https://claude.ai/artifact/1EtgrckxDnnx8RsDDLJ71P): outside the battle screen the lessons are plain text. The course must teach by showing, be polished, communicate each concept clearly, build each concept on the last, and stay consistent with the coach. Every lesson gets care and detail. **Ask the user design questions as the redesign goes** (mockups or screenshots before wiring, as always).
 
-- **Grade quizzes with the judge and rollouts**, like the coach: a "best" answer must be the judge's top choice and win at least as often as the others against the lesson's foe (`scripts/quiz-audit.ts`). Audit (2026-10-26, 60 runs each): no "best" answer loses to a lower grade, but several quizzes don't discriminate at all (every answer wins 100%, or all 0%): `gen3-types` 4, `gen3-split` 4, `gen3-switching` 4, `gen3-spikes` 6 and 7, `gen3-winning` 2. There the grade rests only on the immediate effect, which can teach that it doesn't matter.
-- **Risk wording:** answer explanations in the coach's plain risk style, one concept at a time.
-- **Show, don't tell:** replay the answer's turn on the battle screen (review mode), with the same You / Better tags.
-- **Lesson battles:** prompts that recommend an action also pass the judge.
+#### Decided (2026-10-26)
+
+- **Teach on the battle screen.** A concept is shown as a short demo turn on the real battle screen: everything else dims to about 30%, the part that matters keeps full colour with a soft ring, and a one-line caption sits in the coach's tip slot above the controls (the same place as tips and the review). Text cards shrink to a title and one sentence.
+- **Practice plays out.** After the player answers a practice position, the turn plays with their choice (real animations). If it wasn't best, the coach card gives the reason (the coach's own words) and **Show the better choice** replays the same turn with it, with the You / Better tags of review mode. Try again any time.
+- **Short lessons:** one idea each, 3–5 minutes, about 5–7 steps (show it, try it twice, a short battle).
+- **Curriculum** (18 lessons in 7 units, then graduation; each needs only the ones before it):
+  1. The battle: 1 A turn, 2 Switching
+  2. Damage: 3 Super effective and resisted, 4 Immune, 5 Same-type bonus, 6 Physical vs special (Gen 3)
+  3. Turn order: 7 Speed, 8 Priority
+  4. Risk and switching: 9 What can the foe do to you?, 10 Switch to take the hit, 11 Free turns
+  5. Lasting effects: 12 Burn and paralysis, 13 Toxic and sleep, 14 Spikes and Rapid Spin
+  6. Getting ahead: 15 Setting up, 16 Items
+  7. The whole game: 17 Team roles and leads, 18 Win conditions and closing out
+  - Graduation. Luck is a short note before the first battle with luck, not a lesson.
+- **Prediction and reads** go to a future advanced course (out of scope). This course keeps risk: "what's the worst the foe can do to you right now", and what a foe could carry (its possible sets), the way the coach thinks.
+- **Course map:** a vertical path of units, one node per lesson with its star Pokémon's sprite, a check when done, the next one highlighted; a done lesson can be replayed.
+- **Lesson battles against the Easy AI use the coach's judged tips and warnings** instead of fixed prompts by turn. When two compete, the one about the lesson's idea wins and links back to it. **The coach never mentions a concept the player hasn't learned yet**: each tip kind and warning reason is tied to the lesson that teaches it, and in lessons the coach is quiet about later ones.
+
+#### Standards for every lesson
+
+- One concept per lesson and per step; each builds on earlier lessons only.
+- Every demo and practice position passes the judge (the "best" answer is its top choice) **and** the rollouts against the lesson's foe (the best answer wins clearly more often, not 100% vs 100%): `scripts/lesson-judge.ts`, `scripts/quiz-audit.ts`, then content tests.
+- The same words as the coach: explanations reuse the coach's reasons (`explain.ts`) where they fit.
+- Phone first, no page scrolling; polished visuals, with each lesson's own Pokémon and backgrounds.
+
+#### Plan
+
+1. **Toolkit, as a vertical slice on one lesson** (lesson 3, Super effective and resisted): the demo step (scripted turn, spotlight, caption), the practice step (play it out, show the better choice), the course map, and concept gating for the coach. Screenshots to the user before wiring; iterate.
+2. **Storyboard each unit** (per lesson: the idea, the demo turn, two practice positions, the battle), checked with the judge and rollouts, reviewed with the user before building.
+3. **Build unit by unit**, each with content tests, screenshots, and a commit.
+4. **Migrate progress:** players part-way through the old 12 lessons resume at the matching new lesson.
 
 ### 5. `tut-coach-plan`: Advanced coaching with long-term plans and reads
 
