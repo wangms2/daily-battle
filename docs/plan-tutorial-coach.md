@@ -24,7 +24,7 @@ Working plan for the `tutorial` branch. It records what's built, the decisions b
 
 ## Waiting on the user
 
-Next: step 4b (the course redesign), starting with the toolkit on one lesson as a vertical slice, with design questions to the user along the way. Queued for a quiet night (low concurrency): the targeted Explosion run vs Normal (step 4).
+Next: step 4b, storyboarding unit 1 (lessons 1–2) for the user's review; the vertical slice (lesson 3 draft, the demo and practice steps, the course map at `#learn/course`) is built. Queued for a quiet night (low concurrency): the targeted Explosion run vs Normal (step 4).
 
 ## Decided 2026-10-26 (morning answers)
 
@@ -231,6 +231,15 @@ Asked by the user (2026-10-26) after the lesson review page (https://claude.ai/a
 - **Prediction and reads** go to a future advanced course (out of scope). This course keeps risk: "what's the worst the foe can do to you right now", and what a foe could carry (its possible sets), the way the coach thinks.
 - **Course map:** a vertical path of units, one node per lesson with its star Pokémon's sprite, a check when done, the next one highlighted; a done lesson can be replayed.
 - **Lesson battles against the Easy AI use the coach's judged tips and warnings** instead of fixed prompts by turn. When two compete, the one about the lesson's idea wins and links back to it. **The coach never mentions a concept the player hasn't learned yet**: each tip kind and warning reason is tied to the lesson that teaches it, and in lessons the coach is quiet about later ones.
+
+#### Decided while building the slice (2026-10-26)
+
+- **Demo step:** separate steps, one turn each; the spotlight dims the rest to about a quarter and rings the targets (as shown); the turn plays on **Watch**; captions one or two short sentences. After the turn, ↺ and Next sit side by side so the card is only as tall as its text (several buttons stack under the text).
+- **Practice step:** the Better tag appears only after **Show better**, so Try again is still a real try; Next once the player picks the best move or has watched it; an OK pick gets "Good, but there's better." with Show better and Try again. Practice turns play out in full (the foe's reply is the point); demos stop at your move.
+- **Positions** set starting HP directly (`Position.hp`), so no earlier turns in the log give the answer away.
+- **The coach in lessons** knows the lesson foe's sets (fixed content), so its facts are true for that foe.
+- **Course map:** the straight list (unit headings with progress, each lesson's star Pokémon in a ringed circle, a Start here / Up next card on top). A winding path was tried and dropped. Every lesson can be opened; the next one in order is suggested.
+- **When the new course ships, everyone starts it fresh** (graduation status stays); no mapping from the old 12 lessons.
 
 #### Standards for every lesson
 
