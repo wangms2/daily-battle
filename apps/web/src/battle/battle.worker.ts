@@ -44,7 +44,10 @@ self.onmessage = async (event: MessageEvent<ToWorker>) => {
       engine = new BattleEngine(start, hard, undefined, judge);
       post({ type: 'package', pkg: engine.begin() });
     } else if (msg.type === 'turn') {
-      post({ type: 'turn', turn: presentTurn(msg.format, msg.position, msg.turn, msg.spots) });
+      post({
+        type: 'turn',
+        turn: presentTurn(msg.format, msg.position, msg.turn, msg.spots, msg.whole),
+      });
     } else if (msg.type === 'position') {
       post({ type: 'position', position: presentPosition(msg.format, msg.position, msg.steps) });
     } else if (!engine) {

@@ -73,6 +73,23 @@ describe('BattleSession', () => {
     expect(play('1,2,3,4')).not.toBe(play('9,9,9,9'));
   });
 
+  it('sets HP silently, and both sides see it', () => {
+    const s = new BattleSession({ seed: deriveSeed('session', 6), ...teams(6) });
+    s.drain('p1');
+    s.setHp('p1', 0, 0.3);
+    s.setHp('p2', 0, 0.55);
+    const own = s.view('p1')!;
+    const [hp, max] =
+      own.request.requestType === 'move'
+        ? own.request.side.pokemon[0]!.condition.split(' ')[0]!.split('/').map(Number)
+        : [];
+    expect(hp! / max!).toBeCloseTo(0.3, 2);
+    expect(own.battle.p2.active[0]!.hp).toBe(55);
+    // Sent as a silent update (no battle text).
+    const lines = s.drain('p1');
+    expect(lines.some((l) => l.startsWith('|-sethp|') && l.endsWith('[silent]'))).toBe(true);
+  });
+
   it('reports the winning side, not its name, when players are named', () => {
     const { p1, p2 } = teams(4);
     const s = new BattleSession({

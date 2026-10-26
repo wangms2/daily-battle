@@ -158,6 +158,20 @@ export class BattleSession {
    * and so on). Offline evaluation forks a battle at a decision and plays it
    * out many times, each with its own luck (packages/tutorial/scripts/coach-eval.ts).
    */
+  /**
+   * Sets a Pokémon's HP (a fraction of its max), silently: a lesson position
+   * that starts part-way through a fight, with no turns in the log to get there.
+   */
+  setHp(side: SideID, slot: number, frac: number): void {
+    const mon = this.battle[side].pokemon[slot];
+    if (!mon) throw new Error(`No Pokémon ${slot + 1} on ${side}`);
+    mon.sethp(Math.max(1, Math.round(mon.maxhp * frac)));
+    if (mon.isActive) this.battle.add('-sethp', mon, mon.getHealth, '[silent]');
+    // The pending requests were made before: remake them, so each side sees its new HP.
+    if (this.battle.requestState) this.battle.makeRequest(this.battle.requestState);
+    this.battle.sendUpdates();
+  }
+
   reseed(seed: PRNGSeed): void {
     this.battle.resetRNG(seed);
     this.battle.sendUpdates();

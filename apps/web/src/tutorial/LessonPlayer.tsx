@@ -716,7 +716,7 @@ function Practice({
   const factory = useCallback((): BattleBackend => {
     const b = createBackend();
     const play = (p1: string) =>
-      b.turn!(format, step.position, { p1, p2: step.foe }, step.spotlight ?? []);
+      b.turn!(format, step.position, { p1, p2: step.foe }, step.spotlight ?? [], true);
     let opening: Promise<LessonTurn> | null = null;
     return {
       start: () => {

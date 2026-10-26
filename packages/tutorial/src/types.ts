@@ -28,6 +28,11 @@ export interface Round {
 export interface Position {
   p1: Mon[];
   p2: Mon[];
+  /**
+   * Starting HP (% of max) by team slot, set silently at the start: a position
+   * part-way through a fight without turns in the log to get there.
+   */
+  hp?: { p1?: (number | null)[]; p2?: (number | null)[] };
   /** Seed label (the battle seed is derived from it). */
   seed: string;
   rounds?: Round[];

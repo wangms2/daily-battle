@@ -270,6 +270,7 @@ export type ToWorker =
       position: Position;
       turn: { p1?: string; p2?: string };
       spots: string[];
+      whole?: boolean;
     };
 
 export type FromWorker =

@@ -22,6 +22,9 @@ export function startPosition(format: string, position: Position): BattleSession
     p1: { team: teamOf(format, position.p1), name: 'You' },
     p2: { team: teamOf(format, position.p2), name: 'The opponent' },
   });
+  for (const side of SIDES)
+    for (const [slot, pct] of (position.hp?.[side] ?? []).entries())
+      if (pct !== null) session.setHp(side, slot, pct / 100);
   for (const [i, round] of (position.rounds ?? []).entries()) {
     for (const side of SIDES) {
       const request = session.request(side);

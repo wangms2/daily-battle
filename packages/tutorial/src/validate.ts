@@ -86,7 +86,11 @@ export interface Outcome {
  * (the player as the Normal AI, the foe as `foeAi`) to the end, over
  * `runs` seeds. Every answer gets the same seeds, so only the answer differs.
  */
-export function answerOutcomes(format: string, step: QuizStep, runs = 24): Outcome[] {
+export function answerOutcomes(
+  format: string,
+  step: Pick<QuizStep, 'position' | 'answers'> & { foeAi?: QuizStep['foeAi'] },
+  runs = 24,
+): Outcome[] {
   const data = setsFor(format);
   return step.answers.map(({ choice }) => {
     let wins = 0;

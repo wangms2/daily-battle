@@ -1,4 +1,4 @@
-import { setsFor } from '@daily-battle/data';
+import { setsFor, type SetEntry } from '@daily-battle/data';
 import { findSet, toPokemonSet } from '@daily-battle/gen';
 import { Dex, type PokemonSet } from '@pkmn/sim';
 import type { Mon } from './types';
@@ -27,3 +27,27 @@ export function monSet(format: string, mon: Mon): PokemonSet {
 
 export const teamOf = (format: string, mons: Mon[]): PokemonSet[] =>
   mons.map((m) => monSet(format, m));
+
+/** A lesson team's real sets by species (for checking lesson content with the judge). */
+export function knownSets(format: string, mons: Mon[]): Record<string, SetEntry> {
+  const out: Record<string, SetEntry> = {};
+  for (const m of mons) {
+    const s = monSet(format, m);
+    out[m.species] = {
+      id: `lesson-${toId(m.species)}`,
+      sourceName: 'lesson',
+      label: 'Lesson',
+      description: '',
+      weight: 1,
+      moves: s.moves,
+      item: s.item,
+      ability: s.ability,
+      nature: s.nature,
+      evs: { ...NEUTRAL, ...s.evs },
+      ivs: { ...MAX_IVS, ...s.ivs },
+    };
+  }
+  return out;
+}
+
+const toId = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '');

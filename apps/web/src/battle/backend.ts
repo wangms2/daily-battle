@@ -45,6 +45,8 @@ export interface BattleBackend {
     position: Position,
     turn: { p1?: string; p2?: string },
     spots?: string[],
+    /** The whole turn (practice), not just your move (a demo). */
+    whole?: boolean,
   ): Promise<LessonTurn>;
   /** A quiz position (Learn mode); separate from any battle in progress. */
   position?(format: string, position: Position, steps: string[]): Promise<PositionPackage>;
@@ -115,8 +117,8 @@ export function workerBackend(): BattleBackend {
       worker.addEventListener('message', onMessage);
       return () => worker.removeEventListener('message', onMessage);
     },
-    turn: (format, position, turn, spots = []) =>
-      send<LessonTurn>({ type: 'turn', format, position, turn, spots }),
+    turn: (format, position, turn, spots = [], whole = false) =>
+      send<LessonTurn>({ type: 'turn', format, position, turn, spots, whole }),
     position: (format, position, steps) =>
       send<PositionPackage>({ type: 'position', format, position, steps }),
   };

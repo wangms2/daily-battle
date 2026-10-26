@@ -15,7 +15,13 @@
 //
 // The work is a queue of one-world searches, so the battle worker can run it a
 // slice at a time while the player chooses.
-import { prepareWorlds, searchWorld, toChoice, type PreparedWorld } from '@daily-battle/ai';
+import {
+  prepareWorlds,
+  searchWorld,
+  toChoice,
+  type KnownSets,
+  type PreparedWorld,
+} from '@daily-battle/ai';
 import type { SetsFile } from '@daily-battle/data';
 import type { Engine, SearchResult } from '@daily-battle/engine-wasm';
 import { deriveSeed, legalChoices, makeRng, type SideView } from '@daily-battle/sim-bridge';
@@ -31,6 +37,11 @@ export interface JudgeOptions {
   agree: number;
   /** The week's pool: the prior for foes not seen yet. */
   pool?: readonly string[];
+  /**
+   * The foe's real sets, by species. Only for checking lesson content offline,
+   * where the player is told what the foe is; never in play.
+   */
+  knownSets?: KnownSets;
 }
 
 /** Provisional until the offline check (docs/plan-tutorial-coach.md, step 2). */
@@ -119,6 +130,7 @@ export class Judge {
         iterations: this.options.iterations,
         worlds: this.options.worlds,
         ...(this.options.pool ? { pool: this.options.pool } : {}),
+        ...(this.options.knownSets ? { knownSets: this.options.knownSets } : {}),
       });
     } catch {
       this.failed = true;

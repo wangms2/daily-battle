@@ -1,4 +1,6 @@
+import { engineBuilt, loadEngine } from '@daily-battle/engine-wasm/node';
 import { describe, expect, it } from 'vitest';
+import { practiceCheck } from './coach/lesson-check';
 import { LESSONS } from './index';
 import { lessonProblems } from './validate';
 
@@ -67,4 +69,17 @@ describe('lessonProblems', () => {
     expect(leadProblems).toContain('a lead pick picks exactly one');
     expect(leadProblems).toContain(`Mewtwo isn't in the game's species data`);
   });
+});
+
+// The redesigned course's practice positions: the best answer is the judge's
+// top choice, wins clearly more often, and every wrong answer is explained by
+// an idea already taught (docs/plan-tutorial-coach.md, step 4b).
+describe.skipIf(!engineBuilt(3))('practice positions', () => {
+  for (const lesson of LESSONS.gen3ou ?? [])
+    for (const [n, step] of lesson.steps.entries())
+      if (step.kind === 'practice')
+        it(`${lesson.id} step ${n + 1} decides on what's been taught`, () => {
+          const { problems } = practiceCheck(loadEngine(3), lesson.format, step, lesson.number, 30);
+          expect(problems).toEqual([]);
+        }, 120_000);
 });

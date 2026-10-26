@@ -389,6 +389,8 @@ export function presentTurn(
   position: Position,
   turn: { p1?: string; p2?: string },
   spots: string[] = [],
+  /** A demo shows only your move; practice shows the whole turn (the foe's reply is the point). */
+  whole = false,
 ): TurnReplay & { choice: string; spots: string[] } {
   const session = startPosition(format, position);
   const request = session.request('p1')!;
@@ -404,7 +406,7 @@ export function presentTurn(
   if (foe && turn.p2) session.choose('p2', resolveStep(turn.p2, foe) ?? '');
   const lines = session.drain('p1');
   // A demo shows your move: the turn stops before the foe's (it moves second).
-  const foeMoves = lines.findIndex((l) => l.startsWith('|move|p2a:'));
+  const foeMoves = whole ? -1 : lines.findIndex((l) => l.startsWith('|move|p2a:'));
   const after = presenter.present(
     {
       lines: foeMoves < 0 ? lines : lines.slice(0, foeMoves),

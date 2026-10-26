@@ -52,7 +52,8 @@ export function inlineBackend(hardEngine?: (format: string) => Engine): BattleBa
       tipListeners.add(onTip);
       return () => tipListeners.delete(onTip);
     },
-    turn: async (format, position, turn, spots) => presentTurn(format, position, turn, spots),
+    turn: async (format, position, turn, spots, whole) =>
+      presentTurn(format, position, turn, spots, whole),
     position: async (format, position, steps) => presentPosition(format, position, steps),
   };
 }
