@@ -153,7 +153,28 @@ export interface DemoStep {
   spotlight?: { before?: string[]; after?: string[] };
 }
 
-export type Step = CardStep | QuizStep | BattleStep | PickStep | DemoStep;
+/**
+ * Practice (docs/plan-tutorial-coach.md, step 4b): the player picks on the
+ * battle screen, the turn plays with their pick, and if it wasn't best, the
+ * better choice can be replayed. Every choice that decides it should turn on
+ * this lesson's idea or earlier ones.
+ */
+export interface PracticeStep {
+  kind: 'practice';
+  /** The question, one line. */
+  prompt: string;
+  position: Position;
+  /** What the foe does this turn, whatever the player picks (a step). */
+  foe: string;
+  /** Graded choices; exactly one is `best`. */
+  answers: Answer[];
+  /** For any other choice. */
+  otherwise: string;
+  /** Parts of the screen to point at while the player chooses (as in `DemoStep`). */
+  spotlight?: string[];
+}
+
+export type Step = CardStep | QuizStep | BattleStep | PickStep | DemoStep | PracticeStep;
 
 export interface Lesson {
   /** Stable id, stored in progress (e.g. `gen3-basics`). */

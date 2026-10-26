@@ -160,6 +160,60 @@ describe('demo steps', () => {
     expect(onDone).toHaveBeenCalled();
   });
 
+  it('practice: plays your pick, shows the better choice on request, and passes the best', async () => {
+    const practice: Lesson = {
+      ...demoLesson,
+      steps: [
+        {
+          kind: 'practice',
+          prompt: 'Which move hits Skarmory hardest?',
+          position: {
+            p1: [{ species: 'Starmie', moves: ['Surf', 'Thunderbolt', 'Psychic'] }],
+            p2: [{ species: 'Skarmory', moves: ['Drill Peck'] }],
+            seed: 'learn:practice',
+          },
+          foe: 'move Drill Peck',
+          answers: [
+            { choice: 'move Thunderbolt', grade: 'best', why: 'Electric beats Flying.' },
+            { choice: 'move Psychic', grade: 'wrong', why: 'Steel resists Psychic.' },
+          ],
+          otherwise: 'Thunderbolt does double damage.',
+        },
+      ],
+    };
+    const backend = inlineBackend();
+    const onDone = vi.fn();
+    render(
+      <BattleBackendContext.Provider value={() => backend}>
+        <LessonPlayer
+          lesson={practice}
+          step={0}
+          settings={{ ...initialState().settings, battleSpeed: 'instant' }}
+          onSetting={() => {}}
+          onExplainerSeen={() => {}}
+          onStep={() => {}}
+          onDone={onDone}
+          onExit={() => {}}
+          onSettings={() => {}}
+        />
+      </BattleBackendContext.Provider>,
+    );
+    await userEvent.click(await screen.findByRole('button', { name: /^Psychic, / }));
+    expect(await screen.findByText('Steel resists Psychic.')).toBeInTheDocument();
+    // The answer waits for Show better.
+    expect(screen.queryByRole('button', { name: /, Better$/ })).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Show better' }));
+    await userEvent.click(await screen.findByRole('button', { name: /Watch/ }));
+    expect(
+      await screen.findByRole('button', { name: /^Thunderbolt, .*, Better$/ }),
+    ).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Try again' }));
+    await userEvent.click(await screen.findByRole('button', { name: /^Thunderbolt, / }));
+    expect(await screen.findByText(/That’s it/)).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Finish' }));
+    expect(onDone).toHaveBeenCalled();
+  });
+
   it('keeps draft lessons out of the list', () => {
     render(
       <Learn

@@ -58,9 +58,15 @@ export function warmBattleWorker(): Worker {
   return shared;
 }
 
+/**
+ * Messages to the shared worker, one at a time: every backend uses this queue,
+ * so an answer can't be taken by another backend's question (a lesson asks for
+ * a position and a turn at once).
+ */
+let queue: Promise<unknown> = Promise.resolve();
+
 /** Sends messages one at a time and resolves each with the worker's answer. */
 export function workerBackend(): BattleBackend {
-  let queue: Promise<unknown> = Promise.resolve();
   const send = <T = TurnPackage>(msg: ToWorker) => {
     const next = queue.then(
       () =>

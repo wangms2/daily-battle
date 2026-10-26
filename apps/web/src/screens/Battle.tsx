@@ -99,8 +99,16 @@ export interface LiveOptions {
  * and practice answers this way.
  */
 export interface StagedTurn {
-  /** The choice the turn plays. */
-  choice: string;
+  /**
+   * The choice the turn plays. Left out, the player picks it on the controls
+   * (a lesson's practice), and `onPick` hears which.
+   */
+  choice?: string;
+  onPick?: (choice: string) => void;
+  /** After the turn, offer "Again" (on unless false). */
+  again?: boolean;
+  /** After the turn, the buttons go in a row under the text (for two or more), not beside it. */
+  stack?: boolean;
   /** Tags on the controls; the other choices fade. */
   marks?: Record<string, Mark>;
   /** The top bar's contents. */
@@ -470,7 +478,13 @@ export function Battle({
   // The coach checks a choice first; a flagged one asks before it's sent. If
   // the check takes too long, the choice goes through unwarned.
   const pick = (choice: string) => {
-    if (staged) return;
+    if (staged) {
+      // Practice: the player's pick plays the turn.
+      if (staged.choice !== undefined || played) return;
+      setPlayed(true);
+      staged.onPick?.(choice);
+      return choose(choice);
+    }
     if (!coach || !backend.coachCheck) return choose(choice);
     setChecking(true);
     const slow = setTimeout(() => setCheckingNote(true), CHECKING_MS);
@@ -663,7 +677,8 @@ export function Battle({
       hints={settings.beginnerHints}
       disabled={playing}
       onChoose={pick}
-      {...(staged.marks && { marks: staged.marks })}
+      // Practice: the controls work until the player picks; then the tags show.
+      {...(staged.marks && (staged.choice !== undefined || played) && { marks: staged.marks })}
     />
   ) : (
     <ControlPanel
@@ -680,35 +695,41 @@ export function Battle({
       role="note"
       aria-label={staged.label}
       data-spot="coach"
-      className="animate-fade-in flex items-center gap-2 rounded-card bg-accent-soft px-3 py-2 text-[14px] leading-snug"
+      className={clsx(
+        'animate-fade-in flex gap-2 rounded-card bg-accent-soft px-3 py-2 text-[14px] leading-snug',
+        // Several buttons go under the text; one sits beside it, so the card stays short.
+        staged.stack && played && !playing ? 'flex-col' : 'items-center',
+      )}
     >
       <div className="min-w-0 flex-1">
         {played && !playing ? (staged.after ?? staged.before) : staged.before}
       </div>
       {!playing && (
         // Side by side, so the card is only as tall as its text.
-        <div className="flex shrink-0 items-center gap-1.5">
-          {played ? (
-            <button
-              type="button"
-              aria-label="Again"
-              title="Again"
-              onClick={staged.onReplay}
-              className="btn btn-secondary grid size-9 place-items-center p-0 text-[17px]"
-            >
-              <span aria-hidden>↺</span>
-            </button>
-          ) : (
-            <Button
-              className="h-9 px-3 text-[13.5px]"
-              onClick={() => {
-                setPlayed(true);
-                choose(staged.choice);
-              }}
-            >
-              {staged.playLabel ?? '▶ Play'}
-            </Button>
-          )}
+        <div className="flex shrink-0 items-center justify-end gap-1.5">
+          {played
+            ? staged.again !== false && (
+                <button
+                  type="button"
+                  aria-label="Again"
+                  title="Again"
+                  onClick={staged.onReplay}
+                  className="btn btn-secondary grid size-9 place-items-center p-0 text-[17px]"
+                >
+                  <span aria-hidden>↺</span>
+                </button>
+              )
+            : staged.choice !== undefined && (
+                <Button
+                  className="h-9 px-3 text-[13.5px]"
+                  onClick={() => {
+                    setPlayed(true);
+                    choose(staged.choice!);
+                  }}
+                >
+                  {staged.playLabel ?? '▶ Play'}
+                </Button>
+              )}
           {played && staged.next}
         </div>
       )}
@@ -737,7 +758,7 @@ export function Battle({
       {stagedNote}
       {promptNote}
       {tip && <CoachTip text={tip.text} onDismiss={() => setTipHidden(true)} />}
-      {controlPanel}
+      <div data-spot="controls">{controlPanel}</div>
       {waitingNote}
       {coachChecking}
     </div>
@@ -892,7 +913,16 @@ export function Battle({
   return (
     <div ref={rootRef} className="relative flex h-full flex-col" data-gen={gen}>
       {topBar}
-      <Spotlight root={rootRef} targets={spotlight} keep={['coach', 'header']} />
+      <Spotlight
+        root={rootRef}
+        targets={spotlight}
+        // While the player picks (practice), the controls stay lit too.
+        keep={
+          staged && staged.choice === undefined && !played
+            ? ['coach', 'header', 'controls']
+            : ['coach', 'header']
+        }
+      />
       {wide ? (
         // A size container: the stage (field + controls) and the log sit side by side,
         // the stage as wide as fits (up to a comfortable 960px) with room for the

@@ -6,6 +6,7 @@ import type {
   BattleStep,
   CardStep,
   DemoStep,
+  PracticeStep,
   Grade,
   Lesson,
   PickStep,
@@ -15,7 +16,9 @@ import clsx from 'clsx';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { BattleBackendContext, useBattleBackend } from '../battle/backend';
 import { replayBackend } from '../battle/replay-backend';
+import type { BattleBackend } from '../battle/backend';
 import type { EngineStart, LessonTurn, PositionPackage, Who } from '../battle/frames';
+import type { Mark } from '../battle/ui/Controls';
 import { ControlPanel } from '../battle/ui/Controls';
 import { Field } from '../battle/ui/Field';
 import { MonPopover } from '../battle/ui/MonPopover';
@@ -64,6 +67,23 @@ export function LessonPlayer({
   const next = () => (last ? onDone() : onStep(index + 1));
   const background = backgroundFor(lesson.id, lesson.format);
   const title = lesson.graduation ? lesson.title : `${lesson.number}. ${lesson.title}`;
+
+  if (step.kind === 'practice')
+    return (
+      <Practice
+        key={index}
+        step={step}
+        format={lesson.format}
+        background={background}
+        settings={settings}
+        title={title}
+        index={index}
+        count={lesson.steps.length}
+        last={last}
+        onNext={next}
+        onExit={onExit}
+      />
+    );
 
   if (step.kind === 'demo')
     return (
@@ -620,6 +640,212 @@ function Demo({
           ),
           onReplay: () => setRound((r) => r + 1),
         }}
+      />
+    </BattleBackendContext.Provider>
+  );
+}
+
+/** The battle screen's start for a lesson position shown as a staged turn. */
+const stagedStart = (format: string, seed: string): EngineStart => ({
+  format,
+  playerTeam: [],
+  opponentTeam: [],
+  style: 'balance',
+  battleSeed: seed,
+  aiSeed: seed,
+  choices: [],
+  tutorial: { noLuck: true },
+});
+
+/**
+ * A practice step: the player picks on the battle screen, the turn plays with
+ * their pick, and the coach card says why it was (or wasn't) best. If it
+ * wasn't, Show the better choice replays the same turn with the best one.
+ */
+function Practice({
+  step,
+  format,
+  background,
+  settings,
+  title,
+  index,
+  count,
+  last,
+  onNext,
+  onExit,
+}: {
+  step: PracticeStep;
+  format: string;
+  background: string;
+  settings: Settings;
+  title: string;
+  index: number;
+  count: number;
+  last: boolean;
+  onNext: () => void;
+  onExit: () => void;
+}) {
+  const createBackend = useBattleBackend();
+  // Each try (and each look at the better choice) starts the screen fresh.
+  const [round, setRound] = useState(0);
+  const [picked, setPicked] = useState<string | null>(null);
+  const [better, setBetter] = useState(false);
+  // The answers' steps as choices (`move Surf` → `move 1`).
+  const [choices, setChoices] = useState<(string | null)[] | null>(null);
+  const [spots, setSpots] = useState<string[]>([]);
+  const best = step.answers.findIndex((a) => a.grade === 'best');
+  const bestChoice = choices?.[best] ?? undefined;
+  const answer = picked === null ? undefined : step.answers[choices?.indexOf(picked) ?? -1];
+
+  useEffect(() => {
+    const b = createBackend();
+    let live = true;
+    b.position?.(
+      format,
+      step.position,
+      step.answers.map((a) => a.choice),
+    ).then(
+      (p) => live && setChoices(p.choices),
+      () => {},
+    );
+    return () => {
+      live = false;
+    };
+  }, [createBackend, format, step]);
+
+  const factory = useCallback((): BattleBackend => {
+    const b = createBackend();
+    const play = (p1: string) =>
+      b.turn!(format, step.position, { p1, p2: step.foe }, step.spotlight ?? []);
+    let opening: Promise<LessonTurn> | null = null;
+    return {
+      start: () => {
+        opening = play(step.answers[best]!.choice);
+        return opening.then((t) => {
+          setSpots(t.spots);
+          return t.before;
+        });
+      },
+      choose: (choice) => play(choice).then((t) => t.turn),
+      forfeit: () => Promise.reject(new Error('A practice turn can’t be given up')),
+    };
+  }, [createBackend, format, step, best]);
+
+  const tryAgain = () => {
+    setPicked(null);
+    setBetter(false);
+    setRound((r) => r + 1);
+  };
+  const header = (
+    <>
+      <BackButton label={title} onClick={onExit} />
+      <span className="text-[13px] text-muted tabular-nums">
+        {index + 1} of {count}
+      </span>
+    </>
+  );
+  const nextButton = (
+    <Button className="h-9 px-3 text-[13.5px]" onClick={onNext}>
+      {last ? 'Finish' : 'Next'}
+    </Button>
+  );
+  const right = picked !== null && picked === bestChoice;
+  // The Better tag waits for Show better, so Try again is still a real try.
+  const marks: Record<string, Mark> | undefined =
+    picked === null || !bestChoice
+      ? undefined
+      : right
+        ? { [picked]: 'best' }
+        : better
+          ? { [picked]: 'you', [bestChoice]: 'better' }
+          : { [picked]: 'you' };
+  const feedback = right ? (
+    <p>
+      <b>That’s it.</b> {answer?.why}
+    </p>
+  ) : (
+    <p>
+      {answer?.grade === 'ok' && <b>Good, but there’s better. </b>}
+      {answer?.why ?? step.otherwise}
+    </p>
+  );
+  const after = right ? (
+    nextButton
+  ) : (
+    <>
+      <Button
+        className="h-9 px-3 text-[13.5px]"
+        onClick={() => {
+          setBetter(true);
+          setRound((r) => r + 1);
+        }}
+      >
+        Show better
+      </Button>
+      <Button variant="secondary" className="h-9 px-3 text-[13.5px]" onClick={tryAgain}>
+        Try again
+      </Button>
+    </>
+  );
+
+  // One start per step: a new one would restart the battle screen.
+  const start = useMemo(() => stagedStart(format, step.position.seed), [format, step]);
+  return (
+    <BattleBackendContext.Provider value={factory}>
+      <Battle
+        key={round}
+        start={start}
+        background={background}
+        settings={{ ...settings, beginnerHints: false }}
+        onSetting={() => {}}
+        onExplainerSeen={() => {}}
+        onChoice={() => {}}
+        onEnd={() => {}}
+        onExit={onExit}
+        staged={
+          better && bestChoice
+            ? {
+                // The better choice, played on the same turn.
+                choice: bestChoice,
+                ...(marks && { marks }),
+                header,
+                before: (
+                  <p>
+                    <b>{choiceLabel(step.answers[best]!.choice)}</b> was better.{' '}
+                    {step.answers[best]!.why}
+                  </p>
+                ),
+                label: 'Practice',
+                playLabel: '▶ Watch',
+                stack: true,
+                next: (
+                  <>
+                    <Button
+                      variant="secondary"
+                      className="h-9 px-3 text-[13.5px]"
+                      onClick={tryAgain}
+                    >
+                      Try again
+                    </Button>
+                    {nextButton}
+                  </>
+                ),
+                onReplay: () => setRound((r) => r + 1),
+              }
+            : {
+                ...(marks && { marks }),
+                header,
+                before: <p>{step.prompt}</p>,
+                after: feedback,
+                label: 'Practice',
+                spotlight: { before: spots },
+                onPick: setPicked,
+                again: false,
+                stack: !right,
+                next: after,
+                onReplay: tryAgain,
+              }
+        }
       />
     </BattleBackendContext.Provider>
   );

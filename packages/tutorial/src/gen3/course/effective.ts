@@ -53,5 +53,73 @@ export const effective: Lesson = {
         'Weak to Ice twice over: Ice Beam does four times the damage, enough to knock Flygon out.',
       spotlight: { before: ['move Ice Beam', 'foe-types'], after: ['log'] },
     },
+    {
+      kind: 'practice',
+      prompt: 'Skarmory is a Steel and Flying type. Which move hits it hardest?',
+      position: {
+        p1: [STARMIE],
+        p2: [{ species: 'Skarmory', moves: ['Drill Peck'] }],
+        seed: 'course:effective:practice1',
+      },
+      foe: 'move Drill Peck',
+      answers: [
+        {
+          choice: 'move Thunderbolt',
+          grade: 'best',
+          why: 'Electric is strong against Flying, so Thunderbolt does double damage.',
+        },
+        {
+          choice: 'move Psychic',
+          grade: 'wrong',
+          why: 'Steel resists Psychic, so it does only half damage.',
+        },
+        {
+          choice: 'move Ice Beam',
+          grade: 'wrong',
+          why: 'Ice is strong against Flying but weak against Steel: it evens out to normal damage.',
+        },
+        {
+          choice: 'move Surf',
+          grade: 'ok',
+          why: 'Surf does normal damage to Skarmory. Thunderbolt does double.',
+        },
+      ],
+      otherwise: 'Thunderbolt does double damage to Skarmory.',
+      spotlight: ['foe-types'],
+    },
+    {
+      kind: 'practice',
+      prompt: 'Celebi is a Psychic and Grass type. Which move hits it hardest?',
+      position: {
+        p1: [STARMIE],
+        p2: [{ species: 'Celebi', moves: ['Psychic'] }],
+        seed: 'course:effective:practice2',
+      },
+      foe: 'move Psychic',
+      answers: [
+        {
+          choice: 'move Ice Beam',
+          grade: 'best',
+          why: 'Ice is strong against Grass, so Ice Beam does double damage.',
+        },
+        {
+          choice: 'move Surf',
+          grade: 'wrong',
+          why: 'Grass resists Water, so Surf does only half damage.',
+        },
+        {
+          choice: 'move Thunderbolt',
+          grade: 'wrong',
+          why: 'Grass resists Electric, so Thunderbolt does only half damage.',
+        },
+        {
+          choice: 'move Psychic',
+          grade: 'wrong',
+          why: 'Psychic resists Psychic, so it does only half damage.',
+        },
+      ],
+      otherwise: 'Ice Beam does double damage to Celebi.',
+      spotlight: ['foe-types'],
+    },
   ],
 };

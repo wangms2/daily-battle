@@ -219,6 +219,14 @@ export function lessonProblems(lesson: Lesson): string[] {
         } else if (step.foeAi !== 'easy') {
           note(where, ['a scripted battle needs an intended line']);
         }
+      } else if (step.kind === 'practice') {
+        note(where, teamIssues(format, step.position.p1));
+        note(where, teamIssues(format, step.position.p2));
+        const request = startPosition(format, step.position).request('p1')!;
+        for (const a of step.answers)
+          if (!resolveStep(a.choice, request)) note(where, [`answer "${a.choice}" isn't legal`]);
+        if (step.answers.filter((a) => a.grade === 'best').length !== 1)
+          note(where, ['a practice needs exactly one best answer']);
       } else if (step.kind === 'demo') {
         note(where, teamIssues(format, step.position.p1));
         note(where, teamIssues(format, step.position.p2));
