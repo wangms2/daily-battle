@@ -9,9 +9,12 @@
 import type { Difficulty } from '@daily-battle/ai/version';
 import type { FormatId } from '@daily-battle/data/formats';
 import { Fragment, type CSSProperties } from 'react';
+import { MASCOT } from '../lib/genColors';
+import { isShareAll, type ShareAll, type ShareModel } from '../lib/share';
 import { getSprite } from '../lib/sprites';
 import { CoachBadge, DifficultyBadge } from '../ui/Difficulty';
 import { Friends } from '../ui/Friends';
+import { ShareAllButton } from '../ui/results';
 import { CheckIcon, ChevronIcon, FlameIcon, GearIcon } from '../ui/icons';
 
 export interface GameRow {
@@ -31,14 +34,6 @@ export interface GameRow {
   coached?: boolean;
 }
 
-/** One Pokémon for each game, on its cartridge. Gen 3 shows the games' own Emerald sprite. */
-const MASCOT: Record<FormatId, { species: string; gen: number }> = {
-  gen3ou: { species: 'Swampert', gen: 3 },
-  gen4ou: { species: 'Lucario', gen: 4 },
-  gen5ou: { species: 'Volcarona', gen: 5 },
-  gen6ou: { species: 'Sylveon', gen: 6 },
-};
-
 /** Each cartridge's label wears the colors of its games, muted to sit with the rest of the UI. */
 const LABEL: Record<FormatId, string> = {
   gen3ou: 'linear-gradient(110deg, #b3666c 0 34%, #6f8cb8 34% 67%, #5f9a80 67% 100%)',
@@ -47,7 +42,7 @@ const LABEL: Record<FormatId, string> = {
   gen6ou: 'linear-gradient(110deg, #7b9bc2 0 calc(50% - 0.5px), #c4868c calc(50% + 0.5px) 100%)',
 };
 
-/** The game with lessons (Learn mode); its cartridge gets a Learn row. */
+/** The game with lessons (Learn mode); its cartridge gets a Battle basics pill. */
 const LEARN_GAME: FormatId = 'gen3ou';
 
 export function Home({
@@ -56,6 +51,7 @@ export function Home({
   onPlay,
   onFriends,
   onLearn,
+  share = null,
   onPick,
   onBack,
   onSettings,
@@ -66,6 +62,8 @@ export function Home({
   onFriends: () => void;
   /** Opens Learn mode (the Gen 3 tutorial). */
   onLearn: () => void;
+  /** Today's played games to share; null before any is played. */
+  share?: ShareModel | ShareAll | null;
   onPick: (id: FormatId) => void;
   onBack: () => void;
   onSettings: () => void;
@@ -187,32 +185,37 @@ export function Home({
           {games.map((g, i) => {
             const mascot = MASCOT[g.id];
             return (
-              <Fragment key={g.id}>
-                <button
-                  type="button"
-                  onClick={() => onPick(g.id)}
-                  style={{ '--i': i } as CSSProperties}
-                  className="home-cart grid min-h-0 max-h-[124px] flex-1 grid-cols-[84px_1fr_auto] items-center gap-2 p-2 text-left"
+              // The whole cartridge plays its game (the button's overlay covers it); Gen 3's
+              // Battle basics pill sits above the overlay.
+              <div
+                key={g.id}
+                style={{ '--i': i } as CSSProperties}
+                className="home-cart grid min-h-0 max-h-[124px] flex-1 grid-cols-[84px_1fr_auto] items-center gap-2 p-2 text-left has-[.home-cart-play:focus-visible]:outline-2 has-[.home-cart-play:focus-visible]:outline-accent"
+              >
+                <span
+                  className="relative grid h-[76px] max-h-full place-items-center overflow-hidden rounded-md border border-black/15"
+                  style={{ background: LABEL[g.id] }}
                 >
                   <span
-                    className="relative grid h-[76px] max-h-full place-items-center overflow-hidden rounded-md border border-black/15"
-                    style={{ background: LABEL[g.id] }}
+                    aria-hidden
+                    className="absolute inset-0"
+                    style={{
+                      background:
+                        'radial-gradient(circle at 50% 55%, rgb(255 255 255 / 0.45), transparent 62%)',
+                    }}
+                  />
+                  <img
+                    alt=""
+                    src={getSprite(mascot.species, 'front', undefined, mascot.gen)}
+                    className={`relative max-h-[66px] max-w-[72px] object-contain drop-shadow-[0_1px_1px_rgb(0_0_0/0.3)] ${mascot.gen === 3 ? '[image-rendering:pixelated]' : ''}`}
+                  />
+                </span>
+                <span className="min-w-0">
+                  <button
+                    type="button"
+                    onClick={() => onPick(g.id)}
+                    className="home-cart-play block w-full text-left outline-none after:absolute after:inset-0 after:content-['']"
                   >
-                    <span
-                      aria-hidden
-                      className="absolute inset-0"
-                      style={{
-                        background:
-                          'radial-gradient(circle at 50% 55%, rgb(255 255 255 / 0.45), transparent 62%)',
-                      }}
-                    />
-                    <img
-                      alt=""
-                      src={getSprite(mascot.species, 'front', undefined, mascot.gen)}
-                      className={`relative max-h-[66px] max-w-[72px] object-contain drop-shadow-[0_1px_1px_rgb(0_0_0/0.3)] ${mascot.gen === 3 ? '[image-rendering:pixelated]' : ''}`}
-                    />
-                  </span>
-                  <span className="min-w-0">
                     <span className="flex items-center gap-2">
                       <span className="text-[17px] font-semibold">{g.name}</span>
                       <DifficultyBadge difficulty={g.difficulty} />
@@ -229,30 +232,39 @@ export function Home({
                       ))}
                     </span>
                     <span className="block truncate text-[12.5px] text-muted">{g.today}</span>
-                  </span>
-                  <span
-                    className="flex items-center gap-1 text-[15px] font-semibold tabular-nums"
-                    aria-label={`Streak ${g.streak}`}
-                  >
-                    <FlameIcon className={g.streak > 0 ? 'text-gold' : 'text-muted'} />
-                    {g.streak}
-                  </span>
-                </button>
-                {g.id === LEARN_GAME && (
-                  <button
-                    type="button"
-                    onClick={onLearn}
-                    style={{ '--i': i + 0.5 } as CSSProperties}
-                    className="home-learn flex shrink-0 items-center gap-2 rounded-lg px-3 py-1.5 text-left text-[14px] font-semibold hover:bg-surface-2"
-                  >
-                    <span aria-hidden>🎓</span>
-                    <span className="flex-1">Learn to battle: lessons for new players</span>
-                    <ChevronIcon className="size-4 text-muted" aria-hidden />
+                    <span className="sr-only">. Streak {g.streak}</span>
                   </button>
-                )}
-              </Fragment>
+                  {g.id === LEARN_GAME && (
+                    <button
+                      type="button"
+                      onClick={onLearn}
+                      className="relative z-10 mt-1 flex h-6 items-center gap-1 rounded-full border border-line bg-surface px-2 text-[12px] font-semibold hover:bg-bg"
+                    >
+                      <span aria-hidden>🎓</span>
+                      Battle basics
+                    </button>
+                  )}
+                </span>
+                <span
+                  aria-hidden
+                  className="flex items-center gap-1 text-[15px] font-semibold tabular-nums"
+                >
+                  <FlameIcon className={g.streak > 0 ? 'text-gold' : 'text-muted'} />
+                  {g.streak}
+                </span>
+              </div>
             );
           })}
+          {share && (
+            <div
+              className="home-share grid shrink-0"
+              style={{ '--i': games.length } as CSSProperties}
+            >
+              <ShareAllButton share={share}>
+                {isShareAll(share) ? `Share all ${share.games.length} games` : 'Share today'}
+              </ShareAllButton>
+            </div>
+          )}
         </main>
       </section>
     </div>

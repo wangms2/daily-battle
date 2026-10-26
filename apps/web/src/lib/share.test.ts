@@ -3,7 +3,15 @@ import schedule from '../../public/schedule/2026-10-19.json';
 import type { Attempt, DayChange, DayState, Slot } from '../state/schema';
 import { summarizeDay } from './results';
 import headers from '../../public/_headers?raw';
-import { imageMode, shareImage, shareResult, shareText } from './share';
+import {
+  anyShareText,
+  imageMode,
+  shareAll,
+  shareImage,
+  shareModel,
+  shareResult,
+  shareText,
+} from './share';
 
 const DAY = '2026-10-21';
 const TEAM: Slot[] = ['Hippowdon', 'Azelf', 'Celebi', 'Heatran', 'Jirachi', 'Lucario'].map(
@@ -196,6 +204,53 @@ describe('share text', () => {
       for (const s of opponents) if (!ours.has(s)) expect(t).not.toContain(s);
       expect(t).not.toMatch(/turn/i);
     }
+  });
+});
+
+describe('share all', () => {
+  const game = (name: string, attempts: Attempt[], streak: number, difficulty?: 'easy') =>
+    shareModel({
+      day: DAY,
+      summary: summarizeDay(
+        { swapUsed: false, attempts: attempts.map((x) => ({ ...x, difficulty })) },
+        true,
+        difficulty,
+      ),
+      streak,
+      game: name,
+      difficulty,
+      url: 'https://battle.example/#daily',
+    });
+
+  it('is nothing before any game is played, and that game’s own share for just one', () => {
+    const none = game('Gen 4 OU', [], 0);
+    expect(shareAll([none], 'u')).toBeNull();
+    const one = game('Gen 3 OU', [a('win', 4)], 2);
+    expect(shareAll([one, none], 'u')).toBe(one);
+  });
+
+  it('puts two or more played games on one compact share, in picker order', () => {
+    const all = shareAll(
+      [
+        game('Gen 3 OU', [a('win', 4)], 5, 'easy'),
+        game('Gen 4 OU', [], 0),
+        game('Gen 5 OU', [a('loss', 0), a('win', 2)], 0),
+        game('Gen 6 OU', [a('loss', 0)], 0),
+      ],
+      'https://battle.example/#daily',
+    )!;
+    expect(anyShareText(all)).toBe(
+      [
+        'Pokémon Daily · Oct 21',
+        'Gen 3 OU · Easy · 🔥 5-day streak',
+        '⭐ 🟩🟩🟩🟩⬛⬛ First try!',
+        'Gen 5 OU · Streak reset',
+        '✅ 🟩🟩⬛⬛⬛⬛ Won on try 2',
+        'Gen 6 OU · Streak reset',
+        '❌ ⬛⬛⬛⬛⬛⬛ Not cleared yet · 1 try',
+        'https://battle.example/#daily',
+      ].join('\n'),
+    );
   });
 });
 

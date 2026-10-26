@@ -26,7 +26,7 @@ import type { ScheduleFile } from '@daily-battle/gen/schedule';
 import { hardAvailable } from './battle/hardEngine';
 import { currentDifficulty } from './lib/difficulty';
 import { ENGINE_VERSION, randomSeed } from './lib/seed';
-import { DIFFICULTY_NAME, shareModel } from './lib/share';
+import { DIFFICULTY_NAME, shareAll, shareModel } from './lib/share';
 import { GamesProvider } from './ui/OtherGames';
 import {
   attemptEngine,
@@ -210,6 +210,27 @@ export function App() {
     difficulty,
     coached,
   });
+  // Every game played today on one card or text (DESIGN.md §11); this game reuses `share`.
+  const todayShare = shareAll(
+    (Object.keys(FORMATS) as FormatId[]).map((id) => {
+      if (id === format) return share;
+      const gameDays = state.games[id].days;
+      const level = currentDifficulty(settings, id, gameDays[day]);
+      const b = gameBucket(id);
+      return shareModel({
+        day,
+        summary: summarizeDay(gameDays[day], true, b),
+        streak: computeStats(gameDays, day, b).streak,
+        change: gameDays[day]?.change,
+        url: shareUrl(),
+        game: `${formatInfo(id).name} OU`,
+        format: id,
+        difficulty: level,
+        coached: b === 'coached',
+      });
+    }),
+    shareUrl(),
+  );
   const countdown = countdownTo(now, addDays(day, 1));
   // The other games, for the "Play another generation" row on the result and share screens.
   const otherGames = {
@@ -224,6 +245,7 @@ export function App() {
       dispatchAny({ type: 'setSetting', key: 'format', value: id });
       go('play');
     },
+    shareAll: todayShare,
   };
   const setSetting = <K extends keyof Settings>(key: K, value: Settings[K]) =>
     dispatchAny({ type: 'setSetting', key, value });
@@ -418,6 +440,7 @@ export function App() {
         onPlay={() => go('daily')}
         onFriends={() => go('versus')}
         onLearn={() => go('learn')}
+        share={todayShare}
         onPick={(id) => {
           if (id !== format) dispatchAny({ type: 'setSetting', key: 'format', value: id });
           go('play');

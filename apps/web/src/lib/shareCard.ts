@@ -4,9 +4,16 @@
 // so a glance tells the generation.
 // Drawn on a canvas in the browser from self-hosted assets, so nothing leaves
 // the device until the player shares it.
-import { LIDS } from './genColors';
+import { LIDS, MASCOT } from './genColors';
 import { condenseTries, tryCount } from './results';
-import { shareHeader, type ShareModel, type ShareRow } from './share';
+import {
+  isShareAll,
+  shareHeader,
+  shortHeadline,
+  type ShareAll,
+  type ShareModel,
+  type ShareRow,
+} from './share';
 import { getSprite } from './sprites';
 
 /** Logical size: the common link-preview shape. Drawn at 2× for sharp text. */
@@ -148,28 +155,31 @@ function groundShadow(ctx: CanvasRenderingContext2D, cx: number, y: number, rx: 
   ctx.restore();
 }
 
-export async function drawShareCard(m: ShareModel): Promise<HTMLCanvasElement> {
-  await Promise.all([
+const loadFonts = () =>
+  Promise.all([
     ...[500, 600, 700].map((w) => document.fonts?.load(`${w} 24px "IBM Plex Sans"`)),
     document.fonts?.load('600 40px Fraunces'),
   ]).catch(() => {});
-  const sprites = await Promise.all(m.team.map((s) => loadImage(getSprite(s.species, 'front'))));
 
+/** A blank card, the stone of the home screens' lower half, drawn at 2×. */
+function blankCard() {
   const canvas = document.createElement('canvas');
   canvas.width = CARD_W * SCALE;
   canvas.height = CARD_H * SCALE;
   const ctx = canvas.getContext('2d')!;
   ctx.scale(SCALE, SCALE);
-
-  // The page is the stone of the home screens' lower half.
   ctx.fillStyle = C.stone;
   ctx.fillRect(0, 0, CARD_W, CARD_H);
+  return { canvas, ctx };
+}
 
-  const left = 96;
-  const right = CARD_W - 96;
+const LEFT = 96;
+const RIGHT = CARD_W - 96;
+/** The lid's text line. */
+const MID = 78;
 
-  // Header: the game's lid, the dark seam, and the ball on it.
-  const colors = m.format ? LIDS[m.format] : CLAY;
+/** The lid with "Pokémon Daily · {header}" on it, the dark seam, and the ball. */
+function drawLid(ctx: CanvasRenderingContext2D, colors: typeof CLAY, header: string) {
   const lid = ctx.createLinearGradient(0, 0, CARD_W, 150);
   lid.addColorStop(0, colors.lid);
   lid.addColorStop(1, colors.deep);
@@ -198,27 +208,54 @@ export async function drawShareCard(m: ShareModel): Promise<HTMLCanvasElement> {
   ctx.lineWidth = 4;
   ctx.stroke();
 
-  // The name and date on the lid; the streak on the right.
-  const mid = 78;
   ctx.textBaseline = 'middle';
   ctx.fillStyle = '#ffffff';
   ctx.font = serif(38);
-  ctx.fillText('Pokémon Daily', left, mid);
+  ctx.fillText('Pokémon Daily', LEFT, MID);
   const nameW = ctx.measureText('Pokémon Daily').width;
   ctx.fillStyle = 'rgb(255 255 255 / 0.86)';
   ctx.font = font(500, 28);
-  ctx.fillText(`· ${shareHeader(m)}`, left + nameW + 14, mid + 2);
-  if (m.streak) {
-    const reset = m.streak === 'Streak reset';
-    const text = reset ? m.streak : `🔥 ${m.streak}`;
-    ctx.font = font(700, 20);
-    const w = ctx.measureText(text).width + 22;
-    pill(ctx, text, right - w, mid - 18, {
-      bg: reset ? C.surface2 : C.goldSoft,
-      fg: reset ? C.muted : C.goldText,
-      size: 20,
-    });
-  }
+  ctx.fillText(`· ${header}`, LEFT + nameW + 14, MID + 2);
+}
+
+/** "🔥 5-day streak" in gold, or "Streak reset" in grey, ending at `rightX`. */
+function streakPill(
+  ctx: CanvasRenderingContext2D,
+  streak: string,
+  rightX: number,
+  y: number,
+  size = 20,
+) {
+  const reset = streak === 'Streak reset';
+  const text = reset ? streak : `🔥 ${streak}`;
+  ctx.font = font(700, size);
+  const w = ctx.measureText(text).width + size * 1.1;
+  pill(ctx, text, rightX - w, y, {
+    bg: reset ? C.surface2 : C.goldSoft,
+    fg: reset ? C.muted : C.goldText,
+    size,
+  });
+}
+
+function footer(ctx: CanvasRenderingContext2D, url: string | undefined) {
+  if (!url) return;
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillStyle = C.muted;
+  ctx.font = font(500, 20);
+  ctx.fillText(url.replace(/^https?:\/\//, ''), LEFT, CARD_H - 44);
+}
+
+export async function drawShareCard(m: ShareModel): Promise<HTMLCanvasElement> {
+  await loadFonts();
+  const sprites = await Promise.all(m.team.map((s) => loadImage(getSprite(s.species, 'front'))));
+  const { canvas, ctx } = blankCard();
+  const left = LEFT;
+  const right = RIGHT;
+  const mid = MID;
+
+  // Header: the game's lid with the name and date; the streak on the right.
+  drawLid(ctx, m.format ? LIDS[m.format] : CLAY, shareHeader(m));
+  if (m.streak) streakPill(ctx, m.streak, right, mid - 18);
 
   // Headline.
   let y = 222;
@@ -285,14 +322,91 @@ export async function drawShareCard(m: ShareModel): Promise<HTMLCanvasElement> {
     ctx.textAlign = 'left';
   });
 
-  // Footer: where to play.
-  if (m.url) {
-    ctx.textBaseline = 'alphabetic';
-    ctx.fillStyle = C.muted;
-    ctx.font = font(500, 20);
-    ctx.fillText(m.url.replace(/^https?:\/\//, ''), left, CARD_H - 44);
-  }
+  footer(ctx, m.url);
   return canvas;
+}
+
+const GAME_ROW = 84;
+const GAME_GAP = 18;
+
+/**
+ * Today's games on one card (two to four): a row each with the game's mascot on
+ * its colour, its name and short headline, the deciding try's squares, and its
+ * streak. No teams: they don't fit four times.
+ */
+export async function drawShareAllCard(all: ShareAll): Promise<HTMLCanvasElement> {
+  await loadFonts();
+  const mascots = await Promise.all(
+    all.games.map((m) => {
+      const mascot = m.format && MASCOT[m.format];
+      return mascot ? loadImage(getSprite(mascot.species, 'front', undefined, mascot.gen)) : null;
+    }),
+  );
+  const { canvas, ctx } = blankCard();
+  drawLid(ctx, CLAY, all.date);
+
+  // The rows sit in the middle of the space between the ball and the address.
+  const top = 200;
+  const bottom = CARD_H - 76;
+  const height = all.games.length * GAME_ROW + (all.games.length - 1) * GAME_GAP;
+  let y = top + Math.max(0, (bottom - top - height) / 2);
+  all.games.forEach((m, i) => {
+    // The mascot on its game's colour.
+    const tile = GAME_ROW - 4;
+    roundRect(ctx, LEFT, y + 2, tile, tile, 12);
+    ctx.fillStyle = m.format ? LIDS[m.format].lid : C.clay;
+    ctx.fill();
+    const img = mascots[i];
+    if (img) {
+      // Gen 3's pixel art at its own size; later sprites have a wide margin, so they're
+      // drawn a little larger than the tile and clipped to it.
+      const pixel = m.format === 'gen3ou';
+      const k = pixel ? 1 : (tile * 1.2) / Math.max(img.width, img.height);
+      const w = img.width * k;
+      const h = img.height * k;
+      ctx.save();
+      roundRect(ctx, LEFT, y + 2, tile, tile, 12);
+      ctx.clip();
+      ctx.imageSmoothingEnabled = !pixel;
+      ctx.drawImage(img, LEFT + (tile - w) / 2, y + 2 + (tile - h) / 2, w, h);
+      ctx.restore();
+    }
+
+    // Name, then the short headline.
+    const x = LEFT + tile + 22;
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = C.text;
+    ctx.font = serif(30);
+    ctx.fillText(m.game ?? '', x, y + 24);
+    const nameW = ctx.measureText(m.game ?? '').width;
+    const extra = [m.level, m.coached && 'Coached'].filter(Boolean).join(' · ');
+    if (extra) {
+      ctx.fillStyle = C.muted;
+      ctx.font = font(600, 20);
+      ctx.fillText(`· ${extra}`, x + nameW + 10, y + 26);
+    }
+    if (m.status === 'firstTry') {
+      pill(ctx, '⭐ First try', x, y + 46, { bg: C.gold, fg: C.goldText, size: 18 });
+    } else {
+      ctx.fillStyle = m.status === 'pending' ? C.muted : C.text;
+      ctx.font = font(600, 21);
+      ctx.fillText(shortHeadline(m), x, y + 62);
+    }
+
+    // The deciding try's squares, then the streak at the right edge.
+    tryRow(ctx, m.rows.at(-1)!, 560, y + (GAME_ROW - SQ) / 2);
+    if (m.streak) streakPill(ctx, m.streak, RIGHT, y + GAME_ROW / 2 - 16, 18);
+    y += GAME_ROW + GAME_GAP;
+  });
+
+  footer(ctx, all.url);
+  return canvas;
+}
+
+/** The PNG for either kind of share. */
+export async function anyShareCardBlob(m: ShareModel | ShareAll): Promise<Blob | null> {
+  const canvas = await (isShareAll(m) ? drawShareAllCard(m) : drawShareCard(m));
+  return new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
 }
 
 export async function shareCardBlob(m: ShareModel): Promise<Blob | null> {

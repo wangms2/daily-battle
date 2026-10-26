@@ -1171,7 +1171,7 @@ button {
   pointer-events: none;
 }
 .home-cart,
-.home-learn {
+.home-share {
   opacity: 0;
   translate: 0 16px;
   transition:
@@ -1179,7 +1179,7 @@ button {
     translate 240ms var(--ease);
 }
 .home[data-view='picker'] .home-cart,
-.home[data-view='picker'] .home-learn {
+.home[data-view='picker'] .home-share {
   opacity: 1;
   translate: 0 0;
   transition:

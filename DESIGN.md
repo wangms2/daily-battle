@@ -360,6 +360,17 @@ Easy and Hard add the difficulty to the header, with that difficulty's tries and
   - **Text:** plain text that pastes anywhere, copied straight to the clipboard (never the share sheet), else shown to copy.
   - **Image:** a 1200×630 card in the app's light theme (`lib/shareCard.ts`), drawn on a canvas in the browser. Its header takes one colour from the game played, so the generation shows at a glance: Emerald green for Gen 3, Diamond's steel blue for Gen 4, black for Gen 5 (with a white ball button, for Black and White), and Y's red for Gen 6. The card shows the date, the headline (gold "⭐ First try" badge), the try rows as squares, a practice row when sharing one, the team as sprites with names (`*` and gold for the day's swap), the streak, and the site address. The sheet previews it; it goes to the share sheet as the image alone where files can be shared (phones; with text alongside, iOS's Copy and some apps keep only the text, and the card shows the address anyway), else the clipboard, else a download. The preview is a `blob:` image, which the CSP allows (`img-src 'self' data: blob:`).
 - Never include opponent species, sets, or turn counts.
+- **Share all.** With two or more games played today, the Share sheet has a **This game / All games** switch, and the game picker has a **Share all N games** button under the list (**Share today** with one game, which shares that game's full result). All games is compact, one game per pair of lines, in picker order, with no teams; games not played today are left out:
+
+  ```
+  Pokémon Daily · Oct 21
+  Gen 3 OU · Easy · 🔥 5-day streak
+  ⭐ 🟩🟩🟩🟩⬛⬛ First try!
+  Gen 4 OU · Streak reset
+  ✅ 🟩🟩⬛⬛⬛⬛ Won on try 2
+  ```
+
+  Its image card has a plain clay header with the date, and a row per game: the mascot on the game's colour, the name (with difficulty and Coached), the short headline, the deciding try's squares, and that game's streak.
 
 ## 12. UI and tech
 
@@ -681,7 +692,7 @@ A **Learn** mode teaches Gen 3 OU from the basics, and a **coach** helps in real
   - **Type trainer** (`#learn/types`, a small pill beside the Learn title): rounds of 10 questions, each a real OU Pokémon (sprite and types) and an attack type. Answer ×4 to ×0, then see why, type by type. Spaced repetition: each matchup (an attack type against a typing) sits in a box from 1 to 5; a right answer moves it up, a miss sends it back to 1, and lower boxes come up more often (`settings.typeTrainer`, per game, `lib/typeTrainer.ts`). Questions whose answer would depend on an ability (Levitate, Flash Fire, Thick Fat, …) are skipped. A round ends with the score, a line for it, and every question with its answer.
   - **Type chart** (a sheet, from the trainer and the battle menu): pick a type to see what its moves hit hard, weakly or not at all, and what it takes double, half or nothing from, for the game being played (Fairy in Gen 6).
   - Lesson 2 anchors the chart on the starters' triangle (Water › Fire › Grass › Water) and points to the trainer.
-- **Finding it.** A small **Battle basics** pill under Play on the landing, a Learn row under Gen 3 in the game picker, and a "New to competitive Pokémon?" card with **Start the tutorial** on the welcome sheet and in How to play (it opens the next unfinished lesson).
+- **Finding it.** A small **Battle basics** pill under Play on the landing, a **Battle basics** pill on the Gen 3 cartridge in the game picker, and a "New to competitive Pokémon?" card with **Start the tutorial** on the welcome sheet and in How to play (it opens the next unfinished lesson).
 
 - **Coach.** Rule-based, from the player's own view only (it never sees the foe's real sets). It gives an occasional turn tip, asks before a clear blunder ("Do it anyway" / "Pick again"), and reviews up to 3 key turns after the battle. It's paced so it isn't distracting: at most one tip per turn, a gap of 3 turns between tips (2 for urgent ones: "this hit KOs you", "you can KO"), no tip while a lesson prompt or hint is showing, and a warning the player overrode isn't asked again that battle. Warnings only appear when the blunder is picked.
 - **Where.** On in every lesson battle (the coach only talks about what the lessons so far have taught). In the daily, it's offered in Gen 3 on Easy and Normal (not Hard, until its search-based coach exists). Off by default; offered once on a game's first daily brief and again after graduation (`settings.coachOffered`).

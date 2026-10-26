@@ -4,18 +4,20 @@ import clsx from 'clsx';
 import { useEffect, useState, type ReactNode } from 'react';
 import { condenseTries, tryCount, type DaySummary } from '../lib/results';
 import {
-  formatShareText,
+  anyShareText,
   imageMode,
+  isShareAll,
   shareImage,
   copyText,
   shareResult,
   type ImageMode,
   type ImageOutcome,
+  type ShareAll,
   type ShareModel,
   type ShareOutcome,
 } from '../lib/share';
-import { shareCardBlob } from '../lib/shareCard';
-import { OtherGames } from './OtherGames';
+import { anyShareCardBlob } from '../lib/shareCard';
+import { OtherGames, useShareAll } from './OtherGames';
 import { Sheet } from './Sheet';
 import { Button } from './bits';
 
@@ -183,35 +185,14 @@ export function TextShareButton({
   );
 }
 
-/**
- * Share opens a choice: the result card as an image (previewed), which goes
- * to the share sheet where there is one, else the clipboard; or the text,
- * copied straight to the clipboard (shown to copy by hand if that fails).
- */
-export function ShareButton({
-  share,
-  variant = 'primary',
-  className,
-  children = 'Share',
-}: {
-  share: ShareModel;
-  variant?: 'primary' | 'secondary';
-  className?: string;
-  children?: ReactNode;
-}) {
-  const text = formatShareText(share);
-  const [toast, setToast] = useToast();
-  const [choosing, setChoosing] = useState(false);
-  const [manual, setManual] = useState(false);
-  // The card is drawn when the choice opens, so sharing it needs no wait (iOS
-  // only opens the share sheet straight from a tap).
+/** The card for `share`, drawn when `open` turns on and redrawn when its text changes. */
+function useCard(share: ShareModel | ShareAll, text: string, open: boolean) {
   const [image, setImage] = useState<{ blob: Blob; url: string } | 'failed' | null>(null);
-  const mode = imageMode();
   useEffect(() => {
-    if (!choosing) return;
+    if (!open) return;
     let url: string | null = null;
     let live = true;
-    shareCardBlob(share)
+    anyShareCardBlob(share)
       .then((blob) => {
         if (!live) return;
         if (!blob) return setImage('failed');
@@ -226,7 +207,95 @@ export function ShareButton({
     };
     // Redraw only when what the card says changes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [choosing, text]);
+  }, [open, text]);
+  return image;
+}
+
+/**
+ * Share opens a choice: the result card as an image (previewed), which goes
+ * to the share sheet where there is one, else the clipboard; or the text,
+ * copied straight to the clipboard (shown to copy by hand if that fails).
+ * With two or more games played today, a switch picks this game or all of them.
+ */
+export function ShareButton({
+  share,
+  variant = 'primary',
+  className,
+  children = 'Share',
+}: {
+  share: ShareModel;
+  variant?: 'primary' | 'secondary';
+  className?: string;
+  children?: ReactNode;
+}) {
+  const all = useShareAll();
+  return (
+    <ShareSheetButton
+      share={share}
+      all={all && isShareAll(all) ? all : null}
+      variant={variant}
+      className={className}
+      others
+    >
+      {children}
+    </ShareSheetButton>
+  );
+}
+
+/**
+ * Shares every game played today (the picker's button). One game is that
+ * game's full share; two or more are the compact card.
+ */
+export function ShareAllButton({
+  share,
+  variant = 'secondary',
+  className,
+  children,
+}: {
+  share: ShareModel | ShareAll;
+  variant?: 'primary' | 'secondary';
+  className?: string;
+  children: ReactNode;
+}) {
+  return (
+    <ShareSheetButton share={share} variant={variant} className={className}>
+      {children}
+    </ShareSheetButton>
+  );
+}
+
+const SCOPES = [
+  { id: 'game', label: 'This game' },
+  { id: 'all', label: 'All games' },
+] as const;
+
+function ShareSheetButton({
+  share,
+  all = null,
+  others = false,
+  variant = 'primary',
+  className,
+  children,
+}: {
+  share: ShareModel | ShareAll;
+  /** Offers "All games" next to `share`. */
+  all?: ShareAll | null;
+  /** Shows the other games to play under the buttons. */
+  others?: boolean;
+  variant?: 'primary' | 'secondary';
+  className?: string;
+  children: ReactNode;
+}) {
+  const [scope, setScope] = useState<'game' | 'all'>('game');
+  const shown = scope === 'all' && all ? all : share;
+  const text = anyShareText(shown);
+  const [toast, setToast] = useToast();
+  const [choosing, setChoosing] = useState(false);
+  const [manual, setManual] = useState(false);
+  // The card is drawn when the choice opens, so sharing it needs no wait (iOS
+  // only opens the share sheet straight from a tap).
+  const image = useCard(shown, text, choosing);
+  const mode = imageMode();
 
   // The toast says what was copied: "Text copied", "Image copied".
   const finish = (outcome: ImageOutcome | ShareOutcome, what: 'Text' | 'Image') => {
@@ -238,12 +307,42 @@ export function ShareButton({
 
   return (
     <>
-      <Button variant={variant} className={className} onClick={() => setChoosing(true)}>
+      <Button
+        variant={variant}
+        className={className}
+        onClick={() => {
+          setScope('game');
+          setChoosing(true);
+        }}
+      >
         {children}
       </Button>
       {toast}
       <Sheet open={choosing} onOpenChange={setChoosing} title="Share your result">
         <div className="grid gap-3">
+          {all && (
+            <div
+              className="flex justify-self-center rounded-xl bg-surface-2 p-0.5"
+              role="radiogroup"
+              aria-label="What to share"
+            >
+              {SCOPES.map((s) => (
+                <button
+                  key={s.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={scope === s.id}
+                  onClick={() => setScope(s.id)}
+                  className={clsx(
+                    'min-h-8 rounded-lg px-3.5 text-[13px] font-semibold',
+                    scope === s.id ? 'bg-surface text-ink shadow-card' : 'text-muted',
+                  )}
+                >
+                  {s.id === 'all' ? `All games (${all.games.length})` : s.label}
+                </button>
+              ))}
+            </div>
+          )}
           {image !== 'failed' && (
             <div className="aspect-[1200/630] overflow-hidden rounded-card border border-line bg-surface-2">
               {ready && (
@@ -262,7 +361,7 @@ export function ShareButton({
                 ready &&
                 finish(
                   await shareImage(ready.blob, {
-                    name: `pokemon-daily-${share.date.replace(/\s+/g, '-').toLowerCase()}.png`,
+                    name: `pokemon-daily-${shown.date.replace(/\s+/g, '-').toLowerCase()}.png`,
                   }),
                   'Image',
                 )
@@ -274,7 +373,7 @@ export function ShareButton({
               Copy text
             </Button>
           </div>
-          <OtherGames className="mt-1" onPicked={() => setChoosing(false)} />
+          {others && <OtherGames className="mt-1" onPicked={() => setChoosing(false)} />}
         </div>
       </Sheet>
       <ManualCopy text={text} open={manual} onOpenChange={setManual} />

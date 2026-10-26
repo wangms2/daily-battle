@@ -357,6 +357,23 @@ describe('results and streak', () => {
     expect(screen.getByRole('button', { name: 'Stats. Streak 2' })).toBeInTheDocument();
   });
 
+  it('shares this game or every game played today', async () => {
+    const user = userEvent.setup();
+    const state = seeded({ team: { week: WEEK } });
+    state.games.gen4ou.days['2026-10-21'] = { swapUsed: false, attempts: [finished('win', 4, 3)] };
+    state.games.gen6ou.days['2026-10-21'] = { swapUsed: false, attempts: [finished('loss', 0, 2)] };
+    renderApp(state);
+    const strip = await screen.findByRole('region', { name: 'Today’s result' });
+    await user.click(within(strip).getByRole('button', { name: 'Share' }));
+    const sheet = await screen.findByRole('dialog', { name: 'Share your result' });
+    expect(within(sheet).getByRole('radio', { name: 'This game' })).toBeChecked();
+    await user.click(within(sheet).getByRole('radio', { name: 'All games (2)' }));
+    await user.click(within(sheet).getByRole('button', { name: 'Copy text' }));
+    const text = await navigator.clipboard.readText();
+    expect(text).toMatch(/^Pokémon Daily · Oct 21\nGen 4 OU · 🔥 1-day streak\n⭐ /);
+    expect(text).toContain('Gen 6 OU · Streak reset\n❌ ');
+  });
+
   it('resets the streak when today isn’t won on the first try, and says so', async () => {
     const state = seeded({ team: { week: WEEK } });
     state.games.gen4ou.days['2026-10-20'] = { swapUsed: false, attempts: [finished('win', 2, 1)] };
@@ -581,6 +598,51 @@ describe('home', () => {
     renderApp(seeded());
     await user.click(await screen.findByRole('button', { name: 'Battle basics' }));
     expect(window.location.hash).toBe('#learn');
+  });
+
+  it('opens Learn mode from the Gen 3 cartridge’s Battle basics', async () => {
+    const user = userEvent.setup();
+    window.location.hash = '#daily';
+    renderApp(seeded());
+    await screen.findByText('Choose a generation');
+    const games = screen.getByRole('main');
+    await user.click(within(games).getByRole('button', { name: 'Battle basics' }));
+    expect(window.location.hash).toBe('#learn');
+  });
+
+  it('shares today from the picker: one game in full, more on one card', async () => {
+    const user = userEvent.setup();
+    window.location.hash = '#daily';
+    const state = seeded();
+    const win = {
+      result: 'win' as const,
+      remaining: 3,
+      ts: 1,
+      lead: 'Hippowdon',
+      team: [],
+      battleSeed: '1',
+      aiSeed: '2',
+      choices: [],
+      engine: ENGINE_VERSION,
+    };
+    state.games.gen5ou.days['2026-10-21'] = { swapUsed: false, attempts: [win] };
+    const { unmount } = renderApp(state);
+    await screen.findByText('Choose a generation');
+    expect(screen.queryByRole('button', { name: /^Share all/ })).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Share today' }));
+    const sheet = await screen.findByRole('dialog', { name: 'Share your result' });
+    expect(within(sheet).queryByRole('radio')).not.toBeInTheDocument();
+    await user.click(within(sheet).getByRole('button', { name: 'Copy text' }));
+    expect(await navigator.clipboard.readText()).toMatch(/^Pokémon Daily · Gen 5 OU · Oct 21\n/);
+    unmount();
+
+    state.games.gen3ou.days['2026-10-21'] = { swapUsed: false, attempts: [{ ...win, ts: 2 }] };
+    renderApp(state);
+    await user.click(await screen.findByRole('button', { name: 'Share all 2 games' }));
+    await user.click(await screen.findByRole('button', { name: 'Copy text' }));
+    expect(await navigator.clipboard.readText()).toMatch(
+      /^Pokémon Daily · Oct 21\nGen 3 OU · 🔥 1-day streak\n⭐ .*\nGen 5 OU/,
+    );
   });
 
   it('shows every game with its status and streak, and a pick plays that game', async () => {

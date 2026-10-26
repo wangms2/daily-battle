@@ -147,6 +147,61 @@ export function formatShareText(m: ShareModel): string {
   return lines.join('\n');
 }
 
+/**
+ * Every game played today in one share. One game is that game's own full share;
+ * two or more get a compact line pair each (no team), as `ShareAll`.
+ */
+export interface ShareAll {
+  date: string;
+  /** Today's played games, in picker order. */
+  games: ShareModel[];
+  url?: string;
+}
+
+/** Today's played games as one share: the single game's own share, or the compact one. */
+export function shareAll(games: ShareModel[], url?: string): ShareModel | ShareAll | null {
+  const played = games.filter((m) => m.status !== 'none');
+  if (played.length < 2) return played[0] ?? null;
+  return { date: played[0]!.date, games: played, ...(url && { url }) };
+}
+
+export const isShareAll = (m: ShareModel | ShareAll): m is ShareAll => 'games' in m;
+
+/** "First try!", "Won on try 2", "Not cleared yet · 2 tries": the squares show what's left. */
+export function shortHeadline(m: ShareModel): string {
+  if (m.status === 'firstTry') return 'First try!';
+  if (m.cleared) return `Won on try ${m.rows.length}`;
+  if (m.status === 'failed') return 'Not cleared';
+  return `Not cleared yet · ${tryCount(m.rows.length)}`;
+}
+
+/** "Gen 3 OU · Easy · Coached": a game's name in the compact share. */
+export const gameLabel = (m: ShareModel) =>
+  [m.game, m.level, m.coached && 'Coached'].filter(Boolean).join(' · ');
+
+/**
+ * Pokémon Daily · Oct 21
+ * Gen 3 OU · Easy · 🔥 5-day streak
+ * ⭐ 🟩🟩🟩🟩⬛⬛ First try!
+ * Gen 4 OU · Streak reset
+ * ❌ ⬛⬛⬛⬛⬛⬛ Not cleared yet · 1 try
+ */
+export function formatShareAllText(all: ShareAll): string {
+  const lines = [`Pokémon Daily · ${all.date}`];
+  for (const m of all.games) {
+    const streak = m.streak && (m.streak === 'Streak reset' ? m.streak : `🔥 ${m.streak}`);
+    lines.push([gameLabel(m), streak].filter(Boolean).join(' · '));
+    const icon = m.status === 'firstTry' ? '⭐' : m.cleared ? '✅' : '❌';
+    lines.push(`${icon} ${squares(m.rows.at(-1)!)} ${shortHeadline(m)}`);
+  }
+  if (all.url) lines.push(all.url);
+  return lines.join('\n');
+}
+
+/** The text for either kind of share. */
+export const anyShareText = (m: ShareModel | ShareAll) =>
+  isShareAll(m) ? formatShareAllText(m) : formatShareText(m);
+
 export type ShareOutcome = 'shared' | 'copied' | 'manual';
 
 /**

@@ -5,6 +5,7 @@ import type { FormatId } from '@daily-battle/data/formats';
 import clsx from 'clsx';
 import { createContext, useContext } from 'react';
 import type { DayStatus } from '../lib/results';
+import type { ShareAll, ShareModel } from '../lib/share';
 
 export interface GameLink {
   id: FormatId;
@@ -16,10 +17,19 @@ export interface GameLink {
 interface GamesValue {
   games: GameLink[];
   onPlay: (id: FormatId) => void;
+  /** Every game played today, for Share's "All games" (see `shareAll`). */
+  shareAll?: ShareModel | ShareAll | null;
 }
 
 const GamesContext = createContext<GamesValue | null>(null);
 export const GamesProvider = GamesContext.Provider;
+
+/** Today's games as one share, or null outside the daily. */
+// A hook beside its provider; editing this file reloads the page, which is fine.
+// eslint-disable-next-line react-refresh/only-export-components
+export function useShareAll() {
+  return useContext(GamesContext)?.shareAll ?? null;
+}
 
 const STATUS_LABEL: Record<DayStatus, string> = {
   none: 'Not played',
