@@ -2,6 +2,7 @@
 // The room server holds the state and applies messages through these; the
 // client only ever sees `roomView`, which leaves out every player's token and
 // team. The game itself (build, rounds, lives) is in game.ts.
+import { isDifficulty, type Difficulty } from '@daily-battle/ai/version';
 import { DEFAULT_FORMAT, FORMATS, type FormatId } from '@daily-battle/data/formats';
 import type { Match, MatchEnd, Side, Slot } from './match';
 
@@ -30,6 +31,8 @@ export interface RoomSettings {
   pool: 'random' | 'weekly';
   /** The host's week (its Monday, `YYYY-MM-DD`), for this week's pool. */
   week?: string;
+  /** How hard the Rival plays (the AI that battles an odd player out). Missing is Normal. */
+  rivalDifficulty?: Difficulty;
 }
 
 export const DEFAULT_SETTINGS: RoomSettings = {
@@ -468,6 +471,8 @@ export function validSettings(input: unknown): Partial<RoomSettings> | null {
       out.pool = value;
     } else if (key === 'week' && typeof value === 'string' && WEEK.test(value)) {
       out.week = value;
+    } else if (key === 'rivalDifficulty' && isDifficulty(value)) {
+      out.rivalDifficulty = value;
     } else {
       return null;
     }

@@ -101,3 +101,29 @@ export const STRONG: Params = {
   resistBias: 0,
   predictionRate: 0,
 };
+
+/**
+ * Easy difficulty: a beginner who mostly clicks attacks (not always the best
+ * one), rarely switches, ignores hazards and setup, and never predicts. Used
+ * for every team style.
+ */
+export const EASY: Params = {
+  ...BALANCE,
+  temperature: 0.3,
+  ko: 0.2,
+  risk: 0.1,
+  hazard: 0,
+  earlyHazardBonus: 0,
+  spin: 0,
+  setup: 0,
+  status: 0.05,
+  recover: 0.3,
+  substitute: 0,
+  other: 0,
+  position: 0.2,
+  switchPenalty: 0.6,
+  resistBias: 0,
+  maxDamageBias: 0,
+  predictionRate: 0,
+  mega: 0.5,
+};

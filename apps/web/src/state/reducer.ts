@@ -1,7 +1,9 @@
+import { difficultyTag, type Difficulty } from '@daily-battle/ai/version';
 import type { FormatId } from '@daily-battle/data/formats';
 import { mondayOf } from '@daily-battle/gen/dates';
+import { applyAiChoices, type AiChoices, type CoachMemo } from '../battle/frames';
 import { sameSpecies } from '../lib/data';
-import { summarizeDay } from '../lib/results';
+import { attemptDifficulty, summarizeDay } from '../lib/results';
 import {
   emptyDay,
   type Attempt,
@@ -11,6 +13,7 @@ import {
   type Settings,
   type Slot,
   type State,
+  type TutorialProgress,
 } from './schema';
 
 /** Actions on one format's game. */
@@ -21,7 +24,9 @@ export type GameAction =
   /** A change for the next practice run only (after today's counted tries). */
   | { type: 'setPracticeChange'; day: string; week: string; change: DayChange | null }
   | { type: 'startAttempt'; day: string; attempt: Attempt }
-  | { type: 'recordChoice'; day: string; choice: string }
+  /** The coach was turned on mid-battle: the battle in progress is coached from now on. */
+  | { type: 'coachAttempt'; day: string }
+  | { type: 'recordChoice'; day: string; choice: string; ai?: AiChoices; memo?: CoachMemo }
   | { type: 'endAttempt'; day: string; result: 'win' | 'loss' | 'forfeit'; remaining: number }
   /** Unfinished attempts from past days, or from another engine version, become forfeits. */
   | { type: 'expireAttempts'; today: string; engine: string }
@@ -39,6 +44,9 @@ export type Action =
   | (GameAction & { format: FormatId })
   | { type: 'setSetting'; key: keyof Settings; value: Settings[keyof Settings] }
   | { type: 'markExplainer'; id: string }
+  /** Learn mode: the player reached a lesson's step (saved to resume). */
+  | { type: 'lessonStep'; format: FormatId; lesson: string; step: number }
+  | { type: 'lessonDone'; format: FormatId; lesson: string }
   /** Expires unfinished attempts in every game. */
   | { type: 'expireAll'; today: string; engine: string };
 
@@ -47,6 +55,10 @@ export function attemptInProgress(day: DayState | undefined): Attempt | undefine
   const last = day?.attempts.at(-1);
   return last?.result === 'inProgress' ? last : undefined;
 }
+
+/** The engine string an attempt at `difficulty` is saved with, given Normal's. */
+export const attemptEngine = (normal: string, difficulty: Difficulty): string =>
+  normal + difficultyTag(difficulty);
 
 /** The team with a change applied. */
 export function withChange(team: Slot[], change: DayChange | undefined): Slot[] {
@@ -66,6 +78,9 @@ function changeFits(team: Slot[], change: DayChange): boolean {
     i === slot ? s.species === to.species : sameSpecies(s.species, to.species),
   );
 }
+
+// Team rules follow Normal's tries only: the team is shared, and an Easy or Hard
+// loss doesn't free it up (DESIGN.md §4.5).
 
 /** Tried today and not won yet: the streak is over for today, so the team may change freely. */
 export function dayLost(day: DayState | undefined): boolean {
@@ -97,6 +112,20 @@ export function reducer(state: State, action: Action): State {
           shownExplainers: [...state.settings.shownExplainers, action.id],
         },
       };
+    case 'lessonStep':
+    case 'lessonDone': {
+      const progress = state.settings.tutorial?.[action.format] ?? { completed: [] };
+      const next: TutorialProgress =
+        action.type === 'lessonStep'
+          ? { ...progress, current: { lesson: action.lesson, step: action.step } }
+          : {
+              completed: progress.completed.includes(action.lesson)
+                ? progress.completed
+                : [...progress.completed, action.lesson],
+            };
+      const tutorial = { ...state.settings.tutorial, [action.format]: next };
+      return { ...state, settings: { ...state.settings, tutorial } };
+    }
     case 'expireAll': {
       let games = state.games;
       for (const [format, game] of Object.entries(state.games) as [FormatId, GameState][]) {
@@ -207,6 +236,14 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         },
       };
     }
+    case 'coachAttempt': {
+      const day = state.days[action.day];
+      if (!attemptInProgress(day)) return state;
+      return {
+        ...state,
+        days: { ...state.days, [action.day]: updateLast(day!, (a) => ({ ...a, coached: true })) },
+      };
+    }
     case 'recordChoice': {
       const day = state.days[action.day];
       if (!attemptInProgress(day)) return state;
@@ -214,7 +251,21 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         ...state,
         days: {
           ...state.days,
-          [action.day]: updateLast(day!, (a) => ({ ...a, choices: [...a.choices, action.choice] })),
+          [action.day]: updateLast(day!, (a) => ({
+            ...a,
+            choices: [...a.choices, action.choice],
+            // The AI's choices so far (Hard saves them, to resume without searching again).
+            ...(action.ai ? { aiChoices: applyAiChoices(a.aiChoices, action.ai) } : {}),
+            // The coach's memos, one per choice (null where there's none).
+            ...(action.memo || a.coachLog
+              ? {
+                  coachLog: [
+                    ...Array.from({ length: a.choices.length }, (_, i) => a.coachLog?.[i] ?? null),
+                    action.memo ?? null,
+                  ],
+                }
+              : {}),
+          })),
         },
       };
     }
@@ -247,7 +298,10 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       let days = state.days;
       for (const [key, day] of Object.entries(state.days)) {
         const a = attemptInProgress(day);
-        if (a && (key < action.today || a.engine !== action.engine)) {
+        if (
+          a &&
+          (key < action.today || a.engine !== attemptEngine(action.engine, attemptDifficulty(a)))
+        ) {
           days = { ...days, [key]: updateLast(day, (x) => ({ ...x, result: 'forfeit' })) };
         }
       }

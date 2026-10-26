@@ -89,8 +89,13 @@ export function megaInfo(format: string, species: string, item: string) {
 }
 
 export const toId = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
-/** Request ids can carry Hidden Power's base power (`hiddenpowerice60`). */
-export const moveId = (s: string) => toId(s).replace(/^(hiddenpower[a-z]*)\d+$/, '$1');
+/**
+ * Older gens' requests add the power of Hidden Power and Return/Frustration
+ * ("Hidden Power Ice 70", id `hiddenpowerice70`, `return102`). No move's own
+ * id or name ends in a number, so these strip it.
+ */
+export const moveId = (s: string) => toId(s).replace(/\d+$/, '');
+export const moveName = (s: string) => s.replace(/\s+\d+$/, '');
 
 function sideConds(conditions: Record<string, { level?: number } | undefined>): SideConds {
   const level = (id: string) => (conditions[id] ? (conditions[id]!.level ?? 1) : 0);

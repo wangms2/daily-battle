@@ -4,9 +4,12 @@ import { act, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import scheduleJson from '../public/schedule/2026-10-19.json';
+import gen3Schedule from '../public/schedule/gen3ou/2026-10-19.json';
 import gen5Schedule from '../public/schedule/gen5ou/2026-10-26.json';
+import { LESSONS } from '@daily-battle/tutorial/lessons';
 import { App } from './App';
 import { ENGINE_VERSION } from './lib/seed';
+import { attemptEngine } from './state/reducer';
 import { initialState, type State } from './state/schema';
 import { createStorage, STORAGE_KEY } from './state/storage';
 import { StoreProvider } from './state/store';
@@ -84,6 +87,20 @@ describe('first run', () => {
     expect(about).toHaveTextContent('not affiliated with or endorsed by Nintendo');
     expect(about).toHaveTextContent('Smogon, used with permission');
     expect(about).toHaveTextContent('No accounts and no tracking');
+    expect(about).toHaveTextContent('Every game uses the OU (OverUsed) tier.');
+  });
+
+  it('points beginners to the tutorial from the welcome sheet', async () => {
+    const user = userEvent.setup();
+    renderApp();
+    const welcome = await screen.findByRole('dialog', { name: 'Welcome to Pokémon Daily' });
+    const block = within(welcome).getByRole('region', { name: 'New to competitive Pokémon?' });
+    expect(block).toHaveTextContent('Start with Gen 3. It has lessons and a coach.');
+    await user.click(within(block).getByRole('button', { name: 'Start the tutorial' }));
+    expect(window.location.hash).toBe(`#learn/${LESSONS.gen3ou![0]!.id}`);
+    expect(
+      screen.queryByRole('dialog', { name: 'Welcome to Pokémon Daily' }),
+    ).not.toBeInTheDocument();
   });
 });
 
@@ -391,6 +408,95 @@ describe('results and streak', () => {
     await screen.findByRole('button', { name: /^Start · / });
     expect(screen.queryByRole('region', { name: 'Today’s result' })).not.toBeInTheDocument();
   });
+
+  it('keeps each difficulty’s day apart, and remembers the pick', async () => {
+    const user = userEvent.setup();
+    const state = seeded({ team: { week: WEEK } });
+    state.games.gen4ou.days['2026-10-21'] = { swapUsed: false, attempts: [finished('win', 4, 3)] };
+    renderApp(state);
+    await screen.findByRole('region', { name: 'Today’s result' });
+    const picker = screen.getByRole('radiogroup', { name: 'Difficulty' });
+    expect(within(picker).getByRole('radio', { name: 'Normal' })).toBeChecked();
+
+    await user.click(within(picker).getByRole('radio', { name: 'Easy' }));
+    expect(within(picker).getByRole('radio', { name: 'Easy' })).toBeChecked();
+    // Today's Normal win doesn't count at Easy.
+    expect(screen.queryByRole('region', { name: 'Today’s result' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^Start · / })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Stats. Streak 0' })).toBeInTheDocument();
+
+    await user.click(within(picker).getByRole('radio', { name: 'Normal' }));
+    expect(await screen.findByRole('region', { name: 'Today’s result' })).toHaveTextContent(
+      'First try!',
+    );
+  });
+
+  it('holds the difficulty of a battle in progress', async () => {
+    const state = seeded({ team: { week: WEEK } });
+    state.games.gen4ou.days['2026-10-21'] = {
+      swapUsed: false,
+      attempts: [
+        {
+          ...finished('win', 6, 1),
+          result: 'inProgress',
+          difficulty: 'easy',
+          engine: attemptEngine(ENGINE_VERSION, 'easy'),
+        },
+      ],
+    };
+    renderApp(state);
+    expect(await screen.findByRole('button', { name: 'Resume battle' })).toBeInTheDocument();
+    const picker = screen.getByRole('radiogroup', { name: 'Difficulty' });
+    expect(within(picker).getByRole('radio', { name: 'Easy' })).toBeChecked();
+    expect(within(picker).getByRole('radio', { name: 'Normal' })).toBeDisabled();
+  });
+
+  it('offers the coach once in Gen 3, warns about the streak, and counts coached days apart', async () => {
+    const user = userEvent.setup();
+    const gen3 = gen3Schedule as ScheduleFile;
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response(JSON.stringify(gen3), { status: 200 })),
+    );
+    const state = seeded();
+    state.settings.format = 'gen3ou';
+    state.games.gen3ou.weeks[WEEK] = {
+      team: gen3.suggestedTeams[0]!.team,
+      poolId: `${WEEK}:g${gen3.generatorVersion}:c${gen3.pool.candidate}`,
+    };
+    const won = { ...finished('win', 4, 1), lead: gen3.suggestedTeams[0]!.team[0]!.species };
+    state.games.gen3ou.days['2026-10-20'] = { swapUsed: false, attempts: [won] };
+    renderApp(state);
+    const offer = await screen.findByRole('dialog', { name: 'Want a coach?' });
+    expect(offer).toHaveTextContent('ends your 1-day streak');
+    await user.click(within(offer).getByRole('button', { name: 'Not now' }));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+    const coach = screen.getByRole('button', { name: 'Coach' });
+    expect(coach).toHaveAttribute('aria-pressed', 'false');
+    await user.click(coach);
+    const ask = await screen.findByRole('dialog', { name: 'Turn on the coach?' });
+    await user.click(within(ask).getByRole('button', { name: 'Turn on' }));
+    expect(screen.getByRole('button', { name: 'Coach on' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    // The Coached streak starts from nothing; the header says so.
+    expect(screen.getByRole('button', { name: 'Stats. Streak 0' })).toBeInTheDocument();
+    expect(screen.getByTitle('Back')).toHaveTextContent('Gen 3 · Coached · ');
+
+    // Off again before a battle: the regular streak is still there.
+    await user.click(screen.getByRole('button', { name: 'Coach on' }));
+    expect(screen.getByRole('button', { name: 'Stats. Streak 1' })).toBeInTheDocument();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('has no coach outside Gen 3', async () => {
+    renderApp(seeded({ team: { week: WEEK } }));
+    await screen.findByRole('radiogroup', { name: 'Difficulty' });
+    expect(screen.queryByRole('button', { name: /^Coach/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
 });
 
 describe('edge cases', () => {
@@ -470,6 +576,13 @@ describe('home', () => {
     expect(window.location.hash).toBe('#versus');
   });
 
+  it('opens Learn mode from Battle basics', async () => {
+    const user = userEvent.setup();
+    renderApp(seeded());
+    await user.click(await screen.findByRole('button', { name: 'Battle basics' }));
+    expect(window.location.hash).toBe('#learn');
+  });
+
   it('shows every game with its status and streak, and a pick plays that game', async () => {
     const user = userEvent.setup();
     renderApp(seeded());
@@ -545,6 +658,21 @@ describe('playtest feedback', () => {
     expect(how).toHaveTextContent('Win on your first try');
     expect(within(how).queryByRole('radio')).not.toBeInTheDocument();
     await user.click(within(how).getByRole('button', { name: 'Got it' }));
+    expect(screen.queryByRole('dialog', { name: 'How to play' })).not.toBeInTheDocument();
+  });
+
+  it('opens the next lesson from How to play', async () => {
+    const user = userEvent.setup();
+    const state = seeded();
+    state.settings.tutorial = { gen3ou: { completed: [LESSONS.gen3ou![0]!.id] } };
+    renderApp(state);
+    await user.click(await screen.findByRole('button', { name: 'Settings' }));
+    await user.click(screen.getByRole('button', { name: 'How to play' }));
+    const how = await screen.findByRole('dialog', { name: 'How to play' });
+    expect(how).not.toHaveTextContent('OverUsed');
+    // The tutorial picks up at the first lesson not done yet.
+    await user.click(within(how).getByRole('button', { name: 'Start the tutorial' }));
+    expect(window.location.hash).toBe(`#learn/${LESSONS.gen3ou![1]!.id}`);
     expect(screen.queryByRole('dialog', { name: 'How to play' })).not.toBeInTheDocument();
   });
 

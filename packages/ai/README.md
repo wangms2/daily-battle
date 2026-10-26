@@ -55,6 +55,31 @@ Comparison bots (`bots.ts`):
 - **mid:** the balance preset.
 - **strong:** the same features with low noise and no biases or guessing.
 
+## Difficulties (DESIGN.md §4.6)
+
+```ts
+import { aiFor } from '@daily-battle/ai';
+
+aiFor({ difficulty: 'easy', style }); // the EASY preset, any style
+aiFor({ difficulty: 'normal', style }); // exactly aiForStyle(style)
+aiFor({ difficulty: 'hard', style, engine, pool }); // HardPolicy (engine from @daily-battle/engine-wasm)
+```
+
+- **Easy** (`EASY` in `presets.ts`): a beginner. It mostly attacks, not always with the best move (high temperature), rarely switches, and never sets hazards, sets up, or predicts.
+- **Hard** (`hard/`): seeded MCTS from poke-engine over 8 sampled worlds, 150k iterations a decision.
+  - `worlds.ts` samples foe teams from the belief model, and from the week's pool for unseen foes.
+  - `translate.ts` and `names.ts` build poke-engine's state string.
+  - `choices.ts` maps engine options back to sim choices.
+  - The STRONG preset decides when search can't (about 3% of decisions).
+  - Every choice is deterministic from the `rng`.
+- `version.ts` holds `AI_VERSION`, `EASY_VERSION`, `HARD_VERSION`, and `aiVersion(difficulty)` (the engine-string part). It's import-light so the web app's main bundle can use it.
+- **Eval:** Easy's rows (mid vs easy, easy vs random, naive vs easy) always run. `--hard [--hard-n 30] [--hard-iterations N] [--hard-worlds N] [--only-hard]` adds hard vs mid and hard vs strong. At 150k: hard vs mid 6–0, hard vs strong 6–0 (small n), about 270 ms a decision.
+- **Tests** (`hard/hard.test.ts`, skipped when the WASM isn't built):
+  - Hard plays full battles in every built gen.
+  - Translated states round-trip through the engine.
+  - The engine knows every species, move, and ability in each gen's sets.
+  - The hidden-info test covers Hard too.
+
 ## Evaluation
 
 ```sh

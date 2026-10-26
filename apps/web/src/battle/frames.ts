@@ -1,5 +1,8 @@
 // What the battle worker sends the UI: plain data describing only what the
 // player's side can see. No simulator types cross this boundary.
+import type { Difficulty } from '@daily-battle/ai/version';
+import type { CoachNote, Heeded, Review, Verdict } from '@daily-battle/tutorial';
+import type { FoeScript, Position } from '@daily-battle/tutorial/lessons';
 
 export type Who = 'you' | 'foe';
 
@@ -35,6 +38,8 @@ export interface TeamMark {
   species?: string;
   fainted: boolean;
   status: string;
+  /** HP %, once it has been seen. */
+  hp?: number;
 }
 
 /** What the player knows about a foe Pokémon from what it has done so far. */
@@ -160,7 +165,62 @@ export interface TurnPackage {
   end: { winner: Who | null; youLeft: number; foeLeft: number } | null;
   /** True when this package rebuilds a resumed battle (show it without playback). */
   resumed: boolean;
+  /** Hard: the AI's new choices, to save (they replace any saved from index `from`). */
+  aiChoices?: AiChoices;
+  /**
+   * Coach on: this turn's tip (with controls). Warnings aren't in the package:
+   * the judge decides them when a choice is picked (`BattleBackend.coachCheck`),
+   * and a tip that needs the judge comes late (`BattleBackend.onCoachTip`).
+   */
+  coach?: { tip?: CoachNote };
+  /** Coach on: the memo on the choice just made, to save with it (`Attempt.coachLog`). */
+  coachMemo?: CoachMemo;
+  /** Coach on: the post-battle review (with `end`). */
+  review?: Review;
 }
+
+/**
+ * The coach's memo on one of your choices, saved with the attempt so a resume
+ * neither judges it again nor repeats a warning you overrode.
+ */
+export interface CoachMemo {
+  /** The judge's verdict on the choice. */
+  verdict?: Verdict;
+  /** The warning you saw and overrode. */
+  ignored?: string;
+  /** A warning you listened to (you picked again): your first pick and the warning. */
+  heeded?: Heeded;
+}
+
+/** A past decision replayed (the coach's review): frozen at the decision, then the turn as played. */
+export interface TurnReplay {
+  before: TurnPackage;
+  turn: TurnPackage;
+}
+
+/** A lesson turn (a demo, or a practice answer played out), with the choice it plays and its spotlight keys resolved. */
+export interface LessonTurn extends TurnReplay {
+  choice: string;
+  spots: string[];
+}
+
+export interface AiChoices {
+  from: number;
+  choices: string[];
+}
+
+/** Two batches of AI choices as one, the later winning where they overlap. */
+export function mergeAiChoices(a: AiChoices | undefined, b: AiChoices | undefined) {
+  if (!a || !b) return a ?? b;
+  if (b.from <= a.from) return b;
+  return { from: a.from, choices: [...a.choices.slice(0, b.from - a.from), ...b.choices] };
+}
+
+/** Saved AI choices with a batch applied. */
+export const applyAiChoices = (saved: string[] = [], { from, choices }: AiChoices) => [
+  ...saved.slice(0, from),
+  ...choices,
+];
 
 export interface EngineStart {
   /** The sim format, e.g. `gen5ou`; Gen 4 OU if left out (attempts saved before Gen 5). */
@@ -173,9 +233,62 @@ export interface EngineStart {
   aiSeed: string;
   /** Your recorded choices, for resume. */
   choices: string[];
+  /** Normal when left out. */
+  difficulty?: Difficulty;
+  /** The week's pool species: Hard's prior for your unseen Pokémon, and the coach's for the foe's. */
+  pool?: string[];
+  /** Hard: the AI's saved choices, replayed on resume instead of searched again. */
+  aiChoices?: string[];
+  /**
+   * A lesson battle (Learn mode): the teams are lesson `Mon`s, the foe follows
+   * its script (then plays as Easy), and luck can be removed.
+   */
+  tutorial?: {
+    noLuck: boolean;
+    foeScript?: FoeScript;
+    /** The redesigned course: the lesson reached, so the coach only talks about what's been taught. */
+    taught?: number;
+  };
+  /** The coach (DESIGN.md §22): tips and blunder warnings each turn, and a review at the end. */
+  coach?: 'simple';
+  /** Coach on: a memo per recorded choice (null where there's none), for resume. */
+  coachLog?: (CoachMemo | null)[];
+}
+
+/** A quiz position, shown frozen at the player's decision. */
+export interface PositionPackage {
+  pkg: TurnPackage;
+  /** Each quiz answer's step as a choice (`move 3`), or null if it isn't legal. */
+  choices: (string | null)[];
 }
 
 export type ToWorker =
-  { type: 'start'; start: EngineStart } | { type: 'choose'; choice: string } | { type: 'forfeit' };
+  | { type: 'start'; start: EngineStart }
+  | { type: 'choose'; choice: string }
+  | { type: 'forfeit' }
+  | { type: 'check'; choice: string; waitMs: number }
+  | { type: 'replay'; decision: number }
+  /** Review a battle played without the coach. */
+  | { type: 'review' }
+  | { type: 'position'; format: string; position: Position; steps: string[] }
+  | {
+      type: 'turn';
+      format: string;
+      position: Position;
+      turn: { p1?: string; p2?: string };
+      spots: string[];
+      whole?: boolean;
+    };
 
-export type FromWorker = { type: 'package'; pkg: TurnPackage } | { type: 'error'; message: string };
+export type FromWorker =
+  | { type: 'package'; pkg: TurnPackage }
+  | { type: 'position'; position: PositionPackage }
+  | { type: 'turn'; turn: LessonTurn }
+  | { type: 'check'; note: CoachNote | null }
+  | { type: 'replay'; replay: TurnReplay | null }
+  | { type: 'review'; review: Review }
+  /** How far a review has got (sent unasked, between answers). */
+  | { type: 'reviewProgress'; done: number; total: number }
+  /** A coach tip that waited for the judge (sent unasked, between answers). */
+  | { type: 'tip'; note: CoachNote }
+  | { type: 'error'; message: string };

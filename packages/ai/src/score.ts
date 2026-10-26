@@ -18,7 +18,15 @@ import {
   type Hit,
 } from './calc';
 import type { Params } from './presets';
-import { isMegaForme, megaInfo, moveId, type AIState, type FoeMon, type OwnMon } from './state';
+import {
+  isMegaForme,
+  megaInfo,
+  moveId,
+  moveName,
+  type AIState,
+  type FoeMon,
+  type OwnMon,
+} from './state';
 
 export interface ScoredAction {
   choice: string;
@@ -399,7 +407,7 @@ export function scoreActions(
     const calc = mega ?? meCalc;
     const taken = mega ? takenBy(mega) : takenNow;
     const slot = request?.active[0]?.moves[Number(n) - 1];
-    const name = slot?.name ?? me.set.moves[Number(n) - 1] ?? '';
+    const name = moveName(slot?.name ?? me.set.moves[Number(n) - 1] ?? '');
     const id = moveId(name);
     const info = moveInfo(gen, name);
     const dmg = foes.length

@@ -32,6 +32,8 @@
   --gold: #a9842f;
   --gold-soft: #f3ead6;
   --gold-text: #1b1408; /* dark on gold meets AA (5.2:1); white doesn't */
+  /* A lesson's or the tour's highlight: its own hue, so it never reads as a button. */
+  --spot: #e39a1b;
   --good: #3d7a5a;
   --bad: #a33a46;
 
@@ -71,6 +73,7 @@
     --gold: #d2ae63;
     --gold-soft: #3a3021;
     --gold-text: #1b1408;
+    --spot: #f5b544;
     --good: #7cc39c;
     --bad: #e07a85;
     --card-shadow: 0 1px 2px rgb(0 0 0 / 0.35);
@@ -96,6 +99,7 @@
   --color-accent-soft: var(--accent-soft);
   --color-soft-ink: var(--accent-soft-text);
   --color-gold: var(--gold);
+  --color-spot: var(--spot);
   --color-gold-soft: var(--gold-soft);
   --color-on-gold: var(--gold-text);
   --color-on-accent: var(--accent-text);
@@ -166,7 +170,8 @@ body {
   outline-offset: 2px;
 }
 /* On the battle background, a light halo keeps the ring visible. */
-.statbar:focus-visible {
+.statbar:focus-visible,
+.statbar-btn:focus-visible {
   outline-color: #fff;
   box-shadow: 0 0 0 4px var(--accent);
   border-radius: 4px;
@@ -251,6 +256,15 @@ body {
 }
 .animate-fade-in {
   animation: fade-in 160ms ease-out;
+}
+
+/* Lesson demos (Spotlight.tsx): the rest of the screen dims, the targets keep a soft ring. */
+.spotlight-dim {
+  fill: color-mix(in srgb, var(--bg) 72%, transparent);
+}
+.spotlight-ring {
+  stroke: var(--spot);
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--spot) 55%, transparent));
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1075,7 +1089,7 @@ button {
   container-type: size;
 }
 .home .home-top {
-  height: calc(56cqh - 6px);
+  height: calc(63cqh - 6px);
   transition: height 460ms var(--ease);
 }
 .home[data-view='picker'] .home-top {
@@ -1094,7 +1108,7 @@ button {
   position: absolute;
   inset-inline: 0;
   top: 0;
-  height: calc(56cqh - 6px);
+  height: calc(63cqh - 6px);
   transition:
     opacity 220ms ease,
     translate 460ms var(--ease);
@@ -1126,7 +1140,7 @@ button {
   position: absolute;
   inset-inline: 0;
   bottom: 0;
-  height: calc(44cqh - 6px);
+  height: calc(37cqh - 6px);
   transition:
     opacity 200ms ease,
     translate 400ms var(--ease);
@@ -1147,14 +1161,16 @@ button {
 .home:not([data-view='picker']) .home-games {
   pointer-events: none;
 }
-.home-cart {
+.home-cart,
+.home-learn {
   opacity: 0;
   translate: 0 16px;
   transition:
     opacity 160ms ease,
     translate 240ms var(--ease);
 }
-.home[data-view='picker'] .home-cart {
+.home[data-view='picker'] .home-cart,
+.home[data-view='picker'] .home-learn {
   opacity: 1;
   translate: 0 0;
   transition:
@@ -1225,6 +1241,12 @@ button {
   min-width: clamp(230px, 36cqh, 430px);
   padding-inline: clamp(28px, 4.4cqh, 52px);
   font-size: clamp(25px, 3.9cqh, 46px);
+}
+/* "Battle basics" under Play: a small pill on the clay. */
+.home-basics {
+  min-height: clamp(32px, 5cqh, 48px);
+  padding-inline: clamp(14px, 2.2cqh, 22px);
+  font-size: clamp(14px, 2.2cqh, 20px);
 }
 .home-friend {
   height: clamp(60px, 9.5cqh, 128px);

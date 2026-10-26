@@ -1,6 +1,9 @@
 // Client state, versioned (DESIGN.md §10). Bump `version` and add a migration
 // in storage.ts for any breaking change.
+// Optional fields (like difficulties) are added without a bump: old saves just lack them.
+import type { Difficulty } from '@daily-battle/ai/version';
 import { FORMATS, type FormatId } from '@daily-battle/data/formats';
+import type { CoachMemo } from '../battle/frames';
 import type { Slot } from '../lib/data';
 
 export type { Slot };
@@ -19,6 +22,24 @@ export interface Attempt {
   choices: string[];
   /** Simulator and AI versions; a mismatch on resume records a forfeit (§15). */
   engine: string;
+  /** Easy or Hard; absent for Normal (and for every attempt saved before difficulties). */
+  difficulty?: 'easy' | 'hard';
+  /**
+   * The coach was on (DESIGN.md §22): set when the battle starts with it, or the
+   * moment it's turned on mid-battle, and never unset. A Coached result.
+   */
+  coached?: true;
+  /**
+   * Hard only: the AI's choices so far. A resume replays them instead of searching
+   * again; with the seeds they reproduce the same battle.
+   */
+  aiChoices?: string[];
+  /**
+   * Coach on: the coach's memo per choice (null where there's none), by index
+   * in `choices`: the judge's verdict and any warning you overrode, so a resume
+   * neither judges again nor asks again (DESIGN.md §22).
+   */
+  coachLog?: (CoachMemo | null)[];
   /** A practice run's one-off change; if the run is won, it carries over to the team. */
   practiceChange?: DayChange;
 }
@@ -69,6 +90,21 @@ export interface Settings {
   shownExplainers: string[];
   /** The game to show (Gen 4 OU or Gen 5 OU); unset until the player picks one. */
   format?: FormatId;
+  /** The CPU difficulty picked for each game; Normal when unset. */
+  difficulty?: Partial<Record<FormatId, Difficulty>>;
+  /** Learn mode progress, per game that has lessons (Gen 3 so far). */
+  tutorial?: Partial<Record<FormatId, TutorialProgress>>;
+  /** The coach is on for a game's next battles (where it's offered: lib/coach.ts). */
+  coach?: Partial<Record<FormatId, boolean>>;
+  /** The coach was offered for a game (first daily, or after graduation), so it isn't again. */
+  coachOffered?: Partial<Record<FormatId, boolean>>;
+}
+
+export interface TutorialProgress {
+  /** Lesson ids finished (in the order they were finished). */
+  completed: string[];
+  /** The lesson last opened and the step reached, to resume. */
+  current?: { lesson: string; step: number };
 }
 
 /**

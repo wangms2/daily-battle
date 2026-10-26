@@ -52,9 +52,12 @@ export function MenuSheet({
   onLeave,
   onGiveUp,
   canGiveUp,
+  coach,
 }: {
   open: boolean;
   onOpenChange: (o: boolean) => void;
+  /** The daily coach, where it's offered: once on, it stays on for the battle. */
+  coach?: { on: boolean; onTurnOn: () => void };
   hints: boolean;
   animations: boolean;
   onHints: (v: boolean) => void;
@@ -74,6 +77,19 @@ export function MenuSheet({
           hint="Effectiveness, speed, and tips"
         />
         <Switch checked={animations} onCheckedChange={onAnimations} label="Animations" />
+        {coach && (
+          <Switch
+            checked={coach.on}
+            disabled={coach.on}
+            onCheckedChange={(v) => v && coach.onTurnOn()}
+            label="Coach"
+            hint={
+              coach.on
+                ? 'On for the rest of this battle'
+                : 'Tips, blunder warnings, and a review. A Coached result.'
+            }
+          />
+        )}
       </div>
       <div className="mt-3 grid gap-2">
         <Button variant="secondary" onClick={onLog}>

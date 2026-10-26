@@ -232,6 +232,9 @@ importers:
       '@daily-battle/data':
         specifier: workspace:*
         version: link:../../packages/data
+      '@daily-battle/engine-wasm':
+        specifier: workspace:*
+        version: link:../../packages/engine-wasm
       '@daily-battle/gen':
         specifier: workspace:*
         version: link:../../packages/gen
@@ -257,12 +260,18 @@ importers:
       '@daily-battle/data':
         specifier: workspace:*
         version: link:../../packages/data
+      '@daily-battle/engine-wasm':
+        specifier: workspace:*
+        version: link:../../packages/engine-wasm
       '@daily-battle/gen':
         specifier: workspace:*
         version: link:../../packages/gen
       '@daily-battle/sim-bridge':
         specifier: workspace:*
         version: link:../../packages/sim-bridge
+      '@daily-battle/tutorial':
+        specifier: workspace:*
+        version: link:../../packages/tutorial
       '@daily-battle/versus':
         specifier: workspace:*
         version: link:../../packages/versus
@@ -360,6 +369,9 @@ importers:
       '@daily-battle/data':
         specifier: workspace:*
         version: link:../data
+      '@daily-battle/engine-wasm':
+        specifier: workspace:*
+        version: link:../engine-wasm
       '@daily-battle/gen':
         specifier: workspace:*
         version: link:../gen
@@ -390,6 +402,12 @@ importers:
         specifier: ^4.23.15
         version: 4.23.15
 
+  packages/engine-wasm:
+    devDependencies:
+      tsx:
+        specifier: ^4.23.15
+        version: 4.23.15
+
   packages/gen:
     dependencies:
       '@daily-battle/data':
@@ -411,6 +429,9 @@ importers:
       '@daily-battle/data':
         specifier: workspace:*
         version: link:../data
+      '@daily-battle/engine-wasm':
+        specifier: workspace:*
+        version: link:../engine-wasm
       '@daily-battle/gen':
         specifier: workspace:*
         version: link:../gen
@@ -447,8 +468,36 @@ importers:
         specifier: ^4.23.15
         version: 4.23.15
 
+  packages/tutorial:
+    dependencies:
+      '@daily-battle/ai':
+        specifier: workspace:*
+        version: link:../ai
+      '@daily-battle/data':
+        specifier: workspace:*
+        version: link:../data
+      '@daily-battle/engine-wasm':
+        specifier: workspace:*
+        version: link:../engine-wasm
+      '@daily-battle/gen':
+        specifier: workspace:*
+        version: link:../gen
+      '@daily-battle/sim-bridge':
+        specifier: workspace:*
+        version: link:../sim-bridge
+      '@pkmn/sim':
+        specifier: 'catalog:'
+        version: 0.10.11
+    devDependencies:
+      tsx:
+        specifier: ^4.23.15
+        version: 4.23.15
+
   packages/versus:
     dependencies:
+      '@daily-battle/ai':
+        specifier: workspace:*
+        version: link:../ai
       '@daily-battle/data':
         specifier: workspace:*
         version: link:../data

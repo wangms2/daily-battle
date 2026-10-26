@@ -1,3 +1,4 @@
+import type { Difficulty } from '@daily-battle/ai/version';
 import { DEFAULT_FORMAT, FORMATS, formatInfo, type FormatId } from '@daily-battle/data/formats';
 import { addDays, dayKey, weekKey } from '@daily-battle/gen/dates';
 import { Fragment, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
@@ -6,24 +7,44 @@ import { DailyBrief } from './screens/DailyBrief';
 import { Home } from './screens/Home';
 import { TeamBuilder } from './screens/TeamBuilder';
 import { AboutSheet } from './sheets/About';
-import { SettingsSheet, StatsSheet, WelcomeSheet } from './sheets/misc';
+import { ConfirmDialog, SettingsSheet, StatsSheet, WelcomeSheet } from './sheets/misc';
 import { configureAudio } from './lib/audio';
 import { setActiveFormat } from './lib/data';
 import { setSpriteStyle } from './lib/sprites';
 import { useMediaQuery } from './ui/useWide';
 import { reportText } from './lib/report';
-import { computeStats, dayHeadline, summarizeDay } from './lib/results';
+import {
+  attemptBucket,
+  attemptDifficulty,
+  computeStats,
+  dayHeadline,
+  summarizeDay,
+} from './lib/results';
+import { bucketOf, coachAvailable, coachOn, coachWarning } from './lib/coach';
 import { useSchedule } from './lib/schedule';
 import type { ScheduleFile } from '@daily-battle/gen/schedule';
+import { hardAvailable } from './battle/hardEngine';
+import { currentDifficulty } from './lib/difficulty';
 import { ENGINE_VERSION, randomSeed } from './lib/seed';
-import { shareModel } from './lib/share';
+import { DIFFICULTY_NAME, shareModel } from './lib/share';
 import { GamesProvider } from './ui/OtherGames';
-import { attemptInProgress, dayDecided, withChange, type GameAction } from './state/reducer';
+import {
+  attemptEngine,
+  attemptInProgress,
+  dayDecided,
+  withChange,
+  type GameAction,
+} from './state/reducer';
 import { emptyDay, type Settings } from './state/schema';
 import { useNow, useStore } from './state/context';
 import { Button } from './ui/bits';
 import { TopBar } from './ui/TopBar';
 import { VersusRoute } from './versus/VersusRoute';
+import { gen3Course, LESSONS } from '@daily-battle/tutorial/lessons';
+import { Learn } from './tutorial/Learn';
+import { LessonPlayer } from './tutorial/LessonPlayer';
+import { CourseMap } from './tutorial/CourseMap';
+import { nextLesson } from './tutorial/lesson';
 
 /** Shared links open the game picker, so a friend can choose any generation. */
 const shareUrl = () => `${window.location.origin}/#daily`;
@@ -47,15 +68,17 @@ function countdownTo(now: Date, nextDay: string): string {
   return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
 
-/** The part of the app a route is in: the home screens, versus, today's game, or the battle. */
+/** The part of the app a route is in: the home screens, versus, Learn, today's game, or the battle. */
 const area = (route: string) =>
   route === '' || route === 'daily'
     ? 'home'
     : route === 'versus' || route.startsWith('versus/')
       ? 'versus'
-      : route === 'battle'
-        ? 'battle'
-        : 'play';
+      : route === 'learn' || route.startsWith('learn/')
+        ? 'learn'
+        : route === 'battle'
+          ? 'battle'
+          : 'play';
 
 type ViewTransitions = { startViewTransition?: (update: () => Promise<void>) => unknown };
 
@@ -102,6 +125,12 @@ function useHashRoute(): [string, (r: string) => void] {
 }
 
 /** An older share link's `#gen5` (or `#gen4`, `#gen6`): the game it was shared from. */
+/** Attempts are identified by ts, so keep it unique even if the clock repeats. */
+const nextTs = (last: number | undefined) => Math.max(Date.now(), (last ?? 0) + 1);
+
+/** The game Learn mode teaches (the only one with lessons so far). */
+const LEARN_FORMAT: FormatId = 'gen3ou';
+
 const formatFromHash = (hash: string): FormatId | undefined =>
   (Object.keys(FORMATS) as FormatId[]).find((f) => f === `${hash}ou`);
 
@@ -150,9 +179,24 @@ export function App() {
   const { weeks, days } = state.games[format];
   const weekState = weeks[week];
   const dayState = days[day] ?? emptyDay();
+  // Each difficulty has its own tries and streak; the team is shared.
+  const difficulty = currentDifficulty(settings, format, days[day]);
+  // Coached tries count apart, in one bucket across difficulties (DESIGN.md §22).
+  const coached = coachOn(settings, format, days[day], difficulty);
+  const bucket = bucketOf(difficulty, coached);
+  const gameBucket = (id: FormatId) => {
+    const d = currentDifficulty(settings, id, state.games[id].days[day]);
+    return bucketOf(d, coachOn(settings, id, state.games[id].days[day], d));
+  };
   // Streaks and stats come from the saved attempts (lib/results.ts).
-  const stats = useMemo(() => computeStats(days, day), [days, day]);
-  const summary = useMemo(() => summarizeDay(days[day], true), [days, day]);
+  const stats = useMemo(() => computeStats(days, day, bucket), [days, day, bucket]);
+  const summary = useMemo(() => summarizeDay(days[day], true, bucket), [days, day, bucket]);
+  // What turning the coach on would cost: the regular streak at this difficulty.
+  const regularStreak = useMemo(
+    () => (coached ? stats.streak : computeStats(days, day, difficulty).streak),
+    [coached, stats.streak, days, day, difficulty],
+  );
+  const coachCost = coached ? null : coachWarning(days[day], difficulty, regularStreak);
   const share = shareModel({
     day,
     summary,
@@ -161,6 +205,8 @@ export function App() {
     url: shareUrl(),
     game: `${game.name} OU`,
     format,
+    difficulty,
+    coached,
   });
   const countdown = countdownTo(now, addDays(day, 1));
   // The other games, for the "Play another generation" row on the result and share screens.
@@ -170,7 +216,7 @@ export function App() {
       .map((id) => ({
         id,
         name: `${formatInfo(id).name} OU`,
-        status: summarizeDay(state.games[id].days[day], true).status,
+        status: summarizeDay(state.games[id].days[day], true, gameBucket(id)).status,
       })),
     onPlay: (id: FormatId) => {
       dispatchAny({ type: 'setSetting', key: 'format', value: id });
@@ -179,6 +225,17 @@ export function App() {
   };
   const setSetting = <K extends keyof Settings>(key: K, value: Settings[K]) =>
     dispatchAny({ type: 'setSetting', key, value });
+  const setCoach = (on: boolean) => setSetting('coach', { ...settings.coach, [format]: on });
+  const setDifficulty = (d: Difficulty) =>
+    setSetting('difficulty', { ...settings.difficulty, [format]: d });
+  // The welcome sheet and How to play point beginners to the Gen 3 lessons (DESIGN.md §22).
+  const startTutorial = () => {
+    if (!settings.shownExplainers.includes('welcome'))
+      dispatchAny({ type: 'markExplainer', id: 'welcome' });
+    setHowToPlayOpen(false);
+    const next = nextLesson(LESSONS[LEARN_FORMAT]!, settings.tutorial?.[LEARN_FORMAT]);
+    go(next ? `learn/${next.id}` : 'learn');
+  };
 
   // An unfinished battle from an earlier day, or from an older engine, counts as a loss.
   useEffect(() => {
@@ -207,12 +264,14 @@ export function App() {
     setOpenEdit(false);
     if (!weekState) return;
     if (inProgress) {
+      // Resuming keeps the battle's difficulty picked, so its result shows after.
+      const resumed = attemptDifficulty(inProgress);
+      if (resumed !== (settings.difficulty?.[format] ?? 'normal')) setDifficulty(resumed);
       setBattleTs(inProgress.ts);
     } else {
       const team = runTeam;
       const lead = team.find((s) => s.species === dayState.lead) ?? team[0]!;
-      // Attempts are identified by ts, so keep it unique even if the clock repeats.
-      const ts = Math.max(Date.now(), (dayState.attempts.at(-1)?.ts ?? 0) + 1);
+      const ts = nextTs(dayState.attempts.at(-1)?.ts);
       dispatch({
         type: 'startAttempt',
         day,
@@ -225,7 +284,9 @@ export function App() {
           battleSeed: randomSeed(),
           aiSeed: randomSeed(),
           choices: [],
-          engine: ENGINE_VERSION,
+          engine: attemptEngine(ENGINE_VERSION, difficulty),
+          ...(difficulty !== 'normal' && { difficulty }),
+          ...(coached && { coached: true as const }),
           ...(practiceChange && { practiceChange }),
         },
       });
@@ -233,13 +294,35 @@ export function App() {
     }
     go('battle');
   };
+  // The coach is offered once on the brief (a game's first daily, and after
+  // graduation), never over another sheet or a battle that's under way.
+  const coachOffer =
+    route === 'play' &&
+    schedule.status === 'ready' &&
+    !!weekState &&
+    !staleTeam &&
+    !inProgress &&
+    !coached &&
+    !practice &&
+    coachAvailable(format, difficulty) &&
+    !settings.coachOffered?.[format] &&
+    settings.shownExplainers.includes('welcome');
+  const offeredCoach = () =>
+    setSetting('coachOffered', { ...settings.coachOffered, [format]: true });
   const shownAttempt =
     dayState.attempts.find((a) => a.ts === battleTs) ??
     (route === 'battle' ? inProgress : undefined);
 
   const renderTopBar = (title: string) => (left?: ReactNode) => (
     <TopBar
-      title={`${game.name} · ${title}`}
+      title={[
+        game.name,
+        difficulty !== 'normal' && DIFFICULTY_NAME[difficulty],
+        coached && 'Coached',
+        title,
+      ]
+        .filter(Boolean)
+        .join(' · ')}
       onTitle={() => go('daily')}
       left={left}
       streak={stats.streak}
@@ -254,25 +337,87 @@ export function App() {
   // Today's game is #play (and #battle); anything else is the landing screen,
   // or #daily, the picker a shared link opens.
   const playing = route === 'play' || route === 'battle';
+  // Learn mode (#learn, #learn/LESSON): the Gen 3 tutorial, apart from the daily.
+  const learning = area(route) === 'learn';
 
   let screen: ReactNode;
-  if (!versus && !playing) {
+  if (learning) {
+    const progress = settings.tutorial?.[LEARN_FORMAT];
+    const lessons = LESSONS[LEARN_FORMAT]!;
+    const lesson = lessons.find((l) => route === `learn/${l.id}`);
+    screen =
+      // The redesigned course's map, previewed by its link (step 4b) until it replaces the list.
+      route === 'learn/course' ? (
+        <CourseMap
+          game={formatInfo(LEARN_FORMAT).name}
+          course={gen3Course}
+          lessons={lessons}
+          progress={progress}
+          onOpen={(l) => go(`learn/${l.id}`)}
+          onBack={() => go('learn')}
+          onSettings={() => setSettingsOpen(true)}
+        />
+      ) : lesson ? (
+        <LessonPlayer
+          key={lesson.id}
+          lesson={lesson}
+          step={progress?.current?.lesson === lesson.id ? progress.current.step : 0}
+          settings={settings}
+          onSetting={setSetting}
+          onExplainerSeen={(id) => dispatchAny({ type: 'markExplainer', id })}
+          onStep={(step) =>
+            dispatchAny({ type: 'lessonStep', format: LEARN_FORMAT, lesson: lesson.id, step })
+          }
+          onDone={() => {
+            dispatchAny({ type: 'lessonDone', format: LEARN_FORMAT, lesson: lesson.id });
+            // Graduates are offered the coach again, on their next daily.
+            if (
+              lesson.graduation &&
+              !settings.tutorial?.[LEARN_FORMAT]?.completed.includes(lesson.id)
+            )
+              setSetting('coachOffered', { ...settings.coachOffered, [LEARN_FORMAT]: false });
+            go('learn');
+          }}
+          onExit={() => go('learn')}
+          onSettings={() => setSettingsOpen(true)}
+        />
+      ) : (
+        <Learn
+          game={formatInfo(LEARN_FORMAT).name}
+          lessons={lessons}
+          progress={progress}
+          onOpen={(l) => go(`learn/${l.id}`)}
+          onPlay={() => {
+            if (format !== LEARN_FORMAT)
+              dispatchAny({ type: 'setSetting', key: 'format', value: LEARN_FORMAT });
+            go('play');
+          }}
+          onBack={() => go('')}
+          onSettings={() => setSettingsOpen(true)}
+        />
+      );
+  } else if (!versus && !playing) {
     screen = (
       <Home
         view={route === 'daily' ? 'picker' : 'landing'}
         games={(Object.keys(FORMATS) as FormatId[]).map((id) => {
-          const today = summarizeDay(state.games[id].days[day], true);
+          const gameDays = state.games[id].days;
+          const level = currentDifficulty(settings, id, gameDays[day]);
+          const today = summarizeDay(gameDays[day], true, gameBucket(id));
           return {
             id,
             name: formatInfo(id).name,
             blurb: GAME_BLURB[id],
-            streak: computeStats(state.games[id].days, day).streak,
+            streak: computeStats(gameDays, day, gameBucket(id)).streak,
             today: dayHeadline(today),
             cleared: today.status === 'firstTry' || today.status === 'won',
+            ...(level !== 'normal' && { difficulty: level }),
+            ...(gameBucket(id) === 'coached' && { coached: true }),
           };
         })}
         onPlay={() => go('daily')}
         onFriends={() => go('versus')}
+        onLearn={() => go('learn')}
         onPick={(id) => {
           if (id !== format) dispatchAny({ type: 'setSetting', key: 'format', value: id });
           go('play');
@@ -330,11 +475,16 @@ export function App() {
   } else if (route === 'battle' && shownAttempt) {
     screen = (
       <BattleRoute
-        key={shownAttempt.ts}
+        // Turning the coach on mid-battle starts it again, coached, from the same turn.
+        key={`${shownAttempt.ts}${shownAttempt.coached ? 'c' : ''}`}
         day={day}
         schedule={schedule.schedule}
         attempt={shownAttempt}
-        tryNumber={dayState.attempts.indexOf(shownAttempt) + 1}
+        tryNumber={
+          dayState.attempts
+            .filter((a) => attemptBucket(a) === attemptBucket(shownAttempt))
+            .indexOf(shownAttempt) + 1
+        }
         settings={settings}
         dispatch={dispatchAny}
         format={format}
@@ -354,6 +504,16 @@ export function App() {
           // The same share as the brief's: practice runs never show in it.
           share,
         }}
+        {...(shownAttempt === inProgress &&
+          coachAvailable(format, attemptDifficulty(shownAttempt)) && {
+            coach: {
+              warning: coachCost,
+              onTurnOn: () => {
+                setCoach(true);
+                dispatch({ type: 'coachAttempt', day });
+              },
+            },
+          })}
       />
     );
   } else {
@@ -381,6 +541,12 @@ export function App() {
         }}
         inProgress={!!inProgress}
         onStart={startBattle}
+        difficulty={difficulty}
+        onDifficulty={setDifficulty}
+        {...(coachAvailable(format, difficulty) && {
+          coach: { on: coached, warning: coachCost, onChange: setCoach },
+        })}
+        hardAvailable={hardAvailable(format)}
         result={{ summary, streak: stats.streak, share, countdown }}
       />
     );
@@ -388,7 +554,7 @@ export function App() {
 
   return (
     <div
-      className={`mx-auto h-dvh overflow-hidden ${route === 'battle' ? 'max-w-[1440px]' : !versus && !playing ? '' : 'max-w-[1280px]'}`}
+      className={`mx-auto h-dvh overflow-hidden ${route === 'battle' ? 'max-w-[1440px]' : !versus && !playing && !learning ? '' : 'max-w-[1280px]'}`}
     >
       {!storageAvailable && !storageNoticeDismissed && (
         <div
@@ -414,12 +580,30 @@ export function App() {
         onHints={(v) => setSetting('beginnerHints', v)}
         onDone={() => dispatchAny({ type: 'markExplainer', id: 'welcome' })}
         onAbout={() => setAboutOpen(true)}
+        onTutorial={startTutorial}
+      />
+      <ConfirmDialog
+        open={coachOffer}
+        onOpenChange={(o) => !o && offeredCoach()}
+        title="Want a coach?"
+        body={`The coach gives a tip now and then, checks before a clear mistake, and reviews the key turns after. ${coachCost ?? 'Coached wins build a Coached streak of their own.'} You can turn it on or off before any battle.`}
+        confirm="Turn on coach"
+        cancel="Not now"
+        onConfirm={() => {
+          offeredCoach();
+          setCoach(true);
+        }}
       />
       <StatsSheet
         open={statsOpen}
         onOpenChange={setStatsOpen}
         stats={stats}
-        game={`${game.name} OU`}
+        game={[
+          `${game.name} OU`,
+          coached ? 'Coached' : difficulty !== 'normal' && DIFFICULTY_NAME[difficulty],
+        ]
+          .filter(Boolean)
+          .join(' · ')}
         todayLabel={dayHeadline(summary)}
         countdown={countdown}
       />
@@ -442,6 +626,7 @@ export function App() {
         onHints={() => {}}
         onDone={() => setHowToPlayOpen(false)}
         onAbout={() => setAboutOpen(true)}
+        onTutorial={startTutorial}
       />
       <AboutSheet open={aboutOpen} onOpenChange={setAboutOpen} />
     </div>

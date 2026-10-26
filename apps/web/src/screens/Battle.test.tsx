@@ -1,4 +1,5 @@
-import { act, fireEvent, render, screen, within } from '@testing-library/react';
+import type { CoachNote, Review } from '@daily-battle/tutorial';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { BattleBackendContext, type BattleBackend } from '../battle/backend';
@@ -49,7 +50,8 @@ const view = (turn: number, foeHp = 100): View => ({
   })),
   foeTeam: [
     { species: 'Gyarados', fainted: false, status: '' },
-    ...Array.from({ length: 5 }, () => ({ fainted: false, status: '' })),
+    { species: 'Tyranitar', fainted: false, status: '', hp: 62 },
+    ...Array.from({ length: 4 }, () => ({ fainted: false, status: '' })),
   ],
 });
 const frame = (text: string, v: View, kind?: NonNullable<Frame['event']>['kind']): Frame => ({
@@ -128,9 +130,20 @@ const WON = pkg({
   end: { winner: 'you', youLeft: 3, foeLeft: 0 },
 });
 
-function fakeBackend(turns: TurnPackage[], start = OPENING) {
+function fakeBackend(
+  turns: TurnPackage[],
+  start = OPENING,
+  /** Coach on: the judge's warnings by choice, and how long it takes to answer. */
+  coach?: { warnings: Record<string, CoachNote>; ms?: number },
+) {
   const calls: string[] = [];
   const backend: BattleBackend = {
+    ...(coach && {
+      coachCheck: vi.fn(async (choice: string) => {
+        if (coach.ms) await new Promise((r) => setTimeout(r, coach.ms));
+        return coach.warnings[choice] ?? null;
+      }),
+    }),
     start: vi.fn(async () => start),
     choose: vi.fn(async (c: string) => {
       calls.push(c);
@@ -153,6 +166,8 @@ function renderBattle(
     speed = 'instant',
     hints = true,
     tryNumber = 1,
+    tour = false,
+    start = START,
     result = {
       summary: summarizeDay(undefined, true),
       streak: 0,
@@ -163,13 +178,17 @@ function renderBattle(
     speed?: Settings['battleSpeed'];
     hints?: boolean;
     tryNumber?: number;
+    start?: EngineStart;
     result?: DayResult;
+    /** The first-battle tour not seen yet. */
+    tour?: boolean;
   } = {},
 ) {
   const settings: Settings = {
     ...initialState().settings,
     battleSpeed: speed,
     beginnerHints: hints,
+    shownExplainers: tour ? [] : ['tour'],
   };
   const props = {
     onSetting: vi.fn(),
@@ -183,7 +202,7 @@ function renderBattle(
   render(
     <BattleBackendContext.Provider value={() => backend}>
       <Battle
-        start={START}
+        start={start}
         background="/fx/bg-gen4.png"
         tryNumber={tryNumber}
         settings={settings}
@@ -196,6 +215,35 @@ function renderBattle(
 }
 
 const thunderbolt = () => screen.findByRole('button', { name: /^Thunderbolt, / });
+
+describe('the foe team row', () => {
+  it('opens the card of a foe Pokémon not in battle, with its HP', async () => {
+    renderBattle(fakeBackend([]).backend);
+    await thunderbolt();
+    await userEvent.click(screen.getByRole('button', { name: /^Foe's Tyranitar, 62% HP/ }));
+    const card = screen.getByRole('tooltip');
+    expect(card).toHaveTextContent('Tyranitar');
+    expect(card).toHaveTextContent('62%');
+    // A second tap closes it.
+    await userEvent.click(screen.getByRole('button', { name: /^Foe's Tyranitar/ }));
+    expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
+  });
+});
+
+describe('first-battle tour', () => {
+  it('walks through the moves, your team, and the foe card once, then says it was seen', async () => {
+    const props = renderBattle(fakeBackend([]).backend, { tour: true });
+    const tour = await screen.findByRole('note', { name: 'Tour' });
+    expect(tour.textContent).toMatch(/1\/3.*Tap a move/);
+    await userEvent.click(within(tour).getByRole('button', { name: 'Next' }));
+    expect(tour.textContent).toMatch(/2\/3.*Your team/);
+    await userEvent.click(within(tour).getByRole('button', { name: 'Next' }));
+    expect(tour.textContent).toMatch(/3\/3.*Tap the foe/);
+    await userEvent.click(within(tour).getByRole('button', { name: 'Got it' }));
+    expect(screen.queryByRole('note', { name: 'Tour' })).toBeNull();
+    expect(props.onExplainerSeen).toHaveBeenCalledWith('tour');
+  });
+});
 
 describe('battle screen', () => {
   it('keeps the controls off while a turn plays, and a tap skips to the end', async () => {
@@ -294,12 +342,14 @@ describe('battle screen', () => {
     vi.useFakeTimers();
     try {
       fireEvent.pointerDown(button, { pointerType: 'touch' });
-      act(() => vi.advanceTimersByTime(160)); // almost at once
+      act(() => vi.advanceTimersByTime(350));
+      // Not yet a hold: nothing shows, so a lift now would still choose the move.
+      expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
+      act(() => vi.advanceTimersByTime(60));
       const card = screen.getByRole('tooltip');
       expect(card).toHaveTextContent('10% chance to paralyze the target.');
       expect(card).toHaveTextContent('Power95');
       expect(card).toHaveTextContent('Super effective ×4');
-      act(() => vi.advanceTimersByTime(400));
       fireEvent.pointerUp(button, { pointerType: 'touch' });
       fireEvent.pointerLeave(button, { pointerType: 'touch' });
       fireEvent.click(button);
@@ -313,13 +363,13 @@ describe('battle screen', () => {
     expect(calls).toEqual([]);
   });
 
-  it('chooses the move on a quick tap, even once its details have flashed up', async () => {
+  it('chooses the move on a tap short of a hold, without its details flashing up', async () => {
     const { backend, calls } = fakeBackend([TURN_1]);
     renderBattle(backend);
     const button = await thunderbolt();
     vi.useFakeTimers();
     try {
-      press(button, 250);
+      press(button, 350);
     } finally {
       vi.useRealTimers();
     }
@@ -564,5 +614,239 @@ describe('battle screen', () => {
     } finally {
       vi.unstubAllGlobals();
     }
+  });
+});
+
+describe('coach', () => {
+  const swampert: CoachNote = {
+    rule: 'noEffect',
+    text: 'Earthquake has no effect on Gyarados.',
+    lesson: 'gen3-types',
+  };
+  const coached = (over: Partial<TurnPackage> = {}) =>
+    pkg({
+      ...OPENING,
+      coach: { tip: { rule: 'canKo', text: 'Thunderbolt can knock out Gyarados.' } },
+      ...over,
+    });
+
+  it('shows the turn tip, which you can dismiss', async () => {
+    const { backend } = fakeBackend([], coached());
+    renderBattle(backend);
+    const tip = await screen.findByRole('note', { name: 'Coach tip' });
+    expect(tip).toHaveTextContent('Thunderbolt can knock out Gyarados.');
+    await userEvent.click(within(tip).getByRole('button', { name: 'Dismiss tip' }));
+    expect(screen.queryByRole('note', { name: 'Coach tip' })).not.toBeInTheDocument();
+  });
+
+  it('asks before a flagged choice: pick again, or do it anyway and silence the rule', async () => {
+    const { backend, calls } = fakeBackend([coached({ frames: TURN_1.frames })], coached(), {
+      warnings: { 'move 2': swampert },
+    });
+    renderBattle(backend);
+    await userEvent.click(await screen.findByRole('button', { name: /^Earthquake, / }));
+    expect(await screen.findByText('Earthquake has no effect on Gyarados.')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Pick again' }));
+    expect(calls).toEqual([]);
+
+    await userEvent.click(await screen.findByRole('button', { name: /^Earthquake, / }));
+    await userEvent.click(await screen.findByRole('checkbox', { name: /Don’t warn/ }));
+    await userEvent.click(screen.getByRole('button', { name: 'Do it anyway' }));
+    await within(screen.getByRole('banner')).findByText('Turn 2');
+    expect(calls).toEqual(['move 2']);
+
+    // Silenced for the rest of the battle.
+    await userEvent.click(await screen.findByRole('button', { name: /^Earthquake, / }));
+    await waitFor(() => expect(calls).toEqual(['move 2', 'move 2']));
+    expect(screen.queryByText('Earthquake has no effect on Gyarados.')).not.toBeInTheDocument();
+  });
+
+  it('sends unflagged choices straight away', async () => {
+    const { backend, calls } = fakeBackend([TURN_1], coached(), { warnings: {} });
+    renderBattle(backend);
+    await userEvent.click(await thunderbolt());
+    await waitFor(() => expect(calls).toEqual(['move 1']));
+  });
+
+  it('says so while the coach is still checking a pick, then sends it', async () => {
+    const { backend, calls } = fakeBackend([TURN_1], coached(), { warnings: {}, ms: 400 });
+    renderBattle(backend);
+    await userEvent.click(await thunderbolt());
+    expect(await screen.findByText('Coach is checking…')).toBeInTheDocument();
+    await waitFor(() => expect(calls).toEqual(['move 1']));
+    expect(screen.queryByText('Coach is checking…')).not.toBeInTheDocument();
+  });
+
+  it('sends choices without asking when the coach can’t judge them', async () => {
+    // A backend without a judge (no engine): tips only, never warnings.
+    const { backend, calls } = fakeBackend([TURN_1], coached());
+    renderBattle(backend);
+    await userEvent.click(await screen.findByRole('button', { name: /^Earthquake, / }));
+    await waitFor(() => expect(calls).toEqual(['move 2']));
+  });
+
+  it('reviews the battle on the end card', async () => {
+    const review: Review = {
+      key: [
+        {
+          decision: 2,
+          choice: 'move 2',
+          top: 'move 1',
+          turn: 3,
+          me: 'Heatran',
+          foe: 'Gyarados',
+          chose: 'Earthquake',
+          better: 'Thunderbolt',
+          text: 'Thunderbolt did 4× damage.',
+        },
+      ],
+      good: [
+        {
+          decision: 0,
+          choice: 'move 1',
+          turn: 1,
+          me: 'Heatran',
+          foe: 'Gyarados',
+          chose: 'Thunderbolt',
+          text: 'A KO.',
+        },
+      ],
+    };
+    const { backend } = fakeBackend([{ ...WON, review }], coached());
+    renderBattle(backend);
+    await userEvent.click(await thunderbolt());
+    const section = await screen.findByRole('region', { name: 'Coach review' });
+    expect(section).toHaveTextContent('Turn 3: Heatran vs Gyarados');
+    expect(section).toHaveTextContent('You chose Earthquake; Thunderbolt was better.');
+    expect(section).toHaveTextContent('✓ Turn 1: Thunderbolt');
+  });
+
+  it('shows a tip that waited for the judge when it comes', async () => {
+    let send: ((note: CoachNote) => void) | undefined;
+    const { backend } = fakeBackend([], coached({ coach: {} }), { warnings: {} });
+    backend.onCoachTip = (onTip) => {
+      send = onTip;
+      return () => (send = undefined);
+    };
+    renderBattle(backend);
+    await thunderbolt();
+    expect(screen.queryByRole('note', { name: 'Coach tip' })).not.toBeInTheDocument();
+    act(() => send!({ rule: 'walled', text: 'Scizor hits it much harder.' }));
+    expect(await screen.findByRole('note', { name: 'Coach tip' })).toHaveTextContent(
+      'Scizor hits it much harder.',
+    );
+  });
+
+  it('saves the coach’s memo with the choice', async () => {
+    const memo = { ignored: 'Earthquake will do nothing.' };
+    const { backend } = fakeBackend([{ ...TURN_1, coachMemo: memo }], coached());
+    const props = renderBattle(backend);
+    await userEvent.click(await thunderbolt());
+    await waitFor(() => expect(props.onChoice).toHaveBeenCalledWith('move 1', undefined, memo));
+  });
+
+  const REVIEW: Review = {
+    key: [
+      {
+        decision: 0,
+        choice: 'move 2',
+        top: 'move 1',
+        turn: 1,
+        me: 'Heatran',
+        foe: 'Gyarados',
+        chose: 'Earthquake',
+        better: 'Thunderbolt',
+        text: 'Gyarados is immune to Ground moves, so Earthquake will do nothing.',
+      },
+    ],
+    good: [
+      {
+        decision: 0,
+        choice: 'move 1',
+        first: 'move 2',
+        firstChose: 'Earthquake',
+        turn: 1,
+        me: 'Heatran',
+        foe: 'Gyarados',
+        chose: 'Thunderbolt',
+        text: 'Good catch: you changed your pick after the coach’s warning.',
+      },
+    ],
+  };
+
+  it('replays a review turn on the battle screen, marking your pick and the better one', async () => {
+    const { backend } = fakeBackend([{ ...WON, review: REVIEW }], coached());
+    backend.replay = vi.fn(async () => ({ before: OPENING, turn: TURN_1 }));
+    renderBattle(backend);
+    await userEvent.click(await thunderbolt());
+    const section = await screen.findByRole('region', { name: 'Coach review' });
+    await userEvent.click(within(section).getAllByRole('button', { name: 'Show turn' })[0]!);
+    const turn = await screen.findByRole('dialog', { name: 'Review: turn 1' });
+    expect(backend.replay).toHaveBeenCalledWith(0);
+    expect(
+      await within(turn).findByRole('button', { name: /^Earthquake, .*, You$/ }),
+    ).toBeInTheDocument();
+    expect(
+      within(turn).getByRole('button', { name: /^Thunderbolt, .*, Better$/ }),
+    ).toBeInTheDocument();
+    expect(within(turn).getByRole('note', { name: 'Coach review' })).toHaveTextContent(
+      'Thunderbolt was better. Gyarados is immune to Ground moves',
+    );
+    await userEvent.click(within(turn).getByRole('button', { name: '▶ Play' }));
+    expect(await within(turn).findByRole('button', { name: 'Again' })).toBeInTheDocument();
+    expect(within(turn).getAllByText(/super effective/).length).toBeGreaterThan(0);
+    // The next turn in the review: a warning listened to.
+    await userEvent.click(within(turn).getByRole('button', { name: 'Next turn' }));
+    const next = await screen.findByRole('dialog', { name: 'Review: turn 1' });
+    expect(
+      await within(next).findByRole('button', { name: /^Earthquake, .*, Warned$/ }),
+    ).toBeInTheDocument();
+    expect(
+      within(next).getByRole('button', { name: /^Thunderbolt, .*, You$/ }),
+    ).toBeInTheDocument();
+    await userEvent.click(within(next).getByRole('button', { name: 'Close review' }));
+    await waitFor(() =>
+      expect(screen.queryByRole('dialog', { name: /^Review:/ })).not.toBeInTheDocument(),
+    );
+  });
+
+  it('reviews a Gen 3 battle played without the coach, on request', async () => {
+    const { backend } = fakeBackend([WON]);
+    let finish: (r: Review) => void = () => {};
+    backend.review = vi.fn(
+      (onProgress: (done: number, total: number) => void) =>
+        new Promise<Review>((resolve) => {
+          onProgress(3, 20);
+          finish = resolve;
+        }),
+    );
+    renderBattle(backend, { start: { ...START, format: 'gen3ou' } });
+    await userEvent.click(await thunderbolt());
+    await userEvent.click(await screen.findByRole('button', { name: 'Review this battle' }));
+    expect(await screen.findByRole('status')).toHaveTextContent(
+      'The coach is reviewing your choices… 3 of 20',
+    );
+    act(() => finish(REVIEW));
+    expect(await screen.findByRole('region', { name: 'Coach review' })).toHaveTextContent(
+      'Earthquake will do nothing',
+    );
+  });
+
+  it('offers no review on Hard, where the coach’s warnings aren’t checked yet', async () => {
+    const { backend } = fakeBackend([WON]);
+    backend.review = vi.fn();
+    renderBattle(backend, { start: { ...START, format: 'gen3ou', difficulty: 'hard' } });
+    await userEvent.click(await thunderbolt());
+    await screen.findByRole('dialog', { name: 'Battle over' });
+    expect(screen.queryByRole('button', { name: 'Review this battle' })).not.toBeInTheDocument();
+  });
+
+  it('offers no review outside Gen 3', async () => {
+    const { backend } = fakeBackend([WON]);
+    backend.review = vi.fn();
+    renderBattle(backend);
+    await userEvent.click(await thunderbolt());
+    await screen.findByRole('dialog', { name: 'Battle over' });
+    expect(screen.queryByRole('button', { name: 'Review this battle' })).not.toBeInTheDocument();
   });
 });

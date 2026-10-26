@@ -11,6 +11,7 @@
   "dependencies": {
     "@daily-battle/ai": "workspace:*",
     "@daily-battle/data": "workspace:*",
+    "@daily-battle/engine-wasm": "workspace:*",
     "@daily-battle/gen": "workspace:*",
     "@daily-battle/sim-bridge": "workspace:*",
     "@daily-battle/versus": "workspace:*",

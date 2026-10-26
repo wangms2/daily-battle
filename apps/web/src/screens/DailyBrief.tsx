@@ -1,5 +1,6 @@
 // Daily brief (DESIGN.md §4.3): today's opponent (species only), your team,
 // the lead, and today's single change, all on one screen.
+import type { Difficulty } from '@daily-battle/ai/version';
 import type { ScheduleFile } from '@daily-battle/gen/schedule';
 import clsx from 'clsx';
 import { useEffect, useState, type ReactNode } from 'react';
@@ -23,6 +24,8 @@ import { ConfirmDialog } from '../sheets/misc';
 import { SetPicker } from '../sheets/SetPicker';
 import type { DayChange, DayState } from '../state/schema';
 import { Button, SectionLabel } from '../ui/bits';
+import { DIFFICULTY_HINT } from '../lib/difficulty';
+import { CoachToggle, DifficultyPicker } from '../ui/Difficulty';
 import { StarIcon } from '../ui/icons';
 import { ItemIcon } from '../ui/ItemIcon';
 import { MoveChips } from '../ui/MoveList';
@@ -63,7 +66,21 @@ export function DailyBrief({
   teamPreview = false,
   initialEdit = false,
   onDitch,
+  difficulty = 'normal',
+  onDifficulty,
+  hardAvailable = true,
+  coach,
 }: {
+  /**
+   * The daily coach, where it's offered: on or off for the next battle, and what
+   * turning it on costs (asked first), if anything.
+   */
+  coach?: { on: boolean; warning: string | null; onChange: (on: boolean) => void };
+  /** The CPU difficulty for this game; each has its own tries and streak. */
+  difficulty?: Difficulty;
+  onDifficulty?: (d: Difficulty) => void;
+  /** Whether this build has the Hard engine for the game. */
+  hardAvailable?: boolean;
   /** Open with the team ready to change (after a loss). */
   initialEdit?: boolean;
   /** Throw the weekly team away and build a new one (ends the streak). */
@@ -105,6 +122,7 @@ export function DailyBrief({
     kind: DayChange['kind'];
   } | null>(null);
   const [pending, setPending] = useState<DayChange | null>(null);
+  const [coachAsk, setCoachAsk] = useState<string | null>(null);
 
   useEffect(() => {
     preloadSprites(opponent.team.map((s) => s.species));
@@ -225,7 +243,32 @@ export function DailyBrief({
       </section>
     ) : (
       <section className={clsx('flex flex-col gap-2', wide ? 'shrink-0' : 'min-h-0 flex-1')}>
-        <SectionLabel>Opponent</SectionLabel>
+        <SectionLabel
+          right={
+            onDifficulty &&
+            !editing && (
+              <div className="flex items-center gap-1.5">
+                {coach && (
+                  <CoachToggle
+                    on={coach.on}
+                    disabled={inProgress}
+                    onChange={(on) =>
+                      on && coach.warning ? setCoachAsk(coach.warning) : coach.onChange(on)
+                    }
+                  />
+                )}
+                <DifficultyPicker
+                  value={difficulty}
+                  onChange={onDifficulty}
+                  hardAvailable={hardAvailable}
+                  disabled={inProgress}
+                />
+              </div>
+            )
+          }
+        >
+          Opponent
+        </SectionLabel>
         <div className={sixGrid}>
           {opponent.team.map(({ species }) => (
             <PokemonTile
@@ -385,9 +428,11 @@ export function DailyBrief({
           {teamSection}
           {hints && !editing && !strip && (
             <p className="shrink-0 text-center text-[13px] text-muted">
-              {teamPreview
-                ? 'Tap to lead · ⓘ shows sets · They see your six too'
-                : 'Tap a Pokémon to lead · ⓘ shows its set'}
+              {difficulty !== 'normal'
+                ? DIFFICULTY_HINT[difficulty]
+                : teamPreview
+                  ? 'Tap to lead · ⓘ shows sets · They see your six too'
+                  : 'Tap a Pokémon to lead · ⓘ shows its set'}
             </p>
           )}
           {strip}
@@ -396,6 +441,17 @@ export function DailyBrief({
         </main>
       )}
 
+      <ConfirmDialog
+        open={!!coachAsk}
+        onOpenChange={(o) => !o && setCoachAsk(null)}
+        title="Turn on the coach?"
+        body={coachAsk ?? ''}
+        confirm="Turn on"
+        onConfirm={() => {
+          setCoachAsk(null);
+          coach?.onChange(true);
+        }}
+      />
       <InfoSheet
         species={infoFor?.species ?? null}
         open={!!infoFor}

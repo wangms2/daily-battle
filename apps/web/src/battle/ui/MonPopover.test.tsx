@@ -1,8 +1,9 @@
-import { render, screen } from '@testing-library/react';
+import { cleanup, render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { speciesInfo } from '../../lib/data';
 import type { MonView } from '../frames';
 import { MonPopover } from './MonPopover';
+import type { SpeedCheck } from '../../lib/speed';
 
 const foe = (species: string): MonView => ({
   species,
@@ -30,7 +31,7 @@ describe('MonPopover (a foe)', () => {
         hints={false}
       />,
     );
-    const line = screen.getByText(/^Possible abilities:/);
+    const line = screen.getByText(/^Ability:/);
     for (const a of abilities) expect(line.textContent).toContain(a);
   });
 
@@ -49,5 +50,33 @@ describe('MonPopover (a foe)', () => {
     for (const other of abilities.slice(1)) {
       expect(screen.getByRole('tooltip').textContent).not.toContain(other);
     }
+  });
+
+  const card = (speed: SpeedCheck) => {
+    render(<MonPopover foe mon={foe('Zapdos')} hints={false} speed={speed} />);
+    return screen.getByRole('tooltip').textContent!;
+  };
+
+  it('shows its Speed against yours, without its HP (the plate has it)', () => {
+    const text = card({ lo: 257, hi: 257, mine: { species: 'Heracross', speed: 227 } });
+    expect(text).toContain('Speed 257');
+    expect(text).toContain('Faster than Heracross (227)');
+    expect(text).not.toContain('100%');
+  });
+
+  it('says when a range could go either way', () => {
+    const text = card({ lo: 236, hi: 328, mine: { species: 'Snorlax', speed: 240 } });
+    expect(text).toContain('Speed 236–328');
+    expect(text).toContain('Could be faster or slower than Snorlax (240)');
+  });
+
+  it('adds the Choice Scarf line only when a Scarf would make it faster', () => {
+    expect(
+      card({ lo: 200, hi: 230, scarf: 345, mine: { species: 'Snorlax', speed: 240 } }),
+    ).toContain('With a Choice Scarf: 345, faster');
+    cleanup();
+    expect(
+      card({ lo: 200, hi: 230, scarf: 345, mine: { species: 'Jolteon', speed: 360 } }),
+    ).not.toContain('Scarf');
   });
 });

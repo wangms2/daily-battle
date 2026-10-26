@@ -16,7 +16,7 @@ export function TopBar({
   format,
 }: {
   title: ReactNode;
-  /** Makes the title a button (it goes back to the game picker). */
+  /** Makes the title a back button (to the day's page). */
   onTitle?: () => void;
   streak?: number;
   /** The streak badge that opens stats; left out where no one game is shown. */
@@ -44,10 +44,11 @@ export function TopBar({
           <button
             type="button"
             onClick={onTitle}
-            className="home-serif relative z-10 -ml-2 flex h-10 min-w-0 items-center gap-1 rounded-full px-2 text-[16px] hover:bg-white/10"
+            title="Back"
+            className="home-serif relative z-10 -ml-2 flex h-10 min-w-0 items-center gap-1 rounded-full pr-2 pl-1 text-[16px] hover:bg-white/10"
           >
+            <ChevronIcon className="size-[18px] shrink-0 rotate-180 text-white/80" aria-hidden />
             <span className="truncate">{title}</span>
-            <ChevronIcon className="size-4 shrink-0 rotate-90 text-white/70" aria-hidden />
           </button>
         )}
         <div className="relative z-10 flex items-center gap-1">

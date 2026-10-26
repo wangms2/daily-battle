@@ -1,0 +1,20 @@
+{
+  "name": "@daily-battle/engine-wasm",
+  "version": "0.0.0",
+  "private": true,
+  "description": "poke-engine (MIT) compiled to WebAssembly, one module per generation, for the Hard AI",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./node": "./src/node.ts",
+    "./version": "./src/version.ts",
+    "./dist/*": "./dist/*"
+  },
+  "scripts": {
+    "build:wasm": "tsx scripts/build.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "tsx": "^4.23.15"
+  }
+}

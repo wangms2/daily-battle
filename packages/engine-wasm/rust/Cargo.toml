@@ -1,0 +1,34 @@
+[package]
+name = "daily-battle-engine"
+version = "0.1.0"
+edition = "2021"
+publish = false
+license = "MIT"
+description = "A raw-ABI WebAssembly wrapper around poke-engine's seeded MCTS, for Daily Battle's Hard AI."
+
+[lib]
+crate-type = ["cdylib"]
+path = "src/lib.rs"
+
+[dependencies]
+# Our fork adds perform_mcts_seeded (no clock, seeded rng) so a search is reproducible.
+poke-engine = { git = "https://github.com/wangms2/poke-engine", rev = "b394462aa5acf9acd3b591a380be68421212675b", default-features = false }
+# rand pulls in getrandom; on wasm32 we supply a "custom" backend that's never used.
+getrandom = { version = "0.3", default-features = false }
+
+[features]
+gen3 = ["poke-engine/gen3"]
+gen4 = ["poke-engine/gen4"]
+gen5 = ["poke-engine/gen5"]
+gen6 = ["poke-engine/gen6"]
+gen7 = ["poke-engine/gen7"]
+gen8 = ["poke-engine/gen8"]
+gen9 = ["poke-engine/gen9"]
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
+debug = false

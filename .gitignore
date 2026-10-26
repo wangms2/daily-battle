@@ -16,3 +16,6 @@ playwright-report/
 
 # Wrangler local state
 .wrangler/
+
+# Rust build output (packages/engine-wasm)
+target/
