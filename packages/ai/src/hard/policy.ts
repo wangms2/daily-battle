@@ -3,7 +3,7 @@
 // with the visit counts combined across worlds. Falls back to the strongest
 // utility AI for Team Preview and anything the engine can't model.
 import { sets as defaultSets, type SetsFile } from '@daily-battle/data';
-import type { Engine } from '@daily-battle/engine-wasm';
+import type { Engine, SearchResult } from '@daily-battle/engine-wasm';
 import { legalChoices, type Policy, type Rng, type SideView } from '@daily-battle/sim-bridge';
 import type { KnownSets } from '../belief';
 import { STRONG } from '../presets';
@@ -39,6 +39,99 @@ export interface HardStats {
 }
 
 const MIN_WORLD_ITERATIONS = 200;
+
+/** One sampled world and the engine's search of it. */
+export interface WorldSearch {
+  /** The world's share of the samples. */
+  weight: number;
+  result: SearchResult;
+}
+
+/** One sampled world, ready for the engine: its state, iterations, and seed. */
+export interface PreparedWorld {
+  /** The world's share of the samples. */
+  weight: number;
+  /** The engine state, with `view`'s side as side one. */
+  state: string;
+  iterations: number;
+  seed: number;
+}
+
+export type SearchWorldsOptions = Pick<
+  HardPolicyOptions,
+  'iterations' | 'worlds' | 'pool' | 'knownSets'
+>;
+
+/**
+ * Samples a few worlds for the position from `view`'s side (the foe's hidden
+ * sets filled in from beliefs and the pool) and splits the iterations by each
+ * world's weight. Searching them is separate, so a caller can do it a world at
+ * a time (the coach does, between the battle worker's messages).
+ */
+export function prepareWorlds(
+  view: SideView,
+  data: SetsFile,
+  rng: Rng,
+  options: SearchWorldsOptions = {},
+): PreparedWorld[] {
+  const state = extractState(view, data);
+  const total = options.iterations ?? HARD_DEFAULTS.iterations;
+  const worlds = sampleWorlds(view, state, data, rng, {
+    count: options.worlds ?? HARD_DEFAULTS.worlds,
+    ...(options.pool ? { pool: options.pool } : {}),
+    ...(options.knownSets ? { known: options.knownSets } : {}),
+  });
+  const ownSets = state.own.map((m) => m.set);
+  return worlds.map((world) => ({
+    weight: world.weight,
+    state: translate(view, world.foes, data, ownSets),
+    iterations: Math.max(MIN_WORLD_ITERATIONS, Math.round(total * world.weight)),
+    // Two draws make a 52-bit seed.
+    seed: Math.floor(rng() * 2 ** 32) + Math.floor(rng() * 2 ** 20) * 2 ** 32,
+  }));
+}
+
+/**
+ * Searches one prepared world. With `fixed` (a choice such as `move 2`), the
+ * searching side is held to that choice, so it gets every iteration; a choice
+ * the engine doesn't offer gives an empty result.
+ */
+export function searchWorld(
+  engine: Engine,
+  request: SideView['request'],
+  world: PreparedWorld,
+  fixed?: string,
+): SearchResult {
+  if (fixed === undefined) return engine.search(world.state, world.iterations, world.seed);
+  const option =
+    request.requestType === 'wait' || request.requestType === 'team'
+      ? -1
+      : engine.options(world.state).s1.findIndex((c) => toChoice(c, request) === fixed);
+  return option < 0
+    ? { n: 0, s1: [], s2: [] }
+    : engine.searchFixed(world.state, world.iterations, world.seed, option);
+}
+
+/**
+ * Searches the position from `view`'s side over a few sampled worlds. Hard
+ * uses it to choose; the coach uses it from the player's view to judge a
+ * choice (DESIGN.md §22).
+ */
+export function searchWorlds(
+  engine: Engine,
+  view: SideView,
+  data: SetsFile,
+  rng: Rng,
+  options: SearchWorldsOptions & {
+    /** Hold `view`'s side to this choice (`move 2`, `switch 4`), so it gets every iteration. */
+    fixed?: string;
+  } = {},
+): WorldSearch[] {
+  return prepareWorlds(view, data, rng, options).map((world) => ({
+    weight: world.weight,
+    result: searchWorld(engine, view.request, world, options.fixed),
+  }));
+}
 
 export class HardPolicy implements Policy {
   readonly stats: HardStats = { decisions: 0, searched: 0, errors: [] };
@@ -76,27 +169,20 @@ export class HardPolicy implements Policy {
   private search(view: SideView, rng: Rng, legal: string[]): string | undefined {
     const request = view.request;
     if (request.requestType === 'wait' || request.requestType === 'team') return undefined;
-    const state = extractState(view, this.data);
-    const total = this.options.iterations ?? HARD_DEFAULTS.iterations;
-    const worlds = sampleWorlds(view, state, this.data, rng, {
-      count: this.options.worlds ?? HARD_DEFAULTS.worlds,
-      ...(this.options.pool ? { pool: this.options.pool } : {}),
-      ...(this.options.knownSets ? { known: this.options.knownSets } : {}),
-    });
-    const ownSets = state.own.map((m) => m.set);
     const legalSet = new Set(legal);
     const value = new Map<string, number>();
-    for (const world of worlds) {
-      const engineState = translate(view, world.foes, this.data, ownSets);
-      const iterations = Math.max(MIN_WORLD_ITERATIONS, Math.round(total * world.weight));
-      // Two draws make a 52-bit seed.
-      const seed = Math.floor(rng() * 2 ** 32) + Math.floor(rng() * 2 ** 20) * 2 ** 32;
-      const result = this.engine.search(engineState, iterations, seed);
+    for (const { weight, result } of searchWorlds(
+      this.engine,
+      view,
+      this.data,
+      rng,
+      this.options,
+    )) {
       if (!result.n) continue;
       for (const option of result.s1) {
         const choice = toChoice(option.c, request);
         if (!choice || !legalSet.has(choice)) continue;
-        value.set(choice, (value.get(choice) ?? 0) + (world.weight * option.v) / result.n);
+        value.set(choice, (value.get(choice) ?? 0) + (weight * option.v) / result.n);
       }
     }
     let best: string | undefined;

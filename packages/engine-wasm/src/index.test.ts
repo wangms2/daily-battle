@@ -23,6 +23,16 @@ describe.skipIf(!engineBuilt(4))('engine (gen 4)', () => {
     expect(loadEngine(4).search(STATE, 2000, 12345)).toEqual(a);
   });
 
+  it('searches with side one held to one option', () => {
+    const engine = loadEngine(4);
+    const option = engine.options(STATE).s1.indexOf('switch:1');
+    const r = engine.searchFixed(STATE, 2000, 12345, option);
+    expect(r.n).toBe(2000);
+    expect(r.s1).toEqual([expect.objectContaining({ c: 'switch:1', v: 2000 })]);
+    expect(engine.searchFixed(STATE, 2000, 12345, option)).toEqual(r);
+    expect(() => engine.searchFixed(STATE, 10, 1, 99)).toThrow(EngineError);
+  });
+
   it('lists root options as moves and switches', () => {
     const { s1 } = loadEngine(4).options(STATE);
     expect(s1).toContain('move:0');

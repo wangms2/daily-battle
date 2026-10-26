@@ -52,10 +52,11 @@ export function BattleRoute({
       choices: [...attempt.choices],
       ...(attempt.difficulty && { difficulty: attempt.difficulty }),
       ...(attempt.coached && { coach: 'simple' as const }),
-      ...(attempt.difficulty === 'hard' && {
+      // Hard's prior for your unseen Pokémon, and the coach's for the foe's.
+      ...((attempt.difficulty === 'hard' || attempt.coached) && {
         pool: [...schedule.pool.species],
-        aiChoices: [...(attempt.aiChoices ?? [])],
       }),
+      ...(attempt.difficulty === 'hard' && { aiChoices: [...(attempt.aiChoices ?? [])] }),
     };
   });
   return (

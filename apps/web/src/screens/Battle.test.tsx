@@ -129,9 +129,20 @@ const WON = pkg({
   end: { winner: 'you', youLeft: 3, foeLeft: 0 },
 });
 
-function fakeBackend(turns: TurnPackage[], start = OPENING) {
+function fakeBackend(
+  turns: TurnPackage[],
+  start = OPENING,
+  /** Coach on: the judge's warnings by choice, and how long it takes to answer. */
+  coach?: { warnings: Record<string, CoachNote>; ms?: number },
+) {
   const calls: string[] = [];
   const backend: BattleBackend = {
+    ...(coach && {
+      coachCheck: vi.fn(async (choice: string) => {
+        if (coach.ms) await new Promise((r) => setTimeout(r, coach.ms));
+        return coach.warnings[choice] ?? null;
+      }),
+    }),
     start: vi.fn(async () => start),
     choose: vi.fn(async (c: string) => {
       calls.push(c);
@@ -577,10 +588,7 @@ describe('coach', () => {
   const coached = (over: Partial<TurnPackage> = {}) =>
     pkg({
       ...OPENING,
-      coach: {
-        tip: { rule: 'canKo', text: 'Thunderbolt can knock out Gyarados.' },
-        warnings: { 'move 2': swampert },
-      },
+      coach: { tip: { rule: 'canKo', text: 'Thunderbolt can knock out Gyarados.' } },
       ...over,
     });
 
@@ -594,7 +602,9 @@ describe('coach', () => {
   });
 
   it('asks before a flagged choice: pick again, or do it anyway and silence the rule', async () => {
-    const { backend, calls } = fakeBackend([coached({ frames: TURN_1.frames })], coached());
+    const { backend, calls } = fakeBackend([coached({ frames: TURN_1.frames })], coached(), {
+      warnings: { 'move 2': swampert },
+    });
     renderBattle(backend);
     await userEvent.click(await screen.findByRole('button', { name: /^Earthquake, / }));
     expect(await screen.findByText('Earthquake has no effect on Gyarados.')).toBeInTheDocument();
@@ -614,10 +624,27 @@ describe('coach', () => {
   });
 
   it('sends unflagged choices straight away', async () => {
-    const { backend, calls } = fakeBackend([TURN_1], coached());
+    const { backend, calls } = fakeBackend([TURN_1], coached(), { warnings: {} });
     renderBattle(backend);
     await userEvent.click(await thunderbolt());
     await waitFor(() => expect(calls).toEqual(['move 1']));
+  });
+
+  it('says so while the coach is still checking a pick, then sends it', async () => {
+    const { backend, calls } = fakeBackend([TURN_1], coached(), { warnings: {}, ms: 400 });
+    renderBattle(backend);
+    await userEvent.click(await thunderbolt());
+    expect(await screen.findByText('Coach is checking…')).toBeInTheDocument();
+    await waitFor(() => expect(calls).toEqual(['move 1']));
+    expect(screen.queryByText('Coach is checking…')).not.toBeInTheDocument();
+  });
+
+  it('sends choices without asking when the coach can’t judge them', async () => {
+    // A backend without a judge (no engine): tips only, never warnings.
+    const { backend, calls } = fakeBackend([TURN_1], coached());
+    renderBattle(backend);
+    await userEvent.click(await screen.findByRole('button', { name: /^Earthquake, / }));
+    await waitFor(() => expect(calls).toEqual(['move 2']));
   });
 
   it('reviews the battle on the end card', async () => {

@@ -35,6 +35,14 @@ interface Exports {
   out_len(): number;
   version(): number;
   search(ptr: number, len: number, iterations: number, seedLo: number, seedHi: number): void;
+  search_fixed(
+    ptr: number,
+    len: number,
+    iterations: number,
+    seedLo: number,
+    seedHi: number,
+    option: number,
+  ): void;
   options(ptr: number, len: number): void;
   roundtrip(ptr: number, len: number): void;
   check(ptr: number, len: number): void;
@@ -68,7 +76,7 @@ export class Engine {
   }
 
   #call(
-    name: 'search' | 'options' | 'roundtrip' | 'check' | 'damage',
+    name: 'search' | 'search_fixed' | 'options' | 'roundtrip' | 'check' | 'damage',
     input: string,
     ...args: number[]
   ): string {
@@ -101,6 +109,18 @@ export class Engine {
     const lo = seed >>> 0;
     const hi = Math.floor(seed / 2 ** 32) >>> 0;
     return JSON.parse(this.#call('search', state, iterations >>> 0, lo, hi)) as SearchResult;
+  }
+
+  /**
+   * Like `search`, but side one is held to one root option (`option` indexes
+   * `options(state).s1`), so it gets every iteration against the foe's replies.
+   */
+  searchFixed(state: string, iterations: number, seed: number, option: number): SearchResult {
+    const lo = seed >>> 0;
+    const hi = Math.floor(seed / 2 ** 32) >>> 0;
+    return JSON.parse(
+      this.#call('search_fixed', state, iterations >>> 0, lo, hi, option >>> 0),
+    ) as SearchResult;
   }
 
   /** Root options per side, as the engine sees them. */

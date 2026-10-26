@@ -166,13 +166,20 @@ export class Coach {
 
   /**
    * Remembers the player's choice for the post-battle review. Call it before
-   * the choice is played, while the view still shows the decision.
+   * the choice is played, while the view still shows the decision. `shown` is
+   * the warning the player saw and overrode, if any (the judge decides which
+   * warnings show); without it, any rule warning on the choice counts.
    */
-  record(view: SideView, choice: string): void {
+  record(view: SideView, choice: string, shown?: CoachNote | null): void {
     this.recorded = false;
     if (view.request.requestType === 'wait') return;
     const facts = this.factsFor(view);
-    const warning = this.last?.request === view.request ? this.last.warnings[choice] : undefined;
+    const warning =
+      shown !== undefined
+        ? (shown ?? undefined)
+        : this.last?.request === view.request
+          ? this.last.warnings[choice]
+          : undefined;
     if (warning) this.overridden.add(warning.text);
     const d = decision(view, facts, this.data, choice, warning);
     if (d) this.decisions.push(d);

@@ -10,11 +10,14 @@
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "coach-eval": "tsx scripts/coach-eval.ts"
+    "coach-eval": "tsx scripts/coach-eval.ts",
+    "judge-bench": "tsx scripts/judge-bench.ts",
+    "coach-rate": "tsx scripts/coach-rate.ts"
   },
   "dependencies": {
     "@daily-battle/ai": "workspace:*",
     "@daily-battle/data": "workspace:*",
+    "@daily-battle/engine-wasm": "workspace:*",
     "@daily-battle/gen": "workspace:*",
     "@daily-battle/sim-bridge": "workspace:*",
     "@pkmn/sim": "catalog:"

@@ -1,7 +1,7 @@
 // What the battle worker sends the UI: plain data describing only what the
 // player's side can see. No simulator types cross this boundary.
 import type { Difficulty } from '@daily-battle/ai/version';
-import type { CoachTurn, Review } from '@daily-battle/tutorial';
+import type { CoachNote, Review } from '@daily-battle/tutorial';
 import type { FoeScript, Position } from '@daily-battle/tutorial/lessons';
 
 export type Who = 'you' | 'foe';
@@ -165,8 +165,11 @@ export interface TurnPackage {
   resumed: boolean;
   /** Hard: the AI's new choices, to save (they replace any saved from index `from`). */
   aiChoices?: AiChoices;
-  /** Coach on: this turn's tip and warnings (with controls). */
-  coach?: CoachTurn;
+  /**
+   * Coach on: this turn's tip (with controls). Warnings aren't in the package:
+   * the judge decides them when a choice is picked (`BattleBackend.coachCheck`).
+   */
+  coach?: { tip?: CoachNote };
   /** Coach on: the post-battle review (with `end`). */
   review?: Review;
 }
@@ -202,7 +205,7 @@ export interface EngineStart {
   choices: string[];
   /** Normal when left out. */
   difficulty?: Difficulty;
-  /** Hard: the week's pool species (its prior for your unseen Pokémon). */
+  /** The week's pool species: Hard's prior for your unseen Pokémon, and the coach's for the foe's. */
   pool?: string[];
   /** Hard: the AI's saved choices, replayed on resume instead of searched again. */
   aiChoices?: string[];
@@ -226,9 +229,11 @@ export type ToWorker =
   | { type: 'start'; start: EngineStart }
   | { type: 'choose'; choice: string }
   | { type: 'forfeit' }
+  | { type: 'check'; choice: string; waitMs: number }
   | { type: 'position'; format: string; position: Position; steps: string[] };
 
 export type FromWorker =
   | { type: 'package'; pkg: TurnPackage }
   | { type: 'position'; position: PositionPackage }
+  | { type: 'check'; note: CoachNote | null }
   | { type: 'error'; message: string };

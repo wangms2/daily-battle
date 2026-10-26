@@ -1,7 +1,7 @@
 // The battle screen (DESIGN.md §12.2b): field, this-turn log, and controls on
 // one screen; turns play back line by line at the chosen speed, tap to skip.
 import { DEFAULT_FORMAT, formatInfo } from '@daily-battle/data/formats';
-import type { CoachNote, CoachTurn, Review } from '@daily-battle/tutorial';
+import type { CoachNote, Review } from '@daily-battle/tutorial';
 import clsx from 'clsx';
 import {
   useCallback,
@@ -54,6 +54,10 @@ const DELAY: Record<Settings['battleSpeed'], number> = {
 const SPEEDS: Settings['battleSpeed'][] = ['slow', 'normal', 'fast'];
 /** A daily foe still choosing after this long gets a "thinking" note. */
 const THINKING_MS = 300;
+/** How long the coach may check a pick before it goes through unwarned (DESIGN.md §22). */
+const COACH_CHECK_MS = 1000;
+/** A coach check still going after this long gets a "checking" note. */
+const CHECKING_MS = 150;
 /** How much faster than Showdown's own pace its move animations run at each speed. */
 const ACCEL: Record<Settings['battleSpeed'], number> = {
   slow: 1,
@@ -170,7 +174,10 @@ export function Battle({
   const unsavedAi = useRef<AiChoices | undefined>(undefined);
   // The coach (when on): this turn's tip and warnings, a choice awaiting
   // confirmation, rules silenced for this battle, and the end-of-battle review.
-  const [coach, setCoach] = useState<CoachTurn | null>(null);
+  const [coach, setCoach] = useState<TurnPackage['coach'] | null>(null);
+  // A pick the coach is checking (controls held), and whether to say so yet.
+  const [checking, setChecking] = useState(false);
+  const [checkingNote, setCheckingNote] = useState(false);
   const [tipHidden, setTipHidden] = useState(false);
   const [warning, setWarning] = useState<{ choice: string; note: CoachNote } | null>(null);
   const silenced = useRef(new Set<string>());
@@ -378,11 +385,20 @@ export function Battle({
     [backend, play],
   );
 
-  // The coach checks a choice first; a flagged one asks before it's sent.
+  // The coach checks a choice first; a flagged one asks before it's sent. If
+  // the check takes too long, the choice goes through unwarned.
   const pick = (choice: string) => {
-    const note = coach?.warnings[choice];
-    if (note && !silenced.current.has(note.rule)) setWarning({ choice, note });
-    else choose(choice);
+    if (!coach || !backend.coachCheck) return choose(choice);
+    setChecking(true);
+    const slow = setTimeout(() => setCheckingNote(true), CHECKING_MS);
+    const done = (note: CoachNote | null) => {
+      clearTimeout(slow);
+      setChecking(false);
+      setCheckingNote(false);
+      if (note && !silenced.current.has(note.rule)) setWarning({ choice, note });
+      else choose(choice);
+    };
+    backend.coachCheck(choice, COACH_CHECK_MS).then(done, () => done(null));
   };
 
   const giveUp = () => {
@@ -560,7 +576,7 @@ export function Battle({
       controls={controls}
       team={team}
       hints={settings.beginnerHints}
-      disabled={playing || !!end}
+      disabled={playing || !!end || checking}
       onChoose={pick}
     />
   );
@@ -568,12 +584,23 @@ export function Battle({
   // come before a coach tip.
   const tip =
     !promptText && !showExplainer && controls && !end && !tipHidden ? coach?.tip : undefined;
+  const coachChecking = checkingNote && (
+    <div className="pointer-events-none absolute inset-0 z-10 grid place-items-center">
+      <p
+        role="status"
+        className="rounded-full bg-ink px-4 py-1.5 text-[14px] font-semibold text-surface shadow-card"
+      >
+        Coach is checking…
+      </p>
+    </div>
+  );
   const panel = (
     <div className="relative flex shrink-0 flex-col gap-2">
       {promptNote}
       {tip && <CoachTip text={tip.text} onDismiss={() => setTipHidden(true)} />}
       {controlPanel}
       {waitingNote}
+      {coachChecking}
     </div>
   );
 

@@ -125,6 +125,38 @@ pub extern "C" fn search(ptr: *mut u8, len: usize, iterations: u32, seed_lo: u32
     set_out(out);
 }
 
+/// Like `search`, but side one is held to its root option number `option` (an
+/// index into the root options, in `options` order), so that one option gets
+/// every iteration. The coach compares two choices this way: each is valued
+/// against the foe's best replies with the same effort (DESIGN.md §22).
+#[no_mangle]
+pub extern "C" fn search_fixed(
+    ptr: *mut u8,
+    len: usize,
+    iterations: u32,
+    seed_lo: u32,
+    seed_hi: u32,
+    option: u32,
+) {
+    install_panic_hook();
+    let serialized = input(ptr, len);
+    let mut state = State::deserialize(&serialized);
+    let (s1, s2) = state.root_get_all_options();
+    let only = s1
+        .into_iter()
+        .nth(option as usize)
+        .expect("search_fixed: no such side one option");
+    let seed = ((seed_hi as u64) << 32) | seed_lo as u64;
+    let result = perform_mcts_seeded(&mut state, vec![only], s2, iterations, seed);
+    let mut out = String::with_capacity(512);
+    let _ = write!(out, "{{\"n\":{},\"s1\":", result.iteration_count);
+    side_json(&mut out, &result.s1);
+    out.push_str(",\"s2\":");
+    side_json(&mut out, &result.s2);
+    out.push('}');
+    set_out(out);
+}
+
 /// The root options for both sides, one per line: `s1 move:0`, `s2 switch:3`, ….
 #[no_mangle]
 pub extern "C" fn options(ptr: *mut u8, len: usize) {

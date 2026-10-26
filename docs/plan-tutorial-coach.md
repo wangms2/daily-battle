@@ -14,7 +14,20 @@ Working plan for the `tutorial` branch. It records what's built, the decisions b
   - `1303003`, `a565664` coach pacing (see below)
   - `25a4a54` Coached daily results, streaks, coach toggle, one-time offer
   - step 1 `tut-gen3-recommend`: Battle basics on the landing, the tutorial on the welcome sheet
-- **Checks.** Run from the repo root: `pnpm format`, `pnpm lint`, `pnpm typecheck`, `pnpm test` (56 files, 1440 tests, ~40 s). For one package: `npx tsc --noEmit` and `npx vitest run <file>`. `packages/sim-bridge/src/noluck.test.ts` is occasionally flaky.
+  - `d4a5628` coach fix: our own items and abilities by name in the calc (Levitate, Choice Band were ignored)
+  - `f135fd2` coach-eval proof of concept, `BattleSession.reseed`
+  - step 2 `tut-coach-judge`: the judge (see "Step 2 results" below)
+- **Engine builds.** `packages/engine-wasm/dist` isn't committed. After pulling the step 2 commit, rebuild it (`search_fixed` is new): `PATH="$HOME/.cargo/bin:$PATH" pnpm --filter @daily-battle/engine-wasm build:wasm` (cargo isn't on the Git Bash PATH by default).
+- **Checks.** Run from the repo root: `pnpm format`, `pnpm lint`, `pnpm typecheck`, `pnpm test` (~45 s). For one package: `npx tsc --noEmit` and `npx vitest run <file>`. `packages/sim-bridge/src/noluck.test.ts` is occasionally flaky.
+
+## Waiting on the user (2026-10-26 morning)
+
+Questions prepared overnight, with the data behind them in "Step 2 results" below:
+
+1. **Judge settings.** Keep margin 0.1, agree 0.9, 20k iterations per search? (0.15 halves the warnings with about the same real gain per warning; 0.1 catches twice as many real mistakes.)
+2. **How often warnings may appear once every judged mistake can be explained (step 3).** Judge-backed warnings would fire on many of a beginner bot's picks (measure: see "Warning rate" once run). Each is worth +6 to +8 points of win rate on average. Show every one, only the bigger ones, or pace them (like tips)?
+3. **Explosion.** Quiet on picks of Explosion / Self-Destruct until step 4 has enough samples, or keep judging them?
+4. **Resume.** After a reload, a warning the player already overrode can be asked again. Acceptable, or save the overridden warnings with the attempt?
 
 ## Product decisions (from the user; don't revisit without asking)
 
@@ -99,6 +112,22 @@ Built as decided above (Product decisions). The original picker tag and "Play Ge
 - **Foe model (decided).** Teach good play: advice must be good against a strong foe _and_ not worse against the real AI (checked offline in step 4). If they disagree, the coach stays quiet; it never teaches habits that only work on Easy.
 - Keep the pacing rules (one tip a turn, `TIP_GAP`, no repeats, nothing over a lesson prompt or hint).
 - **Tests:** the judge agrees on clear-cut positions (a switch into a knockout, a move that does nothing); silence without the engine; hidden info (swapping the foe's hidden sets gives the same output until they're revealed); the rate test still holds.
+
+#### Step 2 results (built 2026-10-26)
+
+- **How it's built.**
+  - `packages/tutorial/src/coach/judge.ts` (`Judge`): an open search names the top choice, then searches **held** to one choice (`Engine.searchFixed`, a new wrapper export over poke-engine's MCTS with side one's options limited to one) value the top choice and the pick with the full budget, over the same worlds and luck. Warn when `gap ≥ margin` and the top is ahead in `≥ agree` of the worlds' weight. Seeded by `battleSeed:decision`, so a resume judges the same way.
+  - `packages/ai`: `prepareWorlds` / `searchWorld` / `searchWorlds` factored out of `HardPolicy` (Hard's choices hash identically before and after; checked on 4 battles).
+  - Web: the package carries only the tip; `BattleBackend.coachCheck(choice, 1000)` returns a warning only when a rule explains it **and** the judge agrees. The worker judges in 30 ms slices between messages (it starts when the turn's package is built, so it usually finishes during playback). "Coach is checking…" shows after 150 ms of a check. `Coach.record` takes the warning actually shown. Coached daily battles now get the week's pool (the judge's prior for unseen foes).
+- **Why held searches.** With the open search alone, options it rarely tried scored too low: at 20k iterations it warned on 15% of picks where a 1M search warned on 3%. Held searches fixed that: 21% vs 19% for a 600k reference at margin 0.1, 90% agreement with the reference, 2% flips between runs. More budget barely helped (50k and 100k: 92%).
+- **Speed** (Chrome, CPU throttled; ms per 20k search): desktop 38, mid phone (4×) 190, low-end (6×) 300. A judgment is 3 searches (about 0.6 s on a mid phone), plus one per other choice a rule flags. In a throttled browser run, warnings appeared about 1.2 s after the tap including the turn; "Coach is checking…" never showed, even at 25×, because the judge finished during playback.
+- **Validated with rollouts** (`coach-eval --mode judge`, 600 decisions each, 40 rollouts per branch, the real opponent AI). Warnings at margin 0.1, ahead in ≥ 90% of worlds:
+  - vs Easy: 149 warnings, **+7.9 points** for following the advice (95% CI +5.4 to +10.4), 3.4% clearly worse (about what noise alone gives at 40 rollouts).
+  - vs Normal: 134 warnings, **+6.3 points** (CI +4.1 to +8.4), 1.5% clearly worse.
+  - The judged gap predicts the real gain: under 0.05, +1 point (quiet is right); 0.10–0.15, +7 to +8; 0.15 and up, +5 to +10.
+  - Watch item: steering a player _away from Explosion_ toward setup or a switch was slightly negative on small samples (6 and 2 cases vs Easy). The search lets the foe answer Explosion perfectly (switch to a Ghost, Protect); Easy and Normal don't. Re-check with more samples in step 4.
+- **Provisional settings** (`JUDGE_DEFAULTS`, awaiting the user's OK): 20k iterations per search, 8 worlds, margin 0.1, agree 0.9.
+- **Resume:** a warning the player overrode before a reload can be asked again after it (the shown warnings aren't saved).
 
 ### 3. `tut-coach-messages`: rules explain, the judge decides
 

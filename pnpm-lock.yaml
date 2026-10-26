@@ -476,6 +476,9 @@ importers:
       '@daily-battle/data':
         specifier: workspace:*
         version: link:../data
+      '@daily-battle/engine-wasm':
+        specifier: workspace:*
+        version: link:../engine-wasm
       '@daily-battle/gen':
         specifier: workspace:*
         version: link:../gen

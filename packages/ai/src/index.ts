@@ -14,7 +14,19 @@ export {
   type Threat,
 } from './facts';
 export { extractState, type AIState, type FoeMon, type OwnMon } from './state';
-export { HARD_DEFAULTS, HardPolicy, type HardPolicyOptions, type HardStats } from './hard/policy';
+export {
+  HARD_DEFAULTS,
+  HardPolicy,
+  prepareWorlds,
+  searchWorld,
+  searchWorlds,
+  type HardPolicyOptions,
+  type HardStats,
+  type PreparedWorld,
+  type SearchWorldsOptions,
+  type WorldSearch,
+} from './hard/policy';
+export { toChoice } from './hard/choices';
 export { AI_VERSION, EASY_VERSION, HARD_VERSION } from './version';
 export {
   aiFor,

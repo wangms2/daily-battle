@@ -13,7 +13,15 @@ import {
   type Policy,
   type Rng,
 } from '@daily-battle/sim-bridge';
-import { Coach, startPosition, teamOf, type Mon, type Position } from '@daily-battle/tutorial';
+import {
+  Coach,
+  Judge,
+  startPosition,
+  teamOf,
+  type CoachNote,
+  type Mon,
+  type Position,
+} from '@daily-battle/tutorial';
 import type { PokemonSet, PRNGSeed } from '@pkmn/sim';
 import type { EngineStart, PositionPackage, TurnPackage } from './frames';
 import { SidePresenter } from './presenter';
@@ -38,12 +46,24 @@ export class BattleEngine {
   private readonly coach?: Coach;
   /** The request the coach last spoke on, so it isn't asked twice about one turn. */
   private coached?: unknown;
+  /**
+   * The coach's judge (DESIGN.md §22): the search, from your view, decides which
+   * warnings show. Without it (no engine), the coach gives no warnings.
+   */
+  private readonly judge?: Judge;
+  /** This decision's rule warnings (each needs the judge to agree), and those shown. */
+  private warnings: Record<string, CoachNote> = {};
+  private readonly shown = new Map<string, CoachNote>();
 
-  /** Hard needs `engine`, poke-engine for the format's gen; `budget` is for tests. */
+  /**
+   * Hard needs `engine`, poke-engine for the format's gen; `budget` is for tests.
+   * The coach's judge needs `coachEngine`, the same module.
+   */
   constructor(
     readonly start: EngineStart,
     engine?: Engine,
     budget?: { iterations: number; worlds: number },
+    coachEngine?: Engine,
   ) {
     const format = start.format ?? DEFAULT_FORMAT;
     const { tutorial } = start;
@@ -75,7 +95,13 @@ export class BattleEngine {
     this.replay = this.hard ? [...(start.aiChoices ?? [])] : [];
     this.reported = this.replay.length;
     this.presenter = new SidePresenter('p1', this.sets, format);
-    if (start.coach) this.coach = new Coach(setsFor(format), format);
+    if (start.coach) {
+      this.coach = new Coach(setsFor(format), format);
+      if (coachEngine)
+        this.judge = new Judge(coachEngine, setsFor(format), {
+          ...(start.pool ? { pool: start.pool } : {}),
+        });
+    }
   }
 
   /** Starts (or resumes, replaying recorded choices) and returns the first package. */
@@ -115,7 +141,29 @@ export class BattleEngine {
     const view = this.coach && this.session.view('p1');
     if (!view) return;
     if (this.coached !== view.request) this.coach!.turn(view);
-    this.coach!.record(view, choice);
+    // Only a warning you saw and overrode counts (none on a resumed turn).
+    this.coach!.record(view, choice, this.shown.get(choice) ?? null);
+  }
+
+  /**
+   * The coach's warning on `choice`, if it has one: a rule explains it and the
+   * judge agrees it's clearly worse. Gives the judge up to `waitMs` to finish.
+   */
+  coachCheck(choice: string, waitMs: number): CoachNote | null {
+    const note = this.warnings[choice];
+    if (!note || !this.judge) return null;
+    if (!this.judge.settle(choice, waitMs)?.worse) return null;
+    this.shown.set(choice, note);
+    return note;
+  }
+
+  /** Works on the judge for up to `ms`; true while there's more to do. */
+  coachWork(ms: number): boolean {
+    const judge = this.judge;
+    if (!judge?.busy) return false;
+    const end = performance.now() + ms;
+    while (judge.step() && performance.now() < end);
+    return judge.busy;
   }
 
   forfeit(): TurnPackage {
@@ -169,8 +217,17 @@ export class BattleEngine {
     if (this.coach) {
       const view = this.session.view('p1');
       if (view && pkg.controls) {
-        pkg.coach = this.coach.turn(view);
+        const turn = this.coach.turn(view);
+        pkg.coach = turn.tip ? { tip: turn.tip } : {};
         this.coached = view.request;
+        this.warnings = turn.warnings;
+        this.shown.clear();
+        // Seeded by the decision, so a resumed battle judges it the same way.
+        this.judge?.begin(
+          view,
+          `${this.start.battleSeed}:${this.session.choices('p1').length}`,
+          Object.keys(turn.warnings),
+        );
       }
       if (pkg.end) pkg.review = this.coach.review();
     }

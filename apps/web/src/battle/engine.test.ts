@@ -264,6 +264,42 @@ describe('lesson battles', () => {
   }, 60_000);
 });
 
+describe.skipIf(!engineBuilt(3))('the coach’s judge', () => {
+  it('warns only when the judge agrees, and never without the engine', () => {
+    const rng = makeRng(deriveSeed('engine:judge', 0));
+    const data = setsFor('gen3ou');
+    const s = start(0, {
+      format: 'gen3ou',
+      playerTeam: randomTeam(rng, data),
+      opponentTeam: randomTeam(rng, data),
+      difficulty: 'easy',
+      coach: 'simple',
+    });
+    const judged = new BattleEngine(s, undefined, undefined, loadEngine(3));
+    const blind = new BattleEngine(s);
+    let pkg = judged.begin();
+    blind.begin();
+    const pick = makeRng('3,1,4,1');
+    let warned = 0;
+    for (let i = 0; i < 30 && !pkg.end; i++) {
+      const c = pkg.controls!;
+      const options = [
+        ...c.moves.filter((m) => !m.disabled).map((m) => m.choice),
+        ...c.switches.map((x) => x.choice),
+      ];
+      for (const o of options) {
+        if (judged.coachCheck(o, Infinity)) warned++;
+        expect(blind.coachCheck(o, Infinity)).toBeNull();
+      }
+      const choice = c.only ?? options[Math.floor(pick() * options.length)]!;
+      pkg = judged.choose(choice);
+      blind.choose(choice);
+    }
+    // Random picks blunder often enough for the judge to back a few warnings.
+    expect(warned).toBeGreaterThan(0);
+  }, 120_000);
+});
+
 describe('cleanText', () => {
   it('keeps the shown part of exact/shown number markup', () => {
     expect(cleanText('(Hitmontop lost ||−270/304||88.8%|| of its health!)')).toBe(
