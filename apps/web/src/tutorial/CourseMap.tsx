@@ -36,7 +36,9 @@ export function CourseMap({
   // The first lesson not done that can be played.
   const next = all.find((l) => !done(l.id) && l.id && built.has(l.id));
   const nextLesson = next?.id ? built.get(next.id) : undefined;
-  const count = all.filter((l) => done(l.id)).length;
+  const count = all.filter((l) => !l.review && done(l.id)).length;
+  const label = (l: { number: number; review?: boolean }) =>
+    l.review ? 'Review' : `Lesson ${l.number}`;
   const nextUnit = Math.max(
     0,
     course.findIndex((u) => next && u.lessons.includes(next)),
@@ -59,7 +61,8 @@ export function CourseMap({
       <main className="mx-auto w-full max-w-[560px] flex-1 overflow-y-auto px-4 pt-4 pb-10">
         <h1 className="display text-[22px]">Learn to battle</h1>
         <p className="mt-1 text-[14px] text-muted">
-          {all.length} short lessons, one idea each. {count > 0 && `${count} done.`}
+          {all.filter((l) => !l.review).length} short lessons, one idea each.{' '}
+          {count > 0 && `${count} done.`}
         </p>
         {next && nextLesson && (
           // Up next: the way in, at the top.
@@ -75,7 +78,7 @@ export function CourseMap({
             />
             <span className="min-w-0 flex-1">
               <span className="block text-[12px] font-semibold text-muted">
-                {count > 0 ? 'Up next' : 'Start here'} · Lesson {next.number}
+                {count > 0 ? 'Up next' : 'Start here'} · {label(next)}
               </span>
               <span className="block text-[17px] leading-snug font-semibold">{next.title}</span>
               <span className="block text-[13px] text-muted">{nextLesson.summary}</span>
@@ -130,7 +133,7 @@ export function CourseMap({
                       const isNext = l === next;
                       const last = i === unit.lessons.length - 1;
                       return (
-                        <li key={l.number} className="relative flex gap-3 pb-3">
+                        <li key={l.id ?? l.number} className="relative flex gap-3 pb-3">
                           {/* The path between nodes. */}
                           {!last && (
                             <span
@@ -146,7 +149,7 @@ export function CourseMap({
                             disabled={!lesson}
                             onClick={() => lesson && onOpen(lesson)}
                             aria-current={isNext ? 'step' : undefined}
-                            aria-label={`Lesson ${l.number}: ${l.title}${isDone ? ', done' : ''}${lesson ? '' : ', coming soon'}`}
+                            aria-label={`${label(l)}: ${l.title}${isDone ? ', done' : ''}${lesson ? '' : ', coming soon'}`}
                             className="group flex min-w-0 flex-1 items-center gap-3 text-left disabled:cursor-default"
                           >
                             <span
@@ -182,7 +185,7 @@ export function CourseMap({
                               )}
                             >
                               <span className="block text-[12px] font-semibold text-muted tabular-nums">
-                                Lesson {l.number}
+                                {label(l)}
                               </span>
                               <span
                                 className={clsx(
