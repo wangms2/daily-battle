@@ -223,38 +223,14 @@ describe('field effects', () => {
 });
 
 describe('lesson battles', () => {
-  it('plays a lesson as its content tests do: scripted foe, its seed, no luck', () => {
-    const lesson = gen3Lessons.find((l) => l.id === 'gen3-types')!;
-    const step = lesson.steps.find((s) => s.kind === 'battle')!;
-    const line = { moves: [...step.intended!.moves!], switches: [...step.intended!.switches!] };
-    const engine = new BattleEngine(lessonStart(step, lesson.format));
-    let pkg = engine.begin();
-    expect(pkg.team.map((m) => m.species)).toEqual(['Swampert', 'Jolteon']);
-    while (!pkg.end) {
-      const c = pkg.controls!;
-      const [verb, ...name] = (c.kind === 'switch' ? line.switches : line.moves)
-        .shift()!
-        .split(' ');
-      const choice =
-        verb === 'switch'
-          ? c.switches.find((s) => pkg.team[s.slot - 1]?.species === name.join(' '))?.choice
-          : c.moves.find((m) => m.name === name.join(' '))?.choice;
-      pkg = engine.choose(choice!);
-    }
-    expect(pkg.end.winner).toBe('you');
-    expect(line.moves).toEqual([]);
-  });
-
-  it('coaches battles against the Easy AI, and only those', () => {
-    const scripted = gen3Lessons.find((l) => l.id === 'gen3-types')!;
-    const step = scripted.steps.find((s) => s.kind === 'battle')!;
-    expect(new BattleEngine(lessonStart(step, scripted.format)).begin().coach).toBeUndefined();
-
-    const grad = gen3Lessons.find((l) => l.graduation)!;
+  it('coaches lesson battles, against the Easy AI, and reviews them', () => {
+    const lesson = gen3Lessons.find((l) => l.id === 'gen3-switching-course')!;
     const s = lessonStart(
-      grad.steps.find((x) => x.kind === 'battle')!,
-      grad.format,
+      lesson.steps.find((x) => x.kind === 'battle')!,
+      lesson.format,
+      lesson.number,
     );
+    expect(s.difficulty).toBe('easy');
     expect(s.coach).toBe('simple');
     const { packages, choices } = play(s);
     for (const p of packages) expect(!!p.coach).toBe(!!p.controls);

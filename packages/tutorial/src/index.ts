@@ -2,7 +2,7 @@ export { battleInput, foePolicy, startPosition } from './battle';
 export { gen3Lessons, LESSONS } from './lessons';
 export { knownSets, monSet, teamOf, withLessonSets } from './teams';
 export type * from './types';
-export { answerDamage, answerOutcomes, lessonProblems, type Outcome } from './validate';
+export { answerOutcomes, lessonProblems, type Outcome } from './validate';
 export {
   Coach,
   noEffectText,

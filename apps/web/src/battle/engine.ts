@@ -9,7 +9,6 @@ import {
   legalChoices,
   makeRng,
   resolveStep,
-  ScriptedPolicy,
   type Policy,
   type Rng,
 } from '@daily-battle/sim-bridge';
@@ -26,7 +25,7 @@ import {
   type Position,
 } from '@daily-battle/tutorial';
 import type { PokemonSet, PRNGSeed } from '@pkmn/sim';
-import type { CoachMemo, EngineStart, PositionPackage, TurnPackage, TurnReplay } from './frames';
+import type { CoachMemo, EngineStart, TurnPackage, TurnReplay } from './frames';
 import { SidePresenter } from './presenter';
 
 export { cleanText, effectiveness, moveDesc } from './presenter';
@@ -98,9 +97,7 @@ export class BattleEngine {
       ...(start.pool ? { pool: start.pool } : {}),
       ...(budget ? { hard: budget } : {}),
     });
-    this.ai = tutorial?.foeScript
-      ? new ScriptedPolicy({ ...tutorial.foeScript, fallback: ai })
-      : ai;
+    this.ai = ai;
     this.aiRng = makeRng(tutorial ? deriveSeed(start.battleSeed, 2) : (start.aiSeed as PRNGSeed));
     this.hard = difficulty === 'hard';
     this.replay = this.hard ? [...(start.aiChoices ?? [])] : [];
@@ -434,20 +431,4 @@ export function presentTurn(
     false,
   );
   return { before, turn: after, choice, spots: spots.map(resolve) };
-}
-
-/** A quiz position (Learn mode), frozen at the player's decision, with each answer's step resolved. */
-export function presentPosition(
-  format: string,
-  position: Position,
-  steps: string[],
-): PositionPackage {
-  const session = startPosition(format, position);
-  const request = session.request('p1')!;
-  const presenter = new SidePresenter('p1', teamOf(format, position.p1), format);
-  const pkg = presenter.present(
-    { lines: session.drain('p1'), request, ended: false, winner: null },
-    true,
-  );
-  return { pkg, choices: steps.map((s) => resolveStep(s, request) ?? null) };
 }

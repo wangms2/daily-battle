@@ -10,7 +10,6 @@ const STARMIE: Mon = { species: 'Starmie', moves: ['Surf', 'Ice Beam', 'Thunderb
 
 export const effective: Lesson = {
   id: 'gen3-effective',
-  draft: true,
   format: 'gen3ou',
   number: 2,
   title: 'Super effective and resisted',
@@ -137,10 +136,8 @@ export const effective: Lesson = {
         { species: 'Celebi', moves: ['Giga Drain', 'Psychic'] },
         { species: 'Houndoom', moves: ['Crunch', 'Flamethrower'] },
       ],
-      foeAi: 'easy',
       seed: 'course:effective:battle',
       noLuck: true,
-      prompts: [],
       takeaway:
         'Before you attack, check the foe’s types. A super effective move does double damage; a resisted one, half.',
     },

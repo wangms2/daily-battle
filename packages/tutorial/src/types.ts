@@ -48,93 +48,18 @@ export interface Answer {
   why: string;
 }
 
-export interface CardStep {
-  kind: 'card';
-  title: string;
-  /** Short paragraphs. */
-  text: string[];
-  /** Species to show alongside the text. */
-  sprites?: string[];
-}
-
-export interface QuizStep {
-  kind: 'quiz';
-  prompt: string;
-  position: Position;
-  /** Graded options; at least one is `best`. */
-  answers: Answer[];
-  /** Shown for any legal choice not in `answers` (required when there is one). */
-  otherwise?: string;
-  /**
-   * How tests check the grades. `damage`: the answers are attacks, and their
-   * grades follow the damage they deal here (best ≥ ok ≥ wrong). `outcome`:
-   * each answer is played out against `foeAi` many times, and a better grade
-   * never does worse (wins, then HP left).
-   */
-  check?: 'damage' | 'outcome';
-  /** The foe for `outcome` checks (the Easy AI if left out). */
-  foeAi?: FoeScript | 'easy';
-}
-
-export interface FoeScript {
-  moves?: string[];
-  switches?: string[];
-}
-
-export interface Prompt {
-  /** Shown at the start of this turn (1-based). */
-  turn: number;
-  text: string;
-}
-
+/** A short battle against the Easy AI, with the coach's tips (only about what's been taught). */
 export interface BattleStep {
   kind: 'battle';
   intro: string;
   player: Mon[];
   foe: Mon[];
-  /** A scripted foe (falls back to the Easy AI when a step can't be played), or the Easy AI. */
-  foeAi: FoeScript | 'easy';
   /** Seed label. */
   seed: string;
   /** Remove luck (no crits, misses, or secondary effects). */
   noLuck: boolean;
-  prompts: Prompt[];
   /** Shown after the battle, win or lose. */
   takeaway: string;
-  /**
-   * The line the lesson teaches, for content tests: played by the player
-   * against the scripted foe, it must win with no skipped steps.
-   */
-  intended?: FoeScript;
-}
-
-export interface PickOption {
-  mon: Mon;
-  /** Its job on a team: "Spinner", "Special wall". */
-  role: string;
-  grade: Grade;
-  /** Why it does or doesn't fit this team. */
-  why: string;
-}
-
-/**
- * Guided picking with feedback on each choice. `team` (the default) adds
- * Pokémon from a pool to a team; `lead` picks one of your own team to lead
- * against the foe's six.
- */
-export interface PickStep {
-  kind: 'pick';
-  target?: 'team' | 'lead';
-  prompt: string;
-  /** The team so far (empty for a lead pick). */
-  team: Mon[];
-  /** The foe's species, shown for context (as on the daily brief). */
-  foe?: string[];
-  options: PickOption[];
-  /** How many to add. */
-  picks: number;
-  /** Shown once the picks are done. */
-  done: string;
 }
 
 /**
@@ -196,17 +121,15 @@ export interface PracticeStep {
   spotlight?: string[];
 }
 
-export type Step = CardStep | QuizStep | BattleStep | PickStep | DemoStep | PracticeStep;
+export type Step = DemoStep | PracticeStep | BattleStep;
 
 export interface Lesson {
-  /** Stable id, stored in progress (e.g. `gen3-basics`). */
+  /** Stable id, stored in progress (e.g. `gen3-turn`). */
   id: string;
   format: string;
   number: number;
   /** The final battle: shown with a cap instead of its number. */
   graduation?: boolean;
-  /** Being redesigned (step 4b): opens by its link, but isn't listed or offered as next. */
-  draft?: boolean;
   title: string;
   summary: string;
   steps: Step[];

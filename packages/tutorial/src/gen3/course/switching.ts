@@ -12,7 +12,6 @@ const SKARMORY: Mon = { species: 'Skarmory', moves: ['Drill Peck'] };
 
 export const switching: Lesson = {
   id: 'gen3-switching-course',
-  draft: true,
   format: 'gen3ou',
   number: 6,
   title: 'Switching',
@@ -110,10 +109,8 @@ export const switching: Lesson = {
         { species: 'Celebi', moves: ['Giga Drain', 'Psychic'] },
       ],
       foe: [SWAMPERT, SKARMORY],
-      foeAi: 'easy',
       seed: 'course:switching:battle',
       noLuck: true,
-      prompts: [],
       takeaway:
         'A switch uses your turn, and the new Pokémon takes the foe’s move. Switch to the teammate that does more.',
     },

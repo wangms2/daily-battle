@@ -4,15 +4,14 @@ import {
   BattleSession,
   deriveSeed,
   resolveStep,
-  ScriptedPolicy,
   SIDES,
   type Policy,
   type RunBattleInput,
 } from '@daily-battle/sim-bridge';
 import { teamOf } from './teams';
-import type { BattleStep, FoeScript, Position } from './types';
+import type { BattleStep, Position } from './types';
 
-/** Replays a quiz position (no luck) and returns the session at the player's (p1's) decision. */
+/** Replays a lesson position (no luck) and returns the session at the player's (p1's) decision. */
 export function startPosition(format: string, position: Position): BattleSession {
   const session = new BattleSession({
     format,
@@ -43,11 +42,9 @@ export function startPosition(format: string, position: Position): BattleSession
   return session;
 }
 
-/** A lesson foe's policy: its script, then the Easy AI. */
-export function foePolicy(format: string, foeAi: FoeScript | 'easy'): Policy {
-  const easy = aiFor({ difficulty: 'easy', style: 'balance', data: setsFor(format) });
-  if (foeAi === 'easy') return easy;
-  return new ScriptedPolicy({ ...foeAi, fallback: easy });
+/** A lesson foe's policy: the Easy AI. */
+export function foePolicy(format: string): Policy {
+  return aiFor({ difficulty: 'easy', style: 'balance', data: setsFor(format) });
 }
 
 /** The sim input for a lesson battle, with the player's policy supplied by the caller. */
@@ -59,7 +56,7 @@ export function battleInput(format: string, step: BattleStep, player: Policy): R
     p1: { team: teamOf(format, step.player), policy: player, seed: deriveSeed(step.seed, 1) },
     p2: {
       team: teamOf(format, step.foe),
-      policy: foePolicy(format, step.foeAi),
+      policy: foePolicy(format),
       seed: deriveSeed(step.seed, 2),
     },
   };

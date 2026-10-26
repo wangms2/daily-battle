@@ -60,24 +60,14 @@ type LessonKey = CoachRule | WarningReason | 'status' | 'hazard';
 /** The lesson behind each rule, per game. */
 const LESSONS: Record<string, Partial<Record<LessonKey, string>>> = {
   gen3ou: {
-    noEffect: 'gen3-types',
-    status: 'gen3-status',
-    hazard: 'gen3-spikes',
-    canKo: 'gen3-winning',
-    staysKo: 'gen3-switching',
-    switchKo: 'gen3-switching',
-    koThreat: 'gen3-speed',
-    slower: 'gen3-speed',
-    foeAsleep: 'gen3-status',
-    locked: 'gen3-items',
-    spikes: 'gen3-spikes',
-    walled: 'gen3-switching',
-    setupWindow: 'gen3-setup',
-    bigHit: 'gen3-switching',
-    missedKo: 'gen3-winning',
-    weaker: 'gen3-winning',
-    noTime: 'gen3-setup',
-    noSpikes: 'gen3-spikes',
+    // The course lessons built so far (course.ts has where each idea is taught).
+    noEffect: 'gen3-immune',
+    canKo: 'gen3-turn',
+    missedKo: 'gen3-turn',
+    weaker: 'gen3-turn',
+    walled: 'gen3-switching-course',
+    koThreat: 'gen3-speed-course',
+    slower: 'gen3-speed-course',
   },
 };
 

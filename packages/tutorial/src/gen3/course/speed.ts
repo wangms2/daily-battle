@@ -15,7 +15,6 @@ const GENGAR: Mon = { species: 'Gengar', moves: ['Psychic', 'Ice Punch'] };
 
 export const speed: Lesson = {
   id: 'gen3-speed-course',
-  draft: true,
   format: 'gen3ou',
   number: 7,
   title: 'Speed',
@@ -118,10 +117,8 @@ export const speed: Lesson = {
         'Two on two against the Easy AI. Before you attack, ask: is the foe faster, and can it knock you out?',
       player: [HERACROSS, SNORLAX],
       foe: [ZAPDOS, TYRANITAR],
-      foeAi: 'easy',
       seed: 'course:speed:battle',
       noLuck: true,
-      prompts: [],
       takeaway:
         'The faster Pokémon moves first. If a faster foe can knock you out, your move may never land.',
     },
