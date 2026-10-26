@@ -241,7 +241,12 @@ export interface EngineStart {
    * A lesson battle (Learn mode): the teams are lesson `Mon`s, the foe follows
    * its script (then plays as Easy), and luck can be removed.
    */
-  tutorial?: { noLuck: boolean; foeScript?: FoeScript };
+  tutorial?: {
+    noLuck: boolean;
+    foeScript?: FoeScript;
+    /** The redesigned course: the lesson reached, so the coach only talks about what's been taught. */
+    taught?: number;
+  };
   /** The coach (DESIGN.md §22): tips and blunder warnings each turn, and a review at the end. */
   coach?: 'simple';
   /** Coach on: a memo per recorded choice (null where there's none), for resume. */

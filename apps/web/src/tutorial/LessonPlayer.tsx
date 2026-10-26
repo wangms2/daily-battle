@@ -108,6 +108,8 @@ export function LessonPlayer({
         key={index}
         step={step}
         format={lesson.format}
+        // The redesigned course's coach talks only about what's been taught.
+        {...(lesson.draft && { taught: lesson.number })}
         background={background}
         settings={settings}
         onSetting={onSetting}
@@ -475,7 +477,10 @@ function LessonBattle({
   onNext,
   onExit,
   onSettings,
+  taught,
 }: {
+  /** The redesigned course: the lesson reached, for the coach. */
+  taught?: number;
   step: BattleStep;
   format: string;
   background: string;
@@ -491,7 +496,7 @@ function LessonBattle({
   const [round, setRound] = useState(0);
   const [intro, setIntro] = useState(true);
   // Battle restarts when its start changes, so keep one per lesson step.
-  const start = useMemo(() => lessonStart(step, format), [step, format]);
+  const start = useMemo(() => lessonStart(step, format, taught), [step, format, taught]);
   if (intro)
     return (
       <div className="flex h-full flex-col">

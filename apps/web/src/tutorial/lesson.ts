@@ -3,8 +3,12 @@ import type { BattleStep, Lesson } from '@daily-battle/tutorial/lessons';
 import type { TutorialProgress } from '../state/schema';
 import type { EngineStart } from '../battle/frames';
 
-/** A lesson battle's start: the engine derives its seeds from the lesson's seed label. */
-export function lessonStart(step: BattleStep, format: string): EngineStart {
+/**
+ * A lesson battle's start: the engine derives its seeds from the lesson's seed
+ * label. In the redesigned course (`lesson` given), the coach only talks about
+ * what the lessons up to this one teach.
+ */
+export function lessonStart(step: BattleStep, format: string, taught?: number): EngineStart {
   return {
     format,
     playerTeam: step.player,
@@ -17,6 +21,7 @@ export function lessonStart(step: BattleStep, format: string): EngineStart {
     tutorial: {
       noLuck: step.noLuck,
       ...(step.foeAi !== 'easy' && { foeScript: step.foeAi }),
+      ...(taught !== undefined && { taught }),
     },
     // Battles against the Easy AI (lessons 7+, graduation) are coached.
     ...(step.foeAi === 'easy' && { coach: 'simple' as const }),

@@ -16,8 +16,10 @@ import {
 import {
   Coach,
   Judge,
+  knownSets,
   startPosition,
   teamOf,
+  withLessonSets,
   type CoachNote,
   type Mon,
   type Review,
@@ -105,11 +107,21 @@ export class BattleEngine {
     this.reported = this.replay.length;
     this.presenter = new SidePresenter('p1', this.sets, format);
     if (start.coach) {
+      // A lesson's foe is fixed content, so the coach knows its sets; a daily
+      // foe's are hidden, as for the AI.
+      const lessonFoe = tutorial ? (start.opponentTeam as Mon[]) : undefined;
+      const data = lessonFoe ? withLessonSets(format, lessonFoe) : setsFor(format);
       // Lesson foes count as Easy: some warning reasons are quiet against some opponents.
-      this.coach = new Coach(setsFor(format), format, tutorial ? 'easy' : difficulty);
+      this.coach = new Coach(
+        data,
+        format,
+        tutorial ? 'easy' : difficulty,
+        tutorial?.taught ?? Infinity,
+      );
       if (coachEngine)
-        this.judge = new Judge(coachEngine, setsFor(format), {
+        this.judge = new Judge(coachEngine, data, {
           ...(start.pool ? { pool: start.pool } : {}),
+          ...(lessonFoe ? { knownSets: knownSets(format, lessonFoe) } : {}),
         });
       // Warnings you overrode before a reload aren't asked again.
       this.coach.ignore((start.coachLog ?? []).flatMap((m) => (m?.ignored ? [m.ignored] : [])));

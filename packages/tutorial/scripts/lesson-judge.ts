@@ -11,7 +11,7 @@ import { setsFor } from '@daily-battle/data';
 import { loadEngine } from '@daily-battle/engine-wasm/node';
 import { resolveStep, runBattle, ScriptedPolicy, type Policy } from '@daily-battle/sim-bridge';
 import { battleInput, LESSONS, startPosition } from '../src';
-import { practiceCheck } from '../src/coach/lesson-check';
+import { battlePressure, practiceCheck } from '../src/coach/lesson-check';
 import { Judge } from '../src/coach/judge';
 
 const engine = loadEngine(3);
@@ -67,6 +67,13 @@ for (const lesson of LESSONS.gen3ou ?? []) {
             .join(''),
       );
       out.push({ lesson: lesson.id, step: n + 1, kind: 'practice', problems, rows });
+    } else if (step.kind === 'battle' && lesson.draft) {
+      const p = battlePressure(engine, lesson.format, step, lesson.number);
+      const share = p.outOfScope / Math.max(1, p.decisions);
+      console.log(
+        `${share > 0.05 ? 'PROBLEM' : 'ok     '} ${where} battle: ${p.outOfScope} of ${p.decisions} decisions out of scope (${Math.round(100 * share)}%) ${JSON.stringify(p.reasons)}`,
+      );
+      out.push({ lesson: lesson.id, step: n + 1, kind: 'battle', pressure: p });
     } else if (step.kind === 'battle' && step.intended) {
       const script = new ScriptedPolicy(step.intended);
       const prompted = new Set(step.prompts.map((p) => p.turn));

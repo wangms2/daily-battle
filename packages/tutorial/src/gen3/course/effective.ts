@@ -123,5 +123,26 @@ export const effective: Lesson = {
       otherwise: 'Ice Beam does double damage to Celebi, enough to knock it out.',
       spotlight: ['foe-types'],
     },
+    {
+      kind: 'battle',
+      intro:
+        'Two on two against the Easy AI. Look at each foe’s types and pick the move that hits it hardest. The coach will help.',
+      // No immunities, abilities that act, items, status, or Spikes: only type matchups decide.
+      player: [
+        { species: 'Starmie', moves: ['Surf', 'Ice Beam', 'Thunderbolt'] },
+        // Both of yours outspeed both foes, so Speed (lesson 7) never decides a turn.
+        { species: 'Jolteon', moves: ['Thunderbolt', 'Shadow Ball'] },
+      ],
+      foe: [
+        { species: 'Celebi', moves: ['Giga Drain', 'Psychic'] },
+        { species: 'Houndoom', moves: ['Crunch', 'Flamethrower'] },
+      ],
+      foeAi: 'easy',
+      seed: 'course:effective:battle',
+      noLuck: true,
+      prompts: [],
+      takeaway:
+        'Before you attack, check the foe’s types. A super effective move does double damage; a resisted one, half.',
+    },
   ],
 };

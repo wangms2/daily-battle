@@ -1,4 +1,4 @@
-import { setsFor, type SetEntry } from '@daily-battle/data';
+import { setsFor, type SetEntry, type SetsFile } from '@daily-battle/data';
 import { findSet, toPokemonSet } from '@daily-battle/gen';
 import { Dex, type PokemonSet } from '@pkmn/sim';
 import type { Mon } from './types';
@@ -48,6 +48,25 @@ export function knownSets(format: string, mons: Mon[]): Record<string, SetEntry>
     };
   }
   return out;
+}
+
+/**
+ * The game's set data with a lesson foe's species narrowed to its lesson set:
+ * in a lesson the foe is fixed content, so the coach's facts and judge use it
+ * (rather than the real competitive sets a daily foe might carry).
+ */
+export function withLessonSets(format: string, mons: Mon[]): SetsFile {
+  const data = setsFor(format);
+  const known = knownSets(format, mons);
+  return {
+    ...data,
+    species: {
+      ...data.species,
+      ...Object.fromEntries(
+        Object.entries(known).map(([name, set]) => [name, { ...data.species[name]!, sets: [set] }]),
+      ),
+    },
+  };
 }
 
 const toId = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '');

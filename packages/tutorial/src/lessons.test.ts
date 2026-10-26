@@ -1,6 +1,6 @@
 import { engineBuilt, loadEngine } from '@daily-battle/engine-wasm/node';
 import { describe, expect, it } from 'vitest';
-import { practiceCheck } from './coach/lesson-check';
+import { battlePressure, practiceCheck } from './coach/lesson-check';
 import { LESSONS } from './index';
 import { lessonProblems } from './validate';
 
@@ -82,4 +82,16 @@ describe.skipIf(!engineBuilt(3))('practice positions', () => {
           const { problems } = practiceCheck(loadEngine(3), lesson.format, step, lesson.number, 30);
           expect(problems).toEqual([]);
         }, 120_000);
+});
+
+// The redesigned course's battles: the full coach rarely wants to talk about
+// an idea a later lesson teaches (out-of-scope pressure).
+describe.skipIf(!engineBuilt(3))('lesson battles stay in scope', () => {
+  for (const lesson of (LESSONS.gen3ou ?? []).filter((l) => l.draft))
+    for (const [n, step] of lesson.steps.entries())
+      if (step.kind === 'battle')
+        it(`${lesson.id} step ${n + 1}`, () => {
+          const p = battlePressure(loadEngine(3), lesson.format, step, lesson.number, 3);
+          expect(p.outOfScope / p.decisions).toBeLessThanOrEqual(0.05);
+        }, 300_000);
 });
