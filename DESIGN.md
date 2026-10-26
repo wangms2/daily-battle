@@ -671,3 +671,11 @@ Battle music and Pokémon cries, as on Showdown, across every game. Off by defau
 - **Code.** `src/lib/audio.ts` is the only place audio is touched. Battles call `startMusic` and `stopMusic` and play cries from their frames' events.
 - **Rights.** The music and cries are Nintendo's, like the sprites, and are credited in About. The site stays free and non-commercial (§16).
 
+## 22. Tutorial and coach (Gen 3, added Oct 2026)
+
+A **Learn** mode teaches Gen 3 OU from the basics (12 lessons and a graduation battle, `packages/tutorial`), and a **coach** helps in real battles. EVs, IVs, and natures are out of scope.
+
+- **Coach.** Rule-based, from the player's own view only (it never sees the foe's real sets). It gives an occasional turn tip, asks before a clear blunder ("Do it anyway" / "Pick again"), and reviews up to 3 key turns after the battle. It's paced so it isn't distracting: at most one tip per turn, a gap of 3 turns between tips (2 for urgent ones: "this hit KOs you", "you can KO"), no tip while a lesson prompt or hint is showing, and a warning the player overrode isn't asked again that battle. Warnings only appear when the blunder is picked.
+- **Where.** On in lessons against the Easy foe and in graduation. In the daily, it's offered in Gen 3 on Easy and Normal (not Hard, until its search-based coach exists). Off by default; offered once on a game's first daily brief and again after graduation (`settings.coachOffered`).
+- **Turning it on.** A **Coach** pill beside the difficulty picker on the brief (`settings.coach`, per game), or a switch in the battle menu mid-battle. Either asks first when it costs a streak. Once on, that attempt is `coached: true` for good; mid-battle, the battle restarts with the coach from the same turn.
+- **Coached results.** Coached tries count in their own **Coached** bucket per game, shared across difficulties, with its own streak and stats (a first-try coached win extends it). A coached try before the day is cleared ends the regular streak of the difficulty it was played on; coached practice after a clear doesn't. The header, battle, Home card, and result show **Coached**, and the share header adds it after the level of the deciding try: `Gen 3 OU · Easy · Coached · Oct 21`.

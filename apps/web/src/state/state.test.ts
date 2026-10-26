@@ -390,6 +390,14 @@ describe('attempts', () => {
     );
   });
 
+  it('marks the battle in progress coached, for good', () => {
+    let state = gameReducer(started(), { type: 'recordChoice', day: DAY, choice: 'move 1' });
+    state = gameReducer(state, { type: 'coachAttempt', day: DAY });
+    expect(state.days[DAY]!.attempts).toEqual([attempt({ choices: ['move 1'], coached: true })]);
+    state = gameReducer(state, { type: 'endAttempt', day: DAY, result: 'win', remaining: 2 });
+    expect(gameReducer(state, { type: 'coachAttempt', day: DAY })).toBe(state);
+  });
+
   it('runs one attempt at a time; a finished one can be run back', () => {
     const state = started();
     expect(

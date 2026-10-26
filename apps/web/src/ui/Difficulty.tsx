@@ -66,3 +66,45 @@ export function DifficultyBadge({
     </span>
   );
 }
+
+/** The daily coach's switch on the brief: a pill beside the difficulty. */
+export function CoachToggle({
+  on,
+  onChange,
+  disabled,
+}: {
+  on: boolean;
+  onChange: (on: boolean) => void;
+  /** While a battle is unfinished (turn it on from the battle's menu). */
+  disabled?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      aria-pressed={on}
+      disabled={disabled}
+      title="Tips, blunder warnings, and a review after. Coached results count apart."
+      onClick={() => onChange(!on)}
+      className={clsx(
+        'min-h-7 rounded-xl px-2.5 text-[12px] font-semibold',
+        on ? 'bg-accent text-white' : 'bg-surface-2 text-muted',
+        disabled && 'opacity-60',
+      )}
+    >
+      Coach{on ? ' on' : ''}
+    </button>
+  );
+}
+/** "Coached": the daily coach is on for this battle or game. */
+export function CoachBadge({ className }: { className?: string }) {
+  return (
+    <span
+      className={clsx(
+        'inline-flex items-center rounded-badge bg-accent px-1.5 py-0.5 text-[11px] font-bold text-white',
+        className,
+      )}
+    >
+      Coached
+    </span>
+  );
+}

@@ -44,14 +44,21 @@ export function Switch({
   onCheckedChange,
   label,
   hint,
+  disabled = false,
 }: {
   checked: boolean;
   onCheckedChange: (v: boolean) => void;
   label: string;
   hint?: string;
+  disabled?: boolean;
 }) {
   return (
-    <label className="flex min-h-11 cursor-pointer items-center justify-between gap-4">
+    <label
+      className={clsx(
+        'flex min-h-11 items-center justify-between gap-4',
+        disabled ? 'cursor-default' : 'cursor-pointer',
+      )}
+    >
       <span>
         <span className="block text-[15px] font-medium">{label}</span>
         {hint && <span className="block text-[13px] text-muted">{hint}</span>}
@@ -59,6 +66,7 @@ export function Switch({
       <RadixSwitch.Root
         checked={checked}
         onCheckedChange={onCheckedChange}
+        disabled={disabled}
         className="relative h-7 w-12 shrink-0 rounded-full bg-line transition-colors data-[state=checked]:bg-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
       >
         <RadixSwitch.Thumb className="block size-6 translate-x-0.5 rounded-full bg-white shadow transition-transform data-[state=checked]:translate-x-[22px]" />

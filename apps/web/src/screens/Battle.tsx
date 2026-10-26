@@ -39,8 +39,9 @@ import { Button } from '../ui/bits';
 import type { ShareModel } from '../lib/share';
 import { ShareButton, TryRows } from '../ui/results';
 import { CloseIcon, InfoIcon } from '../ui/icons';
-import { DifficultyBadge } from '../ui/Difficulty';
+import { CoachBadge, DifficultyBadge } from '../ui/Difficulty';
 import { OtherGames } from '../ui/OtherGames';
+import { ConfirmDialog } from '../sheets/misc';
 import { useWide } from '../ui/useWide';
 
 /** Milliseconds per battle line ('instant' is for automated tests only). */
@@ -104,7 +105,13 @@ export function Battle({
   result,
   live,
   prompt,
+  coach: dailyCoach,
 }: {
+  /**
+   * The daily coach (DESIGN.md §22), where it's offered: on, or a switch in the
+   * menu to turn it on (after `warning`, what it costs, if anything).
+   */
+  coach?: { on: boolean; warning: string | null; onTurnOn: () => void };
   /** The day's result, for the end card (daily battles). */
   result?: DayResult;
   live?: LiveOptions;
@@ -151,6 +158,7 @@ export function Battle({
   const [logOpen, setLogOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [giveUpOpen, setGiveUpOpen] = useState(false);
+  const [coachAsk, setCoachAsk] = useState<string | null>(null);
   const [monFor, setMonFor] = useState<Who | null>(null);
   const [floats, setFloats] = useState<Float[]>([]);
   // Showdown's move animations, loaded on demand when animations are on.
@@ -646,6 +654,7 @@ export function Battle({
         </span>
         {/* A lesson's foe follows its script, whatever AI fills in. */}
         <DifficultyBadge difficulty={start.tutorial ? undefined : start.difficulty} />
+        {dailyCoach?.on && <CoachBadge />}
       </div>
       <div className="flex items-center gap-1">
         {topBarRight}
@@ -729,6 +738,29 @@ export function Battle({
         onLeave={onExit}
         onGiveUp={() => setGiveUpOpen(true)}
         canGiveUp={!end}
+        {...(dailyCoach &&
+          !end && {
+            coach: {
+              on: dailyCoach.on,
+              onTurnOn: () => {
+                if (dailyCoach.warning) return setCoachAsk(dailyCoach.warning);
+                setMenuOpen(false);
+                dailyCoach.onTurnOn();
+              },
+            },
+          })}
+      />
+      <ConfirmDialog
+        open={!!coachAsk}
+        onOpenChange={(o) => !o && setCoachAsk(null)}
+        title="Turn on the coach?"
+        body={coachAsk ?? ''}
+        confirm="Turn on"
+        onConfirm={() => {
+          setCoachAsk(null);
+          setMenuOpen(false);
+          dailyCoach?.onTurnOn();
+        }}
       />
       <CoachWarning
         note={warning?.note ?? null}

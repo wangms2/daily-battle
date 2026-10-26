@@ -5,6 +5,10 @@
 // counts) breaks it straight away, and so does a missed day. There's no limit
 // on tries: every try counts until the day is won, and runs after a win are
 // practice.
+//
+// Coached tries (DESIGN.md §22) have a bucket of their own, shared across
+// difficulties. A coached try before the day is cleared ends that difficulty's
+// regular streak; coached practice after a clear doesn't.
 import type { Difficulty } from '@daily-battle/ai/version';
 import { addDays } from '@daily-battle/gen/dates';
 import type { Attempt, DayState } from '../state/schema';
@@ -28,7 +32,12 @@ export interface DaySummary {
   counted: Attempt[];
   /** 1-based try of the day's first win, if any. */
   winTry: number | null;
+  /** A regular day the coach helped with (a coached try before the clear): no streak. */
+  helped: boolean;
 }
+
+/** Each difficulty's own tries and streak, or the coached ones (any difficulty). */
+export type Bucket = Difficulty | 'coached';
 
 const won = (a: Attempt) => a.result === 'win';
 
@@ -36,28 +45,34 @@ const won = (a: Attempt) => a.result === 'win';
 export const attemptDifficulty = (a: Pick<Attempt, 'difficulty'>): Difficulty =>
   a.difficulty ?? 'normal';
 
-/** One difficulty's day: each has its own tries, first try, and streak (§4.4). */
+export const attemptBucket = (a: Pick<Attempt, 'difficulty' | 'coached'>): Bucket =>
+  a.coached ? 'coached' : attemptDifficulty(a);
+
+/** One bucket's day: each has its own tries, first try, and streak (§4.4). */
 export function summarizeDay(
   day: DayState | undefined,
   isToday: boolean,
-  difficulty: Difficulty = 'normal',
+  bucket: Bucket = 'normal',
 ): DaySummary {
-  const tries = (day?.attempts ?? []).filter(
-    (a) => a.result !== 'inProgress' && attemptDifficulty(a) === difficulty,
-  );
+  const attempts = day?.attempts ?? [];
+  const tries = attempts.filter((a) => a.result !== 'inProgress' && attemptBucket(a) === bucket);
   const first = tries.findIndex(won);
   const winTry = first >= 0 ? first + 1 : null;
   const counted = winTry === null ? tries : tries.slice(0, winTry);
+  const clearedAt = winTry === null ? Infinity : tries[first]!.ts;
+  const helped =
+    bucket !== 'coached' &&
+    attempts.some((a) => a.coached && attemptDifficulty(a) === bucket && a.ts < clearedAt);
   let status: DayStatus;
   if (!tries.length) status = 'none';
-  else if (winTry === 1) status = 'firstTry';
+  else if (winTry === 1 && !helped) status = 'firstTry';
   else if (winTry !== null) status = 'won';
   else status = isToday ? 'pending' : 'failed';
-  return { status, tries, counted, winTry };
+  return { status, tries, counted, winTry, helped };
 }
 
-/** Played but not won on the first try: the streak is over. */
-const breaks = (s: DayStatus) => s !== 'none' && s !== 'firstTry';
+/** Played but not won on the first try (or with the coach's help): the streak is over. */
+const breaks = (s: DaySummary) => s.helped || (s.status !== 'none' && s.status !== 'firstTry');
 
 export interface Stats {
   streak: number;
@@ -76,20 +91,20 @@ export interface Stats {
 export function computeStats(
   days: Record<string, DayState>,
   today: string,
-  difficulty: Difficulty = 'normal',
+  bucket: Bucket = 'normal',
 ): Stats {
   // A ditched team ends the streak, even on a first-try win or before any try.
-  // The team is shared, so that's every difficulty's streak.
+  // The team is shared, so that's every bucket's streak. So does the coach's help.
   const status = (key: string): DayStatus => {
-    const s = summarizeDay(days[key], key === today, difficulty).status;
-    if (!days[key]?.ditched) return s;
-    return s === 'none' || s === 'firstTry' ? 'pending' : s;
+    const s = summarizeDay(days[key], key === today, bucket);
+    if (!days[key]?.ditched && !s.helped) return s.status;
+    return s.status === 'none' || s.status === 'firstTry' ? 'pending' : s.status;
   };
 
   // Streak: back from today. A day not played yet doesn't break yesterday's.
   let streak = 0;
   const t = status(today);
-  if (!breaks(t)) {
+  if (t === 'none' || t === 'firstTry') {
     let d = t === 'firstTry' ? today : addDays(today, -1);
     while (status(d) === 'firstTry') {
       streak++;
@@ -108,9 +123,9 @@ export function computeStats(
   let clears = 0;
   let triesToClear = 0;
   for (const key of keys) {
-    const s = summarizeDay(days[key], key === today, difficulty);
+    const s = summarizeDay(days[key], key === today, bucket);
     if (s.status === 'none') {
-      if (days[key]?.ditched) {
+      if (days[key]?.ditched || s.helped) {
         run = 0;
         prev = null;
       }
@@ -168,9 +183,9 @@ export function dayHeadline(s: DaySummary): string {
 
 /** "🔥 5-day streak", "Streak reset" once today's first try is lost, or nothing. */
 export function streakLine(s: DaySummary, streak: number): string {
-  if (breaks(s.status)) return 'Streak reset';
+  if (breaks(s)) return 'Streak reset';
   return streak > 0 ? `🔥 ${streak}-day streak` : '';
 }
 
 /** Whether today's play has ended the streak (any day not won on the first try). */
-export const streakBroken = (s: DaySummary) => breaks(s.status);
+export const streakBroken = (s: DaySummary) => breaks(s);

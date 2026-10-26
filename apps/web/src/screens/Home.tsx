@@ -10,7 +10,7 @@ import type { Difficulty } from '@daily-battle/ai/version';
 import type { FormatId } from '@daily-battle/data/formats';
 import { Fragment, type CSSProperties } from 'react';
 import { getSprite } from '../lib/sprites';
-import { DifficultyBadge } from '../ui/Difficulty';
+import { CoachBadge, DifficultyBadge } from '../ui/Difficulty';
 import { Friends } from '../ui/Friends';
 import { CheckIcon, ChevronIcon, FlameIcon, GearIcon } from '../ui/icons';
 
@@ -27,6 +27,8 @@ export interface GameRow {
   cleared: boolean;
   /** Easy or Hard when picked; the streak and today's status are that difficulty's. */
   difficulty?: Difficulty;
+  /** The coach is on: the streak and today's status are the Coached ones. */
+  coached?: boolean;
 }
 
 /** One Pokémon for each game, on its cartridge. Gen 3 shows the games' own Emerald sprite. */
@@ -212,6 +214,7 @@ export function Home({
                     <span className="flex items-center gap-2">
                       <span className="text-[17px] font-semibold">{g.name}</span>
                       <DifficultyBadge difficulty={g.difficulty} />
+                      {g.coached && <CoachBadge />}
                     </span>
                     <span className="flex flex-wrap items-center text-[12.5px] leading-snug text-muted">
                       {g.blurb.map((game, j) => (

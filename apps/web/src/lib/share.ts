@@ -19,6 +19,8 @@ export interface ShareArgs {
   format?: FormatId;
   /** The CPU difficulty; only Easy and Hard show. */
   difficulty?: Difficulty;
+  /** The coached tries (any difficulty): the header says so, with the deciding try's difficulty. */
+  coached?: boolean;
 }
 
 export interface ShareRow {
@@ -34,6 +36,8 @@ export interface ShareModel {
   format?: FormatId;
   /** "Easy" or "Hard"; nothing for Normal. */
   level?: string;
+  /** The coach helped (DESIGN.md §22). */
+  coached?: true;
   date: string;
   status: DaySummary['status'];
   /** "First try! 4/6 left", "Won on try 2 · 3/6 left", … (no emoji). */
@@ -55,9 +59,9 @@ export const DIFFICULTY_NAME: Record<Difficulty, string> = {
   hard: 'Hard',
 };
 
-/** What follows "Pokémon Daily": "Gen 4 OU · Hard · Oct 21". */
-export const shareHeader = (m: Pick<ShareModel, 'game' | 'level' | 'date'>) =>
-  [m.game, m.level, m.date].filter(Boolean).join(' · ');
+/** What follows "Pokémon Daily": "Gen 4 OU · Hard · Oct 21", "Gen 3 OU · Easy · Coached · Oct 21". */
+export const shareHeader = (m: Pick<ShareModel, 'game' | 'level' | 'coached' | 'date'>) =>
+  [m.game, m.level, m.coached && 'Coached', m.date].filter(Boolean).join(' · ');
 
 const row = (a: Attempt): ShareRow => ({
   result: a.result === 'inProgress' ? 'loss' : a.result,
@@ -73,6 +77,7 @@ export function shareModel({
   game,
   format,
   difficulty,
+  coached,
 }: ShareArgs): ShareModel {
   const { status, counted, tries, winTry } = summary;
   const date = new Date(`${day}T12:00:00`).toLocaleDateString('en-US', {
@@ -96,10 +101,13 @@ export function shareModel({
     swapped: s.species === swappedIn,
   }));
 
+  // Coached tries can span difficulties: name the one the result came from.
+  const level = coached ? (winning ?? counted.at(-1))?.difficulty : difficulty;
   return {
     ...(game && { game }),
     ...(format && { format }),
-    ...(difficulty && difficulty !== 'normal' && { level: DIFFICULTY_NAME[difficulty] }),
+    ...(level && level !== 'normal' && { level: DIFFICULTY_NAME[level] }),
+    ...(coached && { coached: true as const }),
     date,
     status,
     headline,

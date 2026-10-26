@@ -66,6 +66,23 @@ describe('share text', () => {
     expect(header('normal')).toBe('Pokémon Daily · Gen 4 OU · Oct 21');
   });
 
+  it('says Coached, with the difficulty the deciding try was played on', () => {
+    const header = (attempts: Attempt[]) =>
+      shareText({
+        day: DAY,
+        summary: summarizeDay({ swapUsed: false, attempts }, true, 'coached'),
+        streak: 1,
+        game: 'Gen 3 OU',
+        difficulty: 'normal',
+        coached: true,
+      }).split('\n')[0];
+    const easy = { ...a('win', 4), coached: true as const, difficulty: 'easy' as const };
+    expect(header([easy])).toBe('Pokémon Daily · Gen 3 OU · Easy · Coached · Oct 21');
+    expect(header([{ ...a('loss', 0), coached: true }])).toBe(
+      'Pokémon Daily · Gen 3 OU · Coached · Oct 21',
+    );
+  });
+
   it('celebrates a first-try win', () => {
     expect(text([a('win', 4)], 5)).toBe(
       [

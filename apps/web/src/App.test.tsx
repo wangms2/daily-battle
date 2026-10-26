@@ -4,6 +4,7 @@ import { act, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import scheduleJson from '../public/schedule/2026-10-19.json';
+import gen3Schedule from '../public/schedule/gen3ou/2026-10-19.json';
 import gen5Schedule from '../public/schedule/gen5ou/2026-10-26.json';
 import { App } from './App';
 import { ENGINE_VERSION } from './lib/seed';
@@ -433,6 +434,53 @@ describe('results and streak', () => {
     const picker = screen.getByRole('radiogroup', { name: 'Difficulty' });
     expect(within(picker).getByRole('radio', { name: 'Easy' })).toBeChecked();
     expect(within(picker).getByRole('radio', { name: 'Normal' })).toBeDisabled();
+  });
+
+  it('offers the coach once in Gen 3, warns about the streak, and counts coached days apart', async () => {
+    const user = userEvent.setup();
+    const gen3 = gen3Schedule as ScheduleFile;
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response(JSON.stringify(gen3), { status: 200 })),
+    );
+    const state = seeded();
+    state.settings.format = 'gen3ou';
+    state.games.gen3ou.weeks[WEEK] = {
+      team: gen3.suggestedTeams[0]!.team,
+      poolId: `${WEEK}:g${gen3.generatorVersion}:c${gen3.pool.candidate}`,
+    };
+    const won = { ...finished('win', 4, 1), lead: gen3.suggestedTeams[0]!.team[0]!.species };
+    state.games.gen3ou.days['2026-10-20'] = { swapUsed: false, attempts: [won] };
+    renderApp(state);
+    const offer = await screen.findByRole('dialog', { name: 'Want a coach?' });
+    expect(offer).toHaveTextContent('ends your 1-day streak');
+    await user.click(within(offer).getByRole('button', { name: 'Not now' }));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+    const coach = screen.getByRole('button', { name: 'Coach' });
+    expect(coach).toHaveAttribute('aria-pressed', 'false');
+    await user.click(coach);
+    const ask = await screen.findByRole('dialog', { name: 'Turn on the coach?' });
+    await user.click(within(ask).getByRole('button', { name: 'Turn on' }));
+    expect(screen.getByRole('button', { name: 'Coach on' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    // The Coached streak starts from nothing; the header says so.
+    expect(screen.getByRole('button', { name: 'Stats. Streak 0' })).toBeInTheDocument();
+    expect(screen.getByTitle('Back')).toHaveTextContent('Gen 3 · Coached · ');
+
+    // Off again before a battle: the regular streak is still there.
+    await user.click(screen.getByRole('button', { name: 'Coach on' }));
+    expect(screen.getByRole('button', { name: 'Stats. Streak 1' })).toBeInTheDocument();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('has no coach outside Gen 3', async () => {
+    renderApp(seeded({ team: { week: WEEK } }));
+    await screen.findByRole('radiogroup', { name: 'Difficulty' });
+    expect(screen.queryByRole('button', { name: /^Coach/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 });
 

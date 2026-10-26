@@ -24,6 +24,11 @@ export interface Attempt {
   /** Easy or Hard; absent for Normal (and for every attempt saved before difficulties). */
   difficulty?: 'easy' | 'hard';
   /**
+   * The coach was on (DESIGN.md §22): set when the battle starts with it, or the
+   * moment it's turned on mid-battle, and never unset. A Coached result.
+   */
+  coached?: true;
+  /**
    * Hard only: the AI's choices so far. A resume replays them instead of searching
    * again; with the seeds they reproduce the same battle.
    */
@@ -82,6 +87,10 @@ export interface Settings {
   difficulty?: Partial<Record<FormatId, Difficulty>>;
   /** Learn mode progress, per game that has lessons (Gen 3 so far). */
   tutorial?: Partial<Record<FormatId, TutorialProgress>>;
+  /** The coach is on for a game's next battles (where it's offered: lib/coach.ts). */
+  coach?: Partial<Record<FormatId, boolean>>;
+  /** The coach was offered for a game (first daily, or after graduation), so it isn't again. */
+  coachOffered?: Partial<Record<FormatId, boolean>>;
 }
 
 export interface TutorialProgress {

@@ -137,3 +137,45 @@ describe('stats', () => {
     });
   });
 });
+
+describe('coached tries', () => {
+  let ts = 0;
+  const at = (a: Attempt, extra: Partial<Attempt> = {}): Attempt => ({ ...a, ts: ++ts, ...extra });
+  const c = (a: Attempt, extra: Partial<Attempt> = {}) => at(a, { coached: true, ...extra });
+
+  it('count in their own bucket, across difficulties', () => {
+    const d = day(at(L), c(W, { difficulty: 'easy' }));
+    expect(summarizeDay(d, true, 'coached')).toMatchObject({ status: 'firstTry', winTry: 1 });
+    expect(summarizeDay(d, true, 'normal')).toMatchObject({ status: 'pending', helped: false });
+    expect(summarizeDay(d, true, 'easy')).toMatchObject({ status: 'none', helped: true });
+    const s = computeStats(history(day(c(W)), day(c(W, { difficulty: 'easy' }))), TODAY, 'coached');
+    expect(s.streak).toBe(2);
+  });
+
+  it('end the regular streak of their difficulty when played before the clear', () => {
+    // Coached first, then an uncoached win: not a regular first try.
+    const helped = day(c(L), at(W));
+    expect(summarizeDay(helped, true)).toMatchObject({ status: 'won', helped: true });
+    expect(streak(day(at(W)), helped)).toBe(0);
+    // Turned on mid-battle, still unfinished: the streak is already gone.
+    expect(streak(day(at(W)), day(c(attempt('inProgress'))))).toBe(0);
+    // Another difficulty's streak is untouched.
+    const easy = computeStats(
+      history(day(at(W, { difficulty: 'easy' })), day(c(W), at(W, { difficulty: 'easy' }))),
+      TODAY,
+      'easy',
+    );
+    expect(easy.streak).toBe(2);
+  });
+
+  it('don’t touch a streak after the day is cleared', () => {
+    const d = day(at(W), c(L));
+    expect(summarizeDay(d, true)).toMatchObject({ status: 'firstTry', helped: false });
+    expect(streak(day(at(W)), d)).toBe(2);
+  });
+
+  it('break the regular best streak on a day helped before any regular try', () => {
+    const s = computeStats(history(day(at(W)), day(c(W)), day(at(W))), TODAY);
+    expect(s).toMatchObject({ streak: 1, bestStreak: 1 });
+  });
+});

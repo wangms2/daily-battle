@@ -25,7 +25,7 @@ import { SetPicker } from '../sheets/SetPicker';
 import type { DayChange, DayState } from '../state/schema';
 import { Button, SectionLabel } from '../ui/bits';
 import { DIFFICULTY_HINT } from '../lib/difficulty';
-import { DifficultyPicker } from '../ui/Difficulty';
+import { CoachToggle, DifficultyPicker } from '../ui/Difficulty';
 import { StarIcon } from '../ui/icons';
 import { ItemIcon } from '../ui/ItemIcon';
 import { MoveChips } from '../ui/MoveList';
@@ -69,7 +69,13 @@ export function DailyBrief({
   difficulty = 'normal',
   onDifficulty,
   hardAvailable = true,
+  coach,
 }: {
+  /**
+   * The daily coach, where it's offered: on or off for the next battle, and what
+   * turning it on costs (asked first), if anything.
+   */
+  coach?: { on: boolean; warning: string | null; onChange: (on: boolean) => void };
   /** The CPU difficulty for this game; each has its own tries and streak. */
   difficulty?: Difficulty;
   onDifficulty?: (d: Difficulty) => void;
@@ -116,6 +122,7 @@ export function DailyBrief({
     kind: DayChange['kind'];
   } | null>(null);
   const [pending, setPending] = useState<DayChange | null>(null);
+  const [coachAsk, setCoachAsk] = useState<string | null>(null);
 
   useEffect(() => {
     preloadSprites(opponent.team.map((s) => s.species));
@@ -240,12 +247,23 @@ export function DailyBrief({
           right={
             onDifficulty &&
             !editing && (
-              <DifficultyPicker
-                value={difficulty}
-                onChange={onDifficulty}
-                hardAvailable={hardAvailable}
-                disabled={inProgress}
-              />
+              <div className="flex items-center gap-1.5">
+                {coach && (
+                  <CoachToggle
+                    on={coach.on}
+                    disabled={inProgress}
+                    onChange={(on) =>
+                      on && coach.warning ? setCoachAsk(coach.warning) : coach.onChange(on)
+                    }
+                  />
+                )}
+                <DifficultyPicker
+                  value={difficulty}
+                  onChange={onDifficulty}
+                  hardAvailable={hardAvailable}
+                  disabled={inProgress}
+                />
+              </div>
             )
           }
         >
@@ -423,6 +441,17 @@ export function DailyBrief({
         </main>
       )}
 
+      <ConfirmDialog
+        open={!!coachAsk}
+        onOpenChange={(o) => !o && setCoachAsk(null)}
+        title="Turn on the coach?"
+        body={coachAsk ?? ''}
+        confirm="Turn on"
+        onConfirm={() => {
+          setCoachAsk(null);
+          coach?.onChange(true);
+        }}
+      />
       <InfoSheet
         species={infoFor?.species ?? null}
         open={!!infoFor}

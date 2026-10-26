@@ -22,7 +22,10 @@ export function BattleRoute({
   onRunItBack,
   onChangeTeam,
   result,
+  coach,
 }: {
+  /** The daily coach, where it's offered (see Battle). */
+  coach?: { warning: string | null; onTurnOn: () => void };
   /** Today's result so far, for the end card. */
   result: Omit<DayResult, 'ts'>;
   day: string;
@@ -48,6 +51,7 @@ export function BattleRoute({
       aiSeed: attempt.aiSeed,
       choices: [...attempt.choices],
       ...(attempt.difficulty && { difficulty: attempt.difficulty }),
+      ...(attempt.coached && { coach: 'simple' as const }),
       ...(attempt.difficulty === 'hard' && {
         pool: [...schedule.pool.species],
         aiChoices: [...(attempt.aiChoices ?? [])],
@@ -72,6 +76,7 @@ export function BattleRoute({
       onRunItBack={onRunItBack}
       onChangeTeam={onChangeTeam}
       result={{ ...result, ts: attempt.ts }}
+      {...(coach && { coach: { ...coach, on: !!attempt.coached } })}
     />
   );
 }

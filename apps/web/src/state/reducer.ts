@@ -24,6 +24,8 @@ export type GameAction =
   /** A change for the next practice run only (after today's counted tries). */
   | { type: 'setPracticeChange'; day: string; week: string; change: DayChange | null }
   | { type: 'startAttempt'; day: string; attempt: Attempt }
+  /** The coach was turned on mid-battle: the battle in progress is coached from now on. */
+  | { type: 'coachAttempt'; day: string }
   | { type: 'recordChoice'; day: string; choice: string; ai?: AiChoices }
   | { type: 'endAttempt'; day: string; result: 'win' | 'loss' | 'forfeit'; remaining: number }
   /** Unfinished attempts from past days, or from another engine version, become forfeits. */
@@ -232,6 +234,14 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
           ...state.days,
           [action.day]: { ...rest, attempts: [...day.attempts, action.attempt] },
         },
+      };
+    }
+    case 'coachAttempt': {
+      const day = state.days[action.day];
+      if (!attemptInProgress(day)) return state;
+      return {
+        ...state,
+        days: { ...state.days, [action.day]: updateLast(day!, (a) => ({ ...a, coached: true })) },
       };
     }
     case 'recordChoice': {
