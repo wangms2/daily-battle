@@ -40,12 +40,12 @@ import { Spotlight } from '../battle/ui/Spotlight';
 import { GiveUpDialog, LogList, LogSheet, MenuSheet } from '../battle/ui/sheets';
 import { BattleLog } from '../battle/ui/BattleLog';
 import type { Settings } from '../state/schema';
-import { possibleSets } from '../lib/data';
+import { likelyMoves, possibleSets } from '../lib/data';
 import { TypeChartSheet } from '../sheets/TypeChart';
 import { streakLine, type DaySummary } from '../lib/results';
 import { Button } from '../ui/bits';
 import type { ShareModel } from '../lib/share';
-import { battleSpeed, foeSpeed, lessonSet, type SpeedCheck } from '../lib/speed';
+import { battleSpeed, foeSpeed, lessonMoves, lessonSet, type SpeedCheck } from '../lib/speed';
 import { ShareButton, TryRows } from '../ui/results';
 import { ChevronIcon, CloseIcon, InfoIcon } from '../ui/icons';
 import { CoachBadge, DifficultyBadge } from '../ui/Difficulty';
@@ -632,6 +632,17 @@ export function Battle({
   const lessonFoe = start.tutorial
     ? (start.opponentTeam as Mon[]).find((m) => m.species === foeSpecies)
     : undefined;
+  const hinted = settings.beginnerHints || !!lessonFoe || !!staged?.card;
+  // What it likely has but hasn't shown: with beginner hints, and in lessons.
+  const likely =
+    shownFoe && hinted
+      ? likelyMoves(
+          lessonFoe
+            ? [{ moves: lessonMoves(lessonFoe), weight: 1 }]
+            : possibleSets(foeSpecies, view?.revealed[foeSpecies]),
+          view?.revealed[foeSpecies]?.moves ?? [],
+        )
+      : undefined;
   // Who moves first: shown with beginner hints, and always in lessons.
   const speedCheck: SpeedCheck | undefined =
     view && shownFoe && (settings.beginnerHints || lessonFoe || staged?.card)
@@ -670,6 +681,7 @@ export function Battle({
         revealed={view.revealed[foeSpecies]}
         hints={settings.beginnerHints}
         {...(speedCheck && { speed: speedCheck })}
+        {...(likely?.length && { likely })}
         // The card sits above the spotlight, so it rings its own parts.
         {...(staged && !played && { pointAt: staged.spotlight?.before ?? [] })}
       />

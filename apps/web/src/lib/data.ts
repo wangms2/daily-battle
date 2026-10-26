@@ -82,6 +82,27 @@ export function possibleSets(
   return loose.length ? loose : all;
 }
 
+/**
+ * The moves a foe likely has but hasn't shown yet: across the sets it could
+ * still be running (each weighted by its usage), most common first.
+ */
+export function likelyMoves(
+  sets: readonly Pick<SetEntry, 'moves' | 'weight'>[],
+  shown: readonly string[],
+  max = 4,
+): string[] {
+  const id = (m: string) => toId(m).replace(/^hiddenpower[a-z]*$/, 'hiddenpower');
+  const seen = new Set(shown.map(id));
+  const weight = new Map<string, number>();
+  for (const set of sets)
+    for (const m of set.moves)
+      if (!seen.has(id(m))) weight.set(m, (weight.get(m) ?? 0) + (set.weight || 1));
+  return [...weight.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, max)
+    .map(([m]) => m);
+}
+
 /** The most common set for a species (what a tap on a pool tile picks). */
 export function topSet(species: string): SetEntry {
   return [...setsOf(species)].sort((a, b) => b.weight - a.weight)[0]!;
