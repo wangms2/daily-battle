@@ -18,7 +18,8 @@ export const immune: Lesson = {
       kind: 'demo',
       position: {
         // Dugtrio outspeeds Skarmory, so its move lands first.
-        p1: [{ species: 'Dugtrio', moves: ['Earthquake', 'Rock Slide'] }],
+        // (Arena Trap, not Sand Veil, which OU bans.)
+        p1: [{ species: 'Dugtrio', moves: ['Earthquake', 'Rock Slide'], ability: 'Arena Trap' }],
         p2: [{ species: 'Skarmory', moves: ['Drill Peck'] }],
         seed: 'course:immune:demo1',
       },
