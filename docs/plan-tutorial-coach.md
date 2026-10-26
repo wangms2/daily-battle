@@ -20,19 +20,9 @@ Working plan for the `tutorial` branch. It records what's built, the decisions b
 - **Engine builds.** `packages/engine-wasm/dist` isn't committed. After pulling the step 2 commit, rebuild it (`search_fixed` is new): `PATH="$HOME/.cargo/bin:$PATH" pnpm --filter @daily-battle/engine-wasm build:wasm` (cargo isn't on the Git Bash PATH by default).
 - **Checks.** Run from the repo root: `pnpm format`, `pnpm lint`, `pnpm typecheck`, `pnpm test` (~45 s). For one package: `npx tsc --noEmit` and `npx vitest run <file>`. `packages/sim-bridge/src/noluck.test.ts` is occasionally flaky.
 
-## Waiting on the user (2026-10-26, second round)
+## Waiting on the user
 
-1. **Warning frequency.** The user's intent: the coach steps in more when the player blunders more. A fixed bar already does this, because warnings only follow mistakes (`coach-rate`, 40 battles each, judge alone at margin 0.1, ahead in 90% of worlds):
-
-   | player                   | warned picks | per battle (median, max) | battles with none |
-   | ------------------------ | ------------ | ------------------------ | ----------------- |
-   | beginner (Easy bot)      | 16.7%        | 4, 10                    | 2 of 40           |
-   | mid (Normal bot)         | 7.7%         | 2, 7                     | 8 of 40           |
-   | strong (Hard search bot) | 0.6%         | 0, 1                     | 34 of 40          |
-
-   For comparison, the old rules alone warned the strong player on 6.2% of picks. What the margin means: the search's estimate of the pick is at least 0.1 below its best choice, in nearly every sampled foe set. In rollouts against the real AI, warnings at 0.10–0.15 gained +7 points of win rate each (Easy and Normal alike), the same as bigger gaps; under 0.10 they gained +1 to +3. Proposal: keep margin 0.1 with no cap or pacing, so frequency follows the player's mistakes. Alternative: a stricter bar (0.15) that drops to 0.1 after the player's first warned blunder in a battle.
-
-2. **Resume (still open).** Since the judge's values are saved with the attempt (decided below), save the overridden warnings with them too, so a reload never asks again?
+Nothing open. Next: step 3, showing the warning texts and the late-tip screen before wiring them.
 
 ## Decided 2026-10-26 (morning answers)
 
@@ -42,6 +32,21 @@ Working plan for the `tutorial` branch. It records what's built, the decisions b
 - **Judged tips:** appear late (when the judge finishes after the controls show).
 - **Review on resume:** save the judge's values with the attempt.
 - `Verdict` now carries `value` and `topValue` (search values) for saving and the review.
+- **Frequency:** margin 0.1, no cap or pacing. Warnings follow the player's mistakes (`coach-rate`, 40 battles each, judge alone at margin 0.1, ahead in 90% of worlds):
+
+  | player                   | warned picks | per battle (median, max) | battles with none |
+  | ------------------------ | ------------ | ------------------------ | ----------------- |
+  | beginner (Easy bot)      | 16.7%        | 4, 10                    | 2 of 40           |
+  | mid (Normal bot)         | 7.7%         | 2, 7                     | 8 of 40           |
+  | strong (Hard search bot) | 0.6%         | 0, 1                     | 34 of 40          |
+
+  The old rules alone warned the strong player on 6.2% of picks. In rollouts, warnings at gaps of 0.10–0.15 gained +7 points each, as much as bigger gaps; under 0.10, +1 to +3.
+
+- **Resume:** save the warnings the player overrode with the attempt (next to the judge's values), so a reload never asks again.
+- **Hazards (the user asked whether the coach values them).** The search does: poke-engine's Gen 3 score counts each layer of Spikes against every grounded Pokémon still alive on that side (−12 / −16 / −25 per Pokémon for 1 / 2 / 3 layers, against 100 for full HP), and it plays out the Spikes damage on switches within its 2–3 turns. So clearing Spikes from a full team is worth about half a Pokémon's HP to it. Gen 3 has no other hazards. In the 1,200 judged decisions:
+  - Every warning against Rapid Spin (5) came when the player's side had no Spikes (+22 points for the alternative). Every judged preference _for_ Rapid Spin (5) came with 2 layers on the player's side (+6.5). The text must say why ("No Spikes to clear").
+  - Recommending **Spikes** is not proven: 21 warnings where the judge preferred Spikes gained only +1.1 on average, mostly over Explosion (mixed, from −30 to +15). The fixed per-Pokémon penalty is a rough stand-in for Spikes' long-run value.
+  - So in step 4, laying Spikes, Rapid Spin, and Explosion are separate message kinds, each with its own larger sample. A kind that doesn't pass stays quiet.
 
 ## Product decisions (from the user; don't revisit without asking)
 
