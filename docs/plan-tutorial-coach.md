@@ -40,6 +40,8 @@ Questions prepared overnight, with the data behind them in "Step 2 results" belo
 4. **Resume.** After a reload, a warning the player already overrode can be asked again. Acceptable, or save the overridden warnings with the attempt?
 5. **Only true, relevant reasons.** In wording drafts (`scripts/wording-demo.ts` on real judged warnings), most read well, e.g. "Risky: if Donphan uses Earthquake, Raikou is knocked out as it comes in. Heracross takes Donphan's hits much better." But some judged gaps have no reason the facts show (Moltres's Fire Blast vs a Substitute Smeargle: the draft "Sceptile takes Smeargle's hits much better" is invented). Proposal: warn only when a template's reason is true and relevant; otherwise stay quiet.
 6. **Won either way.** Some judged warnings change nothing (rollouts 100% vs 100%: the player wins anyway). Skip warnings when both choices already look winning (say both values ≥ 0.85)?
+7. **Tips that need the judge** (setup window, walled, switch tips). A tip shows with the controls, but the judge finishes a moment later (during playback, usually). Should a judged tip appear a second or so after the controls, or wait for the next turn, or only show when the judge was already done? And "the judge agrees" with "use Calm Mind now": the setup move is the judge's top choice, or just not clearly worse than it?
+8. **Review on resume.** A review judged by the search needs each of the player's decisions judged. Judging them again on resume costs about 0.6 s each on a mid phone (30 decisions: about 18 s in the background). Save the judged values with the attempt instead (a few numbers per turn), or accept a slower review after a reload?
 
 ## Product decisions (from the user; don't revisit without asking)
 
@@ -148,7 +150,7 @@ Built as decided above (Product decisions). The original picker tag and "Play Ge
 - **Tips** (setup window, walled, switch tips) need the judge to agree too. Fact tips with no decision in them (Spikes are up, a Choice lock, the foe is asleep) stay as they are.
 - **Review** uses the judge's values instead of the utility scores, so it never contradicts what the coach said in battle.
 - **Simple and Advanced are wording levels.** Simple never mentions reads, predictions, or plans over several turns (keep the banned-words test).
-- Self-KO moves (Explosion, Self-Destruct) don't count as a "switch-in gets knocked out" threat: they knock out whatever stays in too.
+- Self-KO moves (Explosion, Self-Destruct) don't count as a "switch-in gets knocked out" threat: they knock out whatever stays in too. **Done** (`4a8a9e1`).
 
 ### 4. `tut-coach-eval`: offline check of every message shown
 
