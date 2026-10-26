@@ -19,13 +19,21 @@ Working plan for the `tutorial` branch. It records what's built, the decisions b
 ## Product decisions (from the user; don't revisit without asking)
 
 - **The coach must never give advice that's bad against the opponent the player is actually facing.** This drives the remaining work: per-difficulty validation offline (`coach-eval`) plus a runtime judge.
+- **Only good, risk-based advice (decided 2026-10-25, after the switchKo proof run).** A rule being good _on average_ isn't enough: each message must be right in its own position.
+  - **The search judges everything.** Every coached battle (lessons, Easy, Normal, Hard) runs the Hard search from the player's own view while they choose. A message shows only when the search agrees. The rules no longer decide; they only supply the plain reason.
+  - **Robust bar.** Advise A over B only when A is clearly better on average _and_ not worse in the bad cases (the foe's dangerous likely replies, and the sets it might have). Otherwise the coach stays quiet.
+  - **Risk in plain words.** Messages name the risk, one concept at a time, with no odds from the search: "Risky: if Salamence attacks, Heracross is knocked out. Swampert takes the hit safely."
+  - **Messages kept:** blunder warnings, turn tips (setup and switch tips also need the search to agree), the post-battle review (judged by the same search, so it never contradicts the battle), and reads (Hard / Advanced wording only).
+  - **Simple and Advanced are wording levels, not separate brains.** Simple never mentions reads or predictions.
+  - This replaces the per-rule gates of step 2. `coach-eval` now checks every message the coach shows, not rules on average.
+  - Proof-run result (switchKo vs Easy, 60 cases × 40 rollouts): following the advice won 71.9% vs 64.6% (+7.3 points, CI +3.8 to +10.8), with no case clearly worse. But only 72% of cases passed a per-case test, because one case's result is noisy at 40 rollouts.
 - **It must not be annoying.** At most one tip per turn, and a 3-turn gap between tips (`TIP_GAP`). Urgent tips (`koThreat`, `canKo`) need only a 2-turn gap (`URGENT_GAP`). No tip shows while a lesson prompt or beginner-hint explainer is up, and a warning the player overrode isn't repeated that battle. Warnings appear only when the blunder is actually picked. Severity still matters: the goal is "not spammy on average", not a hard cap. Measured on 20 Easy-vs-Easy battles: tips on 13% of decisions, warnings on 5%, no repeats.
 - **No per-turn move suggestions.** The coach gives tips, blunder warnings, and a post-battle review only.
-- **Two levels:**
-  - **Simple:** one-turn, visible facts only. It never mentions reads, predictions, or multi-turn plans. It's the only level in lessons, graduation, Easy, and Normal (by default).
-  - **Advanced:** uses the Hard search. It's the only level against Hard, and optional on Normal. It's never offered on Easy or in lessons.
+- **Two wording levels** (both judged by the search, see above):
+  - **Simple:** plain wording. It never mentions reads, predictions, or multi-turn plans. It's the only level in lessons, graduation, Easy, and Normal (by default).
+  - **Advanced:** adds reads. It's the only level against Hard, and optional on Normal. It's never offered on Easy or in lessons.
 - **Daily coach (built):**
-  - Gen 3 only. Offered on Easy and Normal. **Hidden on Hard until Advanced exists**; it's enabled there by `tut-coach-advanced`.
+  - Gen 3 only. Offered on Easy and Normal. **Hidden on Hard until Advanced wording exists**; it's enabled there by `tut-coach-reads`.
   - Off by default. Offered once on a game's first daily brief and again after graduation.
   - Coached tries form a separate **Coached** bucket per game, shared across difficulties, with its own streak and stats.
   - A coached try before the day is cleared ends only **that difficulty's** regular streak. Coached practice after a clear doesn't affect it.
@@ -82,71 +90,52 @@ Each step is a separate commit with tests, and runs format, lint, typecheck, and
 
 Built as decided above (Product decisions). The original picker tag and "Play Gen 3" button were dropped.
 
-### 2. `tut-coach-eval`: offline coach-quality validation (the core quality gate)
+### 2. `tut-coach-judge`: the search judges every message
 
-Goal: each rule × opponent difficulty × level is proven not to hurt against **that exact AI**. Rules that fail are switched off for that difficulty by a generated gates file that the coach reads at runtime.
+- **Search on the player's view.** Run `HardPolicy`'s search with the **player** as side one, from the player's own `SideView`, sampling foe worlds from beliefs plus the weekly pool, exactly as Hard does for itself. It never sees the foe's real sets. Run it in the battle worker **while the player chooses**, about 20–40k iterations (measure on a phone). Cache per request; warnings, tips, and the review all reuse it. Used in every coached battle: lessons, Easy, Normal, Hard. Load the Gen 3 WASM whenever the coach is on.
+- **Robust check.** A over B only when A's value beats B's by a clear margin overall **and** in nearly every sampled world (start with 7 of 8; tune with data). The search already lets the foe pick strong replies, so it leans cautious. Otherwise: quiet.
+- **Timing (decided).** If the player taps before the search is done, hold the choice up to about 1 s with "Coach is checking…" on the controls, then warn if needed. Still not done: the choice goes through with no warning.
+- **Fallback (decided).** No engine or a failed search means **silence** for that turn, never unchecked rules.
+- **Foe model (decided).** Teach good play: advice must be good against a strong foe _and_ not worse against the real AI (checked offline in step 4). If they disagree, the coach stays quiet; it never teaches habits that only work on Easy.
+- Keep the pacing rules (one tip a turn, `TIP_GAP`, no repeats, nothing over a lesson prompt or hint).
+- **Tests:** the judge agrees on clear-cut positions (a switch into a knockout, a move that does nothing); silence without the engine; hidden info (swapping the foe's hidden sets gives the same output until they're revealed); the rate test still holds.
 
-- **Script:** `packages/tutorial/scripts/coach-eval.ts` (add a `coach-eval` package script), modelled on `packages/ai/scripts/eval.ts`.
-  1. **Collect advice.** Play Gen 3 battles, using teams from weekly pools vs daily opponents. The player bot is beginner-ish (Easy and mid presets); the opponent is each of Easy, Normal, and Hard. At every player decision, run the coach (each level available for that opponent) and record each warning ("not X", with its suggested alternative) and each tip that implies an action.
-  2. **Counterfactual rollouts.** Fork at the decision by replaying the seed plus the choice log. Branch A plays the advised action; branch B plays the action it argues against. If a warning has no explicit alternative, use the best other option by the coach's ranking. Play each branch to the end R times (R ≈ 30–50) with the **real opponent policy**. Continue the player's side with a fixed `STRONG` policy. Use **common random numbers**: the same continuation seeds in both branches. Only the opponent sees real sets.
-  3. **Score.** A case passes when the advised branch's win rate is at least the other branch's minus 2 points; a tie passes.
-  4. **Gates:**
-     - **Simple:** passes in ≥ 90% of cases, with at least 50 samples.
-     - **Advanced:** passes in ≥ 85% of cases.
+### 3. `tut-coach-messages`: rules explain, the judge decides
 
-     Otherwise the rule is disabled for that difficulty. Write `packages/tutorial/src/coach/coach-gates.gen3.json` with entries `{ rulesHash, gates: { [rule]: { [difficulty]: { simple?, advanced? } } } }`.
+- Each rule becomes an **explanation** for a judged gap, not a trigger. A warning needs the judge to say the pick is clearly worse; the rule supplies the plain reason. A judged gap that no rule explains gets a generic reason from the facts ("Swampert takes much less damage here"); keep these rare.
+- **Risk wording (decided).** Name the risk plainly, one concept at a time, no odds: "Risky: if Salamence attacks, Heracross is knocked out. Swampert takes the hit safely." The foe's likely replies come from the search's foe-side visits; what each does comes from the damage calc.
+- **Tips** (setup window, walled, switch tips) need the judge to agree too. Fact tips with no decision in them (Spikes are up, a Choice lock, the foe is asleep) stay as they are.
+- **Review** uses the judge's values instead of the utility scores, so it never contradicts what the coach said in battle.
+- **Simple and Advanced are wording levels.** Simple never mentions reads, predictions, or plans over several turns (keep the banned-words test).
+- Self-KO moves (Explosion, Self-Destruct) don't count as a "switch-in gets knocked out" threat: they knock out whatever stays in too.
 
-  5. **Report:** `--report` writes Markdown. For each rule × difficulty, show sample positions (both actives, HP, field), the advice text, both branches' win rates with confidence intervals, and the verdict, with the worst failures first.
-- **Runtime:** the `Coach` takes the opponent's `difficulty` and drops gated-off rules (add `gates.ts`). Lesson battles use the Easy gates. Scripted foes need no gates; their prompts are authored.
-- **CI** (`.github/workflows/ci.yml`):
-  - Fail if `rulesHash` doesn't match the current rule set, so changing rules forces a re-run.
-  - Run a small smoke sample on PRs that fails if an enabled rule falls below its bar.
-  - Run the full eval as a manual or scheduled job.
-- **Lesson content check:** each quiz's "best" answer must win at least as often as the alternatives against the lesson's own foe (scripted or Easy). The same goes for mini-battle prompts that recommend an action.
-- **Cost:** Hard rollouts are slow. Use a reduced Hard search budget for the _opponent_ only if the results match full budget on a sample, and document that choice. Parallelise across worker threads or processes. Report the run time.
-- Before writing much code, sanity-check the approach on one rule (`switchKo` vs Easy) end to end.
+### 4. `tut-coach-eval`: offline check of every message shown
 
-### 3. `tut-coach-advanced`: the Advanced coach (Hard search on the player's view)
+- `packages/tutorial/scripts/coach-eval.ts` (started; proof of concept for switchKo vs Easy) and `BattleSession.reseed`.
+- **Collect** the messages the coach actually shows (warnings with their alternative, tips that imply an action) in Gen 3 battles: weekly-pool teams, played by beginner-ish bots (Easy, mid), against the daily opponent on Easy, Normal, and Hard.
+- **Roll out** each case to the end R times per branch with the **real opponent AI**, the strong bot for the player, and shared luck between branches (`reseed`).
+- **Bar:** almost no shown message is worse than its alternative. Report the pooled gain with its CI, and the share of messages clearly worse (by more than 2 SE), per message kind and difficulty. Exact targets to agree after the first full run.
+- **Report** (`--report`, Markdown): worst cases first, with the position, the text, and both branches' win rates.
+- **Cost:** Hard rollouts are slow (full search: about 40 CPU-hours per kind of message). Use a reduced Hard budget for the _opponent_ only if it matches full budget on a sample, and say so. Parallelise across processes. Report the run time.
+- **CI:** a small smoke sample on PRs; the full run as a manual or scheduled job.
+- **Lesson content check:** each quiz's "best" answer must win at least as often as the alternatives against the lesson's own foe, and the same for mini-battle prompts that recommend an action.
 
-- Run `HardPolicy`'s search with the **player** as side one, using the player's own `SideView` and sampling foe worlds from beliefs plus the weekly pool, exactly as Hard does for itself. Run it in the battle worker **while the player is choosing**, so it adds no wait, with a budget of about 20–40k iterations. Cache the result per request; blunder checks reuse it.
-- **Text from the search:**
-  - **Reads** come from the foe-side visit distribution: "Likely foe move: Earthquake (≈60%)."
-  - **Better lines** come from the player-side values: "Switching to Skarmory scores best."
+### 5. `tut-coach-reads`: reads in Advanced wording
 
-  Use templates only, and check wording with a test that lists the banned concepts per level.
+- **Reads** from the foe-side visits: "Likely foe move: Earthquake." Only in Advanced wording.
+- **Availability:** Advanced wording on Hard (enable Hard in `coachAvailable`), and opt-in on Normal via `settings.coachLevelNormal: 'simple' | 'advanced'` (the toggle shows the choice only there). Never on Easy or in lessons. The level doesn't affect streaks.
+- The review on Advanced adds the expected foe reply. Reads go through `coach-eval` like any message.
 
-- If the WASM isn't loaded yet or the search fails, fall back to Simple **for that turn**.
-- **Availability:**
-  - **Hard:** Advanced only (enable Hard in `coachAvailable`).
-  - **Normal:** opt-in via `settings.coachLevelNormal: 'simple' | 'advanced'`. The toggle shows a Simple/Advanced choice only there. Picking Advanced loads the Gen 3 WASM, as Hard does.
-  - **Easy and lessons:** never.
-  - The level doesn't affect streaks: any coached attempt counts as Coached.
-- The review on Advanced adds the stronger line and the foe reply it expects.
-- **Tests:**
-  - Simple never emits Advanced-tagged rules or banned wording.
-  - Advanced produces a read tip on a known position vs Hard.
-  - Falls back to Simple without the engine.
-  - Hidden-info: swapping the foe's hidden sets gives identical output until they're revealed.
-- Re-run `coach-eval` with Advanced and commit the updated gates. Advanced read rules that fail against Normal are gated off there; their Simple counterparts stay.
-
-### 4. `tut-coach-judge`: the runtime judge for each position
-
-- A warning shows only if the judge agrees that the flagged choice is clearly worse than the suggested alternative **against this opponent**. If they disagree, the coach stays quiet.
-  - **Easy/Normal:** a reply-aware one-turn check using the **opponent's own preset params** (its likely replies over the foe's possible sets), not full rollouts. Budget ≤ 500 ms on a phone, run while the player chooses.
-  - **Hard:** the Advanced search is the judge.
-- **AI-only warnings:** when the judge sees a large gap that no rule explains, warn anyway with a generic reason built from the score breakdown ("Swampert takes much less damage here"). Keep these rare; they go through `coach-eval` like any rule.
-- Re-run the rate test (warnings < 0.1, tips < 0.2 per decision) and `coach-eval`.
-
-### 5. `tut-versus-coach`: coach in Versus
+### 6. `tut-versus-coach`: coach in Versus
 
 - Add a per-player `coached` flag to the room protocol in `packages/versus` / `apps/server`. Show a coach badge for that player in the lobby, battle header, standings, and spectate view. Reuse `CoachBadge`. No streak effect.
-- The coach runs client-side from the player's own view, as in the daily, with the level picked by the room's opponent type.
+- The coach runs client-side from the player's own view, as in the daily.
 - Tests: the protocol round-trips the flag, and the badge renders for others.
 
-### 6. `tut-e2e-docs`: E2E and docs
+### 7. `tut-e2e-docs`: E2E and docs
 
 - **Playwright:** open Learn → finish lesson 1 → answer a quiz → start a coached Gen 3 daily (see the warning or offer) → see the review on the end card.
-- **DESIGN.md:** §22 exists. Update §10 (state: `coach`, `coachOffered`, `coachLevelNormal`, `Attempt.coached`, `tutorial`), §11 (share: Coached), §12.2c (beginner hints vs the coach), and §18 (the Versus badge). Add a Learn mode section to the web README. Fold anything still useful from this file into DESIGN.md, then delete it.
+- **DESIGN.md:** update §22 for the judge and risk wording, §10 (state: `coach`, `coachOffered`, `coachLevelNormal`, `Attempt.coached`, `tutorial`), §11 (share: Coached), §12.2c (beginner hints vs the coach), and §18 (the Versus badge). Add a Learn mode section to the web README. Fold anything still useful from this file into DESIGN.md, then delete it.
 
 ## Accepted edge cases (known, not bugs)
 
@@ -157,6 +146,7 @@ Goal: each rule × opponent difficulty × level is proven not to hurt against **
 ## Gotchas
 
 - Windows + PowerShell. When editing LF files with string replacement, check the needle matched (PowerShell `.Replace` fails silently). Don't name a PowerShell helper `R` (it's an alias).
+- Python's text mode on Windows writes CRLF: open files with `newline=''`, or run prettier after.
 - Vitest in `packages/tutorial` hides `console.log`. Write scratch measurements to a file.
 - In App tests, `TopBar`'s back button is found by its `title="Back"`, not an `aria-label`, because existing tests find it by text. Gen 3 App tests need the Gen 3 schedule fixture (`public/schedule/gen3ou/2026-10-19.json`); Gen 4 species crash Gen 3 tiles.
 - Commit messages: write them to a file and use `git commit -F`, ending with `Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>`. (Claude Code can use its own trailer.)
