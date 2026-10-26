@@ -114,19 +114,19 @@ describe('Warning explanations', () => {
       };
       return explainWarning(view, turnFacts(view, data), verdict, { taught });
     };
-    // Immunity to Ground is lesson 4.
+    // Immunity to Ground is lesson 3.
     const immune = {
       p1: [{ species: 'Swampert', moves: ['Surf', 'Earthquake', 'Ice Beam'] }],
       p2: [MENCE],
     };
-    expect(at(immune, 'move 2', 'move 3', 3)).toBeUndefined();
-    expect(at(immune, 'move 2', 'move 3', 4)?.reason).toBe('noEffect');
+    expect(at(immune, 'move 2', 'move 3', 2)).toBeUndefined();
+    expect(at(immune, 'move 2', 'move 3', 3)?.reason).toBe('noEffect');
     // Steel can't be poisoned: status, lesson 12, even though it's a "does nothing".
     const steel = {
       p1: [{ species: 'Jirachi', moves: ['Toxic', 'Psychic'] }],
       p2: [{ species: 'Skarmory', setId: 'skarmory-standard' }],
     };
-    expect(at(steel, 'move 1', 'move 2', 4)).toBeUndefined();
+    expect(at(steel, 'move 1', 'move 2', 3)).toBeUndefined();
     expect(at(steel, 'move 1', 'move 2', 12)?.noEffect).toBe('statusImmune');
   });
 

@@ -9,13 +9,12 @@ import type { CoachRule } from './simple';
 
 /** The lesson that teaches each warning reason. */
 export const REASON_LESSON: Record<WarningReason, number | null> = {
-  // 1 A turn: knockouts, and status moves that heal.
+  // 1 A turn: knockouts, stronger moves do more damage, and status moves that heal.
   missedKo: 1,
   fails: 1,
-  // 3 Super effective and resisted.
-  weaker: 3,
-  // 4 Immune (other no-effect kinds: see `NO_EFFECT_LESSON`).
-  noEffect: 4,
+  weaker: 1,
+  // 3 Immune (other no-effect kinds: see `NO_EFFECT_LESSON`).
+  noEffect: 3,
   // 10 Switch to take the hit.
   staysKo: 10,
   switchKo: 10,
@@ -29,10 +28,10 @@ export const REASON_LESSON: Record<WarningReason, number | null> = {
   explosion: null,
 };
 
-/** A move that does nothing, by why: types and Levitate in lesson 4, the rest with their topic. */
+/** A move that does nothing, by why: types and Levitate in lesson 3, the rest with their topic. */
 export const NO_EFFECT_LESSON: Record<NoEffect['kind'], number | null> = {
-  type: 4,
-  ability: 4,
+  type: 3,
+  ability: 3,
   statused: 12,
   statusImmune: 12,
   sleepClause: 13,

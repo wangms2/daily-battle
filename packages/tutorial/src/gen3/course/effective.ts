@@ -1,4 +1,4 @@
-// Course lesson 3, Super effective and resisted (docs/plan-tutorial-coach.md,
+// Course lesson 2, Super effective and resisted (docs/plan-tutorial-coach.md,
 // step 4b). Prototype of the redesigned lessons: the idea is shown on the
 // battle screen, one turn at a time. Positions keep later ideas out of play:
 // no knockouts, no weather, no abilities that act, full HP on both sides,
@@ -12,7 +12,7 @@ export const effective: Lesson = {
   id: 'gen3-effective',
   draft: true,
   format: 'gen3ou',
-  number: 3,
+  number: 2,
   title: 'Super effective and resisted',
   summary: 'A move’s type against the target’s types decides how hard it hits.',
   steps: [

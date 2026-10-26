@@ -378,7 +378,10 @@ export class SidePresenter {
     let before = viewOf(this.dex, this.client, me, order, this.spectator);
     for (const line of update.lines) {
       for (const { args, kwArgs } of Protocol.parse(line)) {
-        const text = cleanText(this.formatter.formatText(args, kwArgs));
+        // A `[silent]` line (a lesson setting HP) changes the battle, not its text.
+        const text = (kwArgs as { silent?: unknown }).silent
+          ? ''
+          : cleanText(this.formatter.formatText(args, kwArgs));
         this.client.add(args, kwArgs);
         const a = args as readonly string[];
         const kw = kwArgs as Record<string, unknown>;

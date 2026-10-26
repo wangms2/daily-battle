@@ -588,7 +588,13 @@ function Demo({
       replayBackend(async () => {
         const b = createBackend();
         if (!b.turn) return null;
-        const t = await b.turn(format, step.position, step.turn, [...before, ...after]);
+        const t = await b.turn(
+          format,
+          step.position,
+          step.turn,
+          [...before, ...after],
+          !!step.whole,
+        );
         setTurn(t);
         return t;
       }),

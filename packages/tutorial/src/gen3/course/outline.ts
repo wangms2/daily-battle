@@ -20,23 +20,22 @@ export interface CourseUnit {
 export const gen3Course: CourseUnit[] = [
   {
     title: 'The battle',
-    lessons: [
-      { number: 1, title: 'A turn', star: 'Swampert' },
-      { number: 2, title: 'Switching', star: 'Skarmory' },
-    ],
+    lessons: [{ number: 1, title: 'A turn', star: 'Swampert', id: 'gen3-turn' }],
   },
   {
     title: 'Damage',
     lessons: [
-      { number: 3, title: 'Super effective and resisted', star: 'Starmie', id: 'gen3-effective' },
-      { number: 4, title: 'Immune', star: 'Gengar' },
-      { number: 5, title: 'Same-type bonus', star: 'Salamence' },
-      { number: 6, title: 'Physical and special', star: 'Blissey' },
+      { number: 2, title: 'Super effective and resisted', star: 'Starmie', id: 'gen3-effective' },
+      { number: 3, title: 'Immune', star: 'Gengar' },
+      { number: 4, title: 'Same-type bonus', star: 'Salamence' },
+      { number: 5, title: 'Physical and special', star: 'Blissey' },
     ],
   },
   {
-    title: 'Turn order',
+    // Switching comes once types give a reason to switch.
+    title: 'Switching and turn order',
     lessons: [
+      { number: 6, title: 'Switching', star: 'Skarmory' },
       { number: 7, title: 'Speed', star: 'Jolteon' },
       { number: 8, title: 'Priority', star: 'Breloom' },
     ],

@@ -416,6 +416,9 @@ export function presentTurn(
   session.choose('p1', choice);
   const foe = session.request('p2');
   if (foe && turn.p2) session.choose('p2', resolveStep(turn.p2, foe) ?? '');
+  // A foe knocked out sends in its next Pokémon, as in a battle.
+  const next = !session.ended && session.request('p2');
+  if (next && next.requestType === 'switch') session.choose('p2', legalChoices(next)[0]!);
   const lines = session.drain('p1');
   // A demo shows your move: the turn stops before the foe's (it moves second).
   const foeMoves = whole ? -1 : lines.findIndex((l) => l.startsWith('|move|p2a:'));

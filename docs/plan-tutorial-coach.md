@@ -220,9 +220,9 @@ Asked by the user (2026-10-26) after the lesson review page (https://claude.ai/a
 - **Practice plays out.** After the player answers a practice position, the turn plays with their choice (real animations). If it wasn't best, the coach card gives the reason (the coach's own words) and **Show the better choice** replays the same turn with it, with the You / Better tags of review mode. Try again any time.
 - **Short lessons:** one idea each, 3–5 minutes, about 5–7 steps (show it, try it twice, a short battle).
 - **Curriculum** (18 lessons in 7 units, then graduation; each needs only the ones before it):
-  1. The battle: 1 A turn, 2 Switching
-  2. Damage: 3 Super effective and resisted, 4 Immune, 5 Same-type bonus, 6 Physical vs special (Gen 3)
-  3. Turn order: 7 Speed, 8 Priority
+  1. The battle: 1 A turn
+  2. Damage: 2 Super effective and resisted, 3 Immune, 4 Same-type bonus, 5 Physical vs special (Gen 3)
+  3. Switching and turn order: 6 Switching (moved after Damage, 2026-10-26: before types there's no reason to switch), 7 Speed, 8 Priority
   4. Risk and switching: 9 What can the foe do to you?, 10 Switch to take the hit, 11 Free turns
   5. Lasting effects: 12 Burn and paralysis, 13 Toxic and sleep, 14 Spikes and Rapid Spin
   6. Getting ahead: 15 Setting up, 16 Items

@@ -150,6 +150,8 @@ export interface DemoStep {
   /** The coach card before the turn plays, and after it. One idea, plainly. */
   before: string;
   after: string;
+  /** Show the foe's move too (normally the demo stops once your move lands). */
+  whole?: boolean;
   /**
    * Parts of the screen to point at, before the turn and after it: `foe-types`,
    * `foe-hp`, `foe-plate`, the same for `you`, `log` (the battle text), or a
