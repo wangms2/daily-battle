@@ -38,6 +38,8 @@ export interface TeamMark {
   species?: string;
   fainted: boolean;
   status: string;
+  /** HP %, once it has been seen. */
+  hp?: number;
 }
 
 /** What the player knows about a foe Pokémon from what it has done so far. */

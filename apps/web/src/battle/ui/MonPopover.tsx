@@ -39,6 +39,8 @@ type Props = {
       speed?: SpeedCheck;
       /** A lesson foe: its set is known, so there are no other sets it could be. */
       known?: boolean;
+      /** Not in battle (tapped in its team row): show its HP, which no plate shows. */
+      benched?: boolean;
       /**
        * Parts of the card a lesson points at (`foe-ability`, `foe-stats`,
        * `foe-speed`): the card sits above the spotlight, so it rings them itself.
@@ -56,13 +58,15 @@ export function MonPopover(props: Props) {
   const status = props.foe ? props.mon.status : props.member.status;
   const boosts = props.foe ? props.mon.boosts : (props.mon?.boosts ?? {});
   const hp = props.foe
-    ? `${props.mon.hp}%`
+    ? props.mon.fainted
+      ? 'Fainted'
+      : `${props.mon.hp}%`
     : props.member.fainted
       ? 'Fainted'
       : `${props.member.hpExact.hp}/${props.member.hpExact.max}`;
   // A foe's HP is on its plate already: its card keeps to what the plate doesn't show.
   const first = [
-    props.foe ? '' : hp,
+    props.foe && !props.benched ? '' : hp,
     status && STATUS_LABEL[status],
     ...boostLabels(boosts),
   ].filter(Boolean);

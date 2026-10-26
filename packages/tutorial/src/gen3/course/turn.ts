@@ -35,7 +35,7 @@ export const turn: Lesson = {
         seed: 'course:turn:look2',
       },
       before:
-        'Your team is in the bottom row, and the foe’s is under its name. Both show who’s left.',
+        'Your team is in the bottom row, and the foe’s is under its name: who’s left on each side. Tap one to see it.',
       spotlight: { before: ['your-team', 'foe-team'] },
     },
     {

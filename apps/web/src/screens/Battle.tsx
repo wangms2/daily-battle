@@ -24,6 +24,7 @@ import {
   type Controls,
   type EngineStart,
   type Frame,
+  type MonView,
   type TeamMember,
   type TurnPackage,
   type TurnReplay,
@@ -230,6 +231,8 @@ export function Battle({
   const [coachAsk, setCoachAsk] = useState<string | null>(null);
   const [monFor, setMonFor] = useState<Who | null>(staged?.card === 'foe' ? 'foe' : null);
   const [tourAt, setTourAt] = useState(0);
+  // A foe team icon tapped: its card shows instead of the active foe's.
+  const [foePick, setFoePick] = useState<string | null>(null);
   const [floats, setFloats] = useState<Float[]>([]);
   // Showdown's move animations, loaded on demand when animations are on.
   const [anims, setAnims] = useState<typeof AnimPlay | null>(null);
@@ -607,21 +610,36 @@ export function Battle({
     </div>
   );
 
+  // The foe whose card is open: the one in battle, or one tapped in its team row.
+  const picked =
+    foePick && foePick !== (view?.foe?.base ?? view?.foe?.species)
+      ? view?.foeTeam.find((m) => m.species === foePick)
+      : undefined;
+  const shownFoe: MonView | null = picked
+    ? {
+        species: picked.species!,
+        hp: picked.fainted ? 0 : (picked.hp ?? 100),
+        status: picked.status,
+        boosts: {},
+        substitute: false,
+        fainted: picked.fainted,
+      }
+    : (view?.foe ?? null);
   // A lesson's foe is fixed content: its set is known, so its Speed is exact.
-  const foeSpecies = view?.foe ? (view.foe.base ?? view.foe.species) : '';
+  const foeSpecies = shownFoe ? (shownFoe.base ?? shownFoe.species) : '';
   const lessonFoe = start.tutorial
     ? (start.opponentTeam as Mon[]).find((m) => m.species === foeSpecies)
     : undefined;
   // Who moves first: shown with beginner hints, and always in lessons.
   const speedCheck: SpeedCheck | undefined =
-    view?.foe && (settings.beginnerHints || lessonFoe || staged?.card)
+    view && shownFoe && (settings.beginnerHints || lessonFoe || staged?.card)
       ? {
           ...foeSpeed(
-            view.foe.species,
+            shownFoe.species,
             lessonFoe
               ? [lessonSet(lessonFoe)]
               : possibleSets(foeSpecies, view.revealed[foeSpecies]),
-            { boost: view.foe.boosts.spe, status: view.foe.status, weather: view.weather },
+            { boost: shownFoe.boosts.spe, status: shownFoe.status, weather: view.weather },
           ),
           ...(active?.stats.spe && view.you
             ? {
@@ -641,10 +659,12 @@ export function Battle({
       : undefined;
 
   const popover =
-    monFor === 'foe' && view?.foe ? (
+    monFor === 'foe' && view && shownFoe ? (
       <MonPopover
         foe
-        mon={view.foe}
+        mon={shownFoe}
+        // Not in battle: its HP isn't on a plate, so the card has it.
+        benched={!!picked}
         revealed={view.revealed[foeSpecies]}
         hints={settings.beginnerHints}
         {...(speedCheck && { speed: speedCheck })}
@@ -707,7 +727,16 @@ export function Battle({
         onFloatDone={floatDone}
         onTap={skip}
         info={monFor}
-        onInfo={setMonFor}
+        onInfo={(who) => {
+          setFoePick(null);
+          setMonFor(who);
+        }}
+        onPick={(species) => {
+          // A second tap on the same one closes it.
+          const open = monFor === 'foe' && foePick === species;
+          setFoePick(open ? null : species);
+          setMonFor(open ? null : 'foe');
+        }}
         busy={playing}
         popover={popover}
       />

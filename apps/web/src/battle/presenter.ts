@@ -248,6 +248,7 @@ function teamMarks(dex: ModdedDex, side: ClientSide, order?: string[]): TeamMark
     species: species ?? (p && teamSpecies(dex, p.speciesForme)),
     fainted: !!p?.fainted,
     status: p?.status ?? '',
+    ...(p?.maxhp ? { hp: p.fainted ? 0 : Math.round((100 * p.hp) / p.maxhp) } : {}),
   });
   const marks = order
     ? order.map((s) =>

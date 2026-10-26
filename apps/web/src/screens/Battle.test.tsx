@@ -50,7 +50,8 @@ const view = (turn: number, foeHp = 100): View => ({
   })),
   foeTeam: [
     { species: 'Gyarados', fainted: false, status: '' },
-    ...Array.from({ length: 5 }, () => ({ fainted: false, status: '' })),
+    { species: 'Tyranitar', fainted: false, status: '', hp: 62 },
+    ...Array.from({ length: 4 }, () => ({ fainted: false, status: '' })),
   ],
 });
 const frame = (text: string, v: View, kind?: NonNullable<Frame['event']>['kind']): Frame => ({
@@ -214,6 +215,20 @@ function renderBattle(
 }
 
 const thunderbolt = () => screen.findByRole('button', { name: /^Thunderbolt, / });
+
+describe('the foe team row', () => {
+  it('opens the card of a foe Pokémon not in battle, with its HP', async () => {
+    renderBattle(fakeBackend([]).backend);
+    await thunderbolt();
+    await userEvent.click(screen.getByRole('button', { name: /^Foe's Tyranitar, 62% HP/ }));
+    const card = screen.getByRole('tooltip');
+    expect(card).toHaveTextContent('Tyranitar');
+    expect(card).toHaveTextContent('62%');
+    // A second tap closes it.
+    await userEvent.click(screen.getByRole('button', { name: /^Foe's Tyranitar/ }));
+    expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
+  });
+});
 
 describe('first-battle tour', () => {
   it('walks through the moves, your team, and the foe card once, then says it was seen', async () => {
