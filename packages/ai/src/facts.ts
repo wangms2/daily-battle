@@ -99,6 +99,9 @@ export interface Facts {
 
 const NO_THREAT: Threat = { frac: 0, ko: 0, move: '', type: '', effectiveness: 1 };
 
+/** Moves that knock out their user. */
+const SELF_KO = new Set(['explosion', 'selfdestruct']);
+
 /** Abilities that make a type of move do nothing (Gen 3 on). */
 const ABSORB: Record<string, string> = {
   levitate: 'Ground',
@@ -207,13 +210,18 @@ export function turnFacts(view: SideView, data: SetsFile): Facts {
     foes.map((f) => f.ability),
   );
 
-  const threatOn = (calc: Pokemon, species: string): Threat => {
+  /**
+   * The foe's best hit on one of ours. For a switch-in, moves that knock out
+   * the foe too don't count: they'd knock out whatever stayed in just the same.
+   */
+  const threatOn = (calc: Pokemon, species: string, switchIn = false): Threat => {
     let frac = 0;
     let ko = 0;
     const byMove = new Map<string, number>();
     for (const f of foes) {
       let best: Hit & { move: string } = { frac: 0, ko: 0, move: '' };
       for (const move of f.moves) {
+        if (switchIn && SELF_KO.has(moveId(move))) continue;
         const h = hit(f.mon, calc, move, toOwn);
         if (h.frac > best.frac) best = { ...h, move };
       }
@@ -255,7 +263,7 @@ export function turnFacts(view: SideView, data: SetsFile): Facts {
       species: mon.species,
       hpFrac: mon.hpFrac,
       entry,
-      taken: threatOn(calc, mon.forme),
+      taken: threatOn(calc, mon.forme, true),
       best: bestOn(calc, req.moves),
     });
   }

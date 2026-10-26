@@ -99,6 +99,17 @@ describe('Simple coach warnings', () => {
     expect(t.warnings['switch 2']?.text ?? '').not.toContain('Earthquake');
   });
 
+  it('doesn’t blame a switch for Explosion, which knocks out whatever stays in too', () => {
+    const t = coachAt({
+      p1: [
+        { species: 'Dugtrio', setId: 'dugtrio-choice-band' },
+        { species: 'Jynx', setId: 'jynx-special-sweeper' },
+      ],
+      p2: [{ species: 'Gengar', setId: 'gengar-offensive' }],
+    });
+    expect(t.warnings['switch 2']?.text ?? '').not.toContain('Explosion');
+  });
+
   it('warns about staying in to be knocked out when a safe switch exists', () => {
     const t = coachAt({
       p1: [
