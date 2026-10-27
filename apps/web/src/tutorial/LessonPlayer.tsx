@@ -11,6 +11,7 @@ import type {
 import { gen3Course } from '@daily-battle/tutorial/lessons';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { BattleBackendContext, useBattleBackend } from '../battle/backend';
+import { startTutorialMusic, stopTutorialMusic } from '../lib/audio';
 import { replayBackend } from '../battle/replay-backend';
 import type { BattleBackend } from '../battle/backend';
 import type { EngineStart, LessonTurn } from '../battle/frames';
@@ -65,6 +66,13 @@ export function LessonPlayer({
 
   // A fresh start opens on the lesson's card; resuming goes straight to the step.
   const [started, setStarted] = useState(index > 0);
+  // The tutorial track on the lesson's screens; its practice battle plays the battle music.
+  const inBattle = started && step.kind === 'battle';
+  useEffect(() => {
+    if (inBattle) return;
+    startTutorialMusic();
+    return () => stopTutorialMusic();
+  }, [inBattle]);
   const back = useMemo(() => (index > 0 ? () => onStep(index - 1) : undefined), [index, onStep]);
   const forward = useMemo(
     () =>

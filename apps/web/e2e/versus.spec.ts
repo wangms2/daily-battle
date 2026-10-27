@@ -334,8 +334,8 @@ test('a player who gives up mid-battle loses it, and a reload resumes', async ({
   await expect(silver.locator(MOVES).first()).toBeVisible({ timeout: 20_000 });
   // Silver gives up: Gold wins the battle, and Silver loses a life.
   await silver.getByRole('button', { name: 'Battle menu' }).click();
-  await silver.getByRole('button', { name: 'Give up' }).click();
-  await silver.getByRole('dialog').getByRole('button', { name: 'Give up' }).click();
+  await silver.getByRole('button', { name: 'Forfeit' }).click();
+  await silver.getByRole('dialog').getByRole('button', { name: 'Forfeit' }).click();
   await expect(page.getByRole('dialog', { name: 'Battle over' })).toContainText('You won');
   await expect(page.getByRole('dialog', { name: 'Battle over' })).toContainText('Silver gave up.');
   await page.getByRole('button', { name: 'Back to the room' }).click();
@@ -348,8 +348,8 @@ test('a player who gives up mid-battle loses it, and a reload resumes', async ({
 /** Gives up the battle on screen and goes back to the room. */
 async function giveUp(page: Page) {
   await page.getByRole('button', { name: 'Battle menu' }).click();
-  await page.getByRole('button', { name: 'Give up' }).click();
-  await page.getByRole('dialog').getByRole('button', { name: 'Give up' }).click();
+  await page.getByRole('button', { name: 'Forfeit' }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Forfeit' }).click();
   await page.getByRole('button', { name: 'Back to the room' }).click();
 }
 

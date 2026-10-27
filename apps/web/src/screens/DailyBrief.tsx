@@ -16,6 +16,7 @@ import {
   STAT_LABEL,
   type Slot,
 } from '../lib/data';
+import { startBuilderMusic, stopBuilderMusic } from '../lib/audio';
 import { finalStats } from '../lib/stats';
 import { dayHeadline, streakLine, type DaySummary } from '../lib/results';
 import { getSprite, preloadSprites } from '../lib/sprites';
@@ -124,6 +125,13 @@ export function DailyBrief({
   const [pending, setPending] = useState<DayChange | null>(null);
   const [coachAsk, setCoachAsk] = useState<string | null>(null);
 
+  // The builder's track plays on while the lead is picked, until the day is decided.
+  const playing = result.summary.status === 'none' || result.summary.status === 'pending';
+  useEffect(() => {
+    if (!playing) return;
+    startBuilderMusic();
+    return stopBuilderMusic;
+  }, [playing]);
   useEffect(() => {
     preloadSprites(opponent.team.map((s) => s.species));
   }, [opponent]);

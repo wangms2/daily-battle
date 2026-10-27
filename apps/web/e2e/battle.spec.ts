@@ -206,10 +206,10 @@ test('a run after the day is won is practice, and never shows in the share', asy
   await page.getByRole('button', { name: 'Play again · practice' }).click();
   await waitForChoice(page);
   await page.getByRole('button', { name: 'Battle menu' }).click();
-  await page.getByRole('button', { name: 'Give up' }).click();
-  const confirm = page.getByRole('dialog', { name: 'Give up this battle?' });
+  await page.getByRole('button', { name: 'Forfeit' }).click();
+  const confirm = page.getByRole('dialog', { name: 'Forfeit this battle?' });
   await expect(confirm).toContainText('practice run');
-  await confirm.getByRole('button', { name: 'Give up' }).click();
+  await confirm.getByRole('button', { name: 'Forfeit' }).click();
   const card = page.getByRole('dialog', { name: 'Battle over' });
   await expect(card).toContainText('Practice');
   await card.getByRole('button', { name: 'Share' }).click();
@@ -300,8 +300,8 @@ for (const scheme of ['light', 'dark'] as const) {
     await page.waitForTimeout(250);
     await noScroll(page, 'menu');
     await page.screenshot({ path: `${dir}/25-battle-menu.png` });
-    await page.getByRole('button', { name: 'Give up' }).click();
-    await page.getByRole('button', { name: 'Give up' }).last().click();
+    await page.getByRole('button', { name: 'Forfeit' }).click();
+    await page.getByRole('button', { name: 'Forfeit' }).last().click();
     await expect(page.getByRole('dialog', { name: 'Battle over' })).toBeVisible();
     await page.waitForTimeout(300);
     await noScroll(page, 'end');
@@ -331,8 +331,8 @@ test('a lost first try breaks the streak, and the result copies to share', async
     await page.getByRole('button', { name: /^(Start|Try again) · / }).click();
     await waitForChoice(page);
     await page.getByRole('button', { name: 'Battle menu' }).click();
-    await page.getByRole('button', { name: 'Give up' }).click();
-    await page.getByRole('button', { name: 'Give up' }).last().click();
+    await page.getByRole('button', { name: 'Forfeit' }).click();
+    await page.getByRole('button', { name: 'Forfeit' }).last().click();
     const card = page.getByRole('dialog', { name: 'Battle over' });
     await expect(card).toContainText('You gave up');
     await expect(card).toContainText(`Try ${i}`);
@@ -423,8 +423,8 @@ async function loseFirstTry(page: Page) {
   await page.getByRole('button', { name: /^Start · / }).click();
   await waitForChoice(page);
   await page.getByRole('button', { name: 'Battle menu' }).click();
-  await page.getByRole('button', { name: 'Give up' }).click();
-  await page.getByRole('button', { name: 'Give up' }).last().click();
+  await page.getByRole('button', { name: 'Forfeit' }).click();
+  await page.getByRole('button', { name: 'Forfeit' }).last().click();
   return page.getByRole('dialog', { name: 'Battle over' });
 }
 
@@ -478,10 +478,10 @@ test('a finished day offers the other games on the brief, the end card, and the 
   await page.getByRole('button', { name: 'Play again · practice' }).click();
   await waitForChoice(page);
   await page.getByRole('button', { name: 'Battle menu' }).click();
-  await page.getByRole('button', { name: 'Give up' }).click();
+  await page.getByRole('button', { name: 'Forfeit' }).click();
   await page
-    .getByRole('dialog', { name: 'Give up this battle?' })
-    .getByRole('button', { name: 'Give up' })
+    .getByRole('dialog', { name: 'Forfeit this battle?' })
+    .getByRole('button', { name: 'Forfeit' })
     .click();
   const card = page.getByRole('dialog', { name: 'Battle over' });
   await expect(card.getByRole('region', { name: 'Play another generation' })).toBeVisible();
@@ -538,16 +538,15 @@ test('the battle text flows from the newest line back through earlier turns', as
   expect(now.fromEnd).toBeLessThan(24);
   const up = page.getByRole('button', { name: 'Earlier turns' });
   await expect(up).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Later turns' })).toHaveCount(0);
+  const latest = page.getByRole('button', { name: 'Back to the latest' });
+  await expect(latest).toHaveCount(0);
   await up.click();
   await expect.poll(async () => (await view()).top).toBeLessThan(now.top);
-  await expect(page.getByRole('button', { name: 'Later turns' })).toBeVisible();
-  // Forward again to the newest.
-  for (let i = 0; i < 12 && (await view()).fromEnd > 24; i++) {
-    await page.getByRole('button', { name: 'Later turns' }).click();
-    await page.waitForTimeout(250);
-  }
-  expect((await view()).fromEnd).toBeLessThan(24);
+  // Scrolled back, a Latest cue returns to the newest line in one tap.
+  await expect(latest).toBeVisible();
+  await latest.click();
+  await expect.poll(async () => (await view()).fromEnd).toBeLessThan(24);
+  await expect(latest).toHaveCount(0);
   // A new turn keeps following the newest line.
   if ((await act(page)) === 'end') return;
   await waitForChoice(page);

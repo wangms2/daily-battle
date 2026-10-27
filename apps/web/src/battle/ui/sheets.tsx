@@ -109,7 +109,7 @@ export function MenuSheet({
         </Button>
         {canGiveUp && (
           <Button variant="ghost" className="text-bad" onClick={onGiveUp}>
-            Give up
+            Forfeit
           </Button>
         )}
       </div>
@@ -138,7 +138,7 @@ export function GiveUpDialog({
     <ConfirmDialog
       open={open}
       onOpenChange={onOpenChange}
-      title="Give up this battle?"
+      title="Forfeit this battle?"
       body={
         body ??
         (practice
@@ -147,7 +147,7 @@ export function GiveUpDialog({
             ? 'It counts as a loss for today’s first try, with the Pokémon you have left.'
             : 'It counts as a lost try, with the Pokémon you have left.')
       }
-      confirm="Give up"
+      confirm="Forfeit"
       cancel="Keep battling"
       onConfirm={onConfirm}
     />

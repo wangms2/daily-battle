@@ -57,6 +57,44 @@ describe('sound', () => {
     expect(FakeAudio.made[1]!.paused).toBe(false);
   });
 
+  it('keeps the builder track playing when the lead pick opens after the builder', async () => {
+    const audio = await engine();
+    audio.configureAudio(ON);
+    audio.startBuilderMusic();
+    // The builder closes and the brief opens in the same render.
+    audio.stopBuilderMusic();
+    audio.startBuilderMusic();
+    await new Promise((r) => setTimeout(r, 0));
+    expect(FakeAudio.made).toHaveLength(1);
+    expect(FakeAudio.made[0]!.paused).toBe(false);
+    // Closing the brief too fades it out.
+    vi.useFakeTimers();
+    try {
+      audio.stopBuilderMusic();
+      vi.advanceTimersByTime(5000);
+      expect(FakeAudio.made[0]!.paused).toBe(true);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('plays the tutorial track quieter on lesson screens, and hands over to a practice battle', async () => {
+    const audio = await engine();
+    audio.configureAudio(ON);
+    audio.startTutorialMusic();
+    const tutorial = FakeAudio.made[0]!;
+    expect(tutorial.src).toMatch(/\/audio\/music\/tutorial\.mp3$/);
+    expect(tutorial.volume).toBeCloseTo(0.4 * 0.3);
+    audio.configureAudio({ ...ON, musicVolume: 0.8 });
+    expect(tutorial.volume).toBeCloseTo(0.8 * 0.3);
+    // The practice battle's music takes over; the lesson screen closing doesn't stop it.
+    audio.startMusic('gen3ou');
+    audio.stopTutorialMusic();
+    expect(tutorial.paused).toBe(true);
+    expect(FakeAudio.made[1]!.src).toMatch(/gen3\.mp3$/);
+    expect(FakeAudio.made[1]!.paused).toBe(false);
+  });
+
   it('plays the select sound on every tap of a control, and nothing elsewhere', async () => {
     const audio = await engine();
     audio.configureAudio(ON);

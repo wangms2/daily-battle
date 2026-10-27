@@ -504,11 +504,11 @@ describe('battle screen', () => {
     const props = renderBattle(backend);
     await thunderbolt();
     await userEvent.click(screen.getByRole('button', { name: 'Battle menu' }));
-    await userEvent.click(screen.getByRole('button', { name: 'Give up' }));
-    const confirm = await screen.findByRole('dialog', { name: 'Give up this battle?' });
+    await userEvent.click(screen.getByRole('button', { name: 'Forfeit' }));
+    const confirm = await screen.findByRole('dialog', { name: 'Forfeit this battle?' });
     expect(confirm).toHaveTextContent('first try');
     expect(backend.forfeit).not.toHaveBeenCalled();
-    await userEvent.click(within(confirm).getByRole('button', { name: 'Give up' }));
+    await userEvent.click(within(confirm).getByRole('button', { name: 'Forfeit' }));
     expect(await screen.findByRole('dialog', { name: 'Battle over' })).toHaveTextContent(
       'You gave up',
     );

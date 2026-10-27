@@ -112,9 +112,9 @@ for (const scheme of ['light', 'dark'] as const) {
       await check(page, 'log sheet');
       await page.keyboard.press('Escape');
       await page.getByRole('button', { name: 'Battle menu' }).click();
-      await page.getByRole('button', { name: 'Give up' }).click();
+      await page.getByRole('button', { name: 'Forfeit' }).click();
       await check(page, 'give up dialog');
-      await page.getByRole('button', { name: 'Give up' }).last().click();
+      await page.getByRole('button', { name: 'Forfeit' }).last().click();
       await expect(page.getByRole('dialog', { name: 'Battle over' })).toBeVisible();
       await check(page, 'end card');
       await page.getByRole('button', { name: 'Back to today' }).click();

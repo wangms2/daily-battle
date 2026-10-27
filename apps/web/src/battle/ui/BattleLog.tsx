@@ -1,7 +1,8 @@
 // The battle text under the field on phones: the log as it flows, as much as the
 // box holds, ending at the newest line, with a divider at each turn. Scroll up for
-// earlier turns, or tap the arrow at the top (it goes back a turn at a time); the
-// arrow at the bottom comes forward. It follows the newest line until you scroll up.
+// earlier turns, or tap the arrow at the top (it goes back a turn at a time). It
+// follows the newest line until you scroll up; then a "Latest" cue at the bottom
+// jumps back and follows again, as does the next turn or skip (`follow`).
 import clsx from 'clsx';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ChevronIcon } from '../../ui/icons';
@@ -15,8 +16,14 @@ export function BattleLog({
   log,
   onClick,
   className,
+  follow,
 }: {
   log: string[];
+  /**
+   * Changes when the player wants the newest lines again (a new turn, or a
+   * skip): the log follows from there, even if a tap had nudged it up.
+   */
+  follow?: number;
   /** A tap on the text itself (it skips the playback). */
   onClick?: () => void;
   className?: string;
@@ -36,6 +43,12 @@ export function BattleLog({
     setMore((m) => (m.up === up && m.down === down ? m : { up, down }));
   }, []);
 
+  useEffect(() => {
+    following.current = true;
+    const el = scroller.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [follow]);
+
   const lineCount = log.length;
   useEffect(() => {
     const el = scroller.current;
@@ -43,18 +56,23 @@ export function BattleLog({
     measure();
   }, [lineCount, measure]);
 
-  /** Scrolls to the start of the turn above (or below) the top of the view. */
-  const go = (dir: -1 | 1) => {
+  const calm = () => !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
+  /** Scrolls to the start of the turn above the top of the view. */
+  const back = () => {
     const el = scroller.current;
     if (!el) return;
     const tops = [...el.querySelectorAll<HTMLElement>('[data-turn]')].map((b) => b.offsetTop);
-    const here = el.scrollTop;
-    const target =
-      dir < 0
-        ? (tops.filter((t) => t < here - 4).at(-1) ?? 0)
-        : (tops.find((t) => t > here + 4) ?? el.scrollHeight);
-    const calm = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-    el.scrollTo({ top: target, behavior: calm ? 'auto' : 'smooth' });
+    const target = tops.filter((t) => t < el.scrollTop - 4).at(-1) ?? 0;
+    el.scrollTo({ top: target, behavior: calm() ? 'auto' : 'smooth' });
+  };
+
+  /** Back to the newest line, following it again. */
+  const latest = () => {
+    const el = scroller.current;
+    if (!el) return;
+    following.current = true;
+    el.scrollTo({ top: el.scrollHeight, behavior: calm() ? 'auto' : 'smooth' });
   };
 
   return (
@@ -91,7 +109,7 @@ export function BattleLog({
           aria-label="Earlier turns"
           onClick={(e) => {
             e.stopPropagation();
-            go(-1);
+            back();
           }}
           className="battle-textcue top-1.5"
         >
@@ -101,14 +119,15 @@ export function BattleLog({
       {more.down && (
         <button
           type="button"
-          aria-label="Later turns"
+          aria-label="Back to the latest"
           onClick={(e) => {
             e.stopPropagation();
-            go(1);
+            latest();
           }}
-          className="battle-textcue bottom-1.5"
+          className="battle-textlatest"
         >
-          <ChevronIcon className="size-4 rotate-90" aria-hidden />
+          Latest
+          <ChevronIcon className="size-3.5 rotate-90" aria-hidden />
         </button>
       )}
     </div>

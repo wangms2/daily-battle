@@ -1,7 +1,8 @@
 // Sound (DESIGN.md §21): battle music and Pokémon cries, as on Showdown, plus a
 // short chime for versus and a select sound on every tap. Off by default; while it's
 // off nothing is downloaded or played. Music plays in battles (one track per
-// generation) and in the team builder (one track for all), and loops with a
+// generation), in the team builder (one track for all) and on lesson screens (the
+// tutorial track; a lesson's practice battle plays the battle music), and loops with a
 // short crossfade (the tracks end in a fade-out). One effect plays at a
 // time, so a fast turn doesn't stack cries. All audio access goes through here.
 import { genOf } from '@daily-battle/data';
@@ -14,6 +15,14 @@ export interface AudioSettings {
   /** 0 to 1. Cries, the menu select sound, and the versus chime. */
   effectsVolume: number;
 }
+
+/**
+ * Tracks supplied unmastered play at this share of the music volume, to sit
+ * with the others: the tutorial track is about 10 dB louder than the team
+ * builder's, which it matches.
+ */
+const TRACK_GAIN: Record<string, number> = { tutorial: 0.3 };
+const level = (name: string) => settings.musicVolume * (TRACK_GAIN[name] ?? 1);
 
 /** Seconds of overlap when the music loops back to its start. */
 const CROSSFADE = 2.5;
@@ -60,8 +69,8 @@ export function configureAudio(next: AudioSettings): void {
   // Ready the select sound, so the first tap doesn't wait for it.
   loadSelect();
   if (track) {
-    track.now.volume = next.musicVolume;
-    if (track.next) track.next.volume = next.musicVolume;
+    track.now.volume = level(track.name);
+    if (track.next) track.next.volume = level(track.name);
   }
 }
 
@@ -77,12 +86,44 @@ const BUILDER = 'teambuilder';
  * 3 dB quieter than the battle tracks, so it sits under the menus.
  */
 export function startBuilderMusic(): void {
-  want(BUILDER);
+  hold(BUILDER);
 }
 
 /** Fades the builder's track out, unless a battle's music has already taken over. */
 export function stopBuilderMusic(): void {
-  if (wanted === BUILDER) stopMusic();
+  release(BUILDER);
+}
+
+/** How many open screens want each menu track. */
+const holds: Record<string, number> = {};
+
+function hold(name: string) {
+  holds[name] = (holds[name] ?? 0) + 1;
+  want(name);
+}
+
+/**
+ * A screen with a menu track closed. The track stops a moment later unless the
+ * next screen wants it too (the builder hands over to the lead pick), so it
+ * plays on without starting over.
+ */
+function release(name: string) {
+  holds[name] = Math.max(0, (holds[name] ?? 0) - 1);
+  setTimeout(() => {
+    if (!holds[name] && wanted === name) stopMusic();
+  }, 0);
+}
+
+const TUTORIAL = 'tutorial';
+
+/** The lesson screens' track (intro, demos, practice). A practice battle plays the battle music. */
+export function startTutorialMusic(): void {
+  hold(TUTORIAL);
+}
+
+/** Stops the tutorial track, if it's the one playing (a battle may have taken over). */
+export function stopTutorialMusic(): void {
+  release(TUTORIAL);
 }
 
 function want(name: string) {
@@ -134,7 +175,7 @@ function startTrack(name: string) {
 /** One pass of a track that starts the next pass shortly before it ends. */
 function loop(name: string): HTMLAudioElement {
   const el = new Audio(musicUrl(name));
-  el.volume = settings.musicVolume;
+  el.volume = level(name);
   el.addEventListener('timeupdate', () => {
     if (!track || track.now !== el || track.next || !el.duration) return;
     if (el.duration - el.currentTime > CROSSFADE) return;
@@ -146,8 +187,8 @@ function loop(name: string): HTMLAudioElement {
     const blend = setInterval(() => {
       const t = Math.min(1, (Date.now() - started) / (CROSSFADE * 1000));
       if (track?.next !== next) return clearInterval(blend);
-      next.volume = settings.musicVolume * t;
-      el.volume = settings.musicVolume * (1 - t);
+      next.volume = level(name) * t;
+      el.volume = level(name) * (1 - t);
       if (t >= 1) {
         clearInterval(blend);
         el.pause();

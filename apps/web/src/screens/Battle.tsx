@@ -231,6 +231,8 @@ export function Battle({
 
   const [view, setView] = useState<View | null>(null);
   const [log, setLog] = useState<string[]>([]);
+  // Bumped on a new turn or a skip: the battle text follows the newest line again.
+  const [follow, setFollow] = useState(0);
   const [team, setTeam] = useState<TeamMember[]>([]);
   const [controls, setControls] = useState<Controls | null>(null);
   const [playing, setPlaying] = useState(true);
@@ -410,6 +412,7 @@ export function Battle({
   const skip = useCallback(() => {
     const p = pending.current;
     if (!p) return;
+    setFollow((n) => n + 1);
     if (timer.current) clearTimeout(timer.current);
     running.current?.cancel();
     setFloats([]); // labels from a skipped turn shouldn't linger
@@ -420,6 +423,7 @@ export function Battle({
   const play = useCallback(
     (pkg: TurnPackage) => {
       setPlaying(true);
+      setFollow((n) => n + 1);
       setControls(null);
       const delay = pkg.resumed ? 0 : DELAY[settingsRef.current.battleSpeed];
       if (!delay || !pkg.frames.length) {
@@ -625,6 +629,7 @@ export function Battle({
     <div data-spot="log" className="flex min-h-[3.25rem] flex-1 basis-0 flex-col">
       <BattleLog
         log={log}
+        follow={follow}
         onClick={() => playing && skip()}
         className="min-h-[3.25rem] flex-1 basis-0"
       />
@@ -1078,6 +1083,16 @@ export function Battle({
       </div>
       <div className="flex items-center gap-1">
         {topBarRight}
+        {/* Always in reach while the battle is on; it asks first, so a stray tap is safe. */}
+        {!end && (
+          <button
+            type="button"
+            onClick={() => setGiveUpOpen(true)}
+            className="h-9 rounded-chip border border-line bg-surface px-3 text-[13px] font-semibold text-bad"
+          >
+            Forfeit
+          </button>
+        )}
         <button
           type="button"
           onClick={cycleSpeed}

@@ -260,7 +260,7 @@ body {
 
 /* Lesson demos (Spotlight.tsx): the rest of the screen dims, the targets keep a soft ring. */
 .spotlight-dim {
-  fill: color-mix(in srgb, var(--bg) 72%, transparent);
+  fill: color-mix(in srgb, var(--bg) 40%, transparent);
 }
 .spotlight-ring {
   stroke: var(--spot);
@@ -508,6 +508,26 @@ button.move-chip:hover,
 }
 .battle-textcue:hover {
   color: var(--text);
+}
+/* Scrolled up to look back: one tap returns to the newest line and follows it again. */
+.battle-textlatest {
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  translate: -50% 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 26px;
+  padding: 0 10px 0 12px;
+  border-radius: 9999px;
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--accent-text);
+  background: var(--accent);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.18);
 }
 
 /* The log, ranked as on Showdown: what happened (moves, who came in or fainted)
