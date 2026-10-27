@@ -49,7 +49,7 @@ import { battleSpeed, foeSpeed, lessonMoves, lessonSet, type SpeedCheck } from '
 import { ShareButton, TryRows } from '../ui/results';
 import { ChevronIcon, CloseIcon, InfoIcon } from '../ui/icons';
 import { CoachBadge, DifficultyBadge } from '../ui/Difficulty';
-import { OtherGames } from '../ui/OtherGames';
+import { OtherGames, useNextGame } from '../ui/OtherGames';
 import { ConfirmDialog } from '../sheets/misc';
 import { useWide } from '../ui/useWide';
 
@@ -211,7 +211,7 @@ export function Battle({
   onChoice: (choice: string, ai?: AiChoices, memo?: CoachMemo) => void;
   onEnd: (outcome: BattleOutcome) => void;
   onExit: () => void;
-  /** "Back to today" once the day is decided (to the game picker); else `onExit`. */
+  /** Once the day is decided with every game done ("Done for today"): the game picker. */
   onDayDone?: () => void;
   onRunItBack?: () => void;
   /** After a loss: back to the brief with the team open for changes. */
@@ -257,6 +257,7 @@ export function Battle({
   const [anims, setAnims] = useState<typeof AnimPlay | null>(null);
   // A daily foe taking a while to choose (Hard's search): say so.
   const [thinking, setThinking] = useState(false);
+  const nextGame = useNextGame();
   const thinkTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   /** Hard: AI choices not saved yet (they go with your next choice). */
   const unsavedAi = useRef<AiChoices | undefined>(undefined);
@@ -1059,9 +1060,13 @@ export function Battle({
             <Button variant="secondary" onClick={onChangeTeam}>
               Change team
             </Button>
+          ) : nextGame ? (
+            <Button variant="secondary" onClick={nextGame.play}>
+              Play {nextGame.game.name}
+            </Button>
           ) : (
             <Button variant="secondary" onClick={onDayDone ?? onExit}>
-              Back to today
+              Done for today
             </Button>
           )}
         </div>

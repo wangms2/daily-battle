@@ -21,10 +21,10 @@ This doc is written to be split into implementation chunks. Section 13 lists mil
 
 | Area                | Decision                                                                                                                                                                                               |
 | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Format              | Gen 3, 4, 5, and 6 OU as four daily games (each its own team, opponents, tries, and streak), singles, 6v6, Showdown mechanics. Gen 6 adds one rule of ours: one Mega per team (§19) |
+| Format              | Gen 3, 4, 5, and 6 OU as four daily games (each its own team, opponents, tries, and streak), singles, 6v6, Showdown mechanics. Gen 6 adds one rule of ours: one Mega per team (§19)                    |
 | Engine              | `@pkmn/sim` (standalone Showdown simulator), self-hosted, no Showdown server                                                                                                                           |
 | Set data            | Smogon data (usage-weighted). 1–4 most common sets per species, weighted by usage                                                                                                                      |
-| Player team         | Weekly. Pick 6 of 12, choose a role-named set for each, lock for the week. An optional recommended team is a selection, not a default. No lineup ordering; the lead is picked on the daily brief          |
+| Player team         | Weekly. Pick 6 of 12, choose a role-named set for each, lock for the week. An optional recommended team is a selection, not a default. No lineup ordering; the lead is picked on the daily brief       |
 | Daily swap          | One per day: replace one Pokémon (from the original 12) OR change one set. Not both. Done on the daily brief screen                                                                                    |
 | Opponent            | New each day. Species visible, sets hidden                                                                                                                                                             |
 | Attempts            | Unlimited, with "run it back". The first attempt of the day is the scored result; retries still count as a clear but never change the streak                                                           |
@@ -97,11 +97,11 @@ Daily swap (done on the daily brief screen, shown as "1 change left"):
 
 ### 4.6 CPU difficulty (added Oct 2026)
 
-| | Easy | Normal | Hard |
-| --- | --- | --- | --- |
-| Brain | The utility AI (§8) with the `EASY` preset | The utility AI with the team's style preset | poke-engine's MCTS over sampled worlds |
-| Plays like | A beginner: mostly attacks (not always the best one), rarely switches, no hazards, setup, or predictions | A typical ladder player | A strong player that looks turns ahead and guesses your sets |
-| Cost | < 1 ms a decision | < 1 ms | ~0.3 s a decision on a desktop (≤ 2 s on a slow phone) |
+|            | Easy                                                                                                     | Normal                                      | Hard                                                         |
+| ---------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------- | ------------------------------------------------------------ |
+| Brain      | The utility AI (§8) with the `EASY` preset                                                               | The utility AI with the team's style preset | poke-engine's MCTS over sampled worlds                       |
+| Plays like | A beginner: mostly attacks (not always the best one), rarely switches, no hazards, setup, or predictions | A typical ladder player                     | A strong player that looks turns ahead and guesses your sets |
+| Cost       | < 1 ms a decision                                                                                        | < 1 ms                                      | ~0.3 s a decision on a desktop (≤ 2 s on a slow phone)       |
 
 - **API.** `aiFor({ difficulty, style, data, engine?, pool? })` in `@daily-battle/ai`. Normal is exactly `aiForStyle(style)`, so its choices are byte-for-byte as before.
 - **Hard** (`packages/ai/src/hard/`). Each decision:
@@ -406,7 +406,7 @@ Easy and Hard add the difficulty to the header, with that difficulty's tries and
 2. **Weekly team builder**: pool of 12, role-named set picker, recommended team, lock (§12.2a).
 3. **Daily brief**: opponent species, your team, lead picker, daily swap ("1 change left"), Start.
 4. **Battle**: Showdown-style layout and flow (§12.2b). Mobile-first.
-5. **Result** (a card over the field): outcome, a ⭐ for a first-try win, today's tries as rows, the streak, Share, Try again / Play again, Back to today.
+5. **Result** (a card over the field): outcome, a ⭐ for a first-try win, today's tries as rows, the streak, Share, Try again / Play again, then the next unplayed generation ("Play Gen 5 OU"; "Done for today" once all are done, to the picker), or Back to today while the day is open.
 
 ### 12.2a Team builder (should be a pleasure to use)
 
@@ -417,6 +417,7 @@ Goals: fast, tactile, and clear to someone new to competitive Pokémon. The whol
 - **Wide screens (≥900px):** the pool is a 3×4 grid of compact row cards (sprite, name, types, role), with a details panel under it in place of the info sheet and set picker. Clicking a card adds it with the most used set (or the set previewed in the panel) and shows it in the panel; its ⓘ or a team-panel row just shows it (the shown member's row is ringed; each row has a × to remove it, and there are no slot numbers: the n/6 counter is enough). The panel has the set tabs, the selected set's moves, item (with its icon), ability, nature and EVs, a Pokédex entry (wide screens only, loaded on demand from `src/lib/flavor.json`, baked by `scripts/flavor.ts`), base and **final** stats (level 100, from the set's nature, EVs and IVs: `lib/stats.ts`, tested against the simulator), matchups, and Add/Remove.
 
   Phones show the same on the set picker, tightened to fit: the final stats on one line, and a description longer than two lines floats its full text over the card on a tap (or a mouse hover), never changing the layout, so the sheet doesn't scroll. Item icons come from PokeAPI/sprites, self-hosted by `scripts/items.ts` under `public/items/`. For a team member, choosing a tab changes its set at once.
+
 - **Recommended team:** one button under a "Recommended team · Strong and ready to battle" heading, showing the team's six icons and "Use team". Selecting it fills the slots (with Undo), and the team stays fully editable. It comes from the simulation search (§9.2); the player chooses to use it, it is never applied automatically. Hidden when a week has none.
 - **Beginner hints (when on):** a compact checklist under the slots (hazards, hazard removal, physical attacker, special attacker, defensive Pokémon) with checkmarks, and a tap-to-view list of shared weaknesses. Hidden when hints are off.
 - **Lock in:** a "Lock in team" button opens a confirmation showing the six sprites, then goes straight to the daily brief.
@@ -465,16 +466,17 @@ Every screen outside the battle field wears the home screens' look: a Poké Ball
 
 **Colour roles**
 
-| Role | Colour | Used for |
-|---|---|---|
-| **Action (accent)** | Steel blue, `--accent` / `--btn-bg` (`#4a7088` light, `#8db2c5` dark) | Every big action: Start, Join, Let's play, That's me!, Next, Copy image, Learn's Start pills. It's the one colour that says "tap me", and it stands out against the clay. |
-| **Game** | The game's lid colour (`LIDS` in `lib/genColors.ts`): Gen 3 green, Gen 4 blue, Gen 5 black and white, Gen 6 red | The game's header, and in place of steel blue for big actions on that game's own screens (team builder, lead pick, the battle's end card). Gen 5 uses its dark lid on light themes and its light button on dark ones. |
-| **Clay** | `#a3646a` to `#8a4f58` | The home screens' lid, the Learn and Link Battle headers, the Poké Ball's centre. A surface colour, never a button. |
-| **Seam** | `#2b2d36` | The Poké Ball's dark seam: under headers, along the top of sheets, cards and the end card. |
+| Role                | Colour                                                                                                          | Used for                                                                                                                                                                                                              |
+| ------------------- | --------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Action (accent)** | Steel blue, `--accent` / `--btn-bg` (`#4a7088` light, `#8db2c5` dark)                                           | Every big action: Start, Join, Let's play, That's me!, Next, Copy image, Learn's Start pills. It's the one colour that says "tap me", and it stands out against the clay.                                             |
+| **Game**            | The game's lid colour (`LIDS` in `lib/genColors.ts`): Gen 3 green, Gen 4 blue, Gen 5 black and white, Gen 6 red | The game's header, and in place of steel blue for big actions on that game's own screens (team builder, lead pick, the battle's end card). Gen 5 uses its dark lid on light themes and its light button on dark ones. |
+| **Clay**            | `#a3646a` to `#8a4f58`                                                                                          | The home screens' lid, the Learn and Link Battle headers, the Poké Ball's centre. A surface colour, never a button.                                                                                                   |
+| **Seam**            | `#2b2d36`                                                                                                       | The Poké Ball's dark seam: under headers, along the top of sheets, cards and the end card.                                                                                                                            |
 
 **Type.** Fraunces (serif) for screen and sheet titles, big actions, the name card's speech bubble, and headline numbers. The body font for everything else. The game's pixel font only for battle text.
 
 **Buttons** (`styles.css`):
+
 - `.btn-primary`: action colour, serif 17px (18px on game screens), 12px radius, and a pressed-down bottom edge (`0 4px 0` of the colour mixed with black). It sinks 2px when pressed.
 - `.btn-secondary`: the surface colour with a 2px outline and a 3px pressed-down edge.
 - `.cta-pill` for small actions in a list, and `.chunky-chip` (plus `.chip` on game screens) for chips.
@@ -483,6 +485,7 @@ Every screen outside the battle field wears the home screens' look: a Poké Ball
 **Danger.** A step that loses something gets `.btn-danger`: the same chunky serif button, in red (`--bad`). That covers forfeit, starting over with a new team, leaving a room, removing a player, and deleting the account. `ConfirmDialog` takes `danger` for these.
 
 **Toggles, chips and fields.**
+
 - Segmented toggles (difficulty, battle speed, a Pokémon's sets) are a chunky tray (`.seg`), with the picked option in the action colour.
 - Option chips (a room's rules) are `.chunky-chip`, with the pressed one in the action colour.
 - Every text field is `.field`: a 2px outline and a 12px radius, turning the action colour while you type. Field text is 16px or larger, or iPhones zoom in when a field is tapped.
@@ -583,13 +586,13 @@ See §14.
 
 ### Product decisions
 
-| #   | Question             | Status                  | Decision                                                                                                                                                                                                                                                                                           |
-| --- | -------------------- | ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| D1  | Name and branding    | Decided                 | **Pokémon Daily** (first Daily Battle), served from a subdomain of an existing domain. The owner chose to put "Pokémon" in the name, with its logo on the landing (`public/logo.webp`), knowing the trademark risk; About says it is unofficial and unaffiliated. The share header names the game (`Pokémon Daily · Gen 5 OU · Oct 21`) and the link opens that game. The installed app's short name is "Poké Daily". Saved progress keeps its `daily-battle:` storage keys, so nobody loses a streak              |
-| D2  | Target difficulty    | Decided                 | About 50% first-attempt win rate for an average player; 2–3 attempts to clear. Validation bands in §9.3                                                                                                                                                                                            |
-| D3  | Streak definition    | Decided (revised again) | Consecutive days won on the first try; a lost first try or a missed day breaks it. A first-try win is marked with a ⭐ in the share and on the result card; tries 2–3 still clear the day                                                                                                         |
-| D4  | In-battle assistance | Decided                 | One "Beginner hints" toggle, on by default for new players, easy to turn off (§12.2c). Hints cover first-time explainers, type-effectiveness labels, speed range, and the team-builder checklist. With hints off, the battle mirrors classic Showdown. No damage ranges and no "usually runs" info |
-| D5  | Telemetry            | Decided                 | None in v1 (static site). Calibrate difficulty with friends and manual feedback; consider an opt-in anonymous endpoint after launch                                                                                                                                                                |
+| #   | Question             | Status                  | Decision                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| --- | -------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| D1  | Name and branding    | Decided                 | **Pokémon Daily** (first Daily Battle), served from a subdomain of an existing domain. The owner chose to put "Pokémon" in the name, with its logo on the landing (`public/logo.webp`), knowing the trademark risk; About says it is unofficial and unaffiliated. The share header names the game (`Pokémon Daily · Gen 5 OU · Oct 21`) and the link opens that game. The installed app's short name is "Poké Daily". Saved progress keeps its `daily-battle:` storage keys, so nobody loses a streak |
+| D2  | Target difficulty    | Decided                 | About 50% first-attempt win rate for an average player; 2–3 attempts to clear. Validation bands in §9.3                                                                                                                                                                                                                                                                                                                                                                                               |
+| D3  | Streak definition    | Decided (revised again) | Consecutive days won on the first try; a lost first try or a missed day breaks it. A first-try win is marked with a ⭐ in the share and on the result card; tries 2–3 still clear the day                                                                                                                                                                                                                                                                                                             |
+| D4  | In-battle assistance | Decided                 | One "Beginner hints" toggle, on by default for new players, easy to turn off (§12.2c). Hints cover first-time explainers, type-effectiveness labels, speed range, and the team-builder checklist. With hints off, the battle mirrors classic Showdown. No damage ranges and no "usually runs" info                                                                                                                                                                                                    |
+| D5  | Telemetry            | Decided                 | None in v1 (static site). Calibrate difficulty with friends and manual feedback; consider an opt-in anonymous endpoint after launch                                                                                                                                                                                                                                                                                                                                                                   |
 
 ### Proposed defaults (change if you disagree)
 
@@ -679,16 +682,16 @@ A room where friends play live battles against each other, Super Auto Pets style
   1. results, with each battle's card sliding in, the winner lit and the loser's heart cracking, and eliminations stamped "Out" with a placement;
   2. the standings, sliding in;
   3. a VS reveal, where a quick shuffle of names lands on "You vs …" with both players' hearts (the species come in the swap phase); players who are out see every pairing instead.
-  The swap timer starts for everyone when the sequence ends. Tapping skips ahead on your own screen only. Reduced motion uses fades only.
+     The swap timer starts for everyone when the sequence ends. Tapping skips ahead on your own screen only. Reduced motion uses fades only.
 
 ### 18.4 Phases
 
-| Phase | What                                                                                                                   | Done when                                                           |
-| ----- | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| V1    | Split the frame building out of `BattleEngine` into `SidePresenter`, working from either side                          | Daily battles unchanged; tests drive a battle from both sides (done) |
-| V2    | Worker, room Durable Object, websocket protocol, lobby (create, join, settings), reconnect tokens                       | Friends can join a room and see each other (done)                   |
-| V3    | One live battle between two players in a room: server-side sim, turn timer, disconnect grace, resume                    | Two browsers play a battle to the end (done)                        |
-| V4    | The room loop: pool and build phase, pairing by lives, swap phase, lives, elimination, the AI for odd counts, results   | A room of three plays to a winner (done)                             |
+| Phase | What                                                                                                                                                                                  | Done when                                                                                                    |
+| ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| V1    | Split the frame building out of `BattleEngine` into `SidePresenter`, working from either side                                                                                         | Daily battles unchanged; tests drive a battle from both sides (done)                                         |
+| V2    | Worker, room Durable Object, websocket protocol, lobby (create, join, settings), reconnect tokens                                                                                     | Friends can join a room and see each other (done)                                                            |
+| V3    | One live battle between two players in a room: server-side sim, turn timer, disconnect grace, resume                                                                                  | Two browsers play a battle to the end (done)                                                                 |
+| V4    | The room loop: pool and build phase, pairing by lives, swap phase, lives, elimination, the AI for odd counts, results                                                                 | A room of three plays to a winner (done)                                                                     |
 | V5    | The room drawer, spectating for players out and late joiners (multi-battle grid, reactions), the between-round sequence, elimination and winner screens, an entry from the daily game | A late joiner watches two battles at once on a phone, and an eliminated player watches the next round (done) |
 
 ## 19. Gen 6 OU (added Oct 2026)

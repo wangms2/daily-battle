@@ -278,14 +278,22 @@ export function App() {
   );
   const countdown = countdownTo(now, addDays(day, 1));
   // The other games, for the "Play another generation" row on the result and share screens.
+  const ids = Object.keys(FORMATS) as FormatId[];
+  const games = ids
+    .filter((id) => id !== format)
+    .map((id) => ({
+      id,
+      name: `${formatInfo(id).name} OU`,
+      status: summarizeDay(state.games[id].days[day], true, gameBucket(id)).status,
+    }));
+  const after = ids.indexOf(format);
+  const nextOrder = [...ids.slice(after + 1), ...ids.slice(0, after)];
   const otherGames = {
-    games: (Object.keys(FORMATS) as FormatId[])
-      .filter((id) => id !== format)
-      .map((id) => ({
-        id,
-        name: `${formatInfo(id).name} OU`,
-        status: summarizeDay(state.games[id].days[day], true, gameBucket(id)).status,
-      })),
+    games,
+    next:
+      nextOrder
+        .map((id) => games.find((g) => g.id === id)!)
+        .find((g) => g.status === 'none' || g.status === 'pending') ?? null,
     onPlay: (id: FormatId) => {
       dispatchAny({ type: 'setSetting', key: 'format', value: id });
       go('play');

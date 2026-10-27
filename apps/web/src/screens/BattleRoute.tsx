@@ -37,7 +37,7 @@ export function BattleRoute({
   dispatch: (a: Action) => void;
   format: FormatId;
   onExit: () => void;
-  /** "Back to today" once the day is decided: the game picker. */
+  /** "Done for today" once the day is decided and no game is left: the game picker. */
   onDayDone: () => void;
   onRunItBack: () => void;
   onChangeTeam: () => void;

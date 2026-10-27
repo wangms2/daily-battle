@@ -15,6 +15,8 @@ import type {
 import { summarizeDay } from '../lib/results';
 import { formatShareText, shareModel } from '../lib/share';
 import { initialState, type Attempt, type Settings } from '../state/schema';
+import { GamesProvider } from '../ui/OtherGames';
+import type { ComponentProps } from 'react';
 import { Battle, type DayResult } from './Battle';
 
 const START: EngineStart = {
@@ -167,6 +169,7 @@ function renderBattle(
     hints = true,
     tryNumber = 1,
     tour = false,
+    games,
     start = START,
     result = {
       summary: summarizeDay(undefined, true),
@@ -182,6 +185,8 @@ function renderBattle(
     result?: DayResult;
     /** The first-battle tour not seen yet. */
     tour?: boolean;
+    /** Today's other games (App's GamesProvider). */
+    games?: ComponentProps<typeof GamesProvider>['value'];
   } = {},
 ) {
   const settings: Settings = {
@@ -201,16 +206,18 @@ function renderBattle(
     onChangeTeam: vi.fn(),
   };
   render(
-    <BattleBackendContext.Provider value={() => backend}>
-      <Battle
-        start={start}
-        background="/fx/bg-gen4.png"
-        tryNumber={tryNumber}
-        settings={settings}
-        result={result}
-        {...props}
-      />
-    </BattleBackendContext.Provider>,
+    <GamesProvider value={games ?? null}>
+      <BattleBackendContext.Provider value={() => backend}>
+        <Battle
+          start={start}
+          background="/fx/bg-gen4.png"
+          tryNumber={tryNumber}
+          settings={settings}
+          result={result}
+          {...props}
+        />
+      </BattleBackendContext.Provider>
+    </GamesProvider>,
   );
   return props;
 }
@@ -609,12 +616,26 @@ describe('battle screen', () => {
     expect(card).toHaveTextContent('🔥 1-day streak');
   });
 
-  it('goes on to the other games once the day is won, and back to the brief while open', async () => {
+  it('goes on to the next game once the day is won, and back to the brief while open', async () => {
     const user = userEvent.setup();
+    const onPlay = vi.fn();
+    const games = [
+      { id: 'gen5ou', name: 'Gen 5 OU', status: 'won' },
+      { id: 'gen6ou', name: 'Gen 6 OU', status: 'none' },
+    ] as const;
+    renderBattle(fakeBackend([TURN_1]).backend, {
+      result: dayResult([tried('win', 3, 1)], 1),
+      games: { games: [...games], next: games[1], onPlay },
+    });
+    await user.click(within(await winBattle()).getByRole('button', { name: 'Play Gen 6 OU' }));
+    expect(onPlay).toHaveBeenCalledWith('gen6ou');
+    cleanup();
+
+    // Every game done: the picker.
     const won = renderBattle(fakeBackend([TURN_1]).backend, {
       result: dayResult([tried('win', 3, 1)], 1),
     });
-    await user.click(within(await winBattle()).getByRole('button', { name: 'Back to today' }));
+    await user.click(within(await winBattle()).getByRole('button', { name: 'Done for today' }));
     expect(won.onDayDone).toHaveBeenCalled();
     expect(won.onExit).not.toHaveBeenCalled();
     cleanup();

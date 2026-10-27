@@ -17,6 +17,8 @@ export interface GameLink {
 interface GamesValue {
   games: GameLink[];
   onPlay: (id: FormatId) => void;
+  /** The next game not finished today, after the current one in order (wrapping). */
+  next?: GameLink | null;
   /** Every game played today, for Share's "All games" (see `shareAll`). */
   shareAll?: ShareModel | ShareAll | null;
 }
@@ -29,6 +31,14 @@ export const GamesProvider = GamesContext.Provider;
 // eslint-disable-next-line react-refresh/only-export-components
 export function useShareAll() {
   return useContext(GamesContext)?.shareAll ?? null;
+}
+
+/** The next game to play today and how to start it, or null when all are done. */
+// eslint-disable-next-line react-refresh/only-export-components
+export function useNextGame() {
+  const value = useContext(GamesContext);
+  const next = value?.next;
+  return next ? { game: next, play: () => value.onPlay(next.id) } : null;
 }
 
 const STATUS_LABEL: Record<DayStatus, string> = {
