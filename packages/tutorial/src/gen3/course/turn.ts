@@ -22,9 +22,10 @@ export const turn: Lesson = {
         p2: [SNORLAX, { species: 'Blissey', moves: ['Seismic Toss'] }],
         seed: 'course:turn:look1',
       },
-      card: 'move Earthquake',
-      before: 'Your moves are below. Tap one to use it, or press and hold it to see what it does.',
-      spotlight: { before: ['move-details', 'move Earthquake'] },
+      // Nothing opens by itself: the player holds the move to see its details.
+      before:
+        'These are your moves. Tap one to use it. Press and hold Earthquake to see what it does.',
+      spotlight: { before: ['move Earthquake'] },
     },
     {
       kind: 'demo',

@@ -57,6 +57,8 @@ export function configureAudio(next: AudioSettings): void {
     return;
   }
   if (!was.sound && wanted) startTrack(wanted);
+  // Ready the select sound, so the first tap doesn't wait for it.
+  loadSelect();
   if (track) {
     track.now.volume = next.musicVolume;
     if (track.next) track.next.volume = next.musicVolume;
@@ -170,11 +172,52 @@ export function playCry(species: string, format: string, { faint = false } = {})
   play(el);
 }
 
+/** Web Audio, made on first use (the chime and the select sound share it). */
+function audioContext(): AudioContext | null {
+  const Ctx =
+    typeof window === 'undefined'
+      ? undefined
+      : (window.AudioContext ??
+        (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext);
+  if (!Ctx) return null;
+  context ??= new Ctx();
+  return context;
+}
+
+/** The select sound, decoded once: a buffer starts at once, an <audio> element only after loading. */
+let selectBuffer: AudioBuffer | null = null;
+let selectLoading = false;
+function loadSelect(): void {
+  const ctx = audioContext();
+  if (!ctx || selectBuffer || selectLoading) return;
+  selectLoading = true;
+  fetch(`${base()}sfx/select.mp3`)
+    .then((r) => r.arrayBuffer())
+    .then((b) => ctx.decodeAudioData(b))
+    .then(
+      (buffer) => (selectBuffer = buffer),
+      () => (selectLoading = false),
+    );
+}
+
 /**
- * The menu select sound (see `menuSounds`). Its own element, so it never cuts off a cry.
+ * The menu select sound (see `menuSounds`). Played apart from the effect, so it
+ * never cuts off a cry: from the decoded buffer once it's ready, else an element.
  */
 export function playSelect(): void {
   if (!settings.sound || !settings.effectsVolume) return;
+  const ctx = audioContext();
+  if (ctx && selectBuffer) {
+    if (ctx.state === 'suspended') void ctx.resume();
+    const source = ctx.createBufferSource();
+    const gain = ctx.createGain();
+    source.buffer = selectBuffer;
+    gain.gain.value = settings.effectsVolume;
+    source.connect(gain).connect(ctx.destination);
+    source.start();
+    return;
+  }
+  loadSelect();
   select?.pause();
   select = new Audio(`${base()}sfx/select.mp3`);
   select.volume = settings.effectsVolume;
@@ -189,13 +232,21 @@ const CONTROL = 'button, a[href], [role="button"], [role="radio"], [role="switch
  * (moves, switches, sheets). Returns the cleanup.
  */
 export function menuSounds(root: Document = document): () => void {
-  const onClick = (e: MouseEvent) => {
-    const el = (e.target as Element | null)?.closest?.(CONTROL);
+  const onControl = (target: EventTarget | null) => {
+    const el = (target as Element | null)?.closest?.(CONTROL);
     if (!el || el.matches(':disabled, [aria-disabled="true"]')) return;
     playSelect();
   };
+  // The sound starts as the control is pressed, not when it's let go.
+  const onDown = (e: PointerEvent) => e.button === 0 && onControl(e.target);
+  // A keyboard press (Enter or Space) clicks without a pointer: detail is 0.
+  const onClick = (e: MouseEvent) => e.detail === 0 && onControl(e.target);
+  root.addEventListener('pointerdown', onDown, true);
   root.addEventListener('click', onClick, true);
-  return () => root.removeEventListener('click', onClick, true);
+  return () => {
+    root.removeEventListener('pointerdown', onDown, true);
+    root.removeEventListener('click', onClick, true);
+  };
 }
 /** A short two-note chime (versus: your battle started, or it's your turn). Synthesized, no file. */
 export function playChime(): void {

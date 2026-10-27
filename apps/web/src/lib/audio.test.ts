@@ -75,6 +75,23 @@ describe('sound', () => {
       document.body.innerHTML = '';
     }
   });
+  it('plays the select sound as a control is pressed, not again when the click follows', async () => {
+    const audio = await engine();
+    audio.configureAudio(ON);
+    document.body.innerHTML = '<button>Play</button>';
+    const stop = audio.menuSounds();
+    try {
+      const button = document.querySelector('button')!;
+      button.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, button: 0 }));
+      expect(FakeAudio.made).toHaveLength(1);
+      // The pointer's own click (detail 1) doesn't play it a second time.
+      button.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
+      expect(FakeAudio.made).toHaveLength(1);
+    } finally {
+      stop();
+      document.body.innerHTML = '';
+    }
+  });
   it('plays the select sound on a menu pick only with sound on and effects above 0', async () => {
     const audio = await engine();
     audio.configureAudio(OFF);
