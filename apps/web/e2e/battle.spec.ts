@@ -185,7 +185,7 @@ test('on a touch screen, holding a move shows its details and keeps them; a tap 
   await page.screenshot({ path: `e2e/screens/${info.project.name}/light/31-move-hold.png` });
   await expect(page.locator('main')).not.toContainText(' used '); // not chosen
   // A tap elsewhere closes it; a quick tap on the move chooses it.
-  await page.locator('header').tap();
+  await page.locator('header').getByText(/^Turn /).tap();
   await expect(page.getByRole('tooltip')).toBeHidden();
   await move.tap();
   await expect(page.locator('main')).toContainText(' used ');
