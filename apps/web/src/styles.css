@@ -187,53 +187,80 @@ body {
   cursor: not-allowed;
   opacity: 0.45;
 }
+/* Buttons in the landing's style (DESIGN.md §12): chunky, with a pressed-down bottom
+   edge. Big actions are serif in steel blue, which stands out against the clay, or
+   in the game's own colour on its screens and its battle's end card (--game-btn,
+   set in App.tsx). Battle controls keep the plain style, so the field reads first. */
 .btn-primary {
-  background: var(--btn-bg);
-  color: var(--btn-fg);
-  border: var(--card-bw) solid var(--btn-border);
-  box-shadow: var(--btn-shadow);
-}
-.btn-secondary {
-  background: var(--surface-2);
-  color: var(--text);
-  border: var(--card-bw) solid color-mix(in srgb, var(--border) 55%, transparent);
-}
-.btn-ghost {
-  color: var(--accent);
-}
-/* The builder and the brief (lead pick): the landing's chunky buttons, in the
-   game's own colour (--game-btn, set in App.tsx), and chunky chips and toggles. */
-.game-ui .btn-primary {
-  background: var(--game-btn);
-  color: var(--game-btn-fg);
+  --cta: var(--btn-bg);
+  --cta-fg: var(--btn-fg);
+  background: var(--cta);
+  color: var(--cta-fg);
   border: 0;
   border-radius: 12px;
-  box-shadow: 0 4px 0 color-mix(in srgb, var(--game-btn) 62%, black);
+  box-shadow: 0 4px 0 color-mix(in srgb, var(--cta) 60%, black);
   font-family: 'Fraunces', Georgia, serif;
-  font-size: 18px;
+  font-size: 17px;
 }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) .game-ui .btn-primary {
-    background: var(--game-btn-dark);
-    color: var(--game-btn-dark-fg);
-    box-shadow: 0 4px 0 color-mix(in srgb, var(--game-btn-dark) 62%, black);
-  }
-}
-:root[data-theme='dark'] .game-ui .btn-primary {
-  background: var(--game-btn-dark);
-  color: var(--game-btn-dark-fg);
-  box-shadow: 0 4px 0 color-mix(in srgb, var(--game-btn-dark) 62%, black);
-}
-.game-ui .btn-secondary {
+.btn-secondary {
   background: var(--surface);
+  color: var(--text);
   border: 2px solid var(--border);
   border-radius: 12px;
   box-shadow: 0 3px 0 color-mix(in srgb, var(--border) 80%, black);
 }
-.game-ui .btn:active:not(:disabled) {
+.btn-primary:active:not(:disabled),
+.btn-secondary:active:not(:disabled) {
   transform: translateY(2px);
 }
+.game-ui .btn-primary {
+  font-size: 18px;
+}
+:is(.game-ui, .end-card) .btn-primary {
+  --cta: var(--game-btn);
+  --cta-fg: var(--game-btn-fg);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) :is(.game-ui, .end-card) .btn-primary {
+    --cta: var(--game-btn-dark);
+    --cta-fg: var(--game-btn-dark-fg);
+  }
+}
+:root[data-theme='dark'] :is(.game-ui, .end-card) .btn-primary {
+  --cta: var(--game-btn-dark);
+  --cta-fg: var(--game-btn-dark-fg);
+}
+/* In battle, outside the end card, buttons stay plain. */
+.battle-ui .btn-primary:not(.end-card .btn-primary) {
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  border: var(--card-bw) solid var(--btn-border);
+  border-radius: var(--r-btn);
+  box-shadow: var(--btn-shadow);
+  font-family: inherit;
+  font-size: 15px;
+}
+.battle-ui .btn-secondary:not(.end-card .btn-secondary) {
+  background: var(--surface-2);
+  border: var(--card-bw) solid color-mix(in srgb, var(--border) 55%, transparent);
+  border-radius: var(--r-btn);
+  box-shadow: none;
+}
+.btn-ghost {
+  color: var(--accent);
+}
+/* Small calls to action (Learn's Start) and chips, in the same chunky style. */
+.cta-pill {
+  border-radius: 10px;
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  box-shadow: 0 3px 0 color-mix(in srgb, var(--btn-bg) 60%, black);
+  font-family: 'Fraunces', Georgia, serif;
+}
+.chunky-chip,
 .game-ui button.chip {
+  border-width: 2px;
+  border-radius: 12px;
   box-shadow: 0 3px 0 color-mix(in srgb, var(--border) 80%, black);
 }
 .game-ui [role='radiogroup'][aria-label='Difficulty'] {
@@ -242,34 +269,15 @@ body {
   border-radius: 12px;
   box-shadow: 0 3px 0 color-mix(in srgb, var(--border) 80%, black);
 }
-
-/* Menus (ui/Sheet.tsx) in the home screens' style: the Poké Ball's seam along the
-   top, the serif title, and the landing's chunky clay and outlined buttons. */
-.menu-sheet {
-  /* Drawn inside, over the space above the handle, so no sheet grows taller. */
+/* Cards over a screen (menus, the battle's end card): the Poké Ball's seam along the
+   top, drawn inside so nothing grows taller. */
+.menu-sheet,
+.end-card {
   box-shadow:
     inset 0 6px 0 #2b2d36,
     var(--card-shadow);
   border-top-left-radius: 22px;
   border-top-right-radius: 22px;
-}
-.menu-sheet .btn-primary {
-  background: linear-gradient(165deg, #a3646a, #8a4f58);
-  color: #fff;
-  border: 0;
-  border-radius: 12px;
-  box-shadow: 0 4px 0 #5e343b;
-  font-family: 'Fraunces', Georgia, serif;
-  font-size: 17px;
-}
-.menu-sheet .btn-secondary {
-  background: var(--surface);
-  border: 2px solid var(--border);
-  border-radius: 12px;
-  box-shadow: 0 3px 0 color-mix(in srgb, var(--border) 80%, black);
-}
-.menu-sheet .btn:active:not(:disabled) {
-  transform: translateY(2px);
 }
 .chip {
   border-radius: var(--r-chip);
@@ -1262,11 +1270,11 @@ button {
   border: 2px solid var(--border);
   box-shadow: 0 3px 0 color-mix(in srgb, var(--border) 80%, black);
 }
-/* The landing's chunky button, in the lid's clay. */
+/* The landing's chunky button, in the big actions' steel blue. */
 .name-cta {
-  background: linear-gradient(165deg, #a3646a, #8a4f58);
-  color: #fff;
-  box-shadow: 0 4px 0 #5e343b;
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  box-shadow: 0 4px 0 color-mix(in srgb, var(--btn-bg) 60%, black);
 }
 .name-cta:disabled {
   opacity: 0.5;

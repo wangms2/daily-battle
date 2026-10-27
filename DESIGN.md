@@ -460,6 +460,31 @@ Never included: damage ranges, or usage numbers for the opponent's sets. With hi
 - Settings has **How to play**, which reopens the welcome sheet's rules.
 - With **Animations** off (or the system asking for reduced motion), every sprite is a still image: the first frame of its GIF, from `sprites/front-still/` and `back-still/`.
 
+### 12.2e Design language (Oct 2026)
+
+Every screen outside the battle field wears the home screens' look: a Poké Ball split, warm and chunky. New screens follow it from the start. Before they ship, screenshot them at 360 and 375 px, in light and dark.
+
+**Colour roles**
+
+| Role | Colour | Used for |
+|---|---|---|
+| **Action (accent)** | Steel blue, `--accent` / `--btn-bg` (`#4a7088` light, `#8db2c5` dark) | Every big action: Start, Join, Let's play, That's me!, Next, Copy image, Learn's Start pills. It's the one colour that says "tap me", and it stands out against the clay. |
+| **Game** | The game's lid colour (`LIDS` in `lib/genColors.ts`): Gen 3 green, Gen 4 blue, Gen 5 black and white, Gen 6 red | The game's header, and in place of steel blue for big actions on that game's own screens (team builder, lead pick, the battle's end card). Gen 5 uses its dark lid on light themes and its light button on dark ones. |
+| **Clay** | `#a3646a` to `#8a4f58` | The home screens' lid, the Learn and Link Battle headers, the Poké Ball's centre. A surface colour, never a button. |
+| **Seam** | `#2b2d36` | The Poké Ball's dark seam: under headers, along the top of sheets, cards and the end card. |
+
+**Type.** Fraunces (serif) for screen and sheet titles, big actions, the name card's speech bubble, and headline numbers. The body font for everything else. The game's pixel font only for battle text.
+
+**Buttons** (`styles.css`):
+- `.btn-primary`: action colour, serif 17px (18px on game screens), 12px radius, and a pressed-down bottom edge (`0 4px 0` of the colour mixed with black). It sinks 2px when pressed.
+- `.btn-secondary`: the surface colour with a 2px outline and a 3px pressed-down edge.
+- `.cta-pill` for small actions in a list, and `.chunky-chip` (plus `.chip` on game screens) for chips.
+- Battle controls (moves, switches, in-battle prompts) stay plain inside `.battle-ui`, so the field reads first. The end card (`.end-card`) is the exception.
+
+**Cards and sheets.** Sheets (`ui/Sheet.tsx`, `.menu-sheet`) and the end card have a 22px top radius and the seam drawn inside their top edge, so nothing grows taller. Sheet titles are serif. The first-open name card is the model for a card over a screen: the screen dimmed with a light blur, the card rising from the bottom, and a Pokémon standing on its edge when one is speaking.
+
+**Motion.** Screens change with the lid, seam and ball gliding together (view transitions, §12.2). New content rises in and old content fades out. Nothing pops in ahead of its frame.
+
 ### 12.3 Rendering the battle
 
 - Evaluate `@pkmn/client` and `@pkmn/view` for parsing/rendering protocol vs a minimal custom renderer. Pick the option that gets closest to Showdown's own look and flow (§12.2b) with the least custom work, and supports clear HP, status, hazards, weather, and move reveals.

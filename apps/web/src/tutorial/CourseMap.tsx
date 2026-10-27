@@ -96,9 +96,7 @@ export function CourseMap({
               <span className="block text-[17px] leading-snug font-semibold">{next.title}</span>
               <span className="block text-[13px] text-muted">{nextLesson.summary}</span>
             </span>
-            <span className="shrink-0 rounded-full bg-accent px-3 py-1.5 text-[14px] font-semibold text-on-accent">
-              Start
-            </span>
+            <span className="cta-pill shrink-0 px-3 py-1.5 text-[15px]">Start</span>
           </button>
         )}
         <ol className="mt-5 grid gap-2">
@@ -210,9 +208,7 @@ export function CourseMap({
                               </span>
                             </span>
                             {isNext && lesson && (
-                              <span className="shrink-0 rounded-full bg-accent px-3 py-1 text-[13px] font-semibold text-on-accent">
-                                Start
-                              </span>
+                              <span className="cta-pill shrink-0 px-3 py-1 text-[14px]">Start</span>
                             )}
                             {!lesson && (
                               <span className="shrink-0 text-[12px] font-semibold text-muted">

@@ -71,7 +71,7 @@ export function OtherGames({
                 value.onPlay(g.id);
               }}
               className={clsx(
-                'flex flex-col items-center justify-center rounded-card border border-line bg-surface px-1 text-center hover:bg-surface-2',
+                'chunky-chip flex flex-col items-center justify-center border-line bg-surface px-1 text-center hover:bg-surface-2',
                 compact ? 'min-h-10' : 'min-h-12 py-1.5',
               )}
             >

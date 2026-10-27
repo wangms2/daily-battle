@@ -985,7 +985,7 @@ export function Battle({
   const streakText = result && streakLine(result.summary, result.streak);
   const dailyEnd = (e: NonNullable<TurnPackage['end']>, r: DayResult) => (
     <>
-      <p className="display text-[22px]">
+      <p className="home-serif text-[26px] leading-tight">
         {gaveUp ? 'You gave up' : e.winner === 'you' ? 'You won' : 'You lost'}
       </p>
       <div className="mt-1 flex justify-center">
@@ -1039,7 +1039,7 @@ export function Battle({
       <div
         ref={endRef}
         tabIndex={-1}
-        className="card animate-sheet-in max-h-full w-full max-w-sm overflow-y-auto p-5 text-center outline-none"
+        className="end-card card animate-sheet-in max-h-full w-full max-w-sm overflow-y-auto p-5 pt-6 text-center outline-none"
         role="dialog"
         aria-label="Battle over"
       >
@@ -1136,7 +1136,7 @@ export function Battle({
   }
 
   return (
-    <div ref={rootRef} className="relative flex h-full flex-col" data-gen={gen}>
+    <div ref={rootRef} className="battle-ui relative flex h-full flex-col" data-gen={gen}>
       {topBar}
       <Spotlight
         root={rootRef}
