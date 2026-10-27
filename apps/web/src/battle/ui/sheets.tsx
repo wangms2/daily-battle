@@ -76,12 +76,7 @@ export function MenuSheet({
   return (
     <Sheet open={open} onOpenChange={onOpenChange} title="Battle">
       <div className="divide-y divide-line">
-        <Switch
-          checked={hints}
-          onCheckedChange={onHints}
-          label="Beginner hints"
-          hint="Effectiveness, speed, and tips"
-        />
+        <Switch checked={hints} onCheckedChange={onHints} label="Beginner hints" />
         <Switch checked={animations} onCheckedChange={onAnimations} label="Animations" />
         {coach && (
           <Switch
@@ -138,6 +133,7 @@ export function GiveUpDialog({
     <ConfirmDialog
       open={open}
       onOpenChange={onOpenChange}
+      danger
       title="Forfeit this battle?"
       body={
         body ??

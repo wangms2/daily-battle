@@ -4,14 +4,12 @@
 import { cleanName } from '@daily-battle/versus';
 import { useState, type FormEvent } from 'react';
 import { ChevronIcon } from '../ui/icons';
-import { Sheet } from '../ui/Sheet';
 import { useAccount } from '../state/context';
 import { Button } from '../ui/bits';
 import { PASSWORD_MIN } from '../ui/ProtectCard';
 import { saveName } from '../versus/saved';
 
-const input =
-  'h-10 min-w-0 rounded-btn border border-line bg-surface px-3 text-[15px] text-ink placeholder:text-muted';
+const input = 'field h-10 min-w-0 px-3 text-[15px] placeholder:text-muted';
 
 const SIGN_IN_ERROR = {
   wrong: 'That name and password don’t match.',
@@ -131,7 +129,8 @@ export function TrainerSection({
               />
               <Button
                 type="submit"
-                className="h-10 shrink-0 bg-bad px-3"
+                variant="danger"
+                className="h-10 shrink-0 px-3"
                 disabled={busy || !password}
               >
                 Delete
@@ -237,22 +236,15 @@ export function TrainerSection({
   );
 }
 
-/** Settings' row for the player's name; it opens the Trainer sheet. */
-export function TrainerRow({
-  name,
-  onRename,
-}: {
-  name: string | undefined;
-  onRename: (name: string) => void;
-}) {
+/** Settings' row for the player's name; it opens the Trainer page in place. */
+export function TrainerRow({ name, onOpen }: { name: string | undefined; onOpen: () => void }) {
   const account = useAccount();
-  const [open, setOpen] = useState(false);
   const shown = account.name ?? name;
   return (
     <>
       <button
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={onOpen}
         className="flex min-h-12 w-full items-center justify-between gap-4 py-1 text-left"
       >
         <span className="text-[15px] font-medium">Trainer</span>
@@ -264,9 +256,6 @@ export function TrainerRow({
           <ChevronIcon className="size-4 shrink-0" aria-hidden />
         </span>
       </button>
-      <Sheet open={open} onOpenChange={setOpen} title="Trainer">
-        <TrainerSection name={name} onRename={onRename} />
-      </Sheet>
     </>
   );
 }

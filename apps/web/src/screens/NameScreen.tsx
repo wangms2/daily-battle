@@ -108,7 +108,7 @@ export function NameScreen({
           >
             <div className="flex gap-2">
               <input
-                className="name-field home-serif h-12 min-w-0 flex-1 px-3 text-[19px]"
+                className="field home-serif h-12 min-w-0 flex-1 px-3 text-[19px]"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 onFocus={(e) => e.target.select()}

@@ -18,6 +18,7 @@ import type { EngineStart, LessonTurn } from '../battle/frames';
 import type { Mark } from '../battle/ui/Controls';
 import { setActiveFormat } from '../lib/data';
 import { backgroundFor } from '../lib/fx';
+import { getSprite } from '../lib/sprites';
 import { Battle } from '../screens/Battle';
 import type { Settings } from '../state/schema';
 import { Button } from '../ui/bits';
@@ -255,10 +256,35 @@ function LessonBattle({
           left={<BackButton label="Practice battle" onClick={onExit} />}
           onSettings={onSettings}
         />
-        <main className="mx-auto grid w-full max-w-[560px] content-start gap-4 px-4 pt-6">
-          <h2 className="display text-[22px]">Practice battle</h2>
-          <p className="text-[15px] leading-relaxed">{step.intro}</p>
-          <Button onClick={() => setIntro(false)}>Start battle</Button>
+        {/* Laid out like the lesson's opening card: your lead against the foes. */}
+        <main className="mx-auto flex w-full max-w-[480px] flex-1 flex-col items-center justify-center gap-4 overflow-y-auto px-6 pb-10 text-center">
+          <img
+            src={getSprite(step.player[0]!.species, 'front')}
+            alt=""
+            className="lesson-star pixelated size-32 object-contain"
+          />
+          <div className="flex items-center gap-2" aria-hidden>
+            <span className="text-[13px] font-semibold tracking-wider text-muted uppercase">
+              vs
+            </span>
+            {step.foe.map((m) => (
+              <img
+                key={m.species}
+                src={getSprite(m.species, 'front')}
+                alt=""
+                className="pixelated size-12 object-contain"
+              />
+            ))}
+          </div>
+          <div className="grid gap-1">
+            <p className="text-[13px] font-semibold tracking-wider text-muted uppercase">
+              Practice battle
+            </p>
+            <p className="text-[16px] leading-snug">{step.intro}</p>
+          </div>
+          <Button className="mt-2 w-full max-w-[280px]" onClick={() => setIntro(false)}>
+            Start battle
+          </Button>
           {onBack && (
             <Button variant="ghost" onClick={onBack}>
               Previous slide
@@ -286,7 +312,7 @@ function LessonBattle({
         exitLabel: 'Back to lessons',
         renderEnd: (end) => (
           <div className="grid gap-3">
-            <h2 className="display text-[22px]">
+            <h2 className="home-serif text-[22px]">
               {end.winner === 'you' ? 'You won!' : 'Not this time'}
             </h2>
             {end.winner !== 'you' && (

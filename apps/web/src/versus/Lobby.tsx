@@ -64,7 +64,7 @@ function Choice<T extends string | number>({
             aria-pressed={o.value === value}
             onClick={() => onChange(o.value)}
             className={clsx(
-              'chip min-h-10 flex-1 px-3 py-1.5 text-[14px]',
+              'chip chunky-chip min-h-10 flex-1 px-3 py-1.5 text-[14px]',
               o.value === value ? 'is-selected card font-semibold' : 'hover:bg-surface-2',
             )}
           >
@@ -146,7 +146,7 @@ export function Lobby({
       <section className="card flex items-center justify-between gap-3 p-4">
         <div>
           <p className="text-[13px] text-muted">Room code</p>
-          <p className="display text-[26px] tracking-[0.2em]" data-testid="room-code">
+          <p className="home-serif text-[26px] tracking-[0.2em]" data-testid="room-code">
             {room.code}
           </p>
         </div>
@@ -304,6 +304,7 @@ export function Lobby({
       <ConfirmDialog
         open={leaving}
         onOpenChange={setLeaving}
+        danger
         title="Leave the room?"
         body={[
           host && nextHost
@@ -321,6 +322,7 @@ export function Lobby({
       <ConfirmDialog
         open={!!removing}
         onOpenChange={(open) => !open && setRemoving(null)}
+        danger
         title={`Remove ${removing?.name ?? ''}?`}
         body="They can join again with the code."
         confirm="Remove"

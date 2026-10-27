@@ -66,8 +66,7 @@ export function VersusRoute({
   );
 }
 
-const inputClass =
-  'h-11 w-full rounded-btn border border-line bg-surface px-3 text-[16px] text-ink placeholder:text-muted';
+const inputClass = 'field h-11 w-full px-3 text-[16px] placeholder:text-muted';
 
 function NameField({
   value,

@@ -54,7 +54,7 @@ function Results({ room, you }: { room: RoomView; you: string }) {
     <section className="space-y-2" aria-label="Results">
       {outNow && me.place !== null && (
         <div className="anim-vs-stamp card border-bad p-4 text-center" role="status">
-          <p className="display text-[22px]">You’re out</p>
+          <p className="home-serif text-[22px]">You’re out</p>
           <p className="text-[14px] text-muted">
             {placeText(me.place)} · {me.wins}–{me.losses}. Stay to watch the rest.
           </p>
@@ -156,18 +156,18 @@ function NextUp({ room, you, sinceNext }: { room: RoomView; you: string; sinceNe
       </p>
       <div className="mt-3 grid grid-cols-[1fr_auto_1fr] items-center gap-3">
         <div className="anim-vs-left">
-          <p className="display truncate text-[20px]">You</p>
+          <p className="home-serif truncate text-[20px]">You</p>
           <Hearts lives={me.lives} max={room.settings.lives} />
         </div>
         <p
-          className="anim-vs-stamp display text-[28px] text-accent"
+          className="anim-vs-stamp home-serif text-[28px] text-accent"
           style={{ animationDelay: '300ms' }}
         >
           VS
         </p>
         <div className="anim-vs-right">
           <p
-            className={clsx('display truncate text-[20px]', shuffling && 'opacity-60')}
+            className={clsx('home-serif truncate text-[20px]', shuffling && 'opacity-60')}
             role="status"
           >
             {shuffling ? shown : `${shown}`}
@@ -272,7 +272,7 @@ export function GameOverScreen({
             />
           ))}
         </div>
-        <p className="display relative text-[24px]" role="status">
+        <p className="home-serif relative text-[24px]" role="status">
           {headline}
         </p>
         <p className="relative mt-1 text-[14px] text-muted">After {room.round} rounds.</p>

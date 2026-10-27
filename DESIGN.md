@@ -481,6 +481,14 @@ Every screen outside the battle field wears the home screens' look: a Poké Ball
 - `.cta-pill` for small actions in a list, and `.chunky-chip` (plus `.chip` on game screens) for chips.
 - Battle controls (moves, switches, in-battle prompts) stay plain inside `.battle-ui`, so the field reads first. The end card (`.end-card`) is the exception.
 
+**Danger.** A step that loses something gets `.btn-danger`: the same chunky serif button, in red (`--bad`). That covers forfeit, starting over with a new team, leaving a room, removing a player, and deleting the account. `ConfirmDialog` takes `danger` for these.
+
+**Toggles, chips and fields.**
+- Segmented toggles (difficulty, battle speed, a Pokémon's sets) are a chunky tray (`.seg`), with the picked option in the action colour.
+- Option chips (a room's rules) are `.chunky-chip`, with the pressed one in the action colour.
+- Every text field is `.field`: a 2px outline and a 12px radius, turning the action colour while you type.
+- Settings rows are one line, a label and its control, with no descriptions. The welcome sheet explains them.
+
 **Cards and sheets.** Sheets (`ui/Sheet.tsx`, `.menu-sheet`) and the end card have a 22px top radius and the seam drawn inside their top edge, so nothing grows taller. Sheet titles are serif. The first-open name card is the model for a card over a screen: the screen dimmed with a light blur, the card rising from the bottom, and a Pokémon standing on its edge when one is speaking.
 
 **Motion.** Screens change with the lid, seam and ball gliding together (view transitions, §12.2). New content rises in and old content fades out. Nothing pops in ahead of its frame.

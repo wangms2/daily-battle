@@ -38,6 +38,12 @@ export function Sheet({
         <Dialog.Overlay className="animate-fade-in fixed inset-0 z-40 bg-black/45" />
         <Dialog.Content
           ref={sheet}
+          // Focus the sheet itself on opening, not its first button (the ✕ would show a
+          // ring before anything was pressed); Tab still moves into it from there.
+          onOpenAutoFocus={(e) => {
+            e.preventDefault();
+            sheet.current?.focus();
+          }}
           aria-describedby={description ? undefined : undefined}
           className={clsx(
             'menu-sheet animate-sheet-in fixed z-50 flex flex-col bg-surface text-ink shadow-card outline-none',

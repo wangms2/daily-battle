@@ -19,7 +19,7 @@ export function DifficultyPicker({
   disabled?: boolean;
 }) {
   return (
-    <div className="flex rounded-xl bg-surface-2 p-0.5" role="radiogroup" aria-label="Difficulty">
+    <div className="seg flex p-0.5" role="radiogroup" aria-label="Difficulty">
       {DIFFICULTIES.map((d) => {
         const off = disabled || (d === 'hard' && !hardAvailable);
         return (

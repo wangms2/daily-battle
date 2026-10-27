@@ -63,7 +63,7 @@ export function CourseMap({
       />
       <main className="mx-auto w-full max-w-[560px] flex-1 overflow-y-auto px-4 pt-4 pb-10">
         <div className="flex items-center justify-between gap-2">
-          <h1 className="display text-[22px]">Learn to battle</h1>
+          <h1 className="home-serif text-[22px]">Learn to battle</h1>
           {/* Type matchups: an optional side practice, outside the course order. */}
           <button
             type="button"

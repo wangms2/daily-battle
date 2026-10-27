@@ -249,6 +249,30 @@ body {
 .btn-ghost {
   color: var(--accent);
 }
+.btn-ghost.text-bad {
+  color: var(--bad);
+}
+/* A step that loses something (forfeit, a new team, leaving a room, deleting the
+   account): the same chunky button, in red. */
+.btn-danger {
+  background: var(--bad);
+  color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 0 color-mix(in srgb, var(--bad) 60%, black);
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 17px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .btn-danger {
+    color: #1c1215;
+  }
+}
+:root[data-theme='dark'] .btn-danger {
+  color: #1c1215;
+}
+.btn-danger:active:not(:disabled) {
+  transform: translateY(2px);
+}
 /* Small calls to action (Learn's Start) and chips, in the same chunky style. */
 .cta-pill {
   border-radius: 10px;
@@ -263,11 +287,24 @@ body {
   border-radius: 12px;
   box-shadow: 0 3px 0 color-mix(in srgb, var(--border) 80%, black);
 }
-.game-ui [role='radiogroup'][aria-label='Difficulty'] {
+/* Segmented toggles (difficulty, battle speed, a Pokémon's sets): a chunky tray,
+   the picked one in the action colour. */
+.seg {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 12px;
   box-shadow: 0 3px 0 color-mix(in srgb, var(--border) 80%, black);
+}
+.seg > [aria-checked='true'],
+.seg > [aria-selected='true'],
+.chunky-chip[aria-pressed='true'] {
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  border-color: transparent;
+  box-shadow: none;
+}
+.chunky-chip[aria-pressed='true'] .text-muted {
+  color: inherit;
 }
 /* Cards over a screen (menus, the battle's end card): the Poké Ball's seam along the
    top, drawn inside so nothing grows taller. */
@@ -1254,15 +1291,16 @@ button {
 .name-bubble strong {
   color: #a3646a;
 }
-.name-field {
+/* Text fields: a 2px outline that turns the action colour while typing. */
+.field {
   border: 2px solid var(--border);
   border-radius: 12px;
   background: var(--surface);
   color: var(--text);
 }
-.name-field:focus {
+.field:focus {
   outline: none;
-  border-color: #a3646a;
+  border-color: var(--accent);
 }
 .name-dice {
   background: var(--surface);

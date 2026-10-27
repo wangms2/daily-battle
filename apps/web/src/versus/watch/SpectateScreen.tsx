@@ -96,7 +96,7 @@ function WatchCard({
         )}
         {match.stage === 'over' && (
           <div className="absolute inset-0 z-10 grid place-items-center bg-black/35">
-            <p className="display rounded-card bg-surface px-4 py-2 text-[17px]">
+            <p className="home-serif rounded-card bg-surface px-4 py-2 text-[17px]">
               {match.winner ? `${nameIn(room, match.players[match.winner])} won` : 'Draw'}
             </p>
           </div>

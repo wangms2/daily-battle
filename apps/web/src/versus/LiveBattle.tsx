@@ -108,7 +108,7 @@ export default function LiveBattle({
             const { title, detail } = endText(match, end, gaveUp);
             return (
               <>
-                <p className="display text-[22px]">{title}</p>
+                <p className="home-serif text-[22px]">{title}</p>
                 <p className="mt-1 text-[14px] text-muted">vs {foe}</p>
                 <p className="mt-3 text-[15px]">{detail}</p>
                 <Button className="mt-4 w-full" onClick={onBack}>

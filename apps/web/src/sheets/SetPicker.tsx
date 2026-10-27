@@ -178,7 +178,7 @@ export function SetPicker({
         <div
           role="tablist"
           aria-label="Sets"
-          className="mb-2 grid gap-1 rounded-btn bg-surface-2 p-1"
+          className="seg mb-2 grid gap-1 p-1"
           style={{ gridTemplateColumns: `repeat(${sets.length}, minmax(0, 1fr))` }}
         >
           {sets.map((s, i) => (

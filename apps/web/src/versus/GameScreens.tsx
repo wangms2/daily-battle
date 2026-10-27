@@ -35,6 +35,7 @@ export function LeaveButton({ onLeave, inGame }: { onLeave: () => void; inGame: 
       <ConfirmDialog
         open={open}
         onOpenChange={setOpen}
+        danger
         title="Leave the room?"
         body={
           inGame
@@ -86,7 +87,7 @@ export function BuildScreen({
         onLock={onSubmit}
         topBar={
           <header className="flex h-12 shrink-0 items-center justify-between gap-2 px-3 pt-[env(safe-area-inset-top)] wide:px-6">
-            <h1 className="display text-[16px]">
+            <h1 className="home-serif text-[16px]">
               Build your team · {me.teamSize} of {room.pool!.species.length}
             </h1>
             {timer}

@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import clsx from 'clsx';
 import type { SetEntry } from '@daily-battle/data';
 import {
@@ -12,9 +12,9 @@ import { getSprite } from '../lib/sprites';
 import type { Stats } from '../lib/results';
 import type { Settings } from '../state/schema';
 import { Sheet } from '../ui/Sheet';
-import { TrainerRow } from './Trainer';
+import { TrainerRow, TrainerSection } from './Trainer';
 import { Button, Switch, TypeBadge } from '../ui/bits';
-import { CheckIcon, CloseIcon } from '../ui/icons';
+import { CheckIcon, ChevronIcon, CloseIcon } from '../ui/icons';
 
 export function WelcomeSheet({
   open,
@@ -103,7 +103,7 @@ export function WelcomeSheet({
 function StatTile({ value, label }: { value: ReactNode; label: string }) {
   return (
     <div className="rounded-card bg-surface-2 px-3 py-3 text-center">
-      <div className="display text-[22px] tabular-nums">{value}</div>
+      <div className="home-serif text-[24px] tabular-nums">{value}</div>
       <div className="text-[12px] text-muted">{label}</div>
     </div>
   );
@@ -204,72 +204,87 @@ export function SettingsSheet({
   onHowToPlay: () => void;
 }) {
   const speeds: Settings['battleSpeed'][] = ['slow', 'normal', 'fast'];
+  // The Trainer page opens in place of the list, with a way back; closing resets it.
+  const [page, setPage] = useState<'main' | 'trainer'>('main');
+  const close = (o: boolean) => {
+    if (!o) setPage('main');
+    onOpenChange(o);
+  };
   return (
-    <Sheet open={open} onOpenChange={onOpenChange} title="Settings">
-      <div className="divide-y divide-line">
-        <TrainerRow name={settings.name} onRename={(name) => onChange('name', name)} />
-        <Switch
-          checked={settings.beginnerHints}
-          onCheckedChange={(v) => onChange('beginnerHints', v)}
-          label="Beginner hints"
-          hint="Team checklist, weaknesses, and tips"
-        />
-        <div className="flex min-h-14 items-center justify-between gap-4 py-2">
-          <span className="text-[15px] font-medium">Battle speed</span>
-          <div
-            className="flex rounded-xl bg-surface-2 p-1"
-            role="radiogroup"
-            aria-label="Battle speed"
+    <Sheet open={open} onOpenChange={close} title={page === 'trainer' ? 'Trainer' : 'Settings'}>
+      {page === 'trainer' ? (
+        <div>
+          <button
+            type="button"
+            onClick={() => setPage('main')}
+            className="-ml-1 flex h-9 items-center gap-0.5 text-[14px] font-semibold text-accent"
           >
-            {speeds.map((s) => (
-              <button
-                key={s}
-                type="button"
-                role="radio"
-                aria-checked={settings.battleSpeed === s}
-                onClick={() => onChange('battleSpeed', s)}
-                className={`min-h-9 rounded-lg px-3 text-[13px] font-semibold capitalize ${
-                  settings.battleSpeed === s ? 'bg-surface text-ink shadow-card' : 'text-muted'
-                }`}
-              >
-                {s}
-              </button>
-            ))}
-          </div>
+            <ChevronIcon className="size-4 rotate-180" aria-hidden />
+            Settings
+          </button>
+          <TrainerSection name={settings.name} onRename={(name) => onChange('name', name)} />
         </div>
-        <Switch
-          checked={settings.animations}
-          onCheckedChange={(v) => onChange('animations', v)}
-          label="Animations"
-          hint="Battle effects and animated sprites"
-        />
-        <Switch
-          checked={settings.sound}
-          onCheckedChange={(v) => onChange('sound', v)}
-          label="Sound"
-          hint="Music, Pokémon cries, and select sounds"
-        />
-        <VolumeSlider
-          label="Music volume"
-          value={settings.musicVolume}
-          disabled={!settings.sound}
-          onChange={(v) => onChange('musicVolume', v)}
-        />
-        <VolumeSlider
-          label="Effects volume"
-          value={settings.effectsVolume}
-          disabled={!settings.sound}
-          onChange={(v) => onChange('effectsVolume', v)}
-        />
-      </div>
-      <div className="mt-3 grid grid-cols-2 gap-2">
-        <Button variant="secondary" onClick={onHowToPlay}>
-          How to play
-        </Button>
-        <Button variant="secondary" onClick={onAbout}>
-          About
-        </Button>
-      </div>
+      ) : (
+        <>
+          <div className="divide-y divide-line">
+            <TrainerRow name={settings.name} onOpen={() => setPage('trainer')} />
+            <Switch
+              checked={settings.beginnerHints}
+              onCheckedChange={(v) => onChange('beginnerHints', v)}
+              label="Beginner hints"
+            />
+            <div className="flex min-h-14 items-center justify-between gap-4 py-2">
+              <span className="text-[15px] font-medium">Battle speed</span>
+              <div className="seg flex p-1" role="radiogroup" aria-label="Battle speed">
+                {speeds.map((s) => (
+                  <button
+                    key={s}
+                    type="button"
+                    role="radio"
+                    aria-checked={settings.battleSpeed === s}
+                    onClick={() => onChange('battleSpeed', s)}
+                    className={`min-h-9 rounded-lg px-3 text-[13px] font-semibold capitalize ${
+                      settings.battleSpeed === s ? 'bg-surface text-ink shadow-card' : 'text-muted'
+                    }`}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <Switch
+              checked={settings.animations}
+              onCheckedChange={(v) => onChange('animations', v)}
+              label="Animations"
+            />
+            <Switch
+              checked={settings.sound}
+              onCheckedChange={(v) => onChange('sound', v)}
+              label="Sound"
+            />
+            <VolumeSlider
+              label="Music volume"
+              value={settings.musicVolume}
+              disabled={!settings.sound}
+              onChange={(v) => onChange('musicVolume', v)}
+            />
+            <VolumeSlider
+              label="Effects volume"
+              value={settings.effectsVolume}
+              disabled={!settings.sound}
+              onChange={(v) => onChange('effectsVolume', v)}
+            />
+          </div>
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            <Button variant="secondary" onClick={onHowToPlay}>
+              How to play
+            </Button>
+            <Button variant="secondary" onClick={onAbout}>
+              About
+            </Button>
+          </div>
+        </>
+      )}
     </Sheet>
   );
 }
@@ -381,6 +396,7 @@ export function ConfirmDialog({
   confirm,
   cancel = 'Cancel',
   onConfirm,
+  danger = false,
   children,
 }: {
   open: boolean;
@@ -390,6 +406,8 @@ export function ConfirmDialog({
   confirm: string;
   cancel?: string;
   onConfirm: () => void;
+  /** A step that loses something (a battle, a streak, a seat): the confirm is red. */
+  danger?: boolean;
   children?: ReactNode;
 }) {
   return (
@@ -399,7 +417,9 @@ export function ConfirmDialog({
         <Button variant="secondary" onClick={() => onOpenChange(false)}>
           {cancel}
         </Button>
-        <Button onClick={onConfirm}>{confirm}</Button>
+        <Button variant={danger ? 'danger' : 'primary'} onClick={onConfirm}>
+          {confirm}
+        </Button>
       </div>
     </Sheet>
   );

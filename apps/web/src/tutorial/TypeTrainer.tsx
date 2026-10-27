@@ -84,7 +84,7 @@ export function TypeTrainer({
         {done ? (
           <section className="grid gap-4">
             <div className="grid justify-items-center gap-1 pt-2 text-center">
-              <p className="display text-[44px] leading-none tabular-nums">
+              <p className="home-serif text-[44px] leading-none tabular-nums">
                 {score}
                 <span className="text-[24px] text-muted"> / {ROUND}</span>
               </p>

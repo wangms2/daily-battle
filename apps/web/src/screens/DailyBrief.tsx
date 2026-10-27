@@ -553,6 +553,7 @@ export function DailyBrief({
       <ConfirmDialog
         open={ditchOpen}
         onOpenChange={setDitchOpen}
+        danger
         title="Start over with a new team?"
         body={
           result.streak > 0

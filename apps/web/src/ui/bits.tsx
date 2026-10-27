@@ -23,7 +23,9 @@ export function Button({
   variant = 'primary',
   className,
   ...props
-}: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: 'primary' | 'secondary' | 'ghost' }) {
+}: ButtonHTMLAttributes<HTMLButtonElement> & {
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
+}) {
   return (
     <button
       type="button"
@@ -32,6 +34,7 @@ export function Button({
         variant === 'primary' && 'btn-primary',
         variant === 'secondary' && 'btn-secondary',
         variant === 'ghost' && 'btn-ghost',
+        variant === 'danger' && 'btn-danger',
         className,
       )}
       {...props}

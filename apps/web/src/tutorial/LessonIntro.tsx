@@ -45,7 +45,7 @@ export function LessonIntro({
       <main className="mx-auto flex w-full max-w-[480px] flex-1 flex-col items-center justify-center gap-4 overflow-y-auto px-6 pb-10 text-center">
         {first && (
           <div className="grid gap-1">
-            <p className="display text-[26px]">Welcome to Learn to battle!</p>
+            <p className="home-serif text-[26px]">Welcome to Learn to battle!</p>
             <p className="text-[15px] leading-relaxed text-muted">
               Short lessons on the real battle screen. You make every move yourself, and the coach
               helps in the battles.
@@ -63,7 +63,7 @@ export function LessonIntro({
           <p className="text-[13px] font-semibold tracking-wider text-muted uppercase">
             {lesson.review ? 'Unit review' : `Lesson ${lesson.number}`}
           </p>
-          <h1 className="display text-[24px] leading-tight">{lesson.title}</h1>
+          <h1 className="home-serif text-[24px] leading-tight">{lesson.title}</h1>
           <p className="text-[16px] leading-snug">{lesson.summary}</p>
           <p className="mt-1 text-[13px] text-muted tabular-nums">
             {lesson.steps.length} steps · about {minutes(lesson)} min
