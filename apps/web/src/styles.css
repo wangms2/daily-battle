@@ -201,6 +201,48 @@ body {
 .btn-ghost {
   color: var(--accent);
 }
+/* The builder and the brief (lead pick): the landing's chunky buttons, in the
+   game's own colour (--game-btn, set in App.tsx), and chunky chips and toggles. */
+.game-ui .btn-primary {
+  background: var(--game-btn);
+  color: var(--game-btn-fg);
+  border: 0;
+  border-radius: 12px;
+  box-shadow: 0 4px 0 color-mix(in srgb, var(--game-btn) 62%, black);
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 18px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .game-ui .btn-primary {
+    background: var(--game-btn-dark);
+    color: var(--game-btn-dark-fg);
+    box-shadow: 0 4px 0 color-mix(in srgb, var(--game-btn-dark) 62%, black);
+  }
+}
+:root[data-theme='dark'] .game-ui .btn-primary {
+  background: var(--game-btn-dark);
+  color: var(--game-btn-dark-fg);
+  box-shadow: 0 4px 0 color-mix(in srgb, var(--game-btn-dark) 62%, black);
+}
+.game-ui .btn-secondary {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 3px 0 color-mix(in srgb, var(--border) 80%, black);
+}
+.game-ui .btn:active:not(:disabled) {
+  transform: translateY(2px);
+}
+.game-ui button.chip {
+  box-shadow: 0 3px 0 color-mix(in srgb, var(--border) 80%, black);
+}
+.game-ui [role='radiogroup'][aria-label='Difficulty'] {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 3px 0 color-mix(in srgb, var(--border) 80%, black);
+}
+
 /* Menus (ui/Sheet.tsx) in the home screens' style: the Poké Ball's seam along the
    top, the serif title, and the landing's chunky clay and outlined buttons. */
 .menu-sheet {

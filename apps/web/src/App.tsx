@@ -1,9 +1,18 @@
 import type { Difficulty } from '@daily-battle/ai/version';
 import { DEFAULT_FORMAT, FORMATS, formatInfo, type FormatId } from '@daily-battle/data/formats';
 import { addDays, dayKey, weekKey } from '@daily-battle/gen/dates';
-import { Fragment, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import {
+  Fragment,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+  type CSSProperties,
+} from 'react';
 import { BattleRoute } from './screens/BattleRoute';
 import { DailyBrief } from './screens/DailyBrief';
+import { LIDS } from './lib/genColors';
 import { NameScreen } from './screens/NameScreen';
 import { ProtectCard } from './ui/ProtectCard';
 import { savedName, saveName } from './versus/saved';
@@ -613,6 +622,16 @@ export function App() {
   return (
     <div
       className={`mx-auto h-dvh overflow-hidden ${route === 'battle' ? 'max-w-[1440px]' : !versus && !playing && !learning ? '' : 'max-w-[1280px]'}`}
+      // The game's own colour, for its screens' big buttons (styles.css, .game-ui).
+      style={
+        {
+          // Gen 5's black and white: its dark lid on light, its light button on dark.
+          '--game-btn': format === 'gen5ou' ? LIDS.gen5ou.lid : LIDS[format].button,
+          '--game-btn-fg': '#fff',
+          '--game-btn-dark': LIDS[format].button,
+          '--game-btn-dark-fg': format === 'gen5ou' ? LIDS.gen5ou.deep : '#fff',
+        } as CSSProperties
+      }
     >
       {!storageAvailable && !storageNoticeDismissed && (
         <div
