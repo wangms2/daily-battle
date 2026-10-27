@@ -21,8 +21,12 @@
 /audio/*
   Cache-Control: public, max-age=604800
 
+# Icons change name when they change (see index.html), so a day's cache is plenty.
 /icons/*
-  Cache-Control: public, max-age=604800
+  Cache-Control: public, max-age=86400
+
+/apple-touch-icon.png
+  Cache-Control: public, max-age=86400
 
 # Schedules are published weekly; always check for a fresh copy.
 /schedule/*

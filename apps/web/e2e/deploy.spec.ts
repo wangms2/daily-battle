@@ -69,7 +69,10 @@ test('ships icons, a manifest, and link-preview tags', async ({ page, request })
   expect(og).toMatch(/\/og\.png$/);
   const manifest = await (await request.get('/manifest.webmanifest')).json();
   for (const icon of manifest.icons) expect((await request.get(icon.src)).ok()).toBe(true);
-  for (const path of ['/favicon.svg', '/icons/apple-touch-icon.png', '/og.png']) {
+  // The home-screen icon (versioned: iOS keeps an icon by its URL), and the root
+  // path iOS asks for on its own.
+  const touch = (await page.locator('link[rel="apple-touch-icon"]').getAttribute('href'))!;
+  for (const path of ['/favicon.svg', touch, '/apple-touch-icon.png', '/og.png']) {
     expect((await request.get(path)).ok(), path).toBe(true);
   }
 });
