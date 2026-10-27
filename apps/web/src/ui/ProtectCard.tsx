@@ -56,7 +56,7 @@ export function ProtectCard({
       </p>
       {newName !== null && (
         <input
-          className="field h-10 px-3 text-[15px] font-semibold"
+          className="field h-10 px-3 text-[16px] font-semibold"
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
           maxLength={16}
@@ -67,7 +67,7 @@ export function ProtectCard({
       <div className="flex gap-2">
         <input
           type="password"
-          className="field h-10 min-w-0 flex-1 px-3 text-[15px]"
+          className="field h-10 min-w-0 flex-1 px-3 text-[16px]"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Password"

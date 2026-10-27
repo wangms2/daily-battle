@@ -48,6 +48,12 @@ describe('accounts', () => {
     expect(await res.json()).toEqual({ save: '{"v":1}', updatedAt: 1000 });
   });
 
+  it('says whether a name is taken, to anyone, and nothing more', async () => {
+    expect(await (await call(memory(), 'GET', '')).json()).toEqual({ taken: false });
+    const { store } = await registered();
+    expect(await (await call(store, 'GET', '')).json()).toEqual({ taken: true });
+  });
+
   it('refuses a short password, and a name someone already protected', async () => {
     expect((await call(memory(), 'POST', '', { password: 'abcd' })).status).toBe(400);
     const { store } = await registered();

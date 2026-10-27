@@ -1291,7 +1291,9 @@ button {
 .name-bubble strong {
   color: #a3646a;
 }
-/* Text fields: a 2px outline that turns the action colour while typing. */
+/* Text fields: a 2px outline that turns the action colour while typing. Their
+   text is 16px or more: smaller, and iPhones zoom in on focus (and with pinch zoom
+   off, there's no zooming back out). e2e/account.spec.ts checks it. */
 .field {
   border: 2px solid var(--border);
   border-radius: 12px;

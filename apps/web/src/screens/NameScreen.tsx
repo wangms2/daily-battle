@@ -8,6 +8,7 @@ import clsx from 'clsx';
 import { useEffect, useRef, useState } from 'react';
 import { randomName } from '../lib/names';
 import { SignInForm } from '../sheets/Trainer';
+import { useNameCheck } from '../state/useNameCheck';
 import { getSprite } from '../lib/sprites';
 import { DiceIcon } from '../ui/icons';
 
@@ -31,6 +32,8 @@ export function NameScreen({
   const [met, setMet] = useState<string | null>(null);
   const [signingIn, setSigningIn] = useState(false);
   const clean = cleanName(name);
+  // A name someone has protected is theirs: pick another (or sign in to it).
+  const taken = useNameCheck(clean) === 'taken';
   // The greeting carries on once: when it times out, or at a tap.
   // The greeting shows a moment (a tap skips it), then the card slides away.
   const [leaving, setLeaving] = useState(false);
@@ -103,7 +106,7 @@ export function NameScreen({
             inert={!!met}
             onSubmit={(e) => {
               e.preventDefault();
-              if (clean) setMet(clean);
+              if (clean && !taken) setMet(clean);
             }}
           >
             <div className="flex gap-2">
@@ -115,7 +118,8 @@ export function NameScreen({
                 autoComplete="nickname"
                 maxLength={16}
                 aria-label="Your name"
-                aria-invalid={!clean || undefined}
+                aria-invalid={!clean || taken || undefined}
+                aria-describedby={taken ? 'name-taken' : undefined}
               />
               <button
                 type="button"
@@ -126,10 +130,15 @@ export function NameScreen({
                 <DiceIcon width={24} height={24} />
               </button>
             </div>
+            {taken && (
+              <p id="name-taken" role="alert" className="-mt-1 text-[14px] text-bad">
+                Someone already protected that name. Try another!
+              </p>
+            )}
             <button
               type="submit"
               className="home-btn name-cta home-serif h-13 w-full text-[20px]"
-              disabled={!clean}
+              disabled={!clean || taken}
             >
               That’s me!
             </button>

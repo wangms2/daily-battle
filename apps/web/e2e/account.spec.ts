@@ -93,11 +93,21 @@ test('a protected name brings its streak to another device, and a wrong password
   await rival.getByLabel('Password').fill('another');
   await rival.getByRole('button', { name: 'Protect', exact: true }).click();
   await expect(rival.getByRole('alert')).toHaveText(/already protected/);
+  // Text fields are 16px or more, or iPhones zoom in when one is tapped.
+  for (const size of await rival
+    .locator('input:not([type=checkbox]):not([type=range])')
+    .evaluateAll((els) => els.map((e) => parseFloat(getComputedStyle(e).fontSize)))) {
+    expect(size).toBeGreaterThanOrEqual(16);
+  }
 
   // A new device: the game opens on the name screen; sign in instead.
   const phone = await (await browser.newContext({ baseURL })).newPage();
   await phone.clock.setFixedTime(TODAY);
   await phone.goto('/');
+  // A protected name can't be picked as someone new.
+  await phone.getByRole('textbox', { name: 'Your name' }).fill(name);
+  await expect(phone.getByText('Someone already protected that name. Try another!')).toBeVisible();
+  await expect(phone.getByRole('button', { name: 'That’s me!' })).toBeDisabled();
   await phone.getByRole('button', { name: /Sign in/ }).click();
   await phone.getByLabel('Your name').fill(name);
   await phone.getByLabel('Password').fill('wrong!');

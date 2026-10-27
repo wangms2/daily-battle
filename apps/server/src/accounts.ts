@@ -100,6 +100,7 @@ async function newToken(account: Account): Promise<string> {
 
 /**
  * One account's requests; `path` is what follows `/api/accounts/<name>`:
+ *   GET ''                                   whether the name is protected → {taken}
  *   POST ''          {password, save}        register the name → {token, name, updatedAt}
  *   POST '/session'  {password}              sign in → {token, name}
  *   DELETE '/session'                        sign this device out
@@ -117,6 +118,9 @@ export async function accountRequest(
   now = Date.now(),
 ): Promise<Response> {
   const account = await store.get<Account>('account');
+
+  // Anyone may ask whether a name is taken (picking a name checks it); nothing else.
+  if (method === 'GET' && path === '') return json({ taken: !!account });
 
   if (method === 'POST' && path === '') {
     const b = await body(request);

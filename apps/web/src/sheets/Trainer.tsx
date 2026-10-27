@@ -5,11 +5,12 @@ import { cleanName } from '@daily-battle/versus';
 import { useState, type FormEvent } from 'react';
 import { ChevronIcon } from '../ui/icons';
 import { useAccount } from '../state/context';
+import { useNameCheck } from '../state/useNameCheck';
 import { Button } from '../ui/bits';
 import { PASSWORD_MIN } from '../ui/ProtectCard';
 import { saveName } from '../versus/saved';
 
-const input = 'field h-10 min-w-0 px-3 text-[15px] placeholder:text-muted';
+const input = 'field h-10 min-w-0 px-3 text-[16px] placeholder:text-muted';
 
 const SIGN_IN_ERROR = {
   wrong: 'That name and password don’t match.',
@@ -83,6 +84,8 @@ export function TrainerSection({
   const account = useAccount();
   const [mode, setMode] = useState<'view' | 'protect' | 'signIn' | 'delete'>('view');
   const [draft, setDraft] = useState(name ?? '');
+  // A name someone has protected can't be taken here.
+  const draftTaken = useNameCheck(draft === name ? null : cleanName(draft)) === 'taken';
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -165,7 +168,8 @@ export function TrainerSection({
           onChange={(e) => setDraft(e.target.value)}
           onBlur={() => {
             const clean = cleanName(draft);
-            if (clean && clean !== name) {
+            if (draftTaken) setDraft(name ?? '');
+            else if (clean && clean !== name) {
               onRename(clean);
               saveName(clean);
             } else setDraft(name ?? '');
@@ -174,6 +178,11 @@ export function TrainerSection({
           autoComplete="nickname"
         />
       </label>
+      {draftTaken && (
+        <p role="alert" className="text-[13px] text-bad">
+          Someone already protected that name. Try another.
+        </p>
+      )}
       {mode === 'protect' && name ? (
         <form
           className="flex gap-2"

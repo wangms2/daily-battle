@@ -59,6 +59,17 @@ async function call(
   });
 }
 
+/** Whether someone has protected `name`; null when the server can't be reached. */
+export async function nameTaken(name: string): Promise<boolean | null> {
+  try {
+    const res = await fetch(url(name));
+    if (!res.ok) return null;
+    return ((await res.json()) as { taken: boolean }).taken;
+  } catch {
+    return null;
+  }
+}
+
 export type ProtectResult = 'ok' | 'taken' | 'offline';
 
 /** Protects `name` with `password`, saving this device's progress to it. */
