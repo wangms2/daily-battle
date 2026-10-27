@@ -22,89 +22,30 @@
   },
   "suggestedTeams": [
     {
-      "archetype": "Balanced",
       "team": [
-        {
-          "species": "Gyarados",
-          "setId": "gyarados-defensive-resttalk"
-        },
-        {
-          "species": "Snorlax",
-          "setId": "snorlax-utility"
-        },
-        {
-          "species": "Bronzong",
-          "setId": "bronzong-tank"
-        },
         {
           "species": "Weezing",
           "setId": "weezing-physically-defensive"
+        },
+        {
+          "species": "Starmie",
+          "setId": "starmie-offensive-rapid-spin"
         },
         {
           "species": "Tyranitar",
           "setId": "tyranitar-choice-scarf"
         },
         {
-          "species": "Dragonite",
-          "setId": "dragonite-offensive-dragon-dance"
-        }
-      ]
-    },
-    {
-      "archetype": "Offense",
-      "team": [
-        {
-          "species": "Starmie",
-          "setId": "starmie-offensive-rapid-spin"
-        },
-        {
-          "species": "Abomasnow",
-          "setId": "abomasnow-all-out-attacker"
-        },
-        {
-          "species": "Gyarados",
-          "setId": "gyarados-choice-band"
+          "species": "Rotom-Mow",
+          "setId": "rotommow-choice-scarf"
         },
         {
           "species": "Bronzong",
           "setId": "bronzong-offensive-stealth-rock"
         },
         {
-          "species": "Tyranitar",
-          "setId": "tyranitar-choice-band"
-        },
-        {
-          "species": "Snorlax",
-          "setId": "snorlax-utility"
-        }
-      ]
-    },
-    {
-      "archetype": "Stall",
-      "team": [
-        {
-          "species": "Snorlax",
-          "setId": "snorlax-resttalk"
-        },
-        {
-          "species": "Gyarados",
-          "setId": "gyarados-defensive-resttalk"
-        },
-        {
-          "species": "Tyranitar",
-          "setId": "tyranitar-all-purpose"
-        },
-        {
-          "species": "Weezing",
-          "setId": "weezing-physically-defensive"
-        },
-        {
-          "species": "Rotom-Mow",
-          "setId": "rotommow-defensive"
-        },
-        {
-          "species": "Bronzong",
-          "setId": "bronzong-tank"
+          "species": "Abomasnow",
+          "setId": "abomasnow-leech-seed"
         }
       ]
     }

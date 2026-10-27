@@ -22,89 +22,30 @@
   },
   "suggestedTeams": [
     {
-      "archetype": "Balanced",
-      "team": [
-        {
-          "species": "Heatran",
-          "setId": "heatran-offensive"
-        },
-        {
-          "species": "Tyranitar",
-          "setId": "tyranitar-bulky-pursuit-trapper"
-        },
-        {
-          "species": "Reuniclus",
-          "setId": "reuniclus-calm-mind"
-        },
-        {
-          "species": "Toxicroak",
-          "setId": "toxicroak-swords-dance"
-        },
-        {
-          "species": "Dragonite",
-          "setId": "dragonite-3-attacks-dragon-dance"
-        },
-        {
-          "species": "Skarmory",
-          "setId": "skarmory-defensive"
-        }
-      ]
-    },
-    {
-      "archetype": "Offense",
-      "team": [
-        {
-          "species": "Raikou",
-          "setId": "raikou-substitute-calm-mind"
-        },
-        {
-          "species": "Latias",
-          "setId": "latias-choice-scarf"
-        },
-        {
-          "species": "Reuniclus",
-          "setId": "reuniclus-3-attacks"
-        },
-        {
-          "species": "Cobalion",
-          "setId": "cobalion-utility"
-        },
-        {
-          "species": "Dragonite",
-          "setId": "dragonite-3-attacks-dragon-dance"
-        },
-        {
-          "species": "Toxicroak",
-          "setId": "toxicroak-swords-dance"
-        }
-      ]
-    },
-    {
-      "archetype": "Stall",
       "team": [
         {
           "species": "Hitmontop",
           "setId": "hitmontop-rapid-spin"
         },
         {
-          "species": "Cobalion",
-          "setId": "cobalion-utility"
+          "species": "Dragonite",
+          "setId": "dragonite-3-attacks-dragon-dance"
         },
         {
-          "species": "Reuniclus",
-          "setId": "reuniclus-calm-mind"
+          "species": "Raikou",
+          "setId": "raikou-substitute-calm-mind"
+        },
+        {
+          "species": "Toxicroak",
+          "setId": "toxicroak-swords-dance"
         },
         {
           "species": "Heatran",
           "setId": "heatran-specially-defensive"
         },
         {
-          "species": "Tyranitar",
-          "setId": "tyranitar-bulky-pursuit-trapper"
-        },
-        {
-          "species": "Espeon",
-          "setId": "espeon-screens-setter"
+          "species": "Volcarona",
+          "setId": "volcarona-lum-berry-quiver-dance"
         }
       ]
     }

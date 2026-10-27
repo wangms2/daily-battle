@@ -22,89 +22,30 @@
   },
   "suggestedTeams": [
     {
-      "archetype": "Balanced",
-      "team": [
-        {
-          "species": "Clefable",
-          "setId": "clefable-support"
-        },
-        {
-          "species": "Azelf",
-          "setId": "azelf-standard-lead"
-        },
-        {
-          "species": "Bronzong",
-          "setId": "bronzong-offensive-trick-room"
-        },
-        {
-          "species": "Tyranitar",
-          "setId": "tyranitar-choice-band"
-        },
-        {
-          "species": "Rotom-Heat",
-          "setId": "rotomheat-utility"
-        },
-        {
-          "species": "Breloom",
-          "setId": "breloom-defensive"
-        }
-      ]
-    },
-    {
-      "archetype": "Offense",
       "team": [
         {
           "species": "Rotom-Heat",
           "setId": "rotomheat-choice-scarf"
         },
         {
-          "species": "Blastoise",
-          "setId": "blastoise-tortoise-of-choice"
-        },
-        {
-          "species": "Breloom",
-          "setId": "breloom-swords-dance"
-        },
-        {
-          "species": "Tyranitar",
-          "setId": "tyranitar-choice-band"
-        },
-        {
           "species": "Zapdos",
-          "setId": "zapdos-subroost"
+          "setId": "zapdos-agility"
+        },
+        {
+          "species": "Mamoswine",
+          "setId": "mamoswine-physical-attacker"
         },
         {
           "species": "Bronzong",
           "setId": "bronzong-offensive-stealth-rock"
-        }
-      ]
-    },
-    {
-      "archetype": "Stall",
-      "team": [
-        {
-          "species": "Breloom",
-          "setId": "breloom-defensive"
-        },
-        {
-          "species": "Bronzong",
-          "setId": "bronzong-tank"
-        },
-        {
-          "species": "Empoleon",
-          "setId": "empoleon-specially-defensive"
         },
         {
           "species": "Tyranitar",
-          "setId": "tyranitar-all-purpose"
+          "setId": "tyranitar-choice-scarf"
         },
         {
-          "species": "Zapdos",
-          "setId": "zapdos-physically-defensive"
-        },
-        {
-          "species": "Clefable",
-          "setId": "clefable-support"
+          "species": "Blastoise",
+          "setId": "blastoise-utility"
         }
       ]
     }

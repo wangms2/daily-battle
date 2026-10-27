@@ -13,64 +13,35 @@
     "problems": [],
     "suggested": [
       {
-        "archetype": "Balanced",
         "team": [
-          {
-            "species": "Heatran",
-            "setId": "heatran-specially-defensive"
-          },
-          {
-            "species": "Azelf",
-            "setId": "azelf-lead"
-          },
-          {
-            "species": "Gliscor",
-            "setId": "gliscor-stallbreaker"
-          },
-          {
-            "species": "Weavile",
-            "setId": "weavile-choice-band"
-          },
-          {
-            "species": "Magnezone",
-            "setId": "magnezone-choice-scarf"
-          },
-          {
-            "species": "Mew",
-            "setId": "mew-stallbreaker"
-          }
-        ],
-        "winRate": 0.4
-      },
-      {
-        "archetype": "Offense",
-        "team": [
-          {
-            "species": "Kingdra",
-            "setId": "kingdra-choice-specs"
-          },
-          {
-            "species": "Diggersby",
-            "setId": "diggersby-assault-vest"
-          },
           {
             "species": "Gliscor",
             "setId": "gliscor-swords-dance-wallbreaker"
           },
           {
-            "species": "Keldeo",
-            "setId": "keldeo-taunt"
-          },
-          {
-            "species": "Heatran",
-            "setId": "heatran-fast-utility"
+            "species": "Charizard",
+            "setId": "charizard-dragon-dance"
           },
           {
             "species": "Magnezone",
             "setId": "magnezone-choice-scarf"
+          },
+          {
+            "species": "Keldeo",
+            "setId": "keldeo-choice-specs"
+          },
+          {
+            "species": "Mamoswine",
+            "setId": "mamoswine-life-orb-attacker"
+          },
+          {
+            "species": "Diggersby",
+            "setId": "diggersby-choice-band"
           }
         ],
-        "winRate": 0.425
+        "winRate": 0.671875,
+        "battles": 192,
+        "rules": "all"
       }
     ],
     "candidate": 0,

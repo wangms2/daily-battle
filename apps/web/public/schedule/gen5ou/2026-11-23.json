@@ -22,60 +22,30 @@
   },
   "suggestedTeams": [
     {
-      "archetype": "Balanced",
       "team": [
-        {
-          "species": "Haxorus",
-          "setId": "haxorus-choice-band"
-        },
-        {
-          "species": "Kyurem-Black",
-          "setId": "kyuremblack-choice-band"
-        },
-        {
-          "species": "Heatran",
-          "setId": "heatran-specially-defensive"
-        },
-        {
-          "species": "Latios",
-          "setId": "latios-choice-specs"
-        },
         {
           "species": "Gastrodon",
-          "setId": "gastrodon-specially-defensive"
+          "setId": "gastrodon-physically-defensive"
         },
         {
-          "species": "Magneton",
-          "setId": "magneton-steel-killer-substitute"
-        }
-      ]
-    },
-    {
-      "archetype": "Offense",
-      "team": [
-        {
-          "species": "Latios",
-          "setId": "latios-choice-specs"
+          "species": "Hydreigon",
+          "setId": "hydreigon-choice-scarf"
         },
         {
           "species": "Landorus-Therian",
-          "setId": "landorustherian-choice-scarf"
+          "setId": "landorustherian-defensive"
         },
         {
-          "species": "Magneton",
-          "setId": "magneton-choice-scarf"
+          "species": "Heatran",
+          "setId": "heatran-offensive"
         },
         {
           "species": "Kyurem-Black",
           "setId": "kyuremblack-choice-band"
         },
         {
-          "species": "Arcanine",
-          "setId": "arcanine-offensive"
-        },
-        {
-          "species": "Heatran",
-          "setId": "heatran-substitute-protect"
+          "species": "Starmie",
+          "setId": "starmie-rapid-spin"
         }
       ]
     }

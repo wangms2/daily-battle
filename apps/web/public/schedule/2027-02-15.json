@@ -22,89 +22,30 @@
   },
   "suggestedTeams": [
     {
-      "archetype": "Balanced",
       "team": [
-        {
-          "species": "Omastar",
-          "setId": "omastar-support"
-        },
-        {
-          "species": "Bronzong",
-          "setId": "bronzong-tank"
-        },
-        {
-          "species": "Gyarados",
-          "setId": "gyarados-offensive-dragon-dance"
-        },
         {
           "species": "Hippowdon",
           "setId": "hippowdon-specially-defensive"
         },
         {
+          "species": "Snorlax",
+          "setId": "snorlax-utility"
+        },
+        {
           "species": "Gallade",
-          "setId": "gallade-choice-scarf"
+          "setId": "gallade-swords-dance"
         },
         {
-          "species": "Azelf",
-          "setId": "azelf-standard-lead"
-        }
-      ]
-    },
-    {
-      "archetype": "Offense",
-      "team": [
-        {
-          "species": "Blaziken",
-          "setId": "blaziken-swords-dance"
-        },
-        {
-          "species": "Omastar",
-          "setId": "omastar-rain-dance-special-attacker"
-        },
-        {
-          "species": "Azelf",
-          "setId": "azelf-nasty-plot"
+          "species": "Magneton",
+          "setId": "magneton-choice-scarf"
         },
         {
           "species": "Gyarados",
           "setId": "gyarados-offensive-dragon-dance"
         },
         {
-          "species": "Aerodactyl",
-          "setId": "aerodactyl-lead"
-        },
-        {
-          "species": "Empoleon",
-          "setId": "empoleon-lead"
-        }
-      ]
-    },
-    {
-      "archetype": "Stall",
-      "team": [
-        {
-          "species": "Snorlax",
-          "setId": "snorlax-resttalk"
-        },
-        {
-          "species": "Omastar",
-          "setId": "omastar-support"
-        },
-        {
-          "species": "Hippowdon",
-          "setId": "hippowdon-physically-defensive"
-        },
-        {
-          "species": "Gyarados",
-          "setId": "gyarados-defensive-resttalk"
-        },
-        {
-          "species": "Heatran",
-          "setId": "heatran-utility"
-        },
-        {
           "species": "Bronzong",
-          "setId": "bronzong-tank"
+          "setId": "bronzong-offensive-trick-room"
         }
       ]
     }

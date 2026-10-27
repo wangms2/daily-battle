@@ -22,16 +22,7 @@
   },
   "suggestedTeams": [
     {
-      "archetype": "Balanced",
       "team": [
-        {
-          "species": "Abomasnow",
-          "setId": "abomasnow-leech-seed"
-        },
-        {
-          "species": "Breloom",
-          "setId": "breloom-defensive"
-        },
         {
           "species": "Aerodactyl",
           "setId": "aerodactyl-lead"
@@ -41,41 +32,20 @@
           "setId": "rotommow-utility"
         },
         {
+          "species": "Flygon",
+          "setId": "flygon-choice-scarf"
+        },
+        {
+          "species": "Starmie",
+          "setId": "starmie-offensive-rapid-spin"
+        },
+        {
           "species": "Jirachi",
           "setId": "jirachi-wish-protect"
         },
         {
-          "species": "Weavile",
-          "setId": "weavile-swords-dance"
-        }
-      ]
-    },
-    {
-      "archetype": "Offense",
-      "team": [
-        {
-          "species": "Rotom-Mow",
-          "setId": "rotommow-choice-scarf"
-        },
-        {
-          "species": "Scizor",
-          "setId": "scizor-choice-band"
-        },
-        {
-          "species": "Breloom",
-          "setId": "breloom-swords-dance"
-        },
-        {
-          "species": "Weavile",
-          "setId": "weavile-swords-dance"
-        },
-        {
-          "species": "Aerodactyl",
-          "setId": "aerodactyl-lead"
-        },
-        {
-          "species": "Abomasnow",
-          "setId": "abomasnow-all-out-attacker"
+          "species": "Toxicroak",
+          "setId": "toxicroak-swords-dance"
         }
       ]
     }

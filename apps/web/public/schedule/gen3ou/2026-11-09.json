@@ -22,15 +22,10 @@
   },
   "suggestedTeams": [
     {
-      "archetype": "Balanced",
       "team": [
         {
-          "species": "Camerupt",
-          "setId": "camerupt-tank"
-        },
-        {
-          "species": "Porygon2",
-          "setId": "porygon2-standard"
+          "species": "Golduck",
+          "setId": "golduck-calm-mind"
         },
         {
           "species": "Moltres",
@@ -38,44 +33,19 @@
         },
         {
           "species": "Heracross",
-          "setId": "heracross-standard"
+          "setId": "heracross-choice-band"
+        },
+        {
+          "species": "Magneton",
+          "setId": "magneton-trapper"
         },
         {
           "species": "Forretress",
           "setId": "forretress-standard"
         },
         {
-          "species": "Salamence",
-          "setId": "salamence-dragon-dance"
-        }
-      ]
-    },
-    {
-      "archetype": "Offense",
-      "team": [
-        {
-          "species": "Heracross",
-          "setId": "heracross-choice-band"
-        },
-        {
-          "species": "Camerupt",
-          "setId": "camerupt-tank"
-        },
-        {
-          "species": "Breloom",
-          "setId": "breloom-spore"
-        },
-        {
           "species": "Aerodactyl",
           "setId": "aerodactyl-choice-band"
-        },
-        {
-          "species": "Salamence",
-          "setId": "salamence-dragon-dance"
-        },
-        {
-          "species": "Skarmory",
-          "setId": "skarmory-offensive-spikes"
         }
       ]
     }

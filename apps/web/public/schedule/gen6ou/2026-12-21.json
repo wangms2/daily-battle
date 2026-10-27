@@ -22,60 +22,30 @@
   },
   "suggestedTeams": [
     {
-      "archetype": "Balanced",
       "team": [
         {
-          "species": "Serperior",
-          "setId": "serperior-substitute-attacker"
-        },
-        {
-          "species": "Dragonite",
-          "setId": "dragonite-choice-band"
-        },
-        {
           "species": "Excadrill",
-          "setId": "excadrill-fast-utility"
-        },
-        {
-          "species": "Slowbro",
-          "setId": "slowbro-calm-mind"
+          "setId": "excadrill-choice-scarf"
         },
         {
           "species": "Talonflame",
-          "setId": "talonflame-choice-band"
+          "setId": "talonflame-bulky-swords-dance"
         },
         {
           "species": "Clefable",
-          "setId": "clefable-calm-mind"
-        }
-      ]
-    },
-    {
-      "archetype": "Offense",
-      "team": [
-        {
-          "species": "Reuniclus",
-          "setId": "reuniclus-trick-room"
-        },
-        {
-          "species": "Dragonite",
-          "setId": "dragonite-choice-band"
-        },
-        {
-          "species": "Alakazam",
-          "setId": "alakazam-utility-attacker"
+          "setId": "clefable-stealth-rock"
         },
         {
           "species": "Serperior",
           "setId": "serperior-stallbreaker"
         },
         {
-          "species": "Krookodile",
-          "setId": "krookodile-choice-scarf"
+          "species": "Alakazam",
+          "setId": "alakazam-utility-attacker"
         },
         {
-          "species": "Excadrill",
-          "setId": "excadrill-fast-utility"
+          "species": "Dragonite",
+          "setId": "dragonite-dragon-dance-three-attacks"
         }
       ]
     }

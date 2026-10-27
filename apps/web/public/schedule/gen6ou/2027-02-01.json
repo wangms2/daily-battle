@@ -22,89 +22,30 @@
   },
   "suggestedTeams": [
     {
-      "archetype": "Balanced",
       "team": [
-        {
-          "species": "Mandibuzz",
-          "setId": "mandibuzz-physically-defensive"
-        },
-        {
-          "species": "Charizard",
-          "setId": "charizard-wallbreaker"
-        },
-        {
-          "species": "Clefable",
-          "setId": "clefable-stealth-rock"
-        },
-        {
-          "species": "Amoonguss",
-          "setId": "amoonguss-pivot"
-        },
-        {
-          "species": "Dragonite",
-          "setId": "dragonite-bulky-roost-dragon-dance"
-        },
-        {
-          "species": "Magnezone",
-          "setId": "magnezone-choice-scarf"
-        }
-      ]
-    },
-    {
-      "archetype": "Offense",
-      "team": [
-        {
-          "species": "Heatran",
-          "setId": "heatran-fast-utility"
-        },
-        {
-          "species": "Metagross",
-          "setId": "metagross-offensive"
-        },
         {
           "species": "Dragonite",
           "setId": "dragonite-choice-band"
         },
         {
+          "species": "Clefable",
+          "setId": "clefable-calm-mind"
+        },
+        {
           "species": "Kyurem-Black",
-          "setId": "kyuremblack-mixed-wallbreaker"
+          "setId": "kyuremblack-choice-item-attacker"
+        },
+        {
+          "species": "Magnezone",
+          "setId": "magnezone-choice-scarf"
         },
         {
           "species": "Excadrill",
-          "setId": "excadrill-sand-rush"
-        },
-        {
-          "species": "Crawdaunt",
-          "setId": "crawdaunt-choice-band"
-        }
-      ]
-    },
-    {
-      "archetype": "Stall",
-      "team": [
-        {
-          "species": "Clefable",
-          "setId": "clefable-stealth-rock"
-        },
-        {
-          "species": "Mandibuzz",
-          "setId": "mandibuzz-physically-defensive"
-        },
-        {
-          "species": "Skarmory",
-          "setId": "skarmory-defog"
+          "setId": "excadrill-choice-scarf"
         },
         {
           "species": "Heatran",
-          "setId": "heatran-specially-defensive"
-        },
-        {
-          "species": "Excadrill",
-          "setId": "excadrill-fast-utility"
-        },
-        {
-          "species": "Amoonguss",
-          "setId": "amoonguss-pivot"
+          "setId": "heatran-fast-utility"
         }
       ]
     }

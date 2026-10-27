@@ -13,94 +13,35 @@
     "problems": [],
     "suggested": [
       {
-        "archetype": "Balanced",
         "team": [
           {
             "species": "Metagross",
             "setId": "metagross-offensive"
           },
           {
-            "species": "Latios",
-            "setId": "latios-life-orb-attacker"
-          },
-          {
-            "species": "Chansey",
-            "setId": "chansey-de-blob"
-          },
-          {
-            "species": "Clefable",
-            "setId": "clefable-stealth-rock"
+            "species": "Scizor",
+            "setId": "scizor-choice-band"
           },
           {
             "species": "Rotom-Wash",
-            "setId": "rotomwash-physically-defensive-pivot"
-          },
-          {
-            "species": "Scizor",
-            "setId": "scizor-choice-band"
-          }
-        ],
-        "winRate": 0.65
-      },
-      {
-        "archetype": "Offense",
-        "team": [
-          {
-            "species": "Chansey",
-            "setId": "chansey-de-blob"
+            "setId": "rotomwash-fast-utility"
           },
           {
             "species": "Excadrill",
-            "setId": "excadrill-fast-utility"
-          },
-          {
-            "species": "Scizor",
-            "setId": "scizor-choice-band"
-          },
-          {
-            "species": "Whimsicott",
-            "setId": "whimsicott-applaud-attack-offensive"
-          },
-          {
-            "species": "Latios",
-            "setId": "latios-life-orb-attacker"
-          },
-          {
-            "species": "Metagross",
-            "setId": "metagross-offensive"
-          }
-        ],
-        "winRate": 0.65
-      },
-      {
-        "archetype": "Stall",
-        "team": [
-          {
-            "species": "Chansey",
-            "setId": "chansey-wish"
-          },
-          {
-            "species": "Whimsicott",
-            "setId": "whimsicott-support"
-          },
-          {
-            "species": "Scizor",
-            "setId": "scizor-utility"
-          },
-          {
-            "species": "Gliscor",
-            "setId": "gliscor-stallbreaker"
-          },
-          {
-            "species": "Rotom-Wash",
-            "setId": "rotomwash-physically-defensive-pivot"
+            "setId": "excadrill-choice-scarf"
           },
           {
             "species": "Clefable",
             "setId": "clefable-stealth-rock"
+          },
+          {
+            "species": "Raikou",
+            "setId": "raikou-calm-mind"
           }
         ],
-        "winRate": 0.4
+        "winRate": 0.71875,
+        "battles": 192,
+        "rules": "all"
       }
     ],
     "candidate": 0,

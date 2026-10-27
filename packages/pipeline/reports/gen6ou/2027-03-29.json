@@ -13,79 +13,22 @@
     "problems": [],
     "suggested": [
       {
-        "archetype": "Balanced",
         "team": [
           {
-            "species": "Rotom-Wash",
-            "setId": "rotomwash-physically-defensive-pivot"
-          },
-          {
-            "species": "Zapdos",
-            "setId": "zapdos-physically-defensive"
+            "species": "Victini",
+            "setId": "victini-choice-band"
           },
           {
             "species": "Kyurem-Black",
             "setId": "kyuremblack-choice-item-attacker"
           },
           {
-            "species": "Garchomp",
-            "setId": "garchomp-offensive-stealth-rock"
+            "species": "Zapdos",
+            "setId": "zapdos-physically-defensive"
           },
           {
             "species": "Serperior",
-            "setId": "serperior-dual-screens"
-          },
-          {
-            "species": "Raikou",
-            "setId": "raikou-calm-mind"
-          }
-        ],
-        "winRate": 0.7
-      },
-      {
-        "archetype": "Offense",
-        "team": [
-          {
-            "species": "Kyurem-Black",
-            "setId": "kyuremblack-choice-item-attacker"
-          },
-          {
-            "species": "Jirachi",
-            "setId": "jirachi-choice-scarf"
-          },
-          {
-            "species": "Heatran",
-            "setId": "heatran-fast-utility"
-          },
-          {
-            "species": "Lopunny",
-            "setId": "lopunny-all-out-attacker"
-          },
-          {
-            "species": "Garchomp",
-            "setId": "garchomp-substitute-swords-dance"
-          },
-          {
-            "species": "Politoed",
-            "setId": "politoed-choice-scarf"
-          }
-        ],
-        "winRate": 0.475
-      },
-      {
-        "archetype": "Stall",
-        "team": [
-          {
-            "species": "Zapdos",
-            "setId": "zapdos-physically-defensive"
-          },
-          {
-            "species": "Rotom-Wash",
-            "setId": "rotomwash-fast-utility"
-          },
-          {
-            "species": "Heatran",
-            "setId": "heatran-specially-defensive"
+            "setId": "serperior-substitute-attacker"
           },
           {
             "species": "Garchomp",
@@ -93,14 +36,12 @@
           },
           {
             "species": "Jirachi",
-            "setId": "jirachi-specially-defensive"
-          },
-          {
-            "species": "Serperior",
-            "setId": "serperior-stallbreaker"
+            "setId": "jirachi-choice-scarf"
           }
         ],
-        "winRate": 0.5
+        "winRate": 0.7604166666666666,
+        "battles": 192,
+        "rules": "all"
       }
     ],
     "candidate": 0,

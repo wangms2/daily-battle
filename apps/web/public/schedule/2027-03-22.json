@@ -22,89 +22,30 @@
   },
   "suggestedTeams": [
     {
-      "archetype": "Balanced",
       "team": [
-        {
-          "species": "Donphan",
-          "setId": "donphan-rapid-spin"
-        },
-        {
-          "species": "Roserade",
-          "setId": "roserade-spikes"
-        },
-        {
-          "species": "Tentacruel",
-          "setId": "tentacruel-defensive-rapid-spin"
-        },
-        {
-          "species": "Latias",
-          "setId": "latias-choice-specs"
-        },
-        {
-          "species": "Heatran",
-          "setId": "heatran-utility"
-        },
         {
           "species": "Scizor",
           "setId": "scizor-choice-band"
-        }
-      ]
-    },
-    {
-      "archetype": "Offense",
-      "team": [
-        {
-          "species": "Tentacruel",
-          "setId": "tentacruel-offensive-rapid-spin"
         },
         {
-          "species": "Mamoswine",
-          "setId": "mamoswine-physical-attacker"
-        },
-        {
-          "species": "Roserade",
-          "setId": "roserade-toxic-spikes-lead"
+          "species": "Arcanine",
+          "setId": "arcanine-life-orb"
         },
         {
           "species": "Yanmega",
           "setId": "yanmega-choice-specs"
         },
         {
+          "species": "Heatran",
+          "setId": "heatran-choice-scarf"
+        },
+        {
           "species": "Latias",
-          "setId": "latias-choice-scarf"
-        },
-        {
-          "species": "Alakazam",
-          "setId": "alakazam-substitute-3-attacks"
-        }
-      ]
-    },
-    {
-      "archetype": "Stall",
-      "team": [
-        {
-          "species": "Mamoswine",
-          "setId": "mamoswine-mixed"
-        },
-        {
-          "species": "Roserade",
-          "setId": "roserade-spikes"
-        },
-        {
-          "species": "Donphan",
-          "setId": "donphan-standard"
-        },
-        {
-          "species": "Arcanine",
-          "setId": "arcanine-physically-defensive"
+          "setId": "latias-choice-specs"
         },
         {
           "species": "Tentacruel",
           "setId": "tentacruel-defensive-rapid-spin"
-        },
-        {
-          "species": "Heatran",
-          "setId": "heatran-utility"
         }
       ]
     }

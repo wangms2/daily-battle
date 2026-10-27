@@ -13,94 +13,35 @@
     "problems": [],
     "suggested": [
       {
-        "archetype": "Balanced",
         "team": [
-          {
-            "species": "Lucario",
-            "setId": "lucario-swords-dance"
-          },
-          {
-            "species": "Rhyperior",
-            "setId": "rhyperior-tank"
-          },
           {
             "species": "Kingdra",
             "setId": "kingdra-choice-specs"
           },
           {
-            "species": "Tyranitar",
-            "setId": "tyranitar-choice-scarf"
+            "species": "Gyarados",
+            "setId": "gyarados-offensive-dragon-dance"
           },
           {
-            "species": "Breloom",
-            "setId": "breloom-defensive"
+            "species": "Latias",
+            "setId": "latias-choice-specs"
+          },
+          {
+            "species": "Scizor",
+            "setId": "scizor-choice-band"
+          },
+          {
+            "species": "Donphan",
+            "setId": "donphan-standard"
           },
           {
             "species": "Rotom-Frost",
             "setId": "rotomfrost-utility"
           }
         ],
-        "winRate": 0.6
-      },
-      {
-        "archetype": "Offense",
-        "team": [
-          {
-            "species": "Azumarill",
-            "setId": "azumarill-choice-band"
-          },
-          {
-            "species": "Kingdra",
-            "setId": "kingdra-choice-specs"
-          },
-          {
-            "species": "Rotom-Frost",
-            "setId": "rotomfrost-choice-scarf"
-          },
-          {
-            "species": "Azelf",
-            "setId": "azelf-standard-lead"
-          },
-          {
-            "species": "Rhyperior",
-            "setId": "rhyperior-substitute"
-          },
-          {
-            "species": "Tyranitar",
-            "setId": "tyranitar-choice-scarf"
-          }
-        ],
-        "winRate": 0.8125
-      },
-      {
-        "archetype": "Stall",
-        "team": [
-          {
-            "species": "Donphan",
-            "setId": "donphan-standard"
-          },
-          {
-            "species": "Rhyperior",
-            "setId": "rhyperior-tank"
-          },
-          {
-            "species": "Latias",
-            "setId": "latias-calm-mind-2-attacks"
-          },
-          {
-            "species": "Tyranitar",
-            "setId": "tyranitar-all-purpose"
-          },
-          {
-            "species": "Gyarados",
-            "setId": "gyarados-defensive-resttalk"
-          },
-          {
-            "species": "Rotom-Frost",
-            "setId": "rotomfrost-defensive"
-          }
-        ],
-        "winRate": 0.625
+        "winRate": 0.7708333333333334,
+        "battles": 192,
+        "rules": "all"
       }
     ],
     "candidate": 0,

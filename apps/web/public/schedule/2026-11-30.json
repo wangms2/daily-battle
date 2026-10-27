@@ -22,44 +22,22 @@
   },
   "suggestedTeams": [
     {
-      "archetype": "Balanced",
       "team": [
         {
-          "species": "Tyranitar",
-          "setId": "tyranitar-choice-band"
+          "species": "Ludicolo",
+          "setId": "ludicolo-rain-dance-special-attacker"
         },
         {
-          "species": "Tentacruel",
-          "setId": "tentacruel-defensive-rapid-spin"
+          "species": "Celebi",
+          "setId": "celebi-utility"
+        },
+        {
+          "species": "Mamoswine",
+          "setId": "mamoswine-physical-attacker"
         },
         {
           "species": "Toxicroak",
           "setId": "toxicroak-swords-dance"
-        },
-        {
-          "species": "Celebi",
-          "setId": "celebi-utility"
-        },
-        {
-          "species": "Blissey",
-          "setId": "blissey-calm-mind"
-        },
-        {
-          "species": "Flygon",
-          "setId": "flygon-choice-scarf"
-        }
-      ]
-    },
-    {
-      "archetype": "Stall",
-      "team": [
-        {
-          "species": "Tyranitar",
-          "setId": "tyranitar-all-purpose"
-        },
-        {
-          "species": "Celebi",
-          "setId": "celebi-utility"
         },
         {
           "species": "Tentacruel",
@@ -67,15 +45,7 @@
         },
         {
           "species": "Empoleon",
-          "setId": "empoleon-specially-defensive"
-        },
-        {
-          "species": "Blissey",
-          "setId": "blissey-wish-support"
-        },
-        {
-          "species": "Milotic",
-          "setId": "milotic-physically-defensive"
+          "setId": "empoleon-choice-specs"
         }
       ]
     }

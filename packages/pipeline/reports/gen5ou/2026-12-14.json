@@ -13,94 +13,35 @@
     "problems": [],
     "suggested": [
       {
-        "archetype": "Balanced",
         "team": [
           {
-            "species": "Landorus-Therian",
-            "setId": "landorustherian-defensive"
-          },
-          {
-            "species": "Gliscor",
-            "setId": "gliscor-swords-dance"
-          },
-          {
             "species": "Gengar",
-            "setId": "gengar-substitute-will-o-wisp"
+            "setId": "gengar-offensive"
           },
           {
             "species": "Seismitoad",
             "setId": "seismitoad-utility"
           },
           {
-            "species": "Tyranitar",
-            "setId": "tyranitar-bulky-pursuit-trapper"
-          },
-          {
-            "species": "Haxorus",
-            "setId": "haxorus-choice-band"
-          }
-        ],
-        "winRate": 0.65
-      },
-      {
-        "archetype": "Offense",
-        "team": [
-          {
-            "species": "Landorus-Therian",
-            "setId": "landorustherian-choice-scarf"
-          },
-          {
-            "species": "Gliscor",
-            "setId": "gliscor-swords-dance"
-          },
-          {
-            "species": "Haxorus",
-            "setId": "haxorus-choice-band"
-          },
-          {
-            "species": "Jellicent",
-            "setId": "jellicent-standard"
-          },
-          {
             "species": "Tentacruel",
-            "setId": "tentacruel-utility"
+            "setId": "tentacruel-toxic-spikes"
           },
           {
-            "species": "Tyranitar",
-            "setId": "tyranitar-choice-scarf"
+            "species": "Haxorus",
+            "setId": "haxorus-choice-band"
+          },
+          {
+            "species": "Victini",
+            "setId": "victini-choice-band"
+          },
+          {
+            "species": "Heatran",
+            "setId": "heatran-offensive"
           }
         ],
-        "winRate": 0.65
-      },
-      {
-        "archetype": "Stall",
-        "team": [
-          {
-            "species": "Jellicent",
-            "setId": "jellicent-standard"
-          },
-          {
-            "species": "Seismitoad",
-            "setId": "seismitoad-bulky-attacker"
-          },
-          {
-            "species": "Gliscor",
-            "setId": "gliscor-stealth-rock"
-          },
-          {
-            "species": "Forretress",
-            "setId": "forretress-entry-hazard-control"
-          },
-          {
-            "species": "Tyranitar",
-            "setId": "tyranitar-bulky-pursuit-trapper"
-          },
-          {
-            "species": "Landorus-Therian",
-            "setId": "landorustherian-defensive"
-          }
-        ],
-        "winRate": 0.625
+        "winRate": 0.625,
+        "battles": 192,
+        "rules": "all"
       }
     ],
     "candidate": 0,

@@ -13,94 +13,35 @@
     "problems": [],
     "suggested": [
       {
-        "archetype": "Balanced",
         "team": [
           {
-            "species": "Aerodactyl",
-            "setId": "aerodactyl-lead"
-          },
-          {
-            "species": "Latias",
-            "setId": "latias-choice-specs"
-          },
-          {
-            "species": "Donphan",
-            "setId": "donphan-standard"
-          },
-          {
-            "species": "Shaymin",
-            "setId": "shaymin-subseed"
+            "species": "Toxicroak",
+            "setId": "toxicroak-swords-dance"
           },
           {
             "species": "Blastoise",
             "setId": "blastoise-utility"
           },
           {
-            "species": "Toxicroak",
-            "setId": "toxicroak-swords-dance"
-          }
-        ],
-        "winRate": 0.6
-      },
-      {
-        "archetype": "Offense",
-        "team": [
-          {
-            "species": "Aerodactyl",
-            "setId": "aerodactyl-lead"
-          },
-          {
-            "species": "Shaymin",
-            "setId": "shaymin-subseed"
-          },
-          {
-            "species": "Gallade",
-            "setId": "gallade-swords-dance"
-          },
-          {
-            "species": "Blastoise",
-            "setId": "blastoise-tortoise-of-choice"
-          },
-          {
-            "species": "Latias",
-            "setId": "latias-choice-scarf"
-          },
-          {
             "species": "Rotom-Wash",
-            "setId": "rotomwash-choice-scarf"
-          }
-        ],
-        "winRate": 0.6875
-      },
-      {
-        "archetype": "Stall",
-        "team": [
-          {
-            "species": "Forretress",
-            "setId": "forretress-specially-defensive"
+            "setId": "rotomwash-utility"
           },
           {
-            "species": "Blissey",
-            "setId": "blissey-standard"
-          },
-          {
-            "species": "Shaymin",
-            "setId": "shaymin-subseed"
+            "species": "Metagross",
+            "setId": "metagross-utility"
           },
           {
             "species": "Latias",
-            "setId": "latias-calm-mind-2-attacks"
+            "setId": "latias-choice-specs"
           },
           {
-            "species": "Breloom",
-            "setId": "breloom-defensive"
-          },
-          {
-            "species": "Blastoise",
-            "setId": "blastoise-resttalk-shuffler"
+            "species": "Shaymin",
+            "setId": "shaymin-rest-sleep-talk"
           }
         ],
-        "winRate": 0.525
+        "winRate": 0.625,
+        "battles": 192,
+        "rules": "all"
       }
     ],
     "candidate": 0,

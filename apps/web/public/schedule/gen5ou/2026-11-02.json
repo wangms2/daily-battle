@@ -22,89 +22,30 @@
   },
   "suggestedTeams": [
     {
-      "archetype": "Balanced",
       "team": [
         {
           "species": "Garchomp",
-          "setId": "garchomp-swords-dance"
-        },
-        {
-          "species": "Gliscor",
-          "setId": "gliscor-stealth-rock"
-        },
-        {
-          "species": "Bronzong",
-          "setId": "bronzong-tank"
-        },
-        {
-          "species": "Blissey",
-          "setId": "blissey-toxic-attacker"
-        },
-        {
-          "species": "Jellicent",
-          "setId": "jellicent-standard"
-        },
-        {
-          "species": "Excadrill",
-          "setId": "excadrill-swords-dance"
-        }
-      ]
-    },
-    {
-      "archetype": "Offense",
-      "team": [
-        {
-          "species": "Terrakion",
-          "setId": "terrakion-stealth-rock"
-        },
-        {
-          "species": "Swampert",
-          "setId": "swampert-offensive-tank"
-        },
-        {
-          "species": "Heatran",
-          "setId": "heatran-sunny-day-trapper"
-        },
-        {
-          "species": "Krookodile",
-          "setId": "krookodile-choice-scarf"
-        },
-        {
-          "species": "Scizor",
-          "setId": "scizor-offensive-swords-dance"
-        },
-        {
-          "species": "Garchomp",
-          "setId": "garchomp-stealth-rock-lead"
-        }
-      ]
-    },
-    {
-      "archetype": "Stall",
-      "team": [
-        {
-          "species": "Slowking",
-          "setId": "slowking-special-wall"
-        },
-        {
-          "species": "Gliscor",
-          "setId": "gliscor-stealth-rock"
-        },
-        {
-          "species": "Bronzong",
-          "setId": "bronzong-tank"
+          "setId": "garchomp-choice-scarf"
         },
         {
           "species": "Blissey",
           "setId": "blissey-special-wall"
         },
         {
-          "species": "Heatran",
-          "setId": "heatran-substitute-protect"
+          "species": "Excadrill",
+          "setId": "excadrill-choice-scarf"
         },
         {
-          "species": "Swampert",
-          "setId": "swampert-defensive-tank"
+          "species": "Scizor",
+          "setId": "scizor-choice-band"
+        },
+        {
+          "species": "Jellicent",
+          "setId": "jellicent-specially-defensive"
+        },
+        {
+          "species": "Heatran",
+          "setId": "heatran-offensive"
         }
       ]
     }

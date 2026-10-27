@@ -22,60 +22,30 @@
   },
   "suggestedTeams": [
     {
-      "archetype": "Balanced",
       "team": [
         {
           "species": "Dragonite",
           "setId": "dragonite-choice-band"
-        },
-        {
-          "species": "Hippowdon",
-          "setId": "hippowdon-special-wall"
-        },
-        {
-          "species": "Azumarill",
-          "setId": "azumarill-belly-drum"
-        },
-        {
-          "species": "Tyranitar",
-          "setId": "tyranitar-choice-band"
-        },
-        {
-          "species": "Quagsire",
-          "setId": "quagsire-unaware-wall"
-        },
-        {
-          "species": "Zapdos",
-          "setId": "zapdos-physically-defensive"
-        }
-      ]
-    },
-    {
-      "archetype": "Offense",
-      "team": [
-        {
-          "species": "Dragonite",
-          "setId": "dragonite-choice-band"
-        },
-        {
-          "species": "Terrakion",
-          "setId": "terrakion-choice-scarf"
         },
         {
           "species": "Porygon-Z",
           "setId": "porygonz-choice-specs"
         },
         {
-          "species": "Kingdra",
-          "setId": "kingdra-choice-specs"
+          "species": "Excadrill",
+          "setId": "excadrill-choice-scarf"
+        },
+        {
+          "species": "Azumarill",
+          "setId": "azumarill-choice-band"
         },
         {
           "species": "Tyranitar",
-          "setId": "tyranitar-choice-band"
+          "setId": "tyranitar-bulky-support"
         },
         {
-          "species": "Excadrill",
-          "setId": "excadrill-specially-defensive"
+          "species": "Zapdos",
+          "setId": "zapdos-physically-defensive"
         }
       ]
     }

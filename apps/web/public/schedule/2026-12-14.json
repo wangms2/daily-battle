@@ -22,89 +22,30 @@
   },
   "suggestedTeams": [
     {
-      "archetype": "Balanced",
       "team": [
+        {
+          "species": "Magnezone",
+          "setId": "magnezone-choice-scarf"
+        },
+        {
+          "species": "Gyarados",
+          "setId": "gyarados-offensive-dragon-dance"
+        },
         {
           "species": "Claydol",
           "setId": "claydol-support"
-        },
-        {
-          "species": "Roserade",
-          "setId": "roserade-spikes"
-        },
-        {
-          "species": "Rotom-Wash",
-          "setId": "rotomwash-utility"
-        },
-        {
-          "species": "Latias",
-          "setId": "latias-choice-specs"
-        },
-        {
-          "species": "Gyarados",
-          "setId": "gyarados-offensive-dragon-dance"
-        },
-        {
-          "species": "Vaporeon",
-          "setId": "vaporeon-wish-support"
-        }
-      ]
-    },
-    {
-      "archetype": "Offense",
-      "team": [
-        {
-          "species": "Roserade",
-          "setId": "roserade-toxic-spikes-lead"
-        },
-        {
-          "species": "Tyranitar",
-          "setId": "tyranitar-choice-scarf"
-        },
-        {
-          "species": "Latias",
-          "setId": "latias-calm-mind-2-attacks"
-        },
-        {
-          "species": "Gyarados",
-          "setId": "gyarados-offensive-dragon-dance"
-        },
-        {
-          "species": "Zapdos",
-          "setId": "zapdos-subroost"
         },
         {
           "species": "Rotom-Wash",
           "setId": "rotomwash-choice-scarf"
-        }
-      ]
-    },
-    {
-      "archetype": "Stall",
-      "team": [
-        {
-          "species": "Rotom-Wash",
-          "setId": "rotomwash-defensive"
-        },
-        {
-          "species": "Celebi",
-          "setId": "celebi-utility"
         },
         {
           "species": "Zapdos",
-          "setId": "zapdos-specially-defensive"
+          "setId": "zapdos-physically-defensive"
         },
         {
-          "species": "Claydol",
-          "setId": "claydol-support"
-        },
-        {
-          "species": "Quagsire",
-          "setId": "quagsire-wall"
-        },
-        {
-          "species": "Tyranitar",
-          "setId": "tyranitar-all-purpose"
+          "species": "Latias",
+          "setId": "latias-choice-specs"
         }
       ]
     }

@@ -13,20 +13,7 @@
     "problems": [],
     "suggested": [
       {
-        "archetype": "Balanced",
         "team": [
-          {
-            "species": "Rotom-Wash",
-            "setId": "rotomwash-defensive"
-          },
-          {
-            "species": "Jirachi",
-            "setId": "jirachi-choice-scarf"
-          },
-          {
-            "species": "Gastrodon",
-            "setId": "gastrodon-physically-defensive"
-          },
           {
             "species": "Starmie",
             "setId": "starmie-rapid-spin"
@@ -36,71 +23,25 @@
             "setId": "blissey-special-wall"
           },
           {
-            "species": "Abomasnow",
-            "setId": "abomasnow-hail-setter"
-          }
-        ],
-        "winRate": 0.575
-      },
-      {
-        "archetype": "Offense",
-        "team": [
-          {
-            "species": "Starmie",
-            "setId": "starmie-rapid-spin"
-          },
-          {
-            "species": "Tentacruel",
-            "setId": "tentacruel-toxic-spikes"
-          },
-          {
-            "species": "Hydreigon",
-            "setId": "hydreigon-choice-scarf"
-          },
-          {
-            "species": "Rotom-Wash",
-            "setId": "rotomwash-choice-scarf"
-          },
-          {
-            "species": "Weavile",
-            "setId": "weavile-physical-attacker"
+            "species": "Gastrodon",
+            "setId": "gastrodon-physically-defensive"
           },
           {
             "species": "Jirachi",
             "setId": "jirachi-choice-scarf"
-          }
-        ],
-        "winRate": 0.6
-      },
-      {
-        "archetype": "Stall",
-        "team": [
+          },
           {
             "species": "Rotom-Wash",
             "setId": "rotomwash-defensive"
           },
           {
-            "species": "Abomasnow",
-            "setId": "abomasnow-hail-setter"
-          },
-          {
-            "species": "Clefable",
-            "setId": "clefable-support"
-          },
-          {
-            "species": "Jirachi",
-            "setId": "jirachi-utility"
-          },
-          {
-            "species": "Gastrodon",
-            "setId": "gastrodon-physically-defensive"
-          },
-          {
-            "species": "Tentacruel",
-            "setId": "tentacruel-utility"
+            "species": "Hydreigon",
+            "setId": "hydreigon-attacker"
           }
         ],
-        "winRate": 0.45
+        "winRate": 0.7291666666666666,
+        "battles": 192,
+        "rules": "all"
       }
     ],
     "candidate": 0,

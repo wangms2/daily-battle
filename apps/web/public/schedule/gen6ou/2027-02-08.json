@@ -22,60 +22,30 @@
   },
   "suggestedTeams": [
     {
-      "archetype": "Balanced",
       "team": [
-        {
-          "species": "Sceptile",
-          "setId": "sceptile-substitute"
-        },
-        {
-          "species": "Excadrill",
-          "setId": "excadrill-fast-utility"
-        },
-        {
-          "species": "Chansey",
-          "setId": "chansey-wish"
-        },
-        {
-          "species": "Krookodile",
-          "setId": "krookodile-choice-scarf"
-        },
-        {
-          "species": "Tornadus-Therian",
-          "setId": "tornadustherian-assault-vest-pivot"
-        },
-        {
-          "species": "Volcanion",
-          "setId": "volcanion-physically-defensive"
-        }
-      ]
-    },
-    {
-      "archetype": "Offense",
-      "team": [
-        {
-          "species": "Sceptile",
-          "setId": "sceptile-all-out-attacker"
-        },
-        {
-          "species": "Keldeo",
-          "setId": "keldeo-substitute-calm-mind"
-        },
-        {
-          "species": "Tornadus-Therian",
-          "setId": "tornadustherian-assault-vest-pivot"
-        },
-        {
-          "species": "Excadrill",
-          "setId": "excadrill-fast-utility"
-        },
         {
           "species": "Azumarill",
-          "setId": "azumarill-assault-vest"
+          "setId": "azumarill-choice-band"
         },
         {
           "species": "Manaphy",
           "setId": "manaphy-tail-glow-3-attacks"
+        },
+        {
+          "species": "Excadrill",
+          "setId": "excadrill-fast-utility"
+        },
+        {
+          "species": "Latias",
+          "setId": "latias-defensive"
+        },
+        {
+          "species": "Zygarde",
+          "setId": "zygarde-subcoil"
+        },
+        {
+          "species": "Krookodile",
+          "setId": "krookodile-choice-scarf"
         }
       ]
     }

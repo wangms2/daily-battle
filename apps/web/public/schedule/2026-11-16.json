@@ -22,89 +22,30 @@
   },
   "suggestedTeams": [
     {
-      "archetype": "Balanced",
       "team": [
-        {
-          "species": "Rotom-Wash",
-          "setId": "rotomwash-choice-scarf"
-        },
-        {
-          "species": "Mamoswine",
-          "setId": "mamoswine-physical-attacker"
-        },
-        {
-          "species": "Gastrodon",
-          "setId": "gastrodon-curse"
-        },
-        {
-          "species": "Zapdos",
-          "setId": "zapdos-physically-defensive"
-        },
         {
           "species": "Tyranitar",
           "setId": "tyranitar-choice-scarf"
         },
         {
-          "species": "Bronzong",
-          "setId": "bronzong-tank"
-        }
-      ]
-    },
-    {
-      "archetype": "Offense",
-      "team": [
-        {
-          "species": "Bronzong",
-          "setId": "bronzong-tank"
-        },
-        {
           "species": "Weavile",
-          "setId": "weavile-standard"
+          "setId": "weavile-swords-dance"
         },
         {
-          "species": "Metagross",
-          "setId": "metagross-agility"
+          "species": "Starmie",
+          "setId": "starmie-offensive-rapid-spin"
         },
-        {
-          "species": "Mamoswine",
-          "setId": "mamoswine-physical-attacker"
-        },
-        {
-          "species": "Zapdos",
-          "setId": "zapdos-subroost"
-        },
-        {
-          "species": "Tyranitar",
-          "setId": "tyranitar-choice-band"
-        }
-      ]
-    },
-    {
-      "archetype": "Stall",
-      "team": [
         {
           "species": "Rotom-Wash",
-          "setId": "rotomwash-defensive"
-        },
-        {
-          "species": "Cloyster",
-          "setId": "cloyster-support"
-        },
-        {
-          "species": "Bronzong",
-          "setId": "bronzong-tank"
-        },
-        {
-          "species": "Gastrodon",
-          "setId": "gastrodon-tank"
-        },
-        {
-          "species": "Mamoswine",
-          "setId": "mamoswine-mixed"
+          "setId": "rotomwash-choice-scarf"
         },
         {
           "species": "Nidoqueen",
           "setId": "nidoqueen-physically-defensive-toxic-spikes"
+        },
+        {
+          "species": "Bronzong",
+          "setId": "bronzong-offensive-trick-room"
         }
       ]
     }

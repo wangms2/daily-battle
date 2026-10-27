@@ -22,53 +22,7 @@
   },
   "suggestedTeams": [
     {
-      "archetype": "Balanced",
       "team": [
-        {
-          "species": "Volcarona",
-          "setId": "volcarona-lum-berry-quiver-dance"
-        },
-        {
-          "species": "Conkeldurr",
-          "setId": "conkeldurr-bulk-up"
-        },
-        {
-          "species": "Hippowdon",
-          "setId": "hippowdon-physically-defensive"
-        },
-        {
-          "species": "Gengar",
-          "setId": "gengar-substitute-will-o-wisp"
-        },
-        {
-          "species": "Reuniclus",
-          "setId": "reuniclus-calm-mind"
-        },
-        {
-          "species": "Azumarill",
-          "setId": "azumarill-choice-band"
-        }
-      ]
-    },
-    {
-      "archetype": "Offense",
-      "team": [
-        {
-          "species": "Volcarona",
-          "setId": "volcarona-lum-berry-quiver-dance"
-        },
-        {
-          "species": "Arcanine",
-          "setId": "arcanine-offensive"
-        },
-        {
-          "species": "Scizor",
-          "setId": "scizor-choice-band"
-        },
-        {
-          "species": "Alakazam",
-          "setId": "alakazam-attacker"
-        },
         {
           "species": "Tentacruel",
           "setId": "tentacruel-toxic-spikes"
@@ -76,6 +30,22 @@
         {
           "species": "Azumarill",
           "setId": "azumarill-choice-band"
+        },
+        {
+          "species": "Alakazam",
+          "setId": "alakazam-life-orb"
+        },
+        {
+          "species": "Volcarona",
+          "setId": "volcarona-lum-berry-quiver-dance"
+        },
+        {
+          "species": "Reuniclus",
+          "setId": "reuniclus-calm-mind"
+        },
+        {
+          "species": "Conkeldurr",
+          "setId": "conkeldurr-bulk-up"
         }
       ]
     }

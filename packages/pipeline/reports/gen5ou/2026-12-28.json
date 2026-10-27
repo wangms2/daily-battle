@@ -13,24 +13,7 @@
     "problems": [],
     "suggested": [
       {
-        "archetype": "Offense",
         "team": [
-          {
-            "species": "Tentacruel",
-            "setId": "tentacruel-toxic-spikes"
-          },
-          {
-            "species": "Dragonite",
-            "setId": "dragonite-3-attacks-dragon-dance"
-          },
-          {
-            "species": "Kyurem",
-            "setId": "kyurem-subroost"
-          },
-          {
-            "species": "Toxicroak",
-            "setId": "toxicroak-swords-dance"
-          },
           {
             "species": "Mamoswine",
             "setId": "mamoswine-choice-band"
@@ -38,9 +21,27 @@
           {
             "species": "Salamence",
             "setId": "salamence-choice-scarf"
+          },
+          {
+            "species": "Latios",
+            "setId": "latios-choice-specs"
+          },
+          {
+            "species": "Machamp",
+            "setId": "machamp-bulk-up"
+          },
+          {
+            "species": "Dragonite",
+            "setId": "dragonite-3-attacks-dragon-dance"
+          },
+          {
+            "species": "Forretress",
+            "setId": "forretress-entry-hazard-control"
           }
         ],
-        "winRate": 0.625
+        "winRate": 0.703125,
+        "battles": 192,
+        "rules": "all"
       }
     ],
     "candidate": 0,

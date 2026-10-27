@@ -22,89 +22,30 @@
   },
   "suggestedTeams": [
     {
-      "archetype": "Balanced",
       "team": [
-        {
-          "species": "Jellicent",
-          "setId": "jellicent-standard"
-        },
-        {
-          "species": "Latias",
-          "setId": "latias-choice-scarf"
-        },
-        {
-          "species": "Cofagrigus",
-          "setId": "cofagrigus-defensive"
-        },
-        {
-          "species": "Garchomp",
-          "setId": "garchomp-choice-scarf"
-        },
-        {
-          "species": "Krookodile",
-          "setId": "krookodile-choice-scarf"
-        },
-        {
-          "species": "Jirachi",
-          "setId": "jirachi-utility"
-        }
-      ]
-    },
-    {
-      "archetype": "Offense",
-      "team": [
-        {
-          "species": "Latias",
-          "setId": "latias-colbur-berry"
-        },
         {
           "species": "Garchomp",
           "setId": "garchomp-stealth-rock-lead"
         },
         {
+          "species": "Latias",
+          "setId": "latias-colbur-berry"
+        },
+        {
+          "species": "Weavile",
+          "setId": "weavile-physical-attacker"
+        },
+        {
           "species": "Infernape",
-          "setId": "infernape-life-orb"
-        },
-        {
-          "species": "Jellicent",
-          "setId": "jellicent-standard"
-        },
-        {
-          "species": "Jirachi",
-          "setId": "jirachi-choice-scarf"
-        },
-        {
-          "species": "Chandelure",
-          "setId": "chandelure-substitute-calm-mind"
-        }
-      ]
-    },
-    {
-      "archetype": "Stall",
-      "team": [
-        {
-          "species": "Jirachi",
-          "setId": "jirachi-utility"
-        },
-        {
-          "species": "Jellicent",
-          "setId": "jellicent-specially-defensive"
-        },
-        {
-          "species": "Krookodile",
-          "setId": "krookodile-stealth-rock"
-        },
-        {
-          "species": "Ninetales",
-          "setId": "ninetales-defensive"
-        },
-        {
-          "species": "Cofagrigus",
-          "setId": "cofagrigus-defensive"
+          "setId": "infernape-mixed"
         },
         {
           "species": "Rotom-Wash",
           "setId": "rotomwash-defensive"
+        },
+        {
+          "species": "Jirachi",
+          "setId": "jirachi-utility"
         }
       ]
     }

@@ -22,89 +22,30 @@
   },
   "suggestedTeams": [
     {
-      "archetype": "Balanced",
       "team": [
         {
           "species": "Honchkrow",
           "setId": "honchkrow-life-orb"
         },
         {
-          "species": "Magnezone",
-          "setId": "magnezone-choice-scarf"
-        },
-        {
-          "species": "Celebi",
-          "setId": "celebi-utility"
-        },
-        {
-          "species": "Breloom",
-          "setId": "breloom-swords-dance"
+          "species": "Dragonite",
+          "setId": "dragonite-choice-band"
         },
         {
           "species": "Donphan",
           "setId": "donphan-standard"
         },
         {
-          "species": "Heatran",
-          "setId": "heatran-utility"
-        }
-      ]
-    },
-    {
-      "archetype": "Offense",
-      "team": [
-        {
-          "species": "Heatran",
-          "setId": "heatran-choice-scarf"
-        },
-        {
-          "species": "Celebi",
-          "setId": "celebi-nasty-plot"
-        },
-        {
-          "species": "Donphan",
-          "setId": "donphan-choice-band"
-        },
-        {
-          "species": "Honchkrow",
-          "setId": "honchkrow-life-orb"
+          "species": "Sceptile",
+          "setId": "sceptile-swords-dance"
         },
         {
           "species": "Empoleon",
-          "setId": "empoleon-lead"
+          "setId": "empoleon-agility"
         },
         {
-          "species": "Dragonite",
-          "setId": "dragonite-mixed"
-        }
-      ]
-    },
-    {
-      "archetype": "Stall",
-      "team": [
-        {
-          "species": "Mesprit",
-          "setId": "mesprit-physically-defensive"
-        },
-        {
-          "species": "Celebi",
-          "setId": "celebi-utility"
-        },
-        {
-          "species": "Aerodactyl",
-          "setId": "aerodactyl-subroost"
-        },
-        {
-          "species": "Breloom",
-          "setId": "breloom-defensive"
-        },
-        {
-          "species": "Empoleon",
-          "setId": "empoleon-specially-defensive"
-        },
-        {
-          "species": "Heatran",
-          "setId": "heatran-utility"
+          "species": "Magnezone",
+          "setId": "magnezone-choice-scarf"
         }
       ]
     }

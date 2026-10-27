@@ -13,94 +13,35 @@
     "problems": [],
     "suggested": [
       {
-        "archetype": "Balanced",
         "team": [
-          {
-            "species": "Haxorus",
-            "setId": "haxorus-choice-band"
-          },
-          {
-            "species": "Gastrodon",
-            "setId": "gastrodon-physically-defensive"
-          },
           {
             "species": "Seismitoad",
-            "setId": "seismitoad-utility"
+            "setId": "seismitoad-bulky-attacker"
           },
-          {
-            "species": "Espeon",
-            "setId": "espeon-screens-setter"
-          },
-          {
-            "species": "Excadrill",
-            "setId": "excadrill-swords-dance"
-          },
-          {
-            "species": "Garchomp",
-            "setId": "garchomp-choice-scarf"
-          }
-        ],
-        "winRate": 0.575
-      },
-      {
-        "archetype": "Offense",
-        "team": [
           {
             "species": "Landorus-Therian",
             "setId": "landorustherian-choice-scarf"
           },
           {
+            "species": "Excadrill",
+            "setId": "excadrill-choice-scarf"
+          },
+          {
             "species": "Garchomp",
-            "setId": "garchomp-choice-scarf"
+            "setId": "garchomp-stealth-rock-lead"
           },
           {
-            "species": "Chansey",
-            "setId": "chansey-cleric"
-          },
-          {
-            "species": "Politoed",
-            "setId": "politoed-choice-specs"
+            "species": "Heatran",
+            "setId": "heatran-offensive"
           },
           {
             "species": "Kyurem-Black",
             "setId": "kyuremblack-choice-band"
-          },
-          {
-            "species": "Bronzong",
-            "setId": "bronzong-dual-screen"
           }
         ],
-        "winRate": 0.7
-      },
-      {
-        "archetype": "Stall",
-        "team": [
-          {
-            "species": "Seismitoad",
-            "setId": "seismitoad-utility"
-          },
-          {
-            "species": "Politoed",
-            "setId": "politoed-defensive"
-          },
-          {
-            "species": "Espeon",
-            "setId": "espeon-screens-setter"
-          },
-          {
-            "species": "Bronzong",
-            "setId": "bronzong-tank"
-          },
-          {
-            "species": "Gastrodon",
-            "setId": "gastrodon-physically-defensive"
-          },
-          {
-            "species": "Landorus-Therian",
-            "setId": "landorustherian-defensive"
-          }
-        ],
-        "winRate": 0.5
+        "winRate": 0.7708333333333334,
+        "battles": 192,
+        "rules": "all"
       }
     ],
     "candidate": 0,

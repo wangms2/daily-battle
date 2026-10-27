@@ -22,89 +22,30 @@
   },
   "suggestedTeams": [
     {
-      "archetype": "Balanced",
       "team": [
+        {
+          "species": "Gastrodon",
+          "setId": "gastrodon-physically-defensive"
+        },
+        {
+          "species": "Tentacruel",
+          "setId": "tentacruel-toxic-spikes"
+        },
+        {
+          "species": "Toxicroak",
+          "setId": "toxicroak-swords-dance"
+        },
         {
           "species": "Gliscor",
           "setId": "gliscor-swords-dance"
         },
         {
-          "species": "Tyranitar",
-          "setId": "tyranitar-bulky-pursuit-trapper"
-        },
-        {
-          "species": "Tentacruel",
-          "setId": "tentacruel-toxic-spikes"
+          "species": "Darmanitan",
+          "setId": "darmanitan-choice-scarf"
         },
         {
           "species": "Suicune",
           "setId": "suicune-offensive"
-        },
-        {
-          "species": "Magnezone",
-          "setId": "magnezone-choice-scarf"
-        },
-        {
-          "species": "Gastrodon",
-          "setId": "gastrodon-physically-defensive"
-        }
-      ]
-    },
-    {
-      "archetype": "Offense",
-      "team": [
-        {
-          "species": "Toxicroak",
-          "setId": "toxicroak-substitute-bulk-up"
-        },
-        {
-          "species": "Infernape",
-          "setId": "infernape-life-orb"
-        },
-        {
-          "species": "Kyurem-Black",
-          "setId": "kyuremblack-choice-band"
-        },
-        {
-          "species": "Tentacruel",
-          "setId": "tentacruel-toxic-spikes"
-        },
-        {
-          "species": "Tyranitar",
-          "setId": "tyranitar-choice-scarf"
-        },
-        {
-          "species": "Gliscor",
-          "setId": "gliscor-swords-dance"
-        }
-      ]
-    },
-    {
-      "archetype": "Stall",
-      "team": [
-        {
-          "species": "Suicune",
-          "setId": "suicune-resttalk"
-        },
-        {
-          "species": "Gliscor",
-          "setId": "gliscor-stealth-rock"
-        },
-        {
-          "species": "Celebi",
-          "setId": "celebi-bulky-pivot"
-        },
-        {
-          "species": "Tentacruel",
-          "setId": "tentacruel-toxic-spikes"
-        },
-        {
-          "species": "Gastrodon",
-          "setId": "gastrodon-specially-defensive"
-        },
-        {
-          "species": "Tyranitar",
-          "setId": "tyranitar-bulky-pursuit-trapper"
         }
       ]
     }

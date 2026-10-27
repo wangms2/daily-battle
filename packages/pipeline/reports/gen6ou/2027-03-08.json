@@ -13,64 +13,35 @@
     "problems": [],
     "suggested": [
       {
-        "archetype": "Balanced",
         "team": [
-          {
-            "species": "Thundurus-Therian",
-            "setId": "thundurustherian-nasty-plot"
-          },
-          {
-            "species": "Scizor",
-            "setId": "scizor-choice-band"
-          },
-          {
-            "species": "Hippowdon",
-            "setId": "hippowdon-physically-defensive"
-          },
-          {
-            "species": "Volcarona",
-            "setId": "volcarona-offensive-quiver-dance"
-          },
-          {
-            "species": "Mew",
-            "setId": "mew-stallbreaker"
-          },
-          {
-            "species": "Blastoise",
-            "setId": "blastoise-defensive-spinner"
-          }
-        ],
-        "winRate": 0.625
-      },
-      {
-        "archetype": "Offense",
-        "team": [
-          {
-            "species": "Mew",
-            "setId": "mew-lead"
-          },
-          {
-            "species": "Scizor",
-            "setId": "scizor-choice-band"
-          },
-          {
-            "species": "Charizard",
-            "setId": "charizard-wallbreaker"
-          },
           {
             "species": "Bisharp",
             "setId": "bisharp-swords-dance"
+          },
+          {
+            "species": "Blastoise",
+            "setId": "blastoise-all-out-attacker"
           },
           {
             "species": "Excadrill",
             "setId": "excadrill-choice-scarf"
           },
           {
-            "species": "Thundurus-Therian",
-            "setId": "thundurustherian-nasty-plot"
+            "species": "Hippowdon",
+            "setId": "hippowdon-special-wall"
+          },
+          {
+            "species": "Thundurus",
+            "setId": "thundurus-nasty-plot"
+          },
+          {
+            "species": "Raikou",
+            "setId": "raikou-calm-mind"
           }
         ],
-        "winRate": 0.675
+        "winRate": 0.7083333333333334,
+        "battles": 192,
+        "rules": "all"
       }
     ],
     "candidate": 0,

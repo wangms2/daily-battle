@@ -22,89 +22,30 @@
   },
   "suggestedTeams": [
     {
-      "archetype": "Balanced",
       "team": [
+        {
+          "species": "Rotom-Wash",
+          "setId": "rotomwash-defensive"
+        },
         {
           "species": "Tentacruel",
           "setId": "tentacruel-toxic-spikes"
-        },
-        {
-          "species": "Mew",
-          "setId": "mew-swords-dance"
         },
         {
           "species": "Scizor",
           "setId": "scizor-choice-band"
         },
         {
-          "species": "Rotom-Wash",
-          "setId": "rotomwash-defensive"
-        },
-        {
-          "species": "Ferrothorn",
-          "setId": "ferrothorn-standard"
-        },
-        {
-          "species": "Thundurus-Therian",
-          "setId": "thundurustherian-agilthundy"
-        }
-      ]
-    },
-    {
-      "archetype": "Offense",
-      "team": [
-        {
-          "species": "Skarmory",
-          "setId": "skarmory-lead"
-        },
-        {
           "species": "Haxorus",
-          "setId": "haxorus-dragon-dance"
-        },
-        {
-          "species": "Rhyperior",
-          "setId": "rhyperior-rock-polish"
-        },
-        {
-          "species": "Meloetta",
-          "setId": "meloetta-offensive-calm-mind"
-        },
-        {
-          "species": "Latias",
-          "setId": "latias-choice-scarf"
+          "setId": "haxorus-choice-band"
         },
         {
           "species": "Mew",
-          "setId": "mew-swords-dance"
-        }
-      ]
-    },
-    {
-      "archetype": "Stall",
-      "team": [
-        {
-          "species": "Thundurus-Therian",
-          "setId": "thundurustherian-substhundy"
-        },
-        {
-          "species": "Mew",
-          "setId": "mew-defensive"
+          "setId": "mew-nasty-plot"
         },
         {
           "species": "Ferrothorn",
-          "setId": "ferrothorn-standard"
-        },
-        {
-          "species": "Skarmory",
-          "setId": "skarmory-defensive"
-        },
-        {
-          "species": "Rotom-Wash",
-          "setId": "rotomwash-defensive"
-        },
-        {
-          "species": "Rhyperior",
-          "setId": "rhyperior-tank"
+          "setId": "ferrothorn-offensive"
         }
       ]
     }

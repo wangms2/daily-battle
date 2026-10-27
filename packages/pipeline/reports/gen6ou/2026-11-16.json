@@ -13,94 +13,35 @@
     "problems": [],
     "suggested": [
       {
-        "archetype": "Balanced",
         "team": [
           {
-            "species": "Landorus-Therian",
-            "setId": "landorustherian-defensive"
-          },
-          {
             "species": "Clefable",
-            "setId": "clefable-stealth-rock"
+            "setId": "clefable-calm-mind"
           },
           {
-            "species": "Kyurem-Black",
-            "setId": "kyuremblack-choice-item-attacker"
+            "species": "Porygon-Z",
+            "setId": "porygonz-choice-specs"
           },
           {
             "species": "Metagross",
-            "setId": "metagross-offensive"
-          },
-          {
-            "species": "Porygon-Z",
-            "setId": "porygonz-choice-specs"
-          },
-          {
-            "species": "Amoonguss",
-            "setId": "amoonguss-specially-defensive"
-          }
-        ],
-        "winRate": 0.7
-      },
-      {
-        "archetype": "Offense",
-        "team": [
-          {
-            "species": "Kyurem-Black",
-            "setId": "kyuremblack-choice-item-attacker"
-          },
-          {
-            "species": "Porygon-Z",
-            "setId": "porygonz-choice-specs"
+            "setId": "metagross-utility"
           },
           {
             "species": "Crawdaunt",
             "setId": "crawdaunt-swords-dance"
           },
           {
-            "species": "Venusaur",
-            "setId": "venusaur-offensive"
+            "species": "Kyurem-Black",
+            "setId": "kyuremblack-choice-item-attacker"
           },
           {
             "species": "Landorus-Therian",
             "setId": "landorustherian-suicide-lead"
-          },
-          {
-            "species": "Scizor",
-            "setId": "scizor-choice-band"
           }
         ],
-        "winRate": 0.775
-      },
-      {
-        "archetype": "Stall",
-        "team": [
-          {
-            "species": "Amoonguss",
-            "setId": "amoonguss-pivot"
-          },
-          {
-            "species": "Quagsire",
-            "setId": "quagsire-unaware-wall"
-          },
-          {
-            "species": "Zapdos",
-            "setId": "zapdos-physically-defensive"
-          },
-          {
-            "species": "Clefable",
-            "setId": "clefable-calm-mind"
-          },
-          {
-            "species": "Scizor",
-            "setId": "scizor-utility"
-          },
-          {
-            "species": "Landorus-Therian",
-            "setId": "landorustherian-defensive"
-          }
-        ],
-        "winRate": 0.425
+        "winRate": 0.7708333333333334,
+        "battles": 192,
+        "rules": "all"
       }
     ],
     "candidate": 0,

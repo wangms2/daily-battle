@@ -13,64 +13,35 @@
     "problems": [],
     "suggested": [
       {
-        "archetype": "Balanced",
         "team": [
           {
-            "species": "Slowbro",
-            "setId": "slowbro-utility-counter"
-          },
-          {
-            "species": "Heatran",
-            "setId": "heatran-choice-scarf"
-          },
-          {
             "species": "Latias",
-            "setId": "latias-choice-scarf"
+            "setId": "latias-choice-specs"
+          },
+          {
+            "species": "Gallade",
+            "setId": "gallade-choice-scarf"
+          },
+          {
+            "species": "Magnezone",
+            "setId": "magnezone-choice-scarf"
           },
           {
             "species": "Dragonite",
-            "setId": "dragonite-offensive-dragon-dance"
+            "setId": "dragonite-choice-band"
           },
           {
-            "species": "Rotom-Mow",
-            "setId": "rotommow-utility"
+            "species": "Yanmega",
+            "setId": "yanmega-choice-specs"
           },
           {
             "species": "Donphan",
             "setId": "donphan-standard"
           }
         ],
-        "winRate": 0.625
-      },
-      {
-        "archetype": "Offense",
-        "team": [
-          {
-            "species": "Gallade",
-            "setId": "gallade-swords-dance"
-          },
-          {
-            "species": "Slowbro",
-            "setId": "slowbro-choice-specs"
-          },
-          {
-            "species": "Heatran",
-            "setId": "heatran-utility"
-          },
-          {
-            "species": "Donphan",
-            "setId": "donphan-rapid-spin"
-          },
-          {
-            "species": "Starmie",
-            "setId": "starmie-offensive-rapid-spin"
-          },
-          {
-            "species": "Dragonite",
-            "setId": "dragonite-choice-band"
-          }
-        ],
-        "winRate": 0.65
+        "winRate": 0.7760416666666666,
+        "battles": 192,
+        "rules": "all"
       }
     ],
     "candidate": 0,

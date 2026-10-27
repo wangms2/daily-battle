@@ -13,94 +13,35 @@
     "problems": [],
     "suggested": [
       {
-        "archetype": "Balanced",
         "team": [
           {
-            "species": "Rotom-Wash",
-            "setId": "rotomwash-utility"
+            "species": "Magnezone",
+            "setId": "magnezone-choice-scarf"
           },
           {
-            "species": "Skarmory",
-            "setId": "skarmory-physically-defensive"
+            "species": "Rhyperior",
+            "setId": "rhyperior-substitute"
+          },
+          {
+            "species": "Donphan",
+            "setId": "donphan-standard"
           },
           {
             "species": "Dragonite",
             "setId": "dragonite-choice-band"
           },
           {
-            "species": "Milotic",
-            "setId": "milotic-physically-defensive"
-          },
-          {
-            "species": "Blissey",
-            "setId": "blissey-calm-mind"
-          },
-          {
-            "species": "Rhyperior",
-            "setId": "rhyperior-choice-band"
-          }
-        ],
-        "winRate": 0.575
-      },
-      {
-        "archetype": "Offense",
-        "team": [
-          {
-            "species": "Skarmory",
-            "setId": "skarmory-offensive-spiker"
-          },
-          {
-            "species": "Jirachi",
-            "setId": "jirachi-offensive"
-          },
-          {
-            "species": "Rotom-Wash",
-            "setId": "rotomwash-choice-scarf"
-          },
-          {
-            "species": "Dragonite",
-            "setId": "dragonite-offensive-dragon-dance"
-          },
-          {
-            "species": "Slowbro",
-            "setId": "slowbro-choice-specs"
-          },
-          {
-            "species": "Milotic",
-            "setId": "milotic-special-attacker"
-          }
-        ],
-        "winRate": 0.725
-      },
-      {
-        "archetype": "Stall",
-        "team": [
-          {
             "species": "Blissey",
             "setId": "blissey-standard"
           },
           {
-            "species": "Gengar",
-            "setId": "gengar-utility"
-          },
-          {
             "species": "Rotom-Wash",
             "setId": "rotomwash-utility"
-          },
-          {
-            "species": "Milotic",
-            "setId": "milotic-physically-defensive"
-          },
-          {
-            "species": "Rhyperior",
-            "setId": "rhyperior-tank"
-          },
-          {
-            "species": "Slowbro",
-            "setId": "slowbro-utility-counter"
           }
         ],
-        "winRate": 0.55
+        "winRate": 0.671875,
+        "battles": 192,
+        "rules": "all"
       }
     ],
     "candidate": 0,

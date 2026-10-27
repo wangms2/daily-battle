@@ -13,23 +13,18 @@
     "problems": [],
     "suggested": [
       {
-        "archetype": "Balanced",
         "team": [
           {
-            "species": "Azelf",
-            "setId": "azelf-standard-lead"
+            "species": "Slowbro",
+            "setId": "slowbro-utility-counter"
           },
           {
-            "species": "Starmie",
-            "setId": "starmie-defensive-rapid-spin"
+            "species": "Zapdos",
+            "setId": "zapdos-agility"
           },
           {
             "species": "Scizor",
             "setId": "scizor-choice-band"
-          },
-          {
-            "species": "Celebi",
-            "setId": "celebi-utility"
           },
           {
             "species": "Rotom-Wash",
@@ -38,69 +33,15 @@
           {
             "species": "Gastrodon",
             "setId": "gastrodon-curse"
-          }
-        ],
-        "winRate": 0.8
-      },
-      {
-        "archetype": "Offense",
-        "team": [
-          {
-            "species": "Scizor",
-            "setId": "scizor-choice-band"
-          },
-          {
-            "species": "Rotom-Wash",
-            "setId": "rotomwash-choice-scarf"
-          },
-          {
-            "species": "Skarmory",
-            "setId": "skarmory-offensive-spiker"
-          },
-          {
-            "species": "Celebi",
-            "setId": "celebi-nasty-plot"
-          },
-          {
-            "species": "Starmie",
-            "setId": "starmie-choice-specs"
-          },
-          {
-            "species": "Jirachi",
-            "setId": "jirachi-offensive"
-          }
-        ],
-        "winRate": 0.8
-      },
-      {
-        "archetype": "Stall",
-        "team": [
-          {
-            "species": "Slowbro",
-            "setId": "slowbro-utility-counter"
-          },
-          {
-            "species": "Rotom-Wash",
-            "setId": "rotomwash-defensive"
-          },
-          {
-            "species": "Zapdos",
-            "setId": "zapdos-physically-defensive"
-          },
-          {
-            "species": "Starmie",
-            "setId": "starmie-defensive-rapid-spin"
           },
           {
             "species": "Donphan",
             "setId": "donphan-standard"
-          },
-          {
-            "species": "Celebi",
-            "setId": "celebi-utility"
           }
         ],
-        "winRate": 0.625
+        "winRate": 0.6796875,
+        "battles": 192,
+        "rules": "all"
       }
     ],
     "candidate": 0,

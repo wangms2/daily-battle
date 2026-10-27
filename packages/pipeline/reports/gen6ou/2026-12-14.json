@@ -13,94 +13,35 @@
     "problems": [],
     "suggested": [
       {
-        "archetype": "Balanced",
         "team": [
-          {
-            "species": "Weavile",
-            "setId": "weavile-choice-band"
-          },
-          {
-            "species": "Keldeo",
-            "setId": "keldeo-choice-specs"
-          },
           {
             "species": "Azumarill",
             "setId": "azumarill-choice-band"
-          },
-          {
-            "species": "Landorus-Therian",
-            "setId": "landorustherian-defensive"
-          },
-          {
-            "species": "Excadrill",
-            "setId": "excadrill-fast-utility"
-          },
-          {
-            "species": "Sylveon",
-            "setId": "sylveon-cleric"
-          }
-        ],
-        "winRate": 0.775
-      },
-      {
-        "archetype": "Offense",
-        "team": [
-          {
-            "species": "Keldeo",
-            "setId": "keldeo-substitute-calm-mind"
-          },
-          {
-            "species": "Azumarill",
-            "setId": "azumarill-choice-band"
-          },
-          {
-            "species": "Landorus-Therian",
-            "setId": "landorustherian-suicide-lead"
           },
           {
             "species": "Metagross",
             "setId": "metagross-offensive"
           },
           {
-            "species": "Weavile",
-            "setId": "weavile-choice-band"
+            "species": "Sylveon",
+            "setId": "sylveon-choice-specs"
           },
           {
-            "species": "Chansey",
-            "setId": "chansey-de-blob"
-          }
-        ],
-        "winRate": 0.775
-      },
-      {
-        "archetype": "Stall",
-        "team": [
+            "species": "Excadrill",
+            "setId": "excadrill-choice-scarf"
+          },
           {
-            "species": "Latias",
-            "setId": "latias-defensive"
+            "species": "Keldeo",
+            "setId": "keldeo-choice-specs"
           },
           {
             "species": "Landorus-Therian",
             "setId": "landorustherian-defensive"
-          },
-          {
-            "species": "Donphan",
-            "setId": "donphan-defensive-spinner"
-          },
-          {
-            "species": "Sylveon",
-            "setId": "sylveon-cleric"
-          },
-          {
-            "species": "Hippowdon",
-            "setId": "hippowdon-special-wall"
-          },
-          {
-            "species": "Excadrill",
-            "setId": "excadrill-fast-utility"
           }
         ],
-        "winRate": 0.575
+        "winRate": 0.7291666666666666,
+        "battles": 192,
+        "rules": "all"
       }
     ],
     "candidate": 0,

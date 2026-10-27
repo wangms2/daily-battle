@@ -13,94 +13,35 @@
     "problems": [],
     "suggested": [
       {
-        "archetype": "Balanced",
-        "team": [
-          {
-            "species": "Haxorus",
-            "setId": "haxorus-dragon-dance"
-          },
-          {
-            "species": "Latias",
-            "setId": "latias-colbur-berry"
-          },
-          {
-            "species": "Dragonite",
-            "setId": "dragonite-3-attacks-dragon-dance"
-          },
-          {
-            "species": "Blissey",
-            "setId": "blissey-special-wall"
-          },
-          {
-            "species": "Amoonguss",
-            "setId": "amoonguss-defensive-pivot"
-          },
-          {
-            "species": "Jellicent",
-            "setId": "jellicent-standard"
-          }
-        ],
-        "winRate": 0.575
-      },
-      {
-        "archetype": "Offense",
         "team": [
           {
             "species": "Dragonite",
             "setId": "dragonite-3-attacks-dragon-dance"
+          },
+          {
+            "species": "Blastoise",
+            "setId": "blastoise-utility"
           },
           {
             "species": "Scizor",
             "setId": "scizor-choice-band"
           },
           {
-            "species": "Amoonguss",
-            "setId": "amoonguss-choice-specs"
-          },
-          {
             "species": "Latias",
             "setId": "latias-choice-scarf"
-          },
-          {
-            "species": "Azelf",
-            "setId": "azelf-all-out-attacker"
-          },
-          {
-            "species": "Porygon2",
-            "setId": "porygon2-duck-tank"
-          }
-        ],
-        "winRate": 0.775
-      },
-      {
-        "archetype": "Stall",
-        "team": [
-          {
-            "species": "Blastoise",
-            "setId": "blastoise-utility"
-          },
-          {
-            "species": "Jellicent",
-            "setId": "jellicent-specially-defensive"
-          },
-          {
-            "species": "Porygon2",
-            "setId": "porygon2-defensive-duck"
-          },
-          {
-            "species": "Amoonguss",
-            "setId": "amoonguss-defensive-pivot"
           },
           {
             "species": "Blissey",
             "setId": "blissey-special-wall"
           },
           {
-            "species": "Tyranitar",
-            "setId": "tyranitar-bulky-pursuit-trapper"
+            "species": "Porygon2",
+            "setId": "porygon2-duck-tank"
           }
         ],
-        "winRate": 0.375
+        "winRate": 0.5989583333333334,
+        "battles": 192,
+        "rules": "all"
       }
     ],
     "candidate": 0,

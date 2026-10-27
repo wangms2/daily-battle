@@ -22,60 +22,30 @@
   },
   "suggestedTeams": [
     {
-      "archetype": "Balanced",
-      "team": [
-        {
-          "species": "Zapdos",
-          "setId": "zapdos-physically-defensive"
-        },
-        {
-          "species": "Bronzong",
-          "setId": "bronzong-tank"
-        },
-        {
-          "species": "Aerodactyl",
-          "setId": "aerodactyl-lead"
-        },
-        {
-          "species": "Breloom",
-          "setId": "breloom-defensive"
-        },
-        {
-          "species": "Mismagius",
-          "setId": "mismagius-lead"
-        },
-        {
-          "species": "Heracross",
-          "setId": "heracross-choice-band"
-        }
-      ]
-    },
-    {
-      "archetype": "Offense",
       "team": [
         {
           "species": "Jirachi",
           "setId": "jirachi-offensive"
         },
         {
-          "species": "Breloom",
-          "setId": "breloom-swords-dance"
+          "species": "Latias",
+          "setId": "latias-choice-specs"
+        },
+        {
+          "species": "Aerodactyl",
+          "setId": "aerodactyl-lead"
+        },
+        {
+          "species": "Zapdos",
+          "setId": "zapdos-physically-defensive"
+        },
+        {
+          "species": "Bronzong",
+          "setId": "bronzong-offensive-stealth-rock"
         },
         {
           "species": "Heatran",
           "setId": "heatran-utility"
-        },
-        {
-          "species": "Heracross",
-          "setId": "heracross-choice-scarf"
-        },
-        {
-          "species": "Bronzong",
-          "setId": "bronzong-offensive-trick-room"
-        },
-        {
-          "species": "Latias",
-          "setId": "latias-choice-specs"
         }
       ]
     }

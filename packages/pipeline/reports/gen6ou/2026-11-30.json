@@ -13,49 +13,22 @@
     "problems": [],
     "suggested": [
       {
-        "archetype": "Balanced",
         "team": [
           {
-            "species": "Diancie",
-            "setId": "diancie-defensive"
-          },
-          {
-            "species": "Magnezone",
-            "setId": "magnezone-choice-scarf"
-          },
-          {
             "species": "Dragonite",
-            "setId": "dragonite-dragon-dance-three-attacks"
+            "setId": "dragonite-choice-band"
           },
           {
-            "species": "Slowbro",
-            "setId": "slowbro-calm-mind"
+            "species": "Excadrill",
+            "setId": "excadrill-choice-scarf"
           },
           {
             "species": "Crawdaunt",
             "setId": "crawdaunt-choice-band"
           },
           {
-            "species": "Serperior",
-            "setId": "serperior-stallbreaker"
-          }
-        ],
-        "winRate": 0.775
-      },
-      {
-        "archetype": "Offense",
-        "team": [
-          {
             "species": "Aggron",
             "setId": "aggron-tank"
-          },
-          {
-            "species": "Diancie",
-            "setId": "diancie-offensive-trick-room"
-          },
-          {
-            "species": "Excadrill",
-            "setId": "excadrill-sand-rush"
           },
           {
             "species": "Serperior",
@@ -64,13 +37,11 @@
           {
             "species": "Magnezone",
             "setId": "magnezone-choice-scarf"
-          },
-          {
-            "species": "Dragonite",
-            "setId": "dragonite-dragon-dance-three-attacks"
           }
         ],
-        "winRate": 0.6
+        "winRate": 0.7447916666666666,
+        "battles": 192,
+        "rules": "all"
       }
     ],
     "candidate": 0,

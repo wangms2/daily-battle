@@ -13,11 +13,10 @@
     "problems": [],
     "suggested": [
       {
-        "archetype": "Balanced",
         "team": [
           {
-            "species": "Gliscor",
-            "setId": "gliscor-swords-dance"
+            "species": "Ferrothorn",
+            "setId": "ferrothorn-standard"
           },
           {
             "species": "Bisharp",
@@ -28,79 +27,21 @@
             "setId": "slowking-special-wall"
           },
           {
-            "species": "Blissey",
-            "setId": "blissey-special-wall"
-          },
-          {
-            "species": "Chansey",
-            "setId": "chansey-cleric"
-          },
-          {
-            "species": "Kyurem-Black",
-            "setId": "kyuremblack-choice-band"
-          }
-        ],
-        "winRate": 0.65
-      },
-      {
-        "archetype": "Offense",
-        "team": [
-          {
-            "species": "Ferrothorn",
-            "setId": "ferrothorn-offensive"
-          },
-          {
-            "species": "Excadrill",
-            "setId": "excadrill-offensive"
-          },
-          {
-            "species": "Kyurem-Black",
-            "setId": "kyuremblack-choice-band"
-          },
-          {
-            "species": "Gliscor",
-            "setId": "gliscor-swords-dance"
-          },
-          {
-            "species": "Snorlax",
-            "setId": "snorlax-offensive"
-          },
-          {
-            "species": "Gyarados",
-            "setId": "gyarados-substitute-dragon-dance"
-          }
-        ],
-        "winRate": 0.625
-      },
-      {
-        "archetype": "Stall",
-        "team": [
-          {
             "species": "Snorlax",
             "setId": "snorlax-classic-curselax"
           },
           {
-            "species": "Jirachi",
-            "setId": "jirachi-substitute-3-attacks"
-          },
-          {
             "species": "Excadrill",
-            "setId": "excadrill-specially-defensive"
+            "setId": "excadrill-choice-scarf"
           },
           {
-            "species": "Gliscor",
-            "setId": "gliscor-stealth-rock"
-          },
-          {
-            "species": "Ferrothorn",
-            "setId": "ferrothorn-standard"
-          },
-          {
-            "species": "Chansey",
-            "setId": "chansey-support"
+            "species": "Gyarados",
+            "setId": "gyarados-offensive-dragon-dance"
           }
         ],
-        "winRate": 0.575
+        "winRate": 0.6041666666666666,
+        "battles": 192,
+        "rules": "all"
       }
     ],
     "candidate": 0,

@@ -13,64 +13,35 @@
     "problems": [],
     "suggested": [
       {
-        "archetype": "Balanced",
         "team": [
           {
-            "species": "Krookodile",
-            "setId": "krookodile-choice-scarf"
+            "species": "Magnezone",
+            "setId": "magnezone-choice-scarf"
           },
           {
-            "species": "Gliscor",
-            "setId": "gliscor-stallbreaker"
+            "species": "Serperior",
+            "setId": "serperior-substitute-attacker"
           },
           {
             "species": "Latias",
-            "setId": "latias-defensive"
+            "setId": "latias-utility"
+          },
+          {
+            "species": "Krookodile",
+            "setId": "krookodile-choice-scarf"
           },
           {
             "species": "Garchomp",
             "setId": "garchomp-tank-chomp"
           },
           {
-            "species": "Skarmory",
-            "setId": "skarmory-defog"
-          },
-          {
-            "species": "Tyranitar",
-            "setId": "tyranitar-choice-band"
-          }
-        ],
-        "winRate": 0.525
-      },
-      {
-        "archetype": "Offense",
-        "team": [
-          {
-            "species": "Garchomp",
-            "setId": "garchomp-offensive-stealth-rock"
-          },
-          {
-            "species": "Gliscor",
-            "setId": "gliscor-swords-dance-wallbreaker"
-          },
-          {
-            "species": "Magnezone",
-            "setId": "magnezone-choice-scarf"
-          },
-          {
-            "species": "Tyranitar",
-            "setId": "tyranitar-bulky-support"
-          },
-          {
-            "species": "Hydreigon",
-            "setId": "hydreigon-choice-specs"
-          },
-          {
             "species": "Weavile",
             "setId": "weavile-choice-band"
           }
         ],
-        "winRate": 0.65
+        "winRate": 0.6770833333333334,
+        "battles": 192,
+        "rules": "all"
       }
     ],
     "candidate": 1,

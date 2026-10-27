@@ -13,94 +13,35 @@
     "problems": [],
     "suggested": [
       {
-        "archetype": "Balanced",
         "team": [
+          {
+            "species": "Scizor",
+            "setId": "scizor-choice-band"
+          },
           {
             "species": "Donphan",
             "setId": "donphan-standard"
-          },
-          {
-            "species": "Tyranitar",
-            "setId": "tyranitar-choice-scarf"
-          },
-          {
-            "species": "Vaporeon",
-            "setId": "vaporeon-wish-support"
           },
           {
             "species": "Rotom-Wash",
             "setId": "rotomwash-choice-scarf"
           },
           {
-            "species": "Gallade",
-            "setId": "gallade-attacking-lead"
-          },
-          {
-            "species": "Heatran",
-            "setId": "heatran-utility"
-          }
-        ],
-        "winRate": 0.75
-      },
-      {
-        "archetype": "Offense",
-        "team": [
-          {
-            "species": "Rotom-Wash",
-            "setId": "rotomwash-utility"
-          },
-          {
-            "species": "Gliscor",
-            "setId": "gliscor-swords-dance"
+            "species": "Celebi",
+            "setId": "celebi-nasty-plot"
           },
           {
             "species": "Flygon",
-            "setId": "flygon-mixed-attacker"
-          },
-          {
-            "species": "Tyranitar",
-            "setId": "tyranitar-choice-band"
-          },
-          {
-            "species": "Scizor",
-            "setId": "scizor-choice-band"
+            "setId": "flygon-choice-scarf"
           },
           {
             "species": "Heatran",
             "setId": "heatran-utility"
           }
         ],
-        "winRate": 0.775
-      },
-      {
-        "archetype": "Stall",
-        "team": [
-          {
-            "species": "Donphan",
-            "setId": "donphan-standard"
-          },
-          {
-            "species": "Gliscor",
-            "setId": "gliscor-stallbreaker"
-          },
-          {
-            "species": "Heatran",
-            "setId": "heatran-utility"
-          },
-          {
-            "species": "Celebi",
-            "setId": "celebi-utility"
-          },
-          {
-            "species": "Snorlax",
-            "setId": "snorlax-resttalk"
-          },
-          {
-            "species": "Rotom-Wash",
-            "setId": "rotomwash-defensive"
-          }
-        ],
-        "winRate": 0.7
+        "winRate": 0.7526041666666666,
+        "battles": 192,
+        "rules": "all"
       }
     ],
     "candidate": 0,

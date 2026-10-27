@@ -22,89 +22,30 @@
   },
   "suggestedTeams": [
     {
-      "archetype": "Balanced",
-      "team": [
-        {
-          "species": "Infernape",
-          "setId": "infernape-life-orb"
-        },
-        {
-          "species": "Celebi",
-          "setId": "celebi-bulky-pivot"
-        },
-        {
-          "species": "Jirachi",
-          "setId": "jirachi-choice-scarf"
-        },
-        {
-          "species": "Reuniclus",
-          "setId": "reuniclus-calm-mind"
-        },
-        {
-          "species": "Landorus-Therian",
-          "setId": "landorustherian-defensive"
-        },
-        {
-          "species": "Machamp",
-          "setId": "machamp-bulk-up"
-        }
-      ]
-    },
-    {
-      "archetype": "Offense",
       "team": [
         {
           "species": "Bisharp",
           "setId": "bisharp-air-balloon-attacker"
         },
         {
-          "species": "Infernape",
-          "setId": "infernape-life-orb"
-        },
-        {
-          "species": "Scizor",
-          "setId": "scizor-choice-band"
-        },
-        {
-          "species": "Landorus-Therian",
-          "setId": "landorustherian-defensive"
-        },
-        {
-          "species": "Reuniclus",
-          "setId": "reuniclus-trick-room"
-        },
-        {
-          "species": "Tyranitar",
-          "setId": "tyranitar-choice-band"
-        }
-      ]
-    },
-    {
-      "archetype": "Stall",
-      "team": [
-        {
-          "species": "Snorlax",
-          "setId": "snorlax-classic-curselax"
-        },
-        {
-          "species": "Landorus-Therian",
-          "setId": "landorustherian-defensive"
-        },
-        {
           "species": "Celebi",
-          "setId": "celebi-bulky-pivot"
+          "setId": "celebi-nasty-plot"
         },
         {
-          "species": "Tyranitar",
-          "setId": "tyranitar-bulky-pursuit-trapper"
+          "species": "Landorus-Therian",
+          "setId": "landorustherian-choice-scarf"
         },
         {
-          "species": "Reuniclus",
-          "setId": "reuniclus-calm-mind"
+          "species": "Espeon",
+          "setId": "espeon-expert-belt"
         },
         {
           "species": "Jirachi",
           "setId": "jirachi-utility"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-bulky-pursuit-trapper"
         }
       ]
     }

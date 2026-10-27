@@ -22,60 +22,30 @@
   },
   "suggestedTeams": [
     {
-      "archetype": "Balanced",
       "team": [
-        {
-          "species": "Slowbro",
-          "setId": "slowbro-utility-counter"
-        },
-        {
-          "species": "Heatran",
-          "setId": "heatran-choice-scarf"
-        },
         {
           "species": "Latias",
-          "setId": "latias-choice-scarf"
+          "setId": "latias-choice-specs"
         },
-        {
-          "species": "Dragonite",
-          "setId": "dragonite-offensive-dragon-dance"
-        },
-        {
-          "species": "Rotom-Mow",
-          "setId": "rotommow-utility"
-        },
-        {
-          "species": "Donphan",
-          "setId": "donphan-standard"
-        }
-      ]
-    },
-    {
-      "archetype": "Offense",
-      "team": [
         {
           "species": "Gallade",
-          "setId": "gallade-swords-dance"
+          "setId": "gallade-choice-scarf"
         },
         {
-          "species": "Slowbro",
-          "setId": "slowbro-choice-specs"
-        },
-        {
-          "species": "Heatran",
-          "setId": "heatran-utility"
-        },
-        {
-          "species": "Donphan",
-          "setId": "donphan-rapid-spin"
-        },
-        {
-          "species": "Starmie",
-          "setId": "starmie-offensive-rapid-spin"
+          "species": "Magnezone",
+          "setId": "magnezone-choice-scarf"
         },
         {
           "species": "Dragonite",
           "setId": "dragonite-choice-band"
+        },
+        {
+          "species": "Yanmega",
+          "setId": "yanmega-choice-specs"
+        },
+        {
+          "species": "Donphan",
+          "setId": "donphan-standard"
         }
       ]
     }

@@ -13,94 +13,35 @@
     "problems": [],
     "suggested": [
       {
-        "archetype": "Balanced",
         "team": [
           {
             "species": "Donphan",
             "setId": "donphan-standard"
           },
           {
-            "species": "Yanmega",
-            "setId": "yanmega-attacking-lead"
-          },
-          {
             "species": "Togekiss",
             "setId": "togekiss-defensive-nasty-plot"
-          },
-          {
-            "species": "Gliscor",
-            "setId": "gliscor-swords-dance"
-          },
-          {
-            "species": "Blissey",
-            "setId": "blissey-standard"
-          },
-          {
-            "species": "Roserade",
-            "setId": "roserade-spikes"
-          }
-        ],
-        "winRate": 0.575
-      },
-      {
-        "archetype": "Offense",
-        "team": [
-          {
-            "species": "Roserade",
-            "setId": "roserade-toxic-spikes-lead"
-          },
-          {
-            "species": "Jirachi",
-            "setId": "jirachi-utility"
-          },
-          {
-            "species": "Kabutops",
-            "setId": "kabutops-swords-dance"
-          },
-          {
-            "species": "Tyranitar",
-            "setId": "tyranitar-dragon-dance"
           },
           {
             "species": "Yanmega",
             "setId": "yanmega-choice-specs"
           },
           {
-            "species": "Togekiss",
-            "setId": "togekiss-defensive-nasty-plot"
-          }
-        ],
-        "winRate": 0.5625
-      },
-      {
-        "archetype": "Stall",
-        "team": [
-          {
-            "species": "Blissey",
-            "setId": "blissey-standard"
-          },
-          {
-            "species": "Gliscor",
-            "setId": "gliscor-stallbreaker"
-          },
-          {
             "species": "Tyranitar",
-            "setId": "tyranitar-all-purpose"
+            "setId": "tyranitar-choice-scarf"
           },
           {
-            "species": "Roserade",
-            "setId": "roserade-spikes"
-          },
-          {
-            "species": "Donphan",
-            "setId": "donphan-standard"
+            "species": "Rotom-Heat",
+            "setId": "rotomheat-utility"
           },
           {
             "species": "Jirachi",
-            "setId": "jirachi-wish-protect"
+            "setId": "jirachi-offensive"
           }
         ],
-        "winRate": 0.525
+        "winRate": 0.7552083333333334,
+        "battles": 192,
+        "rules": "all"
       }
     ],
     "candidate": 1,

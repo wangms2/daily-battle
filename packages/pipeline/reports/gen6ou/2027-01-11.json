@@ -13,11 +13,22 @@
     "problems": [],
     "suggested": [
       {
-        "archetype": "Balanced",
         "team": [
           {
-            "species": "Jirachi",
-            "setId": "jirachi-stealth-rock"
+            "species": "Bisharp",
+            "setId": "bisharp-swords-dance"
+          },
+          {
+            "species": "Latios",
+            "setId": "latios-life-orb-attacker"
+          },
+          {
+            "species": "Kyurem-Black",
+            "setId": "kyuremblack-choice-item-attacker"
+          },
+          {
+            "species": "Garchomp",
+            "setId": "garchomp-tank-chomp"
           },
           {
             "species": "Magnezone",
@@ -25,52 +36,12 @@
           },
           {
             "species": "Diancie",
-            "setId": "diancie-defensive"
-          },
-          {
-            "species": "Garchomp",
-            "setId": "garchomp-tank-chomp"
-          },
-          {
-            "species": "Raikou",
-            "setId": "raikou-calm-mind"
-          },
-          {
-            "species": "Kyurem-Black",
-            "setId": "kyuremblack-choice-item-attacker"
+            "setId": "diancie-offensive"
           }
         ],
-        "winRate": 0.625
-      },
-      {
-        "archetype": "Offense",
-        "team": [
-          {
-            "species": "Latios",
-            "setId": "latios-choice-scarf"
-          },
-          {
-            "species": "Garchomp",
-            "setId": "garchomp-offensive-stealth-rock"
-          },
-          {
-            "species": "Kyurem-Black",
-            "setId": "kyuremblack-choice-item-attacker"
-          },
-          {
-            "species": "Alakazam",
-            "setId": "alakazam-utility-attacker"
-          },
-          {
-            "species": "Gliscor",
-            "setId": "gliscor-swords-dance-wallbreaker"
-          },
-          {
-            "species": "Tyranitar",
-            "setId": "tyranitar-choice-band"
-          }
-        ],
-        "winRate": 0.75
+        "winRate": 0.75,
+        "battles": 192,
+        "rules": "all"
       }
     ],
     "candidate": 0,

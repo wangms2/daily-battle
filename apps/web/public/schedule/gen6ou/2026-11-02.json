@@ -22,89 +22,30 @@
   },
   "suggestedTeams": [
     {
-      "archetype": "Balanced",
       "team": [
-        {
-          "species": "Mew",
-          "setId": "mew-lead"
-        },
-        {
-          "species": "Volcanion",
-          "setId": "volcanion-assault-vest"
-        },
-        {
-          "species": "Swampert",
-          "setId": "swampert-curse"
-        },
-        {
-          "species": "Rotom-Wash",
-          "setId": "rotomwash-physically-defensive-pivot"
-        },
-        {
-          "species": "Bisharp",
-          "setId": "bisharp-assault-vest"
-        },
-        {
-          "species": "Whimsicott",
-          "setId": "whimsicott-applaud-attack-offensive"
-        }
-      ]
-    },
-    {
-      "archetype": "Offense",
-      "team": [
-        {
-          "species": "Bisharp",
-          "setId": "bisharp-swords-dance"
-        },
-        {
-          "species": "Tornadus-Therian",
-          "setId": "tornadustherian-assault-vest-pivot"
-        },
-        {
-          "species": "Volcanion",
-          "setId": "volcanion-choice-scarf"
-        },
         {
           "species": "Kyurem-Black",
-          "setId": "kyuremblack-mixed-wallbreaker"
-        },
-        {
-          "species": "Mew",
-          "setId": "mew-lead"
-        },
-        {
-          "species": "Manaphy",
-          "setId": "manaphy-tail-glow-rain-dance"
-        }
-      ]
-    },
-    {
-      "archetype": "Stall",
-      "team": [
-        {
-          "species": "Rotom-Wash",
-          "setId": "rotomwash-physically-defensive-pivot"
-        },
-        {
-          "species": "Mew",
-          "setId": "mew-lead"
+          "setId": "kyuremblack-choice-item-attacker"
         },
         {
           "species": "Latias",
           "setId": "latias-utility"
         },
         {
+          "species": "Manaphy",
+          "setId": "manaphy-tail-glow-3-attacks"
+        },
+        {
+          "species": "Bisharp",
+          "setId": "bisharp-swords-dance"
+        },
+        {
           "species": "Swampert",
-          "setId": "swampert-curse"
+          "setId": "swampert-offensive-stealth-rock"
         },
         {
-          "species": "Volcanion",
-          "setId": "volcanion-physically-defensive"
-        },
-        {
-          "species": "Whimsicott",
-          "setId": "whimsicott-support"
+          "species": "Rotom-Wash",
+          "setId": "rotomwash-physically-defensive-pivot"
         }
       ]
     }

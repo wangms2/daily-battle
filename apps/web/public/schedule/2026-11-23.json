@@ -22,89 +22,30 @@
   },
   "suggestedTeams": [
     {
-      "archetype": "Balanced",
       "team": [
         {
-          "species": "Bronzong",
-          "setId": "bronzong-tank"
-        },
-        {
-          "species": "Gyarados",
-          "setId": "gyarados-offensive-dragon-dance"
-        },
-        {
-          "species": "Porygon2",
-          "setId": "porygon2-utility-counter"
-        },
-        {
-          "species": "Dragonite",
-          "setId": "dragonite-choice-band"
-        },
-        {
-          "species": "Hitmontop",
-          "setId": "hitmontop-rapid-spin"
-        },
-        {
-          "species": "Rotom-Mow",
-          "setId": "rotommow-utility"
-        }
-      ]
-    },
-    {
-      "archetype": "Offense",
-      "team": [
-        {
-          "species": "Jolteon",
-          "setId": "jolteon-choice-specs"
+          "species": "Yanmega",
+          "setId": "yanmega-attacking-lead"
         },
         {
           "species": "Heatran",
           "setId": "heatran-choice-scarf"
         },
         {
-          "species": "Rotom-Mow",
-          "setId": "rotommow-utility"
-        },
-        {
-          "species": "Hitmontop",
-          "setId": "hitmontop-technitop"
-        },
-        {
-          "species": "Gyarados",
-          "setId": "gyarados-offensive-dragon-dance"
-        },
-        {
           "species": "Dragonite",
           "setId": "dragonite-choice-band"
-        }
-      ]
-    },
-    {
-      "archetype": "Stall",
-      "team": [
-        {
-          "species": "Hitmontop",
-          "setId": "hitmontop-rapid-spin"
         },
         {
-          "species": "Porygon2",
-          "setId": "porygon2-utility-counter"
-        },
-        {
-          "species": "Crobat",
-          "setId": "crobat-stallbreaker"
-        },
-        {
-          "species": "Gyarados",
-          "setId": "gyarados-defensive-resttalk"
+          "species": "Jolteon",
+          "setId": "jolteon-choice-specs"
         },
         {
           "species": "Bronzong",
-          "setId": "bronzong-tank"
+          "setId": "bronzong-offensive-stealth-rock"
         },
         {
-          "species": "Rotom-Mow",
-          "setId": "rotommow-defensive"
+          "species": "Hitmontop",
+          "setId": "hitmontop-rapid-spin"
         }
       ]
     }

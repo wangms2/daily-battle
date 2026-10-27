@@ -22,89 +22,30 @@
   },
   "suggestedTeams": [
     {
-      "archetype": "Balanced",
       "team": [
         {
-          "species": "Keldeo",
-          "setId": "keldeo-choice-specs"
-        },
-        {
-          "species": "Bronzong",
-          "setId": "bronzong-tank"
-        },
-        {
-          "species": "Jellicent",
-          "setId": "jellicent-specially-defensive"
-        },
-        {
-          "species": "Kyurem-Black",
-          "setId": "kyuremblack-choice-band"
-        },
-        {
-          "species": "Tentacruel",
-          "setId": "tentacruel-toxic-spikes"
-        },
-        {
-          "species": "Terrakion",
-          "setId": "terrakion-choice-scarf"
-        }
-      ]
-    },
-    {
-      "archetype": "Offense",
-      "team": [
-        {
-          "species": "Starmie",
-          "setId": "starmie-rapid-spin"
-        },
-        {
-          "species": "Darmanitan",
-          "setId": "darmanitan-choice-scarf"
-        },
-        {
-          "species": "Skarmory",
-          "setId": "skarmory-lead"
-        },
-        {
-          "species": "Kyurem-Black",
-          "setId": "kyuremblack-choice-band"
-        },
-        {
-          "species": "Terrakion",
-          "setId": "terrakion-choice-scarf"
+          "species": "Jirachi",
+          "setId": "jirachi-choice-scarf"
         },
         {
           "species": "Keldeo",
-          "setId": "keldeo-calm-mind"
-        }
-      ]
-    },
-    {
-      "archetype": "Stall",
-      "team": [
-        {
-          "species": "Bronzong",
-          "setId": "bronzong-tank"
-        },
-        {
-          "species": "Jellicent",
-          "setId": "jellicent-specially-defensive"
-        },
-        {
-          "species": "Thundurus-Therian",
-          "setId": "thundurustherian-substhundy"
+          "setId": "keldeo-leftovers-attacker"
         },
         {
           "species": "Skarmory",
           "setId": "skarmory-defensive"
         },
         {
-          "species": "Tentacruel",
-          "setId": "tentacruel-toxic-spikes"
+          "species": "Starmie",
+          "setId": "starmie-rapid-spin"
         },
         {
-          "species": "Jirachi",
-          "setId": "jirachi-utility"
+          "species": "Thundurus-Therian",
+          "setId": "thundurustherian-agilthundy"
+        },
+        {
+          "species": "Kyurem-Black",
+          "setId": "kyuremblack-choice-band"
         }
       ]
     }

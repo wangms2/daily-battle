@@ -13,64 +13,35 @@
     "problems": [],
     "suggested": [
       {
-        "archetype": "Balanced",
         "team": [
           {
             "species": "Skarmory",
             "setId": "skarmory-standard"
           },
           {
-            "species": "Flygon",
-            "setId": "flygon-defensive"
+            "species": "Jolteon",
+            "setId": "jolteon-standard"
           },
           {
-            "species": "Charizard",
-            "setId": "charizard-sun"
+            "species": "Blissey",
+            "setId": "blissey-calm-mind"
           },
           {
             "species": "Claydol",
-            "setId": "claydol-bulky-spinner"
+            "setId": "claydol-utility"
           },
           {
-            "species": "Regice",
-            "setId": "regice-offensive"
-          },
-          {
-            "species": "Blissey",
-            "setId": "blissey-utility"
-          }
-        ],
-        "winRate": 0.6625
-      },
-      {
-        "archetype": "Offense",
-        "team": [
-          {
-            "species": "Hariyama",
-            "setId": "hariyama-offensive"
+            "species": "Tyranitar",
+            "setId": "tyranitar-bulky-dragon-dance"
           },
           {
             "species": "Flygon",
-            "setId": "flygon-choice-band"
-          },
-          {
-            "species": "Sceptile",
-            "setId": "sceptile-endeavor-subpetaya"
-          },
-          {
-            "species": "Skarmory",
-            "setId": "skarmory-offensive-spikes"
-          },
-          {
-            "species": "Charizard",
-            "setId": "charizard-sun"
-          },
-          {
-            "species": "Blissey",
-            "setId": "blissey-utility"
+            "setId": "flygon-offensive"
           }
         ],
-        "winRate": 0.575
+        "winRate": 0.75,
+        "battles": 192,
+        "rules": "all"
       }
     ],
     "candidate": 0,

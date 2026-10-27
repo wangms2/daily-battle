@@ -22,89 +22,30 @@
   },
   "suggestedTeams": [
     {
-      "archetype": "Balanced",
       "team": [
+        {
+          "species": "Latios",
+          "setId": "latios-life-orb-attacker"
+        },
+        {
+          "species": "Keldeo",
+          "setId": "keldeo-choice-specs"
+        },
+        {
+          "species": "Azumarill",
+          "setId": "azumarill-choice-band"
+        },
         {
           "species": "Gliscor",
           "setId": "gliscor-swords-dance-wallbreaker"
         },
         {
-          "species": "Skarmory",
-          "setId": "skarmory-defog"
-        },
-        {
-          "species": "Lopunny",
-          "setId": "lopunny-all-out-attacker"
-        },
-        {
-          "species": "Clefable",
-          "setId": "clefable-calm-mind"
-        },
-        {
-          "species": "Bisharp",
-          "setId": "bisharp-swords-dance"
+          "species": "Diancie",
+          "setId": "diancie-offensive"
         },
         {
           "species": "Cofagrigus",
           "setId": "cofagrigus-toxic-spikes-support"
-        }
-      ]
-    },
-    {
-      "archetype": "Offense",
-      "team": [
-        {
-          "species": "Cofagrigus",
-          "setId": "cofagrigus-offensive-trick-room-sweeper"
-        },
-        {
-          "species": "Latios",
-          "setId": "latios-choice-specs"
-        },
-        {
-          "species": "Diancie",
-          "setId": "diancie-offensive-trick-room"
-        },
-        {
-          "species": "Bisharp",
-          "setId": "bisharp-swords-dance"
-        },
-        {
-          "species": "Garchomp",
-          "setId": "garchomp-choice-scarf"
-        },
-        {
-          "species": "Keldeo",
-          "setId": "keldeo-substitute-calm-mind"
-        }
-      ]
-    },
-    {
-      "archetype": "Stall",
-      "team": [
-        {
-          "species": "Diancie",
-          "setId": "diancie-defensive"
-        },
-        {
-          "species": "Cofagrigus",
-          "setId": "cofagrigus-toxic-spikes-support"
-        },
-        {
-          "species": "Skarmory",
-          "setId": "skarmory-defog"
-        },
-        {
-          "species": "Garchomp",
-          "setId": "garchomp-tank-chomp"
-        },
-        {
-          "species": "Clefable",
-          "setId": "clefable-unaware-wall"
-        },
-        {
-          "species": "Gliscor",
-          "setId": "gliscor-stallbreaker"
         }
       ]
     }

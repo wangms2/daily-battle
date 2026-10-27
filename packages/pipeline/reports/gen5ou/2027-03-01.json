@@ -13,94 +13,35 @@
     "problems": [],
     "suggested": [
       {
-        "archetype": "Balanced",
-        "team": [
-          {
-            "species": "Dusclops",
-            "setId": "dusclops-curse"
-          },
-          {
-            "species": "Infernape",
-            "setId": "infernape-life-orb"
-          },
-          {
-            "species": "Landorus-Therian",
-            "setId": "landorustherian-defensive"
-          },
-          {
-            "species": "Latios",
-            "setId": "latios-choice-specs"
-          },
-          {
-            "species": "Tyranitar",
-            "setId": "tyranitar-bulky-pursuit-trapper"
-          },
-          {
-            "species": "Scizor",
-            "setId": "scizor-offensive-swords-dance"
-          }
-        ],
-        "winRate": 0.65
-      },
-      {
-        "archetype": "Offense",
         "team": [
           {
             "species": "Scizor",
             "setId": "scizor-choice-band"
           },
           {
-            "species": "Infernape",
-            "setId": "infernape-life-orb"
-          },
-          {
-            "species": "Magnezone",
-            "setId": "magnezone-sunny-day"
-          },
-          {
-            "species": "Nidoking",
-            "setId": "nidoking-choice-scarf"
-          },
-          {
             "species": "Latios",
             "setId": "latios-choice-specs"
           },
-          {
-            "species": "Landorus-Therian",
-            "setId": "landorustherian-choice-scarf"
-          }
-        ],
-        "winRate": 0.85
-      },
-      {
-        "archetype": "Stall",
-        "team": [
           {
             "species": "Forretress",
             "setId": "forretress-entry-hazard-control"
           },
           {
             "species": "Dusclops",
-            "setId": "dusclops-trick-room"
-          },
-          {
-            "species": "Snorlax",
-            "setId": "snorlax-classic-curselax"
-          },
-          {
-            "species": "Gliscor",
-            "setId": "gliscor-stealth-rock"
-          },
-          {
-            "species": "Tyranitar",
-            "setId": "tyranitar-bulky-pursuit-trapper"
+            "setId": "dusclops-curse"
           },
           {
             "species": "Landorus-Therian",
-            "setId": "landorustherian-defensive"
+            "setId": "landorustherian-choice-scarf"
+          },
+          {
+            "species": "Tornadus",
+            "setId": "tornadus-offensive"
           }
         ],
-        "winRate": 0.35
+        "winRate": 0.53125,
+        "battles": 192,
+        "rules": "all"
       }
     ],
     "candidate": 0,

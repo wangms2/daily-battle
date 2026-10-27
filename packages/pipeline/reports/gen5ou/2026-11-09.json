@@ -13,64 +13,35 @@
     "problems": [],
     "suggested": [
       {
-        "archetype": "Balanced",
         "team": [
-          {
-            "species": "Hydreigon",
-            "setId": "hydreigon-choice-scarf"
-          },
-          {
-            "species": "Excadrill",
-            "setId": "excadrill-swords-dance"
-          },
-          {
-            "species": "Magnezone",
-            "setId": "magnezone-sunny-day"
-          },
-          {
-            "species": "Sableye",
-            "setId": "sableye-prankster"
-          },
-          {
-            "species": "Hippowdon",
-            "setId": "hippowdon-mixed-wall"
-          },
-          {
-            "species": "Celebi",
-            "setId": "celebi-bulky-pivot"
-          }
-        ],
-        "winRate": 0.525
-      },
-      {
-        "archetype": "Stall",
-        "team": [
-          {
-            "species": "Bronzong",
-            "setId": "bronzong-tank"
-          },
-          {
-            "species": "Gastrodon",
-            "setId": "gastrodon-physically-defensive"
-          },
           {
             "species": "Reuniclus",
             "setId": "reuniclus-calm-mind"
           },
           {
-            "species": "Tyranitar",
-            "setId": "tyranitar-bulky-pursuit-trapper"
+            "species": "Scizor",
+            "setId": "scizor-choice-band"
           },
           {
             "species": "Excadrill",
-            "setId": "excadrill-specially-defensive"
+            "setId": "excadrill-choice-scarf"
           },
           {
-            "species": "Celebi",
-            "setId": "celebi-bulky-pivot"
+            "species": "Hydreigon",
+            "setId": "hydreigon-attacker"
+          },
+          {
+            "species": "Hippowdon",
+            "setId": "hippowdon-physically-defensive"
+          },
+          {
+            "species": "Gastrodon",
+            "setId": "gastrodon-physically-defensive"
           }
         ],
-        "winRate": 0.55
+        "winRate": 0.671875,
+        "battles": 192,
+        "rules": "all"
       }
     ],
     "candidate": 0,

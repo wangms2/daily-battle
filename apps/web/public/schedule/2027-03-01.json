@@ -22,37 +22,19 @@
   },
   "suggestedTeams": [
     {
-      "archetype": "Balanced",
       "team": [
         {
-          "species": "Suicune",
-          "setId": "suicune-crocune-defensive-calm-mind-resttalk"
-        },
-        {
-          "species": "Aerodactyl",
-          "setId": "aerodactyl-lead"
+          "species": "Mamoswine",
+          "setId": "mamoswine-physical-attacker"
         },
         {
           "species": "Zapdos",
           "setId": "zapdos-physically-defensive"
         },
         {
-          "species": "Hariyama",
-          "setId": "hariyama-attacking-lead"
+          "species": "Gengar",
+          "setId": "gengar-offensive"
         },
-        {
-          "species": "Gastrodon",
-          "setId": "gastrodon-curse"
-        },
-        {
-          "species": "Raikou",
-          "setId": "raikou-choice-specs"
-        }
-      ]
-    },
-    {
-      "archetype": "Offense",
-      "team": [
         {
           "species": "Raikou",
           "setId": "raikou-calm-mind-protect"
@@ -62,49 +44,8 @@
           "setId": "aerodactyl-lead"
         },
         {
-          "species": "Zapdos",
-          "setId": "zapdos-agility"
-        },
-        {
-          "species": "Hariyama",
-          "setId": "hariyama-attacking-lead"
-        },
-        {
-          "species": "Gengar",
-          "setId": "gengar-offensive"
-        },
-        {
-          "species": "Suicune",
-          "setId": "suicune-subcune"
-        }
-      ]
-    },
-    {
-      "archetype": "Stall",
-      "team": [
-        {
-          "species": "Gastrodon",
-          "setId": "gastrodon-curse"
-        },
-        {
-          "species": "Aerodactyl",
-          "setId": "aerodactyl-subroost"
-        },
-        {
-          "species": "Zapdos",
-          "setId": "zapdos-physically-defensive"
-        },
-        {
-          "species": "Suicune",
-          "setId": "suicune-crocune-defensive-calm-mind-resttalk"
-        },
-        {
           "species": "Empoleon",
-          "setId": "empoleon-specially-defensive"
-        },
-        {
-          "species": "Gengar",
-          "setId": "gengar-utility"
+          "setId": "empoleon-lead"
         }
       ]
     }

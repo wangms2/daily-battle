@@ -13,94 +13,35 @@
     "problems": [],
     "suggested": [
       {
-        "archetype": "Balanced",
         "team": [
           {
+            "species": "Flygon",
+            "setId": "flygon-offensive"
+          },
+          {
             "species": "Salamence",
-            "setId": "salamence-choice-band"
+            "setId": "salamence-dragon-dance"
           },
           {
             "species": "Forretress",
             "setId": "forretress-standard"
           },
           {
-            "species": "Flygon",
-            "setId": "flygon-choice-band"
-          },
-          {
-            "species": "Dugtrio",
-            "setId": "dugtrio-choice-band"
-          },
-          {
-            "species": "Steelix",
-            "setId": "steelix-standard-wall"
-          },
-          {
-            "species": "Miltank",
-            "setId": "miltank-curse"
-          }
-        ],
-        "winRate": 0.5125
-      },
-      {
-        "archetype": "Offense",
-        "team": [
-          {
-            "species": "Magneton",
-            "setId": "magneton-trapper"
-          },
-          {
-            "species": "Flygon",
-            "setId": "flygon-offensive"
+            "species": "Houndoom",
+            "setId": "houndoom-pursuit"
           },
           {
             "species": "Celebi",
-            "setId": "celebi-leech-seed-3-attacks"
-          },
-          {
-            "species": "Skarmory",
-            "setId": "skarmory-offensive-spikes"
-          },
-          {
-            "species": "Dugtrio",
-            "setId": "dugtrio-choice-band"
-          },
-          {
-            "species": "Steelix",
-            "setId": "steelix-choice-band"
-          }
-        ],
-        "winRate": 0.5875
-      },
-      {
-        "archetype": "Stall",
-        "team": [
-          {
-            "species": "Miltank",
-            "setId": "miltank-curse"
-          },
-          {
-            "species": "Skarmory",
-            "setId": "skarmory-standard"
-          },
-          {
-            "species": "Celebi",
-            "setId": "celebi-defensive-calm-mind"
-          },
-          {
-            "species": "Milotic",
-            "setId": "milotic-standard"
-          },
-          {
-            "species": "Flygon",
-            "setId": "flygon-defensive"
+            "setId": "celebi-offensive"
           },
           {
             "species": "Steelix",
             "setId": "steelix-standard-wall"
           }
         ],
-        "winRate": 0.475
+        "winRate": 0.5963541666666666,
+        "battles": 192,
+        "rules": "all"
       }
     ],
     "candidate": 0,

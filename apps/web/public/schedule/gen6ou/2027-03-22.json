@@ -22,69 +22,10 @@
   },
   "suggestedTeams": [
     {
-      "archetype": "Balanced",
       "team": [
         {
-          "species": "Tornadus-Therian",
-          "setId": "tornadustherian-life-orb"
-        },
-        {
-          "species": "Quagsire",
-          "setId": "quagsire-unaware-wall"
-        },
-        {
-          "species": "Kyurem-Black",
-          "setId": "kyuremblack-choice-item-attacker"
-        },
-        {
-          "species": "Tyranitar",
-          "setId": "tyranitar-bulky-support"
-        },
-        {
-          "species": "Slowbro",
-          "setId": "slowbro-calm-mind"
-        },
-        {
-          "species": "Serperior",
-          "setId": "serperior-dual-screens"
-        }
-      ]
-    },
-    {
-      "archetype": "Offense",
-      "team": [
-        {
-          "species": "Lucario",
-          "setId": "lucario-swords-dance"
-        },
-        {
-          "species": "Kyurem-Black",
-          "setId": "kyuremblack-choice-item-attacker"
-        },
-        {
-          "species": "Latios",
-          "setId": "latios-life-orb-attacker"
-        },
-        {
-          "species": "Serperior",
-          "setId": "serperior-stallbreaker"
-        },
-        {
-          "species": "Heatran",
-          "setId": "heatran-fast-utility"
-        },
-        {
-          "species": "Tornadus-Therian",
-          "setId": "tornadustherian-assault-vest-pivot"
-        }
-      ]
-    },
-    {
-      "archetype": "Stall",
-      "team": [
-        {
-          "species": "Tyranitar",
-          "setId": "tyranitar-bulky-support"
+          "species": "Bisharp",
+          "setId": "bisharp-assault-vest"
         },
         {
           "species": "Donphan",
@@ -95,12 +36,12 @@
           "setId": "heatran-specially-defensive"
         },
         {
-          "species": "Serperior",
-          "setId": "serperior-stallbreaker"
+          "species": "Kyurem-Black",
+          "setId": "kyuremblack-choice-item-attacker"
         },
         {
-          "species": "Quagsire",
-          "setId": "quagsire-curse"
+          "species": "Serperior",
+          "setId": "serperior-substitute-attacker"
         },
         {
           "species": "Slowbro",

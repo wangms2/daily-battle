@@ -22,56 +22,26 @@
   },
   "suggestedTeams": [
     {
-      "archetype": "Balanced",
       "team": [
-        {
-          "species": "Krookodile",
-          "setId": "krookodile-choice-scarf"
-        },
-        {
-          "species": "Gliscor",
-          "setId": "gliscor-stallbreaker"
-        },
-        {
-          "species": "Latias",
-          "setId": "latias-defensive"
-        },
-        {
-          "species": "Garchomp",
-          "setId": "garchomp-tank-chomp"
-        },
-        {
-          "species": "Skarmory",
-          "setId": "skarmory-defog"
-        },
-        {
-          "species": "Tyranitar",
-          "setId": "tyranitar-choice-band"
-        }
-      ]
-    },
-    {
-      "archetype": "Offense",
-      "team": [
-        {
-          "species": "Garchomp",
-          "setId": "garchomp-offensive-stealth-rock"
-        },
-        {
-          "species": "Gliscor",
-          "setId": "gliscor-swords-dance-wallbreaker"
-        },
         {
           "species": "Magnezone",
           "setId": "magnezone-choice-scarf"
         },
         {
-          "species": "Tyranitar",
-          "setId": "tyranitar-bulky-support"
+          "species": "Serperior",
+          "setId": "serperior-substitute-attacker"
         },
         {
-          "species": "Hydreigon",
-          "setId": "hydreigon-choice-specs"
+          "species": "Latias",
+          "setId": "latias-utility"
+        },
+        {
+          "species": "Krookodile",
+          "setId": "krookodile-choice-scarf"
+        },
+        {
+          "species": "Garchomp",
+          "setId": "garchomp-tank-chomp"
         },
         {
           "species": "Weavile",

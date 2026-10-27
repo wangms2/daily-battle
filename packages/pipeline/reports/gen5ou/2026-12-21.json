@@ -13,94 +13,35 @@
     "problems": [],
     "suggested": [
       {
-        "archetype": "Balanced",
         "team": [
-          {
-            "species": "Venusaur",
-            "setId": "venusaur-bulky-attacker"
-          },
           {
             "species": "Donphan",
             "setId": "donphan-support"
           },
           {
-            "species": "Kingdra",
-            "setId": "kingdra-choice-specs"
+            "species": "Weavile",
+            "setId": "weavile-physical-attacker"
           },
           {
-            "species": "Lucario",
-            "setId": "lucario-swords-dance"
+            "species": "Thundurus-Therian",
+            "setId": "thundurustherian-offensive"
           },
           {
-            "species": "Keldeo",
-            "setId": "keldeo-leftovers-attacker"
+            "species": "Alakazam",
+            "setId": "alakazam-attacker"
           },
           {
             "species": "Landorus-Therian",
-            "setId": "landorustherian-defensive"
-          }
-        ],
-        "winRate": 0.65
-      },
-      {
-        "archetype": "Offense",
-        "team": [
-          {
-            "species": "Heatran",
-            "setId": "heatran-offensive"
-          },
-          {
-            "species": "Donphan",
-            "setId": "donphan-life-orb"
-          },
-          {
-            "species": "Skarmory",
-            "setId": "skarmory-lead"
+            "setId": "landorustherian-choice-scarf"
           },
           {
             "species": "Jirachi",
             "setId": "jirachi-choice-scarf"
-          },
-          {
-            "species": "Lucario",
-            "setId": "lucario-swords-dance"
-          },
-          {
-            "species": "Kingdra",
-            "setId": "kingdra-rain-dance"
           }
         ],
-        "winRate": 0.6
-      },
-      {
-        "archetype": "Stall",
-        "team": [
-          {
-            "species": "Thundurus-Therian",
-            "setId": "thundurustherian-substhundy"
-          },
-          {
-            "species": "Venusaur",
-            "setId": "venusaur-bulky-attacker"
-          },
-          {
-            "species": "Landorus-Therian",
-            "setId": "landorustherian-defensive"
-          },
-          {
-            "species": "Heatran",
-            "setId": "heatran-specially-defensive"
-          },
-          {
-            "species": "Jirachi",
-            "setId": "jirachi-utility"
-          },
-          {
-            "species": "Donphan",
-            "setId": "donphan-support"
-          }
-        ],
-        "winRate": 0.55
+        "winRate": 0.546875,
+        "battles": 192,
+        "rules": "all"
       }
     ],
     "candidate": 1,

@@ -22,89 +22,30 @@
   },
   "suggestedTeams": [
     {
-      "archetype": "Balanced",
       "team": [
+        {
+          "species": "Ferrothorn",
+          "setId": "ferrothorn-utility"
+        },
+        {
+          "species": "Manaphy",
+          "setId": "manaphy-tail-glow-rain-dance"
+        },
         {
           "species": "Kyurem-Black",
           "setId": "kyuremblack-choice-item-attacker"
         },
         {
           "species": "Clefable",
-          "setId": "clefable-stealth-rock"
-        },
-        {
-          "species": "Ferrothorn",
-          "setId": "ferrothorn-utility"
-        },
-        {
-          "species": "Gastrodon",
-          "setId": "gastrodon-curse"
-        },
-        {
-          "species": "Gardevoir",
-          "setId": "gardevoir-calm-mind"
-        },
-        {
-          "species": "Manaphy",
-          "setId": "manaphy-tail-glow-3-attacks"
-        }
-      ]
-    },
-    {
-      "archetype": "Offense",
-      "team": [
-        {
-          "species": "Excadrill",
-          "setId": "excadrill-fast-utility"
-        },
-        {
-          "species": "Gastrodon",
-          "setId": "gastrodon-curse"
-        },
-        {
-          "species": "Gardevoir",
-          "setId": "gardevoir-bulky-attacker"
-        },
-        {
-          "species": "Kyurem-Black",
-          "setId": "kyuremblack-mixed-wallbreaker"
+          "setId": "clefable-calm-mind"
         },
         {
           "species": "Magnezone",
           "setId": "magnezone-choice-scarf"
         },
         {
-          "species": "Manaphy",
-          "setId": "manaphy-tail-glow-rain-dance"
-        }
-      ]
-    },
-    {
-      "archetype": "Stall",
-      "team": [
-        {
-          "species": "Gastrodon",
-          "setId": "gastrodon-curse"
-        },
-        {
-          "species": "Clefable",
-          "setId": "clefable-calm-mind"
-        },
-        {
-          "species": "Zapdos",
-          "setId": "zapdos-specially-defensive"
-        },
-        {
-          "species": "Cresselia",
-          "setId": "cresselia-defensive"
-        },
-        {
-          "species": "Klefki",
-          "setId": "klefki-spikes"
-        },
-        {
-          "species": "Ferrothorn",
-          "setId": "ferrothorn-utility"
+          "species": "Excadrill",
+          "setId": "excadrill-fast-utility"
         }
       ]
     }

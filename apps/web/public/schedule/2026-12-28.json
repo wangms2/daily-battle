@@ -22,89 +22,30 @@
   },
   "suggestedTeams": [
     {
-      "archetype": "Balanced",
       "team": [
         {
-          "species": "Bronzong",
-          "setId": "bronzong-tank"
+          "species": "Tyranitar",
+          "setId": "tyranitar-choice-band"
+        },
+        {
+          "species": "Rotom-Wash",
+          "setId": "rotomwash-choice-scarf"
+        },
+        {
+          "species": "Nidoqueen",
+          "setId": "nidoqueen-physically-defensive-toxic-spikes"
         },
         {
           "species": "Gastrodon",
           "setId": "gastrodon-curse"
         },
         {
-          "species": "Skarmory",
-          "setId": "skarmory-specially-defensive"
-        },
-        {
-          "species": "Jolteon",
-          "setId": "jolteon-choice-specs"
-        },
-        {
-          "species": "Tangrowth",
-          "setId": "tangrowth-swords-dance"
-        },
-        {
-          "species": "Tyranitar",
-          "setId": "tyranitar-choice-scarf"
-        }
-      ]
-    },
-    {
-      "archetype": "Offense",
-      "team": [
-        {
-          "species": "Azelf",
-          "setId": "azelf-choice-specs"
-        },
-        {
-          "species": "Tyranitar",
-          "setId": "tyranitar-dragon-dance"
-        },
-        {
-          "species": "Skarmory",
-          "setId": "skarmory-offensive-spiker"
-        },
-        {
-          "species": "Drapion",
-          "setId": "drapion-all-out-attacker"
-        },
-        {
-          "species": "Tangrowth",
-          "setId": "tangrowth-swords-dance"
+          "species": "Jirachi",
+          "setId": "jirachi-offensive"
         },
         {
           "species": "Bronzong",
           "setId": "bronzong-offensive-stealth-rock"
-        }
-      ]
-    },
-    {
-      "archetype": "Stall",
-      "team": [
-        {
-          "species": "Tyranitar",
-          "setId": "tyranitar-all-purpose"
-        },
-        {
-          "species": "Jirachi",
-          "setId": "jirachi-wish-protect"
-        },
-        {
-          "species": "Skarmory",
-          "setId": "skarmory-specially-defensive"
-        },
-        {
-          "species": "Bronzong",
-          "setId": "bronzong-tank"
-        },
-        {
-          "species": "Tangrowth",
-          "setId": "tangrowth-physical-tank"
-        },
-        {
-          "species": "Rotom-Wash",
-          "setId": "rotomwash-defensive"
         }
       ]
     }

@@ -22,31 +22,30 @@
   },
   "suggestedTeams": [
     {
-      "archetype": "Balanced",
       "team": [
         {
           "species": "Snorlax",
-          "setId": "snorlax-curserestlax"
-        },
-        {
-          "species": "Gyarados",
-          "setId": "gyarados-rest"
-        },
-        {
-          "species": "Registeel",
-          "setId": "registeel-mixed-wall"
-        },
-        {
-          "species": "Breloom",
-          "setId": "breloom-spore"
-        },
-        {
-          "species": "Forretress",
-          "setId": "forretress-physically-defensive"
+          "setId": "snorlax-offensive-curse"
         },
         {
           "species": "Raikou",
           "setId": "raikou-calm-mind-sweeper"
+        },
+        {
+          "species": "Heracross",
+          "setId": "heracross-standard"
+        },
+        {
+          "species": "Salamence",
+          "setId": "salamence-dragon-dance"
+        },
+        {
+          "species": "Forretress",
+          "setId": "forretress-standard"
+        },
+        {
+          "species": "Blastoise",
+          "setId": "blastoise-standard"
         }
       ]
     }

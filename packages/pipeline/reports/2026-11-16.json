@@ -13,94 +13,35 @@
     "problems": [],
     "suggested": [
       {
-        "archetype": "Balanced",
         "team": [
-          {
-            "species": "Rotom-Wash",
-            "setId": "rotomwash-choice-scarf"
-          },
-          {
-            "species": "Mamoswine",
-            "setId": "mamoswine-physical-attacker"
-          },
-          {
-            "species": "Gastrodon",
-            "setId": "gastrodon-curse"
-          },
-          {
-            "species": "Zapdos",
-            "setId": "zapdos-physically-defensive"
-          },
           {
             "species": "Tyranitar",
             "setId": "tyranitar-choice-scarf"
           },
           {
-            "species": "Bronzong",
-            "setId": "bronzong-tank"
-          }
-        ],
-        "winRate": 0.85
-      },
-      {
-        "archetype": "Offense",
-        "team": [
-          {
-            "species": "Bronzong",
-            "setId": "bronzong-tank"
-          },
-          {
             "species": "Weavile",
-            "setId": "weavile-standard"
+            "setId": "weavile-swords-dance"
           },
           {
-            "species": "Metagross",
-            "setId": "metagross-agility"
+            "species": "Starmie",
+            "setId": "starmie-offensive-rapid-spin"
           },
-          {
-            "species": "Mamoswine",
-            "setId": "mamoswine-physical-attacker"
-          },
-          {
-            "species": "Zapdos",
-            "setId": "zapdos-subroost"
-          },
-          {
-            "species": "Tyranitar",
-            "setId": "tyranitar-choice-band"
-          }
-        ],
-        "winRate": 0.75
-      },
-      {
-        "archetype": "Stall",
-        "team": [
           {
             "species": "Rotom-Wash",
-            "setId": "rotomwash-defensive"
-          },
-          {
-            "species": "Cloyster",
-            "setId": "cloyster-support"
-          },
-          {
-            "species": "Bronzong",
-            "setId": "bronzong-tank"
-          },
-          {
-            "species": "Gastrodon",
-            "setId": "gastrodon-tank"
-          },
-          {
-            "species": "Mamoswine",
-            "setId": "mamoswine-mixed"
+            "setId": "rotomwash-choice-scarf"
           },
           {
             "species": "Nidoqueen",
             "setId": "nidoqueen-physically-defensive-toxic-spikes"
+          },
+          {
+            "species": "Bronzong",
+            "setId": "bronzong-offensive-trick-room"
           }
         ],
-        "winRate": 0.675
+        "winRate": 0.6302083333333334,
+        "battles": 192,
+        "rules": "all"
       }
     ],
     "candidate": 0,

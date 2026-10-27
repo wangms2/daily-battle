@@ -13,94 +13,35 @@
     "problems": [],
     "suggested": [
       {
-        "archetype": "Balanced",
-        "team": [
-          {
-            "species": "Tangrowth",
-            "setId": "tangrowth-defensive"
-          },
-          {
-            "species": "Latias",
-            "setId": "latias-defensive"
-          },
-          {
-            "species": "Serperior",
-            "setId": "serperior-substitute-attacker"
-          },
-          {
-            "species": "Bisharp",
-            "setId": "bisharp-swords-dance"
-          },
-          {
-            "species": "Skarmory",
-            "setId": "skarmory-defog"
-          },
-          {
-            "species": "Cofagrigus",
-            "setId": "cofagrigus-toxic-spikes-support"
-          }
-        ],
-        "winRate": 0.675
-      },
-      {
-        "archetype": "Offense",
         "team": [
           {
             "species": "Magnezone",
             "setId": "magnezone-choice-scarf"
           },
           {
-            "species": "Aerodactyl",
-            "setId": "aerodactyl-lead"
+            "species": "Serperior",
+            "setId": "serperior-substitute-attacker"
           },
           {
-            "species": "Serperior",
-            "setId": "serperior-stallbreaker"
+            "species": "Latias",
+            "setId": "latias-utility"
           },
           {
             "species": "Bisharp",
             "setId": "bisharp-swords-dance"
           },
           {
-            "species": "Thundurus",
-            "setId": "thundurus-nasty-plot"
-          },
-          {
-            "species": "Metagross",
-            "setId": "metagross-offensive"
-          }
-        ],
-        "winRate": 0.575
-      },
-      {
-        "archetype": "Stall",
-        "team": [
-          {
-            "species": "Thundurus",
-            "setId": "thundurus-bulky-pivot"
-          },
-          {
-            "species": "Cresselia",
-            "setId": "cresselia-calm-mind"
-          },
-          {
-            "species": "Tangrowth",
-            "setId": "tangrowth-defensive"
-          },
-          {
-            "species": "Serperior",
-            "setId": "serperior-stallbreaker"
-          },
-          {
             "species": "Cofagrigus",
             "setId": "cofagrigus-toxic-spikes-support"
           },
           {
-            "species": "Skarmory",
-            "setId": "skarmory-physically-defensive"
+            "species": "Charizard",
+            "setId": "charizard-wallbreaker"
           }
         ],
-        "winRate": 0.35
+        "winRate": 0.6458333333333334,
+        "battles": 192,
+        "rules": "all"
       }
     ],
     "candidate": 0,

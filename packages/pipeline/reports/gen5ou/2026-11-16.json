@@ -13,64 +13,35 @@
     "problems": [],
     "suggested": [
       {
-        "archetype": "Balanced",
         "team": [
           {
-            "species": "Ninetales",
-            "setId": "ninetales-defensive"
+            "species": "Starmie",
+            "setId": "starmie-rapid-spin"
           },
           {
-            "species": "Honchkrow",
-            "setId": "honchkrow-life-orb"
+            "species": "Volcarona",
+            "setId": "volcarona-lum-berry-quiver-dance"
           },
           {
             "species": "Thundurus-Therian",
-            "setId": "thundurustherian-substhundy"
-          },
-          {
-            "species": "Blissey",
-            "setId": "blissey-special-wall"
-          },
-          {
-            "species": "Reuniclus",
-            "setId": "reuniclus-calm-mind"
-          },
-          {
-            "species": "Hydreigon",
-            "setId": "hydreigon-attacker"
-          }
-        ],
-        "winRate": 0.725
-      },
-      {
-        "archetype": "Stall",
-        "team": [
-          {
-            "species": "Tyranitar",
-            "setId": "tyranitar-bulky-pursuit-trapper"
-          },
-          {
-            "species": "Blissey",
-            "setId": "blissey-special-wall"
+            "setId": "thundurustherian-agilthundy"
           },
           {
             "species": "Bronzong",
             "setId": "bronzong-tank"
           },
           {
-            "species": "Reuniclus",
-            "setId": "reuniclus-calm-mind"
+            "species": "Tyranitar",
+            "setId": "tyranitar-bulky-pursuit-trapper"
           },
           {
-            "species": "Thundurus-Therian",
-            "setId": "thundurustherian-substhundy"
-          },
-          {
-            "species": "Ninetales",
-            "setId": "ninetales-defensive"
+            "species": "Honchkrow",
+            "setId": "honchkrow-life-orb"
           }
         ],
-        "winRate": 0.65
+        "winRate": 0.6510416666666666,
+        "battles": 192,
+        "rules": "all"
       }
     ],
     "candidate": 0,

@@ -13,64 +13,35 @@
     "problems": [],
     "suggested": [
       {
-        "archetype": "Balanced",
         "team": [
           {
-            "species": "Excadrill",
-            "setId": "excadrill-fast-utility"
-          },
-          {
-            "species": "Talonflame",
-            "setId": "talonflame-bulky-swords-dance"
-          },
-          {
-            "species": "Metagross",
-            "setId": "metagross-offensive-stealth-rock"
-          },
-          {
-            "species": "Cresselia",
-            "setId": "cresselia-calm-mind"
-          },
-          {
-            "species": "Cobalion",
-            "setId": "cobalion-offensive-pivot"
-          },
-          {
-            "species": "Garchomp",
-            "setId": "garchomp-tank-chomp"
-          }
-        ],
-        "winRate": 0.575
-      },
-      {
-        "archetype": "Offense",
-        "team": [
-          {
-            "species": "Excadrill",
-            "setId": "excadrill-fast-utility"
-          },
-          {
-            "species": "Cresselia",
-            "setId": "cresselia-defensive"
+            "species": "Venusaur",
+            "setId": "venusaur-offensive"
           },
           {
             "species": "Gengar",
             "setId": "gengar-life-orb-attacker"
           },
           {
-            "species": "Metagross",
-            "setId": "metagross-offensive"
-          },
-          {
             "species": "Talonflame",
-            "setId": "talonflame-offensive-swords-dance"
+            "setId": "talonflame-choice-band"
           },
           {
             "species": "Garchomp",
-            "setId": "garchomp-substitute-swords-dance"
+            "setId": "garchomp-tank-chomp"
+          },
+          {
+            "species": "Cobalion",
+            "setId": "cobalion-offensive-pivot"
+          },
+          {
+            "species": "Starmie",
+            "setId": "starmie-offensive"
           }
         ],
-        "winRate": 0.625
+        "winRate": 0.6979166666666666,
+        "battles": 192,
+        "rules": "all"
       }
     ],
     "candidate": 0,

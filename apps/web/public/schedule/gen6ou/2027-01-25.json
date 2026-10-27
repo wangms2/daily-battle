@@ -22,60 +22,30 @@
   },
   "suggestedTeams": [
     {
-      "archetype": "Balanced",
       "team": [
         {
+          "species": "Volcanion",
+          "setId": "volcanion-bulky-offensive"
+        },
+        {
           "species": "Charizard",
-          "setId": "charizard-dragon-dance"
+          "setId": "charizard-wallbreaker"
         },
         {
-          "species": "Blastoise",
-          "setId": "blastoise-defensive-spinner"
-        },
-        {
-          "species": "Starmie",
-          "setId": "starmie-offensive"
-        },
-        {
-          "species": "Latios",
-          "setId": "latios-life-orb-attacker"
-        },
-        {
-          "species": "Excadrill",
-          "setId": "excadrill-fast-utility"
+          "species": "Tyranitar",
+          "setId": "tyranitar-choice-band"
         },
         {
           "species": "Heatran",
           "setId": "heatran-specially-defensive"
-        }
-      ]
-    },
-    {
-      "archetype": "Offense",
-      "team": [
+        },
         {
           "species": "Excadrill",
-          "setId": "excadrill-sand-rush"
+          "setId": "excadrill-choice-scarf"
         },
         {
-          "species": "Volcanion",
-          "setId": "volcanion-assault-vest"
-        },
-        {
-          "species": "Manaphy",
-          "setId": "manaphy-tail-glow-rain-dance"
-        },
-        {
-          "species": "Heatran",
-          "setId": "heatran-fast-utility"
-        },
-        {
-          "species": "Starmie",
-          "setId": "starmie-utility"
-        },
-        {
-          "species": "Blastoise",
-          "setId": "blastoise-all-out-attacker"
+          "species": "Azelf",
+          "setId": "azelf-lead"
         }
       ]
     }

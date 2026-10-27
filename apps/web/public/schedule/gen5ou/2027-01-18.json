@@ -22,60 +22,30 @@
   },
   "suggestedTeams": [
     {
-      "archetype": "Balanced",
       "team": [
         {
-          "species": "Skarmory",
-          "setId": "skarmory-defensive"
+          "species": "Nidoking",
+          "setId": "nidoking-special-attacker"
         },
         {
-          "species": "Umbreon",
-          "setId": "umbreon-wish-support"
+          "species": "Starmie",
+          "setId": "starmie-rapid-spin"
+        },
+        {
+          "species": "Yanmega",
+          "setId": "yanmega-life-orb"
+        },
+        {
+          "species": "Excadrill",
+          "setId": "excadrill-swords-dance"
         },
         {
           "species": "Conkeldurr",
           "setId": "conkeldurr-bulk-up"
         },
         {
-          "species": "Venusaur",
-          "setId": "venusaur-bulky-attacker"
-        },
-        {
-          "species": "Gengar",
-          "setId": "gengar-substitute-will-o-wisp"
-        },
-        {
-          "species": "Scizor",
-          "setId": "scizor-choice-scarf"
-        }
-      ]
-    },
-    {
-      "archetype": "Offense",
-      "team": [
-        {
-          "species": "Conkeldurr",
-          "setId": "conkeldurr-four-attacks"
-        },
-        {
           "species": "Skarmory",
           "setId": "skarmory-lead"
-        },
-        {
-          "species": "Volcarona",
-          "setId": "volcarona-quiver-dance"
-        },
-        {
-          "species": "Nidoking",
-          "setId": "nidoking-special-attacker"
-        },
-        {
-          "species": "Gengar",
-          "setId": "gengar-offensive"
-        },
-        {
-          "species": "Yanmega",
-          "setId": "yanmega-life-orb"
         }
       ]
     }

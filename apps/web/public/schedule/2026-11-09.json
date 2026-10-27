@@ -22,89 +22,30 @@
   },
   "suggestedTeams": [
     {
-      "archetype": "Balanced",
       "team": [
-        {
-          "species": "Nidoqueen",
-          "setId": "nidoqueen-physically-defensive-toxic-spikes"
-        },
-        {
-          "species": "Bronzong",
-          "setId": "bronzong-offensive-trick-room"
-        },
-        {
-          "species": "Rotom-Heat",
-          "setId": "rotomheat-utility"
-        },
-        {
-          "species": "Kingdra",
-          "setId": "kingdra-choice-specs"
-        },
-        {
-          "species": "Celebi",
-          "setId": "celebi-utility"
-        },
-        {
-          "species": "Hitmonlee",
-          "setId": "hitmonlee-life-orb"
-        }
-      ]
-    },
-    {
-      "archetype": "Offense",
-      "team": [
-        {
-          "species": "Hitmonlee",
-          "setId": "hitmonlee-choice-band"
-        },
-        {
-          "species": "Cloyster",
-          "setId": "cloyster-life-orb"
-        },
-        {
-          "species": "Heatran",
-          "setId": "heatran-trapper"
-        },
-        {
-          "species": "Rotom-Heat",
-          "setId": "rotomheat-utility"
-        },
-        {
-          "species": "Celebi",
-          "setId": "celebi-nasty-plot"
-        },
-        {
-          "species": "Gyarados",
-          "setId": "gyarados-offensive-dragon-dance"
-        }
-      ]
-    },
-    {
-      "archetype": "Stall",
-      "team": [
-        {
-          "species": "Nidoqueen",
-          "setId": "nidoqueen-physically-defensive-toxic-spikes"
-        },
-        {
-          "species": "Celebi",
-          "setId": "celebi-utility"
-        },
         {
           "species": "Cloyster",
           "setId": "cloyster-support"
         },
         {
+          "species": "Rotom-Heat",
+          "setId": "rotomheat-utility"
+        },
+        {
           "species": "Gyarados",
-          "setId": "gyarados-defensive-resttalk"
+          "setId": "gyarados-offensive-dragon-dance"
         },
         {
           "species": "Bronzong",
           "setId": "bronzong-tank"
         },
         {
-          "species": "Rotom-Heat",
-          "setId": "rotomheat-defensive"
+          "species": "Heatran",
+          "setId": "heatran-substitute"
+        },
+        {
+          "species": "Hitmonlee",
+          "setId": "hitmonlee-life-orb"
         }
       ]
     }

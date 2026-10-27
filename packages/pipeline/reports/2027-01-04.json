@@ -13,64 +13,35 @@
     "problems": [],
     "suggested": [
       {
-        "archetype": "Balanced",
         "team": [
-          {
-            "species": "Heatran",
-            "setId": "heatran-utility"
-          },
-          {
-            "species": "Nidoqueen",
-            "setId": "nidoqueen-physically-defensive-toxic-spikes"
-          },
-          {
-            "species": "Quagsire",
-            "setId": "quagsire-wall"
-          },
-          {
-            "species": "Porygon-Z",
-            "setId": "porygonz-choice-scarf"
-          },
-          {
-            "species": "Tyranitar",
-            "setId": "tyranitar-choice-band"
-          },
-          {
-            "species": "Magnezone",
-            "setId": "magnezone-choice-scarf"
-          }
-        ],
-        "winRate": 0.5625
-      },
-      {
-        "archetype": "Offense",
-        "team": [
-          {
-            "species": "Starmie",
-            "setId": "starmie-offensive-rapid-spin"
-          },
-          {
-            "species": "Dragonite",
-            "setId": "dragonite-offensive-dragon-dance"
-          },
-          {
-            "species": "Suicune",
-            "setId": "suicune-supercune-offensive-calm-mind"
-          },
           {
             "species": "Jolteon",
             "setId": "jolteon-choice-specs"
           },
           {
-            "species": "Heatran",
-            "setId": "heatran-choice-scarf"
+            "species": "Dusknoir",
+            "setId": "dusknoir-offensive-spinblocker"
           },
           {
-            "species": "Tyranitar",
-            "setId": "tyranitar-choice-band"
+            "species": "Quagsire",
+            "setId": "quagsire-specially-defensive"
+          },
+          {
+            "species": "Bronzong",
+            "setId": "bronzong-tank"
+          },
+          {
+            "species": "Dragonite",
+            "setId": "dragonite-choice-band"
+          },
+          {
+            "species": "Starmie",
+            "setId": "starmie-defensive-rapid-spin"
           }
         ],
-        "winRate": 0.625
+        "winRate": 0.7916666666666666,
+        "battles": 192,
+        "rules": "all"
       }
     ],
     "candidate": 0,

@@ -13,94 +13,35 @@
     "problems": [],
     "suggested": [
       {
-        "archetype": "Balanced",
         "team": [
           {
-            "species": "Clefable",
-            "setId": "clefable-calm-mind"
+            "species": "Scizor",
+            "setId": "scizor-choice-band"
           },
           {
-            "species": "Thundurus-Therian",
-            "setId": "thundurustherian-nasty-plot"
-          },
-          {
-            "species": "Mew",
-            "setId": "mew-lead"
+            "species": "Venusaur",
+            "setId": "venusaur-offensive"
           },
           {
             "species": "Serperior",
             "setId": "serperior-stallbreaker"
           },
           {
-            "species": "Scizor",
-            "setId": "scizor-bulky-swords-dance"
-          },
-          {
-            "species": "Diancie",
-            "setId": "diancie-defensive"
-          }
-        ],
-        "winRate": 0.625
-      },
-      {
-        "archetype": "Offense",
-        "team": [
-          {
-            "species": "Serperior",
-            "setId": "serperior-substitute-attacker"
-          },
-          {
-            "species": "Landorus-Therian",
-            "setId": "landorustherian-suicide-lead"
-          },
-          {
-            "species": "Diancie",
-            "setId": "diancie-offensive"
-          },
-          {
-            "species": "Thundurus-Therian",
-            "setId": "thundurustherian-double-dance"
-          },
-          {
-            "species": "Aerodactyl",
-            "setId": "aerodactyl-lead"
-          },
-          {
             "species": "Latios",
-            "setId": "latios-choice-scarf"
-          }
-        ],
-        "winRate": 0.6
-      },
-      {
-        "archetype": "Stall",
-        "team": [
-          {
-            "species": "Clefable",
-            "setId": "clefable-calm-mind"
+            "setId": "latios-life-orb-attacker"
           },
           {
             "species": "Landorus-Therian",
             "setId": "landorustherian-defensive"
           },
           {
-            "species": "Venusaur",
-            "setId": "venusaur-defensive"
-          },
-          {
-            "species": "Serperior",
-            "setId": "serperior-stallbreaker"
-          },
-          {
-            "species": "Mew",
-            "setId": "mew-stallbreaker"
-          },
-          {
-            "species": "Diancie",
-            "setId": "diancie-defensive"
+            "species": "Thundurus-Therian",
+            "setId": "thundurustherian-nasty-plot"
           }
         ],
-        "winRate": 0.55
+        "winRate": 0.7291666666666666,
+        "battles": 192,
+        "rules": "all"
       }
     ],
     "candidate": 0,

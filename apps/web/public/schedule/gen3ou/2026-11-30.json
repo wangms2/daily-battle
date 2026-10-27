@@ -22,60 +22,30 @@
   },
   "suggestedTeams": [
     {
-      "archetype": "Balanced",
       "team": [
-        {
-          "species": "Steelix",
-          "setId": "steelix-standard-wall"
-        },
-        {
-          "species": "Forretress",
-          "setId": "forretress-standard"
-        },
-        {
-          "species": "Jynx",
-          "setId": "jynx-special-sweeper"
-        },
         {
           "species": "Starmie",
           "setId": "starmie-offensive"
         },
         {
-          "species": "Charizard",
-          "setId": "charizard-sun"
+          "species": "Swampert",
+          "setId": "swampert-standard-offensive"
         },
         {
-          "species": "Metagross",
-          "setId": "metagross-bulky-attacker"
-        }
-      ]
-    },
-    {
-      "archetype": "Stall",
-      "team": [
-        {
-          "species": "Starmie",
-          "setId": "starmie-defensive"
+          "species": "Jolteon",
+          "setId": "jolteon-standard"
         },
         {
           "species": "Forretress",
           "setId": "forretress-standard"
         },
         {
-          "species": "Registeel",
-          "setId": "registeel-toxic-stall"
-        },
-        {
-          "species": "Steelix",
-          "setId": "steelix-standard-wall"
-        },
-        {
           "species": "Metagross",
-          "setId": "metagross-bulky-attacker"
+          "setId": "metagross-choice-band"
         },
         {
-          "species": "Swampert",
-          "setId": "swampert-surf-defensive"
+          "species": "Aerodactyl",
+          "setId": "aerodactyl-choice-band"
         }
       ]
     }

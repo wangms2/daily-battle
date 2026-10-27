@@ -13,64 +13,35 @@
     "problems": [],
     "suggested": [
       {
-        "archetype": "Balanced",
         "team": [
-          {
-            "species": "Cofagrigus",
-            "setId": "cofagrigus-defensive"
-          },
-          {
-            "species": "Donphan",
-            "setId": "donphan-support"
-          },
-          {
-            "species": "Latios",
-            "setId": "latios-choice-scarf"
-          },
           {
             "species": "Jirachi",
             "setId": "jirachi-choice-scarf"
           },
           {
-            "species": "Heatran",
-            "setId": "heatran-substitute-protect"
-          },
-          {
-            "species": "Gengar",
-            "setId": "gengar-substitute-will-o-wisp"
-          }
-        ],
-        "winRate": 0.55
-      },
-      {
-        "archetype": "Stall",
-        "team": [
-          {
-            "species": "Hitmontop",
-            "setId": "hitmontop-rapid-spin"
-          },
-          {
-            "species": "Heatran",
-            "setId": "heatran-substitute-protect"
+            "species": "Keldeo",
+            "setId": "keldeo-choice-specs"
           },
           {
             "species": "Gastrodon",
             "setId": "gastrodon-physically-defensive"
           },
           {
-            "species": "Crobat",
-            "setId": "crobat-stallbreaker"
+            "species": "Virizion",
+            "setId": "virizion-calm-mind"
           },
           {
             "species": "Donphan",
             "setId": "donphan-support"
           },
           {
-            "species": "Jirachi",
-            "setId": "jirachi-utility"
+            "species": "Heatran",
+            "setId": "heatran-substitute-protect"
           }
         ],
-        "winRate": 0.55
+        "winRate": 0.6666666666666666,
+        "battles": 192,
+        "rules": "all"
       }
     ],
     "candidate": 0,

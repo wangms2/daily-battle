@@ -22,60 +22,30 @@
   },
   "suggestedTeams": [
     {
-      "archetype": "Balanced",
       "team": [
+        {
+          "species": "Excadrill",
+          "setId": "excadrill-choice-scarf"
+        },
         {
           "species": "Blissey",
           "setId": "blissey-special-wall"
         },
         {
           "species": "Heatran",
-          "setId": "heatran-specially-defensive"
-        },
-        {
-          "species": "Rotom-Wash",
-          "setId": "rotomwash-defensive"
-        },
-        {
-          "species": "Starmie",
-          "setId": "starmie-rapid-spin"
+          "setId": "heatran-offensive"
         },
         {
           "species": "Gyarados",
-          "setId": "gyarados-substitute-dragon-dance"
+          "setId": "gyarados-offensive-dragon-dance"
         },
-        {
-          "species": "Gliscor",
-          "setId": "gliscor-swords-dance"
-        }
-      ]
-    },
-    {
-      "archetype": "Stall",
-      "team": [
         {
           "species": "Crobat",
-          "setId": "crobat-stallbreaker"
-        },
-        {
-          "species": "Gliscor",
-          "setId": "gliscor-stealth-rock"
+          "setId": "crobat-choice-band"
         },
         {
           "species": "Suicune",
           "setId": "suicune-crocune"
-        },
-        {
-          "species": "Excadrill",
-          "setId": "excadrill-specially-defensive"
-        },
-        {
-          "species": "Heatran",
-          "setId": "heatran-specially-defensive"
-        },
-        {
-          "species": "Blissey",
-          "setId": "blissey-special-wall"
         }
       ]
     }
