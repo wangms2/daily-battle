@@ -4,6 +4,9 @@ import { addDays, dayKey, weekKey } from '@daily-battle/gen/dates';
 import { Fragment, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { BattleRoute } from './screens/BattleRoute';
 import { DailyBrief } from './screens/DailyBrief';
+import { NameScreen } from './screens/NameScreen';
+import { ProtectCard } from './ui/ProtectCard';
+import { savedName, saveName } from './versus/saved';
 import { Home } from './screens/Home';
 import { TeamBuilder } from './screens/TeamBuilder';
 import { AboutSheet } from './sheets/About';
@@ -12,7 +15,6 @@ import { configureAudio, menuSounds } from './lib/audio';
 import { setActiveFormat } from './lib/data';
 import { setSpriteStyle } from './lib/sprites';
 import { useMediaQuery } from './ui/useWide';
-import { reportText } from './lib/report';
 import {
   attemptBucket,
   attemptDifficulty,
@@ -36,7 +38,7 @@ import {
   type GameAction,
 } from './state/reducer';
 import { emptyDay, type Settings } from './state/schema';
-import { useNow, useStore } from './state/context';
+import { useAccount, useNow, useStore } from './state/context';
 import { Button } from './ui/bits';
 import { TopBar } from './ui/TopBar';
 import { VersusRoute } from './versus/VersusRoute';
@@ -142,6 +144,7 @@ function poolIdOf(s: ScheduleFile): string {
 
 export function App() {
   const { state, dispatch: dispatchAny, storageAvailable } = useStore();
+  const account = useAccount();
   const now = useNow(1000);
   const day = dayKey(now);
   const week = weekKey(now);
@@ -173,12 +176,24 @@ export function App() {
   // After a loss, the end card's "Change team" opens the brief with the team editable.
   const [openEdit, setOpenEdit] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  // The first Play asks the player's name, then carries on where they tapped.
+  const [naming, setNaming] = useState<(() => void) | null>(null);
   const [typeChartOpen, setTypeChartOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [howToPlayOpen, setHowToPlayOpen] = useState(false);
   const [storageNoticeDismissed, setStorageNoticeDismissed] = useState(false);
 
   const { settings } = state;
+  const named = (then: () => void) => {
+    if (settings.name) return then();
+    // A name from versus is already theirs.
+    const versusName = savedName();
+    if (versusName) {
+      dispatchAny({ type: 'setSetting', key: 'name', value: versusName });
+      return then();
+    }
+    setNaming(() => then);
+  };
   const { weeks, days } = state.games[format];
   const weekState = weeks[week];
   const dayState = days[day] ?? emptyDay();
@@ -198,6 +213,10 @@ export function App() {
   const regularStreak = useMemo(
     () => (coached ? stats.streak : computeStats(days, day, difficulty).streak),
     [coached, stats.streak, days, day, difficulty],
+  );
+  // After a win, the offer to protect the name (Showdown-style), until it's protected.
+  const protectOffer = settings.name && !account.name && (
+    <ProtectCard name={settings.name} streak={stats.streak} onProtect={account.protect} />
   );
   const coachCost = coached ? null : coachWarning(days[day], difficulty, regularStreak);
   const share = shareModel({
@@ -446,14 +465,16 @@ export function App() {
             ...(gameBucket(id) === 'coached' && { coached: true }),
           };
         })}
-        onPlay={() => go('daily')}
-        onFriends={() => go('versus')}
-        onLearn={() => go('learn')}
+        onPlay={() => named(() => go('daily'))}
+        onFriends={() => named(() => go('versus'))}
+        onLearn={() => named(() => go('learn'))}
         share={todayShare}
-        onPick={(id) => {
-          if (id !== format) dispatchAny({ type: 'setSetting', key: 'format', value: id });
-          go('play');
-        }}
+        onPick={(id) =>
+          named(() => {
+            if (id !== format) dispatchAny({ type: 'setSetting', key: 'format', value: id });
+            go('play');
+          })
+        }
         onBack={() => go('')}
         onSettings={() => setSettingsOpen(true)}
       />
@@ -540,6 +561,7 @@ export function App() {
           streak: stats.streak,
           // The same share as the brief's: practice runs never show in it.
           share,
+          ...(protectOffer && { protect: protectOffer }),
         }}
         {...(shownAttempt === inProgress &&
           coachAvailable(format, attemptDifficulty(shownAttempt)) && {
@@ -585,6 +607,23 @@ export function App() {
         })}
         hardAvailable={hardAvailable(format)}
         result={{ summary, streak: stats.streak, share, countdown }}
+      />
+    );
+  }
+
+  if (naming) {
+    screen = (
+      <NameScreen
+        onDone={(name) => {
+          dispatchAny({ type: 'setSetting', key: 'name', value: name });
+          saveName(name);
+          setNaming(null);
+          naming();
+        }}
+        onSignedIn={() => {
+          setNaming(null);
+          naming();
+        }}
       />
     );
   }
@@ -650,7 +689,6 @@ export function App() {
         onOpenChange={setSettingsOpen}
         settings={settings}
         onChange={setSetting}
-        report={reportText({ days, settings }, ENGINE_VERSION)}
         onAbout={() => setAboutOpen(true)}
         onHowToPlay={() => {
           setSettingsOpen(false);

@@ -83,6 +83,8 @@ export interface DayResult {
   share: ShareModel;
   /** This battle's attempt. */
   ts: number;
+  /** After a win: the offer to protect the player's name with a password (ProtectCard). */
+  protect?: ReactNode;
 }
 
 /** A battle against a friend (versus rooms, DESIGN.md §18) instead of the day's opponent. */
@@ -1001,6 +1003,7 @@ export function Battle({
         <TryRows summary={r.summary} current={r.ts} />
       </div>
       {streakText && <p className="mt-2 text-[14px] font-semibold">{streakText}</p>}
+      {e.winner === 'you' && !gaveUp && r.protect}
       <div className="mt-4 grid gap-2">
         <ShareButton share={r.share} />
         <div className="grid grid-cols-2 gap-2">

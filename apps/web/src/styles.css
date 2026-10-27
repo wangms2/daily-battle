@@ -120,6 +120,13 @@ body,
   height: 100%;
 }
 
+/* No pinch zoom on touch screens: the game fits the screen and zooming only
+   unsettles it. Panning still scrolls, and browser zoom on a computer still works
+   (it isn't a touch gesture). Safari also needs main.tsx's gesture handler. */
+html {
+  touch-action: pan-x pan-y;
+}
+
 body {
   margin: 0;
   background: var(--bg);
@@ -958,6 +965,13 @@ button {
   /* Above the sections after it, so the ball isn't cut off where it overlaps them. */
   z-index: 10;
 }
+/* With friends' band: the game picker's height, so the two screens match. */
+.home-hero {
+  height: 94px;
+}
+.home-ball.is-small {
+  scale: 0.66;
+}
 /* Inside the game, the seam is just a line under the header. */
 .home-seam.is-thin {
   height: 6px;
@@ -1057,6 +1071,16 @@ button {
   animation: home-bob 2.6s ease-in-out calc(var(--i) * -0.65s) infinite;
   user-select: none;
 }
+/* The name screen's grass platform, under the professor's Pokémon. */
+.name-ground {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 4px;
+  height: 34px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, #b9dfa4 0 55%, #a3cf8c 56% 70%, transparent 72%);
+}
+
 /* A soft platform, like the battle field's. */
 .home-mascot-ground {
   position: absolute;
@@ -1218,6 +1242,18 @@ button {
   animation-duration: 480ms;
   animation-timing-function: cubic-bezier(0.4, 0, 0.15, 1);
 }
+/* The lid stays solid clay while it moves (as on the landing), and only what's on it
+   cross-fades; the old screen's art is clipped to it rather than squashed. */
+::view-transition-group(lid) {
+  overflow: hidden;
+  background: linear-gradient(165deg, #a3646a, #8a4f58);
+}
+::view-transition-old(lid),
+::view-transition-new(lid) {
+  height: auto;
+  object-fit: none;
+  object-position: top;
+}
 ::view-transition-old(root),
 ::view-transition-new(root),
 ::view-transition-old(lid),
@@ -1228,14 +1264,28 @@ button {
 ::view-transition-old(lid) {
   animation: vt-out 170ms ease-in both;
 }
-::view-transition-new(root),
 ::view-transition-new(lid) {
-  animation: vt-in 300ms ease-out 170ms both;
+  animation: vt-in 280ms ease 200ms both;
 }
+/* The new screen's contents rise in as the lid settles, like the picker's cartridges. */
+::view-transition-new(root) {
+  animation:
+    vt-in 320ms ease 180ms both,
+    vt-rise 460ms cubic-bezier(0.22, 0.8, 0.2, 1) 180ms both;
+}
+/* A ball on both screens glides and shrinks with its group, crisp, without fading;
+   one leaving (or arriving on) a screen without it fades. */
 ::view-transition-old(ball) {
-  animation: vt-out 200ms ease-in both;
+  animation: none;
+  opacity: 0;
 }
 ::view-transition-new(ball) {
+  animation: none;
+}
+::view-transition-old(ball):only-child {
+  animation: vt-out 200ms ease-in both;
+}
+::view-transition-new(ball):only-child {
   animation: vt-in 240ms ease-out 240ms both;
 }
 @keyframes vt-out {
@@ -1246,6 +1296,11 @@ button {
 @keyframes vt-in {
   from {
     opacity: 0;
+  }
+}
+@keyframes vt-rise {
+  from {
+    translate: 0 16px;
   }
 }
 

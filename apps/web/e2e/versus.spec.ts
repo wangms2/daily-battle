@@ -3,6 +3,7 @@
 // see the host's settings; a reload keeps your seat; leaving and removal work.
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Browser, type Page } from '@playwright/test';
+import { meet } from './name';
 
 // Playwright requires object destructuring for the fixtures argument.
 // eslint-disable-next-line no-empty-pattern
@@ -169,7 +170,10 @@ test('the first screen opens versus rooms', async ({ page }) => {
   await quick(page);
   await page.goto('/');
   await page.getByRole('button', { name: 'With friends' }).click();
+  // A first-time player is asked their name first, which then names them in rooms.
+  await meet(page);
   await expect(page.getByRole('button', { name: 'Create a room' })).toBeVisible();
+  await expect(page.getByRole('textbox', { name: /name/i }).first()).not.toHaveValue('');
 });
 
 test('a code for no room says so', async ({ page }) => {

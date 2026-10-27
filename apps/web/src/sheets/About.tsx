@@ -68,8 +68,15 @@ export function AboutSheet({
 
       <h3 className="mt-4 text-[13px] font-semibold tracking-wide text-muted uppercase">Privacy</h3>
       <p className="mt-1 text-[13.5px] leading-relaxed">
-        No accounts and no tracking. Your team and results stay in this browser. A playtest report
-        contains only what you choose to copy and send.
+        No ads, no tracking, and no email. Your name, teams, and results stay in this browser.
+      </p>
+      <p className="mt-2 text-[13.5px] leading-relaxed">
+        If you protect your name with a password, your progress is also saved with it on our server,
+        so you can sign in on other devices. The password is stored only as a secure hash. Deleting
+        your account in Settings › Trainer removes the saved copy.
+      </p>
+      <p className="mt-2 text-[13.5px] leading-relaxed">
+        In rooms with friends, the other players see the name you play under.
       </p>
 
       <p className="mt-4 text-[12px] text-muted tabular-nums">Engine: {ENGINE_VERSION}</p>

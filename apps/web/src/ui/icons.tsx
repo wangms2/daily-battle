@@ -68,3 +68,14 @@ export const ExpandIcon = (p: SVGProps<SVGSVGElement>) => (
     <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
   </svg>
 );
+
+export const DiceIcon = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}>
+    <rect x="3.5" y="3.5" width="17" height="17" rx="4" />
+    <circle cx="8.5" cy="8.5" r="1.2" fill="currentColor" stroke="none" />
+    <circle cx="15.5" cy="8.5" r="1.2" fill="currentColor" stroke="none" />
+    <circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none" />
+    <circle cx="8.5" cy="15.5" r="1.2" fill="currentColor" stroke="none" />
+    <circle cx="15.5" cy="15.5" r="1.2" fill="currentColor" stroke="none" />
+  </svg>
+);

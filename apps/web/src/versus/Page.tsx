@@ -1,5 +1,7 @@
 // The frame of a versus screen: the home screens' clay band with a back button,
 // a title, something on the right (the room drawer), and a centered column.
+// `hero` is the band at the game picker's height, its title large and left, and
+// the Poké Ball on the seam (With friends, opened from the landing like Play).
 import clsx from 'clsx';
 import type { ReactNode } from 'react';
 import { ChevronIcon } from '../ui/icons';
@@ -10,6 +12,7 @@ export function Page({
   onBack,
   right,
   wide = false,
+  hero = false,
   children,
 }: {
   title: string;
@@ -18,8 +21,39 @@ export function Page({
   right?: ReactNode;
   /** A wider column, for watching several battles on a big screen. */
   wide?: boolean;
+  hero?: boolean;
   children: ReactNode;
 }) {
+  if (hero) {
+    return (
+      <div className="flex h-full flex-col">
+        <header className="home-top home-hero relative shrink-0">
+          <div className="absolute inset-x-0 top-0 z-20 flex h-12 items-center justify-between px-3 pt-[env(safe-area-inset-top)] wide:px-6">
+            <button
+              type="button"
+              onClick={onBack}
+              className="-ml-2 flex h-10 items-center gap-0.5 rounded-full pr-3 pl-1 font-semibold text-white hover:bg-white/10"
+            >
+              <ChevronIcon className="size-[18px] rotate-180" aria-hidden />
+              {back}
+            </button>
+            {right}
+          </div>
+          <div className="absolute inset-x-0 top-12 z-10">
+            <h1 className="home-serif mx-auto w-full max-w-[520px] px-5 text-[26px] leading-[1.1]">
+              {title}
+            </h1>
+          </div>
+        </header>
+        <div className="home-seam">
+          <span aria-hidden className="home-ball is-small" />
+        </div>
+        <main className="min-h-0 flex-1 overflow-y-auto px-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+          <div className="mx-auto w-full max-w-[520px] space-y-4 pt-6">{children}</div>
+        </main>
+      </div>
+    );
+  }
   return (
     <div className="flex h-full flex-col">
       <header className="home-top flex h-12 shrink-0 items-center gap-2 px-3 pt-[env(safe-area-inset-top)] wide:px-6">

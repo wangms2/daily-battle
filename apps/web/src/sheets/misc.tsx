@@ -11,8 +11,8 @@ import {
 import { getSprite } from '../lib/sprites';
 import type { Stats } from '../lib/results';
 import type { Settings } from '../state/schema';
-import { TextShareButton } from '../ui/results';
 import { Sheet } from '../ui/Sheet';
+import { TrainerRow } from './Trainer';
 import { Button, Switch, TypeBadge } from '../ui/bits';
 import { CheckIcon, CloseIcon } from '../ui/icons';
 
@@ -193,7 +193,6 @@ export function SettingsSheet({
   onOpenChange,
   settings,
   onChange,
-  report,
   onAbout,
   onHowToPlay,
 }: {
@@ -201,8 +200,6 @@ export function SettingsSheet({
   onOpenChange: (open: boolean) => void;
   settings: Settings;
   onChange: <K extends keyof Settings>(key: K, value: Settings[K]) => void;
-  /** The playtest report text, copied by the button. */
-  report: string;
   onAbout: () => void;
   onHowToPlay: () => void;
 }) {
@@ -210,6 +207,7 @@ export function SettingsSheet({
   return (
     <Sheet open={open} onOpenChange={onOpenChange} title="Settings">
       <div className="divide-y divide-line">
+        <TrainerRow name={settings.name} onRename={(name) => onChange('name', name)} />
         <Switch
           checked={settings.beginnerHints}
           onCheckedChange={(v) => onChange('beginnerHints', v)}
@@ -269,16 +267,9 @@ export function SettingsSheet({
           How to play
         </Button>
         <Button variant="secondary" onClick={onAbout}>
-          About and credits
+          About
         </Button>
-        <TextShareButton text={report} variant="secondary" className="col-span-2">
-          Copy playtest report
-        </TextShareButton>
       </div>
-      <p className="mt-3 text-[12px] leading-relaxed text-muted">
-        An unofficial, free fan project, not affiliated with Nintendo or Smogon. The playtest report
-        lists your days, team, and results, nothing else.
-      </p>
     </Sheet>
   );
 }

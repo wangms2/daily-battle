@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react';
+import type { ProtectResult, SignInResult } from './account';
 import type { Action } from './reducer';
 import type { State } from './schema';
 
@@ -9,6 +10,26 @@ export interface StoreValue {
 }
 
 export const StoreContext = createContext<StoreValue | null>(null);
+
+/** The protected name on this device, and what can be done with it (state/account.ts). */
+export interface AccountValue {
+  /** The protected name this device is signed in as, or null. */
+  name: string | null;
+  /** When the save last reached the server (ms), or null. */
+  syncedAt: number | null;
+  protect: (name: string, password: string) => Promise<ProtectResult>;
+  signIn: (name: string, password: string) => Promise<SignInResult>;
+  signOut: () => Promise<void>;
+  deleteAccount: (password: string) => Promise<boolean>;
+}
+
+export const AccountContext = createContext<AccountValue | null>(null);
+
+export function useAccount(): AccountValue {
+  const value = useContext(AccountContext);
+  if (!value) throw new Error('useAccount outside StoreProvider');
+  return value;
+}
 export const ClockContext = createContext<() => Date>(() => new Date());
 
 export function useStore(): StoreValue {

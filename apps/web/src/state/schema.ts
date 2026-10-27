@@ -100,6 +100,8 @@ export interface Settings {
   coachOffered?: Partial<Record<FormatId, boolean>>;
   /** The type trainer's boxes per game: each matchup answered, by key (lib/typeTrainer.ts). */
   typeTrainer?: Partial<Record<FormatId, Record<string, number>>>;
+  /** The player's name, asked on their first Play; versus uses it too. */
+  name?: string;
 }
 
 export interface TutorialProgress {

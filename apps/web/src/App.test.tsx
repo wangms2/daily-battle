@@ -43,6 +43,7 @@ function seeded({ hints = true, team }: { hints?: boolean; team?: { week: string
   state.settings.shownExplainers = ['welcome'];
   state.settings.beginnerHints = hints;
   state.settings.format = 'gen4ou';
+  state.settings.name = 'Ash';
   if (team) {
     state.games.gen4ou.weeks[team.week] = {
       team: schedule.suggestedTeams[0]!.team,
@@ -86,7 +87,7 @@ describe('first run', () => {
     const about = await screen.findByRole('dialog', { name: 'About Pokémon Daily' });
     expect(about).toHaveTextContent('not affiliated with or endorsed by Nintendo');
     expect(about).toHaveTextContent('Smogon, used with permission');
-    expect(about).toHaveTextContent('No accounts and no tracking');
+    expect(about).toHaveTextContent('No ads, no tracking, and no email');
     expect(about).toHaveTextContent('Every game uses the OU (OverUsed) tier.');
   });
 
@@ -105,15 +106,11 @@ describe('first run', () => {
 });
 
 describe('settings', () => {
-  it('copies a playtest report and opens About', async () => {
+  it('opens About', async () => {
     const user = userEvent.setup();
-    const writeText = vi.fn(async (_text: string) => {});
-    vi.stubGlobal('navigator', { ...navigator, share: undefined, clipboard: { writeText } });
     renderApp(seeded({ team: { week: WEEK } }));
     await user.click(await screen.findByRole('button', { name: 'Settings' }));
-    await user.click(screen.getByRole('button', { name: 'Copy playtest report' }));
-    expect(writeText.mock.calls[0]![0]).toMatch(/^#daily-battle-report v1\n\{"v":1,/);
-    await user.click(screen.getByRole('button', { name: 'About and credits' }));
+    await user.click(screen.getByRole('button', { name: 'About' }));
     expect(await screen.findByRole('dialog', { name: 'About Pokémon Daily' })).toBeInTheDocument();
   });
 });
@@ -584,6 +581,27 @@ describe('home', () => {
     expect(await screen.findByRole('button', { name: 'Play' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'With friends' })).toBeInTheDocument();
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('asks a first-time player’s name on Play, then carries on, and never asks again', async () => {
+    const user = userEvent.setup();
+    const state = seeded();
+    delete state.settings.name;
+    renderApp(state);
+    await user.click(await screen.findByRole('button', { name: 'Play' }));
+    const field = await screen.findByRole('textbox', { name: 'Your name' });
+    expect((field as HTMLInputElement).value).not.toBe('');
+    await user.clear(field);
+    await user.type(field, 'Misty');
+    await user.click(screen.getByRole('button', { name: 'That’s me!' }));
+    expect(await screen.findByText(/Nice to meet you/)).toHaveTextContent('Misty');
+    await user.click(screen.getByRole('status'));
+    expect(await screen.findByText('Choose a generation')).toBeInTheDocument();
+    expect(window.location.hash).toBe('#daily');
+    // Back home and Play again: straight on.
+    await user.click(screen.getByRole('button', { name: 'Back' }));
+    await user.click(await screen.findByRole('button', { name: 'Play' }));
+    expect(screen.queryByRole('textbox', { name: 'Your name' })).not.toBeInTheDocument();
   });
 
   it('opens a versus room from With friends', async () => {

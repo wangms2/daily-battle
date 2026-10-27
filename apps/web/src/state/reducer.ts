@@ -48,7 +48,9 @@ export type Action =
   | { type: 'lessonStep'; format: FormatId; lesson: string; step: number }
   | { type: 'lessonDone'; format: FormatId; lesson: string }
   /** Expires unfinished attempts in every game. */
-  | { type: 'expireAll'; today: string; engine: string };
+  | { type: 'expireAll'; today: string; engine: string }
+  /** Progress merged with another device's (state/account.ts) replaces this device's. */
+  | { type: 'load'; state: State };
 
 /** Today's attempt still being played, if any. */
 export function attemptInProgress(day: DayState | undefined): Attempt | undefined {
@@ -101,6 +103,8 @@ function updateLast(day: DayState, change: (a: Attempt) => Attempt): DayState {
 
 export function reducer(state: State, action: Action): State {
   switch (action.type) {
+    case 'load':
+      return action.state;
     case 'setSetting':
       return { ...state, settings: { ...state.settings, [action.key]: action.value } };
     case 'markExplainer':

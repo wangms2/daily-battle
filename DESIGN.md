@@ -41,7 +41,7 @@ This doc is written to be split into implementation chunks. Section 13 lists mil
 
 ## 3. Non-goals
 
-- No accounts, server-side storage, or leaderboards in v1.
+- No leaderboards, and no email. Accounts are optional and minimal: a name protected with a password (§10.1).
 - No multiplayer or PvP in the daily games. Versus rooms with friends are a separate mode (§18).
 - No formats beyond Gen 3 to 6 OU for now. The format is a parameter throughout (`packages/data/src/formats.ts`), so another one is mostly data, sets, and a schedule run (§17, §19, §20).
 - No minimizing-turns scoring.
@@ -323,7 +323,18 @@ Attempt = { result: 'win'|'loss'|'forfeit'|'inProgress', remaining: number, ts: 
 - Wrap all reads/writes in try/catch; the game must work if storage is unavailable (in-memory fallback with a notice).
 - **Difficulties (§4.5) added no version:** they're optional fields an older save just lacks. `settings.difficulty: { [format]: 'easy'|'normal'|'hard' }` (Normal when unset); `Attempt.difficulty?: 'easy'|'hard'` (absent means Normal, so every earlier attempt is a Normal one); `Attempt.aiChoices?: string[]` (Hard's choices so far, for resume). The engine string carries the difficulty's versions (§4.6).
 - Migration function per version bump.
-- Export/import of state as JSON (nice-to-have, since there are no accounts).
+- **Existing saves are never rewritten by a new feature.** New fields are optional (an older save just lacks them), and nothing merged in from an account removes anything (§10.1). `state/merge.test.ts` loads a save as players have it and checks it comes back unchanged.
+
+### 10.1 Names and protected names (added Oct 2026)
+
+Showdown-style, and as simple as possible: no email, no sign-up step.
+
+- **A name on the first Play.** Tapping Play (or a generation, With friends, or Learn) for the first time opens the name screen (`screens/NameScreen.tsx`): a Professor-style "What's your name?" with a random suggestion (🎲). It's `settings.name`, local only, and versus uses it too (`versus/saved.ts`). A player who already has a versus name isn't asked.
+- **Protecting it.** After a win, the end card offers to protect the name with a password (5+ characters). It stays there until the name is protected, and it's also in Settings › Trainer. Protecting registers the name on the server with this device's save. Like Showdown, an unprotected name isn't reserved; a protected one is taken.
+- **Other devices.** Sign in with the name and password, from the name screen ("Played on another device?") or Settings › Trainer. The saves are merged (`state/merge.ts`): days and tries are combined (each try once), weeks keep the team that played more, lessons finished and the type trainer combine, and this device's preferences win. Streaks are derived, so they span both devices.
+- **Sync.** Signed in, the save is pushed 2 s after a change and when the page is hidden; on opening, the server's save is merged in. A push over a newer save (another device's) gets 409, and the client merges and pushes again. Offline, play carries on and syncs later. Sessions don't expire; a signed-in device is never asked again.
+- **Server** (`apps/server/src/accounts.ts`): one Durable Object per name (case and spacing don't make a new name), holding the PBKDF2-SHA256 hash (100k rounds, random salt), the SHA-256 of each device's token (up to 10), and the save (up to 1 MB). Ten wrong passwords in a row pause sign-in for 15 minutes. Routes: `POST /api/accounts/<name>` (protect), `POST|DELETE …/session` (sign in, sign out), `GET|PUT …/save`, `DELETE …` (delete, with the password).
+- **No email, so no reset:** a forgotten password can't be recovered. The device's progress stays on the device regardless.
 
 ## 11. Share format
 

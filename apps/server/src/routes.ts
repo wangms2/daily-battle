@@ -2,12 +2,25 @@
 // Cloudflare's asset handling before the Worker runs.
 import { CODE_PATTERN } from '@daily-battle/versus';
 
-export type Route = { kind: 'create' } | { kind: 'socket'; code: string };
+export type Route =
+  | { kind: 'create' }
+  | { kind: 'socket'; code: string }
+  /** An account's request: its name (decoded) and the rest of the path. */
+  | { kind: 'account'; name: string; path: '' | '/session' | '/save' };
 
 export function matchRoute(method: string, pathname: string): Route | null {
   if (pathname === '/api/rooms') return method === 'POST' ? { kind: 'create' } : null;
   const m = /^\/api\/rooms\/([^/]+)\/socket$/.exec(pathname);
   if (m && method === 'GET' && CODE_PATTERN.test(m[1]!)) return { kind: 'socket', code: m[1]! };
+  const a = /^\/api\/accounts\/([^/]+)(\/session|\/save)?$/.exec(pathname);
+  if (a) {
+    try {
+      const name = decodeURIComponent(a[1]!);
+      return { kind: 'account', name, path: (a[2] ?? '') as '' | '/session' | '/save' };
+    } catch {
+      return null;
+    }
+  }
   return null;
 }
 

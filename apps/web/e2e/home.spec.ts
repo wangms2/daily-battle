@@ -2,6 +2,7 @@
 // Versus with friends; then the game picker.
 // A shared link (#daily) lands on the picker. Nothing scrolls on phones.
 import { expect, test, type Page } from '@playwright/test';
+import { meet } from './name';
 
 const TODAY = new Date('2026-10-28T10:00:00-04:00');
 
@@ -38,6 +39,7 @@ test('the first screen offers Play and Versus, then the four games', async ({ pa
   await shot(page, '01-landing', info.project.name);
 
   await page.getByRole('button', { name: 'Play', exact: true }).click();
+  await meet(page);
   for (const gen of ['Gen 3', 'Gen 4', 'Gen 5', 'Gen 6'])
     await expect(page.getByRole('button', { name: new RegExp(gen) })).toBeVisible();
   await noScroll(page, 'game picker');
@@ -56,6 +58,7 @@ test('a shared link opens the game picker', async ({ page }) => {
 test('With friends opens the room screen', async ({ page }) => {
   await open(page, '/');
   await page.getByRole('button', { name: 'With friends' }).click();
+  await meet(page);
   await expect(page).toHaveURL(/#versus$/);
 });
 
@@ -100,6 +103,7 @@ test('a mascot opens its generation, and one cleared today has a check', async (
   await expect(mascots.nth(2)).toHaveAccessibleName('Play Gen 5 OU, cleared today');
   await expect(page.locator('.home-mascot-check')).toHaveCount(1);
   await mascots.nth(0).click();
+  await meet(page);
   await expect(page.getByRole('button', { name: /^Gen 3 · / })).toBeVisible();
 });
 
