@@ -1,5 +1,6 @@
 // The CPU difficulty: a picker on the daily brief, and a badge wherever a game
 // isn't at Normal (Normal shows nothing, so it looks as it always has).
+import { BallIcon } from './icons';
 import { DIFFICULTIES, type Difficulty } from '@daily-battle/ai/version';
 import clsx from 'clsx';
 import { DIFFICULTY_HINT } from '../lib/difficulty';
@@ -37,7 +38,10 @@ export function DifficultyPicker({
               off && value !== d && 'opacity-40',
             )}
           >
-            {DIFFICULTY_NAME[d]}
+            <span className="flex items-center gap-1">
+              <BallIcon kind={d === 'hard' ? 'ultra' : d === 'easy' ? 'premier' : 'poke'} />
+              {DIFFICULTY_NAME[d]}
+            </span>
           </button>
         );
       })}

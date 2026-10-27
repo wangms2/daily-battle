@@ -79,3 +79,32 @@ export const DiceIcon = (p: SVGProps<SVGSVGElement>) => (
     <circle cx="15.5" cy="15.5" r="1.2" fill="currentColor" stroke="none" />
   </svg>
 );
+
+/** A tiny ball for a difficulty: Premier (Easy), Poké (Normal), Ultra (Hard). */
+export const BallIcon = ({
+  kind,
+  ...p
+}: SVGProps<SVGSVGElement> & { kind: 'poke' | 'ultra' | 'premier' }) => {
+  const ring = kind === 'premier' ? '#d1434b' : '#2b2d36';
+  const top = kind === 'ultra' ? '#26252b' : kind === 'poke' ? '#d1434b' : '#f4f3f1';
+  return (
+    <svg width={14} height={14} viewBox="0 0 20 20" aria-hidden {...p}>
+      <clipPath id={`ball-${kind}`}>
+        <circle cx="10" cy="10" r="9" />
+      </clipPath>
+      <g clipPath={`url(#ball-${kind})`}>
+        <rect width="20" height="20" fill="#f4f3f1" />
+        <rect width="20" height="10" fill={top} />
+        {kind === 'ultra' && (
+          <>
+            <rect x="1" y="3.5" width="4.5" height="3.5" fill="#f2c230" />
+            <rect x="14.5" y="3.5" width="4.5" height="3.5" fill="#f2c230" />
+          </>
+        )}
+        <rect y="9" width="20" height="2" fill={ring} />
+      </g>
+      <circle cx="10" cy="10" r="9" fill="none" stroke={ring} strokeWidth="2" />
+      <circle cx="10" cy="10" r="3" fill="#f4f3f1" stroke={ring} strokeWidth="1.6" />
+    </svg>
+  );
+};

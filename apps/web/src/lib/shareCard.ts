@@ -57,6 +57,57 @@ function loadImage(src: string): Promise<HTMLImageElement | null> {
   });
 }
 
+/** The part of a sprite that isn't transparent (sprites carry wide empty margins). */
+export interface Box {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
+/** The opaque box in RGBA pixels `data` of a `width`×`height` image. */
+export function opaqueBox(data: Uint8ClampedArray, width: number, height: number): Box {
+  let x0 = width;
+  let y0 = height;
+  let x1 = -1;
+  let y1 = -1;
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      if (data[(y * width + x) * 4 + 3]! > 8) {
+        if (x < x0) x0 = x;
+        if (x > x1) x1 = x;
+        if (y < y0) y0 = y;
+        if (y > y1) y1 = y;
+      }
+    }
+  }
+  return x1 < 0
+    ? { x: 0, y: 0, w: width, h: height }
+    : { x: x0, y: y0, w: x1 - x0 + 1, h: y1 - y0 + 1 };
+}
+
+/** A sprite's opaque box; the whole image if it can't be read. */
+function trimmed(img: HTMLImageElement): Box {
+  const whole = { x: 0, y: 0, w: img.width, h: img.height };
+  try {
+    const c = document.createElement('canvas');
+    c.width = img.width;
+    c.height = img.height;
+    const g = c.getContext('2d');
+    if (!g) return whole;
+    g.drawImage(img, 0, 0);
+    return opaqueBox(g.getImageData(0, 0, img.width, img.height).data, img.width, img.height);
+  } catch {
+    return whole;
+  }
+}
+
+/** How much to scale `box` to fit within `room`, up to `max`; whole or half steps from 1×, so pixels stay crisp. */
+function fitScale(box: Box, room: number, max: number): number {
+  const k = Math.min(max, room / Math.max(box.w, box.h));
+  return k >= 1 ? Math.floor(k * 2) / 2 : k;
+}
+
 function roundRect(
   ctx: CanvasRenderingContext2D,
   x: number,
@@ -180,7 +231,64 @@ const RIGHT = CARD_W - 96;
 const MID = 78;
 
 /** The lid with "Pokémon Daily · {header}" on it, the dark seam, and the ball. */
-function drawLid(ctx: CanvasRenderingContext2D, colors: typeof CLAY, header: string) {
+/** Which ball sits on the seam: a Poké Ball for Normal, Ultra for Hard, Premier for Easy. */
+export type BallKind = 'poke' | 'ultra' | 'premier';
+
+export const ballFor = (level: string | undefined): BallKind =>
+  level === 'Hard' ? 'ultra' : level === 'Easy' ? 'premier' : 'poke';
+
+const ULTRA = { top: '#26252b', band: '#f2c230' };
+const PREMIER_RED = '#d1434b';
+
+/** A ball at (cx, cy) of radius r, with a ring of width r/4 (the card's style). */
+function drawBall(
+  ctx: CanvasRenderingContext2D,
+  cx: number,
+  cy: number,
+  r: number,
+  kind: BallKind,
+  button: string,
+) {
+  const ring = kind === 'premier' ? PREMIER_RED : C.seam;
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.clip();
+  ctx.fillStyle = C.stone;
+  ctx.fillRect(cx - r, cy - r, r * 2, r * 2);
+  if (kind === 'ultra') {
+    // The Ultra Ball: a black top with its two gold bands.
+    ctx.fillStyle = ULTRA.top;
+    ctx.fillRect(cx - r, cy - r, r * 2, r);
+    ctx.fillStyle = ULTRA.band;
+    ctx.fillRect(cx - r, cy - r * 0.62, r * 0.5, r * 0.42);
+    ctx.fillRect(cx + r * 0.5, cy - r * 0.62, r * 0.5, r * 0.42);
+  }
+  if (kind !== 'poke') {
+    // Its middle line.
+    ctx.fillStyle = ring;
+    ctx.fillRect(cx - r, cy - r * 0.09, r * 2, r * 0.18);
+  }
+  ctx.restore();
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.lineWidth = r * 0.27;
+  ctx.strokeStyle = ring;
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(cx, cy, r * 0.3, 0, Math.PI * 2);
+  ctx.fillStyle = kind === 'poke' ? button : C.stone;
+  ctx.fill();
+  ctx.lineWidth = r * 0.13;
+  ctx.stroke();
+}
+
+function drawLid(
+  ctx: CanvasRenderingContext2D,
+  colors: typeof CLAY,
+  header: string,
+  ball: BallKind = 'poke',
+) {
   const lid = ctx.createLinearGradient(0, 0, CARD_W, 150);
   lid.addColorStop(0, colors.lid);
   lid.addColorStop(1, colors.deep);
@@ -197,17 +305,7 @@ function drawLid(ctx: CanvasRenderingContext2D, colors: typeof CLAY, header: str
   ctx.fillStyle = C.stone;
   ctx.fill();
   ctx.restore();
-  ctx.beginPath();
-  ctx.arc(CARD_W / 2, 156, 30, 0, Math.PI * 2);
-  ctx.lineWidth = 8;
-  ctx.strokeStyle = C.seam;
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.arc(CARD_W / 2, 156, 9, 0, Math.PI * 2);
-  ctx.fillStyle = colors.button;
-  ctx.fill();
-  ctx.lineWidth = 4;
-  ctx.stroke();
+  drawBall(ctx, CARD_W / 2, 156, 30, ball, colors.button);
 
   ctx.textBaseline = 'middle';
   ctx.fillStyle = '#ffffff';
@@ -256,7 +354,7 @@ export async function drawShareCard(m: ShareModel): Promise<HTMLCanvasElement> {
   const mid = MID;
 
   // Header: the game's lid with the name and date; the streak on the right.
-  drawLid(ctx, m.format ? LIDS[m.format] : CLAY, shareHeader(m));
+  drawLid(ctx, m.format ? LIDS[m.format] : CLAY, shareHeader(m), ballFor(m.level));
   if (m.streak) streakPill(ctx, m.streak, right, mid - 18);
 
   // Headline.
@@ -305,16 +403,15 @@ export async function drawShareCard(m: ShareModel): Promise<HTMLCanvasElement> {
     const base = 322 + Math.floor(i / 3) * 160; // sprite baseline
     const img = sprites[i];
     if (img) {
-      // Half-pixel steps at the 2× canvas, as large as fits a 136px cell, 1× to 2×.
-      const k = Math.min(
-        2,
-        Math.max(1, Math.floor((136 / Math.max(img.width, img.height)) * 2) / 2),
-      );
-      const w = img.width * k;
-      const h = img.height * k;
+      // The sprite itself (without its empty margin), as large as fits its 136px cell,
+      // up to 2×, standing on the shadow.
+      const b = trimmed(img);
+      const k = fitScale(b, 136, 2);
+      const w = b.w * k;
+      const h = b.h * k;
       groundShadow(ctx, cx, base + 2, Math.max(36, w * 0.5));
       ctx.imageSmoothingEnabled = false;
-      ctx.drawImage(img, cx - w / 2, base - h, w, h);
+      ctx.drawImage(img, b.x, b.y, b.w, b.h, cx - w / 2, base - h, w, h);
     }
     ctx.textBaseline = 'alphabetic';
     ctx.textAlign = 'center';
@@ -388,19 +485,17 @@ export async function drawShareAllCard(all: ShareAll): Promise<HTMLCanvasElement
     ctx.fill();
     const img = mascots[i];
     if (img) {
-      // Gen 3's pixel art at its own size; later sprites have a wide margin, so they're
-      // drawn a little larger than the tile and clipped to it.
+      // The mascot itself (without its empty margin), whole and centred in the tile.
       const pixel = m.format === 'gen3ou';
-      const k = pixel ? 1 : (tile * 1.2) / Math.max(img.width, img.height);
-      const w = img.width * k;
-      const h = img.height * k;
-      ctx.save();
-      roundRect(ctx, LEFT, y + 2, tile, tile, 12);
-      ctx.clip();
+      const b = trimmed(img);
+      const k = (tile - 12) / Math.max(b.w, b.h);
+      const w = b.w * k;
+      const h = b.h * k;
       ctx.imageSmoothingEnabled = !pixel;
-      ctx.drawImage(img, LEFT + (tile - w) / 2, y + 2 + (tile - h) / 2, w, h);
-      ctx.restore();
+      ctx.drawImage(img, b.x, b.y, b.w, b.h, LEFT + (tile - w) / 2, y + 2 + (tile - h) / 2, w, h);
     }
+    // Easy or Hard: that ball in the tile's corner, as on the single game's card.
+    if (m.level) drawBall(ctx, LEFT + tile - 6, y + 10, 14, ballFor(m.level), C.clay);
 
     // Name, then the short headline.
     const x = LEFT + tile + 22;

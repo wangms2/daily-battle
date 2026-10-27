@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { summarizeDay } from './results';
 import { shareModel } from './share';
 import { LIDS } from './genColors';
+import { opaqueBox } from './shareCard';
 
 /** WCAG contrast of white text on a `#rrggbb` colour. */
 function contrastWithWhite(hex: string): number {
@@ -30,5 +31,18 @@ describe('share card colours', () => {
       'gen5ou',
     );
     expect(shareModel({ day: '2026-10-21', summary, streak: 0 })).not.toHaveProperty('format');
+  });
+});
+
+describe('opaqueBox', () => {
+  it('finds the sprite inside its empty margin', () => {
+    // A 4×3 image, transparent but for pixels (1,1) and (2,2).
+    const data = new Uint8ClampedArray(4 * 3 * 4);
+    data[(1 * 4 + 1) * 4 + 3] = 255;
+    data[(2 * 4 + 2) * 4 + 3] = 255;
+    expect(opaqueBox(data, 4, 3)).toEqual({ x: 1, y: 1, w: 2, h: 2 });
+  });
+  it('is the whole image when nothing shows', () => {
+    expect(opaqueBox(new Uint8ClampedArray(2 * 2 * 4), 2, 2)).toEqual({ x: 0, y: 0, w: 2, h: 2 });
   });
 });

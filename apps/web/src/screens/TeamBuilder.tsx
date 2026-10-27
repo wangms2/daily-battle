@@ -351,7 +351,7 @@ export function TeamBuilder({
       {topBar}
       {wide ? (
         <main className="grid min-h-0 flex-1 grid-cols-[1fr_380px] grid-rows-[minmax(0,1fr)] items-start gap-6 px-6 pb-6 pt-4">
-          <section className="flex max-h-full min-h-0 flex-col gap-3 overflow-y-auto">
+          <section className="flex min-h-0 flex-col gap-3 self-stretch overflow-y-auto">
             <SectionLabel>This week’s pool · pick 6</SectionLabel>
             {poolGrid}
             <DetailsPanel
@@ -368,7 +368,7 @@ export function TeamBuilder({
               onToggle={() => viewing && toggleWide(viewing)}
             />
           </section>
-          <aside className="card flex max-h-full min-h-0 flex-col gap-3 p-4">
+          <aside className="card flex min-h-0 flex-col gap-3 self-stretch overflow-y-auto p-4">
             {noticeBar}
             {recommendRow}
             <SectionLabel
