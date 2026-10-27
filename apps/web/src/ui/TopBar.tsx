@@ -2,7 +2,7 @@
 // tapping Play carries on in the same place, in the color of the generation being
 // played (its share card's color).
 import type { FormatId } from '@daily-battle/data/formats';
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { LIDS } from '../lib/genColors';
 import { ChevronIcon, FlameIcon, GearIcon } from './icons';
 
@@ -32,9 +32,7 @@ export function TopBar({
     <>
       <header
         style={
-          colors
-            ? { background: `linear-gradient(165deg, ${colors.lid}, ${colors.deep})` }
-            : undefined
+          colors ? ({ '--lid-a': colors.lid, '--lid-b': colors.deep } as CSSProperties) : undefined
         }
         className="home-top flex h-12 shrink-0 items-center justify-between gap-2 px-3 pt-[env(safe-area-inset-top)] wide:px-6"
       >

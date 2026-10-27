@@ -122,14 +122,29 @@ function useHashRoute(): [string, (r: string) => void] {
       window.location.hash = next;
       return;
     }
+    // The header's colors before and after, for its gradient to blend (styles.css, vt-lid).
+    const root = document.documentElement;
+    const lidColors = (to: 'from' | 'to') => {
+      const lid = document.querySelector('.home-top');
+      for (const k of ['a', 'b'] as const) {
+        const color = lid && getComputedStyle(lid).getPropertyValue(`--lid-${k}`).trim();
+        if (color) root.style.setProperty(`--vt-${to}-${k}`, color);
+        else root.style.removeProperty(`--vt-${to}-${k}`);
+      }
+    };
+    lidColors('from');
     start.call(
       document,
       () =>
         new Promise<void>((resolve) => {
-          settled.current = resolve;
+          const done = () => {
+            lidColors('to');
+            resolve();
+          };
+          settled.current = done;
           window.location.hash = next;
           // Never leave the page frozen if the route doesn't change.
-          window.setTimeout(resolve, 600);
+          window.setTimeout(done, 600);
         }),
     );
   };
@@ -621,7 +636,9 @@ export function App() {
 
   return (
     <div
-      className={`mx-auto h-[calc(100dvh/var(--z,1))] overflow-hidden ${route === 'battle' ? 'max-w-[1440px]' : !versus && !playing && !learning ? '' : 'max-w-[1280px]'}`}
+      // The header spans the window like the landing's (so the gear stays put); in the
+      // game, only the content under it is capped (styles.css, .app-capped).
+      className={`mx-auto h-[calc(100dvh/var(--z,1))] overflow-hidden ${route === 'battle' ? 'max-w-[1440px]' : !versus && !playing && !learning ? '' : 'app-capped'}`}
       // The game's own colour, for its screens' big buttons (styles.css, .game-ui).
       style={
         {

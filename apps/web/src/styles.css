@@ -1091,7 +1091,8 @@ button {
   position: relative;
   overflow: hidden;
   color: #fff;
-  background: linear-gradient(165deg, #a3646a, #8a4f58);
+  /* A game's header sets these to its generation's colors (ui/TopBar.tsx). */
+  background: linear-gradient(165deg, var(--lid-a, #a3646a), var(--lid-b, #8a4f58));
   view-transition-name: lid;
 }
 .home-seam {
@@ -1548,7 +1549,33 @@ button {
    cross-fades; the old screen's art is clipped to it rather than squashed. */
 ::view-transition-group(lid) {
   overflow: hidden;
-  background: linear-gradient(165deg, #a3646a, #8a4f58);
+}
+/* Under the snapshots, the lid's gradient blends from the old screen's colors to the
+   new one's (set on <html> by App.tsx's go()) as it glides, so a game's color washes in
+   rather than popping. */
+@property --vt-a {
+  syntax: '<color>';
+  inherits: false;
+  initial-value: #a3646a;
+}
+@property --vt-b {
+  syntax: '<color>';
+  inherits: false;
+  initial-value: #8a4f58;
+}
+::view-transition-image-pair(lid) {
+  background: linear-gradient(165deg, var(--vt-a), var(--vt-b));
+  animation: vt-lid 480ms cubic-bezier(0.4, 0, 0.15, 1) both;
+}
+@keyframes vt-lid {
+  from {
+    --vt-a: var(--vt-from-a, #a3646a);
+    --vt-b: var(--vt-from-b, #8a4f58);
+  }
+  to {
+    --vt-a: var(--vt-to-a, #a3646a);
+    --vt-b: var(--vt-to-b, #8a4f58);
+  }
 }
 ::view-transition-old(lid),
 ::view-transition-new(lid) {
@@ -1636,4 +1663,15 @@ button {
 }
 .home-friend {
   height: clamp(60px, 9.5cqh, 128px);
+}
+
+/* In the game the header spans the window like the landing's; the content under it
+   keeps a comfortable width. A layer below the utilities, so a screen's own max-width
+   (the lessons') still wins. */
+@layer base {
+  .app-capped main {
+    width: 100%;
+    max-width: 1280px;
+    margin-inline: auto;
+  }
 }
