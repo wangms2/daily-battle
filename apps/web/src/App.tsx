@@ -32,7 +32,7 @@ import {
   summarizeDay,
 } from './lib/results';
 import { bucketOf, coachAvailable, coachOn, coachWarning } from './lib/coach';
-import { useSchedule } from './lib/schedule';
+import { preloadSchedule, useSchedule } from './lib/schedule';
 import type { ScheduleFile } from '@daily-battle/gen/schedule';
 import { hardAvailable } from './battle/hardEngine';
 import { currentDifficulty } from './lib/difficulty';
@@ -186,6 +186,13 @@ export function App() {
   const dispatch = (action: GameAction) => dispatchAny({ ...action, format });
   const [retry, setRetry] = useState(0);
   const schedule = useSchedule(week, format, retry);
+  // On the landing and the picker, every game's week loads ahead (they're small),
+  // so picking one opens it at once.
+  const home = route === '' || route === 'daily';
+  useEffect(() => {
+    if (!home) return;
+    for (const id of Object.keys(FORMATS)) void preloadSchedule(week, id);
+  }, [home, week]);
 
   // An older shared link (`…/#gen5`) opens the game it came from.
   const linked = formatFromHash(route);
@@ -524,7 +531,17 @@ export function App() {
       />
     );
   } else if (schedule.status === 'loading') {
-    screen = <div className="grid h-full place-items-center text-muted">Loading this week…</div>;
+    // The game's own header straight away, so the way in glides to its colors.
+    screen = (
+      <div className="flex h-full flex-col">
+        {renderTopBar(
+          weekState
+            ? fmtDay(day, { weekday: 'short', month: 'short', day: 'numeric' })
+            : `Week of ${fmtDay(week, { month: 'short', day: 'numeric' })}`,
+        )()}
+        <div className="grid flex-1 place-items-center text-muted">Loading this week…</div>
+      </div>
+    );
   } else if (schedule.status === 'error') {
     screen = (
       <div className="grid h-full place-items-center p-6 text-center">

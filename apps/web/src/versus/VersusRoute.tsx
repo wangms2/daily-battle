@@ -1,7 +1,8 @@
 // Versus rooms with friends (DESIGN.md §18): `#versus` creates or joins a
 // room, `#versus/CODE` is the room itself.
 import { cleanName, ERROR_TEXT, normalizeCode, type ErrorCode } from '@daily-battle/versus';
-import { lazy, Suspense, useState, type ReactNode } from 'react';
+import { lazy, Suspense, useEffect, useState, type ReactNode } from 'react';
+import { startVersusMusic, stopVersusMusic } from '../lib/audio';
 import type { Settings } from '../state/schema';
 import { Button } from '../ui/bits';
 import { BreakScreen, GameOverScreen } from './Break';
@@ -24,6 +25,19 @@ export interface BattleSettings {
   settings: Settings;
   onSetting: <K extends keyof Settings>(key: K, value: Settings[K]) => void;
   onExplainerSeen: (id: string) => void;
+}
+
+/**
+ * The versus track, while shown: on Link Battle's menus (its home, a room's lobby,
+ * between rounds), never over building, the swap or a battle, which have their own
+ * music. Moving between menus plays it on (DESIGN.md §21).
+ */
+function VersusMusic() {
+  useEffect(() => {
+    startVersusMusic();
+    return stopVersusMusic;
+  }, []);
+  return null;
 }
 
 /** The explainer id for the How Link Battle works sheet (settings.shownExplainers). */
@@ -62,6 +76,7 @@ export function VersusRoute({
   if (!code) {
     return (
       <>
+        <VersusMusic />
         <VersusHome
           onExit={onExit}
           onHowTo={() => setHowTo(true)}
@@ -246,7 +261,10 @@ function RoomScreen({
       !!match &&
       (match.stage === 'battle' || (match.stage === 'over' && room.feedFor(match.id).size > 0));
     let screen: ReactNode;
+    // Whether the screen is one of the room's menus, with the versus track.
+    let menu = true;
     if (match && inRoomFor !== match.id && (match.stage === 'prep' || watchable)) {
+      menu = false;
       const toRoom = () => {
         if (match.stage === 'over') room.dismissMatch();
         else setInRoomFor(match.id);
@@ -278,6 +296,7 @@ function RoomScreen({
           </Suspense>
         );
     } else if (view.phase === 'playing' && watcher) {
+      menu = false;
       screen = (
         <Suspense fallback={<p className="py-10 text-center text-muted">Loading the battles…</p>}>
           <SpectateScreen
@@ -293,6 +312,8 @@ function RoomScreen({
     } else if (view.phase === 'build' && !view.players.some((p) => p.id === you)) {
       screen = <RoundScreen {...common} note="The players are building their teams." />;
     } else if (view.phase === 'build') {
+      // Building has its game's builder track; waiting for the others after, the versus one.
+      menu = !!room.team;
       screen = (
         <BuildScreen
           {...common}
@@ -328,6 +349,7 @@ function RoomScreen({
     }
     return (
       <>
+        {menu && <VersusMusic />}
         {screen}
         <RoomNotice connected={status.connected} notice={room.notice} />
       </>
@@ -370,6 +392,7 @@ function RoomScreen({
   }
   return (
     <Page title={`Room ${code}`} back="Back" onBack={onExit}>
+      <VersusMusic />
       {body}
     </Page>
   );

@@ -5,6 +5,7 @@ import type { ScheduleFile } from '@daily-battle/gen/schedule';
 import clsx from 'clsx';
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import {
+  activeFormat,
   CHECK_ITEMS,
   checklist,
   findSet,
@@ -48,10 +49,11 @@ export function TeamBuilder({
   lockBody?: string;
 }) {
   const wide = useWide();
-  // Its own music, quieter than a battle's, while the team is being picked (DESIGN.md §21).
+  // Its game's own music, quieter than a battle's, while the team is being picked (DESIGN.md §21).
   useEffect(() => {
-    startBuilderMusic();
-    return stopBuilderMusic;
+    const format = activeFormat();
+    startBuilderMusic(format);
+    return () => stopBuilderMusic(format);
   }, []);
   const [noticeShown, setNoticeShown] = useState(true);
   const noticeBar = notice && noticeShown && (

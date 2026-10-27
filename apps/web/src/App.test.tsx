@@ -1,6 +1,6 @@
 import { sets } from '@daily-battle/data';
 import type { ScheduleFile } from '@daily-battle/gen/schedule';
-import { act, render, screen, within } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import scheduleJson from '../public/schedule/2026-10-19.json';
@@ -62,6 +62,12 @@ function renderApp(seed?: State, { broken = false } = {}) {
   );
 }
 
+/** The Settings button once the week has loaded (the loading screen has its own, which goes). */
+async function settingsOnceLoaded() {
+  await waitFor(() => expect(screen.queryByText('Loading this week…')).not.toBeInTheDocument());
+  return screen.getByRole('button', { name: 'Settings' });
+}
+
 beforeEach(() => {
   // Most tests play today's game; the landing screen is tested on its own.
   window.location.hash = '#play';
@@ -109,7 +115,7 @@ describe('settings', () => {
   it('opens About', async () => {
     const user = userEvent.setup();
     renderApp(seeded({ team: { week: WEEK } }));
-    await user.click(await screen.findByRole('button', { name: 'Settings' }));
+    await user.click(await settingsOnceLoaded());
     await user.click(screen.getByRole('button', { name: 'About' }));
     expect(await screen.findByRole('dialog', { name: 'About Pokémon Daily' })).toBeInTheDocument();
   });
@@ -692,6 +698,17 @@ describe('home', () => {
     expect(window.location.hash).toBe('#play');
   });
 
+  it('loads every game’s week on the picker, so a pick opens at once', async () => {
+    const user = userEvent.setup();
+    renderApp(seeded());
+    await user.click(await screen.findByRole('button', { name: 'Play' }));
+    await waitFor(() => expect(fetch).toHaveBeenCalledWith(expect.stringContaining('gen5ou/')));
+    await act(() => new Promise((r) => setTimeout(r, 20)));
+    await user.click(screen.getByRole('button', { name: /^Gen 5/ }));
+    expect(screen.queryByText('Loading this week…')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^Gen 5 · Week of/ })).toBeInTheDocument();
+  });
+
   it('opens the game picker from a shared link', async () => {
     window.location.hash = '#daily';
     renderApp();
@@ -749,7 +766,7 @@ describe('playtest feedback', () => {
   it('reopens the rules from Settings as How to play', async () => {
     const user = userEvent.setup();
     renderApp(seeded());
-    await user.click(await screen.findByRole('button', { name: 'Settings' }));
+    await user.click(await settingsOnceLoaded());
     await user.click(screen.getByRole('button', { name: 'How to play' }));
     const how = await screen.findByRole('dialog', { name: 'How to play' });
     expect(how).toHaveTextContent('Win on your first try');
@@ -763,7 +780,7 @@ describe('playtest feedback', () => {
     const state = seeded();
     state.settings.tutorial = { gen3ou: { completed: [LESSONS.gen3ou![0]!.id] } };
     renderApp(state);
-    await user.click(await screen.findByRole('button', { name: 'Settings' }));
+    await user.click(await settingsOnceLoaded());
     await user.click(screen.getByRole('button', { name: 'How to play' }));
     const how = await screen.findByRole('dialog', { name: 'How to play' });
     expect(how).not.toHaveTextContent('OverUsed');

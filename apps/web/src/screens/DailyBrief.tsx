@@ -6,6 +6,7 @@ import clsx from 'clsx';
 import { useEffect, useState, type ReactNode } from 'react';
 import { warmBattleWorker } from '../battle/backend';
 import {
+  activeFormat,
   canMega,
   findSet,
   megaClash,
@@ -132,8 +133,9 @@ export function DailyBrief({
   const playing = result.summary.status === 'none' || result.summary.status === 'pending';
   useEffect(() => {
     if (!playing) return;
-    startBuilderMusic();
-    return stopBuilderMusic;
+    const format = activeFormat();
+    startBuilderMusic(format);
+    return () => stopBuilderMusic(format);
   }, [playing]);
   useEffect(() => {
     preloadSprites(opponent.team.map((s) => s.species));

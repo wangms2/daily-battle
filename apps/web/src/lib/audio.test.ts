@@ -13,6 +13,7 @@ class FakeAudio {
   paused = true;
   duration = NaN;
   currentTime = 0;
+  listeners: Record<string, (() => void)[]> = {};
   constructor(public src: string) {
     FakeAudio.made.push(this);
   }
@@ -23,7 +24,15 @@ class FakeAudio {
   pause() {
     this.paused = true;
   }
-  addEventListener() {}
+  addEventListener(type: string, fn: () => void) {
+    (this.listeners[type] ??= []).push(fn);
+  }
+  /** Plays on to `time` (seconds) of a track `duration` long. */
+  at(time: number, duration: number) {
+    this.currentTime = time;
+    this.duration = duration;
+    this.listeners.timeupdate?.forEach((fn) => fn());
+  }
 }
 
 const ON = { sound: true, musicVolume: 0.4, effectsVolume: 0.6 };
@@ -35,53 +44,144 @@ async function engine() {
   return import('./audio');
 }
 
+/** Whether the device is in dark mode, for `matchMedia`. */
+let dark = false;
+
 beforeEach(() => {
   FakeAudio.made = [];
+  dark = false;
   vi.stubGlobal('Audio', FakeAudio);
+  vi.stubGlobal('matchMedia', (q: string) => ({ matches: q.includes('dark') && dark }));
+  vi.useFakeTimers();
 });
-afterEach(() => vi.unstubAllGlobals());
+afterEach(() => {
+  vi.useRealTimers();
+  vi.unstubAllGlobals();
+});
+
+/** Lets fades (in, out, and the loop's crossfade) finish. */
+const settle = () => vi.advanceTimersByTime(5000);
 
 describe('sound', () => {
-  it('plays one builder track in every game, and leaves a battle’s music playing', async () => {
+  it('plays each game’s builder track, and leaves a battle’s music playing', async () => {
     const audio = await engine();
     audio.configureAudio(ON);
-    audio.startBuilderMusic();
-    expect(FakeAudio.made[0]!.src).toMatch(/\/audio\/music\/teambuilder\.mp3$/);
+    audio.startBuilderMusic('gen5ou');
+    settle();
+    expect(FakeAudio.made[0]!.src).toMatch(/\/audio\/music\/teambuilder-gen5\.mp3$/);
     expect(FakeAudio.made[0]!.volume).toBe(0.4);
-    // Locking in opens the battle: its music takes over, and the builder closing after
-    // doesn't stop it.
+    // Locking in opens the battle: its music takes over (the builder's fades out),
+    // and the builder closing after doesn't stop it.
     audio.startMusic('gen5ou');
-    audio.stopBuilderMusic();
+    audio.stopBuilderMusic('gen5ou');
+    settle();
     expect(FakeAudio.made[0]!.paused).toBe(true);
     expect(FakeAudio.made[1]!.src).toMatch(/\/audio\/music\/gen5\.mp3$/);
     expect(FakeAudio.made[1]!.paused).toBe(false);
   });
 
+  it.each([
+    ['gen3ou', 'teambuilder-gen3'],
+    ['gen5ou', 'teambuilder-gen5'],
+    ['gen6ou', 'teambuilder-gen6'],
+  ])('plays %s’s builder track', async (format, file) => {
+    const audio = await engine();
+    audio.configureAudio(ON);
+    audio.startBuilderMusic(format);
+    expect(FakeAudio.made[0]!.src).toMatch(new RegExp(`/${file}\\.mp3$`));
+  });
+
+  it('plays Gen 4’s builder track by day in light mode and by night in dark mode', async () => {
+    let audio = await engine();
+    audio.configureAudio(ON);
+    audio.startBuilderMusic('gen4ou');
+    expect(FakeAudio.made[0]!.src).toMatch(/teambuilder-gen4-day\.mp3$/);
+    dark = true;
+    audio = await engine();
+    audio.configureAudio(ON);
+    audio.startBuilderMusic('gen4ou');
+    expect(FakeAudio.made[1]!.src).toMatch(/teambuilder-gen4-night\.mp3$/);
+  });
+
+  it('switches Gen 4’s track after dark mode turns on only at its loop, with a crossfade', async () => {
+    const audio = await engine();
+    audio.configureAudio(ON);
+    audio.startBuilderMusic('gen4ou');
+    settle();
+    const day = FakeAudio.made[0]!;
+    dark = true;
+    // Mid-tune, nothing changes.
+    day.at(20, 46);
+    settle();
+    expect(FakeAudio.made).toHaveLength(1);
+    expect(day.volume).toBe(0.4);
+    // At the loop point the night track blends in as the day one blends out.
+    day.at(44, 46);
+    const night = FakeAudio.made[1]!;
+    expect(night.src).toMatch(/teambuilder-gen4-night\.mp3$/);
+    expect(night.volume).toBe(0);
+    vi.advanceTimersByTime(1250);
+    expect(day.volume).toBeGreaterThan(0.1);
+    expect(night.volume).toBeGreaterThan(0.1);
+    expect(day.paused).toBe(false);
+    settle();
+    expect(day.paused).toBe(true);
+    expect(night.volume).toBe(0.4);
+  });
+
+  it('fades a track in when it starts, never at full volume at once', async () => {
+    const audio = await engine();
+    audio.configureAudio(ON);
+    audio.startMusic('gen3ou');
+    const track = FakeAudio.made[0]!;
+    expect(track.volume).toBe(0);
+    vi.advanceTimersByTime(300);
+    expect(track.volume).toBeGreaterThan(0);
+    expect(track.volume).toBeLessThan(0.4);
+    settle();
+    expect(track.volume).toBe(0.4);
+  });
+
   it('keeps the builder track playing when the lead pick opens after the builder', async () => {
     const audio = await engine();
     audio.configureAudio(ON);
-    audio.startBuilderMusic();
+    audio.startBuilderMusic('gen3ou');
     // The builder closes and the brief opens in the same render.
-    audio.stopBuilderMusic();
-    audio.startBuilderMusic();
-    await new Promise((r) => setTimeout(r, 0));
+    audio.stopBuilderMusic('gen3ou');
+    audio.startBuilderMusic('gen3ou');
+    vi.advanceTimersByTime(0);
     expect(FakeAudio.made).toHaveLength(1);
     expect(FakeAudio.made[0]!.paused).toBe(false);
     // Closing the brief too fades it out.
-    vi.useFakeTimers();
-    try {
-      audio.stopBuilderMusic();
-      vi.advanceTimersByTime(5000);
-      expect(FakeAudio.made[0]!.paused).toBe(true);
-    } finally {
-      vi.useRealTimers();
-    }
+    audio.stopBuilderMusic('gen3ou');
+    settle();
+    expect(FakeAudio.made[0]!.paused).toBe(true);
+  });
+
+  it('plays the versus track on, from Link Battle’s home into a room', async () => {
+    const audio = await engine();
+    audio.configureAudio(ON);
+    audio.startVersusMusic();
+    expect(FakeAudio.made[0]!.src).toMatch(/\/audio\/music\/versus\.mp3$/);
+    audio.stopVersusMusic();
+    audio.startVersusMusic();
+    settle();
+    expect(FakeAudio.made).toHaveLength(1);
+    expect(FakeAudio.made[0]!.paused).toBe(false);
+    // Building a team: the game's builder track takes over, the versus one fades out.
+    audio.startBuilderMusic('gen6ou');
+    audio.stopVersusMusic();
+    settle();
+    expect(FakeAudio.made[0]!.paused).toBe(true);
+    expect(FakeAudio.made[1]!.src).toMatch(/teambuilder-gen6\.mp3$/);
+    expect(FakeAudio.made[1]!.paused).toBe(false);
   });
 
   it('plays the tutorial track quieter on lesson screens, and hands over to a practice battle', async () => {
     const audio = await engine();
     audio.configureAudio(ON);
     audio.startTutorialMusic();
+    settle();
     const tutorial = FakeAudio.made[0]!;
     expect(tutorial.src).toMatch(/\/audio\/music\/tutorial\.mp3$/);
     expect(tutorial.volume).toBeCloseTo(0.4 * 0.3);
@@ -90,9 +190,91 @@ describe('sound', () => {
     // The practice battle's music takes over; the lesson screen closing doesn't stop it.
     audio.startMusic('gen3ou');
     audio.stopTutorialMusic();
+    settle();
     expect(tutorial.paused).toBe(true);
     expect(FakeAudio.made[1]!.src).toMatch(/gen3\.mp3$/);
     expect(FakeAudio.made[1]!.paused).toBe(false);
+  });
+
+  it('sets volume through Web Audio, which iOS obeys, behind a limiter', async () => {
+    const gains: { gain: { value: number } }[] = [];
+    const node = () => ({ connect: (n: unknown) => n, disconnect() {} });
+    const limiter = {
+      ...node(),
+      threshold: { value: 0 },
+      knee: { value: 0 },
+      ratio: { value: 0 },
+      attack: { value: 0 },
+      release: { value: 0 },
+    };
+    const connected: unknown[] = [];
+    class FakeContext {
+      state = 'suspended';
+      destination = {};
+      resume = vi.fn(() => {
+        this.state = 'running';
+        return Promise.resolve();
+      });
+      createMediaElementSource = () => ({
+        connect: (n: unknown) => n,
+        disconnect() {},
+      });
+      createGain = () => {
+        const g = {
+          gain: { value: 1 },
+          connect: (n: unknown) => (connected.push(n), n),
+          disconnect() {},
+        };
+        gains.push(g);
+        return g;
+      };
+      createDynamicsCompressor = () => limiter;
+    }
+    vi.stubGlobal('AudioContext', FakeContext);
+    const audio = await engine();
+    audio.configureAudio(ON);
+    audio.startMusic('gen3ou');
+    settle();
+    const track = FakeAudio.made[0]!;
+    // The element's own volume stays at full; its gain sets the level.
+    expect(track.volume).toBe(1);
+    expect(gains.at(-1)!.gain.value).toBe(0.4);
+    audio.configureAudio({ ...ON, musicVolume: 0.9 });
+    expect(gains.at(-1)!.gain.value).toBe(0.9);
+    expect(connected).toContain(limiter);
+    expect(limiter.threshold.value).toBe(-3);
+    audio.playCry('Skarmory', 'gen4ou');
+    expect(FakeAudio.made[1]!.volume).toBe(1);
+    expect(gains.at(-1)!.gain.value).toBeCloseTo(0.6 * 0.5);
+  });
+
+  it('wakes Web Audio and a held-back track on the next tap', async () => {
+    const resume = vi.fn(() => Promise.resolve());
+    vi.stubGlobal(
+      'AudioContext',
+      class {
+        state = 'suspended';
+        destination = {};
+        resume = resume;
+        createMediaElementSource = () => ({ connect: (n: unknown) => n, disconnect() {} });
+        createGain = () => ({ gain: { value: 1 }, connect: (n: unknown) => n, disconnect() {} });
+      },
+    );
+    const audio = await engine();
+    audio.configureAudio(ON);
+    audio.startMusic('gen3ou');
+    const track = FakeAudio.made[0]!;
+    // The browser refused to start it without a tap.
+    track.paused = true;
+    resume.mockClear();
+    const stop = audio.menuSounds();
+    try {
+      document.dispatchEvent(new Event('touchend'));
+      expect(resume).toHaveBeenCalled();
+      expect(track.paused).toBe(false);
+    } finally {
+      stop();
+    }
   });
 
   it('plays the select sound on every tap of a control, and nothing elsewhere', async () => {
@@ -152,6 +334,7 @@ describe('sound', () => {
     const audio = await engine();
     audio.configureAudio(ON);
     audio.startMusic('gen3ou');
+    settle();
     expect(FakeAudio.made).toHaveLength(1);
     expect(FakeAudio.made[0]!.src).toMatch(/\/audio\/music\/gen3\.mp3$/);
     expect(FakeAudio.made[0]!.volume).toBe(0.4);
@@ -166,6 +349,7 @@ describe('sound', () => {
     audio.configureAudio(ON);
     const track = FakeAudio.made[0]!;
     expect(track.src).toMatch(/gen5\.mp3$/);
+    settle();
     audio.configureAudio({ ...ON, musicVolume: 0.9 });
     expect(track.volume).toBe(0.9);
     audio.configureAudio(OFF);
@@ -182,7 +366,7 @@ describe('sound', () => {
     );
   });
 
-  it('plays one cry at a time at the effects volume, and faint cries lower', async () => {
+  it('plays one cry at a time at half the effects volume, and faint cries lower', async () => {
     const audio = await engine();
     audio.configureAudio(ON);
     audio.playCry('Skarmory', 'gen4ou');
@@ -190,7 +374,8 @@ describe('sound', () => {
     const [first, second] = FakeAudio.made;
     expect(first!.paused).toBe(true);
     expect(second!.paused).toBe(false);
-    expect(second!.volume).toBe(0.6);
+    // Cries are mastered about 9 dB over the music: half keeps them from startling.
+    expect(second!.volume).toBe(0.3);
     expect(second!.playbackRate).toBeLessThan(1);
     expect(second!.preservesPitch).toBe(false);
   });
@@ -218,11 +403,14 @@ describe('sound', () => {
     expect(species.map((s) => audio.cryUrl(s, format)).filter((u) => !onDisk(u))).toEqual([]);
   });
 
-  it('ships a battle track for every generation', async () => {
+  it('ships a battle track for every generation, and its builder tracks', async () => {
+    const music = (file: string) =>
+      existsSync(resolve(import.meta.dirname, `../../public/audio/music/${file}.mp3`));
     for (const { gen } of Object.values(FORMATS)) {
-      expect(
-        existsSync(resolve(import.meta.dirname, `../../public/audio/music/gen${gen}.mp3`)),
-      ).toBe(true);
+      expect(music(`gen${gen}`)).toBe(true);
+      const builder = gen === 4 ? ['gen4-day', 'gen4-night'] : [`gen${gen}`];
+      for (const b of builder) expect(music(`teambuilder-${b}`), b).toBe(true);
     }
+    expect(music('versus')).toBe(true);
   });
 });
