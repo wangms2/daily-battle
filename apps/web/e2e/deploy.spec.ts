@@ -66,13 +66,19 @@ test('ships icons, a manifest, and link-preview tags', async ({ page, request })
     await expect(page.locator(sel)).toHaveCount(1);
   }
   const og = await page.locator('meta[property="og:image"]').getAttribute('content');
-  expect(og).toMatch(/\/og\.png$/);
+  // A new file name when the image changes: chat apps keep a preview image by its URL.
+  expect(og).toMatch(/\/og-v\d+\.png$/);
   const manifest = await (await request.get('/manifest.webmanifest')).json();
   for (const icon of manifest.icons) expect((await request.get(icon.src)).ok()).toBe(true);
   // The home-screen icon (versioned: iOS keeps an icon by its URL), and the root
   // path iOS asks for on its own.
   const touch = (await page.locator('link[rel="apple-touch-icon"]').getAttribute('href'))!;
-  for (const path of ['/favicon.svg', touch, '/apple-touch-icon.png', '/og.png']) {
+  for (const path of [
+    '/favicon.svg',
+    touch,
+    '/apple-touch-icon.png',
+    og!.replace(/^https?:\/\/[^/]+/, ''),
+  ]) {
     expect((await request.get(path)).ok(), path).toBe(true);
   }
 });
