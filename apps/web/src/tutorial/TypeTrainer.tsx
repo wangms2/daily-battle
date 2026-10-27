@@ -164,7 +164,7 @@ export function TypeTrainer({
               </div>
             </section>
             {/* Strongest to none, each in its colour: a ladder to pick a rung on. */}
-            <div className="grid gap-1" role="group" aria-label="How hard it hits">
+            <div className="grid gap-1.5" role="group" aria-label="How hard it hits">
               {MULTIPLIERS.map((m) => {
                 const isAnswer = m === question.mult;
                 const isPick = m === picked;
@@ -178,7 +178,7 @@ export function TypeTrainer({
                     aria-label={`${multWords(m)}, ${multLabel(m)}`}
                     data-mult={m}
                     className={clsx(
-                      'eff-rung flex h-9 items-center justify-between rounded-btn border pr-1.5 pl-3 text-left text-[15px] font-semibold',
+                      'eff-rung flex h-[clamp(36px,5.8dvh,48px)] items-center justify-between rounded-btn border pr-1.5 pl-3 text-left text-[15px] font-semibold',
                       picked === null && 'border-line bg-surface hover:bg-surface-2',
                       picked !== null && isAnswer && 'is-answer',
                       picked !== null && isPick && !isAnswer && 'is-wrong',
