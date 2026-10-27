@@ -124,7 +124,12 @@ export interface StagedTurn {
   /** The card's accessible name. */
   label: string;
   /** Parts of the screen to point at before the turn and after it (`data-spot` keys, Spotlight.tsx). */
-  spotlight?: { before?: readonly string[]; after?: readonly string[] };
+  spotlight?: {
+    before?: readonly string[];
+    after?: readonly string[];
+    /** Before the turn: lit without a ring (a practice's answers, the info spots ringed in `before`). */
+    lit?: readonly string[];
+  };
   /** The play button's label before the turn. */
   playLabel?: string;
   /** After the turn, beside "Again": the way on (a lesson's Next). */
@@ -937,6 +942,7 @@ export function Battle({
       : ((played ? staged.spotlight?.after : staged.spotlight?.before) ?? []);
   // The coach's card and the top bar stay lit (unringed): they say what to look at, and how to go on.
   const spotlight = lit;
+  const litPlain = touring || !staged || playing || played ? [] : (staged.spotlight?.lit ?? []);
   // One message at a time: the lesson's own prompt and a beginner hint both
   // come before a coach tip.
   const tip =
@@ -1117,6 +1123,7 @@ export function Battle({
       <Spotlight
         root={rootRef}
         targets={spotlight}
+        lit={litPlain}
         // While the player picks (practice), the controls stay lit too.
         keep={
           touring

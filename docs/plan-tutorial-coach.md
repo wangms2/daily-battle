@@ -262,7 +262,7 @@ Asked by the user (2026-10-26) after the lesson review page (https://claude.ai/a
   - a practice position passes when the best answer is the judge's top choice, wins clearly more often in rollouts, and every wrong answer is explained by a reason already taught (if only a later reason explains it, the position fails);
   - a lesson battle passes when, over many games by bots of several strengths, the full coach rarely wants to say something the player hasn't learned (out-of-scope pressure);
   - a lesson battle can be won: the guided replay's line (the judge's top move each turn, `coach/guide.ts`) wins on the step's seed and in at least 90% of seed variants. Battles that need it start the foes part-way down (`hp`). Every battle has a loss `hint`.
-- **Outlines (from the playtest):** a practice rings every graded answer equally plus its info spots. A practice `spotlight` never lists an answer (validator rule).
+- **Outlines (from the playtest):** a practice lights every graded answer equally (no ring) and rings only its info spots. A practice `spotlight` never lists an answer (validator rule).
 - Every demo and practice position passes the judge (the "best" answer is its top choice) **and** the rollouts against the lesson's foe (the best answer wins clearly more often, not 100% vs 100%): `scripts/lesson-judge.ts`, `scripts/quiz-audit.ts`, then content tests.
 - The same words as the coach: explanations reuse the coach's reasons (`explain.ts`) where they fit.
 - Phone first, no page scrolling; polished visuals, with each lesson's own Pokémon and backgrounds.

@@ -434,11 +434,9 @@ function Demo({
   );
 }
 
-/** A practice's lit spots: every answer equally, then the step's info spots. */
-function practiceSpots(choices: (string | null)[] | null, info: string[]): string[] {
-  const answers = (choices ?? []).filter((c): c is string => !!c);
-  return [...new Set([...answers, ...info])];
-}
+/** A practice's answers, as spots to light. */
+const answerSpots = (choices: (string | null)[] | null): string[] =>
+  (choices ?? []).filter((c): c is string => !!c);
 
 /** The battle screen's start for a lesson position shown as a staged turn. */
 const stagedStart = (format: string, seed: string, foe: Mon[] = []): EngineStart => ({
@@ -637,8 +635,8 @@ function Practice({
                 before: <p>{step.prompt}</p>,
                 after: feedback,
                 label: 'Practice',
-                // Every answer is lit the same, plus the info to look at.
-                spotlight: { before: practiceSpots(choices, spots) },
+                // Every answer is lit the same, without a ring; the info to look at is ringed.
+                spotlight: { before: spots, lit: answerSpots(choices) },
                 onPick: setPicked,
                 again: false,
                 stack: !right,
