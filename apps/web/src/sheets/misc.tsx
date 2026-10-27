@@ -38,7 +38,7 @@ export function WelcomeSheet({
   const rules = [
     ['Build a team', 'Pick 6 of this week’s 12 for the week.'],
     ['Beat today’s opponent', 'A new one daily. Its sets stay hidden.'],
-    ['Win on your first try', 'A ⭐ and your streak. Retry till you win.'],
+    ['Win on your first try', 'A ⭐ and your streak. Win later for a ✓.'],
   ];
   return (
     <Sheet
