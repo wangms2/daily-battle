@@ -1035,7 +1035,7 @@ export function Battle({
     </>
   );
   const endCard = end && !staged && (
-    <div className="animate-fade-in absolute inset-0 z-20 grid place-items-center bg-black/35 p-4">
+    <div className="end-card-wrap animate-fade-in absolute inset-0 z-20 grid place-items-center bg-black/35 p-4">
       <div
         ref={endRef}
         tabIndex={-1}

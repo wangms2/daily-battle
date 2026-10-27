@@ -1228,6 +1228,25 @@ button {
   box-shadow: 0 0 0 2px var(--bad);
 }
 
+/* Above the on-screen keyboard (--kb, lib/keyboard.ts): the name card, and sheets on
+   phones (wide screens centre them). If they're taller than what's left, they scroll. */
+.name-pop {
+  bottom: var(--kb, 0px);
+}
+.kb-open .name-pop-card {
+  max-height: calc(100dvh - var(--kb, 0px) - 12px);
+  overflow-y: auto;
+}
+.end-card-wrap {
+  padding-bottom: calc(1rem + var(--kb, 0px));
+}
+@media (max-width: 899.98px) {
+  .menu-sheet {
+    bottom: var(--kb, 0px);
+    max-height: calc(92dvh - var(--kb, 0px));
+  }
+}
+
 /* The first-open name card: the landing dims and the card rises with Pikachu
    on its edge; it slides away once the player's met. */
 .name-pop-dim {
