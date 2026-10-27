@@ -63,7 +63,7 @@ export const priority: Lesson = {
         },
       ],
       otherwise: 'Mach Punch goes first and knocks Houndoom out.',
-      spotlight: ['move Mach Punch', 'foe-plate'],
+      spotlight: ['foe-plate'],
     },
     {
       kind: 'practice',
@@ -88,20 +88,25 @@ export const priority: Lesson = {
         },
       ],
       otherwise: 'Extreme Speed goes first and knocks Alakazam out.',
-      spotlight: ['move Extreme Speed', 'foe-plate'],
+      spotlight: ['foe-plate'],
     },
     {
       kind: 'battle',
       intro:
-        'Two on two against the Easy AI. Hit hard while the foe is healthy; finish it with priority.',
+        'Two on two against the Easy AI. Both foes are faster than you, and Houndoom is already hurt. Hit hard while a foe is healthy; finish it with priority.',
+      // Houndoom starts low enough for Mach Punch; Alakazam is healthy, so
+      // Linoone hits hard with Shadow Ball first (two Extreme Speeds aren't
+      // enough), then finishes with Extreme Speed before Alakazam moves again.
       player: [
         { species: 'Breloom', moves: ['Sky Uppercut', 'Mach Punch'] },
         { species: 'Linoone', moves: ['Shadow Ball', 'Extreme Speed'] },
       ],
       foe: [HOUNDOOM, ALAKAZAM],
       seed: 'course:priority:battle',
+      hp: { p2: [45] },
       noLuck: true,
       takeaway: 'Priority moves go first, whatever the Speed. Use them to finish a faster foe.',
+      hint: 'Houndoom is low: Mach Punch goes first and finishes it. Alakazam is healthy: hit it hard with Shadow Ball, then finish it with Extreme Speed before it moves.',
     },
   ],
 };

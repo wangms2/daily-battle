@@ -117,7 +117,19 @@ export function reducer(state: State, action: Action): State {
       const progress = state.settings.tutorial?.[action.format] ?? { completed: [] };
       const next: TutorialProgress =
         action.type === 'lessonStep'
-          ? { ...progress, current: { lesson: action.lesson, step: action.step } }
+          ? {
+              ...progress,
+              current: {
+                lesson: action.lesson,
+                step: action.step,
+                reached: Math.max(
+                  action.step,
+                  progress.current?.lesson === action.lesson
+                    ? (progress.current.reached ?? progress.current.step)
+                    : 0,
+                ),
+              },
+            }
           : {
               completed: progress.completed.includes(action.lesson)
                 ? progress.completed

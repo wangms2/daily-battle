@@ -111,6 +111,10 @@ export function lessonProblems(lesson: Lesson): string[] {
           if (!resolveStep(a.choice, request)) note(where, [`answer "${a.choice}" isn't legal`]);
         if (step.answers.filter((a) => a.grade === 'best').length !== 1)
           note(where, ['a practice needs exactly one best answer']);
+        // Every answer is lit equally by the player, so the spotlight holds only info.
+        for (const a of step.answers)
+          if (step.spotlight?.includes(a.choice))
+            note(where, [`the spotlight lists the answer "${a.choice}" (answers are lit already)`]);
       } else if (step.kind === 'demo') {
         note(where, teamIssues(format, step.position.p1));
         note(where, teamIssues(format, step.position.p2));

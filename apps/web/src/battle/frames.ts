@@ -247,6 +247,10 @@ export interface EngineStart {
     noLuck: boolean;
     /** The lesson reached, so the coach only talks about what's been taught. */
     taught?: number;
+    /** Starting HP (% of max) by team slot. */
+    hp?: Position['hp'];
+    /** The guided replay (DESIGN.md §22): a tip names the winning choice each turn. */
+    guide?: boolean;
   };
   /** The coach (DESIGN.md §22): tips and blunder warnings each turn, and a review at the end. */
   coach?: 'simple';

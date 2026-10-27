@@ -93,6 +93,7 @@ export const stab: Lesson = {
       seed: 'course:stab:battle',
       noLuck: true,
       takeaway: 'A move of your Pokémon’s own type hits 1.5× as hard. Look for the match.',
+      hint: 'Use moves that match your Pokémon’s type: Meteor Mash for Metagross, Surf for Swampert.',
     },
   ],
 };

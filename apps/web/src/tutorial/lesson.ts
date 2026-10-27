@@ -6,9 +6,15 @@ import type { EngineStart } from '../battle/frames';
 /**
  * A lesson battle's start: the engine derives its seeds from the lesson's seed
  * label. The foe is the Easy AI, and the coach only talks about what the
- * lessons up to this one (`taught`) teach.
+ * lessons up to this one (`taught`) teach. `guide`: the guided replay, where a
+ * tip names the winning choice each turn.
  */
-export function lessonStart(step: BattleStep, format: string, taught: number): EngineStart {
+export function lessonStart(
+  step: BattleStep,
+  format: string,
+  taught: number,
+  guide = false,
+): EngineStart {
   return {
     format,
     playerTeam: step.player,
@@ -18,7 +24,12 @@ export function lessonStart(step: BattleStep, format: string, taught: number): E
     aiSeed: step.seed,
     choices: [],
     difficulty: 'easy',
-    tutorial: { noLuck: step.noLuck, taught },
+    tutorial: {
+      noLuck: step.noLuck,
+      taught,
+      ...(step.hp && { hp: step.hp }),
+      ...(guide && { guide: true }),
+    },
     coach: 'simple',
   };
 }

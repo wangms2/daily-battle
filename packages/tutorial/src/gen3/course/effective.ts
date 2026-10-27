@@ -127,21 +127,21 @@ export const effective: Lesson = {
     {
       kind: 'battle',
       intro:
-        'Two on two against the Easy AI. Look at each foe’s types and pick the move that hits it hardest. The coach will help.',
+        'Your Starmie against two foes and the Easy AI. Look at each foe’s types and pick the move that hits it hardest. The coach will help.',
       // No immunities, abilities that act, items, status, or Spikes: only type matchups decide.
-      player: [
-        { species: 'Starmie', moves: ['Surf', 'Ice Beam', 'Thunderbolt'] },
-        // Both of yours outspeed both foes, so Speed (lesson 7) never decides a turn.
-        { species: 'Jolteon', moves: ['Thunderbolt', 'Shadow Ball'] },
-      ],
+      // Starmie alone, so switching (lesson 6) never comes up, and it outspeeds
+      // both foes, so Speed (lesson 7) never decides a turn. Each foe is weak to
+      // one of its moves and not the others.
+      player: [{ species: 'Starmie', moves: ['Surf', 'Ice Beam', 'Thunderbolt'] }],
       foe: [
-        { species: 'Celebi', moves: ['Giga Drain', 'Psychic'] },
-        { species: 'Houndoom', moves: ['Crunch', 'Flamethrower'] },
+        { species: 'Gyarados', moves: ['Double-Edge'] },
+        { species: 'Flygon', moves: ['Dragon Claw'] },
       ],
       seed: 'course:effective:battle',
       noLuck: true,
       takeaway:
         'Before you attack, check the foe’s types. To learn the matchups, try the Type trainer at the top of Learn.',
+      hint: 'Check each foe’s types. Thunderbolt hits Gyarados 4×, and Ice Beam hits Flygon 4×.',
     },
   ],
 };

@@ -58,8 +58,19 @@ export interface BattleStep {
   seed: string;
   /** Remove luck (no crits, misses, or secondary effects). */
   noLuck: boolean;
+  /**
+   * Starting HP (% of max) by team slot, set silently at the start, as in
+   * `Position`: foes part-way down, so the lesson's idea decides the battle.
+   */
+  hp?: Position['hp'];
   /** Shown after the battle, win or lose. */
   takeaway: string;
+  /**
+   * Shown after a loss: what to try, in the lesson's terms. After a couple of
+   * losses the player can replay with help: the coach names a choice each turn
+   * (the line the lesson's win check plays, `coach/guide.ts`).
+   */
+  hint: string;
 }
 
 /**

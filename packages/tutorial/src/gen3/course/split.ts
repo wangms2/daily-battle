@@ -22,8 +22,9 @@ export const split: Lesson = {
       kind: 'demo',
       position: { p1: [SWAMPERT], p2: [BLISSEY], seed: 'course:split:look1' },
       card: 'move Surf',
-      before: 'Hold a move to see its details. In Gen 3, Water moves are special: Surf is Special.',
-      spotlight: { before: ['move-details'] },
+      before:
+        'Hold a move to see its details. Here’s Surf’s: it says Special, because in Gen 3 every Water move is special.',
+      spotlight: { before: ['move Surf', 'move-details'] },
     },
     {
       kind: 'demo',
@@ -120,6 +121,7 @@ export const split: Lesson = {
       noLuck: true,
       takeaway:
         'Physical moves hit Defense; special moves hit Special Defense. Aim at the weaker one.',
+      hint: 'Blissey’s Defense is tiny: hit it with Earthquake or Meteor Mash. Forretress’s Special Defense is lower: use Surf or Psychic.',
     },
   ],
 };

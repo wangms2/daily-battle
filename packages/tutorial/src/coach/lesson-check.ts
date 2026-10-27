@@ -6,8 +6,14 @@
 // and the judge know the lesson foe's real set here.
 import { aiFor, strongBot, turnFacts } from '@daily-battle/ai';
 import type { Engine } from '@daily-battle/engine-wasm';
-import { legalChoices, resolveStep, runBattle, type Policy } from '@daily-battle/sim-bridge';
-import { battleInput, startPosition } from '../battle';
+import {
+  deriveSeed,
+  legalChoices,
+  makeRng,
+  resolveStep,
+  type Policy,
+} from '@daily-battle/sim-bridge';
+import { playBattle, startPosition } from '../battle';
 import { knownSets, withLessonSets } from '../teams';
 import type { BattleStep, PracticeStep } from '../types';
 import { answerOutcomes } from '../validate';
@@ -129,8 +135,8 @@ export function battlePressure(
         return choice;
       },
     };
-    const input = battleInput(format, { ...step, seed: `${step.seed}:pressure:${i}` }, player);
-    runBattle(input);
+    const rng = makeRng(deriveSeed(`${step.seed}:pressure:${i}`, 1));
+    playBattle(format, step, (view) => player.choose(view, rng), `${step.seed}:pressure:${i}`);
   }
   return { decisions, outOfScope, reasons };
 }

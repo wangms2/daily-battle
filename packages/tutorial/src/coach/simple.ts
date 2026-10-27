@@ -22,7 +22,8 @@ export type CoachRule =
   'canKo' | 'koThreat' | 'foeAsleep' | 'locked' | 'spikes' | 'walled' | 'setupWindow';
 
 export interface CoachNote {
-  rule: CoachRule | WarningReason;
+  /** `guide`: a guided replay's pick for the turn (guide.ts). */
+  rule: CoachRule | WarningReason | 'guide';
   text: string;
   /** The lesson that explains it, if any. */
   lesson?: string;

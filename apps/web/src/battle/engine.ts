@@ -14,9 +14,13 @@ import {
 } from '@daily-battle/sim-bridge';
 import {
   Coach,
+  guideKey,
+  guideNote,
+  guideSwitch,
   Judge,
   LESSON_TIE,
   knownSets,
+  setStartHp,
   startPosition,
   teamOf,
   withLessonSets,
@@ -89,6 +93,7 @@ export class BattleEngine {
       p1: { team: this.sets, name: 'You' },
       p2: { team: team(start.opponentTeam), name: 'The opponent' },
     });
+    if (tutorial?.hp) setStartHp(this.session, tutorial.hp);
     const difficulty = start.difficulty ?? 'normal';
     const ai = aiFor({
       difficulty,
@@ -223,7 +228,7 @@ export class BattleEngine {
     const view = this.session.view('p1');
     if (!this.tipPending || !top || !view || !this.coach) return undefined;
     this.tipPending = false;
-    return this.coach.confirm(view, top);
+    return this.start.tutorial?.guide ? guideNote(view, top) : this.coach.confirm(view, top);
   }
 
   /**
@@ -331,9 +336,24 @@ export class BattleEngine {
         pkg.coach = turn.tip ? { tip: turn.tip } : {};
         this.coached = view.request;
         this.shown.clear();
-        // Seeded by the decision, so a resumed battle judges it the same way.
-        this.judge?.begin(view, `${this.start.battleSeed}:${this.session.choices('p1').length}`);
+        // Seeded by the decision (guideKey), so a resumed battle judges it the
+        // same way, and the guided replay is the line the content tests win with.
+        this.judge?.begin(
+          view,
+          guideKey(String(this.start.battleSeed), this.session.choices('p1').length),
+        );
         this.tipPending = !!turn.pending && !!this.judge;
+        if (this.start.tutorial?.guide) {
+          // The guide's tip replaces the coach's: the judge's top move, or the
+          // teammate to send in when one of yours has fainted.
+          const lessonFoe = this.start.opponentTeam as Mon[];
+          const pick =
+            view.request.requestType === 'move'
+              ? undefined
+              : guideSwitch(this.start.format ?? DEFAULT_FORMAT, lessonFoe, view);
+          pkg.coach = pick ? { tip: guideNote(view, pick) } : {};
+          this.tipPending = !pick && !!this.judge;
+        }
       }
       if (pkg.end) pkg.review = this.coach.review();
     }

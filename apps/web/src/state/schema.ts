@@ -105,8 +105,11 @@ export interface Settings {
 export interface TutorialProgress {
   /** Lesson ids finished (in the order they were finished). */
   completed: string[];
-  /** The lesson last opened and the step reached, to resume. */
-  current?: { lesson: string; step: number };
+  /**
+   * The lesson last opened and the step it's on, to resume, and the furthest
+   * step reached in it (the slide arrows go forward up to it; `step` if absent).
+   */
+  current?: { lesson: string; step: number; reached?: number };
 }
 
 /**

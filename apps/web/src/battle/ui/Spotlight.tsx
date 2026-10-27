@@ -2,7 +2,7 @@
 // rest dims, and each target (an element marked `data-spot="…"`: a type
 // badge row, an HP bar, a move button) keeps its colour with a soft ring.
 // It measures the real elements, so it works over any part of the screen.
-import { useLayoutEffect, useState, type RefObject } from 'react';
+import { useId, useLayoutEffect, useState, type RefObject } from 'react';
 
 type Hole = { x: number; y: number; w: number; h: number };
 
@@ -22,6 +22,7 @@ export function Spotlight({
   /** Keys that stay lit without a ring while something is pointed at (the instructions). */
   keep?: readonly string[];
 }) {
+  const maskId = `spot-${useId().replace(/:/g, '')}`;
   const [holes, setHoles] = useState<{ w: number; h: number; holes: Hole[]; rings: number } | null>(
     null,
   );
@@ -74,6 +75,8 @@ export function Spotlight({
       `a${r},${r} 0 0 1 -${r},-${r}v-${h.h - 2 * r}a${r},${r} 0 0 1 ${r},-${r}z`
     );
   };
+  // A mask, not an even-odd path: where two holes overlap (a ringed move inside
+  // the lit controls) the overlap must stay lit, not dim again.
   return (
     <svg
       aria-hidden
@@ -81,11 +84,13 @@ export function Spotlight({
       width={holes.w}
       height={holes.h}
     >
-      <path
-        className="spotlight-dim"
-        fillRule="evenodd"
-        d={`M0,0h${holes.w}v${holes.h}h-${holes.w}z${holes.holes.map(rect).join('')}`}
-      />
+      <mask id={maskId}>
+        <rect width={holes.w} height={holes.h} fill="white" />
+        {holes.holes.map((h, i) => (
+          <path key={i} d={rect(h)} fill="black" />
+        ))}
+      </mask>
+      <rect className="spotlight-dim" width={holes.w} height={holes.h} mask={`url(#${maskId})`} />
       {holes.holes.slice(0, holes.rings).map((h, i) => (
         <path key={i} className="spotlight-ring" fill="none" strokeWidth={2.5} d={rect(h)} />
       ))}

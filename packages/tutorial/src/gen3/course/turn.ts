@@ -126,6 +126,7 @@ export const turn: Lesson = {
       seed: 'course:turn:battle',
       noLuck: true,
       takeaway: 'Stronger moves take more HP. Knock out every foe Pokémon to win.',
+      hint: 'Earthquake is Swampert’s strongest move here. Use it every turn.',
     },
   ],
 };

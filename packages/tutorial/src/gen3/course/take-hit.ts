@@ -113,6 +113,7 @@ export const takeHit: Lesson = {
       noLuck: true,
       takeaway:
         'If the foe’s best hit would knock you out and you can’t knock it out first, switch to the teammate that takes it.',
+      hint: 'When the foe’s best hit would knock you out, switch to the teammate that takes it, then hit back.',
     },
   ],
 };

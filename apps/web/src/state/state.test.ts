@@ -346,7 +346,13 @@ describe('settings', () => {
     let state = reducer(initialState(), at('gen3-basics', 2));
     expect(state.settings.tutorial?.gen3ou).toEqual({
       completed: [],
-      current: { lesson: 'gen3-basics', step: 2 },
+      current: { lesson: 'gen3-basics', step: 2, reached: 2 },
+    });
+    // Going back a slide keeps the furthest one reached, for the forward arrow.
+    expect(reducer(state, at('gen3-basics', 1)).settings.tutorial?.gen3ou?.current).toEqual({
+      lesson: 'gen3-basics',
+      step: 1,
+      reached: 2,
     });
     state = reducer(reducer(state, done('gen3-basics')), done('gen3-basics'));
     expect(state.settings.tutorial?.gen3ou).toEqual({ completed: ['gen3-basics'] });
