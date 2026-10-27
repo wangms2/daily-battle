@@ -609,7 +609,7 @@ describe('home', () => {
     await user.type(field, 'Misty');
     await user.click(screen.getByRole('button', { name: 'That’s me!' }));
     expect(await screen.findByText(/Nice to meet you/)).toHaveTextContent('Misty');
-    await user.click(screen.getByRole('status'));
+    await user.click(screen.getByRole('button', { name: 'Let’s go!' }));
     expect(await screen.findByRole('button', { name: 'Play' })).toBeInTheDocument();
     unmount();
   });

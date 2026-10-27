@@ -199,10 +199,12 @@ export function DailyBrief({
 
   // Six tiles: 3×2 on phones, one row of six on wide screens, where the teams stack.
   // On wide screens the rows are a fixed, shorter height (the page centers them),
-  // instead of stretching tall tiles over the whole window.
+  // instead of stretching tall tiles over the whole window; on a short window they shrink.
   const sixGrid = clsx(
     'grid gap-2',
-    wide ? 'h-52 shrink-0 grid-cols-6 grid-rows-1' : 'min-h-0 flex-1 grid-cols-3 grid-rows-2',
+    wide
+      ? 'h-52 min-h-36 shrink grid-cols-6 grid-rows-1'
+      : 'min-h-0 flex-1 grid-cols-3 grid-rows-2',
   );
 
   /** What hovering a tile shows on desktop: base stats, and for your own, its set. */
@@ -253,7 +255,7 @@ export function DailyBrief({
         </div>
       </section>
     ) : (
-      <section className={clsx('flex flex-col gap-2', wide ? 'shrink-0' : 'min-h-0 flex-1')}>
+      <section className={clsx('flex flex-col gap-2', wide ? 'min-h-0 shrink' : 'min-h-0 flex-1')}>
         <SectionLabel>Opponent</SectionLabel>
         <div className={sixGrid}>
           {opponent.team.map(({ species }) => (
@@ -273,7 +275,7 @@ export function DailyBrief({
     );
 
   const teamSection = (
-    <section className={clsx('flex flex-col gap-2', wide ? 'shrink-0' : 'min-h-0 flex-1')}>
+    <section className={clsx('flex flex-col gap-2', wide ? 'min-h-0 shrink' : 'min-h-0 flex-1')}>
       <SectionLabel right={changeChip}>
         {editing ? 'Pick a Pokémon to change' : 'Your team'}
       </SectionLabel>
@@ -367,7 +369,7 @@ export function DailyBrief({
 
   // The opponent's difficulty (and the coach), labelled, right where you start.
   const level = onDifficulty && !editing && (
-    <div className="flex shrink-0 items-center justify-between gap-2">
+    <div className={clsx('flex shrink-0 items-center gap-2', wide ? 'gap-3' : 'justify-between')}>
       <span className="text-[14px] font-semibold">Difficulty</span>
       <div className="flex items-center gap-1.5">
         {coach && (
@@ -394,7 +396,10 @@ export function DailyBrief({
   const strip = summary.status !== 'none' && !editing && (
     <section
       aria-label="Today’s result"
-      className="card flex h-14 shrink-0 items-center gap-3 px-3"
+      className={clsx(
+        'card flex shrink-0 items-center gap-3 px-3',
+        wide ? 'min-h-16 py-2' : 'h-14',
+      )}
     >
       <div className="min-w-0 flex-1">
         <p className="truncate text-[14px] font-semibold">{dayHeadline(summary)}</p>
@@ -405,10 +410,17 @@ export function DailyBrief({
         </p>
       </div>
       <ShareButton share={result.share} variant="secondary" className="h-9 shrink-0 px-4" />
+      {/* A computer has room: the other games on the same line. */}
+      {wide && decided && (
+        <>
+          <span aria-hidden className="h-10 w-px shrink-0 bg-line" />
+          <OtherGames compact className="w-[360px] shrink-0" />
+        </>
+      )}
     </section>
   );
   // Once the day's decided, the other games are one tap away.
-  const others = decided && !editing && <OtherGames compact className="shrink-0" />;
+  const others = decided && !editing && !wide && <OtherGames compact className="shrink-0" />;
 
   // The panel's Pokémon: the one picked, else your lead.
   const panelSlot = (() => {
@@ -442,11 +454,18 @@ export function DailyBrief({
             {opponentSection}
             {vs}
             {teamSection}
-            <div className="mx-auto mt-2 flex w-full max-w-md flex-col gap-2">
+            {/* Two rows across the team's width: how today went, then how to play. */}
+            <div className="mt-2 flex w-full flex-col gap-3">
               {strip}
-              {others}
-              {level}
-              {start}
+              <div
+                className={clsx(
+                  'flex items-center gap-4',
+                  level ? 'justify-between' : 'justify-center',
+                )}
+              >
+                {level}
+                <div className="w-full max-w-sm">{start}</div>
+              </div>
             </div>
           </div>
           {/* A computer has room: details beside the teams instead of a sheet over them. */}

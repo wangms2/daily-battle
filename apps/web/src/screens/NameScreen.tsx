@@ -12,7 +12,7 @@ import { useNameCheck } from '../state/useNameCheck';
 import { getSprite } from '../lib/sprites';
 import { DiceIcon } from '../ui/icons';
 
-/** How long "Nice to meet you" shows before the card goes (a tap skips it). */
+/** How long "Nice to meet you" shows before the card goes (Let's go! skips it). */
 const GREETING_MS = 1800;
 /** The card sliding away and the dim lifting (styles.css, .name-pop). */
 const LEAVE_MS = 320;
@@ -34,10 +34,15 @@ export function NameScreen({
   const clean = cleanName(name);
   // A name someone has protected is theirs: pick another (or sign in to it).
   const taken = useNameCheck(clean) === 'taken';
-  // The greeting carries on once: when it times out, or at a tap.
-  // The greeting shows a moment (a tap skips it), then the card slides away.
+  // The greeting shows a moment (Let's go! skips it), then the card slides away, once.
   const [leaving, setLeaving] = useState(false);
   const sent = useRef(false);
+  // The latest onDone, so a parent re-rendering (App ticks every second) doesn't
+  // restart the timers below and keep the card up for ever.
+  const doneRef = useRef(onDone);
+  useEffect(() => {
+    doneRef.current = onDone;
+  });
   useEffect(() => {
     if (!met) return;
     const t = setTimeout(
@@ -45,12 +50,12 @@ export function NameScreen({
         if (!leaving) return setLeaving(true);
         if (sent.current) return;
         sent.current = true;
-        onDone(met);
+        doneRef.current(met);
       },
       leaving ? LEAVE_MS : GREETING_MS,
     );
     return () => clearTimeout(t);
-  }, [met, leaving, onDone]);
+  }, [met, leaving]);
 
   return (
     <div
@@ -74,7 +79,6 @@ export function NameScreen({
         <div
           className="name-bubble home-serif grid min-h-[92px] content-center px-4 py-3"
           role="status"
-          onClick={met ? () => setLeaving(true) : undefined}
         >
           {signingIn ? (
             <p>Welcome back! Sign in to pick up where you left off.</p>
@@ -101,55 +105,68 @@ export function NameScreen({
         )}
         {/* Hidden, not removed, after the name: the screen doesn't jump. */}
         {!signingIn && (
-          <form
-            className={clsx('grid gap-3', met && 'invisible')}
-            inert={!!met}
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (clean && !taken) setMet(clean);
-            }}
-          >
-            <div className="flex gap-2">
-              <input
-                className="field home-serif h-12 min-w-0 flex-1 px-3 text-[19px]"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                onFocus={(e) => e.target.select()}
-                autoComplete="nickname"
-                maxLength={16}
-                aria-label="Your name"
-                aria-invalid={!clean || taken || undefined}
-                aria-describedby={taken ? 'name-taken' : undefined}
-              />
+          <div className="relative">
+            <form
+              className={clsx('grid gap-3', met && 'invisible')}
+              inert={!!met}
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (clean && !taken) setMet(clean);
+              }}
+            >
+              <div className="flex gap-2">
+                <input
+                  className="field home-serif h-12 min-w-0 flex-1 px-3 text-[19px]"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  onFocus={(e) => e.target.select()}
+                  autoComplete="nickname"
+                  maxLength={16}
+                  aria-label="Your name"
+                  aria-invalid={!clean || taken || undefined}
+                  aria-describedby={taken ? 'name-taken' : undefined}
+                />
+                <button
+                  type="button"
+                  onClick={() => setName(randomName())}
+                  aria-label="A random name"
+                  className="home-btn name-dice size-12 shrink-0"
+                >
+                  <DiceIcon width={24} height={24} />
+                </button>
+              </div>
+              {taken && (
+                <p id="name-taken" role="alert" className="-mt-1 text-[14px] text-bad">
+                  Someone already protected that name. Try another!
+                </p>
+              )}
+              <button
+                type="submit"
+                className="home-btn name-cta home-serif h-13 w-full text-[20px]"
+                disabled={!clean || taken}
+              >
+                That’s me!
+              </button>
               <button
                 type="button"
-                onClick={() => setName(randomName())}
-                aria-label="A random name"
-                className="home-btn name-dice size-12 shrink-0"
+                onClick={() => setSigningIn(true)}
+                className="mx-auto h-10 px-3 text-[14px] text-muted hover:text-ink"
               >
-                <DiceIcon width={24} height={24} />
+                Played on another device? <span className="font-semibold text-accent">Sign in</span>
               </button>
-            </div>
-            {taken && (
-              <p id="name-taken" role="alert" className="-mt-1 text-[14px] text-bad">
-                Someone already protected that name. Try another!
-              </p>
+            </form>
+            {/* Over the hidden form: carry on now (it also goes by itself). */}
+            {met && (
+              <button
+                type="button"
+                autoFocus
+                onClick={() => setLeaving(true)}
+                className="home-btn name-cta home-serif absolute inset-x-0 top-0 h-13 w-full text-[20px]"
+              >
+                Let’s go!
+              </button>
             )}
-            <button
-              type="submit"
-              className="home-btn name-cta home-serif h-13 w-full text-[20px]"
-              disabled={!clean || taken}
-            >
-              That’s me!
-            </button>
-            <button
-              type="button"
-              onClick={() => setSigningIn(true)}
-              className="mx-auto h-10 px-3 text-[14px] text-muted hover:text-ink"
-            >
-              Played on another device? <span className="font-semibold text-accent">Sign in</span>
-            </button>
-          </form>
+          </div>
         )}
       </section>
     </div>

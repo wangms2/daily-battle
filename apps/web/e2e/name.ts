@@ -10,9 +10,13 @@ export async function meet(page: Page) {
   if (!(await ask.isVisible())) return;
   await ask.click();
   await expect(page.getByText(/Nice to meet you/)).toBeVisible();
-  await page
-    .getByRole('status')
-    .filter({ hasText: /Nice to meet you/ })
-    .click();
+  await page.getByRole('button', { name: 'Let’s go!' }).click();
   await expect(play).toBeVisible();
+}
+
+/** Answers the name and waits: the greeting goes by itself. */
+export async function meetAndWait(page: Page) {
+  await page.getByRole('button', { name: 'That’s me!' }).click();
+  await expect(page.getByText(/Nice to meet you/)).toBeVisible();
+  await expect(page.getByRole('dialog', { name: 'Welcome' })).toBeHidden({ timeout: 5000 });
 }

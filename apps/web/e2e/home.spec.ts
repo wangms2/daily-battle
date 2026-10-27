@@ -2,7 +2,7 @@
 // Versus with friends; then the game picker.
 // A shared link (#daily) lands on the picker. Nothing scrolls on phones.
 import { expect, test, type Page } from '@playwright/test';
-import { meet } from './name';
+import { meet, meetAndWait } from './name';
 
 const TODAY = new Date('2026-10-28T10:00:00-04:00');
 
@@ -47,6 +47,13 @@ test('the first screen offers Play and Versus, then the four games', async ({ pa
 
   await page.getByRole('button', { name: 'Back' }).click();
   await expect(page.getByRole('button', { name: 'With friends' })).toBeVisible();
+});
+
+test('the name greeting goes away by itself', async ({ page }) => {
+  await page.clock.setFixedTime(TODAY);
+  await page.goto('/');
+  await meetAndWait(page);
+  await expect(page.getByRole('button', { name: 'Play', exact: true })).toBeVisible();
 });
 
 test('a shared link opens the game picker', async ({ page }) => {
