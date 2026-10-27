@@ -201,6 +201,34 @@ body {
 .btn-ghost {
   color: var(--accent);
 }
+/* Menus (ui/Sheet.tsx) in the home screens' style: the Poké Ball's seam along the
+   top, the serif title, and the landing's chunky clay and outlined buttons. */
+.menu-sheet {
+  /* Drawn inside, over the space above the handle, so no sheet grows taller. */
+  box-shadow:
+    inset 0 6px 0 #2b2d36,
+    var(--card-shadow);
+  border-top-left-radius: 22px;
+  border-top-right-radius: 22px;
+}
+.menu-sheet .btn-primary {
+  background: linear-gradient(165deg, #a3646a, #8a4f58);
+  color: #fff;
+  border: 0;
+  border-radius: 12px;
+  box-shadow: 0 4px 0 #5e343b;
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 17px;
+}
+.menu-sheet .btn-secondary {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 3px 0 color-mix(in srgb, var(--border) 80%, black);
+}
+.menu-sheet .btn:active:not(:disabled) {
+  transform: translateY(2px);
+}
 .chip {
   border-radius: var(--r-chip);
   border: var(--card-bw) solid var(--border);
@@ -1113,6 +1141,95 @@ button {
   box-shadow: 0 0 0 2px var(--bad);
 }
 
+/* The first-open name card: the landing dims and the card rises with Pikachu
+   on its edge; it slides away once the player's met. */
+.name-pop-dim {
+  background: rgb(20 18 24 / 0.5);
+  backdrop-filter: blur(2px);
+  animation: fade-in 260ms ease-out both;
+}
+.name-pop-card {
+  animation: name-rise 420ms cubic-bezier(0.22, 0.8, 0.2, 1) 150ms both;
+}
+.name-pop.is-leaving .name-pop-dim {
+  opacity: 0;
+  transition: opacity 320ms ease;
+}
+.name-pop.is-leaving .name-pop-card {
+  translate: 0 110%;
+  transition: translate 320ms cubic-bezier(0.4, 0, 1, 1);
+}
+@keyframes name-rise {
+  from {
+    translate: 0 110%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .name-pop-dim,
+  .name-pop-card {
+    animation: none;
+  }
+}
+
+/* The card is the Poké Ball's lower half: the dark seam along its top, like the landing. */
+.name-pop-card {
+  background: var(--bg);
+  border-top: 8px solid #2b2d36;
+  border-radius: 22px 22px 0 0;
+  box-shadow: 0 -6px 24px rgb(0 0 0 / 0.25);
+}
+/* Pikachu's words: a warm speech bubble with a tail up to it. */
+.name-bubble {
+  position: relative;
+  border: 2px solid #2b2d36;
+  border-radius: 16px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 19px;
+  line-height: 1.3;
+  box-shadow: 0 3px 0 #2b2d36;
+}
+.name-bubble::before {
+  content: '';
+  position: absolute;
+  left: 46px;
+  top: -11px;
+  width: 18px;
+  height: 18px;
+  background: var(--surface);
+  border-left: 2px solid #2b2d36;
+  border-top: 2px solid #2b2d36;
+  rotate: 45deg;
+}
+.name-bubble strong {
+  color: #a3646a;
+}
+.name-field {
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text);
+}
+.name-field:focus {
+  outline: none;
+  border-color: #a3646a;
+}
+.name-dice {
+  background: var(--surface);
+  color: var(--text);
+  border: 2px solid var(--border);
+  box-shadow: 0 3px 0 color-mix(in srgb, var(--border) 80%, black);
+}
+/* The landing's chunky button, in the lid's clay. */
+.name-cta {
+  background: linear-gradient(165deg, #a3646a, #8a4f58);
+  color: #fff;
+  box-shadow: 0 4px 0 #5e343b;
+}
+.name-cta:disabled {
+  opacity: 0.5;
+}
+
 /* The name screen's grass platform, under the professor's Pokémon. */
 .name-ground {
   position: absolute;
@@ -1329,17 +1446,6 @@ button {
 }
 ::view-transition-new(ball):only-child {
   animation: vt-in 240ms ease-out 240ms both;
-}
-/* The name screen into the landing: one even cross-fade, the landing arriving whole. */
-.vt-fade::view-transition-group(*) {
-  animation: none;
-  background: none;
-}
-.vt-fade::view-transition-old(*) {
-  animation: vt-out 260ms ease-in both;
-}
-.vt-fade::view-transition-new(*) {
-  animation: vt-in 420ms ease-out 180ms both;
 }
 @keyframes vt-out {
   to {

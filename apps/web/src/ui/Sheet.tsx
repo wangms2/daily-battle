@@ -1,5 +1,6 @@
 // A bottom sheet on phones and a centered dialog on wide screens, built on
-// Radix Dialog (focus trap, Escape, screen-reader labels).
+// Radix Dialog (focus trap, Escape, screen-reader labels). Menus wear the home
+// screens' style (styles.css, .menu-sheet): the Poké Ball seam, serif titles, clay buttons.
 import * as Dialog from '@radix-ui/react-dialog';
 import clsx from 'clsx';
 import type { ReactNode } from 'react';
@@ -39,7 +40,7 @@ export function Sheet({
           ref={sheet}
           aria-describedby={description ? undefined : undefined}
           className={clsx(
-            'animate-sheet-in fixed z-50 flex flex-col bg-surface text-ink shadow-card outline-none',
+            'menu-sheet animate-sheet-in fixed z-50 flex flex-col bg-surface text-ink shadow-card outline-none',
             'inset-x-0 bottom-0 max-h-[92dvh] rounded-t-sheet pb-[max(1rem,env(safe-area-inset-bottom))]',
             'wide:inset-auto wide:top-1/2 wide:left-1/2 wide:-translate-x-1/2 wide:-translate-y-1/2 wide:rounded-sheet wide:pb-5',
             wide ? 'wide:w-[min(960px,92vw)]' : 'wide:w-[440px]',
@@ -55,7 +56,9 @@ export function Sheet({
               )}
             >
               <div>
-                <Dialog.Title className="display text-[17px]">{title}</Dialog.Title>
+                <Dialog.Title className="home-serif text-[18px] leading-tight">
+                  {title}
+                </Dialog.Title>
                 {description && (
                   <Dialog.Description className="mt-0.5 text-[14px] text-muted">
                     {description}

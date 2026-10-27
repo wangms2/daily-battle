@@ -1,5 +1,6 @@
-// The first time someone plays, the game asks their name, the way the main games'
-// professor does: part of the game, not a sign-up. The name is the player's
+// The first time the game opens, Pikachu pops up over the landing and asks the
+// player's name, the way the main games' professor does: part of the game, not a
+// sign-up, and over the landing so it's clear this is Pokémon Daily. The name is the player's
 // everywhere (versus too). It stays on this device until they protect it with a
 // password after a win (DESIGN.md §10).
 import { cleanName } from '@daily-battle/versus';
@@ -8,11 +9,12 @@ import { useEffect, useRef, useState } from 'react';
 import { randomName } from '../lib/names';
 import { SignInForm } from '../sheets/Trainer';
 import { getSprite } from '../lib/sprites';
-import { Button } from '../ui/bits';
 import { DiceIcon } from '../ui/icons';
 
-/** How long "Nice to meet you" shows before the game carries on (a tap skips it). */
+/** How long "Nice to meet you" shows before the card goes (a tap skips it). */
 const GREETING_MS = 1800;
+/** The card sliding away and the dim lifting (styles.css, .name-pop). */
+const LEAVE_MS = 320;
 
 export function NameScreen({
   initial,
@@ -30,36 +32,46 @@ export function NameScreen({
   const [signingIn, setSigningIn] = useState(false);
   const clean = cleanName(name);
   // The greeting carries on once: when it times out, or at a tap.
-  const [tapped, setTapped] = useState(false);
+  // The greeting shows a moment (a tap skips it), then the card slides away.
+  const [leaving, setLeaving] = useState(false);
   const sent = useRef(false);
   useEffect(() => {
     if (!met) return;
-    const finish = () => {
-      if (sent.current) return;
-      sent.current = true;
-      onDone(met);
-    };
-    if (tapped) return finish();
-    const t = setTimeout(finish, GREETING_MS);
+    const t = setTimeout(
+      () => {
+        if (!leaving) return setLeaving(true);
+        if (sent.current) return;
+        sent.current = true;
+        onDone(met);
+      },
+      leaving ? LEAVE_MS : GREETING_MS,
+    );
     return () => clearTimeout(t);
-  }, [met, tapped, onDone]);
+  }, [met, leaving, onDone]);
 
   return (
-    <div className="flex h-full flex-col bg-bg" data-gen="3">
-      <main className="mx-auto flex w-full max-w-[440px] flex-1 flex-col justify-center gap-5 px-4 pb-6 pt-[max(16px,env(safe-area-inset-top))]">
-        <div className="relative mx-auto grid h-40 w-48 place-items-end justify-center">
-          <span aria-hidden className="name-ground" />
-          <img
-            src={getSprite('Pikachu', 'front', undefined, 5)}
-            alt=""
-            className="pixelated relative mb-3 size-28 object-contain object-bottom"
-          />
-        </div>
+    <div
+      className={clsx('name-pop fixed inset-0 z-40 flex items-end', leaving && 'is-leaving')}
+      data-gen="3"
+    >
+      <div aria-hidden className="name-pop-dim absolute inset-0" />
+      <section
+        role="dialog"
+        aria-modal="true"
+        aria-label="Welcome"
+        className="name-pop-card relative mx-auto grid w-full max-w-[440px] grid-cols-[minmax(0,1fr)] gap-4 px-4 pt-6 pb-[max(1.25rem,env(safe-area-inset-bottom))]"
+      >
+        {/* Pikachu stands on the card's top edge, peeking up to say hello. */}
+        <img
+          src={getSprite('Pikachu', 'front', undefined, 5)}
+          alt=""
+          className="pixelated absolute -top-[104px] left-6 size-28 object-contain object-bottom"
+        />
 
         <div
-          className="battle-textbox min-h-[96px] justify-center px-4 py-3"
+          className="name-bubble home-serif grid min-h-[92px] content-center px-4 py-3"
           role="status"
-          onClick={met ? () => setTapped(true) : undefined}
+          onClick={met ? () => setLeaving(true) : undefined}
         >
           {signingIn ? (
             <p>Welcome back! Sign in to pick up where you left off.</p>
@@ -96,7 +108,7 @@ export function NameScreen({
           >
             <div className="flex gap-2">
               <input
-                className="h-12 min-w-0 flex-1 rounded-btn border border-line bg-surface px-3 text-[18px] font-semibold text-ink"
+                className="name-field home-serif h-12 min-w-0 flex-1 px-3 text-[19px]"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 onFocus={(e) => e.target.select()}
@@ -109,14 +121,18 @@ export function NameScreen({
                 type="button"
                 onClick={() => setName(randomName())}
                 aria-label="A random name"
-                className="grid size-12 shrink-0 place-items-center rounded-btn border border-line bg-surface text-ink hover:bg-surface-2"
+                className="home-btn name-dice size-12 shrink-0"
               >
                 <DiceIcon width={24} height={24} />
               </button>
             </div>
-            <Button type="submit" className="h-12 w-full text-[17px]" disabled={!clean}>
+            <button
+              type="submit"
+              className="home-btn name-cta home-serif h-13 w-full text-[20px]"
+              disabled={!clean}
+            >
               That’s me!
-            </Button>
+            </button>
             <button
               type="button"
               onClick={() => setSigningIn(true)}
@@ -126,7 +142,7 @@ export function NameScreen({
             </button>
           </form>
         )}
-      </main>
+      </section>
     </div>
   );
 }

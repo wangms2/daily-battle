@@ -588,7 +588,9 @@ describe('home', () => {
     const user = userEvent.setup();
     const { unmount } = renderApp();
     const field = await screen.findByRole('textbox', { name: 'Your name' });
-    expect(screen.queryByRole('button', { name: 'Play' })).not.toBeInTheDocument();
+    // Over the landing, so it's clear this is Pokémon Daily.
+    expect(screen.getByRole('dialog', { name: 'Welcome' })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'Pokémon Daily' })).toBeInTheDocument();
     expect((field as HTMLInputElement).value).not.toBe('');
     await user.clear(field);
     await user.type(field, 'Misty');

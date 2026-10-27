@@ -7,7 +7,6 @@ import { DailyBrief } from './screens/DailyBrief';
 import { NameScreen } from './screens/NameScreen';
 import { ProtectCard } from './ui/ProtectCard';
 import { savedName, saveName } from './versus/saved';
-import { flushSync } from 'react-dom';
 import { Home } from './screens/Home';
 import { TeamBuilder } from './screens/TeamBuilder';
 import { AboutSheet } from './sheets/About';
@@ -190,19 +189,9 @@ export function App() {
       dispatchAny({ type: 'setSetting', key: 'name', value: versusName });
     }
   }, [settings.name, dispatchAny]);
-  // The first time the game opens, it asks the player's name before the landing,
-  // like the main games' professor; links straight into a game or room skip it.
+  // The first time the game opens, Pikachu pops up over the landing to ask the
+  // player's name, like the main games' professor; links into a game or room skip it.
   const askName = !settings.name && !savedName() && route === '';
-  /** The name screen fades into the landing (a view transition, where there is one). */
-  const fadeIn = (apply: () => void) => {
-    const start = (document as unknown as ViewTransitions).startViewTransition;
-    if (!start || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return apply();
-    // A plain cross-fade (styles.css, .vt-fade): the landing arrives whole.
-    const root = document.documentElement;
-    root.classList.add('vt-fade');
-    const vt = start.call(document, async () => flushSync(apply)) as { finished?: Promise<void> };
-    void (vt.finished ?? Promise.resolve()).finally(() => root.classList.remove('vt-fade'));
-  };
   const { weeks, days } = state.games[format];
   const weekState = weeks[week];
   const dayState = days[day] ?? emptyDay();
@@ -621,21 +610,6 @@ export function App() {
     );
   }
 
-  if (askName) {
-    screen = (
-      <NameScreen
-        onDone={(name) =>
-          fadeIn(() => {
-            dispatchAny({ type: 'setSetting', key: 'name', value: name });
-            saveName(name);
-          })
-        }
-        // Signing in brings the name with the progress: the landing follows.
-        onSignedIn={() => {}}
-      />
-    );
-  }
-
   return (
     <div
       className={`mx-auto h-dvh overflow-hidden ${route === 'battle' ? 'max-w-[1440px]' : !versus && !playing && !learning ? '' : 'max-w-[1280px]'}`}
@@ -658,6 +632,16 @@ export function App() {
       <GamesProvider value={otherGames}>
         <Fragment key={format}>{screen}</Fragment>
       </GamesProvider>
+      {askName && (
+        <NameScreen
+          onDone={(name) => {
+            dispatchAny({ type: 'setSetting', key: 'name', value: name });
+            saveName(name);
+          }}
+          // Signing in brings the name with the progress, and the card goes.
+          onSignedIn={() => {}}
+        />
+      )}
       <WelcomeSheet
         open={playing && !settings.shownExplainers.includes('welcome')}
         hints={settings.beginnerHints}
