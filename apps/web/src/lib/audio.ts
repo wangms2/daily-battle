@@ -184,6 +184,9 @@ function audioContext(): AudioContext | null {
   return context;
 }
 
+/** The select sound plays at this share of the effects volume: a subtle tick under the cries. */
+const SELECT_LEVEL = 0.3;
+
 /** The select sound, decoded once: a buffer starts at once, an <audio> element only after loading. */
 let selectBuffer: AudioBuffer | null = null;
 let selectLoading = false;
@@ -212,7 +215,7 @@ export function playSelect(): void {
     const source = ctx.createBufferSource();
     const gain = ctx.createGain();
     source.buffer = selectBuffer;
-    gain.gain.value = settings.effectsVolume;
+    gain.gain.value = settings.effectsVolume * SELECT_LEVEL;
     source.connect(gain).connect(ctx.destination);
     source.start();
     return;
@@ -220,7 +223,7 @@ export function playSelect(): void {
   loadSelect();
   select?.pause();
   select = new Audio(`${base()}sfx/select.mp3`);
-  select.volume = settings.effectsVolume;
+  select.volume = settings.effectsVolume * SELECT_LEVEL;
   play(select);
 }
 

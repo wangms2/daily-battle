@@ -104,7 +104,8 @@ describe('sound', () => {
     audio.playSelect();
     const [cry, select] = FakeAudio.made;
     expect(select!.src).toMatch(/\/audio\/sfx\/select\.mp3$/);
-    expect(select!.volume).toBe(0.6);
+    // Subtle: a share of the effects volume.
+    expect(select!.volume).toBeCloseTo(0.6 * 0.3);
     expect(select!.paused).toBe(false);
     // It doesn't cut off a cry.
     expect(cry!.paused).toBe(false);
