@@ -2,7 +2,7 @@
 // two friends in two browsers create and join a room, see each other, and
 // see the host's settings; a reload keeps your seat; leaving and removal work.
 import AxeBuilder from '@axe-core/playwright';
-import { expect, test, type Browser, type Page } from '@playwright/test';
+import { expect, test, type Browser, type Locator, type Page } from '@playwright/test';
 import { meet } from './name';
 
 // Playwright requires object destructuring for the fixtures argument.
@@ -19,15 +19,59 @@ const players = (page: Page) => page.getByRole('list', { name: 'Players' }).getB
 /** A second player in their own browser. */
 async function friend(browser: Browser, baseURL: string | undefined) {
   const context = await browser.newContext({ baseURL });
-  return context.newPage();
+  const page = await context.newPage();
+  await pastHowTo(page);
+  return page;
 }
+
+/** The host changes the room's rules in the Rules sheet (Edit on the summary). */
+async function rules(page: Page, change: (sheet: Locator) => Promise<unknown>) {
+  await page.getByRole('region', { name: 'Rules' }).getByRole('button', { name: 'Edit' }).click();
+  const sheet = page.getByRole('dialog', { name: 'Rules' });
+  await change(sheet);
+  await sheet.getByRole('button', { name: 'Done' }).click();
+  await expect(sheet).toBeHidden();
+}
+
+/** Sets a player's handicap with their row's − and +. */
+async function teamSize(page: Page, name: string, size: number) {
+  const group = page.getByRole('group', { name: /team size: \d Pokémon$/ }).filter({
+    has: page.getByRole('button', { name: `Fewer Pokémon for ${name}` }),
+  });
+  for (let i = 0; i < 4; i++) {
+    const now = Number((await group.getAttribute('aria-label'))!.match(/(\d) Pokémon$/)![1]);
+    if (now === size) return;
+    await group.getByRole('button', { name: now > size ? /^Fewer/ : /^More/ }).click();
+    await expect(group).toHaveAttribute(
+      'aria-label',
+      new RegExp(`${now > size ? now - 1 : now + 1} Pokémon$`),
+    );
+  }
+}
+
+/** Past the first-visit How Link Battle works sheet (tested on its own below). */
+async function pastHowTo(page: Page) {
+  await page.addInitScript(() => {
+    const key = 'daily-battle:state';
+    const saved = JSON.parse(localStorage.getItem(key) ?? 'null') ?? { version: 4, games: {} };
+    const seen: string[] = saved.settings?.shownExplainers ?? [];
+    if (seen.includes('versus-howto')) return;
+    saved.settings = { ...saved.settings, shownExplainers: [...seen, 'versus-howto'] };
+    localStorage.setItem(key, JSON.stringify(saved));
+  });
+}
+
+test.beforeEach(async ({ page }) => pastHowTo(page));
 
 /** Battle settings for both players: instant playback, no hints, past the welcome. */
 async function quick(page: Page) {
   await page.addInitScript(() => {
-    if (localStorage.getItem('daily-battle:state')) return;
+    const key = 'daily-battle:state';
+    const saved = JSON.parse(localStorage.getItem(key) ?? 'null');
+    // Once per test: a reload keeps what the test has played since.
+    if (saved?.settings?.battleSpeed === 'instant') return;
     localStorage.setItem(
-      'daily-battle:state',
+      key,
       JSON.stringify({
         version: 4,
         games: { gen4ou: { weeks: {}, days: {} }, gen5ou: { weeks: {}, days: {} } },
@@ -35,7 +79,14 @@ async function quick(page: Page) {
           beginnerHints: false,
           battleSpeed: 'instant',
           animations: false,
-          shownExplainers: ['welcome', 'gen5-news', 'gen6-news', 'gen3-news', 'tour'],
+          shownExplainers: [
+            'welcome',
+            'gen5-news',
+            'gen6-news',
+            'gen3-news',
+            'tour',
+            'versus-howto',
+          ],
           format: 'gen4ou',
         },
       }),
@@ -126,14 +177,22 @@ test('friends join a room, see each other, and see the host’s rules', async ({
   }
 
   // The host changes the rules; everyone sees them. Only the host has the controls.
-  await page.getByRole('button', { name: '3', exact: true }).click();
-  await page.getByRole('button', { name: 'Gen 5 OU' }).click();
-  await page.getByRole('combobox', { name: 'Misty’s team size' }).selectOption('4');
-  await expect(misty.getByText('Gen 5 OU')).toBeVisible();
-  await expect(misty.getByText('Lives').locator('..')).toContainText('3');
-  await expect(players(misty).nth(1)).toContainText('4 Pokémon');
+  await rules(page, async (sheet) => {
+    await sheet.getByRole('button', { name: '3', exact: true }).click();
+    await sheet.getByRole('button', { name: 'Gen 5 OU' }).click();
+  });
+  await teamSize(page, 'Misty', 4);
+  await expect(misty.getByRole('region', { name: 'Rules' })).toContainText('Gen 5 OU · 3 lives');
+  await expect(misty.getByRole('button', { name: 'Edit' })).toHaveCount(0);
+  // Misty sees the size the host gave her, on her own stepper.
+  await expect(misty.getByRole('group', { name: 'Misty’s team size: 4 Pokémon' })).toBeVisible();
   await expect(misty.getByRole('button', { name: 'Gen 4 OU' })).toHaveCount(0);
   await expect(misty.getByText('Waiting for the host')).toBeVisible();
+  // A guest sets their own handicap, and only their own.
+  await expect(misty.getByRole('button', { name: 'Fewer Pokémon for Ash' })).toHaveCount(0);
+  await expect(misty.getByRole('group', { name: 'Ash’s team size: 6 Pokémon' })).toBeVisible();
+  await teamSize(misty, 'Misty', 5);
+  await expect(page.getByRole('group', { name: 'Misty’s team size: 5 Pokémon' })).toBeVisible();
 
   // A reload keeps your seat: no name to type, the same player.
   await misty.reload();
@@ -188,6 +247,7 @@ test('the versus screens pass axe, light and dark', async ({ page, browser, base
     await axe(page);
     const code = await createRoom(page, `Host ${colorScheme}`);
     const guest = await (await browser.newContext({ baseURL, colorScheme })).newPage();
+    await pastHowTo(guest);
     await guest.goto(`/#versus/${code}`);
     await guest.getByLabel('Your name').waitFor();
     await axe(guest);
@@ -265,9 +325,9 @@ test('a room of three builds teams and plays to a winner', async ({ page, browse
   await joinRoom(blue, code, 'Blue');
   await joinRoom(green, code, 'Green');
   // One life each and three Pokémon keep the game short.
-  await red.getByRole('button', { name: '1', exact: true }).click();
+  await rules(red, (sheet) => sheet.getByRole('button', { name: '1', exact: true }).click());
   for (const name of ['Red', 'Blue', 'Green']) {
-    await red.getByRole('combobox', { name: `${name}’s team size` }).selectOption('3');
+    await teamSize(red, name, 3);
   }
   await expect(red.getByRole('list', { name: 'The pool' }).getByRole('listitem')).toHaveCount(12);
   await red.getByRole('button', { name: 'Start the game' }).click();
@@ -327,7 +387,7 @@ test('a player who gives up mid-battle loses it, and a reload resumes', async ({
   await quick(silver);
   await joinRoom(silver, code, 'Silver');
   for (const name of ['Gold', 'Silver']) {
-    await page.getByRole('combobox', { name: `${name}’s team size` }).selectOption('3');
+    await teamSize(page, name, 3);
   }
   await page.getByRole('button', { name: 'Start the game' }).click();
   for (const p of [page, silver]) await build(p, 3);
@@ -374,9 +434,9 @@ test('late joiners and players who are out watch the battles; players still in s
     await joinRoom(pages[name], code, name);
   }
   for (const p of Object.values(pages)) p.on('pageerror', (e) => errors.push(String(e)));
-  await page.getByRole('button', { name: '1', exact: true }).click();
+  await rules(page, (sheet) => sheet.getByRole('button', { name: '1', exact: true }).click());
   for (const name of names) {
-    await page.getByRole('combobox', { name: `${name}’s team size` }).selectOption('3');
+    await teamSize(page, name, 3);
   }
   await page.getByRole('button', { name: 'Start the game' }).click();
   for (const name of names) await build(pages[name]!, 3);
@@ -465,4 +525,22 @@ test('late joiners and players who are out watch the battles; players still in s
   await page.getByRole('button', { name: 'Play again' }).click();
   await expect(players(oak)).toHaveCount(5);
   expect(errors).toEqual([]);
+});
+
+test('the first visit explains Link Battle once, and How it works brings it back', async ({
+  browser,
+  baseURL,
+}) => {
+  const page = await (await browser.newContext({ baseURL })).newPage();
+  await page.goto('/#versus');
+  const sheet = page.getByRole('dialog', { name: 'How Link Battle works' });
+  await expect(sheet).toContainText('Last one standing wins');
+  await expect(sheet).toContainText('Handicaps');
+  await sheet.getByRole('button', { name: 'Got it' }).click();
+  await expect(sheet).toBeHidden();
+  await page.reload();
+  await expect(page.getByRole('button', { name: 'Create a room' })).toBeVisible();
+  await expect(sheet).toBeHidden();
+  await page.getByRole('button', { name: 'How it works' }).click();
+  await expect(sheet).toBeVisible();
 });

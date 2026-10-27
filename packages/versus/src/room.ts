@@ -370,7 +370,9 @@ export function applyCommand(state: RoomState, by: string, command: RoomCommand)
     return fail('notJoined');
   }
   if (command.type === 'leave') return { ok: true, state: removePlayer(state, by) };
-  if (state.hostId !== by) return fail('notHost');
+  // A player sets their own handicap; the host sets anyone's, and everything else.
+  const own = command.type === 'teamSize' && command.player === by;
+  if (state.hostId !== by && !own) return fail('notHost');
   // Removing works mid-game too (the room server forfeits their battle first).
   if (command.type !== 'kick' && state.phase !== 'lobby') return fail('started');
   switch (command.type) {

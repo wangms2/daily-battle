@@ -38,7 +38,13 @@ export function Standings({ room, you }: { room: RoomView; you: string }) {
               {p.id === you && <span className="font-normal text-muted"> (you)</span>}
             </span>
             <span className="block text-[12px] text-muted">
-              {[`${p.wins}–${p.losses}`, p.place !== null && placeText(p.place), p.left && 'Left']
+              {[
+                `${p.wins}–${p.losses}`,
+                // A handicap, so the standings say why someone brought fewer.
+                p.teamSize < 6 && `${p.teamSize} Pokémon`,
+                p.place !== null && placeText(p.place),
+                p.left && 'Left',
+              ]
                 .filter(Boolean)
                 .join(' · ')}
             </span>

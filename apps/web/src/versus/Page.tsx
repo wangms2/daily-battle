@@ -13,6 +13,7 @@ export function Page({
   right,
   wide = false,
   hero = false,
+  tight = false,
   children,
 }: {
   title: string;
@@ -22,6 +23,8 @@ export function Page({
   /** A wider column, for watching several battles on a big screen. */
   wide?: boolean;
   hero?: boolean;
+  /** Closer sections, for a screen that should fit without scrolling (the lobby). */
+  tight?: boolean;
   children: ReactNode;
 }) {
   if (hero) {
@@ -48,7 +51,14 @@ export function Page({
         <div className="home-seam">
           <span aria-hidden className="home-ball is-small" />
         </div>
-        <main className="min-h-0 flex-1 overflow-y-auto px-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+        <main
+          className={clsx(
+            'min-h-0 flex-1 overflow-y-auto px-4',
+            tight
+              ? 'pb-[max(0.5rem,env(safe-area-inset-bottom))]'
+              : 'pb-[max(1rem,env(safe-area-inset-bottom))]',
+          )}
+        >
           <div className="mx-auto w-full max-w-[520px] space-y-4 pt-6">{children}</div>
         </main>
       </div>
@@ -73,7 +83,8 @@ export function Page({
       <main className="min-h-0 flex-1 overflow-y-auto px-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
         <div
           className={clsx(
-            'mx-auto w-full space-y-4 pt-2',
+            'mx-auto w-full pt-2',
+            tight ? 'space-y-3' : 'space-y-4',
             wide ? 'max-w-[1200px]' : 'max-w-[560px]',
           )}
         >

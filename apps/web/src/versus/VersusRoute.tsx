@@ -9,6 +9,7 @@ import { BuildScreen, RoundScreen } from './GameScreens';
 import { Lobby } from './Lobby';
 import { Friends } from '../ui/Friends';
 import { Page } from './Page';
+import { HowToLink, VersusHowTo } from './HowTo';
 import { PrepScreen } from './PrepScreen';
 import { RoomDrawer } from './RoomDrawer';
 import { savedName, saveName } from './saved';
@@ -24,6 +25,9 @@ export interface BattleSettings {
   onSetting: <K extends keyof Settings>(key: K, value: Settings[K]) => void;
   onExplainerSeen: (id: string) => void;
 }
+
+/** The explainer id for the How Link Battle works sheet (settings.shownExplainers). */
+export const HOW_TO_SEEN = 'versus-howto';
 
 /** The room code in a `versus/CODE` route, or null for the versus home. */
 const roomCodeOf = (route: string): string | null =>
@@ -44,25 +48,44 @@ export function VersusRoute({
   const code = roomCodeOf(route);
   // The name to join a room with straight away (you just created it, or typed a name first).
   const [joinAs, setJoinAs] = useState<{ code: string; name: string } | null>(null);
+  // How it works: on the first visit (Link Battle or a room's link), then on request.
+  const [howTo, setHowTo] = useState(() => !battle.settings.shownExplainers.includes(HOW_TO_SEEN));
+  const sheet = (
+    <VersusHowTo
+      open={howTo}
+      onDone={() => {
+        setHowTo(false);
+        battle.onExplainerSeen(HOW_TO_SEEN);
+      }}
+    />
+  );
   if (!code) {
     return (
-      <VersusHome
-        onExit={onExit}
-        onRoom={(c, name) => {
-          setJoinAs(name ? { code: c, name } : null);
-          go(`versus/${c}`);
-        }}
-      />
+      <>
+        <VersusHome
+          onExit={onExit}
+          onHowTo={() => setHowTo(true)}
+          onRoom={(c, name) => {
+            setJoinAs(name ? { code: c, name } : null);
+            go(`versus/${c}`);
+          }}
+        />
+        {sheet}
+      </>
     );
   }
   return (
-    <RoomScreen
-      key={code}
-      code={code}
-      autoJoinAs={joinAs?.code === code ? joinAs.name : undefined}
-      battle={battle}
-      onExit={() => go('versus')}
-    />
+    <>
+      <RoomScreen
+        key={code}
+        code={code}
+        autoJoinAs={joinAs?.code === code ? joinAs.name : undefined}
+        battle={battle}
+        onHowTo={() => setHowTo(true)}
+        onExit={() => go('versus')}
+      />
+      {sheet}
+    </>
   );
 }
 
@@ -97,9 +120,11 @@ function NameField({
 function VersusHome({
   onExit,
   onRoom,
+  onHowTo,
 }: {
   onExit: () => void;
   onRoom: (code: string, name: string | null) => void;
+  onHowTo: () => void;
 }) {
   const [name, setName] = useState(savedName);
   const [code, setCode] = useState('');
@@ -128,7 +153,7 @@ function VersusHome({
       <Friends size="sm" className="pt-1" />
       <p className="text-[14px] leading-relaxed text-muted">
         Live battles with friends. Everyone builds from the same 12, makes one change before each
-        round, and plays until one player has lives left.
+        round, and plays until one player has lives left. <HowToLink onClick={onHowTo} />
       </p>
       <section className="card space-y-3 p-4">
         <NameField value={name} onChange={setName} />
@@ -184,11 +209,13 @@ function RoomScreen({
   code,
   autoJoinAs,
   onExit,
+  onHowTo,
   battle,
 }: {
   code: string;
   autoJoinAs?: string;
   onExit: () => void;
+  onHowTo: () => void;
   battle: BattleSettings;
 }) {
   const room = useRoom(code, autoJoinAs);
@@ -292,6 +319,7 @@ function RoomScreen({
           onRedraw={room.redraw}
           onLeave={leave}
           onBack={onExit}
+          onHowTo={onHowTo}
         />
       );
     }

@@ -96,6 +96,16 @@ describe('commands', () => {
     expect(state.players[1]!.teamSize).toBe(4);
   });
 
+  it('lets a player set their own handicap, but not anyone else’s', () => {
+    const room = roomWith('Ash', 'Misty', 'Brock');
+    const own = ok(applyCommand(room, 'id1', { type: 'teamSize', player: 'id1', size: 3 }));
+    expect(own.players[1]!.teamSize).toBe(3);
+    expect(applyCommand(room, 'id1', { type: 'teamSize', player: 'id2', size: 3 })).toEqual({
+      ok: false,
+      error: 'notHost',
+    });
+  });
+
   it('passes the host on when the host leaves', () => {
     const state = ok(applyCommand(roomWith('Ash', 'Misty', 'Brock'), 'id0', { type: 'leave' }));
     expect(state.hostId).toBe('id1');
