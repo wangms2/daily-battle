@@ -213,6 +213,45 @@ describe('demo steps', () => {
     expect(onDone).toHaveBeenCalled();
   });
 
+  it('steps back, and forward only as far as the slides reached', async () => {
+    const look = (before: string): DemoStep => ({
+      kind: 'demo',
+      position: (demoLesson.steps[0] as DemoStep).position,
+      card: 'foe',
+      before,
+      spotlight: { before: ['foe-speed'] },
+    });
+    const lesson: Lesson = { ...demoLesson, steps: [look('One.'), look('Two.'), look('Three.')] };
+    const onStep = vi.fn();
+    const backend = inlineBackend();
+    const view = (step: number, reached: number) => (
+      <BattleBackendContext.Provider value={() => backend}>
+        <LessonPlayer
+          lesson={lesson}
+          step={step}
+          reached={reached}
+          settings={{ ...initialState().settings, battleSpeed: 'instant' }}
+          onSetting={() => {}}
+          onExplainerSeen={() => {}}
+          onStep={onStep}
+          onDone={() => {}}
+          onExit={() => {}}
+          onSettings={() => {}}
+        />
+      </BattleBackendContext.Provider>
+    );
+    const { rerender } = render(view(1, 1));
+    expect(await screen.findByText('2 of 3')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Next slide' })).toBeDisabled();
+    await userEvent.click(screen.getByRole('button', { name: 'Previous slide' }));
+    expect(onStep).toHaveBeenLastCalledWith(0);
+    rerender(view(1, 2));
+    await userEvent.click(screen.getByRole('button', { name: 'Next slide' }));
+    expect(onStep).toHaveBeenLastCalledWith(2);
+    await userEvent.keyboard('{ArrowLeft}');
+    expect(onStep).toHaveBeenLastCalledWith(0);
+  });
+
   it('a look: the screen at the position, with Next at once', async () => {
     const look: Lesson = {
       ...demoLesson,
@@ -252,4 +291,61 @@ describe('demo steps', () => {
     await userEvent.click(within(card).getByRole('button', { name: 'Finish' }));
     expect(onDone).toHaveBeenCalled();
   });
+});
+
+describe('practice battles', () => {
+  it('a loss shows the hint, and a second offers a replay with help', async () => {
+    const lesson: Lesson = {
+      id: 'test-battle',
+      format: 'gen3ou',
+      number: 3,
+      title: 'Lose',
+      summary: '',
+      steps: [
+        {
+          kind: 'battle',
+          intro: 'You can’t win this one.',
+          player: [{ species: 'Jolteon', moves: ['Thunderbolt'] }],
+          foe: [{ species: 'Swampert', moves: ['Earthquake'] }],
+          seed: 'learn:lose',
+          noLuck: true,
+          takeaway: 'Ground is immune to Electric.',
+          hint: 'Bring a better Pokémon.',
+        },
+      ],
+    };
+    const backend = inlineBackend();
+    render(
+      <BattleBackendContext.Provider value={() => backend}>
+        <LessonPlayer
+          lesson={lesson}
+          step={0}
+          settings={{ ...initialState().settings, battleSpeed: 'instant' }}
+          onSetting={() => {}}
+          onExplainerSeen={() => {}}
+          onStep={() => {}}
+          onDone={() => {}}
+          onExit={() => {}}
+          onSettings={() => {}}
+        />
+      </BattleBackendContext.Provider>,
+    );
+    await start();
+    await userEvent.click(await screen.findByRole('button', { name: 'Start battle' }));
+    // The battle menu's way out leads back to the lessons.
+    await userEvent.click(await screen.findByRole('button', { name: 'Battle menu' }));
+    expect(await screen.findByRole('button', { name: 'Back to lessons' })).toBeInTheDocument();
+    await userEvent.keyboard('{Escape}');
+    const lose = async () => {
+      while (!screen.queryByText('Not this time'))
+        await userEvent.click(await screen.findByRole('button', { name: /^Thunderbolt, / }));
+    };
+    await lose();
+    expect(screen.getByText('Bring a better Pokémon.')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Replay with help' })).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Replay' }));
+    await lose();
+    await userEvent.click(screen.getByRole('button', { name: 'Replay with help' }));
+    expect(await screen.findByRole('button', { name: /^Thunderbolt, / })).toBeInTheDocument();
+  }, 60_000);
 });

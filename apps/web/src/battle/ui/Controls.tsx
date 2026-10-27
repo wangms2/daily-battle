@@ -284,15 +284,19 @@ function BenchButton({
         // Short phones: the switch cards get shorter (names stay whole) and the bench
         // row's tiles shrink, to leave the battle text room.
         big ? 'short:py-1 py-2' : 'short:py-0.5 short:gap-0 py-1',
-        marking
-          ? markRing(mark, marking)
-          : [
-              current && 'outline-accent outline-2 -outline-offset-2',
-              disabled && !current && 'opacity-40',
-            ],
+        marking ? markRing(mark, marking) : disabled && !current && 'opacity-40',
       )}
     >
-      {mark && <MarkTag mark={mark} />}
+      {mark ? (
+        <MarkTag mark={mark} />
+      ) : (
+        current && (
+          // A plain tag, not a ring: rings are a lesson pointing at something.
+          <span className="pointer-events-none absolute -top-2 left-1/2 z-10 -translate-x-1/2 rounded-full border border-line bg-surface px-1.5 text-[10px] leading-[15px] font-semibold whitespace-nowrap text-muted">
+            In battle
+          </span>
+        )
+      )}
       <img
         src={getSprite(member.species, big ? 'front' : 'icon')}
         alt=""
@@ -392,7 +396,8 @@ export function ControlPanel({
   onChoose: (choice: string) => void;
   /**
    * Review mode (the coach's review): nothing can be chosen; these choices are
-   * tagged and the rest fade.
+   * tagged and the rest fade. Keyed by choice, or `mon:Species` for a Pokémon
+   * whatever its slot (one a staged switch brought in).
    */
   marks?: Record<string, Mark>;
   /**
@@ -504,7 +509,7 @@ export function ControlPanel({
               off={disabled}
               direct={last}
               big
-              mark={marks?.[switchFor(m) ?? '']}
+              mark={marks?.[switchFor(m) ?? ''] ?? marks?.[`mon:${m.species}`]}
               marking={marking}
             />
           ))}
@@ -610,7 +615,7 @@ export function ControlPanel({
             shown={pinnedSlot === m.slot}
             off={off}
             current={m === active}
-            mark={marks?.[switchFor(m) ?? '']}
+            mark={marks?.[switchFor(m) ?? ''] ?? marks?.[`mon:${m.species}`]}
             marking={marking}
           />
         ))}

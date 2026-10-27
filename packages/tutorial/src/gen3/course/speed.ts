@@ -84,7 +84,7 @@ export const speed: Lesson = {
         },
       ],
       otherwise: 'Switch to Snorlax: it takes Drill Peck easily.',
-      spotlight: ['foe-plate', 'switch Snorlax'],
+      spotlight: ['foe-plate'],
     },
     {
       kind: 'practice',
@@ -118,9 +118,11 @@ export const speed: Lesson = {
       player: [HERACROSS, SNORLAX],
       foe: [ZAPDOS, TYRANITAR],
       seed: 'course:speed:battle',
+      hp: { p2: [70, 70] },
       noLuck: true,
       takeaway:
         'The faster Pokémon moves first. If a faster foe can knock you out, your move may never land.',
+      hint: 'Zapdos is faster, and Drill Peck knocks Heracross out. Switch to Snorlax, which takes it, and save Heracross for Tyranitar.',
     },
   ],
 };

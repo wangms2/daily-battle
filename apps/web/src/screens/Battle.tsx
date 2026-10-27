@@ -124,7 +124,12 @@ export interface StagedTurn {
   /** The card's accessible name. */
   label: string;
   /** Parts of the screen to point at before the turn and after it (`data-spot` keys, Spotlight.tsx). */
-  spotlight?: { before?: readonly string[]; after?: readonly string[] };
+  spotlight?: {
+    before?: readonly string[];
+    after?: readonly string[];
+    /** Before the turn: lit without a ring (a practice's answers, the info spots ringed in `before`). */
+    lit?: readonly string[];
+  };
   /** The play button's label before the turn. */
   playLabel?: string;
   /** After the turn, beside "Again": the way on (a lesson's Next). */
@@ -785,30 +790,51 @@ export function Battle({
     </p>
   );
 
-  // A demo the player taps through: only its choice is on.
-  const stagedControls =
-    staged?.tap && decision?.controls && !played
-      ? {
-          ...decision.controls,
-          moves: decision.controls.moves.map((m) => ({
-            ...m,
-            disabled: m.disabled || m.choice !== staged.choice,
-          })),
-          switches: decision.controls.switches.filter((s) => s.choice === staged.choice),
-        }
-      : (decision?.controls ?? null);
+  // A demo the player taps through: only its choice is on. Kept as one object
+  // while the decision stands: a tapped bench card belongs to the controls it
+  // opened on, so a new object each render would close it.
+  const decisionControls = decision?.controls;
+  const tapChoice = staged?.tap && !played ? staged.choice : undefined;
+  const tapControls = useMemo(
+    () =>
+      tapChoice !== undefined && decisionControls
+        ? {
+            ...decisionControls,
+            moves: decisionControls.moves.map((m) => ({
+              ...m,
+              disabled: m.disabled || m.choice !== tapChoice,
+            })),
+            switches: decisionControls.switches.filter((s) => s.choice === tapChoice),
+          }
+        : null,
+    [tapChoice, decisionControls],
+  );
+  // Once a staged turn has played and brought in another Pokémon (a switch),
+  // the panel shows it: its moves, and the tags on it rather than on a slot.
+  const switchedIn =
+    staged &&
+    played &&
+    !playing &&
+    controls?.kind === 'move' &&
+    decision &&
+    active &&
+    decision.team.find((m) => m.active)?.species !== active.species;
+  const stagedControls = switchedIn ? controls : (tapControls ?? decision?.controls ?? null);
+  const stagedTeam = switchedIn ? team : (decision?.team ?? team);
+  const stagedMarks =
+    staged?.marks && switchedIn ? marksBySpecies(staged.marks, decision!) : staged?.marks;
   const controlPanel = staged ? (
     <ControlPanel
       controls={stagedControls}
-      team={decision?.team ?? team}
+      team={stagedTeam}
       hints={settings.beginnerHints}
       disabled={playing}
       onChoose={pick}
       {...(staged.card && staged.card !== 'foe' && !played && { show: staged.card })}
       // Practice: the controls work until the player picks; then the tags show. A turn the
       // player taps through shows them once it's played.
-      {...(staged.marks &&
-        (staged.tap ? played : staged.choice !== undefined || played) && { marks: staged.marks })}
+      {...(stagedMarks &&
+        (staged.tap ? played : staged.choice !== undefined || played) && { marks: stagedMarks })}
     />
   ) : (
     <ControlPanel
@@ -916,6 +942,7 @@ export function Battle({
       : ((played ? staged.spotlight?.after : staged.spotlight?.before) ?? []);
   // The coach's card and the top bar stay lit (unringed): they say what to look at, and how to go on.
   const spotlight = lit;
+  const litPlain = touring || !staged || playing || played ? [] : (staged.spotlight?.lit ?? []);
   // One message at a time: the lesson's own prompt and a beginner hint both
   // come before a coach tip.
   const tip =
@@ -1096,6 +1123,7 @@ export function Battle({
       <Spotlight
         root={rootRef}
         targets={spotlight}
+        lit={litPlain}
         // While the player picks (practice), the controls stay lit too.
         keep={
           touring
@@ -1146,6 +1174,7 @@ export function Battle({
           setChartOpen(true);
         }}
         onLeave={onExit}
+        {...(live && { leaveLabel: live.exitLabel })}
         onGiveUp={() => setGiveUpOpen(true)}
         canGiveUp={!end}
         {...(dailyCoach &&
@@ -1311,4 +1340,21 @@ function ReviewTurnScreen({
       </BattleBackendContext.Provider>
     </div>
   );
+}
+
+/**
+ * A staged turn's tags once another Pokémon has come in: a switch's tag goes on
+ * the Pokémon it brought in (`mon:Species`); the old one's move tags are dropped.
+ */
+function marksBySpecies(
+  marks: Record<string, Mark>,
+  decision: { controls: Controls; team: TeamMember[] },
+): Record<string, Mark> {
+  const out: Record<string, Mark> = {};
+  for (const [choice, mark] of Object.entries(marks)) {
+    const slot = decision.controls.switches.find((s) => s.choice === choice)?.slot;
+    const species = decision.team.find((m) => m.slot === slot)?.species;
+    if (species) out[`mon:${species}`] = mark;
+  }
+  return out;
 }

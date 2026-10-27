@@ -70,7 +70,7 @@ export const switching: Lesson = {
         },
       ],
       otherwise: 'Switch to Celebi: Swampert can’t hurt it much, and Giga Drain hits hard.',
-      spotlight: ['switch Celebi', 'foe-types'],
+      spotlight: ['foe-types'],
     },
     {
       kind: 'practice',
@@ -98,7 +98,7 @@ export const switching: Lesson = {
         },
       ],
       otherwise: 'Switch to Gyarados: Earthquake does nothing to it.',
-      spotlight: ['switch Gyarados', 'foe-types'],
+      spotlight: ['foe-types'],
     },
     {
       kind: 'battle',
@@ -113,6 +113,7 @@ export const switching: Lesson = {
       noLuck: true,
       takeaway:
         'A switch uses your turn, and the new Pokémon takes the foe’s move. Switch to the teammate that does more.',
+      hint: 'Thunderbolt does nothing to Swampert. Switch to Celebi: Giga Drain hits Swampert 4×.',
     },
   ],
 };

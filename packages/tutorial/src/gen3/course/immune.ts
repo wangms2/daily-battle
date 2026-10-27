@@ -127,8 +127,10 @@ export const immune: Lesson = {
         { species: 'Dusclops', moves: ['Seismic Toss'] },
       ],
       seed: 'course:immune:battle',
+      hp: { p2: [80, 80] },
       noLuck: true,
       takeaway: 'A move the foe is immune to does nothing at all. Check its types first.',
+      hint: 'Swampert is Ground type, so Thunderbolt does nothing to it. Dusclops is a Ghost: Shadow Ball hits it hard.',
     },
   ],
 };

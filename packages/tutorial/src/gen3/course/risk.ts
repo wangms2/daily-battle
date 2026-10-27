@@ -3,15 +3,20 @@
 // check what it likely has (its card's Likely line), not just what you've
 // seen. Unlocks the coach's switch-in warnings (switchKo, bigHit). Builds on
 // lessons 1–8; prediction stays out.
+//
+// Zapdos has to leave: Tyranitar's Rock Slide hits it hard. The demo takes the
+// tempting switch, Magneton (it resists Rock), into the Earthquake Tyranitar
+// hadn't shown. The practices bring the same trap to Salamence: Magneton
+// resists Dragon Claw but not Earthquake, and Skarmory takes both.
 import type { Lesson, Mon } from '../../types';
 
 // Tyranitar has shown Rock Slide; Earthquake is the move it hasn't.
 const TYRANITAR: Mon = { species: 'Tyranitar', moves: ['Rock Slide', 'Earthquake'] };
-const SNORLAX: Mon = { species: 'Snorlax', moves: ['Body Slam'] };
-const JOLTEON: Mon = { species: 'Jolteon', moves: ['Thunderbolt'] };
-const SWAMPERT: Mon = { species: 'Swampert', moves: ['Surf'] };
-/** Snorlax leads and Tyranitar shows Rock Slide: the turn before each position. */
-const SHOWN = [{ p1: 'move Body Slam', p2: 'move Rock Slide' }];
+const ZAPDOS: Mon = { species: 'Zapdos', moves: ['Thunderbolt'] };
+const MAGNETON: Mon = { species: 'Magneton', moves: ['Thunderbolt'] };
+const SKARMORY: Mon = { species: 'Skarmory', moves: ['Drill Peck'] };
+/** Zapdos leads and Tyranitar shows Rock Slide: the turn before each position. */
+const SHOWN = [{ p1: 'move Thunderbolt', p2: 'move Rock Slide' }];
 
 export const risk: Lesson = {
   id: 'gen3-risk',
@@ -23,7 +28,7 @@ export const risk: Lesson = {
     {
       kind: 'demo',
       position: {
-        p1: [SNORLAX, JOLTEON, SWAMPERT],
+        p1: [ZAPDOS, MAGNETON, SKARMORY],
         p2: [TYRANITAR],
         rounds: SHOWN,
         seed: 'course:risk:look',
@@ -36,16 +41,17 @@ export const risk: Lesson = {
     {
       kind: 'demo',
       position: {
-        p1: [SNORLAX, JOLTEON, SWAMPERT],
+        p1: [ZAPDOS, MAGNETON, SKARMORY],
         p2: [TYRANITAR],
         rounds: SHOWN,
         seed: 'course:risk:demo',
       },
-      turn: { p1: 'switch Jolteon', p2: 'move Earthquake' },
+      turn: { p1: 'switch Magneton', p2: 'move Earthquake' },
       whole: true,
-      before: 'Jolteon takes Rock Slide fine. Switch it in?',
-      after: 'Tyranitar had Earthquake too. Check what a foe likely has, not just what it’s shown.',
-      spotlight: { before: ['switch Jolteon'], after: ['log'] },
+      before: 'Rock Slide hits Zapdos hard. Magneton resists Rock: switch it in?',
+      after:
+        'Tyranitar had Earthquake too: four times the damage on Magneton. Check what a foe likely has, not just what it’s shown.',
+      spotlight: { before: ['switch Magneton'], after: ['log'] },
     },
     {
       kind: 'practice',
@@ -132,6 +138,7 @@ export const risk: Lesson = {
       noLuck: true,
       takeaway:
         'A foe has four moves, and you’ve seen only some. Before you switch in, check what it likely has.',
+      hint: 'Before you switch in, check what the foe likely has. Tyranitar and Salamence can have Earthquake: don’t bring Jolteon in on them.',
     },
   ],
 };

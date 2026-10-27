@@ -561,3 +561,33 @@ describe.skipIf(!engineBuilt(4))('BattleEngine on Hard', () => {
     expect(resumed.aiChoices?.choices[0]).not.toBe('switch 9');
   }, 30_000);
 });
+
+describe.skipIf(!engineBuilt(3))('the guided replay', () => {
+  it('names a choice every turn, and following it wins the lesson battle', () => {
+    const lesson = gen3Lessons.find((l) => l.id === 'gen3-priority')!;
+    const step = lesson.steps.find((x) => x.kind === 'battle')!;
+    const engine = new BattleEngine(
+      lessonStart(step, lesson.format, lesson.number, true),
+      undefined,
+      undefined,
+      loadEngine(3),
+    );
+    let pkg = engine.begin();
+    for (let i = 0; i < 40 && !pkg.end; i++) {
+      const c = pkg.controls!;
+      let tip = pkg.coach?.tip;
+      while (!tip && engine.coachWork(1000)) tip = engine.coachTip();
+      tip ??= engine.coachTip();
+      let choice = c.only;
+      if (!choice) {
+        expect(tip?.rule).toBe('guide');
+        const name = /^Try (.+)\.$/.exec(tip!.text)![1]!;
+        choice =
+          c.moves.find((m) => m.name === name)?.choice ??
+          c.switches.find((s) => pkg.team.find((m) => m.slot === s.slot)?.species === name)!.choice;
+      }
+      pkg = engine.choose(choice);
+    }
+    expect(pkg.end?.winner).toBe('you');
+  }, 120_000);
+});

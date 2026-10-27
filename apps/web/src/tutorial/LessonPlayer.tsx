@@ -20,6 +20,7 @@ import { backgroundFor } from '../lib/fx';
 import { Battle } from '../screens/Battle';
 import type { Settings } from '../state/schema';
 import { Button } from '../ui/bits';
+import { ChevronIcon } from '../ui/icons';
 import { TopBar } from '../ui/TopBar';
 import { BackButton } from './BackButton';
 import { choiceLabel, lessonSpeed, lessonStart } from './lesson';
@@ -28,6 +29,7 @@ import { LessonIntro } from './LessonIntro';
 export function LessonPlayer({
   lesson,
   step: index,
+  reached = index,
   settings,
   onSetting,
   onExplainerSeen,
@@ -39,6 +41,8 @@ export function LessonPlayer({
   lesson: Lesson;
   /** The step to show (resumes where the player left off). */
   step: number;
+  /** The furthest step reached: the forward arrow goes up to it. */
+  reached?: number;
   settings: Settings;
   onSetting: <K extends keyof Settings>(key: K, value: Settings[K]) => void;
   onExplainerSeen: (id: string) => void;
@@ -61,6 +65,27 @@ export function LessonPlayer({
 
   // A fresh start opens on the lesson's card; resuming goes straight to the step.
   const [started, setStarted] = useState(index > 0);
+  const back = useMemo(() => (index > 0 ? () => onStep(index - 1) : undefined), [index, onStep]);
+  const forward = useMemo(
+    () =>
+      index < Math.min(reached, lesson.steps.length - 1) ? () => onStep(index + 1) : undefined,
+    [index, reached, lesson.steps.length, onStep],
+  );
+  // ← and → move between the slides reached, as the arrows do.
+  useEffect(() => {
+    if (!started) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+      const go = e.key === 'ArrowLeft' ? back : e.key === 'ArrowRight' ? forward : undefined;
+      const target = e.target as Element | null;
+      if (!go || target?.closest?.('input, textarea, select, [role="dialog"]')) return;
+      e.preventDefault();
+      go();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [started, back, forward]);
+  const nav = { index, count: lesson.steps.length, onBack: back, onForward: forward };
   if (!started)
     return (
       <LessonIntro
@@ -82,8 +107,7 @@ export function LessonPlayer({
         background={background}
         settings={settings}
         title={title}
-        index={index}
-        count={lesson.steps.length}
+        nav={nav}
         last={last}
         onNext={next}
         onExit={onExit}
@@ -99,8 +123,7 @@ export function LessonPlayer({
         background={background}
         settings={settings}
         title={title}
-        index={index}
-        count={lesson.steps.length}
+        nav={nav}
         last={last}
         onNext={next}
         onExit={onExit}
@@ -115,6 +138,7 @@ export function LessonPlayer({
         format={lesson.format}
         // The coach talks only about what the lessons so far have taught.
         taught={lesson.number}
+        onBack={back}
         background={background}
         settings={settings}
         onSetting={onSetting}
@@ -129,6 +153,47 @@ export function LessonPlayer({
   return null;
 }
 
+/** Where a slide is in its lesson, and the ways to the ones around it that are open. */
+interface Nav {
+  index: number;
+  count: number;
+  /** The previous slide; none on the first. */
+  onBack: (() => void) | undefined;
+  /** The next slide, once it's been reached; none before that (Next or a solved practice gets there). */
+  onForward: (() => void) | undefined;
+}
+
+/** The header's `‹ 2 of 7 ›`. */
+export function StepNav({ index, count, onBack, onForward }: Nav) {
+  const arrow =
+    'grid size-9 place-items-center rounded-full text-ink hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent';
+  return (
+    <div className="-mr-2 flex shrink-0 items-center">
+      <button
+        type="button"
+        className={arrow}
+        onClick={onBack}
+        disabled={!onBack}
+        aria-label="Previous slide"
+      >
+        <ChevronIcon className="size-[18px] rotate-180" aria-hidden />
+      </button>
+      <span className="text-[13px] text-muted tabular-nums">
+        {index + 1} of {count}
+      </span>
+      <button
+        type="button"
+        className={arrow}
+        onClick={onForward}
+        disabled={!onForward}
+        aria-label="Next slide"
+      >
+        <ChevronIcon className="size-[18px]" aria-hidden />
+      </button>
+    </div>
+  );
+}
+
 function LessonBattle({
   step,
   format,
@@ -141,9 +206,12 @@ function LessonBattle({
   onExit,
   onSettings,
   taught,
+  onBack,
 }: {
   /** The lesson reached, for the coach. */
   taught: number;
+  /** The previous slide, if there is one. */
+  onBack: (() => void) | undefined;
   step: BattleStep;
   format: string;
   background: string;
@@ -158,8 +226,19 @@ function LessonBattle({
   // Bumped to replay the battle from the start.
   const [round, setRound] = useState(0);
   const [intro, setIntro] = useState(true);
+  // Lost twice, the end card offers a guided replay: a tip names the winning
+  // choice each turn (DESIGN.md §22).
+  const [losses, setLosses] = useState(0);
+  const [guide, setGuide] = useState(false);
   // Battle restarts when its start changes, so keep one per lesson step.
-  const start = useMemo(() => lessonStart(step, format, taught), [step, format, taught]);
+  const start = useMemo(
+    () => lessonStart(step, format, taught, guide),
+    [step, format, taught, guide],
+  );
+  const replay = (help: boolean) => {
+    setGuide(help);
+    setRound((r) => r + 1);
+  };
   if (intro)
     return (
       <div className="flex h-full flex-col">
@@ -172,6 +251,11 @@ function LessonBattle({
           <h2 className="display text-[22px]">Practice battle</h2>
           <p className="text-[15px] leading-relaxed">{step.intro}</p>
           <Button onClick={() => setIntro(false)}>Start battle</Button>
+          {onBack && (
+            <Button variant="ghost" onClick={onBack}>
+              Previous slide
+            </Button>
+          )}
         </main>
       </div>
     );
@@ -184,7 +268,9 @@ function LessonBattle({
       onSetting={onSetting}
       onExplainerSeen={onExplainerSeen}
       onChoice={() => {}}
-      onEnd={() => {}}
+      onEnd={(outcome) => {
+        if (outcome.result === 'loss') setLosses((n) => n + 1);
+      }}
       onExit={onExit}
       live={{
         waiting: 'The foe is choosing…',
@@ -195,15 +281,35 @@ function LessonBattle({
             <h2 className="display text-[22px]">
               {end.winner === 'you' ? 'You won!' : 'Not this time'}
             </h2>
+            {end.winner !== 'you' && (
+              <p className="rounded-card bg-surface-2 px-3 py-2 text-[14px] leading-relaxed">
+                <span className="font-semibold">Hint: </span>
+                {step.hint}
+              </p>
+            )}
             <p className="text-[15px] leading-relaxed">{step.takeaway}</p>
+            {end.winner !== 'you' && losses >= 2 && !guide && (
+              <Button variant="secondary" onClick={() => replay(true)}>
+                Replay with help
+              </Button>
+            )}
             <div className="flex gap-2">
-              <Button variant="secondary" className="flex-1" onClick={() => setRound((r) => r + 1)}>
+              <Button variant="secondary" className="flex-1" onClick={() => replay(false)}>
                 Replay
               </Button>
               <Button className="flex-1" onClick={onNext}>
                 {last ? 'Finish lesson' : 'Continue'}
               </Button>
             </div>
+            {onBack && (
+              <button
+                type="button"
+                onClick={onBack}
+                className="min-h-9 text-[13px] font-semibold text-muted"
+              >
+                Previous slide
+              </button>
+            )}
           </div>
         ),
       }}
@@ -222,8 +328,7 @@ function Demo({
   background,
   settings,
   title,
-  index,
-  count,
+  nav,
   last,
   onNext,
   onExit,
@@ -233,8 +338,7 @@ function Demo({
   background: string;
   settings: Settings;
   title: string;
-  index: number;
-  count: number;
+  nav: Nav;
   last: boolean;
   onNext: () => void;
   onExit: () => void;
@@ -284,9 +388,7 @@ function Demo({
   const header = (
     <>
       <BackButton label={title} onClick={onExit} />
-      <span className="text-[13px] text-muted tabular-nums">
-        {index + 1} of {count}
-      </span>
+      <StepNav {...nav} />
     </>
   );
   return (
@@ -332,6 +434,10 @@ function Demo({
   );
 }
 
+/** A practice's answers, as spots to light. */
+const answerSpots = (choices: (string | null)[] | null): string[] =>
+  (choices ?? []).filter((c): c is string => !!c);
+
 /** The battle screen's start for a lesson position shown as a staged turn. */
 const stagedStart = (format: string, seed: string, foe: Mon[] = []): EngineStart => ({
   format,
@@ -355,8 +461,7 @@ function Practice({
   background,
   settings,
   title,
-  index,
-  count,
+  nav,
   last,
   onNext,
   onExit,
@@ -366,8 +471,7 @@ function Practice({
   background: string;
   settings: Settings;
   title: string;
-  index: number;
-  count: number;
+  nav: Nav;
   last: boolean;
   onNext: () => void;
   onExit: () => void;
@@ -429,9 +533,7 @@ function Practice({
   const header = (
     <>
       <BackButton label={title} onClick={onExit} />
-      <span className="text-[13px] text-muted tabular-nums">
-        {index + 1} of {count}
-      </span>
+      <StepNav {...nav} />
     </>
   );
   const nextButton = (
@@ -533,7 +635,8 @@ function Practice({
                 before: <p>{step.prompt}</p>,
                 after: feedback,
                 label: 'Practice',
-                spotlight: { before: spots },
+                // Every answer is lit the same, without a ring; the info to look at is ringed.
+                spotlight: { before: spots, lit: answerSpots(choices) },
                 onPick: setPicked,
                 again: false,
                 stack: !right,

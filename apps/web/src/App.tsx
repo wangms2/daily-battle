@@ -387,6 +387,14 @@ export function App() {
           key={lesson.id}
           lesson={lesson}
           step={progress?.current?.lesson === lesson.id ? progress.current.step : 0}
+          // A finished lesson's slides are all open; else up to the furthest reached.
+          reached={
+            progress?.completed.includes(lesson.id)
+              ? lesson.steps.length - 1
+              : progress?.current?.lesson === lesson.id
+                ? (progress.current.reached ?? progress.current.step)
+                : 0
+          }
           settings={settings}
           onSetting={setSetting}
           onExplainerSeen={(id) => dispatchAny({ type: 'markExplainer', id })}

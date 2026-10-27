@@ -1,4 +1,12 @@
-export { battleInput, foePolicy, startPosition } from './battle';
+export { battleSession, foePolicy, playBattle, setStartHp, startPosition } from './battle';
+export {
+  guideKey,
+  guideNote,
+  guideSwitch,
+  lessonJudge,
+  winCheck,
+  type WinCheck,
+} from './coach/guide';
 export { gen3Lessons, LESSONS } from './lessons';
 export { knownSets, monSet, teamOf, withLessonSets } from './teams';
 export type * from './types';

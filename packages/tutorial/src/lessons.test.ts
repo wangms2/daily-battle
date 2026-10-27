@@ -1,5 +1,6 @@
 import { engineBuilt, loadEngine } from '@daily-battle/engine-wasm/node';
 import { describe, expect, it } from 'vitest';
+import { winCheck } from './coach/guide';
 import { battlePressure, practiceCheck } from './coach/lesson-check';
 import { LESSONS } from './index';
 import { lessonProblems } from './validate';
@@ -80,4 +81,17 @@ describe.skipIf(!engineBuilt(3))('lesson battles stay in scope', () => {
           const p = battlePressure(loadEngine(3), lesson.format, step, lesson.number, 3);
           expect(p.outOfScope / p.decisions).toBeLessThanOrEqual(0.05);
         }, 300_000);
+});
+
+// Lesson battles: the guided replay's line wins the battle the app plays
+// (the step's seed) and nearly always on other seeds (DESIGN.md §22).
+describe.skipIf(!engineBuilt(3))('lesson battles can be won', () => {
+  for (const lesson of LESSONS.gen3ou ?? [])
+    for (const [n, step] of lesson.steps.entries())
+      if (step.kind === 'battle')
+        it(`${lesson.id} step ${n + 1}`, () => {
+          const r = winCheck(loadEngine(3), lesson.format, step, 10);
+          expect(r.guided).toBe(true);
+          expect(r.wins).toBeGreaterThanOrEqual(0.9);
+        }, 120_000);
 });

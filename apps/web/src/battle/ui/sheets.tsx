@@ -51,6 +51,7 @@ export function MenuSheet({
   onLog,
   onChart,
   onLeave,
+  leaveLabel = 'Back to today (battle is saved)',
   onGiveUp,
   canGiveUp,
   coach,
@@ -67,6 +68,8 @@ export function MenuSheet({
   /** The type chart, for this battle's game. */
   onChart: () => void;
   onLeave: () => void;
+  /** The way out, e.g. "Back to lessons" (the daily's by default). */
+  leaveLabel?: string;
   onGiveUp: () => void;
   canGiveUp: boolean;
 }) {
@@ -102,7 +105,7 @@ export function MenuSheet({
           Type chart
         </Button>
         <Button variant="secondary" onClick={onLeave}>
-          Back to today (battle is saved)
+          {leaveLabel}
         </Button>
         {canGiveUp && (
           <Button variant="ghost" className="text-bad" onClick={onGiveUp}>

@@ -98,6 +98,7 @@ export const freeTurns: Lesson = {
       seed: 'course:free-turns:battle',
       noLuck: true,
       takeaway: 'A turn the foe can’t hurt you is a free turn. Hit as hard as you can, or heal.',
+      hint: 'When the foe can’t hurt you much, hit as hard as you can, or heal with Soft-Boiled.',
     },
   ],
 };
