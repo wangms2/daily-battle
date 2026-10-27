@@ -276,6 +276,15 @@ describe('battle screen', () => {
     expect(await thunderbolt()).toBeEnabled();
   });
 
+  it('skips playback on a tap in the empty space around the field too', async () => {
+    const { backend } = fakeBackend([]);
+    renderBattle(backend, { speed: 'slow' });
+    await screen.findAllByText('Heatran', { selector: 'strong' });
+    expect(screen.queryByRole('button', { name: /^Thunderbolt, / })).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole('main'));
+    expect(await thunderbolt()).toBeEnabled();
+  });
+
   it('sends a chosen move, saves it, and plays the answer', async () => {
     const { backend, calls } = fakeBackend([TURN_1]);
     const props = renderBattle(backend);

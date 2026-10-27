@@ -11,6 +11,7 @@ import {
   megaClash,
   megaFor,
   ONE_MEGA_MESSAGE,
+  randomTeam,
   sameSpecies,
   topSet,
   type Slot,
@@ -21,7 +22,7 @@ import { ConfirmDialog, TeamCheckSheet } from '../sheets/misc';
 import { InfoSheet } from '../sheets/InfoSheet';
 import { SetPicker } from '../sheets/SetPicker';
 import { Button, SectionLabel } from '../ui/bits';
-import { CheckIcon, ChevronIcon, CloseIcon } from '../ui/icons';
+import { CheckIcon, ChevronIcon, CloseIcon, DiceIcon } from '../ui/icons';
 import { PokemonRow, PokemonTile } from '../ui/PokemonTile';
 import { DetailsPanel } from '../ui/DetailsPanel';
 import { useWide } from '../ui/useWide';
@@ -79,7 +80,10 @@ export function TeamBuilder({
     setPicker(species ? { species, adding: false } : null);
   const [checklistOpen, setChecklistOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
-  const [snack, setSnack] = useState<{ message: string; undo?: Slot[] } | null>(null);
+  // undo: the team before; reroll: offers another random team in place.
+  const [snack, setSnack] = useState<{ message: string; undo?: Slot[]; reroll?: boolean } | null>(
+    null,
+  );
   // Wide: the Pokémon in the details panel, and the set previewed for it.
   const [viewing, setViewing] = useState<string | null>(null);
   const [preview, setPreview] = useState<string | undefined>();
@@ -147,6 +151,11 @@ export function TeamBuilder({
     setSnack({ message: 'Recommended team added', undo: team });
     setTeam(recommended.map((slot) => ({ ...slot })));
   };
+  // Any Pokémon, any sets; tap again for another. Undo goes back to before the first roll.
+  const applyRandom = () => {
+    setSnack({ message: 'Random team', undo: snack?.reroll ? snack.undo : team, reroll: true });
+    setTeam(randomTeam(schedule.pool.species, size, team));
+  };
 
   const setSetFor = (species: string, setId: string) => {
     if (megaBlocked(species, setId)) return;
@@ -154,7 +163,7 @@ export function TeamBuilder({
   };
 
   // The undo message takes the button's place, so it never covers controls.
-  const recommendRow = recommended && (
+  const recommendRow = (
     <div className="flex shrink-0 flex-col gap-1">
       <div className="flex items-baseline gap-2">
         <h2 className="display text-[12px] tracking-wider text-muted uppercase">
@@ -179,6 +188,16 @@ export function TeamBuilder({
           >
             {snack.message}
           </span>
+          {snack.reroll && (
+            <button
+              type="button"
+              aria-label="Another random team"
+              className="grid size-9 place-items-center text-soft-ink active:scale-[0.94]"
+              onClick={applyRandom}
+            >
+              <DiceIcon width={20} height={20} />
+            </button>
+          )}
           {snack.undo && (
             <button
               type="button"
@@ -193,24 +212,41 @@ export function TeamBuilder({
           )}
         </div>
       ) : (
-        <button
-          type="button"
-          onClick={applyRecommended}
-          aria-label="Use recommended team"
-          className="chip flex h-10 items-center gap-2 pr-3 pl-1 active:scale-[0.99]"
-        >
-          <span className="flex min-w-0 flex-1 items-center">
-            {recommended.map((slot) => (
-              <img
-                key={slot.species}
-                src={getSprite(slot.species, 'icon')}
-                alt=""
-                className="pixelated -mr-2 h-8 w-10 shrink-0 object-contain"
-              />
-            ))}
-          </span>
-          <span className="shrink-0 text-[14px] font-semibold">Use team</span>
-        </button>
+        <div className="flex h-10 gap-2">
+          {recommended && (
+            <button
+              type="button"
+              onClick={applyRecommended}
+              aria-label="Use recommended team"
+              className="chip flex h-10 min-w-0 flex-1 items-center gap-2 pr-3 pl-1 active:scale-[0.99]"
+            >
+              <span className="flex min-w-0 flex-1 items-center overflow-hidden">
+                {recommended.map((slot) => (
+                  <img
+                    key={slot.species}
+                    src={getSprite(slot.species, 'icon')}
+                    alt=""
+                    className="pixelated -mr-2 h-8 w-10 shrink-0 object-contain"
+                  />
+                ))}
+              </span>
+              <span className="shrink-0 text-[14px] font-semibold">Use team</span>
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={applyRandom}
+            aria-label="Random team"
+            title="Random team"
+            className={clsx(
+              'chip flex h-10 shrink-0 items-center justify-center gap-1.5 active:scale-[0.97]',
+              recommended ? 'w-10' : 'px-4 text-[14px] font-semibold',
+            )}
+          >
+            <DiceIcon width={20} height={20} />
+            {!recommended && 'Random team'}
+          </button>
+        </div>
       )}
     </div>
   );

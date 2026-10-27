@@ -208,6 +208,21 @@ describe('team builder', () => {
     expect(screen.getByRole('button', { name: /Pick 1 more/ })).toBeInTheDocument();
   });
 
+  it('rolls random teams again and again, and undo goes back to before the first', async () => {
+    const user = userEvent.setup();
+    renderApp(seeded());
+    await user.click(await screen.findByRole('button', { name: 'Random team' }));
+    expect(screen.getByRole('button', { name: 'Lock in team' })).toBeEnabled();
+    const members = () =>
+      screen.getAllByRole('button', { name: /^Remove .* from team$/ }).map((b) => b.ariaLabel);
+    expect(members()).toHaveLength(6);
+    await user.click(screen.getByRole('button', { name: 'Another random team' }));
+    await user.click(screen.getByRole('button', { name: 'Another random team' }));
+    expect(members()).toHaveLength(6);
+    await user.click(screen.getByRole('button', { name: 'Undo' }));
+    expect(screen.getByRole('button', { name: /Pick 6 more/ })).toBeInTheDocument();
+  });
+
   it('shows the team checklist only with Beginner hints on', async () => {
     const user = userEvent.setup();
     renderApp(seeded({ hints: true }));

@@ -157,6 +157,34 @@ export function megaClash(team: Slot[], slot: Slot): string | undefined {
   return team.find((s) => s.species !== slot.species && megaFor(s.species, findSet(s)))?.species;
 }
 
+/**
+ * A random team of `size` from the pool, any sets, keeping the builder's rules
+ * (one per species, one Mega). Never the same as `current` when it can help it.
+ */
+export function randomTeam(
+  pool: string[],
+  size: number,
+  current: Slot[] = [],
+  random: () => number = Math.random,
+): Slot[] {
+  const pick = <T>(xs: T[]) => xs[Math.floor(random() * xs.length)]!;
+  const same = (a: Slot[], b: Slot[]) =>
+    a.length === b.length && a.every((s) => b.some((t) => t.setId === s.setId));
+  let team: Slot[] = [];
+  for (let tries = 0; tries < 10; tries++) {
+    team = [];
+    const left = [...pool];
+    while (team.length < size && left.length) {
+      const species = left.splice(Math.floor(random() * left.length), 1)[0]!;
+      if (team.some((s) => sameSpecies(s.species, species))) continue;
+      const allowed = setsOf(species).filter((set) => !megaClash(team, { species, setId: set.id }));
+      if (allowed.length) team.push({ species, setId: pick(allowed).id });
+    }
+    if (!same(team, current)) break;
+  }
+  return team;
+}
+
 /** Whether any of a species' sets can Mega Evolve (for the "Can Mega Evolve" hint). */
 export const canMega = (species: string) =>
   Object.keys(speciesData.species[species]?.megas ?? {}).length > 0;

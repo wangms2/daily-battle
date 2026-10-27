@@ -618,6 +618,15 @@ export function Battle({
     return () => window.removeEventListener('keydown', onKey);
   }, [playing, end]);
 
+  // During playback a tap anywhere in the battle area skips, not just on the field or log:
+  // empty space included. Controls, and the field and log (which skip on their own), don't.
+  const tapToSkip = (e: React.MouseEvent) => {
+    if (!playing) return;
+    const target = e.target as Element;
+    if (target.closest('button, a, input, select, textarea, [role="dialog"], [data-taps]')) return;
+    skip();
+  };
+
   const showExplainer = explainer && settings.beginnerHints && !end;
 
   // The hint leaves on its own after a few seconds (and slides back up next time).
@@ -639,6 +648,7 @@ export function Battle({
     <div
       role="log"
       aria-label="Battle log"
+      data-taps
       onClick={() => playing && skip()}
       className="card relative flex min-h-0 flex-1 basis-0 flex-col p-4"
     >
@@ -656,7 +666,7 @@ export function Battle({
   // field that takes the spare height (see battle/ui/BattleLog.tsx).
   const gen = formatInfo(format).gen;
   const textbox = (
-    <div data-spot="log" className="flex min-h-[3.25rem] flex-1 basis-0 flex-col">
+    <div data-spot="log" data-taps className="flex min-h-[3.25rem] flex-1 basis-0 flex-col">
       <BattleLog
         log={log}
         follow={follow}
@@ -779,7 +789,7 @@ export function Battle({
   );
 
   const field = (
-    <div className={clsx('relative w-full', wide ? 'shrink-0' : 'shrink')}>
+    <div data-taps className={clsx('relative w-full', wide ? 'shrink-0' : 'shrink')}>
       <Field
         // Wide screens keep the scene's own shape. Phones get a taller field, which zooms
         // the scene a little (--s covers it) so it reads bigger.
@@ -1190,7 +1200,10 @@ export function Battle({
         // A size container: the stage (field + controls) and the log sit side by side,
         // the stage as wide as fits (up to a comfortable 960px) with room for the
         // controls below, and the log matching its height.
-        <main className="battle-main relative flex min-h-0 flex-1 justify-center px-6 pb-6">
+        <main
+          className="battle-main relative flex min-h-0 flex-1 justify-center px-6 pb-6"
+          onClick={tapToSkip}
+        >
           <div className="flex min-h-0 items-stretch gap-5 self-start">
             <section className="battle-stage flex min-h-0 shrink-0 flex-col gap-2">
               {field}
@@ -1204,7 +1217,10 @@ export function Battle({
           {endCard}
         </main>
       ) : (
-        <main className="relative flex min-h-0 flex-1 flex-col gap-2 px-2 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+        <main
+          className="relative flex min-h-0 flex-1 flex-col gap-2 px-2 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
+          onClick={tapToSkip}
+        >
           {field}
           {textbox}
           {panel}

@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import {
+  canMega,
+  megaFor,
+  ouSpecies,
+  randomTeam,
+  setActiveFormat,
   likelyMoves,
   abilityInfo,
   defenseGaps,
@@ -88,5 +93,42 @@ describe('species facts', () => {
   it('treats forms of one Pokémon as the same species', () => {
     expect(sameSpecies('Rotom-Wash', 'Rotom-Frost')).toBe(true);
     expect(sameSpecies('Rotom-Wash', 'Gengar')).toBe(false);
+  });
+});
+
+describe('randomTeam', () => {
+  it('fills the team from the pool, one per species, and changes on each roll', () => {
+    const pool = [
+      'Rotom-Wash',
+      'Rotom-Frost',
+      'Infernape',
+      'Latias',
+      'Breloom',
+      'Metagross',
+      'Gengar',
+    ];
+    let last: ReturnType<typeof randomTeam> = [];
+    for (let i = 0; i < 40; i++) {
+      const team = randomTeam(pool, 6, last);
+      expect(team).toHaveLength(6);
+      expect(team.filter((s) => s.species.startsWith('Rotom'))).toHaveLength(1);
+      expect(team.every((s) => pool.includes(s.species) && findSet(s))).toBe(true);
+      expect(team.map((s) => s.setId).sort()).not.toEqual(last.map((s) => s.setId).sort());
+      last = team;
+    }
+    expect(randomTeam(pool, 3)).toHaveLength(3);
+  });
+
+  it('never gives two Megas (Gen 6)', () => {
+    setActiveFormat('gen6ou');
+    try {
+      const pool = ouSpecies().filter(canMega);
+      for (let i = 0; i < 40; i++) {
+        const megas = randomTeam(pool, 6).filter((s) => megaFor(s.species, findSet(s)));
+        expect(megas.length).toBeLessThanOrEqual(1);
+      }
+    } finally {
+      setActiveFormat('gen4ou');
+    }
   });
 });
