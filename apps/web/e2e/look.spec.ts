@@ -19,7 +19,7 @@ for (const scheme of ['light', 'dark'] as const) {
       await page.getByRole('button', { name: 'Let’s play' }).click();
       await page.screenshot({ path: `${dir}/builder-empty.png` });
 
-      await page.getByRole('button', { name: 'Balanced' }).click();
+      await page.getByRole('button', { name: 'Use recommended team' }).click();
       await page.screenshot({ path: `${dir}/builder-undo.png` });
       await page.waitForTimeout(5300);
       await page.screenshot({ path: `${dir}/builder.png` });

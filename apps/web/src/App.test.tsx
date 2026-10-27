@@ -141,7 +141,7 @@ describe('team builder', () => {
     await user.click(screen.getByRole('button', { name: 'Dismiss' }));
     expect(screen.queryByText(/Pick your team again/)).not.toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: schedule.suggestedTeams[0]!.archetype }));
+    await user.click(screen.getByRole('button', { name: 'Use recommended team' }));
     await user.click(screen.getByRole('button', { name: 'Lock in team' }));
     const confirm = screen.queryByRole('dialog', { name: /Lock/ });
     if (confirm) await user.click(within(confirm).getByRole('button', { name: /Lock/ }));
@@ -192,16 +192,16 @@ describe('team builder', () => {
     expect(screen.getAllByRole('button', { name: /^Remove .* from team$/ })).toHaveLength(6);
   }, 20_000);
 
-  it('applies a suggested team, offers undo, and stays editable', async () => {
+  it('applies the recommended team, offers undo, and stays editable', async () => {
     const user = userEvent.setup();
     renderApp(seeded());
     const suggestion = schedule.suggestedTeams[0]!;
-    await user.click(await screen.findByRole('button', { name: suggestion.archetype }));
+    await user.click(await screen.findByRole('button', { name: 'Use recommended team' }));
     expect(screen.getByRole('button', { name: 'Lock in team' })).toBeEnabled();
     await user.click(screen.getByRole('button', { name: 'Undo' }));
     expect(screen.getByRole('button', { name: /Pick 6 more/ })).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: suggestion.archetype }));
+    await user.click(screen.getByRole('button', { name: 'Use recommended team' }));
     await user.click(
       screen.getByRole('button', { name: `Remove ${suggestion.team[0]!.species} from team` }),
     );
@@ -222,9 +222,7 @@ describe('team builder', () => {
   it('locks the team and goes to the daily brief', async () => {
     const user = userEvent.setup();
     renderApp(seeded());
-    await user.click(
-      await screen.findByRole('button', { name: schedule.suggestedTeams[0]!.archetype }),
-    );
+    await user.click(await screen.findByRole('button', { name: 'Use recommended team' }));
     await user.click(screen.getByRole('button', { name: 'Lock in team' }));
     await user.click(screen.getByRole('button', { name: /^Lock in$/ }));
     expect(await screen.findByRole('button', { name: /^Start · / })).toBeInTheDocument();

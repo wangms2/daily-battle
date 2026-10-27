@@ -3,8 +3,6 @@
 import type { Style } from './opponent';
 import type { TeamSlot } from './sets';
 
-export type Archetype = 'Balanced' | 'Offense' | 'Stall';
-
 export interface ScheduleFile {
   version: 1;
   generatorVersion: number;
@@ -13,7 +11,8 @@ export interface ScheduleFile {
   /** Monday of the week, `YYYY-MM-DD`. */
   week: string;
   pool: { species: string[]; candidate: number };
-  suggestedTeams: { archetype: Archetype; team: TeamSlot[] }[];
+  /** The builder's recommended team: none or one (older files had up to three). */
+  suggestedTeams: { team: TeamSlot[] }[];
   /** Monday first. The client shows only species from these teams. */
   days: { day: string; style: Style; team: TeamSlot[]; candidate: number }[];
 }

@@ -22,85 +22,26 @@
   },
   "suggestedTeams": [
     {
-      "archetype": "Balanced",
       "team": [
         {
-          "species": "Landorus-Therian",
-          "setId": "landorustherian-choice-scarf"
-        },
-        {
-          "species": "Tyranitar",
-          "setId": "tyranitar-bulky-pursuit-trapper"
-        },
-        {
-          "species": "Politoed",
-          "setId": "politoed-defensive"
+          "species": "Crobat",
+          "setId": "crobat-choice-band"
         },
         {
           "species": "Magnezone",
           "setId": "magnezone-choice-scarf"
         },
         {
-          "species": "Heatran",
-          "setId": "heatran-sunny-day-trapper"
+          "species": "Latias",
+          "setId": "latias-choice-scarf"
         },
         {
           "species": "Dragonite",
           "setId": "dragonite-3-attacks-dragon-dance"
-        }
-      ]
-    },
-    {
-      "archetype": "Offense",
-      "team": [
+        },
         {
           "species": "Landorus-Therian",
           "setId": "landorustherian-choice-scarf"
-        },
-        {
-          "species": "Weavile",
-          "setId": "weavile-physical-attacker"
-        },
-        {
-          "species": "Heatran",
-          "setId": "heatran-sunny-day-trapper"
-        },
-        {
-          "species": "Politoed",
-          "setId": "politoed-choice-specs"
-        },
-        {
-          "species": "Reuniclus",
-          "setId": "reuniclus-3-attacks"
-        },
-        {
-          "species": "Dragonite",
-          "setId": "dragonite-3-attacks-dragon-dance"
-        }
-      ]
-    },
-    {
-      "archetype": "Stall",
-      "team": [
-        {
-          "species": "Crobat",
-          "setId": "crobat-stallbreaker"
-        },
-        {
-          "species": "Heatran",
-          "setId": "heatran-specially-defensive"
-        },
-        {
-          "species": "Reuniclus",
-          "setId": "reuniclus-calm-mind"
-        },
-        {
-          "species": "Politoed",
-          "setId": "politoed-defensive"
-        },
-        {
-          "species": "Landorus-Therian",
-          "setId": "landorustherian-defensive"
         },
         {
           "species": "Tyranitar",

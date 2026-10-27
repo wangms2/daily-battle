@@ -25,6 +25,7 @@ import { getSprite } from '../lib/sprites';
 import { CloseIcon } from '../ui/icons';
 import { Sheet } from '../ui/Sheet';
 import { useWide } from '../ui/useWide';
+import { useSpritesReady } from '../ui/useSpritesReady';
 import { Page } from './Page';
 
 interface Option<T> {
@@ -130,6 +131,7 @@ export function Lobby({
   const [copied, setCopied] = useState(false);
   const [editingRules, setEditingRules] = useState(false);
   const wide = useWide();
+  const pool = useSpritesReady(room.pool?.species ?? [], 'icon');
   // A big room gets compact rows.
   const dense = room.players.length > 4;
   const link = `${window.location.origin}/#versus/${room.code}`;
@@ -340,13 +342,19 @@ export function Lobby({
           </SectionLabel>
           {room.pool && (
             <ul className="grid grid-cols-12 gap-0.5" aria-label="The pool">
-              {room.pool.species.map((sp) => (
-                <li key={sp} title={sp}>
-                  <img
-                    src={getSprite(sp, 'icon')}
-                    alt={sp}
-                    className="pixelated aspect-[4/3] w-full object-contain"
-                  />
+              {/* All 12 appear together: a redraw keeps the old pool up until every
+                new sprite has loaded, and the first draw holds empty spaces. */}
+              {(pool ?? room.pool.species.map(() => '')).map((sp, i) => (
+                <li key={sp || i} title={sp || undefined}>
+                  {sp ? (
+                    <img
+                      src={getSprite(sp, 'icon')}
+                      alt={sp}
+                      className="pixelated aspect-[4/3] w-full object-contain"
+                    />
+                  ) : (
+                    <span className="block aspect-[4/3] w-full" />
+                  )}
                 </li>
               ))}
             </ul>

@@ -268,17 +268,9 @@ export function defenseGaps(team: string[]): { type: string; species: string[] }
     .map(({ type, species }) => ({ type, species }));
 }
 
-const HAZARDS = ['Stealth Rock', 'Spikes', 'Toxic Spikes', 'Sticky Web'];
-const REMOVAL = ['Rapid Spin', 'Defog'];
-const isBulky = (s: SetEntry) => s.evs.hp >= 200 && Math.max(s.evs.def, s.evs.spd) >= 160;
-
-export interface Checklist {
-  hazards: boolean;
-  removal: boolean;
-  physical: boolean;
-  special: boolean;
-  defensive: boolean;
-}
+// The checklist logic is shared with the pipeline's recommended team.
+import { type Checklist } from '@daily-battle/gen/checklist';
+export { checklist, type Checklist } from '@daily-battle/gen/checklist';
 
 export const CHECK_ITEMS: { key: keyof Checklist; label: string; why: string }[] = [
   { key: 'hazards', label: 'Hazards', why: 'Stealth Rock or Spikes chip every switch-in.' },
@@ -287,18 +279,6 @@ export const CHECK_ITEMS: { key: keyof Checklist; label: string; why: string }[]
   { key: 'special', label: 'Special', why: 'A strong special attacker.' },
   { key: 'defensive', label: 'Defense', why: 'A bulky Pokémon to take hits.' },
 ];
-
-/** Beginner checklist (§12.2a) for the chosen sets. */
-export function checklist(team: SetEntry[]): Checklist {
-  const any = (pred: (s: SetEntry) => boolean) => team.some(pred);
-  return {
-    hazards: any((s) => s.moves.some((m) => HAZARDS.includes(m))),
-    removal: any((s) => s.moves.some((m) => REMOVAL.includes(m))),
-    physical: any((s) => !isBulky(s) && s.evs.atk >= 200),
-    special: any((s) => !isBulky(s) && s.evs.spa >= 200),
-    defensive: any(isBulky),
-  };
-}
 
 const STAT_LABEL: Record<string, string> = {
   hp: 'HP',

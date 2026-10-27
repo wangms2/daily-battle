@@ -8,6 +8,7 @@
   "scripts": {
     "calibrate": "tsx scripts/calibrate.ts",
     "schedule": "tsx scripts/schedule.ts",
+    "recommend": "tsx scripts/recommend.ts",
     "typecheck": "tsc --noEmit",
     "difficulty-report": "tsx scripts/difficulty-report.ts"
   },

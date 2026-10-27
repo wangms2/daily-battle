@@ -13,94 +13,35 @@
     "problems": [],
     "suggested": [
       {
-        "archetype": "Balanced",
         "team": [
           {
-            "species": "Nidoqueen",
-            "setId": "nidoqueen-physically-defensive-toxic-spikes"
-          },
-          {
-            "species": "Suicune",
-            "setId": "suicune-supercune-offensive-calm-mind"
-          },
-          {
-            "species": "Gastrodon",
-            "setId": "gastrodon-curse"
-          },
-          {
-            "species": "Togekiss",
-            "setId": "togekiss-defensive-nasty-plot"
+            "species": "Celebi",
+            "setId": "celebi-nasty-plot"
           },
           {
             "species": "Scizor",
             "setId": "scizor-choice-band"
           },
           {
-            "species": "Celebi",
-            "setId": "celebi-utility"
-          }
-        ],
-        "winRate": 0.625
-      },
-      {
-        "archetype": "Offense",
-        "team": [
-          {
-            "species": "Hitmontop",
-            "setId": "hitmontop-life-orb"
-          },
-          {
-            "species": "Tyranitar",
-            "setId": "tyranitar-choice-scarf"
+            "species": "Suicune",
+            "setId": "suicune-subcune"
           },
           {
             "species": "Heatran",
             "setId": "heatran-choice-scarf"
           },
           {
-            "species": "Suicune",
-            "setId": "suicune-subcune"
+            "species": "Hitmontop",
+            "setId": "hitmontop-rapid-spin"
           },
           {
-            "species": "Scizor",
-            "setId": "scizor-bulky-swords-dance"
-          },
-          {
-            "species": "Celebi",
-            "setId": "celebi-nasty-plot"
+            "species": "Infernape",
+            "setId": "infernape-mixed-attacker"
           }
         ],
-        "winRate": 0.8
-      },
-      {
-        "archetype": "Stall",
-        "team": [
-          {
-            "species": "Gastrodon",
-            "setId": "gastrodon-curse"
-          },
-          {
-            "species": "Steelix",
-            "setId": "steelix-curse"
-          },
-          {
-            "species": "Heatran",
-            "setId": "heatran-utility"
-          },
-          {
-            "species": "Suicune",
-            "setId": "suicune-crocune-defensive-calm-mind-resttalk"
-          },
-          {
-            "species": "Celebi",
-            "setId": "celebi-utility"
-          },
-          {
-            "species": "Tyranitar",
-            "setId": "tyranitar-all-purpose"
-          }
-        ],
-        "winRate": 0.425
+        "winRate": 0.6822916666666666,
+        "battles": 192,
+        "rules": "all"
       }
     ],
     "candidate": 0,

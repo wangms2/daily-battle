@@ -1,5 +1,5 @@
 // Weekly team builder (DESIGN.md §12.2a). Phone: one screen, no scrolling:
-// suggestions, the 4×3 pool, the checklist, the tray, and Lock in.
+// the recommended team, the 4×3 pool, the checklist, the tray, and Lock in.
 // Wide: compact pool cards on the left, the team panel on the right.
 import type { ScheduleFile } from '@daily-battle/gen/schedule';
 import clsx from 'clsx';
@@ -25,13 +25,6 @@ import { CheckIcon, ChevronIcon, CloseIcon } from '../ui/icons';
 import { PokemonRow, PokemonTile } from '../ui/PokemonTile';
 import { DetailsPanel } from '../ui/DetailsPanel';
 import { useWide } from '../ui/useWide';
-
-/** Archetype dots: Dialga blue, Giratina crimson, Palkia mauve. */
-const ARCHETYPE_DOT: Record<string, string> = {
-  Balanced: 'var(--accent)',
-  Offense: 'var(--bad)',
-  Stall: 'var(--accent-soft-text)',
-};
 
 export function TeamBuilder({
   schedule,
@@ -147,10 +140,12 @@ export function TeamBuilder({
     add(species, (species === viewing && preview) || topSet(species).id);
   };
 
-  const applySuggested = (i: number) => {
-    const s = schedule.suggestedTeams[i]!;
-    setSnack({ message: `Applied ${s.archetype}`, undo: team });
-    setTeam(s.team.map((slot) => ({ ...slot })));
+  // The week's recommended team (DESIGN.md §9.2), if the pipeline found one.
+  const recommended = schedule.suggestedTeams[0]?.team;
+  const applyRecommended = () => {
+    if (!recommended) return;
+    setSnack({ message: 'Recommended team added', undo: team });
+    setTeam(recommended.map((slot) => ({ ...slot })));
   };
 
   const setSetFor = (species: string, setId: string) => {
@@ -158,12 +153,14 @@ export function TeamBuilder({
     setTeam((t) => t.map((s) => (s.species === species ? { ...s, setId } : s)));
   };
 
-  // The undo message takes the chips' place, so it never covers controls.
-  const suggestions = schedule.suggestedTeams.length > 0 && (
+  // The undo message takes the button's place, so it never covers controls.
+  const recommendRow = recommended && (
     <div className="flex shrink-0 flex-col gap-1">
       <div className="flex items-baseline gap-2">
-        <h2 className="display text-[12px] tracking-wider text-muted uppercase">Suggested teams</h2>
-        <span className="truncate text-[12px] text-muted">Pick one to fill your team</span>
+        <h2 className="display text-[12px] tracking-wider text-muted uppercase">
+          Recommended team
+        </h2>
+        <span className="truncate text-[12px] text-muted">Strong and ready to battle</span>
       </div>
       {snack ? (
         <div
@@ -196,23 +193,24 @@ export function TeamBuilder({
           )}
         </div>
       ) : (
-        <div className="flex h-10 items-center gap-2 overflow-hidden">
-          {schedule.suggestedTeams.map((s, i) => (
-            <button
-              key={s.archetype}
-              type="button"
-              onClick={() => applySuggested(i)}
-              className="chip flex h-9 items-center gap-1.5 px-3 text-[14px] font-semibold active:scale-[0.97]"
-            >
-              <span
-                className="size-2 rounded-full"
-                style={{ background: ARCHETYPE_DOT[s.archetype] }}
-                aria-hidden
+        <button
+          type="button"
+          onClick={applyRecommended}
+          aria-label="Use recommended team"
+          className="chip flex h-10 items-center gap-2 pr-3 pl-1 active:scale-[0.99]"
+        >
+          <span className="flex min-w-0 flex-1 items-center">
+            {recommended.map((slot) => (
+              <img
+                key={slot.species}
+                src={getSprite(slot.species, 'icon')}
+                alt=""
+                className="pixelated -mr-2 h-8 w-10 shrink-0 object-contain"
               />
-              {s.archetype}
-            </button>
-          ))}
-        </div>
+            ))}
+          </span>
+          <span className="shrink-0 text-[14px] font-semibold">Use team</span>
+        </button>
       )}
     </div>
   );
@@ -334,7 +332,7 @@ export function TeamBuilder({
           </section>
           <aside className="card flex max-h-full min-h-0 flex-col gap-3 p-4">
             {noticeBar}
-            {suggestions}
+            {recommendRow}
             <SectionLabel
               right={
                 <span className="text-[13px] font-semibold text-muted">
@@ -397,7 +395,7 @@ export function TeamBuilder({
       ) : (
         <main className="flex min-h-0 flex-1 flex-col gap-2 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3">
           {noticeBar}
-          {suggestions}
+          {recommendRow}
           {poolGrid}
           {checklistRow}
           {/* No team row here: picked tiles are highlighted, and their pencil changes the set. */}

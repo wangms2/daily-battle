@@ -39,7 +39,7 @@ for (const scheme of ['light', 'dark'] as const) {
     await shot(page, '01-welcome', project);
     await page.getByRole('button', { name: 'Let’s play' }).click();
 
-    // Builder: empty, then a suggested team, then info and set picker.
+    // Builder: empty, then the recommended team, then info and set picker.
     await expect(page.getByRole('button', { name: /Pick 6 more/ })).toBeVisible();
     await shot(page, '02-builder-empty', project);
     // Wide screens show sets in a panel under the pool instead of sheets.
@@ -65,7 +65,7 @@ for (const scheme of ['light', 'dark'] as const) {
       .first()
       .click();
 
-    await page.getByRole('button', { name: 'Balanced' }).click();
+    await page.getByRole('button', { name: 'Use recommended team' }).click();
     await expect(page.getByRole('button', { name: 'Lock in team' })).toBeEnabled();
     await shot(page, '04-builder-full', project);
 

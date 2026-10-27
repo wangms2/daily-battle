@@ -1,4 +1,4 @@
-// Weekly pool validation and suggested teams (DESIGN.md §9.2).
+// Weekly pool validation and the recommended team (DESIGN.md §9.2).
 import { sets as defaultSets, type SetsFile } from '@daily-battle/data';
 import {
   findSet,
@@ -7,13 +7,12 @@ import {
   rngFor,
   styleOf,
   teamSets,
-  type Archetype,
   type TeamSlot,
   type WeeklyPool,
 } from '@daily-battle/gen';
-import { archetypeTeams } from './archetypes';
 import { PIPELINE } from './config';
 import type { Job } from './job';
+import { recommendTeam, type Recommendation } from './recommend';
 import { poolTeams } from './sample';
 import type { Simulator } from './simulate';
 import { pct } from './stats';
@@ -30,7 +29,8 @@ export interface PoolResult {
   candidate: number;
   accepted: 'pass' | 'closest';
   stats: PoolStats;
-  suggested: { archetype: Archetype; team: TeamSlot[]; winRate: number }[];
+  /** The builder's recommended team (none if it couldn't reach the viable win rate). */
+  suggested: Recommendation[];
   problems: string[];
   rejected: { candidate: number; stats: PoolStats; problems: string[] }[];
 }
@@ -123,56 +123,22 @@ async function checkPool(
   if (stats.bestWinRate > cfg.maxBestWinRate) {
     problems.push(`one team dominates: ${pct(stats.bestWinRate)}`);
   }
-  if (styles.size < cfg.minSuggested) {
-    problems.push(`only ${styles.size} distinct suggested archetype(s)`);
+  if (styles.size < cfg.minStyles) {
+    problems.push(`viable teams come in only ${styles.size} style(s)`);
   }
   return { pool, stats, problems };
 }
 
-const ARCHETYPES: Archetype[] = ['Balanced', 'Offense', 'Stall'];
-
-/**
- * The strongest viable team of each archetype, built to that archetype's rules
- * (archetypes.ts) rather than labelled after the fact, so "Stall" is walls and
- * "Offense" is attackers. An archetype the pool can't field is left out.
- */
-async function suggestTeams(
+/** The recommended team, if it's strong enough to recommend. */
+export async function recommendedTeams(
   week: string,
-  candidate: number,
-  pool: WeeklyPool,
+  species: string[],
   sim: Simulator,
   data: SetsFile,
-  cfg: Config,
-): Promise<PoolResult['suggested']> {
-  const winRates = rater(week, candidate, sim, data, cfg);
-  const suggested: PoolResult['suggested'] = [];
-  for (const archetype of ARCHETYPES) {
-    const teams = archetypeTeams(
-      pool.species,
-      archetype,
-      cfg.suggestTeams,
-      rngFor(`pipeline:suggest:${week}:c${candidate}:${archetype}`),
-      data,
-    );
-    if (!teams.length) continue;
-    const tag = `suggest-${archetype}`;
-    const rates = await winRates(teams, cfg.opponents, cfg.seeds, tag);
-    const top = teams
-      .map((team, t) => ({ team, rate: rates[t]! }))
-      .sort((a, b) => b.rate - a.rate)
-      .slice(0, cfg.suggestRetestTop);
-    const retested = await winRates(
-      top.map((x) => x.team),
-      cfg.retestOpponents,
-      cfg.retestSeeds,
-      `${tag}-retest`,
-    );
-    top.forEach((x, i) => (x.rate = retested[i]!));
-    top.sort((a, b) => b.rate - a.rate);
-    const best = top[0]!;
-    if (best.rate >= cfg.viableWinRate) suggested.push({ archetype, ...best, winRate: best.rate });
-  }
-  return suggested.map(({ archetype, team, winRate }) => ({ archetype, team, winRate }));
+  cfg: Config = PIPELINE.pool,
+): Promise<Recommendation[]> {
+  const rec = await recommendTeam(week, species, sim, data);
+  return rec && rec.winRate >= cfg.viableWinRate ? [rec] : [];
 }
 
 /** Tries pool candidates for a week until one passes; otherwise keeps the closest. */
@@ -187,12 +153,12 @@ export async function validatePool(
   for (let candidate = 0; candidate < cfg.maxCandidates; candidate++) {
     const result = await checkPool(week, candidate, sim, data, cfg);
     if (!result.problems.length) {
-      const suggested = await suggestTeams(week, candidate, result.pool, sim, data, cfg);
+      const suggested = await recommendedTeams(week, result.pool.species, sim, data, cfg);
       return { ...result, suggested, candidate, accepted: 'pass', rejected };
     }
     rejected.push({ candidate, stats: result.stats, problems: result.problems });
     if (!best || result.problems.length < best.problems.length) best = { ...result, candidate };
   }
-  const suggested = await suggestTeams(week, best!.candidate, best!.pool, sim, data, cfg);
+  const suggested = await recommendedTeams(week, best!.pool.species, sim, data, cfg);
   return { ...best!, suggested, accepted: 'closest', rejected };
 }

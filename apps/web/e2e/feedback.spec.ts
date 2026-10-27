@@ -54,7 +54,7 @@ test('the builder fits with no team row, and a picked tile’s pencil changes it
   page,
 }, info) => {
   await open(page, state());
-  await page.getByRole('button', { name: 'Balanced' }).click();
+  await page.getByRole('button', { name: 'Use recommended team' }).click();
   await page.waitForLoadState('networkidle');
   await noScroll(page, 'builder with a team');
   await shot(page, '01-builder', info.project.name);
@@ -75,7 +75,7 @@ test('the builder fits with no team row, and a picked tile’s pencil changes it
 
 test('the checklist sheet shows coverage gaps without overflowing', async ({ page }, info) => {
   await open(page, state());
-  await page.getByRole('button', { name: 'Balanced' }).click();
+  await page.getByRole('button', { name: 'Use recommended team' }).click();
   await page.getByRole('button', { name: /^Team checklist/ }).click();
   const sheet = page.getByRole('dialog', { name: 'Team checklist' });
   await expect(sheet).toBeVisible();
@@ -143,7 +143,7 @@ test('wide screens show a Pokédex entry, final stats and item icons; phones kee
   page,
 }, info) => {
   await open(page, state());
-  await page.getByRole('button', { name: 'Balanced' }).click();
+  await page.getByRole('button', { name: 'Use recommended team' }).click();
   await page.waitForLoadState('networkidle');
   if (info.project.use.isMobile) {
     await page

@@ -36,12 +36,32 @@ export const PIPELINE = {
     retestOpponents: 10,
     retestSeeds: 4,
     maxBestWinRate: 0.85,
-    minSuggested: 2,
-    /** Candidate teams built per archetype for the suggestions, and how many are re-tested. */
-    suggestTeams: 16,
-    suggestRetestTop: 3,
+    /** Viable random teams must come in at least this many styles (pool diversity). */
+    minStyles: 2,
     maxCandidates: 8,
     /** Off-schedule opponent candidates start here so they never match a scheduled day's. */
     probeCandidateBase: 100,
+  },
+  /** The builder's recommended team (DESIGN.md §9.2): searched for, then tested hard. */
+  recommend: {
+    /** Sets used less than this (share of the species' usage) are left out. */
+    minSetWeight: 0.15,
+    /** Probe opponents the search plays, and the held-out ones the finalists play. */
+    searchProbes: 12,
+    finalProbes: 16,
+    /** First and second batches: these never match the pool check's probes (100+). */
+    searchProbeBase: 200,
+    finalProbeBase: 300,
+    /** Random rule-meeting teams to start from, and battles per probe while screening. */
+    startTeams: 40,
+    screenSeeds: 2,
+    /** Rounds of one-change tweaks to the leaders, and tweaks tried per round. */
+    rounds: 4,
+    tweaks: 16,
+    /** Leaders re-tested with more battles, then finalists on the held-out probes. */
+    retestTop: 8,
+    retestSeeds: 6,
+    finalists: 3,
+    finalSeeds: 6,
   },
 };

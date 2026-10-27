@@ -82,6 +82,23 @@ export function battleTypes(species: string, set: SetEntry, gen: number): string
   return [...dex.species.get(megaForme(species, set, gen) ?? species).types];
 }
 
+/** How hard `type` hits a set: 0 if immune (by typing or the set's ability), else the multiplier. */
+export function typeMultiplier(species: string, set: SetEntry, type: string, gen: number): number {
+  if (IMMUNITY_ABILITIES[set.ability] === type) return 0;
+  const dex = Dex.forGen(gen);
+  const types = battleTypes(species, set, gen);
+  if (!dex.getImmunity(type, types)) return 0;
+  return 2 ** dex.getEffectiveness(type, types);
+}
+
+/** The attacking types that exist in a generation (no Fairy before Gen 6). */
+export function typesOf(gen: number): string[] {
+  return Dex.forGen(gen)
+    .types.all()
+    .filter((t) => t.exists && !t.isNonstandard && t.name !== '???' && t.name !== 'Stellar')
+    .map((t) => t.name);
+}
+
 /**
  * True if the species resists or is immune to `type` (by typing, or the
  * ability its sets use). A species with a Mega set also counts its Mega's typing.

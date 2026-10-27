@@ -22,60 +22,30 @@
   },
   "suggestedTeams": [
     {
-      "archetype": "Balanced",
       "team": [
-        {
-          "species": "Latias",
-          "setId": "latias-calm-mind"
-        },
         {
           "species": "Ferrothorn",
-          "setId": "ferrothorn-utility"
+          "setId": "ferrothorn-stealth-rock"
         },
         {
-          "species": "Landorus-Therian",
-          "setId": "landorustherian-defensive"
+          "species": "Latias",
+          "setId": "latias-utility"
         },
         {
-          "species": "Gengar",
-          "setId": "gengar-life-orb-attacker"
+          "species": "Thundurus",
+          "setId": "thundurus-nasty-plot"
         },
-        {
-          "species": "Aerodactyl",
-          "setId": "aerodactyl-suicide-lead"
-        },
-        {
-          "species": "Serperior",
-          "setId": "serperior-stallbreaker"
-        }
-      ]
-    },
-    {
-      "archetype": "Offense",
-      "team": [
         {
           "species": "Metagross",
           "setId": "metagross-offensive"
         },
         {
-          "species": "Gengar",
-          "setId": "gengar-hex"
+          "species": "Serperior",
+          "setId": "serperior-substitute-attacker"
         },
         {
           "species": "Landorus-Therian",
           "setId": "landorustherian-choice-scarf"
-        },
-        {
-          "species": "Aerodactyl",
-          "setId": "aerodactyl-suicide-lead"
-        },
-        {
-          "species": "Zygarde",
-          "setId": "zygarde-subcoil"
-        },
-        {
-          "species": "Krookodile",
-          "setId": "krookodile-choice-scarf"
         }
       ]
     }

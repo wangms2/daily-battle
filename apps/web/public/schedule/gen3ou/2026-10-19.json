@@ -22,89 +22,30 @@
   },
   "suggestedTeams": [
     {
-      "archetype": "Balanced",
       "team": [
         {
-          "species": "Regirock",
-          "setId": "regirock-curse"
-        },
-        {
-          "species": "Swampert",
-          "setId": "swampert-standard-defensive"
-        },
-        {
-          "species": "Flygon",
-          "setId": "flygon-defensive"
-        },
-        {
-          "species": "Zapdos",
-          "setId": "zapdos-mixed"
-        },
-        {
-          "species": "Tyranitar",
-          "setId": "tyranitar-bulky-physical-attacker"
-        },
-        {
-          "species": "Skarmory",
-          "setId": "skarmory-standard"
-        }
-      ]
-    },
-    {
-      "archetype": "Offense",
-      "team": [
-        {
-          "species": "Charizard",
-          "setId": "charizard-mixed-attacker"
-        },
-        {
-          "species": "Skarmory",
-          "setId": "skarmory-offensive-spikes"
+          "species": "Forretress",
+          "setId": "forretress-standard"
         },
         {
           "species": "Swampert",
           "setId": "swampert-standard-offensive"
         },
         {
-          "species": "Flygon",
-          "setId": "flygon-offensive"
-        },
-        {
-          "species": "Heracross",
-          "setId": "heracross-standard"
+          "species": "Alakazam",
+          "setId": "alakazam-calm-mind-sweeper"
         },
         {
           "species": "Zapdos",
           "setId": "zapdos-standard-offensive"
-        }
-      ]
-    },
-    {
-      "archetype": "Stall",
-      "team": [
-        {
-          "species": "Regirock",
-          "setId": "regirock-curse"
         },
         {
-          "species": "Swampert",
-          "setId": "swampert-standard-defensive"
+          "species": "Dugtrio",
+          "setId": "dugtrio-choice-band"
         },
         {
-          "species": "Zapdos",
-          "setId": "zapdos-rest"
-        },
-        {
-          "species": "Flygon",
-          "setId": "flygon-defensive"
-        },
-        {
-          "species": "Milotic",
-          "setId": "milotic-standard"
-        },
-        {
-          "species": "Forretress",
-          "setId": "forretress-standard"
+          "species": "Charizard",
+          "setId": "charizard-mixed-attacker"
         }
       ]
     }

@@ -53,3 +53,15 @@ export function preloadSprites(species: string[], kind: SpriteKind = 'front'): v
     img.src = getSprite(s, kind);
   }
 }
+
+/** Resolves once every sprite has loaded and decoded (a broken one counts as done). */
+export function loadSprites(species: string[], kind: SpriteKind = 'front'): Promise<void> {
+  return Promise.all(
+    species.map((s) => {
+      const img = new Image();
+      img.src = getSprite(s, kind);
+      // jsdom has no decode(); there, treat it as loaded.
+      return typeof img.decode === 'function' ? img.decode().catch(() => undefined) : undefined;
+    }),
+  ).then(() => undefined);
+}

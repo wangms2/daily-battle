@@ -8,7 +8,7 @@ import schedule from '../public/schedule/gen3ou/2026-10-19.json' with { type: 'j
 const TODAY = new Date('2026-10-21T10:00:00-04:00');
 const MOVES = 'main button[aria-label*=" PP"]:enabled';
 const poolId = `${schedule.week}:g${schedule.generatorVersion}:c${schedule.pool.candidate}`;
-/** This week's Balanced suggestion, led by its first Pokémon. */
+/** This week's recommended team, led by its first Pokémon. */
 const TEAM = schedule.suggestedTeams[0]!.team;
 const LEAD = TEAM[0]!.species;
 

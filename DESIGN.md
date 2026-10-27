@@ -24,7 +24,7 @@ This doc is written to be split into implementation chunks. Section 13 lists mil
 | Format              | Gen 3, 4, 5, and 6 OU as four daily games (each its own team, opponents, tries, and streak), singles, 6v6, Showdown mechanics. Gen 6 adds one rule of ours: one Mega per team (§19) |
 | Engine              | `@pkmn/sim` (standalone Showdown simulator), self-hosted, no Showdown server                                                                                                                           |
 | Set data            | Smogon data (usage-weighted). 1–4 most common sets per species, weighted by usage                                                                                                                      |
-| Player team         | Weekly. Pick 6 of 12, choose a role-named set for each, lock for the week. Optional suggested teams are a selection, not a default. No lineup ordering; the lead is picked on the daily brief          |
+| Player team         | Weekly. Pick 6 of 12, choose a role-named set for each, lock for the week. An optional recommended team is a selection, not a default. No lineup ordering; the lead is picked on the daily brief          |
 | Daily swap          | One per day: replace one Pokémon (from the original 12) OR change one set. Not both. Done on the daily brief screen                                                                                    |
 | Opponent            | New each day. Species visible, sets hidden                                                                                                                                                             |
 | Attempts            | Unlimited, with "run it back". The first attempt of the day is the scored result; retries still count as a clear but never change the streak                                                           |
@@ -59,7 +59,7 @@ This doc is written to be split into implementation chunks. Section 13 lists mil
 
 1. On the first visit of a week, show the **pool of 12** (same for everyone).
 2. Player selects 6, then a set for each. Sets are presented by **role** ("Choice Scarf attacker", "Stealth Rock lead") with a one-line description and the four moves; item, ability, nature, and EVs are behind a "Details" tap. No usage percentages.
-3. Optionally, instead of building from scratch, the player can pick one of 2–3 **suggested teams** (§12.2a). This is a selection the player chooses, not a default, and the result stays editable.
+3. Optionally, instead of building from scratch, the player can use the week's **recommended team** (§12.2a). This is a selection the player chooses, not a default, and the result stays editable.
 4. Team locks for the week. There is no lineup ordering: in singles, only the lead matters, and it is chosen on the daily brief (§4.3).
 
 Daily swap (done on the daily brief screen, shown as "1 change left"):
@@ -192,7 +192,7 @@ Weighted random draw by usage, with:
 - Prefer **pre-generating a published schedule** over generating at runtime: a build-time script emits `schedule/2026-W44.json` etc. containing the weekly pool and the 7 daily opponents. The client reads the file for the current date.
 - Benefits: one source of truth, validated content only, easy to roll back, no cross-browser divergence.
 - Pre-generate several weeks ahead. Fall back to runtime generation with the same seed only if a schedule file is missing (log it).
-- **Regenerating a published week** (e.g. after a set data change) is allowed but deliberate: `schedule --force` rebuilds whole weeks, and `schedule --from-day <date>` rebuilds only a week's later days, keeping its pool, suggestions, and earlier days. A locked team records the pool it was built against as `<week>:g<generatorVersion>:c<candidate>`; when the current schedule's id differs, the app unlocks the week, drops today's unfinished battle and change, keeps finished tries, and reopens the team builder with a note that the week was refreshed.
+- **Regenerating a published week** (e.g. after a set data change) is allowed but deliberate: `schedule --force` rebuilds whole weeks, and `schedule --from-day <date>` rebuilds only a week's later days, keeping its pool, recommended team, and earlier days. `recommend` re-picks only the recommended team of existing weeks. A locked team records the pool it was built against as `<week>:g<generatorVersion>:c<candidate>`; when the current schedule's id differs, the app unlocks the week, drops today's unfinished battle and change, keeps finished tries, and reopens the team builder with a note that the week was refreshed.
 
 ## 7. Battle engine
 
@@ -280,10 +280,9 @@ Weights are parameters (§8.5).
 
 - Sample many legal 6-of-12 teams from the pool with random set choices. Simulate against several random daily opponents.
 - Require: sufficient viable teams (win rate above a floor for the mid bot), and no single dominating team (cap on the best team's win rate).
-- Also emit 2–3 **suggested teams** per week with distinct archetypes (e.g. Balanced, Offense, Stall) that pass validation, for the team builder's suggestion row (§12.2a).
-  - Suggested teams are **built to their archetype**, not labelled after the fact (`packages/pipeline/src/archetypes.ts`). Each set gets a role: an **attacker** (Choice item, Life Orb, Expert Belt, Focus Sash, a sweeping setup move such as Swords Dance or Dragon Dance, or a frail set with a full attacking stat), a **wall** (bulky, with recovery, Leftovers/Black Sludge, status or phazing; bulky Calm Mind or Curse counts), or **support** (the rest).
-  - **Offense:** 4–6 attackers, no walls. **Stall:** 4–6 walls, no attackers. **Balanced:** 2–3 of each. All three need a hazard setter.
-  - Per archetype, 16 candidate teams are drawn to those rules and simulated against the week's probe opponents; the top 3 are re-tested and the best is suggested if it clears the viability floor. A pool that can't field an archetype (too few walls for stall, say) simply offers fewer suggestions.
+- Also emit one **recommended team** per week for the team builder (§12.2a): a strong, well-built team a player can use without teambuilding (`packages/pipeline/src/recommend.ts`). No style label: the strongest team is nearly always a mix.
+  - **Rules:** legal; covers every team-checklist item the pool can provide (hazards, removal, physical, special, defensive; the same `checklist` the builder shows); no type that 3+ members are weak to with no member resisting or immune; only sets with at least 15% of the species' usage. If the pool can't meet them, the rules relax in that order and the report says so.
+  - **Search:** 40 random rule-meeting teams, then rounds of one-change tweaks (a member or a set) to the leaders, all scored on the same battles against 12 probe opponents (mid bot). The top 8 get more battles; the top 3 then play 16 held-out probes, and the best overall is recommended if it clears the viability floor. About 3 minutes a week on 19 workers.
   - Pool acceptance is unaffected: it still checks that viable random teams come in more than one style.
 
 ### 9.3 Opponent validation (daily)
@@ -404,7 +403,7 @@ Easy and Hard add the difficulty to the header, with that difficulty's tries and
 ### 12.2 Screens
 
 1. **Home** (the daily brief): once played, today's result, tries, streak, Share, and the countdown to the next day.
-2. **Weekly team builder**: pool of 12, role-named set picker, suggested teams, lock (§12.2a).
+2. **Weekly team builder**: pool of 12, role-named set picker, recommended team, lock (§12.2a).
 3. **Daily brief**: opponent species, your team, lead picker, daily swap ("1 change left"), Start.
 4. **Battle**: Showdown-style layout and flow (§12.2b). Mobile-first.
 5. **Result** (a card over the field): outcome, a ⭐ for a first-try win, today's tries as rows, the streak, Share, Try again / Play again, Back to today.
@@ -418,7 +417,7 @@ Goals: fast, tactile, and clear to someone new to competitive Pokémon. The whol
 - **Wide screens (≥900px):** the pool is a 3×4 grid of compact row cards (sprite, name, types, role), with a details panel under it in place of the info sheet and set picker. Clicking a card adds it with the most used set (or the set previewed in the panel) and shows it in the panel; its ⓘ or a team-panel row just shows it (the shown member's row is ringed; each row has a × to remove it, and there are no slot numbers: the n/6 counter is enough). The panel has the set tabs, the selected set's moves, item (with its icon), ability, nature and EVs, a Pokédex entry (wide screens only, loaded on demand from `src/lib/flavor.json`, baked by `scripts/flavor.ts`), base and **final** stats (level 100, from the set's nature, EVs and IVs: `lib/stats.ts`, tested against the simulator), matchups, and Add/Remove.
 
   Phones show the same on the set picker, tightened to fit: the final stats on one line, and a description longer than two lines floats its full text over the card on a tap (or a mouse hover), never changing the layout, so the sheet doesn't scroll. Item icons come from PokeAPI/sprites, self-hosted by `scripts/items.ts` under `public/items/`. For a team member, choosing a tab changes its set at once.
-- **Suggested teams:** a row of 2–3 suggested teams labeled by archetype (e.g. Balanced, Offense, Stall), under a "Suggested teams · Pick one to fill your team" heading so the chips explain themselves. Selecting one fills the slots, and the team stays fully editable. These come from simulation-validated candidates (§9.2); the player chooses to use one, it is never applied automatically.
+- **Recommended team:** one button under a "Recommended team · Strong and ready to battle" heading, showing the team's six icons and "Use team". Selecting it fills the slots (with Undo), and the team stays fully editable. It comes from the simulation search (§9.2); the player chooses to use it, it is never applied automatically. Hidden when a week has none.
 - **Beginner hints (when on):** a compact checklist under the slots (hazards, hazard removal, physical attacker, special attacker, defensive Pokémon) with checkmarks, and a tap-to-view list of shared weaknesses. Hidden when hints are off.
 - **Lock in:** a "Lock in team" button opens a confirmation showing the six sprites, then goes straight to the daily brief.
 
@@ -546,7 +545,7 @@ Belief model, utility scoring, softmax choice, style presets. _Accept:_ beats th
 Pool and opponent validation, reports, schedule files for N weeks. _Accept:_ produces schedule files with validation reports; rejects an intentionally bad opponent in a test.
 
 **M6 — Web client: team building and state**
-Weekly pool UI, role-named set picker, suggested-teams row, lock, daily brief with lead picker and daily swap, Beginner hints toggle and settings, localStorage. See §12.2a and §12.2c. _Accept:_ a team can be built and locked in under a minute; suggested teams are selectable and editable; state persists across reloads; swap limited to one per day; storage-unavailable path works; turning hints off removes all hint UI.
+Weekly pool UI, role-named set picker, recommended-team button, lock, daily brief with lead picker and daily swap, Beginner hints toggle and settings, localStorage. See §12.2a and §12.2c. _Accept:_ a team can be built and locked in under a minute; the recommended team is selectable and editable; state persists across reloads; swap limited to one per day; storage-unavailable path works; turning hints off removes all hint UI.
 
 **M7 — Web client: battle UI**
 Worker-based battle, move/switch UI, protocol rendering, AI turns, win/loss detection, attempts recording, run it back. Uses the sprite interface and self-hosted sprites from M6 (§12.3a; brought forward so the team builder could show them). _Accept:_ full playthrough on mobile and desktop; mid-battle reload handled per §7; no runtime requests to third-party image hosts; layout and flow follow §12.2b; speed control and tap-to-skip work; single-choice turns wait for your tap; Animations off setting works.
@@ -596,7 +595,7 @@ See §14.
 
 - **Ruleset:** use the sim's `gen4ou` clauses and bans as-is for both sides. The AI must respect them (e.g. sleep and freeze clauses).
 - **Customization:** preset sets only. No custom EVs, moves, or items.
-- **Suggested teams:** 2–3 validated teams offered as a selection in the team builder (§12.2a). Never applied by default; always editable before locking.
+- **Recommended team:** one simulation-searched team offered as a selection in the team builder (§12.2a). Never applied by default; always editable before locking.
 - **Weekly pool timing:** visible to everyone at the start of the week. Late joiners get the same pool and the same daily swap rule.
 - **Opponent style hint:** not shown in v1. It would give away information.
 - **Streak freezes:** none (see the streak fragility risk in §15).
@@ -702,7 +701,7 @@ A third daily game, built in seven phases the same way as Gen 5 (§17). Each pha
 - **Pools** always offer at least one Mega species, and at least five that don't need one. Type-coverage checks count a Mega set's typing.
 - **Sim bridge.** With a Mega available, `legalChoices` adds `move N mega` for each move. A foe's stone stays hidden until it Mega Evolves (tested).
 - **AI.** Mega Evolution is a scored choice: the move's score in Mega form plus a preset bonus for keeping the boost all battle, sampled with the usual noise. It moves at its old Speed on the turn it Mega Evolves. Pokémon are tracked by base species; a revealed Mega narrows the foe's sets to that stone, and once one foe has Mega Evolved, no other is assumed to. Damage is calculated in Mega form when a Pokémon has Mega Evolved or is assumed able to, and leads are rated the same way. Gen 6 mechanics it scores: Sticky Web, Defog clearing both sides, terrains, 5-turn ability weather, Sleep Clause, Grass types ignoring powder, Electric types immune to paralysis, and Gale Wings and Prankster priority. Fairy, Assault Vest, and the damage changes come from `@smogon/calc`; trapping (Ghosts escape it from Gen 6) comes from the sim's own legal choices.
-- **Schedules** live in `schedule/gen6ou/` and `reports/gen6ou/`, built with `schedule --format gen6ou` from 2026-10-19. The player bots Mega Evolve too, and the archetypes know Assault Vest, Weakness Policy, Geomancy, and Sticky Web.
+- **Schedules** live in `schedule/gen6ou/` and `reports/gen6ou/`, built with `schedule --format gen6ou` from 2026-10-19. The player bots Mega Evolve too, and the team checklist knows Sticky Web.
 - **Web.**
   - **Font:** Nunito 700 (`@fontsource/nunito`, OFL), a clean rounded face close to X/Y's battle text, for Gen 6 only (`[data-gen='6']`).
 - **Home screen.** A Poké Ball split: the top card (about 56% of the height, the primary mode) has the Pokémon Daily logo, a mascot for each generation on a small platform (Swampert in its Emerald sprite, Lucario, Volcarona, Sylveon; a tap opens that generation, and a green check appears only once it's cleared today), and Play, which opens the generation picker. Below, With friends, with a crowd of cute first stages (Eevee in the middle; `src/lib/friends.ts`), as many as fit across the screen so none is cut off.

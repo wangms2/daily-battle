@@ -61,7 +61,7 @@ export async function buildWeek(
     dataBuiltAt: data.meta.builtAt,
     week,
     pool: { species: pool.pool.species, candidate: pool.candidate },
-    suggestedTeams: pool.suggested.map(({ archetype, team }) => ({ archetype, team })),
+    suggestedTeams: pool.suggested.map(({ team }) => ({ team })),
     days: days.map(({ opponent, candidate }) => ({
       day: opponent.day,
       style: opponent.style,
@@ -87,7 +87,7 @@ export async function buildWeek(
 
 /**
  * Regenerates a published week's days from `fromDay` on, keeping its pool,
- * suggested teams, and earlier days: for picking up a set data change in a
+ * recommended team, and earlier days: for picking up a set data change in a
  * week that's already being played (locked teams and played days stay valid).
  */
 export async function rebuildDays(
@@ -124,6 +124,14 @@ export async function rebuildDays(
   };
 }
 
+/** The report's line about the recommended team. */
+export function recommendedLine(suggested: WeekReport['pool']['suggested']): string {
+  const rec = suggested[0];
+  if (!rec) return 'Recommended: none (no team reached the viable win rate).';
+  const rules = rec.rules === 'all' ? '' : `, rules relaxed to ${rec.rules}`;
+  return `Recommended (${pct(rec.winRate)} over ${rec.battles} battles${rules}): ${rec.team.map((s) => s.setId).join(', ')}.`;
+}
+
 export function reportMarkdown(r: WeekReport): string {
   const lines = [
     `# Week of ${r.week}`,
@@ -135,7 +143,7 @@ export function reportMarkdown(r: WeekReport): string {
     r.pool.species.join(', '),
     '',
     `Viable teams ${pct(r.pool.stats.viableShare)}, median ${pct(r.pool.stats.medianWinRate)}, best ${pct(r.pool.stats.bestWinRate)} (${r.pool.stats.teams} teams).`,
-    `Suggested: ${r.pool.suggested.map((s) => `${s.archetype} (${pct(s.winRate)})`).join(', ')}.`,
+    recommendedLine(r.pool.suggested),
     ...(r.pool.rejected.length
       ? [
           '',

@@ -13,64 +13,35 @@
     "problems": [],
     "suggested": [
       {
-        "archetype": "Balanced",
         "team": [
           {
-            "species": "Aerodactyl",
-            "setId": "aerodactyl-choice-band"
-          },
-          {
-            "species": "Quagsire",
-            "setId": "quagsire-curse-rest"
-          },
-          {
             "species": "Starmie",
-            "setId": "starmie-defensive"
+            "setId": "starmie-offensive"
           },
           {
             "species": "Blissey",
             "setId": "blissey-calm-mind"
           },
           {
-            "species": "Zapdos",
-            "setId": "zapdos-rest"
+            "species": "Aerodactyl",
+            "setId": "aerodactyl-choice-band"
           },
           {
-            "species": "Forretress",
-            "setId": "forretress-standard"
-          }
-        ],
-        "winRate": 0.85
-      },
-      {
-        "archetype": "Stall",
-        "team": [
+            "species": "Medicham",
+            "setId": "medicham-all-out-attacker"
+          },
           {
             "species": "Quagsire",
-            "setId": "quagsire-counter"
-          },
-          {
-            "species": "Starmie",
-            "setId": "starmie-defensive"
-          },
-          {
-            "species": "Flygon",
-            "setId": "flygon-defensive"
+            "setId": "quagsire-curse-rest"
           },
           {
             "species": "Forretress",
             "setId": "forretress-standard"
-          },
-          {
-            "species": "Zapdos",
-            "setId": "zapdos-rest"
-          },
-          {
-            "species": "Gardevoir",
-            "setId": "gardevoir-supporter"
           }
         ],
-        "winRate": 0.5625
+        "winRate": 0.7317708333333334,
+        "battles": 192,
+        "rules": "all"
       }
     ],
     "candidate": 0,
