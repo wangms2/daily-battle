@@ -94,11 +94,10 @@ test('a protected name brings its streak to another device, and a wrong password
   await rival.getByRole('button', { name: 'Protect', exact: true }).click();
   await expect(rival.getByRole('alert')).toHaveText(/already protected/);
 
-  // A new device: first Play asks the name; sign in instead.
+  // A new device: the game opens on the name screen; sign in instead.
   const phone = await (await browser.newContext({ baseURL })).newPage();
   await phone.clock.setFixedTime(TODAY);
   await phone.goto('/');
-  await phone.getByRole('button', { name: 'Play', exact: true }).click();
   await phone.getByRole('button', { name: /Sign in/ }).click();
   await phone.getByLabel('Your name').fill(name);
   await phone.getByLabel('Password').fill('wrong!');
@@ -106,7 +105,8 @@ test('a protected name brings its streak to another device, and a wrong password
   await expect(phone.getByRole('alert')).toHaveText(/don’t match/);
   await phone.getByLabel('Password').fill('pikachu');
   await phone.getByRole('button', { name: 'Sign in', exact: true }).click();
-  // On to the games, with the streak from the first device.
+  // On to the landing, then the games, with the streak from the first device.
+  await phone.getByRole('button', { name: 'Play', exact: true }).click();
   await expect(phone.getByText('Choose a generation')).toBeVisible();
   await expect(phone.getByRole('button', { name: /^Gen 4.*Streak 3/ })).toBeVisible();
 });

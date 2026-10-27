@@ -169,9 +169,9 @@ test('the host can remove a player, and names are unique', async ({ page, browse
 test('the first screen opens versus rooms', async ({ page }) => {
   await quick(page);
   await page.goto('/');
-  await page.getByRole('button', { name: 'With friends' }).click();
-  // A first-time player is asked their name first, which then names them in rooms.
+  // A new player names themselves first: the name they play under in rooms.
   await meet(page);
+  await page.getByRole('button', { name: 'With friends' }).click();
   await expect(page.getByRole('button', { name: 'Create a room' })).toBeVisible();
   await expect(page.getByRole('textbox', { name: /name/i }).first()).not.toHaveValue('');
 });

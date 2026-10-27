@@ -3,7 +3,6 @@
 // Preview (the foe's six show from the start), with no scrolling on phones.
 import { expect, test, type Page } from '@playwright/test';
 import schedule from '../public/schedule/gen5ou/2026-10-26.json' with { type: 'json' };
-import { meet } from './name';
 
 const TODAY = new Date('2026-10-28T10:00:00-04:00');
 const MOVES = 'main button[aria-label*=" PP"]:enabled';
@@ -58,7 +57,6 @@ const shot = (page: Page, name: string, project: string) =>
 test('a first-time player picks Gen 5 and gets its pool', async ({ page }, info) => {
   await open(page, undefined, '/#daily');
   await page.getByRole('button', { name: /^Gen 5/ }).click();
-  await meet(page);
   const welcome = page.getByRole('dialog', { name: 'Welcome to Pokémon Daily' });
   await noScroll(page, 'welcome sheet');
   await shot(page, '01-welcome', info.project.name);
@@ -81,7 +79,6 @@ test('the title opens the picker to switch games, each with its own team', async
   await noScroll(page, 'game picker');
   await shot(page, '03-picker', info.project.name);
   await page.getByRole('button', { name: /^Gen 4/ }).click();
-  await meet(page);
   // No Gen 4 team yet this week: its builder opens.
   await expect(page.getByRole('button', { name: /^Gen 4 · Week of/ })).toBeVisible();
   await page.getByRole('button', { name: /^Gen 4 · / }).click();

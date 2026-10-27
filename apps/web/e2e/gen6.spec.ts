@@ -3,7 +3,6 @@
 // rule in the team builder. (The news sheet is Gen 3's now: gen3.spec.ts.)
 import { expect, test, type Page } from '@playwright/test';
 import schedule from '../public/schedule/gen6ou/2026-10-19.json' with { type: 'json' };
-import { meet } from './name';
 
 const TODAY = new Date('2026-10-21T10:00:00-04:00');
 const MOVES = 'main button[aria-label*=" PP"]:enabled';
@@ -71,7 +70,6 @@ const shot = (page: Page, name: string, project: string) =>
 test('a first-time player picks Gen 6 and gets its pool', async ({ page }, info) => {
   await open(page, undefined, '/#daily');
   await page.getByRole('button', { name: /^Gen 6/ }).click();
-  await meet(page);
   const welcome = page.getByRole('dialog', { name: 'Welcome to Pokémon Daily' });
   await noScroll(page, 'welcome sheet');
   await shot(page, '01-welcome', info.project.name);

@@ -578,30 +578,31 @@ describe('home', () => {
   });
 
   it('lands on Play or Versus, with no sheet over them', async () => {
-    renderApp();
+    renderApp(seeded());
     expect(await screen.findByRole('button', { name: 'Play' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'With friends' })).toBeInTheDocument();
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
-  it('asks a first-time player’s name on Play, then carries on, and never asks again', async () => {
+  it('asks a first-time player’s name before the landing, and never again', async () => {
     const user = userEvent.setup();
-    const state = seeded();
-    delete state.settings.name;
-    renderApp(state);
-    await user.click(await screen.findByRole('button', { name: 'Play' }));
+    const { unmount } = renderApp();
     const field = await screen.findByRole('textbox', { name: 'Your name' });
+    expect(screen.queryByRole('button', { name: 'Play' })).not.toBeInTheDocument();
     expect((field as HTMLInputElement).value).not.toBe('');
     await user.clear(field);
     await user.type(field, 'Misty');
     await user.click(screen.getByRole('button', { name: 'That’s me!' }));
     expect(await screen.findByText(/Nice to meet you/)).toHaveTextContent('Misty');
     await user.click(screen.getByRole('status'));
+    expect(await screen.findByRole('button', { name: 'Play' })).toBeInTheDocument();
+    unmount();
+  });
+
+  it('lets a link straight into a game skip the name screen', async () => {
+    window.location.hash = '#daily';
+    renderApp();
     expect(await screen.findByText('Choose a generation')).toBeInTheDocument();
-    expect(window.location.hash).toBe('#daily');
-    // Back home and Play again: straight on.
-    await user.click(screen.getByRole('button', { name: 'Back' }));
-    await user.click(await screen.findByRole('button', { name: 'Play' }));
     expect(screen.queryByRole('textbox', { name: 'Your name' })).not.toBeInTheDocument();
   });
 

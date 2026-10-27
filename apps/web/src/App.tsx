@@ -7,6 +7,7 @@ import { DailyBrief } from './screens/DailyBrief';
 import { NameScreen } from './screens/NameScreen';
 import { ProtectCard } from './ui/ProtectCard';
 import { savedName, saveName } from './versus/saved';
+import { flushSync } from 'react-dom';
 import { Home } from './screens/Home';
 import { TeamBuilder } from './screens/TeamBuilder';
 import { AboutSheet } from './sheets/About';
@@ -176,23 +177,31 @@ export function App() {
   // After a loss, the end card's "Change team" opens the brief with the team editable.
   const [openEdit, setOpenEdit] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  // The first Play asks the player's name, then carries on where they tapped.
-  const [naming, setNaming] = useState<(() => void) | null>(null);
   const [typeChartOpen, setTypeChartOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [howToPlayOpen, setHowToPlayOpen] = useState(false);
   const [storageNoticeDismissed, setStorageNoticeDismissed] = useState(false);
 
   const { settings } = state;
-  const named = (then: () => void) => {
-    if (settings.name) return then();
-    // A name from versus is already theirs.
+  // A name from versus is already theirs.
+  useEffect(() => {
     const versusName = savedName();
-    if (versusName) {
+    if (!settings.name && versusName) {
       dispatchAny({ type: 'setSetting', key: 'name', value: versusName });
-      return then();
     }
-    setNaming(() => then);
+  }, [settings.name, dispatchAny]);
+  // The first time the game opens, it asks the player's name before the landing,
+  // like the main games' professor; links straight into a game or room skip it.
+  const askName = !settings.name && !savedName() && route === '';
+  /** The name screen fades into the landing (a view transition, where there is one). */
+  const fadeIn = (apply: () => void) => {
+    const start = (document as unknown as ViewTransitions).startViewTransition;
+    if (!start || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return apply();
+    // A plain cross-fade (styles.css, .vt-fade): the landing arrives whole.
+    const root = document.documentElement;
+    root.classList.add('vt-fade');
+    const vt = start.call(document, async () => flushSync(apply)) as { finished?: Promise<void> };
+    void (vt.finished ?? Promise.resolve()).finally(() => root.classList.remove('vt-fade'));
   };
   const { weeks, days } = state.games[format];
   const weekState = weeks[week];
@@ -468,16 +477,14 @@ export function App() {
             ...(gameBucket(id) === 'coached' && { coached: true }),
           };
         })}
-        onPlay={() => named(() => go('daily'))}
-        onFriends={() => named(() => go('versus'))}
-        onLearn={() => named(() => go('learn'))}
+        onPlay={() => go('daily')}
+        onFriends={() => go('versus')}
+        onLearn={() => go('learn')}
         share={todayShare}
-        onPick={(id) =>
-          named(() => {
-            if (id !== format) dispatchAny({ type: 'setSetting', key: 'format', value: id });
-            go('play');
-          })
-        }
+        onPick={(id) => {
+          if (id !== format) dispatchAny({ type: 'setSetting', key: 'format', value: id });
+          go('play');
+        }}
         onBack={() => go('')}
         onSettings={() => setSettingsOpen(true)}
       />
@@ -614,19 +621,17 @@ export function App() {
     );
   }
 
-  if (naming) {
+  if (askName) {
     screen = (
       <NameScreen
-        onDone={(name) => {
-          dispatchAny({ type: 'setSetting', key: 'name', value: name });
-          saveName(name);
-          setNaming(null);
-          naming();
-        }}
-        onSignedIn={() => {
-          setNaming(null);
-          naming();
-        }}
+        onDone={(name) =>
+          fadeIn(() => {
+            dispatchAny({ type: 'setSetting', key: 'name', value: name });
+            saveName(name);
+          })
+        }
+        // Signing in brings the name with the progress: the landing follows.
+        onSignedIn={() => {}}
       />
     );
   }

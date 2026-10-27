@@ -1330,6 +1330,17 @@ button {
 ::view-transition-new(ball):only-child {
   animation: vt-in 240ms ease-out 240ms both;
 }
+/* The name screen into the landing: one even cross-fade, the landing arriving whole. */
+.vt-fade::view-transition-group(*) {
+  animation: none;
+  background: none;
+}
+.vt-fade::view-transition-old(*) {
+  animation: vt-out 260ms ease-in both;
+}
+.vt-fade::view-transition-new(*) {
+  animation: vt-in 420ms ease-out 180ms both;
+}
 @keyframes vt-out {
   to {
     opacity: 0;
