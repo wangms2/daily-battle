@@ -36,6 +36,16 @@ export const MULTIPLIERS = [4, 2, 1, 0.5, 0.25, 0] as const;
 
 export const multLabel = (m: number) => (m === 0.5 ? '×½' : m === 0.25 ? '×¼' : `×${m}`);
 
+/** What the games call each multiplier. */
+export const multWords = (m: number) =>
+  m > 1
+    ? 'Super effective'
+    : m === 1
+      ? 'Normal damage'
+      : m > 0
+        ? 'Not very effective'
+        : 'No effect';
+
 /** A matchup's key: the attack type against the typing (in a fixed order). */
 export const matchupKey = (attack: string, types: readonly string[]) =>
   `${attack}>${[...types].sort().join('/')}`;

@@ -21,8 +21,8 @@ describe('TypeTrainer', () => {
     for (let i = 0; i < 10; i++) {
       expect(screen.getByText(`${i + 1} of 10`)).toBeInTheDocument();
       const answers = screen.getByRole('group', { name: 'How hard it hits' });
-      await userEvent.click(within(answers).getByRole('button', { name: '×1' }));
-      expect(screen.getByText(/^(Right!|It’s ×)/)).toBeInTheDocument();
+      await userEvent.click(within(answers).getByRole('button', { name: 'Normal damage, ×1' }));
+      expect(screen.getByText(/^(Right!|It’s )/)).toBeInTheDocument();
       await userEvent.click(
         screen.getByRole('button', { name: i < 9 ? 'Next' : 'See your score' }),
       );

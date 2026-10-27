@@ -1071,6 +1071,48 @@ button {
   animation: home-bob 2.6s ease-in-out calc(var(--i) * -0.65s) infinite;
   user-select: none;
 }
+/* The type trainer's answers: a ladder from ×4 to ×0, each rung in its colour. */
+.eff-rung {
+  --eff: #8a8f9c;
+  border-left: 6px solid var(--eff);
+}
+.eff-rung[data-mult='4'] {
+  --eff: #1f7a46;
+}
+.eff-rung[data-mult='2'] {
+  --eff: #3f9e63;
+}
+.eff-rung[data-mult='1'] {
+  --eff: #8a8f9c;
+}
+.eff-rung[data-mult='0.5'] {
+  --eff: #d4842f;
+}
+.eff-rung[data-mult='0.25'] {
+  --eff: #b0581c;
+}
+.eff-rung[data-mult='0'] {
+  --eff: #4b4e58;
+}
+.eff-chip {
+  min-width: 44px;
+  border-radius: 6px;
+  padding: 3px 8px;
+  background: var(--eff);
+  color: #fff;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.eff-rung.is-answer {
+  border-color: var(--eff);
+  background: color-mix(in srgb, var(--eff) 22%, var(--surface));
+  box-shadow: 0 0 0 2px var(--good);
+}
+.eff-rung.is-wrong {
+  border-color: var(--eff);
+  box-shadow: 0 0 0 2px var(--bad);
+}
+
 /* The name screen's grass platform, under the professor's Pokémon. */
 .name-ground {
   position: absolute;

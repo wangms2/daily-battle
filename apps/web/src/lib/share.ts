@@ -21,6 +21,14 @@ export interface ShareArgs {
   difficulty?: Difficulty;
   /** The coached tries (any difficulty): the header says so, with the deciding try's difficulty. */
   coached?: boolean;
+  /** This game's days won ever, at this difficulty: on the first try, and on any try. */
+  stars?: Stars;
+}
+
+/** A game's collection, kept whatever the streak: ⭐ first-try wins and ✓ clears (any try). */
+export interface Stars {
+  firstTries: number;
+  clears: number;
 }
 
 export interface ShareRow {
@@ -50,6 +58,8 @@ export interface ShareModel {
   team: { species: string; swapped: boolean }[];
   /** "5-day streak", "Streak reset", or nothing. */
   streak: string | null;
+  /** The game's stars so far; absent before its first clear. */
+  stars?: Stars;
   url?: string;
 }
 
@@ -78,6 +88,7 @@ export function shareModel({
   format,
   difficulty,
   coached,
+  stars,
 }: ShareArgs): ShareModel {
   const { status, counted, tries, winTry } = summary;
   const date = new Date(`${day}T12:00:00`).toLocaleDateString('en-US', {
@@ -115,6 +126,7 @@ export function shareModel({
     rows: (status === 'firstTry' ? [winning!] : counted).map(row),
     team,
     streak: streakBroken(summary) ? 'Streak reset' : streak > 0 ? `${streak}-day streak` : null,
+    ...(stars && stars.clears > 0 && { stars }),
     url,
   };
 }
@@ -143,9 +155,19 @@ export function formatShareText(m: ShareModel): string {
     lines.push(m.team.map((s) => (s.swapped ? `${s.species}*` : s.species)).join(', '));
   }
   if (m.streak) lines.push(`🔥 ${m.streak}`);
+  if (m.stars) lines.push(starsText(m.stars));
   if (m.url) lines.push(m.url);
   return lines.join('\n');
 }
+
+const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
+
+/** "⭐ 10 first tries · ✓ 23 clears" */
+export const starsText = (s: Stars) =>
+  `⭐ ${plural(s.firstTries, 'first try', 'first tries')} · ✓ ${plural(s.clears, 'clear', 'clears')}`;
+
+/** "⭐ 10 · ✓ 23", for the compact share. */
+export const starsShort = (s: Stars) => `⭐ ${s.firstTries} · ✓ ${s.clears}`;
 
 /**
  * Every game played today in one share. One game is that game's own full share;
@@ -181,7 +203,7 @@ export const gameLabel = (m: ShareModel) =>
 
 /**
  * Pokémon Daily · Oct 21
- * Gen 3 OU · Easy · 🔥 5-day streak
+ * Gen 3 OU · Easy · 🔥 5-day streak · ⭐ 10 · ✓ 23
  * ⭐ 🟩🟩🟩🟩⬛⬛ First try!
  * Gen 4 OU · Streak reset
  * ❌ ⬛⬛⬛⬛⬛⬛ Not cleared yet · 1 try
@@ -190,7 +212,7 @@ export function formatShareAllText(all: ShareAll): string {
   const lines = [`Pokémon Daily · ${all.date}`];
   for (const m of all.games) {
     const streak = m.streak && (m.streak === 'Streak reset' ? m.streak : `🔥 ${m.streak}`);
-    lines.push([gameLabel(m), streak].filter(Boolean).join(' · '));
+    lines.push([gameLabel(m), streak, m.stars && starsShort(m.stars)].filter(Boolean).join(' · '));
     const icon = m.status === 'firstTry' ? '⭐' : m.cleared ? '✅' : '❌';
     lines.push(`${icon} ${squares(m.rows.at(-1)!)} ${shortHeadline(m)}`);
   }

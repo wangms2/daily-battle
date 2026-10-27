@@ -229,6 +229,7 @@ export function App() {
     format,
     difficulty,
     coached,
+    stars: { firstTries: stats.firstTryWins, clears: stats.clears },
   });
   // Every game played today on one card or text (DESIGN.md §11); this game reuses `share`.
   const todayShare = shareAll(
@@ -237,10 +238,12 @@ export function App() {
       const gameDays = state.games[id].days;
       const level = currentDifficulty(settings, id, gameDays[day]);
       const b = gameBucket(id);
+      const gameStats = computeStats(gameDays, day, b);
       return shareModel({
         day,
         summary: summarizeDay(gameDays[day], true, b),
-        streak: computeStats(gameDays, day, b).streak,
+        streak: gameStats.streak,
+        stars: { firstTries: gameStats.firstTryWins, clears: gameStats.clears },
         change: gameDays[day]?.change,
         url: shareUrl(),
         game: `${formatInfo(id).name} OU`,

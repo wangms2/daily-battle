@@ -125,7 +125,7 @@ function VersusHome({
   };
 
   return (
-    <Page title="With friends" back="Back" onBack={onExit} hero>
+    <Page title="Link Battle" back="Back" onBack={onExit} hero>
       <Friends size="sm" className="pt-1" />
       <p className="text-[14px] leading-relaxed text-muted">
         Live battles with friends. Everyone builds from the same 12, makes one change before each

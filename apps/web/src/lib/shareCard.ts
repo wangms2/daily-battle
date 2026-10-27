@@ -13,6 +13,7 @@ import {
   type ShareAll,
   type ShareModel,
   type ShareRow,
+  type Stars,
 } from './share';
 import { getSprite } from './sprites';
 
@@ -322,8 +323,34 @@ export async function drawShareCard(m: ShareModel): Promise<HTMLCanvasElement> {
     ctx.textAlign = 'left';
   });
 
+  // The game's stars, bottom right, under the team: kept whatever the streak.
+  if (m.stars) starPills(ctx, m.stars, right, CARD_H - 70, 20, false);
+
   footer(ctx, m.url);
   return canvas;
+}
+
+/** "⭐ 10 first tries" in soft gold and "✓ 23 clears" in grey, ending at `rightX`. */
+function starPills(
+  ctx: CanvasRenderingContext2D,
+  stars: Stars,
+  rightX: number,
+  y: number,
+  size: number,
+  short: boolean,
+) {
+  const first = short
+    ? `⭐ ${stars.firstTries}`
+    : `⭐ ${stars.firstTries} first ${stars.firstTries === 1 ? 'try' : 'tries'}`;
+  const clears = short
+    ? `✓ ${stars.clears}`
+    : `✓ ${stars.clears} ${stars.clears === 1 ? 'clear' : 'clears'}`;
+  ctx.font = font(700, size);
+  const cw = ctx.measureText(clears).width + size * 1.1;
+  pill(ctx, clears, rightX - cw, y, { bg: C.surface2, fg: C.text, size });
+  ctx.font = font(700, size);
+  const fw = ctx.measureText(first).width + size * 1.1;
+  pill(ctx, first, rightX - cw - 8 - fw, y, { bg: C.goldSoft, fg: C.goldText, size });
 }
 
 const GAME_ROW = 84;
@@ -395,7 +422,10 @@ export async function drawShareAllCard(all: ShareAll): Promise<HTMLCanvasElement
 
     // The deciding try's squares, then the streak at the right edge.
     tryRow(ctx, m.rows.at(-1)!, 560, y + (GAME_ROW - SQ) / 2);
-    if (m.streak) streakPill(ctx, m.streak, RIGHT, y + GAME_ROW / 2 - 16, 18);
+    // With stars, the streak sits above them; alone, it's centred.
+    if (m.streak) streakPill(ctx, m.streak, RIGHT, m.stars ? y + 4 : y + GAME_ROW / 2 - 16, 18);
+    if (m.stars)
+      starPills(ctx, m.stars, RIGHT, m.streak ? y + 46 : y + GAME_ROW / 2 - 16, 16, true);
     y += GAME_ROW + GAME_GAP;
   });
 

@@ -9,6 +9,7 @@ import {
   matchupKey,
   MULTIPLIERS,
   multLabel,
+  multWords,
   nextQuestion,
   type Boxes,
   type Question,
@@ -141,23 +142,29 @@ export function TypeTrainer({
                 Type chart
               </button>
             </div>
-            <section className="card grid justify-items-center gap-2 p-4">
-              <img
-                src={getSprite(question.species, 'front')}
-                alt={question.species}
-                className="pixelated size-24 object-contain"
-              />
-              <p className="text-[16px] font-semibold">{question.species}</p>
-              <span className="flex gap-1">
-                {question.types.map((t) => (
-                  <TypeBadge key={t} type={t} />
-                ))}
-              </span>
+            {/* Who hits whom, as one sentence: your move's type, then the Pokémon it hits. */}
+            <section className="card grid gap-0.5 px-4 pt-2 pb-1">
+              <p className="flex flex-wrap items-center gap-1.5 text-[16px] font-semibold">
+                Your <TypeBadge type={question.attack} /> attack hits…
+              </p>
+              <div className="flex items-center gap-3">
+                <img
+                  src={getSprite(question.species, 'front')}
+                  alt=""
+                  className="pixelated size-14 shrink-0 object-contain"
+                />
+                <div className="grid gap-1.5">
+                  <p className="text-[16px] font-semibold">{question.species}</p>
+                  <span className="flex gap-1">
+                    {question.types.map((t) => (
+                      <TypeBadge key={t} type={t} />
+                    ))}
+                  </span>
+                </div>
+              </div>
             </section>
-            <p className="flex flex-wrap items-center justify-center gap-1.5 text-[17px]">
-              A <TypeBadge type={question.attack} /> attack does…
-            </p>
-            <div className="grid grid-cols-3 gap-2" role="group" aria-label="How hard it hits">
+            {/* Strongest to none, each in its colour: a ladder to pick a rung on. */}
+            <div className="grid gap-1" role="group" aria-label="How hard it hits">
               {MULTIPLIERS.map((m) => {
                 const isAnswer = m === question.mult;
                 const isPick = m === picked;
@@ -168,15 +175,18 @@ export function TypeTrainer({
                     onClick={() => pick(m)}
                     disabled={picked !== null && !isAnswer && !isPick}
                     aria-pressed={isPick}
+                    aria-label={`${multWords(m)}, ${multLabel(m)}`}
+                    data-mult={m}
                     className={clsx(
-                      'h-12 rounded-btn border text-[18px] font-semibold tabular-nums',
+                      'eff-rung flex h-9 items-center justify-between rounded-btn border pr-1.5 pl-3 text-left text-[15px] font-semibold',
                       picked === null && 'border-line bg-surface hover:bg-surface-2',
-                      picked !== null && isAnswer && 'border-good bg-good text-on-accent',
-                      picked !== null && isPick && !isAnswer && 'border-bad bg-bad text-on-accent',
-                      picked !== null && !isAnswer && !isPick && 'border-line opacity-40',
+                      picked !== null && isAnswer && 'is-answer',
+                      picked !== null && isPick && !isAnswer && 'is-wrong',
+                      picked !== null && !isAnswer && !isPick && 'border-line opacity-35',
                     )}
                   >
-                    {multLabel(m)}
+                    {multWords(m)}
+                    <span className="eff-chip">{multLabel(m)}</span>
                   </button>
                 );
               })}
@@ -187,7 +197,9 @@ export function TypeTrainer({
                 className="animate-fade-in grid gap-2 rounded-card bg-accent-soft px-3 py-2 text-[14px] leading-snug"
               >
                 <p className="font-semibold">
-                  {picked === question.mult ? 'Right!' : `It’s ${multLabel(question.mult)}.`}
+                  {picked === question.mult
+                    ? `Right! ${multWords(question.mult)} (${multLabel(question.mult)}).`
+                    : `It’s ${multWords(question.mult).toLowerCase()} (${multLabel(question.mult)}).`}
                 </p>
                 <p className="flex flex-wrap items-center gap-1">
                   <TypeBadge type={question.attack} size="sm" />

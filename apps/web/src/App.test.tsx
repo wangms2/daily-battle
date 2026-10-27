@@ -367,7 +367,8 @@ describe('results and streak', () => {
     await user.click(within(sheet).getByRole('radio', { name: 'All games (2)' }));
     await user.click(within(sheet).getByRole('button', { name: 'Copy text' }));
     const text = await navigator.clipboard.readText();
-    expect(text).toMatch(/^Pokémon Daily · Oct 21\nGen 4 OU · 🔥 1-day streak\n⭐ /);
+    // The streak, then the game's stars: ⭐ first tries · ✓ clears.
+    expect(text).toMatch(/^Pokémon Daily · Oct 21\nGen 4 OU · 🔥 1-day streak · ⭐ 1 · ✓ 1\n⭐ /);
     expect(text).toContain('Gen 6 OU · Streak reset\n❌ ');
   });
 
@@ -659,7 +660,7 @@ describe('home', () => {
     await user.click(await screen.findByRole('button', { name: 'Share all 2 games' }));
     await user.click(await screen.findByRole('button', { name: 'Copy text' }));
     expect(await navigator.clipboard.readText()).toMatch(
-      /^Pokémon Daily · Oct 21\nGen 3 OU · 🔥 1-day streak\n⭐ .*\nGen 5 OU/,
+      /^Pokémon Daily · Oct 21\nGen 3 OU · 🔥 1-day streak · ⭐ 1 · ✓ 1\n⭐ .*\nGen 5 OU/,
     );
   });
 

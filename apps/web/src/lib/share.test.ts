@@ -184,6 +184,17 @@ describe('share text', () => {
     );
   });
 
+  it('counts the game’s stars whatever the streak: first tries and clears', () => {
+    const day: DayState = { swapUsed: false, attempts: [a('loss', 0), a('win', 3)] };
+    const share = (stars: { firstTries: number; clears: number }) =>
+      shareText({ day: DAY, summary: summarizeDay(day, true), streak: 0, stars }).split('\n');
+    // Won on try 2: the streak is reset, but the collection stays.
+    expect(share({ firstTries: 10, clears: 23 })).toContain('⭐ 10 first tries · ✓ 23 clears');
+    expect(share({ firstTries: 1, clears: 1 })).toContain('⭐ 1 first try · ✓ 1 clear');
+    // Nothing to show before the first clear.
+    expect(share({ firstTries: 0, clears: 0 }).join('\n')).not.toMatch(/clears?$/m);
+  });
+
   it('ends with the link to play', () => {
     const t = text([a('win', 4)], 5, { url: 'https://battle.peanutbuilds.com' });
     expect(t.split('\n').slice(-2)).toEqual(['🔥 5-day streak', 'https://battle.peanutbuilds.com']);
@@ -208,8 +219,15 @@ describe('share text', () => {
 });
 
 describe('share all', () => {
-  const game = (name: string, attempts: Attempt[], streak: number, difficulty?: 'easy') =>
+  const game = (
+    name: string,
+    attempts: Attempt[],
+    streak: number,
+    difficulty?: 'easy',
+    stars?: { firstTries: number; clears: number },
+  ) =>
     shareModel({
+      ...(stars && { stars }),
       day: DAY,
       summary: summarizeDay(
         { swapUsed: false, attempts: attempts.map((x) => ({ ...x, difficulty })) },
@@ -232,7 +250,7 @@ describe('share all', () => {
   it('puts two or more played games on one compact share, in picker order', () => {
     const all = shareAll(
       [
-        game('Gen 3 OU', [a('win', 4)], 5, 'easy'),
+        game('Gen 3 OU', [a('win', 4)], 5, 'easy', { firstTries: 10, clears: 23 }),
         game('Gen 4 OU', [], 0),
         game('Gen 5 OU', [a('loss', 0), a('win', 2)], 0),
         game('Gen 6 OU', [a('loss', 0)], 0),
@@ -242,7 +260,7 @@ describe('share all', () => {
     expect(anyShareText(all)).toBe(
       [
         'Pokémon Daily · Oct 21',
-        'Gen 3 OU · Easy · 🔥 5-day streak',
+        'Gen 3 OU · Easy · 🔥 5-day streak · ⭐ 10 · ✓ 23',
         '⭐ 🟩🟩🟩🟩⬛⬛ First try!',
         'Gen 5 OU · Streak reset',
         '✅ 🟩🟩⬛⬛⬛⬛ Won on try 2',
