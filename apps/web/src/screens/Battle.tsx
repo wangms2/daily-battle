@@ -591,6 +591,33 @@ export function Battle({
     return () => window.removeEventListener('keydown', onKey);
   }, [playing, skip]);
 
+  // Keyboard play on a computer: 1–4 pick a move, Q W E R T Y your Pokémon in team order
+  // (the battle menu lists them). Only while you can choose, and never while typing.
+  useEffect(() => {
+    if (playing || end) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.altKey || e.ctrlKey || e.metaKey) return;
+      const target = e.target as Element | null;
+      if (target?.closest?.('input, textarea, select, [role="dialog"]')) return;
+      const root = rootRef.current;
+      if (!root) return;
+      const move = '1234'.indexOf(e.key);
+      const mon = 'qwerty'.indexOf(e.key.toLowerCase());
+      const button =
+        move >= 0
+          ? root.querySelectorAll<HTMLButtonElement>('main button[aria-label*=" PP"]')[move]
+          : mon >= 0
+            ? root.querySelectorAll<HTMLButtonElement>('main [data-bench]')[mon]
+            : undefined;
+      if (!button || button.disabled || button.getAttribute('aria-disabled') === 'true') return;
+      if (button.hasAttribute('aria-current')) return;
+      e.preventDefault();
+      button.click();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [playing, end]);
+
   const showExplainer = explainer && settings.beginnerHints && !end;
 
   // The hint leaves on its own after a few seconds (and slides back up next time).
@@ -617,9 +644,10 @@ export function Battle({
     >
       <p className="display mb-2 text-[12px] tracking-wider text-muted uppercase">Battle log</p>
       {log.length ? (
-        <LogList lines={log} className="min-h-0 flex-1 text-[13px] leading-[1.45]" />
+        // A computer's log: a touch larger than the rest, it's read a lot.
+        <LogList lines={log} className="min-h-0 flex-1 !text-[15px] leading-[1.5]" />
       ) : (
-        <span className="text-[13px] text-muted">The battle is starting…</span>
+        <span className="text-[15px] text-muted">The battle is starting…</span>
       )}
     </div>
   );
@@ -966,12 +994,19 @@ export function Battle({
       </p>
     </div>
   );
-  const panel = (
-    <div className="relative flex shrink-0 flex-col gap-2">
+  // The lesson's and coach's words: above the moves on phones, and on a computer at the
+  // top of the right-hand column, next to the field, where there's room to read them.
+  const notes = (
+    <>
       {tourNote}
       {stagedNote}
       {promptNote}
       {tip && <CoachTip text={tip.text} onDismiss={() => setTipHidden(true)} />}
+    </>
+  );
+  const panel = (
+    <div className="relative flex shrink-0 flex-col gap-2">
+      {!wide && notes}
       <div data-spot="controls">{controlPanel}</div>
       {waitingNote}
       {coachChecking}
@@ -1161,7 +1196,10 @@ export function Battle({
               {field}
               {panel}
             </section>
-            <div className="flex w-[380px] shrink-0 flex-col">{turnLog}</div>
+            <div className="flex w-[380px] shrink-0 flex-col gap-3">
+              {notes}
+              {turnLog}
+            </div>
           </div>
           {endCard}
         </main>

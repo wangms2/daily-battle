@@ -53,7 +53,9 @@ export function PokemonTile({
       onPointerEnter={(e) => e.pointerType === 'mouse' && setHovered(true)}
       onPointerLeave={(e) => e.pointerType === 'mouse' && setHovered(false)}
       className={clsx(
-        'card relative flex min-h-0 min-w-0 flex-col transition-[opacity,box-shadow]',
+        'card relative flex min-h-0 min-w-0 flex-col transition-[opacity,box-shadow,translate]',
+        // A mouse over a tile you can tap lifts it a little.
+        onTap && 'tile-hover',
         selected && 'is-selected',
         dimmed && 'opacity-45',
         pop && 'animate-pop',

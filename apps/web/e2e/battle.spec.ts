@@ -580,3 +580,12 @@ test('the switch row starts with your Pokémon in battle, which shows its detail
   // The turn goes on as before: nothing was switched.
   await expect(page.locator(MOVES).first()).toBeVisible();
 });
+
+test('on a computer, 1–4 pick a move from the keyboard', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'keyboard play is for computers');
+  await open(page, 'instant');
+  await page.getByRole('button', { name: /^Start · / }).click();
+  test.skip((await waitForChoice(page)) !== 'moves', 'no move turn');
+  await page.keyboard.press('1');
+  await expect(page.locator('main')).toContainText(' used ');
+});

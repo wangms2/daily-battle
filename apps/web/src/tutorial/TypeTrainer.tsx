@@ -79,7 +79,10 @@ export function TypeTrainer({
       />
       <main
         key={round}
-        className="mx-auto flex w-full max-w-[560px] flex-1 flex-col gap-4 overflow-y-auto px-4 pt-4 pb-6"
+        className={clsx(
+          'mx-auto flex w-full max-w-[560px] flex-1 flex-col gap-4 overflow-y-auto px-4 pt-4 pb-6',
+          !done && 'wide:max-w-[960px] wide:justify-center',
+        )}
       >
         {done ? (
           <section className="grid gap-4">
@@ -129,8 +132,10 @@ export function TypeTrainer({
             </Button>
           </section>
         ) : (
-          <>
-            <div className="flex items-center justify-between">
+          // Wide screens: the question (and why, once answered) on the left, the ladder
+          // on the right.
+          <div className="flex flex-col gap-4 wide:grid wide:grid-cols-2 wide:items-start wide:gap-x-10">
+            <div className="flex items-center justify-between wide:col-span-2">
               <p className="text-[13px] font-semibold text-muted tabular-nums">
                 {index + 1} of {ROUND}
               </p>
@@ -143,7 +148,7 @@ export function TypeTrainer({
               </button>
             </div>
             {/* Who hits whom, as one sentence: your move's type, then the Pokémon it hits. */}
-            <section className="card grid gap-0.5 px-4 pt-2 pb-1">
+            <section className="card grid gap-0.5 px-4 pt-2 pb-1 wide:col-start-1 wide:row-start-2 wide:gap-3 wide:p-6">
               <p className="flex flex-wrap items-center gap-1.5 text-[16px] font-semibold">
                 Your <TypeBadge type={question.attack} /> attack hits…
               </p>
@@ -151,7 +156,7 @@ export function TypeTrainer({
                 <img
                   src={getSprite(question.species, 'front')}
                   alt=""
-                  className="pixelated size-14 shrink-0 object-contain"
+                  className="pixelated size-14 shrink-0 object-contain wide:size-28"
                 />
                 <div className="grid gap-1.5">
                   <p className="text-[16px] font-semibold">{question.species}</p>
@@ -164,7 +169,11 @@ export function TypeTrainer({
               </div>
             </section>
             {/* Strongest to none, each in its colour: a ladder to pick a rung on. */}
-            <div className="grid gap-1.5" role="group" aria-label="How hard it hits">
+            <div
+              className="grid gap-1.5 wide:col-start-2 wide:row-span-2 wide:row-start-2 wide:gap-2"
+              role="group"
+              aria-label="How hard it hits"
+            >
               {MULTIPLIERS.map((m) => {
                 const isAnswer = m === question.mult;
                 const isPick = m === picked;
@@ -178,7 +187,7 @@ export function TypeTrainer({
                     aria-label={`${multWords(m)}, ${multLabel(m)}`}
                     data-mult={m}
                     className={clsx(
-                      'eff-rung flex h-[clamp(36px,5.8dvh,48px)] items-center justify-between rounded-btn border pr-1.5 pl-3 text-left text-[15px] font-semibold',
+                      'eff-rung flex h-[clamp(36px,calc(5.8dvh/var(--z,1)),48px)] items-center wide:h-12 wide:text-[16px] justify-between rounded-btn border pr-1.5 pl-3 text-left text-[15px] font-semibold',
                       picked === null && 'border-line bg-surface hover:bg-surface-2',
                       picked !== null && isAnswer && 'is-answer',
                       picked !== null && isPick && !isAnswer && 'is-wrong',
@@ -194,7 +203,7 @@ export function TypeTrainer({
             {picked !== null && (
               <div
                 role="note"
-                className="animate-fade-in grid gap-2 rounded-card bg-accent-soft px-3 py-2 text-[14px] leading-snug"
+                className="animate-fade-in grid gap-2 rounded-card bg-accent-soft px-3 py-2 text-[14px] leading-snug wide:col-start-1 wide:row-start-3"
               >
                 <p className="font-semibold">
                   {picked === question.mult
@@ -215,7 +224,7 @@ export function TypeTrainer({
                 </Button>
               </div>
             )}
-          </>
+          </div>
         )}
       </main>
     </div>

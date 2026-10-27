@@ -493,6 +493,14 @@ Every screen outside the battle field wears the home screens' look: a Poké Ball
 
 **Motion.** Screens change with the lid, seam and ball gliding together (view transitions, §12.2). New content rises in and old content fades out. Nothing pops in ahead of its frame.
 
+### 12.2f Computers and big screens (Oct 2026)
+
+- **Scale.** From 1100px wide the whole UI grows steadily (`lib/uiScale.ts`, CSS zoom on `<body>`): about 1.1× on a 1280 laptop, 1.35× at 1920, 1.6× at 2560 (1440p, or 4K at 150%) and about 2.15× at 3840 (4K unscaled), capped at 2.25×. Text is never tiny on a high-resolution screen. Viewport heights divide by the zoom (`calc(100dvh / var(--z))`), and anything that measures the screen (the lesson spotlight, the friends crowd) undoes it.
+- **Desktop layouts, not just bigger phones.** The picker is a 2×2 grid; Learn, the type trainer and the lesson intro use two columns; Link Battle puts Create and Join side by side, and the lobby has the players on the left and the room with its full rules (no Edit sheet) on the right; the lead pick has a details panel beside the teams (your lead, or whoever you click) from 1280px; in battle the lesson's and coach's words sit at the top of the right column, above the log, whose text is a little larger (15px).
+- **Dialogs.** Sheets are centred dialogs, 480px wide; Settings and Share are 720px (Settings in two columns). The first-open name card is centred too.
+- **Mouse and keyboard.** Everything tappable has a hover state. In battle, 1–4 pick a move and Q–Y your Pokémon in team order; Space skips the playback. The battle menu lists the keys.
+- **Checked at** 1280×800, 1366×768, 1440×900, 1536×864, 1920×1080, 2560×1440, 3440×1440 and 3840×2160: nothing scrolls that shouldn't.
+
 ### 12.3 Rendering the battle
 
 - Evaluate `@pkmn/client` and `@pkmn/view` for parsing/rendering protocol vs a minimal custom renderer. Pick the option that gets closest to Showdown's own look and flow (§12.2b) with the least custom work, and supports clear HP, status, hazards, weather, and move reveals.

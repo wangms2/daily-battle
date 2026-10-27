@@ -63,7 +63,7 @@ function Description({ text }: { text: string }) {
   );
 }
 
-function SetCard({
+export function SetCard({
   species,
   set,
   badge,

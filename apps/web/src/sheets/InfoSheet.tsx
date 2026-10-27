@@ -38,11 +38,33 @@ export function InfoSheet({
   action?: { label: string; onClick: () => void; disabled?: boolean };
 }) {
   if (!species) return null;
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange} title={species}>
+      <InfoBody species={species} showRoles={showRoles} showPossibleSets={showPossibleSets} />
+      {action && (
+        <Button className="mt-5 w-full" onClick={action.onClick} disabled={action.disabled}>
+          {action.label}
+        </Button>
+      )}
+    </Sheet>
+  );
+}
+
+/** A Pokémon's types, stats, roles and matchups: the info sheet's contents (or a panel's). */
+export function InfoBody({
+  species,
+  showRoles = true,
+  showPossibleSets = false,
+}: {
+  species: string;
+  showRoles?: boolean;
+  showPossibleSets?: boolean;
+}) {
   const info = speciesInfo(species);
   const m = matchups(species);
   const total = Object.values(info.baseStats).reduce((a, b) => a + b, 0);
   return (
-    <Sheet open={open} onOpenChange={onOpenChange} title={species}>
+    <>
       <div className="flex items-center gap-4">
         <img src={getSprite(species)} alt="" className="pixelated h-20 w-20 object-contain" />
         <div className="space-y-2">
@@ -95,13 +117,7 @@ export function InfoSheet({
         <MatchupRow label="Resists" types={m.resist.map((r) => r.type)} />
         {m.immune.length > 0 && <MatchupRow label="Immune" types={m.immune} />}
       </div>
-
-      {action && (
-        <Button className="mt-5 w-full" onClick={action.onClick} disabled={action.disabled}>
-          {action.label}
-        </Button>
-      )}
-    </Sheet>
+    </>
   );
 }
 

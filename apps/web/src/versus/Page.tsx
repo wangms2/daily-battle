@@ -43,7 +43,7 @@ export function Page({
             {right}
           </div>
           <div className="absolute inset-x-0 top-12 z-10">
-            <h1 className="home-serif mx-auto w-full max-w-[520px] px-5 text-[26px] leading-[1.1]">
+            <h1 className="home-serif mx-auto w-full max-w-[520px] px-5 text-[26px] leading-[1.1] wide:max-w-[880px] wide:px-4">
               {title}
             </h1>
           </div>
@@ -59,7 +59,9 @@ export function Page({
               : 'pb-[max(1rem,env(safe-area-inset-bottom))]',
           )}
         >
-          <div className="mx-auto w-full max-w-[520px] space-y-4 pt-6">{children}</div>
+          <div className="mx-auto w-full max-w-[520px] space-y-4 pt-6 wide:max-w-[880px]">
+            {children}
+          </div>
         </main>
       </div>
     );
@@ -83,9 +85,9 @@ export function Page({
       <main className="min-h-0 flex-1 overflow-y-auto px-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
         <div
           className={clsx(
-            'mx-auto w-full pt-2',
+            'mx-auto w-full pt-2 wide:pt-6',
             tight ? 'space-y-3' : 'space-y-4',
-            wide ? 'max-w-[1200px]' : 'max-w-[560px]',
+            wide ? 'max-w-[1200px]' : 'max-w-[560px] wide:max-w-[920px]',
           )}
         >
           {children}

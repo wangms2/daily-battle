@@ -24,6 +24,7 @@ import { weekKey } from '@daily-battle/gen/dates';
 import { getSprite } from '../lib/sprites';
 import { CloseIcon } from '../ui/icons';
 import { Sheet } from '../ui/Sheet';
+import { useWide } from '../ui/useWide';
 import { Page } from './Page';
 
 interface Option<T> {
@@ -128,6 +129,7 @@ export function Lobby({
   const [removing, setRemoving] = useState<RoomView['players'][number] | null>(null);
   const [copied, setCopied] = useState(false);
   const [editingRules, setEditingRules] = useState(false);
+  const wide = useWide();
   // A big room gets compact rows.
   const dense = room.players.length > 4;
   const link = `${window.location.origin}/#versus/${room.code}`;
@@ -159,6 +161,48 @@ export function Lobby({
     `Rival ${DIFFICULTY_NAME[rival]}`,
   ];
 
+  // The room's rules as choices: controls for the host, read-only rows otherwise.
+  const ruleChoices = (edit: boolean) => (
+    <>
+      <Choice
+        label="Game"
+        value={room.settings.format}
+        options={FORMAT_OPTIONS}
+        onChange={edit ? (format) => set({ format }) : undefined}
+      />
+      <Choice
+        label="Lives"
+        value={room.settings.lives}
+        options={LIVES_OPTIONS}
+        onChange={edit ? (l) => set({ lives: l }) : undefined}
+      />
+      <Choice
+        label="Turn timer"
+        value={room.settings.timer}
+        options={TIMER_OPTIONS}
+        onChange={edit ? (timer) => set({ timer }) : undefined}
+      />
+      <Choice
+        label="Pokémon pool"
+        value={room.settings.pool}
+        options={POOL_OPTIONS}
+        onChange={
+          edit
+            ? (pool) => set(pool === 'weekly' ? { pool, week: weekKey(new Date()) } : { pool })
+            : undefined
+        }
+      />
+      <Choice
+        label="Rival (the AI for an odd player out)"
+        value={rival}
+        options={RIVAL_OPTIONS.filter(
+          (o) => o.value !== 'hard' || hasEngine(genOf(room.settings.format)),
+        )}
+        onChange={edit ? (rivalDifficulty) => set({ rivalDifficulty }) : undefined}
+      />
+    </>
+  );
+
   // The page scrolls if it needs to; a long list of players scrolls on its own.
   return (
     <Page
@@ -177,204 +221,194 @@ export function Lobby({
         </button>
       }
     >
-      <section className="card flex shrink-0 items-center justify-between gap-3 px-4 py-1">
-        <p className="flex items-baseline gap-2">
-          <span className="text-[13px] text-muted">Code</span>
-          <span className="home-serif text-[22px] tracking-[0.18em]" data-testid="room-code">
-            {room.code}
-          </span>
-        </p>
-        <Button variant="secondary" className="h-9 px-3" onClick={invite}>
-          {copied ? 'Link copied' : 'Invite friends'}
-        </Button>
-      </section>
+      {/* Wide screens: the players on the left, the room and its rules on the right. */}
+      <div className="space-y-3 wide:grid wide:grid-cols-2 wide:items-start wide:gap-x-8 wide:gap-y-3 wide:space-y-0">
+        <section className="card flex shrink-0 items-center justify-between gap-3 px-4 py-1 wide:col-start-2">
+          <p className="flex items-baseline gap-2">
+            <span className="text-[13px] text-muted">Code</span>
+            <span className="home-serif text-[22px] tracking-[0.18em]" data-testid="room-code">
+              {room.code}
+            </span>
+          </p>
+          <Button variant="secondary" className="h-9 px-3" onClick={invite}>
+            {copied ? 'Link copied' : 'Invite friends'}
+          </Button>
+        </section>
 
-      <section className="space-y-1">
-        <SectionLabel right={onHowTo && <HowToLink onClick={onHowTo} />}>
-          Players · {room.players.length}
-        </SectionLabel>
-        {/* Up to four, roomy rows and everyone in view. A bigger room gets one-line
+        <section className="space-y-1 wide:col-start-1 wide:row-span-4 wide:row-start-1">
+          <SectionLabel right={onHowTo && <HowToLink onClick={onHowTo} />}>
+            Players · {room.players.length}
+          </SectionLabel>
+          {/* Up to four, roomy rows and everyone in view. A bigger room gets one-line
             rows with small steppers, so a full room of 8 still fits. */}
-        <ul className="card divide-y divide-line" aria-label="Players">
-          {room.players.map((p) => (
-            <li
-              key={p.id}
-              className={clsx(
-                'flex items-center gap-3 px-3',
-                dense ? 'min-h-8 py-0.5' : 'min-h-14 py-2',
-              )}
-            >
-              <span
-                className={clsx('size-2.5 shrink-0 rounded-full', p.online ? 'bg-good' : 'bg-line')}
-                aria-hidden
-              />
-              <span className="min-w-0 flex-1">
+          <ul className="card divide-y divide-line" aria-label="Players">
+            {room.players.map((p) => (
+              <li
+                key={p.id}
+                className={clsx(
+                  'flex items-center gap-3 px-3',
+                  dense ? 'min-h-8 py-0.5' : 'min-h-14 py-2',
+                )}
+              >
                 <span
                   className={clsx(
-                    'block truncate font-semibold',
-                    dense ? 'text-[14px]' : 'text-[15px]',
+                    'size-2.5 shrink-0 rounded-full',
+                    p.online ? 'bg-good' : 'bg-line',
                   )}
-                >
-                  {p.name}
-                  {p.id === you && <span className="font-normal text-muted"> (you)</span>}
-                  {/* One line in a big room: the tags follow the name. */}
-                  {dense && (p.id === room.hostId || !p.online) && (
-                    <span className="text-[12px] font-normal text-muted">
-                      {' · '}
+                  aria-hidden
+                />
+                <span className="min-w-0 flex-1">
+                  <span
+                    className={clsx(
+                      'block truncate font-semibold',
+                      dense ? 'text-[14px]' : 'text-[15px]',
+                    )}
+                  >
+                    {p.name}
+                    {p.id === you && <span className="font-normal text-muted"> (you)</span>}
+                    {/* One line in a big room: the tags follow the name. */}
+                    {dense && (p.id === room.hostId || !p.online) && (
+                      <span className="text-[12px] font-normal text-muted">
+                        {' · '}
+                        {[p.id === room.hostId && 'Host', !p.online && 'Away']
+                          .filter(Boolean)
+                          .join(' · ')}
+                      </span>
+                    )}
+                  </span>
+                  {!dense && (p.id === room.hostId || !p.online) && (
+                    <span className="block text-[12px] text-muted">
                       {[p.id === room.hostId && 'Host', !p.online && 'Away']
                         .filter(Boolean)
                         .join(' · ')}
                     </span>
                   )}
                 </span>
-                {!dense && (p.id === room.hostId || !p.online) && (
-                  <span className="block text-[12px] text-muted">
-                    {[p.id === room.hostId && 'Host', !p.online && 'Away']
-                      .filter(Boolean)
-                      .join(' · ')}
+                {/* Everyone's size in the same place and style; only the ones you can
+                  change have − and + (the others keep their space, so they line up). */}
+                <SizeStepper
+                  compact={dense}
+                  name={p.name}
+                  size={p.teamSize}
+                  onChange={
+                    editable || (p.id === you && room.phase === 'lobby')
+                      ? (size) => command({ type: 'teamSize', player: p.id, size })
+                      : undefined
+                  }
+                />
+                {/* The host's column of Remove buttons, kept on their own row too, so the
+                  steppers line up. */}
+                {host && (
+                  <span className={clsx('flex shrink-0 justify-end', dense ? 'w-8' : 'w-16')}>
+                    {p.id !== you && (
+                      <button
+                        type="button"
+                        className={clsx(
+                          'grid place-items-center rounded-btn text-[13px] text-bad hover:bg-surface-2',
+                          dense ? 'size-7' : 'h-9 px-2',
+                        )}
+                        onClick={() => setRemoving(p)}
+                        aria-label={`Remove ${p.name}`}
+                      >
+                        {/* A big room's rows: a small ✕ instead of the word. */}
+                        {dense ? <CloseIcon className="size-4" aria-hidden /> : 'Remove'}
+                      </button>
+                    )}
                   </span>
                 )}
-              </span>
-              {/* Everyone's size in the same place and style; only the ones you can
-                  change have − and + (the others keep their space, so they line up). */}
-              <SizeStepper
-                compact={dense}
-                name={p.name}
-                size={p.teamSize}
-                onChange={
-                  editable || (p.id === you && room.phase === 'lobby')
-                    ? (size) => command({ type: 'teamSize', player: p.id, size })
-                    : undefined
-                }
-              />
-              {/* The host's column of Remove buttons, kept on their own row too, so the
-                  steppers line up. */}
-              {host && (
-                <span className={clsx('flex shrink-0 justify-end', dense ? 'w-8' : 'w-16')}>
-                  {p.id !== you && (
-                    <button
-                      type="button"
-                      className={clsx(
-                        'grid place-items-center rounded-btn text-[13px] text-bad hover:bg-surface-2',
-                        dense ? 'size-7' : 'h-9 px-2',
-                      )}
-                      onClick={() => setRemoving(p)}
-                      aria-label={`Remove ${p.name}`}
-                    >
-                      {/* A big room's rows: a small ✕ instead of the word. */}
-                      {dense ? <CloseIcon className="size-4" aria-hidden /> : 'Remove'}
-                    </button>
-                  )}
-                </span>
-              )}
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <section className="space-y-1">
-        <SectionLabel
-          right={
-            editable &&
-            room.settings.pool === 'random' && (
-              <button
-                type="button"
-                className="h-7 rounded-chip px-2 text-[13px] font-semibold text-accent hover:bg-surface-2"
-                onClick={onRedraw}
-              >
-                Redraw
-              </button>
-            )
-          }
-        >
-          The 12 · {room.pool?.source === 'weekly' ? 'this week’s pool' : 'random pool'}
-        </SectionLabel>
-        {room.pool && (
-          <ul className="grid grid-cols-12 gap-0.5" aria-label="The pool">
-            {room.pool.species.map((sp) => (
-              <li key={sp} title={sp}>
-                <img
-                  src={getSprite(sp, 'icon')}
-                  alt={sp}
-                  className="pixelated aspect-[4/3] w-full object-contain"
-                />
               </li>
             ))}
           </ul>
-        )}
-      </section>
+        </section>
 
-      <section className="card flex items-center gap-3 px-4 py-1.5" aria-label="Rules">
-        <p className="min-w-0 flex-1 text-[14px] leading-snug">
-          <span className="block text-[12px] font-semibold tracking-wider text-muted uppercase">
-            Rules
-          </span>
-          {rules.join(' · ')}
-        </p>
-        {editable && (
-          <Button
-            variant="secondary"
-            className="h-9 shrink-0 px-3"
-            onClick={() => setEditingRules(true)}
+        <section className="space-y-1 wide:col-start-2">
+          <SectionLabel
+            right={
+              editable &&
+              room.settings.pool === 'random' && (
+                <button
+                  type="button"
+                  className="h-7 rounded-chip px-2 text-[13px] font-semibold text-accent hover:bg-surface-2"
+                  onClick={onRedraw}
+                >
+                  Redraw
+                </button>
+              )
+            }
           >
-            Edit
-          </Button>
-        )}
-      </section>
+            The 12 · {room.pool?.source === 'weekly' ? 'this week’s pool' : 'random pool'}
+          </SectionLabel>
+          {room.pool && (
+            <ul className="grid grid-cols-12 gap-0.5" aria-label="The pool">
+              {room.pool.species.map((sp) => (
+                <li key={sp} title={sp}>
+                  <img
+                    src={getSprite(sp, 'icon')}
+                    alt={sp}
+                    className="pixelated aspect-[4/3] w-full object-contain"
+                  />
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
 
-      <section className="space-y-1">
-        {room.phase === 'lobby' && host && (
-          <Button className="w-full" disabled={room.players.length < 2} onClick={onStart}>
-            Start the game
-          </Button>
+        {wide ? (
+          // A computer has room: the rules themselves, on the page.
+          <section
+            className={clsx(
+              'card px-4 wide:col-start-2',
+              editable ? 'space-y-3 py-3' : 'divide-y divide-line py-1',
+            )}
+            aria-label="Rules"
+          >
+            <p className="pt-1 text-[12px] font-semibold tracking-wider text-muted uppercase">
+              Rules
+            </p>
+            {ruleChoices(editable)}
+          </section>
+        ) : (
+          <section
+            className="card flex items-center gap-3 px-4 py-1.5 wide:col-start-2"
+            aria-label="Rules"
+          >
+            <p className="min-w-0 flex-1 text-[14px] leading-snug">
+              <span className="block text-[12px] font-semibold tracking-wider text-muted uppercase">
+                Rules
+              </span>
+              {rules.join(' · ')}
+            </p>
+            {editable && (
+              <Button
+                variant="secondary"
+                className="h-9 shrink-0 px-3"
+                onClick={() => setEditingRules(true)}
+              >
+                Edit
+              </Button>
+            )}
+          </section>
         )}
-        {/* A note only when there's something to wait for (Leave is up in the header). */}
-        {room.phase === 'lobby' && (!host || room.players.length < 2) && (
-          <p className="text-center text-[13px] text-muted">
-            {host
-              ? 'Invite at least one friend to start.'
-              : 'Waiting for the host to start the game.'}
-          </p>
-        )}
-      </section>
+
+        <section className="space-y-1 wide:col-start-2">
+          {room.phase === 'lobby' && host && (
+            <Button className="w-full" disabled={room.players.length < 2} onClick={onStart}>
+              Start the game
+            </Button>
+          )}
+          {/* A note only when there's something to wait for (Leave is up in the header). */}
+          {room.phase === 'lobby' && (!host || room.players.length < 2) && (
+            <p className="text-center text-[13px] text-muted">
+              {host
+                ? 'Invite at least one friend to start.'
+                : 'Waiting for the host to start the game.'}
+            </p>
+          )}
+        </section>
+      </div>
 
       <Sheet open={editingRules} onOpenChange={setEditingRules} title="Rules">
-        <div className="space-y-3">
-          <Choice
-            label="Game"
-            value={room.settings.format}
-            options={FORMAT_OPTIONS}
-            onChange={(format) => set({ format })}
-          />
-          <Choice
-            label="Lives"
-            value={room.settings.lives}
-            options={LIVES_OPTIONS}
-            onChange={(l) => set({ lives: l })}
-          />
-          <Choice
-            label="Turn timer"
-            value={room.settings.timer}
-            options={TIMER_OPTIONS}
-            onChange={(timer) => set({ timer })}
-          />
-          <Choice
-            label="Pokémon pool"
-            value={room.settings.pool}
-            options={POOL_OPTIONS}
-            onChange={(pool) =>
-              set(pool === 'weekly' ? { pool, week: weekKey(new Date()) } : { pool })
-            }
-          />
-          <Choice
-            label="Rival (the AI for an odd player out)"
-            value={rival}
-            options={RIVAL_OPTIONS.filter(
-              (o) => o.value !== 'hard' || hasEngine(genOf(room.settings.format)),
-            )}
-            onChange={(rivalDifficulty) => set({ rivalDifficulty })}
-          />
-        </div>
+        <div className="space-y-3">{ruleChoices(true)} </div>
         <Button className="mt-4 w-full" onClick={() => setEditingRules(false)}>
           Done
         </Button>

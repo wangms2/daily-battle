@@ -61,45 +61,48 @@ export function CourseMap({
         left={<BackButton label={`Learn · ${game} OU`} onClick={onBack} />}
         onSettings={onSettings}
       />
-      <main className="mx-auto w-full max-w-[560px] flex-1 overflow-y-auto px-4 pt-4 pb-10">
-        <div className="flex items-center justify-between gap-2">
-          <h1 className="home-serif text-[22px]">Learn to battle</h1>
-          {/* Type matchups: an optional side practice, outside the course order. */}
-          <button
-            type="button"
-            onClick={onTrainer}
-            className="flex shrink-0 items-center gap-1 rounded-full border border-line bg-surface px-2.5 py-1 text-[13px] font-semibold hover:bg-surface-2"
-          >
-            <span aria-hidden>🎯</span> Type trainer
-          </button>
-        </div>
-        <p className="mt-1 text-[14px] text-muted">
-          {all.filter((l) => !l.review).length} short lessons, one idea each.{' '}
-          {count > 0 && `${count} done.`}
-        </p>
-        {next && nextLesson && (
-          // Up next: the way in, at the top.
-          <button
-            type="button"
-            onClick={() => onOpen(nextLesson)}
-            className="card mt-4 flex w-full items-center gap-3 p-3 text-left ring-2 ring-accent"
-          >
-            <img
-              src={getSprite(next.star, 'front')}
-              alt=""
-              className="pixelated size-16 shrink-0 object-contain"
-            />
-            <span className="min-w-0 flex-1">
-              <span className="block text-[12px] font-semibold text-muted">
-                {count > 0 ? 'Up next' : 'Start here'} · {label(next)}
+      {/* Wide screens: the intro and Up next on the left, the course on the right. */}
+      <main className="mx-auto w-full max-w-[560px] flex-1 overflow-y-auto px-4 pt-4 pb-10 wide:grid wide:max-w-[1040px] wide:grid-cols-[minmax(0,380px)_minmax(0,1fr)] wide:items-start wide:gap-10 wide:pt-8">
+        <div className="wide:sticky wide:top-0">
+          <div className="flex items-center justify-between gap-2">
+            <h1 className="home-serif text-[22px]">Learn to battle</h1>
+            {/* Type matchups: an optional side practice, outside the course order. */}
+            <button
+              type="button"
+              onClick={onTrainer}
+              className="flex shrink-0 items-center gap-1 rounded-full border border-line bg-surface px-2.5 py-1 text-[13px] font-semibold hover:bg-surface-2"
+            >
+              <span aria-hidden>🎯</span> Type trainer
+            </button>
+          </div>
+          <p className="mt-1 text-[14px] text-muted">
+            {all.filter((l) => !l.review).length} short lessons, one idea each.{' '}
+            {count > 0 && `${count} done.`}
+          </p>
+          {next && nextLesson && (
+            // Up next: the way in, at the top.
+            <button
+              type="button"
+              onClick={() => onOpen(nextLesson)}
+              className="card mt-4 flex w-full items-center gap-3 p-3 text-left ring-2 ring-accent"
+            >
+              <img
+                src={getSprite(next.star, 'front')}
+                alt=""
+                className="pixelated size-16 shrink-0 object-contain"
+              />
+              <span className="min-w-0 flex-1">
+                <span className="block text-[12px] font-semibold text-muted">
+                  {count > 0 ? 'Up next' : 'Start here'} · {label(next)}
+                </span>
+                <span className="block text-[17px] leading-snug font-semibold">{next.title}</span>
+                <span className="block text-[13px] text-muted">{nextLesson.summary}</span>
               </span>
-              <span className="block text-[17px] leading-snug font-semibold">{next.title}</span>
-              <span className="block text-[13px] text-muted">{nextLesson.summary}</span>
-            </span>
-            <span className="cta-pill shrink-0 px-3 py-1.5 text-[15px]">Start</span>
-          </button>
-        )}
-        <ol className="mt-5 grid gap-2">
+              <span className="cta-pill shrink-0 px-3 py-1.5 text-[15px]">Start</span>
+            </button>
+          )}
+        </div>
+        <ol className="mt-5 grid gap-2 wide:mt-0">
           {course.map((unit, u) => {
             const finished = unit.lessons.filter((l) => done(l.id)).length;
             const complete = finished === unit.lessons.length;

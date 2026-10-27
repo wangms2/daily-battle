@@ -314,8 +314,8 @@ export function TeamBuilder({
     <div className="game-ui flex h-full flex-col">
       {topBar}
       {wide ? (
-        <main className="grid min-h-0 flex-1 grid-cols-[1fr_380px] items-start gap-6 px-6 pb-6 pt-4">
-          <section className="flex max-h-full flex-col gap-3 overflow-y-auto">
+        <main className="grid min-h-0 flex-1 grid-cols-[1fr_380px] grid-rows-[minmax(0,1fr)] items-start gap-6 px-6 pb-6 pt-4">
+          <section className="flex max-h-full min-h-0 flex-col gap-3 overflow-y-auto">
             <SectionLabel>This week’s pool · pick 6</SectionLabel>
             {poolGrid}
             <DetailsPanel
@@ -332,7 +332,7 @@ export function TeamBuilder({
               onToggle={() => viewing && toggleWide(viewing)}
             />
           </section>
-          <aside className="card flex flex-col gap-3 p-4">
+          <aside className="card flex max-h-full min-h-0 flex-col gap-3 p-4">
             {noticeBar}
             {suggestions}
             <SectionLabel

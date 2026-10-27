@@ -318,11 +318,12 @@ function ShareSheetButton({
         {children}
       </Button>
       {toast}
-      <Sheet open={choosing} onOpenChange={setChoosing} title="Share your result">
+      {/* Roomier on a computer: the card shows near its real size. */}
+      <Sheet open={choosing} onOpenChange={setChoosing} title="Share your result" size="md">
         <div className="grid gap-3">
           {all && (
             <div
-              className="flex justify-self-center rounded-xl bg-surface-2 p-0.5"
+              className="seg flex justify-self-center p-0.5"
               role="radiogroup"
               aria-label="What to share"
             >

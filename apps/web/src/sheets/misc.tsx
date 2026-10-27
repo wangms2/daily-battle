@@ -211,7 +211,12 @@ export function SettingsSheet({
     onOpenChange(o);
   };
   return (
-    <Sheet open={open} onOpenChange={close} title={page === 'trainer' ? 'Trainer' : 'Settings'}>
+    <Sheet
+      open={open}
+      onOpenChange={close}
+      title={page === 'trainer' ? 'Trainer' : 'Settings'}
+      size="md"
+    >
       {page === 'trainer' ? (
         <div>
           <button
@@ -226,54 +231,61 @@ export function SettingsSheet({
         </div>
       ) : (
         <>
-          <div className="divide-y divide-line">
-            <TrainerRow name={settings.name} onOpen={() => setPage('trainer')} />
-            <Switch
-              checked={settings.beginnerHints}
-              onCheckedChange={(v) => onChange('beginnerHints', v)}
-              label="Beginner hints"
-            />
-            <div className="flex min-h-14 items-center justify-between gap-4 py-2">
-              <span className="text-[15px] font-medium">Battle speed</span>
-              <div className="seg flex p-1" role="radiogroup" aria-label="Battle speed">
-                {speeds.map((s) => (
-                  <button
-                    key={s}
-                    type="button"
-                    role="radio"
-                    aria-checked={settings.battleSpeed === s}
-                    onClick={() => onChange('battleSpeed', s)}
-                    className={`min-h-9 rounded-lg px-3 text-[13px] font-semibold capitalize ${
-                      settings.battleSpeed === s ? 'bg-surface text-ink shadow-card' : 'text-muted'
-                    }`}
-                  >
-                    {s}
-                  </button>
-                ))}
+          {/* Two columns on wide screens: the game on the left, sound on the right. */}
+          <div className="wide:grid wide:grid-cols-2 wide:gap-8">
+            <div className="divide-y divide-line">
+              <TrainerRow name={settings.name} onOpen={() => setPage('trainer')} />
+              <Switch
+                checked={settings.beginnerHints}
+                onCheckedChange={(v) => onChange('beginnerHints', v)}
+                label="Beginner hints"
+              />
+              <div className="flex min-h-14 items-center justify-between gap-4 py-2">
+                <span className="text-[15px] font-medium">Battle speed</span>
+                <div className="seg flex p-1" role="radiogroup" aria-label="Battle speed">
+                  {speeds.map((s) => (
+                    <button
+                      key={s}
+                      type="button"
+                      role="radio"
+                      aria-checked={settings.battleSpeed === s}
+                      onClick={() => onChange('battleSpeed', s)}
+                      className={`min-h-9 rounded-lg px-3 text-[13px] font-semibold capitalize ${
+                        settings.battleSpeed === s
+                          ? 'bg-surface text-ink shadow-card'
+                          : 'text-muted'
+                      }`}
+                    >
+                      {s}
+                    </button>
+                  ))}
+                </div>
               </div>
+              <Switch
+                checked={settings.animations}
+                onCheckedChange={(v) => onChange('animations', v)}
+                label="Animations"
+              />
             </div>
-            <Switch
-              checked={settings.animations}
-              onCheckedChange={(v) => onChange('animations', v)}
-              label="Animations"
-            />
-            <Switch
-              checked={settings.sound}
-              onCheckedChange={(v) => onChange('sound', v)}
-              label="Sound"
-            />
-            <VolumeSlider
-              label="Music volume"
-              value={settings.musicVolume}
-              disabled={!settings.sound}
-              onChange={(v) => onChange('musicVolume', v)}
-            />
-            <VolumeSlider
-              label="Effects volume"
-              value={settings.effectsVolume}
-              disabled={!settings.sound}
-              onChange={(v) => onChange('effectsVolume', v)}
-            />
+            <div className="divide-y divide-line border-t border-line wide:border-t-0">
+              <Switch
+                checked={settings.sound}
+                onCheckedChange={(v) => onChange('sound', v)}
+                label="Sound"
+              />
+              <VolumeSlider
+                label="Music volume"
+                value={settings.musicVolume}
+                disabled={!settings.sound}
+                onChange={(v) => onChange('musicVolume', v)}
+              />
+              <VolumeSlider
+                label="Effects volume"
+                value={settings.effectsVolume}
+                disabled={!settings.sound}
+                onChange={(v) => onChange('effectsVolume', v)}
+              />
+            </div>
           </div>
           <div className="mt-3 grid grid-cols-2 gap-2">
             <Button variant="secondary" onClick={onHowToPlay}>

@@ -15,7 +15,7 @@ export function LogSheet({
 }) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange} title="Battle log">
-      <LogList lines={lines} className="h-[60dvh]" />
+      <LogList lines={lines} className="h-[calc(60dvh/var(--z,1))]" />
     </Sheet>
   );
 }
@@ -108,7 +108,20 @@ export function MenuSheet({
           </Button>
         )}
       </div>
+      {/* Keyboard play, on a computer. */}
+      <p className="mt-3 hidden rounded-card bg-surface-2 px-3 py-2 text-[13px] leading-relaxed text-muted wide:block">
+        <span className="font-semibold text-ink">Keys:</span> <Kbd>1</Kbd>–<Kbd>4</Kbd> moves ·{' '}
+        <Kbd>Q</Kbd>–<Kbd>Y</Kbd> your team, in order · <Kbd>Space</Kbd> skips the playback
+      </p>
     </Sheet>
+  );
+}
+
+function Kbd({ children }: { children: string }) {
+  return (
+    <kbd className="rounded border border-line bg-surface px-1 font-sans text-[12px] font-semibold text-ink">
+      {children}
+    </kbd>
   );
 }
 

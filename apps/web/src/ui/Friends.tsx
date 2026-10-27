@@ -1,6 +1,7 @@
 // A few Pokémon hanging out together: the home screens' nod to playing with friends.
 // On the landing the group grows with the screen (a bigger crowd on a big monitor)
 // but only as many as fit across it, so none is cut off; elsewhere it is the small four.
+import { uiScale } from '../lib/uiScale';
 import { useEffect, useState } from 'react';
 import { FRIENDS } from '../lib/friends';
 import { getSprite } from '../lib/sprites';
@@ -23,7 +24,11 @@ const LANDING_SHARE = 0.095;
 const EDGE = 12;
 
 function useViewport() {
-  const read = () => ({ w: window.innerWidth, h: window.innerHeight });
+  // In layout px: the window divided by the big-screen zoom (lib/uiScale.ts).
+  const read = () => {
+    const z = uiScale(window.innerWidth);
+    return { w: window.innerWidth / z, h: window.innerHeight / z };
+  };
   const [size, setSize] = useState(read);
   useEffect(() => {
     const on = () => setSize(read());

@@ -42,7 +42,7 @@ export function LessonIntro({
         left={<BackButton label={title} onClick={onExit} />}
         onSettings={onSettings}
       />
-      <main className="mx-auto flex w-full max-w-[480px] flex-1 flex-col items-center justify-center gap-4 overflow-y-auto px-6 pb-10 text-center">
+      <main className="mx-auto flex w-full max-w-[480px] wide:max-w-[800px] flex-1 flex-col items-center justify-center gap-4 overflow-y-auto px-6 pb-10 text-center">
         {first && (
           <div className="grid gap-1">
             <p className="home-serif text-[26px]">Welcome to Learn to battle!</p>
@@ -52,26 +52,33 @@ export function LessonIntro({
             </p>
           </div>
         )}
-        {star && (
-          <img
-            src={getSprite(star, 'front')}
-            alt=""
-            className="lesson-star pixelated size-36 object-contain"
-          />
-        )}
-        <div className="grid gap-1">
-          <p className="text-[13px] font-semibold tracking-wider text-muted uppercase">
-            {lesson.review ? 'Unit review' : `Lesson ${lesson.number}`}
-          </p>
-          <h1 className="home-serif text-[24px] leading-tight">{lesson.title}</h1>
-          <p className="text-[16px] leading-snug">{lesson.summary}</p>
-          <p className="mt-1 text-[13px] text-muted tabular-nums">
-            {lesson.steps.length} steps · about {minutes(lesson)} min
-          </p>
+        {/* Wide screens: the star beside the lesson, not above it. */}
+        <div className="flex flex-col items-center gap-4 wide:flex-row wide:gap-12 wide:text-left">
+          {star && (
+            <img
+              src={getSprite(star, 'front')}
+              alt=""
+              className="lesson-star pixelated size-36 shrink-0 object-contain wide:size-52"
+            />
+          )}
+          <div className="flex flex-col items-center wide:items-start">
+            <div className="grid gap-1 wide:max-w-[420px]">
+              <p className="text-[13px] font-semibold tracking-wider text-muted uppercase">
+                {lesson.review ? 'Unit review' : `Lesson ${lesson.number}`}
+              </p>
+              <h1 className="home-serif text-[24px] leading-tight wide:text-[32px]">
+                {lesson.title}
+              </h1>
+              <p className="text-[16px] leading-snug">{lesson.summary}</p>
+              <p className="mt-1 text-[13px] text-muted tabular-nums">
+                {lesson.steps.length} steps · about {minutes(lesson)} min
+              </p>
+            </div>
+            <Button className="mt-2 w-full max-w-[280px] wide:mt-4" onClick={onStart}>
+              {first ? 'Let’s go' : 'Start'}
+            </Button>
+          </div>
         </div>
-        <Button className="mt-2 w-full max-w-[280px]" onClick={onStart}>
-          {first ? 'Let’s go' : 'Start'}
-        </Button>
       </main>
     </div>
   );

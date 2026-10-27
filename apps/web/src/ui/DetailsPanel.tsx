@@ -70,7 +70,12 @@ export function DetailsPanel({
   };
 
   return (
-    <section aria-label={`${species} details`} className="card flex min-h-0 flex-col gap-3 p-4">
+    <section
+      aria-label={`${species} details`}
+      // Scrolls inside itself when a tall set doesn't fit beside the pool. `relative`
+      // keeps the stat rows' sr-only labels clipped here, not stretching the page.
+      className="card relative flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-4"
+    >
       <header className="flex items-center gap-2">
         <img
           src={getSprite(species, 'icon')}

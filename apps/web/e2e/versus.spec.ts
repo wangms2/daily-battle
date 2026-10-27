@@ -24,9 +24,12 @@ async function friend(browser: Browser, baseURL: string | undefined) {
   return page;
 }
 
-/** The host changes the room's rules in the Rules sheet (Edit on the summary). */
-async function rules(page: Page, change: (sheet: Locator) => Promise<unknown>) {
-  await page.getByRole('region', { name: 'Rules' }).getByRole('button', { name: 'Edit' }).click();
+/** The host changes the room's rules: on the page (wide screens), or in the Rules sheet. */
+async function rules(page: Page, change: (rules: Locator) => Promise<unknown>) {
+  const region = page.getByRole('region', { name: 'Rules' });
+  const edit = region.getByRole('button', { name: 'Edit' });
+  if (!(await edit.isVisible())) return change(region);
+  await edit.click();
   const sheet = page.getByRole('dialog', { name: 'Rules' });
   await change(sheet);
   await sheet.getByRole('button', { name: 'Done' }).click();
@@ -182,7 +185,8 @@ test('friends join a room, see each other, and see the host’s rules', async ({
     await sheet.getByRole('button', { name: 'Gen 5 OU' }).click();
   });
   await teamSize(page, 'Misty', 4);
-  await expect(misty.getByRole('region', { name: 'Rules' })).toContainText('Gen 5 OU · 3 lives');
+  await expect(misty.getByRole('region', { name: 'Rules' })).toContainText('Gen 5 OU');
+  await expect(misty.getByRole('region', { name: 'Rules' })).toContainText('3');
   await expect(misty.getByRole('button', { name: 'Edit' })).toHaveCount(0);
   // Misty sees the size the host gave her, on her own stepper.
   await expect(misty.getByRole('group', { name: 'Misty’s team size: 4 Pokémon' })).toBeVisible();

@@ -621,7 +621,7 @@ export function App() {
 
   return (
     <div
-      className={`mx-auto h-dvh overflow-hidden ${route === 'battle' ? 'max-w-[1440px]' : !versus && !playing && !learning ? '' : 'max-w-[1280px]'}`}
+      className={`mx-auto h-[calc(100dvh/var(--z,1))] overflow-hidden ${route === 'battle' ? 'max-w-[1440px]' : !versus && !playing && !learning ? '' : 'max-w-[1280px]'}`}
       // The game's own colour, for its screens' big buttons (styles.css, .game-ui).
       style={
         {

@@ -15,6 +15,7 @@ export function Sheet({
   description,
   children,
   wide = false,
+  size,
   hideTitle = false,
   scroll = false,
 }: {
@@ -27,6 +28,8 @@ export function Sheet({
   children: ReactNode;
   /** Let the dialog grow wider on desktop (e.g. side-by-side set cards). */
   wide?: boolean;
+  /** "md": a roomier dialog on desktop, for two-column content (Settings). */
+  size?: 'md';
   hideTitle?: boolean;
 }) {
   // Phones get a bottom sheet with a handle that drags it closed; wide screens a dialog.
@@ -47,9 +50,13 @@ export function Sheet({
           aria-describedby={description ? undefined : undefined}
           className={clsx(
             'menu-sheet animate-sheet-in fixed z-50 flex flex-col bg-surface text-ink shadow-card outline-none',
-            'inset-x-0 bottom-0 max-h-[92dvh] rounded-t-sheet pb-[max(1rem,env(safe-area-inset-bottom))]',
+            'inset-x-0 bottom-0 max-h-[calc(92dvh/var(--z,1))] rounded-t-sheet pb-[max(1rem,env(safe-area-inset-bottom))]',
             'wide:inset-auto wide:top-1/2 wide:left-1/2 wide:-translate-x-1/2 wide:-translate-y-1/2 wide:rounded-sheet wide:pb-5',
-            wide ? 'wide:w-[min(960px,92vw)]' : 'wide:w-[440px]',
+            wide
+              ? 'wide:w-[min(960px,92vw)]'
+              : size === 'md'
+                ? 'wide:w-[min(720px,92vw)]'
+                : 'wide:w-[480px]',
           )}
         >
           {/* The handle and header are the drag area for swiping the sheet closed. */}

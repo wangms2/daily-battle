@@ -20,9 +20,9 @@ import { startBuilderMusic, stopBuilderMusic } from '../lib/audio';
 import { finalStats } from '../lib/stats';
 import { dayHeadline, streakLine, type DaySummary } from '../lib/results';
 import { getSprite, preloadSprites } from '../lib/sprites';
-import { InfoSheet } from '../sheets/InfoSheet';
+import { InfoBody, InfoSheet } from '../sheets/InfoSheet';
 import { ConfirmDialog } from '../sheets/misc';
-import { SetPicker } from '../sheets/SetPicker';
+import { SetCard, SetPicker } from '../sheets/SetPicker';
 import type { DayChange, DayState } from '../state/schema';
 import { Button, SectionLabel } from '../ui/bits';
 import { CoachToggle, DifficultyPicker } from '../ui/Difficulty';
@@ -33,7 +33,7 @@ import { PokemonTile } from '../ui/PokemonTile';
 import type { ShareModel } from '../lib/share';
 import { OtherGames } from '../ui/OtherGames';
 import { ShareButton } from '../ui/results';
-import { useWide } from '../ui/useWide';
+import { useMediaQuery, useWide } from '../ui/useWide';
 
 type Mode =
   | { kind: 'view' }
@@ -107,6 +107,8 @@ export function DailyBrief({
   renderTopBar: (left?: ReactNode) => ReactNode;
 }) {
   const wide = useWide();
+  // Wide enough for the details panel beside the teams.
+  const panelOn = useMediaQuery('(min-width: 1280px)');
   const opponent = schedule.days.find((d) => d.day === day)!;
   const lead =
     dayState.lead && team.some((s) => s.species === dayState.lead)
@@ -116,6 +118,8 @@ export function DailyBrief({
   const [ditchOpen, setDitchOpen] = useState(false);
   const [infoFor, setInfoFor] = useState<{ species: string; foe: boolean } | null>(null);
   const [setView, setSetView] = useState<Slot | null>(null);
+  // Wide screens: who the side panel shows (your lead until you pick another).
+  const [focus, setFocus] = useState<{ species: string; foe: boolean } | null>(null);
   const [picker, setPicker] = useState<{
     slot: number;
     species: string;
@@ -257,9 +261,11 @@ export function DailyBrief({
               key={species}
               species={species}
               label={`About ${species}${hints && canMega(species) ? ', can Mega Evolve' : ''}`}
-              onTap={() => setInfoFor({ species, foe: true })}
+              onTap={() =>
+                panelOn ? setFocus({ species, foe: true }) : setInfoFor({ species, foe: true })
+              }
               badge={hints && canMega(species) ? <MegaMark text="Can Mega Evolve" /> : undefined}
-              hoverCard={wide ? hoverOf(species) : undefined}
+              hoverCard={wide && !panelOn ? hoverOf(species) : undefined}
             />
           ))}
         </div>
@@ -279,7 +285,9 @@ export function DailyBrief({
               key={slot.species}
               species={slot.species}
               showTypes={!editing}
-              hoverCard={wide && !editing ? hoverOf(slot.species, slot.setId) : undefined}
+              hoverCard={
+                wide && !editing && !panelOn ? hoverOf(slot.species, slot.setId) : undefined
+              }
               selected={!editing && isLead}
               badge={
                 (!editing && isLead) || megaFor(slot.species, findSet(slot)) ? (
@@ -301,7 +309,12 @@ export function DailyBrief({
                     : `Lead with ${slot.species}`
               }
               onTap={editing ? undefined : () => onLead(slot.species)}
-              onInfo={editing ? undefined : () => setSetView(slot)}
+              onInfo={
+                editing
+                  ? undefined
+                  : () =>
+                      panelOn ? setFocus({ species: slot.species, foe: false }) : setSetView(slot)
+              }
               infoLabel={`${slot.species}'s set`}
               footer={
                 editing ? (
@@ -397,6 +410,15 @@ export function DailyBrief({
   // Once the day's decided, the other games are one tap away.
   const others = decided && !editing && <OtherGames compact className="shrink-0" />;
 
+  // The panel's Pokémon: the one picked, else your lead.
+  const panelSlot = (() => {
+    const f = focus ?? { species: lead, foe: false };
+    if (f.foe) return { species: f.species, foe: true, set: undefined };
+    const slot = team.find((t) => t.species === f.species);
+    if (!slot) return null;
+    return { species: slot.species, foe: false, set: findSet(slot) };
+  })();
+
   const vs = (
     <div className="flex shrink-0 items-center gap-3 text-[12px] font-bold tracking-[0.2em] text-muted">
       <span className="h-px flex-1 bg-line" />
@@ -414,7 +436,7 @@ export function DailyBrief({
     <div className="game-ui flex h-full flex-col">
       {topBar}
       {wide ? (
-        <main className="flex min-h-0 flex-1 flex-col gap-4 px-6 pb-6 pt-4">
+        <main className="flex min-h-0 flex-1 gap-6 px-6 pb-6 pt-4">
           {/* Stacked as on phones: the opponent on top, your team nearer you. */}
           <div className="mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col justify-center gap-3">
             {opponentSection}
@@ -427,6 +449,32 @@ export function DailyBrief({
               {start}
             </div>
           </div>
+          {/* A computer has room: details beside the teams instead of a sheet over them. */}
+          {panelOn && !editing && panelSlot && (
+            <aside
+              aria-label={`${panelSlot.species} details`}
+              className="card w-[340px] shrink-0 self-start overflow-y-auto p-4"
+              style={{ maxHeight: '100%' }}
+            >
+              <p className="mb-2 flex items-baseline justify-between gap-2">
+                <span className="home-serif text-[20px]">{panelSlot.species}</span>
+                <span className="text-[12px] font-semibold tracking-wider text-muted uppercase">
+                  {panelSlot.foe
+                    ? 'Opponent'
+                    : panelSlot.species === lead
+                      ? 'Your lead'
+                      : 'Your team'}
+                </span>
+              </p>
+              {panelSlot.foe ? (
+                <InfoBody species={panelSlot.species} showRoles={false} showPossibleSets={hints} />
+              ) : (
+                panelSlot.set && (
+                  <SetCard species={panelSlot.species} set={panelSlot.set} badge={null} />
+                )
+              )}
+            </aside>
+          )}
         </main>
       ) : (
         <main className="flex min-h-0 flex-1 flex-col gap-2 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3">

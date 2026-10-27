@@ -249,6 +249,29 @@ body {
 .btn-ghost {
   color: var(--accent);
 }
+/* Hover, for a mouse: everything tappable answers the pointer (DESIGN.md §12.2e). */
+@media (hover: hover) {
+  .btn-primary:hover:not(:disabled),
+  .btn-danger:hover:not(:disabled),
+  .home-btn:hover:not(:disabled) {
+    filter: brightness(1.07);
+  }
+  .btn-secondary:hover:not(:disabled),
+  .chip:hover:not([aria-pressed='true']):not(:disabled),
+  .seg > button:hover:not([aria-checked='true']):not([aria-selected='true']):not(:disabled) {
+    background: color-mix(in srgb, var(--surface-2) 70%, var(--surface));
+  }
+  .btn-ghost:hover:not(:disabled) {
+    background: var(--surface-2);
+  }
+  .tile-hover:hover {
+    translate: 0 -2px;
+    box-shadow: 0 6px 16px rgb(0 0 0 / 0.1);
+  }
+  .home-cart:hover {
+    border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+  }
+}
 .btn-ghost.text-bad {
   color: var(--bad);
 }
@@ -1234,7 +1257,7 @@ button {
   bottom: var(--kb, 0px);
 }
 .kb-open .name-pop-card {
-  max-height: calc(100dvh - var(--kb, 0px) - 12px);
+  max-height: calc(100dvh / var(--z, 1) - var(--kb, 0px) - 12px);
   overflow-y: auto;
 }
 .end-card-wrap {
@@ -1243,7 +1266,7 @@ button {
 @media (max-width: 899.98px) {
   .menu-sheet {
     bottom: var(--kb, 0px);
-    max-height: calc(92dvh - var(--kb, 0px));
+    max-height: calc(92dvh / var(--z, 1) - var(--kb, 0px));
   }
 }
 
@@ -1268,6 +1291,17 @@ button {
 @keyframes name-rise {
   from {
     translate: 0 110%;
+  }
+}
+/* A computer: the name card is a dialog in the middle of the landing. */
+@media (min-width: 900px) {
+  .name-pop {
+    align-items: center;
+  }
+  .name-pop .name-pop-card {
+    border-radius: 22px;
+    margin-top: 96px;
+    padding-bottom: 1.5rem;
   }
 }
 @media (prefers-reduced-motion: reduce) {

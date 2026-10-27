@@ -90,7 +90,11 @@ test('an opponent’s possible sets show with hints on, and fit', async ({ page 
   await shot(page, '00-brief', info.project.name);
   const foe = schedule.days.find((d) => d.day === '2026-10-21')!.team[0]!.species;
   await page.getByRole('button', { name: `About ${foe}` }).click();
-  const sheet = page.getByRole('dialog', { name: foe });
+  // A computer shows it in the panel beside the teams; a phone or tablet in a sheet.
+  const sheet =
+    page.viewportSize()!.width >= 1280
+      ? page.getByRole('complementary', { name: `${foe} details` })
+      : page.getByRole('dialog', { name: foe });
   await expect(sheet.getByRole('tablist', { name: 'Possible sets' })).toBeVisible();
   await noScroll(page, 'foe info with possible sets');
   await shot(page, '04-foe-sets', info.project.name);

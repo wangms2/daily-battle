@@ -38,6 +38,8 @@ export function Spotlight({
     let frame = 0;
     const measure = () => {
       const box = el.getBoundingClientRect();
+      // Measured on screen, drawn in layout px: undo the big-screen zoom (lib/uiScale.ts).
+      const z = el.offsetWidth ? box.width / el.offsetWidth : 1;
       const found: Hole[] = [];
       // Targets come before the empty separator; the kept keys after it.
       const keys = key.split('|');
@@ -51,15 +53,15 @@ export function Spotlight({
           const r = node.getBoundingClientRect();
           if (r.width && r.height)
             found.push({
-              x: r.left - box.left - PAD,
-              y: r.top - box.top - PAD,
-              w: r.width + 2 * PAD,
-              h: r.height + 2 * PAD,
+              x: (r.left - box.left) / z - PAD,
+              y: (r.top - box.top) / z - PAD,
+              w: r.width / z + 2 * PAD,
+              h: r.height / z + 2 * PAD,
             });
         }
       }
       setHoles((prev) => {
-        const next = { w: box.width, h: box.height, holes: found, rings };
+        const next = { w: box.width / z, h: box.height / z, holes: found, rings };
         return prev && JSON.stringify(prev) === JSON.stringify(next) ? prev : next;
       });
       frame = requestAnimationFrame(measure);

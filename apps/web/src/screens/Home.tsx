@@ -98,7 +98,7 @@ export function Home({
           inert={landing}
           aria-hidden={landing}
         >
-          <h1 className="home-serif mx-auto w-full max-w-[520px] px-5 text-[26px] leading-[1.1]">
+          <h1 className="home-serif mx-auto w-full max-w-[520px] px-5 text-[26px] leading-[1.1] wide:max-w-[900px] wide:px-4">
             Choose a generation
           </h1>
         </div>
@@ -178,7 +178,7 @@ export function Home({
         </div>
 
         <main
-          className="home-games mx-auto flex w-full max-w-[520px] flex-col gap-2.5 px-4 pb-5 pt-7"
+          className="home-games mx-auto flex w-full max-w-[520px] flex-col gap-2.5 px-4 pb-5 pt-7 wide:grid wide:max-w-[900px] wide:grid-cols-2 wide:content-center wide:gap-4 wide:pt-6"
           inert={landing}
           aria-hidden={landing}
         >
@@ -190,10 +190,10 @@ export function Home({
               <div
                 key={g.id}
                 style={{ '--i': i } as CSSProperties}
-                className="home-cart grid min-h-0 max-h-[124px] flex-1 grid-cols-[84px_1fr_auto] items-center gap-2 p-2 text-left has-[.home-cart-play:focus-visible]:outline-2 has-[.home-cart-play:focus-visible]:outline-accent"
+                className="home-cart grid min-h-0 max-h-[124px] flex-1 grid-cols-[84px_1fr_auto] items-center gap-2 p-2 text-left wide:max-h-none wide:grid-cols-[132px_1fr_auto] wide:gap-4 wide:p-3 has-[.home-cart-play:focus-visible]:outline-2 has-[.home-cart-play:focus-visible]:outline-accent"
               >
                 <span
-                  className="relative grid h-[76px] max-h-full place-items-center overflow-hidden rounded-md border border-black/15"
+                  className="relative grid h-[76px] max-h-full place-items-center overflow-hidden rounded-md border border-black/15 wide:h-[120px]"
                   style={{ background: LABEL[g.id] }}
                 >
                   <span
@@ -207,7 +207,7 @@ export function Home({
                   <img
                     alt=""
                     src={getSprite(mascot.species, 'front', undefined, mascot.gen)}
-                    className={`relative max-h-[66px] max-w-[72px] object-contain drop-shadow-[0_1px_1px_rgb(0_0_0/0.3)] ${mascot.gen === 3 ? '[image-rendering:pixelated]' : ''}`}
+                    className={`relative max-h-[66px] max-w-[72px] object-contain wide:max-h-[104px] wide:max-w-[116px] drop-shadow-[0_1px_1px_rgb(0_0_0/0.3)] ${mascot.gen === 3 ? '[image-rendering:pixelated]' : ''}`}
                   />
                 </span>
                 <span className="min-w-0">
@@ -217,11 +217,11 @@ export function Home({
                     className="home-cart-play block w-full text-left outline-none after:absolute after:inset-0 after:content-['']"
                   >
                     <span className="flex items-center gap-2">
-                      <span className="text-[17px] font-semibold">{g.name}</span>
+                      <span className="text-[17px] font-semibold wide:text-[22px]">{g.name}</span>
                       <DifficultyBadge difficulty={g.difficulty} />
                       {g.coached && <CoachBadge />}
                     </span>
-                    <span className="flex flex-wrap items-center text-[12.5px] leading-snug text-muted">
+                    <span className="flex flex-wrap items-center text-[12.5px] leading-snug text-muted wide:text-[14px]">
                       {g.blurb.map((game, j) => (
                         <Fragment key={game}>
                           {j > 0 && (
@@ -231,7 +231,9 @@ export function Home({
                         </Fragment>
                       ))}
                     </span>
-                    <span className="block truncate text-[12.5px] text-muted">{g.today}</span>
+                    <span className="block truncate text-[12.5px] text-muted wide:text-[14px]">
+                      {g.today}
+                    </span>
                     <span className="sr-only">. Streak {g.streak}</span>
                   </button>
                   {g.id === LEARN_GAME && (
@@ -257,7 +259,7 @@ export function Home({
           })}
           {share && (
             <div
-              className="home-share grid shrink-0"
+              className="home-share grid shrink-0 wide:col-span-2"
               style={{ '--i': games.length } as CSSProperties}
             >
               <ShareAllButton share={share}>

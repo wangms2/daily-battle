@@ -155,43 +155,46 @@ function VersusHome({
         Live battles with friends. Everyone builds from the same 12, makes one change before each
         round, and plays until one player has lives left. <HowToLink onClick={onHowTo} />
       </p>
-      <section className="card space-y-3 p-4">
-        <NameField value={name} onChange={setName} />
-        <Button className="w-full" disabled={!clean || busy} onClick={create}>
-          {busy ? 'Creating…' : 'Create a room'}
-        </Button>
-        {error && (
-          <p role="alert" className="text-[13px] text-bad">
-            {error}
-          </p>
-        )}
-      </section>
-      <section className="card space-y-3 p-4">
-        <label className="block space-y-1.5">
-          <span className="block text-[14px] font-medium">Join with a code</span>
-          <input
-            className={`${inputClass} font-semibold tracking-[0.2em] uppercase`}
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && typed) onRoom(typed, clean);
-            }}
-            autoCapitalize="characters"
-            autoComplete="off"
-            spellCheck={false}
-            maxLength={8}
-            placeholder="5 letters"
-          />
-        </label>
-        <Button
-          variant="secondary"
-          className="w-full"
-          disabled={!typed}
-          onClick={() => typed && onRoom(typed, clean)}
-        >
-          Join room
-        </Button>
-      </section>
+      {/* Create and Join side by side on wide screens. */}
+      <div className="space-y-4 wide:grid wide:grid-cols-2 wide:items-start wide:gap-4 wide:space-y-0">
+        <section className="card space-y-3 p-4">
+          <NameField value={name} onChange={setName} />
+          <Button className="w-full" disabled={!clean || busy} onClick={create}>
+            {busy ? 'Creating…' : 'Create a room'}
+          </Button>
+          {error && (
+            <p role="alert" className="text-[13px] text-bad">
+              {error}
+            </p>
+          )}
+        </section>
+        <section className="card space-y-3 p-4">
+          <label className="block space-y-1.5">
+            <span className="block text-[14px] font-medium">Join with a code</span>
+            <input
+              className={`${inputClass} font-semibold tracking-[0.2em] uppercase`}
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && typed) onRoom(typed, clean);
+              }}
+              autoCapitalize="characters"
+              autoComplete="off"
+              spellCheck={false}
+              maxLength={8}
+              placeholder="5 letters"
+            />
+          </label>
+          <Button
+            variant="secondary"
+            className="w-full"
+            disabled={!typed}
+            onClick={() => typed && onRoom(typed, clean)}
+          >
+            Join room
+          </Button>
+        </section>
+      </div>
     </Page>
   );
 }
