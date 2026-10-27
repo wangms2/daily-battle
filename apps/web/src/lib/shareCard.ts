@@ -238,12 +238,13 @@ function streakPill(
   });
 }
 
-function footer(ctx: CanvasRenderingContext2D, url: string | undefined) {
+/** Where to play, in white under the title on the lid, so the card's body stays calm. */
+function headerUrl(ctx: CanvasRenderingContext2D, url: string | undefined) {
   if (!url) return;
-  ctx.textBaseline = 'alphabetic';
-  ctx.fillStyle = C.muted;
-  ctx.font = font(500, 20);
-  ctx.fillText(url.replace(/^https?:\/\//, ''), LEFT, CARD_H - 44);
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = 'rgb(255 255 255 / 0.78)';
+  ctx.font = font(500, 21);
+  ctx.fillText(url.replace(/^https?:\/\//, ''), LEFT, MID + 42);
 }
 
 export async function drawShareCard(m: ShareModel): Promise<HTMLCanvasElement> {
@@ -326,7 +327,7 @@ export async function drawShareCard(m: ShareModel): Promise<HTMLCanvasElement> {
   // The game's stars, bottom right, under the team: kept whatever the streak.
   if (m.stars) starPills(ctx, m.stars, right, CARD_H - 70, 20, false);
 
-  footer(ctx, m.url);
+  headerUrl(ctx, m.url);
   return canvas;
 }
 
@@ -372,12 +373,11 @@ export async function drawShareAllCard(all: ShareAll): Promise<HTMLCanvasElement
   const { canvas, ctx } = blankCard();
   drawLid(ctx, CLAY, all.date);
 
-  // The rows sit in the middle of the space between the ball and the address.
-  // Four games only fit with the rows starting just under the ball and closer together.
-  const many = all.games.length > 3;
-  const gap = many ? 10 : GAME_GAP;
-  const top = many ? 184 : 200;
-  const bottom = CARD_H - 76;
+  // The rows sit in the space under the ball (the address is up on the lid); four
+  // games sit a little closer together.
+  const gap = all.games.length > 3 ? 14 : GAME_GAP;
+  const top = 196;
+  const bottom = CARD_H - 28;
   const height = all.games.length * GAME_ROW + (all.games.length - 1) * gap;
   let y = top + Math.max(0, (bottom - top - height) / 2);
   all.games.forEach((m, i) => {
@@ -432,7 +432,7 @@ export async function drawShareAllCard(all: ShareAll): Promise<HTMLCanvasElement
     y += GAME_ROW + gap;
   });
 
-  footer(ctx, all.url);
+  headerUrl(ctx, all.url);
   return canvas;
 }
 
