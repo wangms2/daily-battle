@@ -634,7 +634,7 @@ A room where friends play live battles against each other, Super Auto Pets style
 - **Lives.** 2 by default (host setting). A loss costs one; a tie (the turn cap, or both sides' last Pokémon fainting together) costs both players one. At 0 you're out and can spectate.
 - **Odd counts.** One living player each round faces the AI with a generated opponent team. A loss to it costs a life, the same as any other.
 - **End.** The last player standing wins. If the last players all reach 0 in the same round, they share the win.
-- **Handicaps.** A team size per player (6, 5, 4, or 3), set by the host. The sim doesn't require six in these formats.
+- **Handicaps.** A team size per player (6, 5, 4, or 3). Each player can set their own, and the host can set anyone's; nobody else can change another player's. The sim doesn't require six in these formats.
 
 ### 18.2 Live play
 
@@ -746,5 +746,5 @@ A **Learn** mode teaches Gen 3 OU from the basics, and a **coach** helps in real
 
 - **Coach.** Rule-based, from the player's own view only (it never sees the foe's real sets). It gives an occasional turn tip, asks before a clear blunder ("Do it anyway" / "Pick again"), and reviews up to 3 key turns after the battle. It's paced so it isn't distracting: at most one tip per turn, a gap of 3 turns between tips (2 for urgent ones: "this hit KOs you", "you can KO"), no tip while a lesson prompt or hint is showing, and a warning the player overrode isn't asked again that battle. Warnings only appear when the blunder is picked.
 - **Where.** On in every lesson battle (the coach only talks about what the lessons so far have taught). In the daily, it's offered in Gen 3 on Easy and Normal (not Hard, until its search-based coach exists). Off by default; offered once on a game's first daily brief and again after graduation (`settings.coachOffered`).
-- **Turning it on.** A **Coach** pill beside the difficulty picker on the brief (`settings.coach`, per game), or a switch in the battle menu mid-battle. Either asks first when it costs a streak. Once on, that attempt is `coached: true` for good; mid-battle, the battle restarts with the coach from the same turn.
+- **Turning it on.** A **Coach on/off** chip beside the difficulty picker, in the labelled Difficulty row just above Start on the brief (`settings.coach`, per game), or a switch in the battle menu mid-battle. Either asks first when it costs a streak. Once on, that attempt is `coached: true` for good; mid-battle, the battle restarts with the coach from the same turn.
 - **Coached results.** Coached tries count in their own **Coached** bucket per game, shared across difficulties, with its own streak and stats (a first-try coached win extends it). A coached try before the day is cleared ends the regular streak of the difficulty it was played on; coached practice after a clear doesn't. The header, battle, Home card, and result show **Coached**, and the share header adds it after the level of the deciding try: `Gen 3 OU · Easy · Coached · Oct 21`.

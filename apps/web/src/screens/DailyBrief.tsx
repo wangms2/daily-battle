@@ -25,7 +25,6 @@ import { ConfirmDialog } from '../sheets/misc';
 import { SetPicker } from '../sheets/SetPicker';
 import type { DayChange, DayState } from '../state/schema';
 import { Button, SectionLabel } from '../ui/bits';
-import { DIFFICULTY_HINT } from '../lib/difficulty';
 import { CoachToggle, DifficultyPicker } from '../ui/Difficulty';
 import { StarIcon } from '../ui/icons';
 import { ItemIcon } from '../ui/ItemIcon';
@@ -251,32 +250,7 @@ export function DailyBrief({
       </section>
     ) : (
       <section className={clsx('flex flex-col gap-2', wide ? 'shrink-0' : 'min-h-0 flex-1')}>
-        <SectionLabel
-          right={
-            onDifficulty &&
-            !editing && (
-              <div className="flex items-center gap-1.5">
-                {coach && (
-                  <CoachToggle
-                    on={coach.on}
-                    disabled={inProgress}
-                    onChange={(on) =>
-                      on && coach.warning ? setCoachAsk(coach.warning) : coach.onChange(on)
-                    }
-                  />
-                )}
-                <DifficultyPicker
-                  value={difficulty}
-                  onChange={onDifficulty}
-                  hardAvailable={hardAvailable}
-                  disabled={inProgress}
-                />
-              </div>
-            )
-          }
-        >
-          Opponent
-        </SectionLabel>
+        <SectionLabel>Opponent</SectionLabel>
         <div className={sixGrid}>
           {opponent.team.map(({ species }) => (
             <PokemonTile
@@ -378,6 +352,30 @@ export function DailyBrief({
     </Button>
   );
 
+  // The opponent's difficulty (and the coach), labelled, right where you start.
+  const level = onDifficulty && !editing && (
+    <div className="flex shrink-0 items-center justify-between gap-2">
+      <span className="text-[14px] font-semibold">Difficulty</span>
+      <div className="flex items-center gap-1.5">
+        {coach && (
+          <CoachToggle
+            on={coach.on}
+            disabled={inProgress}
+            onChange={(on) =>
+              on && coach.warning ? setCoachAsk(coach.warning) : coach.onChange(on)
+            }
+          />
+        )}
+        <DifficultyPicker
+          value={difficulty}
+          onChange={onDifficulty}
+          hardAvailable={hardAvailable}
+          disabled={inProgress}
+        />
+      </div>
+    </div>
+  );
+
   // After a finished try: how today went, the streak, and Share.
   const decided = summary.status !== 'none' && summary.status !== 'pending';
   const strip = summary.status !== 'none' && !editing && (
@@ -425,6 +423,7 @@ export function DailyBrief({
             <div className="mx-auto mt-2 flex w-full max-w-md flex-col gap-2">
               {strip}
               {others}
+              {level}
               {start}
             </div>
           </div>
@@ -436,15 +435,14 @@ export function DailyBrief({
           {teamSection}
           {hints && !editing && !strip && (
             <p className="shrink-0 text-center text-[13px] text-muted">
-              {difficulty !== 'normal'
-                ? DIFFICULTY_HINT[difficulty]
-                : teamPreview
-                  ? 'Tap to lead · ⓘ shows sets · They see your six too'
-                  : 'Tap a Pokémon to lead · ⓘ shows its set'}
+              {teamPreview
+                ? 'Tap to lead · ⓘ shows sets · They see your six too'
+                : 'Tap a Pokémon to lead · ⓘ shows its set'}
             </p>
           )}
           {strip}
           {others}
+          {level}
           {start}
         </main>
       )}

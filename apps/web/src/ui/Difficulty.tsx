@@ -86,12 +86,11 @@ export function CoachToggle({
       title="Tips, blunder warnings, and a review after. Coached results count apart."
       onClick={() => onChange(!on)}
       className={clsx(
-        'min-h-7 rounded-xl px-2.5 text-[12px] font-semibold',
-        on ? 'bg-accent text-white' : 'bg-surface-2 text-muted',
+        'chip chunky-chip min-h-8 shrink-0 px-2.5 text-[13px] font-semibold',
         disabled && 'opacity-60',
       )}
     >
-      Coach{on ? ' on' : ''}
+      Coach {on ? 'on' : 'off'}
     </button>
   );
 }

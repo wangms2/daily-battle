@@ -487,7 +487,7 @@ describe('results and streak', () => {
     await user.click(within(offer).getByRole('button', { name: 'Not now' }));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
 
-    const coach = screen.getByRole('button', { name: 'Coach' });
+    const coach = screen.getByRole('button', { name: 'Coach off' });
     expect(coach).toHaveAttribute('aria-pressed', 'false');
     await user.click(coach);
     const ask = await screen.findByRole('dialog', { name: 'Turn on the coach?' });
