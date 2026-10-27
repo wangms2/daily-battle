@@ -373,9 +373,12 @@ export async function drawShareAllCard(all: ShareAll): Promise<HTMLCanvasElement
   drawLid(ctx, CLAY, all.date);
 
   // The rows sit in the middle of the space between the ball and the address.
-  const top = 200;
+  // Four games only fit with the rows starting just under the ball and closer together.
+  const many = all.games.length > 3;
+  const gap = many ? 10 : GAME_GAP;
+  const top = many ? 184 : 200;
   const bottom = CARD_H - 76;
-  const height = all.games.length * GAME_ROW + (all.games.length - 1) * GAME_GAP;
+  const height = all.games.length * GAME_ROW + (all.games.length - 1) * gap;
   let y = top + Math.max(0, (bottom - top - height) / 2);
   all.games.forEach((m, i) => {
     // The mascot on its game's colour.
@@ -426,7 +429,7 @@ export async function drawShareAllCard(all: ShareAll): Promise<HTMLCanvasElement
     if (m.streak) streakPill(ctx, m.streak, RIGHT, m.stars ? y + 4 : y + GAME_ROW / 2 - 16, 18);
     if (m.stars)
       starPills(ctx, m.stars, RIGHT, m.streak ? y + 46 : y + GAME_ROW / 2 - 16, 16, true);
-    y += GAME_ROW + GAME_GAP;
+    y += GAME_ROW + gap;
   });
 
   footer(ctx, all.url);
