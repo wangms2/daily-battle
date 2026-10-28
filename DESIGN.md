@@ -694,6 +694,33 @@ A room where friends play live battles against each other, Super Auto Pets style
 | V4    | The room loop: pool and build phase, pairing by lives, swap phase, lives, elimination, the AI for odd counts, results                                                                 | A room of three plays to a winner (done)                                                                     |
 | V5    | The room drawer, spectating for players out and late joiners (multi-battle grid, reactions), the between-round sequence, elimination and winner screens, an entry from the daily game | A late joiner watches two battles at once on a phone, and an eliminated player watches the next round (done) |
 
+### 18a. Stats and the admin page (added Oct 2026)
+
+The owner can see how the site is used: versus games and accounts. Data is kept forever.
+
+**Storage.** D1 database `daily-battle-stats`, bound as `DB` (`wrangler.jsonc`). Its schema lives in `apps/server/migrations/`. CI applies the migrations before each deploy, which needs a token with D1 Edit; if that step fails it only warns. Writes are best-effort: `stats.ts` runs them under `waitUntil` and logs failures, so stats never affect play. Without `DB`, nothing is recorded.
+
+**What's recorded.**
+
+- **Versus** (`room.ts`):
+  - A game row when the build phase starts. The id is the room code plus the start time.
+  - One row per battle: round, players, winner, reason, turns and length.
+  - At the end, the game's results and each player's build time, place, record, whether the timer filled their team, and whether they left early.
+  - A game left unfinished keeps an empty end time. Rooms that never start aren't recorded.
+- **Accounts** (`account.ts`):
+  - Name, creation time, last seen and sign-ins.
+  - Per-gen progress taken from the synced save (`progress.ts`, using the app's `computeStats`): days played, last day, wins and losses, clears, first-try wins, current and best streak in the difficulty the player has picked, coach on or off, and Learn lessons done.
+  - Updated on register and sign-in, and on save syncs at most every 10 minutes.
+  - Accounts made before tracking show up on their next sync, without a creation date.
+  - Deleting an account deletes its stats.
+- Players without an account, and versus names, are not linked to anything.
+
+**Admin page.** `/#admin` isn't linked from the app. It asks for the `ADMIN_TOKEN` Worker secret and keeps it on that device. It reads `GET /api/admin/stats?view=summary|games|game|accounts` with a bearer token, compared in constant time. The API returns 404 when the secret or DB is unset. The page has three tabs:
+
+- **Overview:** totals, games per day for 30 days, and progress per gen.
+- **Games:** a list where each game opens to its players and battles.
+- **Accounts:** a search, with each account's progress per gen.
+
 ## 19. Gen 6 OU (added Oct 2026)
 
 A third daily game, built in seven phases the same way as Gen 5 (§17). Each phase kept Gen 4's and Gen 5's output byte-for-byte: seed keys, golden fixtures, set ids, schedules, and AI choices. Nothing in `GENERATOR_VERSION` or the AI changed for them; every new rule is gated on Gen 6 data or format.

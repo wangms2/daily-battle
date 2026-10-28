@@ -1,5 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
 
+/** The admin page's password on the test server (e2e/versus.spec.ts). */
+export const E2E_ADMIN_TOKEN = 'e2e-admin';
+
 const phone = (width: number, height: number) => ({
   ...devices['Desktop Chrome'],
   viewport: { width, height },
@@ -32,8 +35,11 @@ export default defineConfig({
       timeout: 120_000,
     },
     {
-      // The versus room server; the preview sends /api to it (vite.config.ts).
-      command: 'pnpm --dir ../.. exec wrangler dev --port 8787 --persist-to .wrangler/e2e',
+      // The versus room server; the preview sends /api to it (vite.config.ts). Its
+      // stats database is migrated first, and the admin page's password is a test one.
+      command:
+        'pnpm --dir ../.. exec wrangler d1 migrations apply DB --local --persist-to .wrangler/e2e' +
+        ` && pnpm --dir ../.. exec wrangler dev --port 8787 --persist-to .wrangler/e2e --var ADMIN_TOKEN:${E2E_ADMIN_TOKEN}`,
       url: 'http://localhost:8787/',
       reuseExistingServer: false,
       timeout: 120_000,

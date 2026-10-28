@@ -3,6 +3,7 @@
 // straight to that room's Durable Object.
 import { makeCode } from '@daily-battle/versus';
 import type { Env } from './env';
+import { adminRequest } from './admin';
 import { nameKey } from './accounts';
 import { matchRoute, sameOrigin } from './routes';
 
@@ -15,6 +16,8 @@ export default {
   async fetch(request, env): Promise<Response> {
     const route = matchRoute(request.method, new URL(request.url).pathname);
     if (!route) return new Response('Not found', { status: 404 });
+    // The admin token is the check (a GET, so browsers send no Origin).
+    if (route.kind === 'admin') return adminRequest(env.DB, env.ADMIN_TOKEN, request);
     // Browsers leave Origin off same-site GETs. Reading a save needs the device's
     // token, which another site can't have, so it doesn't need the check.
     const tokenRead = route.kind === 'account' && request.method === 'GET';

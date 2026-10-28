@@ -23,7 +23,7 @@ export interface Store {
   deleteAll(): Promise<void>;
 }
 
-interface Account {
+export interface Account {
   name: string;
   salt: string;
   hash: string;
@@ -59,11 +59,11 @@ async function hashPassword(password: string, salt: string): Promise<string> {
   return hex(bits);
 }
 
-const sha256 = async (s: string) =>
+export const sha256 = async (s: string) =>
   hex(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)));
 
 /** Compares in time that doesn't depend on where the strings differ. */
-function same(a: string, b: string): boolean {
+export function same(a: string, b: string): boolean {
   if (a.length !== b.length) return false;
   let diff = 0;
   for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);

@@ -25,4 +25,13 @@
     { "tag": "v1", "new_sqlite_classes": ["Room"] },
     { "tag": "v2", "new_sqlite_classes": ["Account"] },
   ],
+  // Stats for the admin page (DESIGN.md §18a). CI applies the migrations before deploying.
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "daily-battle-stats",
+      "database_id": "0b086e55-3549-4b79-8208-a31ceb79f6bd",
+      "migrations_dir": "apps/server/migrations",
+    },
+  ],
 }

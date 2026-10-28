@@ -3,6 +3,7 @@
 // see the host's settings; a reload keeps your seat; leaving and removal work.
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Browser, type Locator, type Page } from '@playwright/test';
+import { E2E_ADMIN_TOKEN } from '../playwright.config';
 import { meet } from './name';
 
 // Playwright requires object destructuring for the fixtures argument.
@@ -388,6 +389,21 @@ test('a room of three builds teams and plays to a winner', async ({ page, browse
   for (const p of all) await expect(p.getByRole('heading', { name: /^Room / })).toBeVisible();
   await expect(players(blue)).toHaveCount(3);
   expect(errors).toEqual([]);
+
+  // The admin page has the game: its three players and its battles.
+  const admin = await browser.newPage({ baseURL });
+  await admin.goto('/#admin');
+  await admin.getByLabel('Password').fill(E2E_ADMIN_TOKEN);
+  await admin.getByRole('button', { name: 'Open' }).click();
+  await expect(admin.getByText('Versus games', { exact: true })).toBeVisible();
+  await admin.getByRole('button', { name: 'games' }).click();
+  await admin.getByRole('row').filter({ hasText: code }).click();
+  const detail = admin.getByLabel('Game detail');
+  for (const name of ['Red', 'Blue', 'Green']) {
+    await expect(detail.getByRole('cell', { name, exact: true }).first()).toBeVisible();
+  }
+  await expect(detail.getByRole('cell', { name: /vs Rival \(AI\)$/ }).first()).toBeVisible();
+  await admin.close();
 });
 
 test('a player who gives up mid-battle loses it, and a reload resumes', async ({

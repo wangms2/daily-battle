@@ -68,6 +68,8 @@ export interface Player {
   lives: number;
   /** Built from the pool; each round's change stays on it. Null until built. */
   team: Slot[] | null;
+  /** When they locked in their team; missing if the timer built it (for stats). */
+  builtAt?: number;
   /** Final placement (1 for the winner), once it's known. */
   place: number | null;
   /** The round they went out in. */
@@ -132,6 +134,8 @@ export interface RoomState {
   next: Pairing[];
   /** How the last finished round went, and who went out in it. */
   lastRound: { round: number; matches: MatchSummary[]; out: string[] } | null;
+  /** The current or last game, for stats (the server's). Missing in older rooms. */
+  game?: { id: string; startedAt: number };
 }
 
 /** What every player sees of the room: who plays whom and who's in, never teams. */

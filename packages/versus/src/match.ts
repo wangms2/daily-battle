@@ -70,6 +70,8 @@ export interface Match {
   prep: Record<Side, Prep>;
   stage: 'prep' | 'battle' | 'over';
   prepDeadline: number;
+  /** When the battle itself started (after the swap), for stats. */
+  battleAt?: number;
   /** The teams as they battle, lead first; filled in when the battle starts. */
   teams: Record<Side, PokemonSet[]>;
   /** Each side's accepted choices, in order. */

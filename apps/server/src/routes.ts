@@ -6,10 +6,13 @@ export type Route =
   | { kind: 'create' }
   | { kind: 'socket'; code: string }
   /** An account's request: its name (decoded) and the rest of the path. */
-  | { kind: 'account'; name: string; path: '' | '/session' | '/save' };
+  | { kind: 'account'; name: string; path: '' | '/session' | '/save' }
+  /** The admin page's stats (admin.ts). */
+  | { kind: 'admin' };
 
 export function matchRoute(method: string, pathname: string): Route | null {
   if (pathname === '/api/rooms') return method === 'POST' ? { kind: 'create' } : null;
+  if (pathname === '/api/admin/stats') return method === 'GET' ? { kind: 'admin' } : null;
   const m = /^\/api\/rooms\/([^/]+)\/socket$/.exec(pathname);
   if (m && method === 'GET' && CODE_PATTERN.test(m[1]!)) return { kind: 'socket', code: m[1]! };
   const a = /^\/api\/accounts\/([^/]+)(\/session|\/save)?$/.exec(pathname);

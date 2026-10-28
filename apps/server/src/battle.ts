@@ -87,6 +87,11 @@ export class LiveBattle {
     return this.session.spectatorLog.filter((l) => l.startsWith(`|faint|${side}a:`)).length;
   }
 
+  /** Turns started so far. */
+  turns(): number {
+    return this.session.spectatorLog.filter((l) => l.startsWith('|turn|')).length;
+  }
+
   spectatorLength(): number {
     return this.session.spectatorLog.length;
   }

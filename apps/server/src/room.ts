@@ -68,6 +68,14 @@ import {
 import type { PRNGSeed } from '@pkmn/sim';
 import { LiveBattle, randomSeed } from './battle';
 import type { Env } from './env';
+import {
+  battleEnded,
+  gameEnded,
+  gameId,
+  gameStarted,
+  record as recordStat,
+  type Db,
+} from './stats';
 import { aiTeam, autoTeam, legalTeam, randomPool, weeklyPool } from './teams';
 
 /** Which player a socket belongs to, kept on the socket so it survives hibernation. */
@@ -362,7 +370,10 @@ export class Room extends DurableObject<Env> {
     this.battles.clear();
     this.sent.clear();
     this.watched.clear();
-    await this.save(startBuild(this.room!, now));
+    await this.save({
+      ...startBuild(this.room!, now),
+      game: { id: gameId(this.room!.code, now), startedAt: now },
+    });
     this.broadcast();
     for (const p of this.room!.players) this.sendTo(p.id, { type: 'team', team: null });
   }
@@ -374,9 +385,13 @@ export class Room extends DurableObject<Env> {
     }
     const result = submitTeam(room, me, slots);
     if (!result.ok) return this.send(ws, { type: 'error', code: result.error });
-    await this.save(result.state);
+    const state: RoomState = {
+      ...result.state,
+      players: result.state.players.map((p) => (p.id === me ? { ...p, builtAt: now } : p)),
+    };
+    await this.save(state);
     this.sendTo(me, { type: 'team', team: slots });
-    if (buildDone(result.state, now)) return this.beginGame(now);
+    if (buildDone(state, now)) return this.beginGame(now);
     this.broadcast();
   }
 
@@ -470,6 +485,7 @@ export class Room extends DurableObject<Env> {
     let m: Match = {
       ...match,
       stage: 'battle',
+      battleAt: now,
       teams: {
         p1: legalTeam(match.format, slots.p1)!,
         p2: legalTeam(match.format, slots.p2)!,
@@ -568,6 +584,9 @@ export class Room extends DurableObject<Env> {
       result: { winner: winner ?? battle?.winner ?? null, reason },
     };
     let room = putMatch(this.room!, m);
+    const before = room;
+    const turns = battle?.turns() ?? 0;
+    if (before.game) this.stats((db) => battleEnded(db, before, m, turns, now));
     if (battle) {
       for (const s of SIDES) this.sendSide(m, s);
       this.sendWatch(m);
@@ -611,9 +630,22 @@ export class Room extends DurableObject<Env> {
   // Storage and the alarm
 
   private async save(room: RoomState) {
+    const prev = this.room?.phase;
     this.room = this.dealt(room);
+    const saved = this.room;
+    if (saved.game && prev === 'lobby' && saved.phase === 'build') {
+      this.stats((db) => gameStarted(db, saved));
+    }
+    if (saved.game && prev && prev !== 'lobby' && prev !== 'over' && saved.phase === 'over') {
+      this.stats((db) => gameEnded(db, saved, Date.now()));
+    }
     await this.ctx.storage.put('room', this.room);
     await this.schedule();
+  }
+
+  /** A stats write that runs after the response and never fails the game. */
+  private stats(write: (db: Db) => Promise<unknown>) {
+    this.ctx.waitUntil(recordStat(this.env.DB, write));
   }
 
   /** The alarm goes off at the game's next deadline, or when the room would go idle. */

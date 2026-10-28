@@ -157,4 +157,9 @@ jobs:
             echo "::notice::Cloudflare secrets not set; skipping deploy."
             exit 0
           fi
+          # The stats database's migrations (apps/server/migrations). The token needs
+          # D1 Edit; without it this warns, and migrations are applied by hand
+          # (wrangler d1 migrations apply DB --remote).
+          pnpm exec wrangler d1 migrations apply DB --remote ||
+            echo "::warning::Couldn't apply D1 migrations (does the token have D1 Edit?)"
           pnpm exec wrangler deploy

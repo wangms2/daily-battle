@@ -20,6 +20,14 @@ rustup target add wasm32-unknown-unknown
 pnpm --filter @daily-battle/engine-wasm build:wasm
 ```
 
+Usage stats (versus games and accounts) go to a D1 database, which is viewed at `/#admin` (see DESIGN.md §18a). To set up:
+
+1. Create the database with `wrangler d1 create daily-battle-stats`, and put its id in `wrangler.jsonc`.
+2. Set the admin password with `wrangler secret put ADMIN_TOKEN`.
+3. Give CI's `CLOUDFLARE_API_TOKEN` D1 Edit, so the deploy can run `wrangler d1 migrations apply DB --remote`.
+
+Locally, apply the migrations with `pnpm exec wrangler d1 migrations apply DB --local`.
+
 ## Scripts
 
 | Command                    | What it does                               |

@@ -8,4 +8,8 @@ export interface Env {
   ACCOUNTS: DurableObjectNamespace<Account>;
   /** The static site, for the published schedules (this week's pool). */
   ASSETS: Fetcher;
+  /** Stats for the admin page (stats.ts); writes are skipped without it. */
+  DB?: D1Database;
+  /** The admin page's password (a secret); the admin API is off without it. */
+  ADMIN_TOKEN?: string;
 }
