@@ -23,8 +23,9 @@ export const immune: Lesson = {
         seed: 'course:immune:demo1',
       },
       turn: { p1: 'move Earthquake', p2: 'move Drill Peck' },
-      before: 'Earthquake is a Ground move, and Skarmory is a Steel and Flying type.',
-      after: 'Flying types take nothing from Ground moves: Earthquake did nothing.',
+      before:
+        'Earthquake is a Ground move, and Skarmory is a Steel and Flying type. Flying types take nothing from Ground moves. Watch.',
+      after: 'No effect: Earthquake did nothing.',
       spotlight: { before: ['move Earthquake', 'foe-types'], after: ['log'] },
     },
     {
@@ -35,8 +36,9 @@ export const immune: Lesson = {
         seed: 'course:immune:demo2',
       },
       turn: { p1: 'move Body Slam', p2: 'move Seismic Toss' },
-      before: 'Body Slam is a Normal move, and Dusclops is a Ghost type.',
-      after: 'Ghost types take nothing from Normal moves: Body Slam did nothing.',
+      before:
+        'Body Slam is a Normal move, and Dusclops is a Ghost type. Ghost types take nothing from Normal moves.',
+      after: 'No effect again: Body Slam did nothing.',
       spotlight: { before: ['move Body Slam', 'foe-types'], after: ['log'] },
     },
     {

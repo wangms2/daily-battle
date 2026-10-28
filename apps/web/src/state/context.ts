@@ -21,6 +21,8 @@ export interface AccountValue {
   signIn: (name: string, password: string) => Promise<SignInResult>;
   signOut: () => Promise<void>;
   deleteAccount: (password: string) => Promise<boolean>;
+  /** Erases everything this device saved (signing out first) and reloads the app. */
+  startOver: () => Promise<void>;
 }
 
 export const AccountContext = createContext<AccountValue | null>(null);

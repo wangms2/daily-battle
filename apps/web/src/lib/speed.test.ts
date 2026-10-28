@@ -3,6 +3,7 @@ import {
   battleSpeed,
   foeSpeed,
   lessonSet,
+  showdownRange,
   speedStat,
   speedVerdict,
   theoreticalRange,
@@ -22,7 +23,9 @@ describe('Speed', () => {
     expect(speedStat(85, 85)).toBe(227); // Heracross
     expect(speedStat(100, 85)).toBe(257); // Zapdos
     expect(speedStat(130, 252, 31, 'Timid')).toBe(394); // Jolteon, max
-    expect(theoreticalRange(100)).toEqual([212, 328]);
+    // As Showdown shows Zapdos: 0 IVs and a slowing nature at the bottom.
+    expect(showdownRange(100)).toEqual([184, 236, 299, 328]);
+    expect(theoreticalRange(100)).toEqual([184, 328]);
   });
 
   it('applies boosts, paralysis and the weather abilities as the coach does', () => {
@@ -41,7 +44,7 @@ describe('Speed', () => {
       foeSpeed('Zapdos', [lessonSet({ species: 'Zapdos', moves: ['Thunderbolt'] })], {}),
     ).toEqual({ lo: 257, hi: 257 });
     // No set data: the theoretical range.
-    expect(foeSpeed('Zapdos', [], {})).toEqual({ lo: 212, hi: 328 });
+    expect(foeSpeed('Zapdos', [], {})).toEqual({ lo: 184, hi: 328 });
   });
 
   it('keeps a possible Choice Scarf apart, and uses it once it is all that fits', () => {

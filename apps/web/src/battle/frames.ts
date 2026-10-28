@@ -235,6 +235,8 @@ export interface EngineStart {
   choices: string[];
   /** Normal when left out. */
   difficulty?: Difficulty;
+  /** The AI version the attempt was saved under, if older than the current one (Easy and Normal). */
+  aiVersion?: number;
   /** The week's pool species: Hard's prior for your unseen Pokémon, and the coach's for the foe's. */
   pool?: string[];
   /** Hard: the AI's saved choices, replayed on resume instead of searched again. */

@@ -83,6 +83,33 @@ export class UtilityPolicy implements Policy {
     }
     return pick.choice;
   }
+
+  /**
+   * How likely each legal choice is: the scores and softmax `choose` samples
+   * from, with the prediction roll weighed in rather than drawn. For the coach,
+   * which reads the opponent's odds without touching the battle's rng.
+   */
+  likely(view: SideView): { choice: string; p: number }[] {
+    const legal = legalChoices(view.request);
+    if (legal.length <= 1) return legal.map((choice) => ({ choice, p: 1 }));
+    if (view.request.requestType === 'team') return [];
+    const state = extractState(view, this.data);
+    const probs = (roll: number) =>
+      softmax(
+        scoreActions(view, state, this.params, () => roll, this.data, this.known).map(
+          (a) => a.score,
+        ),
+        this.params.temperature,
+      );
+    const rate = Math.min(1, Math.max(0, this.params.predictionRate));
+    // A roll of 0 always predicts (when prediction applies); 1 never does.
+    const yes = rate > 0 ? probs(0) : undefined;
+    const no = rate < 1 ? probs(1) : undefined;
+    return legal.map((choice, i) => ({
+      choice,
+      p: rate * (yes?.[i] ?? 0) + (1 - rate) * (no?.[i] ?? 0),
+    }));
+  }
 }
 
 /** The opponent AI for a daily opponent's style. */

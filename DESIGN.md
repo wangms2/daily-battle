@@ -113,7 +113,7 @@ Daily swap (done on the daily brief screen, shown as "1 change left"):
 - **Budget.** 150k iterations and 8 worlds came from a sweep of 40k to 200k: strength rose until about 150k and then flattened, while time kept growing. Measured at 150k: 6–0 against mid and 6–0 against strong in a small eval, about 270 ms a decision in Node.
 - **Determinism and resume.** Each decision's search seed comes from the attempt's AI seed and the decision index. The AI's choices are also saved on the attempt (`aiChoices`), so a resume replays them instead of searching again; a saved choice that's no longer legal is searched for anew.
 - **Where it runs.** In the battle worker, which fetches and compiles that game's module only for Hard (once per session; Easy and Normal never load it). The CSP allows `'wasm-unsafe-eval'` for it (`public/_headers`). A failed load shows the battle's usual error, and trying again fetches it anew. The picker hides Hard for a game whose module isn't in the build.
-- **Versions.** The engine string gains the difficulty: `sim <v> ai 1` (Normal), `ai 1 easy 1`, `ai 1 hard 1 e1` (`EASY_VERSION`, `HARD_VERSION`, `WASM_VERSION`). Bump them when Easy's preset or Hard's search could choose differently; an in-progress battle then becomes a forfeit (§15).
+- **Versions.** The engine string gains the difficulty: `sim <v> ai 2` (Normal), `ai 2 easy 1`, `ai 2 hard 1 e1` (`EASY_VERSION`, `HARD_VERSION`, `WASM_VERSION`). Bump them when Easy's preset or Hard's search could choose differently; an in-progress battle then becomes a forfeit (§15). An older AI version still listed in `RESUMABLE_AI` (1) is the exception: its battle resumes, and Easy and Normal play it with that version's scoring (`legacy` params), so the replay matches.
 - **Testing.**
   - The eval (`pnpm --filter @daily-battle/ai eval`) has Easy rows; `--hard` adds Hard's.
   - CI builds the WASM once (Rust stable plus `wasm32-unknown-unknown`) and shares it with every job. The sims job runs a small Hard eval at 20k iterations, reported but not asserted.
@@ -254,8 +254,12 @@ Weights are parameters (§8.5).
   - High rate of picking the highest-damage move
   - Slight over-switching into resists
   - Hazards early
-  - Some chance of "predicting" a switch and attacking the likely switch-in, sometimes wrong
+  - Some chance of "predicting" a switch and attacking the likely switch-in, sometimes wrong (from AI version 2, never when it can knock the active out first)
   - Avoid repeating obviously suicidal moves
+- Two rules from AI version 2 (playtest: it swapped the same two Pokémon while a KO was there to take):
+  - **Sure KO:** a move that very likely moves first (≥ 95%) and knocks the foe out (≥ 85%) is kept 0.2 ahead of every other choice (not Explosion and the like). The foe's reply never happens.
+  - **No swapping back:** switching to the Pokémon that left in the last two turns costs `switchBack` (0.5), doubling for each swap in a row. It's read from the AI's own battle log, so the choice stays a pure function of what it sees and a resumed battle replays it exactly.
+  - In 200–400 benchmark battles per gen, straight switch-backs fell by about 70–90% with no significant change in win rate. A tried third change, not fearing a foe it KOs first when rating a matchup, switched more and won less, so it was dropped.
 - No omniscience: if the player's Pokémon is not revealed, the AI treats it by priors.
 
 ### 8.5 Parameters and styles
@@ -315,7 +319,7 @@ Slot = { species, setId }
 Attempt = { result: 'win'|'loss'|'forfeit'|'inProgress', remaining: number, ts: number, lead: string,
             team: Slot[6],   // as sent into battle, lead first
             battleSeed: string, aiSeed: string, choices: string[],  // seeds + choices enable resume (§7)
-            engine: string,  // 'sim <version> ai <AI_VERSION>'; a mismatch on resume records a forfeit (§15)
+            engine: string,  // 'sim <version> ai <AI_VERSION>'; a mismatch on resume records a forfeit unless that AI version is still playable (§15)
             practiceChange?: DayChange }  // a practice run's one-off change (§4.2)
 ```
 
@@ -334,6 +338,7 @@ Showdown-style, and as simple as possible: no email, no sign-up step.
 - **Sync.** Signed in, the save is pushed 2 s after a change and when the page is hidden; on opening, the server's save is merged in. A push over a newer save (another device's) gets 409, and the client merges and pushes again. Offline, play carries on and syncs later. Sessions don't expire; a signed-in device is never asked again.
 - **Server** (`apps/server/src/accounts.ts`): one Durable Object per name (case and spacing don't make a new name), holding the PBKDF2-SHA256 hash (100k rounds, random salt), the SHA-256 of each device's token (up to 10), and the save (up to 1 MB). Ten wrong passwords in a row pause sign-in for 15 minutes. Routes: `POST /api/accounts/<name>` (protect), `POST|DELETE …/session` (sign in, sign out), `GET|PUT …/save`, `DELETE …` (delete, with the password).
 - **No email, so no reset:** a forgotten password can't be recovered. The device's progress stays on the device regardless.
+- **Starting over.** Settings › "Start over…" (a small link under About, then a confirm page with a red button) erases this browser's `daily-battle:` keys and reloads to the first visit. Signed in, it signs out first and nothing more is pushed; the account's server copy stays (signing in brings it back), so deleting it is a separate step in Trainer. The owner can also wipe an account with `DELETE /api/admin/accounts/<name>` (the admin token).
 
 ## 11. Share format
 
@@ -446,7 +451,7 @@ When on:
 - **First-time explainers:** a one-line dismissible tooltip the first time each mechanic appears (Stealth Rock, Choice lock, Toxic, sleep, and so on). Shown once each, tracked in `settings.shownExplainers`.
 - **Type-effectiveness labels** on move buttons against the opposing active Pokémon: the bottom line keeps the type and adds a short tag by the PP (Super, Super ×4, Neutral, Weak, Weak ×¼, No effect; Status for status moves), spelled out in the move's details card.
 - **Team checklist** in the team builder (hazards, removal, attackers, defense) and the brief's tip line. With hints off, the builder never tells the player what their team is missing.
-- **Speed range** line in Pokémon tooltips.
+- **Speed range** line in Pokémon tooltips: a foe's card always shows Showdown's line ("Speed 184–236–299–328": 0 IVs and a slowing nature, 0 and 252 EVs neutral, 252 EVs and a boosting nature; before boosts, items and abilities) and whether it's faster, slower or possibly faster than yours. With hints on, it adds "Its sets", the range from this game's sets for it (boosts, paralysis and weather applied), and the comparison uses that.
 - **Team-builder checklist** and shared-weakness list (§12.2a).
 
 - **Possible sets for the opponent:** an opponent's info on the brief lists the sets it might run (as tabs: moves, item, ability), and in battle its card lists the sets still possible given what it has revealed. No usage numbers or weights.
@@ -801,6 +806,7 @@ A **Learn** mode teaches Gen 3 OU from the basics, and a **coach** helps in real
 - **Finding it.** A small **Battle basics** pill under Play on the landing, a **Battle basics** pill on the Gen 3 cartridge in the game picker, and a "New to competitive Pokémon?" card with **Start the tutorial** on the welcome sheet and in How to play (it opens the next unfinished lesson).
 
 - **Coach.** Rule-based, from the player's own view only (it never sees the foe's real sets). It gives an occasional turn tip, asks before a clear blunder ("Do it anyway" / "Pick again"), and reviews up to 3 key turns after the battle. It's paced so it isn't distracting: at most one tip per turn, a gap of 3 turns between tips (2 for urgent ones: "this hit KOs you", "you can KO"), no tip while a lesson prompt or hint is showing, and a warning the player overrode isn't asked again that battle. Warnings only appear when the blunder is picked.
+- **Reading the foe's pick.** On Easy and Normal the AI locks in its choice as the turn starts, so the coach checks advice against it (it's never shown, sent, or saved). A tip needs the move to be (a) best against the foe's actual pick and (b) within 0.03 of the best expected value over the AI's own odds (its softmax and prediction rate, no randomness). If (a) and (b) disagree, the coach stays quiet; warnings and the review need the top choice to beat the pick on both. Explanations only use what the player can see. One tip comes from this, **likely switch**: when you threaten a KO and a seen benched foe resists that move, "Tyranitar is 4× weak to Fighting, so it's likely to switch out, perhaps to Celebi. Consider reading the switch with Hidden Power Ghost." It's not used in lessons. Hard and guided replays don't read the foe.
 - **Where.** On in every lesson battle (the coach only talks about what the lessons so far have taught). In the daily, it's offered in Gen 3 on Easy and Normal (not Hard, until its search-based coach exists). Off by default; offered once on a game's first daily brief and again after graduation (`settings.coachOffered`).
 - **Turning it on.** A **Coach on/off** chip beside the difficulty picker, in the labelled Difficulty row just above Start on the brief (`settings.coach`, per game), or a switch in the battle menu mid-battle. Either asks first when it costs a streak. Once on, that attempt is `coached: true` for good; mid-battle, the battle restarts with the coach from the same turn.
 - **Coached results.** Coached tries count in their own **Coached** bucket per game, shared across difficulties, with its own streak and stats (a first-try coached win extends it). A coached try before the day is cleared ends the regular streak of the difficulty it was played on; coached practice after a clear doesn't. The header, battle, Home card, and result show **Coached**, and the share header adds it after the level of the deciding try: `Gen 3 OU · Easy · Coached · Oct 21`.

@@ -4,7 +4,7 @@ import { engineBuilt, loadEngine } from '@daily-battle/engine-wasm/node';
 import { describe, expect, it } from 'vitest';
 import { startPosition } from '../battle';
 import type { Position } from '../types';
-import { agreement, Judge } from './judge';
+import { agreement, behind, choiceKey, Judge, replyKey, soundPick } from './judge';
 
 const data = setsFor('gen3ou');
 const SWAMPERT = { species: 'Swampert', moves: ['Surf', 'Earthquake', 'Protect', 'Toxic'] };
@@ -118,6 +118,48 @@ describe('Judge without a working engine', () => {
     judge.begin(viewOf({ p1: [SWAMPERT], p2: [MENCE] }), 'k');
     expect(judge.settle('move 2', Infinity)).toBeUndefined();
     expect(judge.busy).toBe(false);
+  });
+});
+
+describe('reading the foe’s choice', () => {
+  const values = {
+    'move 1': { actual: 0.4, expected: 0.6 },
+    'move 2': { actual: 0.555, expected: 0.58 },
+    'move 3': { actual: 0.56, expected: 0.45 },
+  };
+
+  it('recommends only a pick that is best against the real choice and close to best on average', () => {
+    expect(soundPick('move 1', values)).toBe(false); // the read it relies on is wrong
+    expect(soundPick('move 2', values)).toBe(true); // within the search's noise of best, and of the average
+    expect(soundPick('move 3', values)).toBe(false); // works this time, but a gamble
+  });
+
+  it('judges on the average alone when the search barely tried the real choice', () => {
+    const unknown = { 'move 1': { expected: 0.6 }, 'move 2': { expected: 0.5 } };
+    expect(soundPick('move 1', unknown)).toBe(true);
+    expect(soundPick('move 2', unknown)).toBe(false);
+  });
+
+  it('warns only when the top is ahead against the real choice too', () => {
+    expect(behind('move 3', 'move 1', values)).toBe(false);
+    expect(behind('move 3', 'move 2', values)).toBe(false);
+    expect(behind('move 2', 'move 3', values)).toBe(false);
+    expect(
+      behind('move 3', 'move 1', { ...values, 'move 1': { actual: 0.7, expected: 0.6 } }),
+    ).toBe(true);
+  });
+
+  it('matches the foe’s request choices to the search’s replies', () => {
+    const view = startPosition('gen3ou', {
+      p1: [SWAMPERT],
+      p2: [MENCE, { species: 'Metagross', moves: ['Meteor Mash', 'Earthquake'] }],
+      seed: 'k',
+    }).view('p2')!;
+    expect(choiceKey(view.request, 'move 1')).toBe(
+      replyKey('move', data.species.Salamence!.sets.find((x) => x.id === MENCE.setId)!.moves[0]!),
+    );
+    expect(choiceKey(view.request, 'switch 2')).toBe('switch:metagross');
+    expect(replyKey('move', 'Hidden Power Ghost 70')).toBe(replyKey('move', 'Hidden Power Ghost'));
   });
 });
 

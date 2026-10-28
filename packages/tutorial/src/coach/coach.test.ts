@@ -1,11 +1,11 @@
-import { aiFor, turnFacts } from '@daily-battle/ai';
+import { aiFor, turnFacts, type UtilityPolicy } from '@daily-battle/ai';
 import { setsFor } from '@daily-battle/data';
 import { engineBuilt, loadEngine } from '@daily-battle/engine-wasm/node';
 import { deriveSeed, makeRng, randomTeam, runBattle, type Policy } from '@daily-battle/sim-bridge';
 import { describe, expect, it } from 'vitest';
 import { startPosition } from '../battle';
 import type { Position } from '../types';
-import { Judge, type Verdict } from './judge';
+import { choiceKey, Judge, soundPick, type Verdict } from './judge';
 import { buildReview, decision } from './review';
 import { Coach, TIP_GAP, tipGap, type CoachTurn } from './simple';
 
@@ -291,8 +291,69 @@ describe('Simple coach tips', () => {
   });
 });
 
+describe.skipIf(!engineBuilt(3))('Simple coach, knowing the foe’s choice', () => {
+  // Machamp (Bulk Up, Cross Chop, Rock Slide, Hidden Power Ghost) against
+  // Tyranitar, with Celebi and Jirachi seen in the back.
+  const TTAR = {
+    seed: 'ttar',
+    p1: [
+      { species: 'Blissey', moves: ['Soft-Boiled', 'Seismic Toss'] },
+      { species: 'Machamp', setId: 'machamp-bulk-up' },
+    ],
+    p2: [
+      { species: 'Tyranitar', setId: 'tyranitar-bulky-physical-attacker' },
+      { species: 'Celebi', setId: 'celebi-leech-seed-3-attacks' },
+      { species: 'Jirachi', setId: 'jirachi-wish-calm-mind' },
+    ],
+    rounds: [
+      { p1: 'move Soft-Boiled', p2: 'switch Celebi' },
+      { p1: 'move Soft-Boiled', p2: 'switch Jirachi' },
+      { p1: 'switch Machamp', p2: 'switch Tyranitar' },
+    ],
+  };
+  const s = startPosition('gen3ou', TTAR);
+  const view = s.view('p1')!;
+  let judge: Judge | undefined;
+  /** The tip when the foe, played by `difficulty`, has chosen `actual`. */
+  const tipFor = (difficulty: 'easy' | 'normal', actual: string) => {
+    if (!judge) {
+      judge = new Judge(loadEngine(3), data);
+      judge.begin(view, 'ttar');
+      while (judge.step());
+    }
+    const ai = aiFor({ difficulty, style: 'balance', data }) as UtilityPolicy;
+    const foe = s.view('p2')!;
+    const likely: Record<string, number> = {};
+    for (const { choice, p } of ai.likely(foe)) likely[choiceKey(foe.request, choice)!] = p;
+    const values = judge.against({ actual, likely })!;
+    const coach = new Coach(data);
+    expect(coach.turn(view)).toEqual({ pending: true });
+    return coach.confirm(view, judge.best!, (c) => soundPick(c, values));
+  };
+
+  it('doesn’t call the knockout when Tyranitar is switching out, and says why', () => {
+    // Normal switches to Celebi almost every time here.
+    const tip = tipFor('normal', 'switch:celebi');
+    expect(tip?.rule).toBe('likelySwitch');
+    expect(tip?.text).toBe(
+      'Tyranitar is 4× weak to Fighting, so it’s likely to switch out, perhaps to Celebi. Consider reading the switch with Hidden Power Ghost.',
+    );
+  });
+
+  it('calls the knockout when Tyranitar stays in', () => {
+    // Easy mostly attacks.
+    expect(tipFor('easy', 'move:rockslide')?.rule).toBe('canKo');
+  });
+
+  it('stays quiet when the foe made an unlikely choice', () => {
+    // Easy switching out: Hidden Power Ghost works this time, but it wasn't the sound pick.
+    expect(tipFor('easy', 'switch:celebi')).toBeUndefined();
+  });
+});
+
 describe('Simple coach in real battles', () => {
-  // Words for reads and plans over several turns: Simple never uses them.
+  // Words for reads and plans over several turns: Simple never uses them. (Its
+  // one read, a foe likely to switch out of a knockout, says why from what's seen.)
   const BANNED = /predict|\bread\b|likely switch|next turn|double|they.ll switch|mind game/i;
 
   it('never peeks at the foe’s hidden set', () => {

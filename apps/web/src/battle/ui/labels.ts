@@ -20,7 +20,7 @@ export const EXPLAINERS: Record<string, string> = {
   sunnyday: 'Sun powers up Fire moves and weakens Water moves.',
   hail: 'Hail chips every Pokémon that isn’t Ice each turn.',
   brn: 'A burn halves physical damage and chips HP each turn.',
-  par: 'Paralysis cuts Speed and sometimes stops a Pokémon from moving.',
+  par: 'Paralysis quarters Speed and sometimes stops a Pokémon from moving.',
   psn: 'Poison chips HP each turn.',
   tox: 'Toxic poison hurts more every turn it stays in.',
   slp: 'A sleeping Pokémon can’t move for a few turns.',
@@ -36,6 +36,14 @@ export const EXPLAINERS: Record<string, string> = {
   mistyterrain:
     'Misty Terrain halves Dragon damage and protects grounded Pokémon from status for five turns.',
 };
+
+/** An explainer's text in this generation (Gen 7 made paralysis halve Speed, not quarter it). */
+export function explainer(id: string, gen: number): string | undefined {
+  if (id === 'par' && gen >= 7) {
+    return 'Paralysis halves Speed and sometimes stops a Pokémon from moving.';
+  }
+  return EXPLAINERS[id];
+}
 
 export const STATUS_LABEL: Record<string, string> = {
   brn: 'BRN',

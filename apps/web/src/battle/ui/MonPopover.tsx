@@ -15,7 +15,7 @@ const VERDICT = {
   faster: ['▲', 'Faster than'],
   slower: ['▼', 'Slower than'],
   tie: ['=', 'Ties with'],
-  either: ['◆', 'Could be faster or slower than'],
+  either: ['◆', 'Possibly faster than'],
 } as const;
 
 type Props = {
@@ -210,10 +210,32 @@ export function MonPopover(props: Props) {
         >
           <p>
             <span className="text-muted">Speed </span>
-            <span className="font-semibold">
-              {speed.lo === speed.hi ? speed.lo : `${speed.lo}–${speed.hi}`}
-            </span>
+            {speed.showdown ? (
+              // Showdown's line: slowest, 0 and 252 EVs (neutral nature), fastest.
+              <span className="font-semibold">
+                {speed.showdown[0]}
+                <span className="font-normal text-muted">
+                  –{speed.showdown[1]}–{speed.showdown[2]}–
+                </span>
+                {speed.showdown[3]}
+              </span>
+            ) : (
+              <span className="font-semibold">
+                {speed.lo === speed.hi ? speed.lo : `${speed.lo}–${speed.hi}`}
+              </span>
+            )}
           </p>
+          {speed.showdown && (
+            <p className="text-[11.5px] text-muted">before boosts, items and abilities</p>
+          )}
+          {speed.fromSets && (
+            <p>
+              <span className="text-muted">Its sets </span>
+              <span className="font-semibold">
+                {speed.lo === speed.hi ? speed.lo : `${speed.lo}–${speed.hi}`}
+              </span>
+            </p>
+          )}
           {verdict && speed.mine && (
             <p>
               <span aria-hidden>{VERDICT[verdict][0]} </span>

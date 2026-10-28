@@ -1,6 +1,6 @@
 // The battle engine that runs inside the worker: a BattleSession, the
 // opponent AI, and a presenter that turns the player's side into frames.
-import { aiFor } from '@daily-battle/ai';
+import { aiFor, UtilityPolicy } from '@daily-battle/ai';
 import { DEFAULT_FORMAT, setsFor } from '@daily-battle/data';
 import type { Engine } from '@daily-battle/engine-wasm';
 import {
@@ -11,8 +11,11 @@ import {
   resolveStep,
   type Policy,
   type Rng,
+  type SideView,
 } from '@daily-battle/sim-bridge';
 import {
+  behind,
+  choiceKey,
   Coach,
   guideKey,
   guideNote,
@@ -21,13 +24,16 @@ import {
   LESSON_TIE,
   knownSets,
   setStartHp,
+  soundPick,
   startPosition,
   teamOf,
   withLessonSets,
   type CoachNote,
+  type FoeRead,
   type Mon,
   type Review,
   type Position,
+  type Verdict,
 } from '@daily-battle/tutorial';
 import type { PokemonSet, PRNGSeed } from '@pkmn/sim';
 import type { CoachMemo, EngineStart, TurnPackage, TurnReplay } from './frames';
@@ -69,6 +75,11 @@ export class BattleEngine {
   private memo?: CoachMemo;
   /** Every choice you've made (resumed ones too, blocked ones included), for replays. */
   private readonly made: string[] = [];
+  /**
+   * The opponent's choice for this turn, made before yours, and its view: the
+   * coach checks its advice against it (DESIGN.md §22). Never sent or saved.
+   */
+  private pending?: { view: SideView; choice: string; read?: FoeRead };
 
   /**
    * Hard needs `engine`, poke-engine for the format's gen; `budget` is for tests.
@@ -102,6 +113,7 @@ export class BattleEngine {
       ...(engine ? { engine } : {}),
       ...(start.pool ? { pool: start.pool } : {}),
       ...(budget ? { hard: budget } : {}),
+      ...(start.aiVersion ? { aiVersion: start.aiVersion } : {}),
     });
     this.ai = ai;
     this.aiRng = makeRng(tutorial ? deriveSeed(start.battleSeed, 2) : (start.aiSeed as PRNGSeed));
@@ -182,7 +194,7 @@ export class BattleEngine {
       this.coach!.record(view, choice, null, saved?.verdict, saved?.heeded);
       return;
     }
-    const verdict = this.judge?.verdict(choice);
+    const verdict = this.readVerdict(this.judge?.verdict(choice));
     const shown = this.shown.get(choice);
     // A warning you listened to: the last one shown on another pick.
     const other = [...this.shown].filter(([c]) => c !== choice).at(-1);
@@ -203,11 +215,41 @@ export class BattleEngine {
   coachCheck(choice: string, waitMs: number): CoachNote | null {
     const view = this.session.view('p1');
     if (!this.coach || !this.judge || !view) return null;
-    const verdict = this.judge.settle(choice, waitMs);
+    const verdict = this.readVerdict(this.judge.settle(choice, waitMs));
     const note = verdict && this.coach.warn(view, verdict);
     if (!note) return null;
     this.shown.set(choice, note);
     return note;
+  }
+
+  /** What the opponent is doing this turn, by the judge's reply keys; undefined without one. */
+  private foeRead(): FoeRead | undefined {
+    const p = this.pending;
+    if (!p || !(this.ai instanceof UtilityPolicy)) return undefined;
+    if (!p.read) {
+      const likely: Record<string, number> = {};
+      for (const { choice, p: odds } of this.ai.likely(p.view)) {
+        const key = choiceKey(p.view.request, choice);
+        if (key) likely[key] = (likely[key] ?? 0) + odds;
+      }
+      const actual = choiceKey(p.view.request, p.choice);
+      p.read = { likely, ...(actual ? { actual } : {}) };
+    }
+    return p.read;
+  }
+
+  /**
+   * A verdict that the pick is clearly worse also needs the judge's top to beat
+   * it against what the opponent is really doing (judge.ts `behind`), so a
+   * warning never argues against the pick that works this turn.
+   */
+  private readVerdict(verdict: Verdict | undefined): Verdict | undefined {
+    const read = verdict?.worse && this.foeRead();
+    if (!verdict || !read) return verdict;
+    const values = this.judge?.against(read, [verdict.choice, verdict.top]);
+    return values && !behind(verdict.choice, verdict.top, values)
+      ? { ...verdict, worse: false }
+      : verdict;
   }
 
   /** Works on the judge for up to `ms`; true while there's more to do. */
@@ -215,20 +257,34 @@ export class BattleEngine {
     const judge = this.judge;
     if (!judge?.busy) return false;
     const end = performance.now() + ms;
-    while (judge.step() && performance.now() < end && !(this.tipPending && judge.best));
+    while (judge.step() && performance.now() < end && !(this.tipPending && this.tipReady()));
     return judge.busy;
   }
 
   /**
+   * A waiting tip can show: the judge's top choice is known and, when the
+   * coach checks it against the opponent's pick, every choice has been searched.
+   */
+  private tipReady(): boolean {
+    if (!this.judge?.best) return false;
+    return !!this.start.tutorial?.guide || !this.foeRead() || !this.judge.busy;
+  }
+
+  /**
    * A tip that waited for the judge, once its top choice is known (DESIGN.md
-   * §22): it shows late, after the controls. At most once a decision.
+   * §22): it shows late, after the controls. At most once a decision. A tip
+   * recommending a choice also needs it to be sound against what the opponent
+   * is doing (judge.ts `soundPick`).
    */
   coachTip(): CoachNote | undefined {
     const top = this.judge?.best;
     const view = this.session.view('p1');
-    if (!this.tipPending || !top || !view || !this.coach) return undefined;
+    if (!this.tipPending || !top || !view || !this.coach || !this.tipReady()) return undefined;
     this.tipPending = false;
-    return this.start.tutorial?.guide ? guideNote(view, top) : this.coach.confirm(view, top);
+    if (this.start.tutorial?.guide) return guideNote(view, top);
+    const read = this.foeRead();
+    const values = read && this.judge!.against(read);
+    return this.coach.confirm(view, top, values ? (c) => soundPick(c, values) : undefined);
   }
 
   /**
@@ -285,13 +341,16 @@ export class BattleEngine {
 
   /** The opponent answers every request it has. */
   private advanceAi() {
+    this.pending = undefined;
     for (
       let view = this.session.view('p2');
       view && !this.session.ended;
       view = this.session.view('p2')
     ) {
       if (!this.hard) {
-        this.session.choose('p2', this.ai.choose(view, this.aiRng));
+        const choice = this.ai.choose(view, this.aiRng);
+        if (this.coach && view.request.requestType === 'move') this.pending = { view, choice };
+        this.session.choose('p2', choice);
         continue;
       }
       // Hard: a saved choice skips the search (a resume would otherwise redo every

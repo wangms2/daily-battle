@@ -120,3 +120,37 @@ test('a protected name brings its streak to another device, and a wrong password
   await expect(phone.getByText('Choose a generation')).toBeVisible();
   await expect(phone.getByRole('button', { name: /^Gen 4.*Streak 3/ })).toBeVisible();
 });
+
+test('starting over erases this device and signs out, but keeps the account', async ({
+  page,
+}, info) => {
+  test.skip(info.project.name !== 'phone-375x667', 'one size covers it');
+  const name = `Misty${Date.now() % 1_000_000}`;
+  await page.clock.setFixedTime(TODAY);
+  await page.goto('/');
+  await page.evaluate(
+    (s) => localStorage.setItem('daily-battle:state', s),
+    JSON.stringify(player(name)),
+  );
+  await page.reload();
+  await openTrainer(page);
+  await page.getByRole('button', { name: /Protect with a password/ }).click();
+  await page.getByLabel('Password').fill('pikachu');
+  await page.getByRole('button', { name: 'Protect', exact: true }).click();
+  await expect(page.getByText(/^Protected ·/)).toBeVisible();
+  await page.getByRole('button', { name: 'Settings', exact: true }).click();
+
+  await page.getByRole('button', { name: 'Start over…' }).click();
+  await expect(page.getByText(new RegExp(`signed out of 🔒 ${name}`))).toBeVisible();
+  await page.getByRole('button', { name: 'Erase and start over' }).click();
+  // Fresh, like the first visit: the name screen.
+  await expect(page.getByRole('textbox', { name: 'Your name' })).toBeVisible();
+  expect(await page.evaluate(() => localStorage.getItem('daily-battle:account'))).toBeNull();
+  // The account is still there: signing in brings the streak back.
+  await page.getByRole('button', { name: /Sign in/ }).click();
+  await page.getByLabel('Your name').fill(name);
+  await page.getByLabel('Password').fill('pikachu');
+  await page.getByRole('button', { name: 'Sign in', exact: true }).click();
+  await page.getByRole('button', { name: 'Play', exact: true }).click();
+  await expect(page.getByRole('button', { name: /^Gen 4.*Streak 3/ })).toBeVisible();
+});

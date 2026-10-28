@@ -11,6 +11,7 @@ import {
 import { getSprite } from '../lib/sprites';
 import type { Stats } from '../lib/results';
 import type { Settings } from '../state/schema';
+import { useAccount } from '../state/context';
 import { Sheet } from '../ui/Sheet';
 import { TrainerRow, TrainerSection } from './Trainer';
 import { Button, Switch, TypeBadge } from '../ui/bits';
@@ -204,30 +205,65 @@ export function SettingsSheet({
   onHowToPlay: () => void;
 }) {
   const speeds: Settings['battleSpeed'][] = ['slow', 'normal', 'fast'];
+  const account = useAccount();
+  const [erasing, setErasing] = useState(false);
   // The Trainer page opens in place of the list, with a way back; closing resets it.
-  const [page, setPage] = useState<'main' | 'trainer'>('main');
+  const [page, setPage] = useState<'main' | 'trainer' | 'startOver'>('main');
   const close = (o: boolean) => {
     if (!o) setPage('main');
     onOpenChange(o);
   };
+  const back = (
+    <button
+      type="button"
+      onClick={() => setPage('main')}
+      className="-ml-1 flex h-9 items-center gap-0.5 text-[14px] font-semibold text-accent"
+    >
+      <ChevronIcon className="size-4 rotate-180" aria-hidden />
+      Settings
+    </button>
+  );
   return (
     <Sheet
       open={open}
       onOpenChange={close}
-      title={page === 'trainer' ? 'Trainer' : 'Settings'}
+      title={page === 'trainer' ? 'Trainer' : page === 'startOver' ? 'Start over' : 'Settings'}
       size="md"
     >
       {page === 'trainer' ? (
         <div>
-          <button
-            type="button"
-            onClick={() => setPage('main')}
-            className="-ml-1 flex h-9 items-center gap-0.5 text-[14px] font-semibold text-accent"
-          >
-            <ChevronIcon className="size-4 rotate-180" aria-hidden />
-            Settings
-          </button>
+          {back}
           <TrainerSection name={settings.name} onRename={(name) => onChange('name', name)} />
+        </div>
+      ) : page === 'startOver' ? (
+        <div className="grid gap-3">
+          {back}
+          <p className="text-[15px]">
+            This erases everything on this device: your name, teams, streaks, lessons and settings.
+            The game starts fresh, like the first time you opened it.
+          </p>
+          {account.name && (
+            <p className="text-[14px] text-muted">
+              You’ll be signed out of 🔒 {account.name}. Its saved copy stays on the server, so
+              signing in again brings it back. To erase that too, delete the account in Trainer
+              first.
+            </p>
+          )}
+          <div className="grid grid-cols-2 gap-2">
+            <Button variant="secondary" onClick={() => setPage('main')}>
+              Cancel
+            </Button>
+            <Button
+              variant="danger"
+              disabled={erasing}
+              onClick={() => {
+                setErasing(true);
+                void account.startOver();
+              }}
+            >
+              {erasing ? 'Erasing…' : 'Erase and start over'}
+            </Button>
+          </div>
         </div>
       ) : (
         <>
@@ -295,6 +331,13 @@ export function SettingsSheet({
               About
             </Button>
           </div>
+          <button
+            type="button"
+            onClick={() => setPage('startOver')}
+            className="mt-3 h-9 text-[13px] font-semibold text-muted hover:text-bad"
+          >
+            Start over…
+          </button>
         </>
       )}
     </Sheet>

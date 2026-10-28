@@ -23,10 +23,11 @@ export const effective: Lesson = {
         seed: 'course:effective:demo1',
       },
       turn: { p1: 'move Surf', p2: 'move Crunch' },
-      before: 'Every move has a type. Surf is a Water move, and Houndoom is a Dark and Fire type.',
+      before:
+        'Every move has a type. Surf is a Water move, and Houndoom is a Dark and Fire type. Water is strong against Fire, so Surf will do double damage. Use it and watch.',
       // The anchor for the whole chart: the starters' triangle.
       after:
-        'Water is strong against Fire: Surf does double damage. Like the starters, it goes round: Water beats Fire, Fire beats Grass, Grass beats Water.',
+        'Super effective: double damage. Like the starters, it goes round: Water beats Fire, Fire beats Grass, Grass beats Water.',
       spotlight: { before: ['move Surf', 'foe-types'], after: ['foe-hp'] },
     },
     {
@@ -37,8 +38,9 @@ export const effective: Lesson = {
         seed: 'course:effective:demo2',
       },
       turn: { p1: 'move Surf', p2: 'move Psychic' },
-      before: 'Celebi is a Psychic and Grass type. Watch the same Surf hit it.',
-      after: 'Grass resists Water: Surf is not very effective and does only half damage.',
+      before:
+        'Celebi is a Psychic and Grass type. Grass resists Water, so the same Surf will do only half damage.',
+      after: 'Not very effective: half damage.',
       spotlight: { before: ['move Surf', 'foe-types'], after: ['foe-hp'] },
     },
     {
@@ -49,9 +51,9 @@ export const effective: Lesson = {
         seed: 'course:effective:demo3',
       },
       turn: { p1: 'move Ice Beam', p2: 'move Dragon Claw' },
-      before: 'Flygon is a Ground and Dragon type. Ice is strong against both.',
-      after:
-        'Weak to Ice twice over: Ice Beam does four times the damage, enough to knock Flygon out.',
+      before:
+        'Flygon is a Ground and Dragon type, and Ice is strong against both. Twice over, Ice Beam will do four times the damage.',
+      after: 'Four times the damage: enough to knock Flygon out.',
       spotlight: { before: ['move Ice Beam', 'foe-types'], after: ['log'] },
     },
     {

@@ -1,5 +1,5 @@
 export { candidates, consistent, type Candidate, type KnownSets } from './belief';
-export { bestDamage, genFor, type Gen, type SetLike } from './calc';
+export { bestDamage, effectiveness, genFor, type Gen, type SetLike } from './calc';
 export { midBot, NaivePolicy, strongBot } from './bots';
 export { sample, softmax } from './choose';
 export { aiForStyle, UtilityPolicy, type PolicyStats, type UtilityPolicyOptions } from './policy';
@@ -13,7 +13,7 @@ export {
   type SwitchFact,
   type Threat,
 } from './facts';
-export { extractState, type AIState, type FoeMon, type OwnMon } from './state';
+export { extractState, moveId, type AIState, type FoeMon, type OwnMon } from './state';
 export {
   HARD_DEFAULTS,
   HardPolicy,

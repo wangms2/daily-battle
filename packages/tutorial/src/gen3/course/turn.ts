@@ -6,6 +6,8 @@ import type { Lesson, Mon } from '../../types';
 
 const SWAMPERT: Mon = { species: 'Swampert', moves: ['Earthquake', 'Rock Slide'] };
 const SNORLAX: Mon = { species: 'Snorlax', moves: ['Body Slam'] };
+const SLOWBRO: Mon = { species: 'Slowbro', moves: ['Surf'] };
+const BLISSEY: Mon = { species: 'Blissey', moves: ['Seismic Toss'] };
 
 export const turn: Lesson = {
   id: 'gen3-turn',
@@ -19,7 +21,7 @@ export const turn: Lesson = {
       kind: 'demo',
       position: {
         p1: [SWAMPERT, { species: 'Metagross', moves: ['Meteor Mash'] }],
-        p2: [SNORLAX, { species: 'Blissey', moves: ['Seismic Toss'] }],
+        p2: [SNORLAX, BLISSEY],
         seed: 'course:turn:look1',
       },
       // Nothing opens by itself: the player holds the move to see its details.
@@ -31,7 +33,7 @@ export const turn: Lesson = {
       kind: 'demo',
       position: {
         p1: [SWAMPERT, { species: 'Metagross', moves: ['Meteor Mash'] }],
-        p2: [SNORLAX, { species: 'Blissey', moves: ['Seismic Toss'] }],
+        p2: [SNORLAX, BLISSEY],
         seed: 'course:turn:look2',
       },
       before:
@@ -47,24 +49,26 @@ export const turn: Lesson = {
       after: 'Both moves happened: each one took some of the other’s HP.',
       spotlight: { before: ['move Earthquake'], after: ['foe-hp', 'you-hp'] },
     },
+    // One story to the win: Slowbro faints and Blissey comes in, already low;
+    // the next step goes on from there, so nothing that fainted comes back.
     {
       kind: 'demo',
       position: {
         p1: [SWAMPERT],
-        p2: [SNORLAX, { species: 'Blissey', moves: ['Seismic Toss'] }],
-        hp: { p2: [15] },
+        p2: [SLOWBRO, BLISSEY],
+        hp: { p2: [15, 15] },
         seed: 'course:turn:demo2',
       },
-      turn: { p1: 'move Earthquake', p2: 'move Body Slam' },
-      before: 'Snorlax is low on HP. Watch what happens when it reaches zero.',
+      turn: { p1: 'move Earthquake', p2: 'move Surf' },
+      before: 'Slowbro is low on HP. Watch what happens when it reaches zero.',
       after: 'At zero HP a Pokémon faints and can’t battle again. The foe sent in its next one.',
       spotlight: { before: ['foe-hp'], after: ['log'] },
     },
     {
       kind: 'demo',
-      position: { p1: [SWAMPERT], p2: [SNORLAX], hp: { p2: [15] }, seed: 'course:turn:demo3' },
-      turn: { p1: 'move Earthquake', p2: 'move Body Slam' },
-      before: 'This Snorlax is the foe’s last Pokémon.',
+      position: { p1: [SWAMPERT], p2: [BLISSEY], hp: { p2: [15] }, seed: 'course:turn:demo3' },
+      turn: { p1: 'move Earthquake', p2: 'move Seismic Toss' },
+      before: 'Blissey is low on HP too, and it’s the foe’s last Pokémon.',
       after: 'Knock out all of the foe’s Pokémon and you win.',
       spotlight: { before: ['foe-plate'], after: ['log'] },
     },

@@ -4,9 +4,9 @@ import type { Engine } from '@daily-battle/engine-wasm';
 import type { Style } from '@daily-battle/gen';
 import type { Policy } from '@daily-battle/sim-bridge';
 import { HardPolicy, type HardPolicyOptions } from './hard/policy';
-import { aiForStyle, UtilityPolicy } from './policy';
-import { EASY } from './presets';
-import type { Difficulty } from './version';
+import { UtilityPolicy } from './policy';
+import { EASY, legacy, PRESETS, type Params } from './presets';
+import { AI_VERSION, type Difficulty } from './version';
 
 export { aiVersion, DIFFICULTIES, difficultyTag, isDifficulty, type Difficulty } from './version';
 
@@ -21,16 +21,22 @@ export interface AiForOptions {
   pool?: readonly string[];
   /** Hard: override the search budget (tests, eval). */
   hard?: Pick<HardPolicyOptions, 'iterations' | 'worlds'>;
+  /**
+   * Easy and Normal: the AI version a saved battle started under. An older
+   * one plays as it did then, so the battle resumes exactly (DESIGN.md §15).
+   */
+  aiVersion?: number;
 }
 
-/** The opponent AI for a difficulty. Normal is exactly `aiForStyle`. */
+/** The opponent AI for a difficulty. Normal is exactly `aiForStyle` (at the current version). */
 export function aiFor(options: AiForOptions): Policy {
   const data = options.data ? { data: options.data } : {};
+  const at = (params: Params) => ((options.aiVersion ?? AI_VERSION) < 2 ? legacy(params) : params);
   switch (options.difficulty) {
     case 'easy':
-      return new UtilityPolicy(EASY, data);
+      return new UtilityPolicy(at(EASY), data);
     case 'normal':
-      return aiForStyle(options.style, data);
+      return new UtilityPolicy(at(PRESETS[options.style]), data);
     case 'hard':
       if (!options.engine) throw new Error('Hard difficulty needs the engine');
       return new HardPolicy({

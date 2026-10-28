@@ -1,9 +1,18 @@
 // The Simple coach (DESIGN.md §22): blunder warnings and one-turn tips from
-// what the player can see this turn. It never mentions predictions, reads, or
-// plans over several turns. The judge (judge.ts) decides: a warning needs it to
-// find the pick clearly worse (explain.ts says why), and a tip that recommends
-// an action needs that action to be its top choice.
-import { turnFacts, type Facts, type MoveFact, type NoEffect } from '@daily-battle/ai';
+// what the player can see this turn. It never mentions predictions or plans
+// over several turns; the one read it names, a foe likely to switch out of a
+// knockout, it explains from what's on screen. The judge (judge.ts) decides: a
+// warning needs it to find the pick clearly worse (explain.ts says why), and a
+// tip that recommends an action needs that action to be its top choice or,
+// when the foe's choice this turn is known, sound against it (`confirm`).
+import {
+  effectiveness,
+  genFor,
+  turnFacts,
+  type Facts,
+  type MoveFact,
+  type NoEffect,
+} from '@daily-battle/ai';
 import type { SetsFile } from '@daily-battle/data';
 import type { SideView } from '@daily-battle/sim-bridge';
 import {
@@ -19,7 +28,14 @@ import { buildReview, decision, type Decision, type Heeded, type Review } from '
 
 /** The kinds of tip. Warnings have their own reasons (`WarningReason`, explain.ts). */
 export type CoachRule =
-  'canKo' | 'koThreat' | 'foeAsleep' | 'locked' | 'spikes' | 'walled' | 'setupWindow';
+  | 'canKo'
+  | 'likelySwitch'
+  | 'koThreat'
+  | 'foeAsleep'
+  | 'locked'
+  | 'spikes'
+  | 'walled'
+  | 'setupWindow';
 
 export interface CoachNote {
   /** `guide`: a guided replay's pick for the turn (guide.ts). */
@@ -64,6 +80,7 @@ const LESSONS: Record<string, Partial<Record<LessonKey, string>>> = {
     // The course lessons built so far (course.ts has where each idea is taught).
     noEffect: 'gen3-immune',
     canKo: 'gen3-turn',
+    likelySwitch: 'gen3-switching-course',
     missedKo: 'gen3-turn',
     weaker: 'gen3-turn',
     walled: 'gen3-switching-course',
@@ -118,7 +135,7 @@ export function noEffectText(foe: string, move: string, why: NoEffect): string {
  */
 export const TIP_GAP = 3;
 const URGENT_GAP = 2;
-const URGENT = new Set<CoachNote['rule']>(['koThreat', 'canKo']);
+const URGENT = new Set<CoachNote['rule']>(['koThreat', 'canKo', 'likelySwitch']);
 export const tipGap = (rule: CoachNote['rule']) => (URGENT.has(rule) ? URGENT_GAP : TIP_GAP);
 
 /** The coach for one battle. It remembers which one-time tips it has shown. */
@@ -197,12 +214,17 @@ export class Coach {
 
   /**
    * The judge's top choice for the current request is known: the first waiting
-   * tip that's a fact or recommends `top`, if any. Call it at most once a request.
+   * tip that's a fact or recommends `top`, if any. With `sound`, a check of a
+   * choice against what the foe is really doing (judge.ts `soundPick`), a tip
+   * needs its choice to pass that instead: a stricter test than the top, which
+   * only knows the foe's odds as the search guesses them. Call it at most once
+   * a request.
    */
-  confirm(view: SideView, top: string): CoachNote | undefined {
+  confirm(view: SideView, top: string, sound?: (choice: string) => boolean): CoachNote | undefined {
     const t = this.tipFor;
     if (!t?.pending || t.request !== view.request) return undefined;
-    const hit = t.pending.find((c) => !c.choice || c.choice === top);
+    const fits = sound ?? ((choice: string) => choice === top);
+    const hit = t.pending.find((c) => !c.choice || fits(c.choice));
     delete t.pending;
     if (!hit) return undefined;
     this.show(hit, this.factsFor(view));
@@ -294,6 +316,29 @@ export class Coach {
   }
 
   /**
+   * For a foe that `ko` knocks out: a teammate of its we've seen that resists
+   * `ko` by type (where it would likely switch), and another of our moves that
+   * hits that teammate super effectively. The most resistant teammate first.
+   */
+  private cover(f: Facts, ko: MoveFact): { move: MoveFact; target: string } | undefined {
+    const gen = genFor(this.data.meta.format);
+    let best: { move: MoveFact; target: string; resist: number; hits: number } | undefined;
+    for (const b of f.state.foe) {
+      if (b.active || b.fainted) continue;
+      const resist = effectiveness(gen, ko.type, b.forme);
+      if (resist > 0.5) continue;
+      for (const m of f.moves) {
+        if (m === ko || m.category === 'Status' || m.noEffect || SELF_KO.has(m.id)) continue;
+        const hits = effectiveness(gen, m.type, b.forme);
+        if (hits < 2) continue;
+        if (!best || resist < best.resist || (resist === best.resist && hits > best.hits))
+          best = { move: m, target: b.forme, resist, hits };
+      }
+    }
+    return best && { move: best.move, target: best.target };
+  }
+
+  /**
    * This turn's tip candidates, in order of importance. A one-time tip already
    * given is left out; its key is marked when a candidate shows.
    */
@@ -333,6 +378,19 @@ export class Coach {
         `threat:${me}:${foe}`,
       );
     const ko = this.koMove(f);
+    const cover = ko && this.cover(f, ko);
+    if (ko && cover) {
+      const weak = ko.effectiveness ?? 1;
+      add(
+        'likelySwitch',
+        (weak >= 2
+          ? `${foe} is ${weak}× weak to ${ko.type}, so it’s likely to switch out`
+          : `${ko.name} can knock out ${foe}, so it’s likely to switch out`) +
+          `, perhaps to ${cover.target}. Consider reading the switch with ${cover.move.name}.`,
+        `switch:${me}:${foe}:${cover.move.id}`,
+        cover.move.choice,
+      );
+    }
     if (ko)
       add(
         'canKo',

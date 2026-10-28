@@ -446,6 +446,38 @@ describe('attempts', () => {
     expect(upgraded.days[DAY]!.attempts[0]!.result).toBe('forfeit');
   });
 
+  it('resumes a battle saved under AI version 1, which is still playable', () => {
+    for (const difficulty of ['normal', 'easy'] as const) {
+      const saved = gameReducer(locked(), {
+        type: 'startAttempt',
+        day: DAY,
+        attempt: attempt({
+          ...(difficulty === 'easy' && { difficulty }),
+          engine: attemptEngine(ENGINE, difficulty),
+        }),
+      });
+      expect(
+        gameReducer(saved, {
+          type: 'expireAttempts',
+          today: DAY,
+          engine: 'sim 0.10.11 ai 2',
+        }),
+      ).toBe(saved);
+    }
+    // A version no longer playable can't.
+    const old = gameReducer(locked(), {
+      type: 'startAttempt',
+      day: DAY,
+      attempt: attempt({ engine: 'sim 0.10.11 ai 0' }),
+    });
+    const expired = gameReducer(old, {
+      type: 'expireAttempts',
+      today: DAY,
+      engine: 'sim 0.10.11 ai 2',
+    });
+    expect(expired.days[DAY]!.attempts[0]!.result).toBe('forfeit');
+  });
+
   it('expires an Easy or Hard battle against its own engine string', () => {
     const hard = gameReducer(locked(), {
       type: 'startAttempt',

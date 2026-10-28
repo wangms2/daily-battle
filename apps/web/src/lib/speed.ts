@@ -16,9 +16,25 @@ export function speedStat(base: number, ev = 0, iv = 31, nature = 'Serious'): nu
   return Math.floor(raw * mult);
 }
 
-/** Speed with no EVs and a slowing nature, up to max EVs and a boosting one (as Showdown shows it). */
+/**
+ * A foe's Speed as Showdown's tooltip shows it (battle-tooltips.ts
+ * `getSpeedRange`), before boosts, items and abilities: the slowest it could
+ * be (0 IVs, 0 EVs, a slowing nature), then 0 and 252 EVs with a neutral
+ * nature, then the fastest (252 EVs, a boosting nature).
+ */
+export function showdownRange(base: number): [number, number, number, number] {
+  return [
+    speedStat(base, 0, 0, 'Brave'),
+    speedStat(base, 0),
+    speedStat(base, 252),
+    speedStat(base, 252, 31, 'Jolly'),
+  ];
+}
+
+/** The slowest and fastest of Showdown's range. */
 export function theoreticalRange(base: number): [number, number] {
-  return [speedStat(base, 0, 31, 'Brave'), speedStat(base, 252, 31, 'Jolly')];
+  const r = showdownRange(base);
+  return [r[0], r[3]];
 }
 
 /** A lesson Pokémon's set, for its Speed: a named set, or a custom one (neutral, 85 EVs each; packages/tutorial teams.ts). */
@@ -66,7 +82,11 @@ export function battleSpeed(stat: number, s: SpeedState): number {
 
 /** The Speed facts behind a foe's card. */
 export interface SpeedCheck {
-  /** The foe's Speed now: one number when every set agrees. */
+  /** Showdown's line (`showdownRange`), unless the foe's set is known (a lesson). */
+  showdown?: [number, number, number, number];
+  /** `lo`–`hi` come from this game's sets for it (Beginner hints), so the card shows them too. */
+  fromSets?: boolean;
+  /** The foe's Speed now, for the comparison: one number when every set agrees. */
   lo: number;
   hi: number;
   /**

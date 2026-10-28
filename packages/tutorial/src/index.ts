@@ -27,10 +27,17 @@ export {
 } from './coach/explain';
 export {
   agreement,
+  behind,
+  choiceKey,
   Judge,
   JUDGE_DEFAULTS,
   LESSON_TIE,
+  READ_MARGIN,
+  replyKey,
+  soundPick,
+  type FoeRead,
   type JudgeOptions,
+  type ReadValue,
   type Verdict,
 } from './coach/judge';
 export {

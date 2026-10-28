@@ -13,9 +13,16 @@
 // it's ahead in at least `agree` of the worlds (by weight): better in the bad
 // cases too, not just on average.
 //
+// The held searches also record a value for each foe reply (`against`). On Easy
+// and Normal the foe's choice is locked in before the player's, so the coach
+// can check a choice against it: `soundPick` needs it best (within READ_TIE)
+// against the actual reply and within READ_MARGIN of the best expected over the
+// AI's own odds; `behind` gates warnings the same way. Neither is ever shown.
+//
 // The work is a queue of one-world searches, so the battle worker can run it a
 // slice at a time while the player chooses.
 import {
+  moveId,
   prepareWorlds,
   searchWorld,
   toChoice,
@@ -106,6 +113,86 @@ export interface Verdict {
 
 type Task = { world: number; fixed?: string };
 
+/**
+ * A reply's key, so the foe's real choice and the judge's worlds can be matched:
+ * `move:<id>` (Hidden Power by its type, without its power) or `switch:<species id>`.
+ */
+export function replyKey(kind: 'move' | 'switch', name: string): string {
+  return `${kind}:${kind === 'move' ? moveId(name) : toId(name)}`;
+}
+
+const toId = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+/** The key of a choice (`move 2`, `switch 3`) on `request`, the foe's own request. */
+export function choiceKey(request: SideView['request'], choice: string): string | undefined {
+  if (request.requestType === 'wait') return undefined;
+  const [kind, n] = choice.split(' ');
+  const i = Number(n) - 1;
+  if (kind === 'switch') {
+    const details = request.side.pokemon[i]?.details;
+    return details ? replyKey('switch', details.split(',')[0]!) : undefined;
+  }
+  if (kind !== 'move' || request.requestType !== 'move') return undefined;
+  const move = request.active[0]?.moves[i];
+  return move ? replyKey('move', move.name) : undefined;
+}
+
+/**
+ * What the foe is doing this turn, for the coach (DESIGN.md §22): the choice it
+ * has locked in, and how likely each choice was (the opponent AI's own odds),
+ * both by `replyKey`. Never shown or saved.
+ */
+export interface FoeRead {
+  actual?: string;
+  likely: Record<string, number>;
+}
+
+/** A choice against a foe read: its value against the foe's real choice (when the search tried it enough), and on average over its likely ones. */
+export interface ReadValue {
+  actual?: number;
+  expected: number;
+}
+
+/** Visits a reply needs in a world's held search for its value there to count. */
+const MIN_REPLY_VISITS = 20;
+/** (b) of the read rule: within this of the best value over the foe's likely choices. */
+export const READ_MARGIN = 0.03;
+/** (a): within this of the best value against the foe's real choice (search noise). */
+export const READ_TIE = 0.01;
+
+/**
+ * Whether recommending `choice` is sound against the foe read (DESIGN.md §22):
+ * (a) the best against what the foe really chose, and (b) within `READ_MARGIN`
+ * of the best on average over what it would likely do. A reply the search
+ * didn't try enough leaves (a) out.
+ */
+export function soundPick(choice: string, values: Record<string, ReadValue>): boolean {
+  const mine = values[choice];
+  if (!mine) return false;
+  const all = Object.values(values);
+  const bestExpected = Math.max(...all.map((v) => v.expected));
+  if (mine.expected < bestExpected - READ_MARGIN) return false;
+  if (mine.actual === undefined) return true;
+  const bestActual = Math.max(...all.map((v) => v.actual ?? -Infinity));
+  return mine.actual >= bestActual - READ_TIE;
+}
+
+/**
+ * Whether `top` beats `choice` against the foe read, so a warning on `choice`
+ * holds up: ahead against the foe's real choice (when known), and by
+ * `READ_MARGIN` on average over its likely ones.
+ */
+export function behind(choice: string, top: string, values: Record<string, ReadValue>): boolean {
+  const c = values[choice];
+  const t = values[top];
+  if (!c || !t) return true;
+  if (t.expected - c.expected < READ_MARGIN) return false;
+  return c.actual === undefined || t.actual === undefined || t.actual > c.actual;
+}
+
+/** A held search's replies in one world: each reply's visits and value (for the searching side), by key. */
+type Replies = Record<string, { v: number; value: number }>;
+
 /** Each choice's value (win chance, 0–1) for the searching side, from a search's root options. */
 function values(result: SearchResult, request: SideView['request']): Record<string, number> {
   const out: Record<string, number> = {};
@@ -129,6 +216,8 @@ export class Judge {
   private held = new Map<string, (number | null | undefined)[]>();
   /** Held searches: the foe's replies to the held choice (a move's name, or `switch Species`), weighted. */
   private answers = new Map<string, Record<string, number>>();
+  /** Held searches: each reply's visits and value per world, by `replyKey`. */
+  private pairs = new Map<string, (Replies | undefined)[]>();
   private top?: string;
   private failed = false;
 
@@ -152,6 +241,7 @@ export class Judge {
     this.open = [];
     this.held = new Map();
     this.answers = new Map();
+    this.pairs = new Map();
     this.top = undefined;
     this.failed = false;
     this.worlds = [];
@@ -211,16 +301,28 @@ export class Judge {
       list[task.world] = values(result, this.request)[task.fixed] ?? null;
       this.held.set(task.fixed, list);
       const answers = this.answers.get(task.fixed) ?? {};
+      const replies: Replies = {};
       for (const o of result.s2) {
         const [kind, i] = o.c.split(':');
-        const name =
-          kind === 'switch'
-            ? `switch ${world.foes[Number(i)]?.species ?? '?'}`
-            : world.foes[world.foeActive]?.set.moves[Number(i)];
+        const species = kind === 'switch' ? world.foes[Number(i)]?.species : undefined;
+        const name = species
+          ? `switch ${species}`
+          : kind === 'move' || kind === 'mega'
+            ? world.foes[world.foeActive]?.set.moves[Number(i)]
+            : undefined;
         if (name && result.n)
           answers[name] = (answers[name] ?? 0) + (world.weight * o.v) / result.n;
+        // The foe's side scores 1 − ours, so its option's value is flipped back.
+        if (name && o.v > 0)
+          replies[species ? replyKey('switch', species) : replyKey('move', name)] = {
+            v: o.v,
+            value: 1 - o.s / o.v,
+          };
       }
       this.answers.set(task.fixed, answers);
+      const pairs = this.pairs.get(task.fixed) ?? [];
+      pairs[task.world] = replies;
+      this.pairs.set(task.fixed, pairs);
     }
     return this.queue.length > 0;
   }
@@ -259,6 +361,64 @@ export class Judge {
     return Object.entries(this.answers.get(choice) ?? {})
       .map(([reply, share]) => ({ reply, share }))
       .sort((a, b) => b.share - a.share);
+  }
+
+  /**
+   * How `choices` (every legal one by default) fare against a foe read, from
+   * the held searches; undefined until each has been searched in every world.
+   * A reply's value counts in a world only where every compared choice's search
+   * tried it enough, so the choices are compared on the same worlds. Replies
+   * with no such world count at each choice's overall value.
+   */
+  against(
+    read: FoeRead,
+    choices: readonly string[] = [...this.legal],
+  ): Record<string, ReadValue> | undefined {
+    if (this.failed || !this.top || !choices.length) return undefined;
+    const held = choices.map((c) => this.held.get(c));
+    const pairs = choices.map((c) => this.pairs.get(c));
+    for (const list of held)
+      for (let w = 0; w < this.worlds.length; w++) if (list?.[w] === undefined) return undefined;
+    const mean = held.map((list) => {
+      let total = 0;
+      let sum = 0;
+      list!.forEach((v, w) => {
+        if (v === null || v === undefined) return;
+        total += this.worlds[w]!.weight;
+        sum += this.worlds[w]!.weight * v;
+      });
+      return total ? sum / total : 0;
+    });
+    const valueOf = (reply: string): number[] | undefined => {
+      let total = 0;
+      const sums = choices.map(() => 0);
+      for (let w = 0; w < this.worlds.length; w++) {
+        const found = pairs.map((p) => p?.[w]?.[reply]);
+        if (found.some((r) => !r || r.v < MIN_REPLY_VISITS)) continue;
+        const weight = this.worlds[w]!.weight;
+        total += weight;
+        found.forEach((r, i) => (sums[i]! += weight * r!.value));
+      }
+      return total ? sums.map((s) => s / total) : undefined;
+    };
+    const actual = read.actual ? valueOf(read.actual) : undefined;
+    let mass = 0;
+    const expected = choices.map(() => 0);
+    for (const [reply, p] of Object.entries(read.likely)) {
+      if (!(p > 0)) continue;
+      const v = valueOf(reply);
+      mass += p;
+      choices.forEach((_, i) => (expected[i]! += p * (v?.[i] ?? mean[i]!)));
+    }
+    return Object.fromEntries(
+      choices.map((c, i) => [
+        c,
+        {
+          expected: mass ? expected[i]! / mass : mean[i]!,
+          ...(actual ? { actual: actual[i]! } : {}),
+        },
+      ]),
+    );
   }
 
   /** Moves a choice's searches (and the top's) to the front of the queue. */

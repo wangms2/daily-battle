@@ -2,6 +2,7 @@ import { sets, setsFor } from '@daily-battle/data';
 import { findSet, toPokemonSet } from '@daily-battle/gen';
 import {
   deriveSeed,
+  makeRng,
   RandomPolicy,
   runBattle,
   type Policy,
@@ -9,8 +10,8 @@ import {
 } from '@daily-battle/sim-bridge';
 import { describe, expect, it } from 'vitest';
 import { UtilityPolicy } from './policy';
-import { PRESETS } from './presets';
-import { scoreActions } from './score';
+import { legacy, PRESETS, type Params } from './presets';
+import { scoreActions, swapStreak, type ScoredAction } from './score';
 import { extractState } from './state';
 
 /** A near-greedy AI so behavior tests aren't at the mercy of noise. */
@@ -170,6 +171,68 @@ describe('AI behavior', () => {
       ['return', true],
     ]);
   });
+
+  /** Scores the AI's (p2) first move decision, its view's log starting with `before`. */
+  function scoreFirst(aiTeam: string[], foeTeam: string[], params: Params, before: string[] = []) {
+    let actions: ScoredAction[] | undefined;
+    const capture: Policy = {
+      choose(v, rng) {
+        if (v.request.requestType === 'move' && !actions) {
+          const view = { ...v, log: [...before, ...v.log] };
+          actions = scoreActions(view, extractState(view), params, () => 0.5, sets);
+        }
+        return new RandomPolicy().choose(v, rng);
+      },
+    };
+    runBattle({
+      seed: deriveSeed('score-first', 0),
+      maxTurns: 1,
+      p1: { team: team(...foeTeam), policy: new RandomPolicy(), seed: '1,1,1,1' },
+      p2: { team: team(...aiTeam), policy: capture, seed: '2,2,2,2' },
+    });
+    return actions!;
+  }
+
+  it('keeps a sure first-strike KO ahead of every other choice', () => {
+    // Choice Scarf Heatran outspeeds Scizor, and Fire Blast (move 1) OHKOs it.
+    const actions = scoreFirst(
+      ['heatran-choice-scarf', 'gyarados-offensive-dragon-dance'],
+      ['scizor-choice-band', ...FILLER],
+      { ...PRESETS.balance, predictionRate: 0 },
+    );
+    const ko = actions.find((a) => a.choice === 'move 1')!;
+    expect(ko.sure).toBe(true);
+    for (const a of actions.filter((x) => x !== ko)) {
+      expect(ko.score).toBeGreaterThanOrEqual(a.score + 0.2);
+    }
+  });
+
+  it('counts the cost of switching straight back to what just left', () => {
+    // Gyarados has just switched out for Magnezone; switching back is `switch 2`.
+    const aiTeam = ['magnezone-choice-scarf', 'gyarados-offensive-dragon-dance', 'heatran-utility'];
+    const foe = ['swampert-physically-offensive-stealth-rock', ...FILLER];
+    const swapped = ['|switch|p2a: Gyarados|Gyarados, L100, M|100/100'];
+    const params = { ...PRESETS.balance, predictionRate: 0 };
+    const back = (p: Params, before?: string[]) =>
+      scoreFirst(aiTeam, foe, p, before).find((a) => a.choice === 'switch 2')!.score;
+    expect(back(params) - back(params, swapped)).toBeCloseTo(params.switchBack);
+    // Version 1 didn't.
+    expect(back(legacy(params), swapped)).toBeCloseTo(back(legacy(params)));
+  });
+
+  it('counts each swap back and forth in a row', () => {
+    const ins = [
+      { turn: 0, species: 'Skarmory' },
+      { turn: 3, species: 'Swampert' },
+      { turn: 4, species: 'Skarmory' },
+      { turn: 5, species: 'Swampert' },
+    ];
+    // Skarmory left on turn 5 and came in for Swampert on turn 4, which had come in on 3.
+    expect(swapStreak(ins, 'Skarmory', 6)).toBe(3);
+    expect(swapStreak(ins, 'Celebi', 6)).toBe(0);
+    // Long enough on the field, it isn't a swap back.
+    expect(swapStreak(ins, 'Skarmory', 8)).toBe(0);
+  });
 });
 
 describe('AI behavior with Team Preview (Gen 5)', () => {
@@ -258,4 +321,42 @@ describe('AI behavior with Team Preview (Gen 5)', () => {
     expect(srScore('espeon-expert-belt')).toBeLessThan(0);
     expect(srScore('latias-choice-scarf')).toBeGreaterThan(0);
   });
+});
+
+describe('UtilityPolicy.likely', () => {
+  it('gives the odds choose() samples from', () => {
+    let view: SideView | undefined;
+    const capture: Policy = {
+      choose(v, rng) {
+        if (v.request.requestType === 'move') view ??= v;
+        return new RandomPolicy().choose(v, rng);
+      },
+    };
+    runBattle({
+      seed: deriveSeed('likely', 0),
+      maxTurns: 1,
+      p1: {
+        team: team('scizor-choice-band', ...FILLER),
+        policy: new RandomPolicy(),
+        seed: '1,1,1,1',
+      },
+      p2: {
+        team: team('heatran-choice-scarf', 'gyarados-offensive-dragon-dance'),
+        policy: capture,
+        seed: '2,2,2,2',
+      },
+    });
+    // Normal's noise, and a prediction rate high enough to matter.
+    const ai = new UtilityPolicy({ ...PRESETS.balance, temperature: 0.5, predictionRate: 0.5 });
+    const odds = ai.likely(view!);
+    expect(odds.reduce((a, o) => a + o.p, 0)).toBeCloseTo(1);
+    const rng = makeRng(deriveSeed('likely', 1));
+    const counts: Record<string, number> = {};
+    const n = 2000;
+    for (let i = 0; i < n; i++) {
+      const c = ai.choose(view!, rng);
+      counts[c] = (counts[c] ?? 0) + 1;
+    }
+    for (const { choice, p } of odds) expect((counts[choice] ?? 0) / n).toBeCloseTo(p, 1);
+  }, 20_000);
 });

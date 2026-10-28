@@ -41,7 +41,20 @@ export interface Params {
   predictionRate: number;
   /** Mega Evolving now (Gen 6 on), on top of the move's score in Mega form: the boost lasts all battle. */
   mega: number;
+  /**
+   * Cost of switching straight back to the Pokémon that just left, doubling
+   * each time the same two keep swapping (AI version 2).
+   */
+  switchBack: number;
+  /**
+   * AI version 1's scoring: no switch-back cost, and no sure-KO rule. Kept
+   * so battles saved under version 1 resume exactly (DESIGN.md §15).
+   */
+  legacy?: boolean;
 }
+
+/** These weights scored as AI version 1 did. */
+export const legacy = (params: Params): Params => ({ ...params, legacy: true });
 
 const BALANCE: Params = {
   temperature: 0.12,
@@ -62,6 +75,7 @@ const BALANCE: Params = {
   maxDamageBias: 0.1,
   predictionRate: 0.15,
   mega: 0.2,
+  switchBack: 0.5,
 };
 
 export const PRESETS: Record<Style, Params> = {

@@ -1,6 +1,7 @@
 // Connects the battle screen to today's attempt: builds the engine input from
 // the saved attempt (seeds, team, recorded choices) and records progress.
 import { backgroundFor } from '../lib/fx';
+import { AI_VERSION, aiVersionOf } from '@daily-battle/ai/version';
 import type { ScheduleFile } from '@daily-battle/gen/schedule';
 import { useState } from 'react';
 import type { EngineStart } from '../battle/frames';
@@ -54,6 +55,7 @@ export function BattleRoute({
       aiSeed: attempt.aiSeed,
       choices: [...attempt.choices],
       ...(attempt.difficulty && { difficulty: attempt.difficulty }),
+      ...(aiVersionOf(attempt.engine) < AI_VERSION && { aiVersion: aiVersionOf(attempt.engine) }),
       ...(attempt.coached && { coach: 'simple' as const }),
       // Hard's prior for your unseen Pokémon, and the coach's for the foe's.
       ...((attempt.difficulty === 'hard' || attempt.coached) && {

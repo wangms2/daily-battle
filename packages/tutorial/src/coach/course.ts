@@ -47,6 +47,8 @@ export const NO_EFFECT_LESSON: Record<NoEffect['kind'], number | null> = {
 /** The lesson that teaches each tip's idea. */
 export const TIP_LESSON: Record<CoachRule, number | null> = {
   canKo: 1,
+  // Reads aren't taught in the lessons built so far.
+  likelySwitch: null,
   koThreat: 7,
   // 6 Switching: a teammate hits this foe much harder.
   walled: 6,

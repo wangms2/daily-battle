@@ -19,8 +19,9 @@ export const stab: Lesson = {
       kind: 'demo',
       position: { p1: [METAGROSS], p2: [URSARING], seed: 'course:stab:demo1' },
       turn: { p1: 'move Meteor Mash', p2: 'move Return' },
-      before: 'Metagross is a Steel and Psychic type, and Meteor Mash is a Steel move.',
-      after: 'A move that matches its user’s type gets a bonus: 1.5× the power.',
+      before:
+        'Metagross is a Steel and Psychic type, and Meteor Mash is a Steel move. A move that matches its user’s type gets a bonus: 1.5× the power.',
+      after: 'Same type, so Meteor Mash hit with the bonus.',
       spotlight: { before: ['move Meteor Mash', 'you-types'], after: ['foe-hp'] },
     },
     {

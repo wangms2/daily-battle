@@ -19,6 +19,7 @@ import {
 } from './calc';
 import type { Params } from './presets';
 import {
+  baseSpecies,
   isMegaForme,
   megaInfo,
   moveId,
@@ -36,6 +37,8 @@ export interface ScoredAction {
   move?: string;
   /** Expected damage dealt to the foe's active (fraction of its max HP), for moves. */
   damage: number;
+  /** A move that very likely knocks the foe's active out before it moves (version 2). */
+  sure?: true;
 }
 
 interface FoeCand {
@@ -287,6 +290,48 @@ function resists(gen: Gen, mon: OwnMon, foes: FoeCand[]): boolean {
 const hazardSeverity = (s: AIState['ownSide']) =>
   (s.sr ? 0.5 : 0) + 0.25 * s.spikes + 0.15 * s.tspikes + (s.web ? 0.2 : 0);
 
+/** Our side's switch-ins so far, from the view's log: who came in, and on which turn. */
+function switchIns(log: readonly string[], side: string): { turn: number; species: string }[] {
+  const ins: { turn: number; species: string }[] = [];
+  let turn = 0;
+  for (const line of log) {
+    if (line.startsWith('|turn|')) turn = Number(line.slice(6));
+    else if (line.startsWith(`|switch|${side}a:`) || line.startsWith(`|drag|${side}a:`)) {
+      ins.push({ turn, species: baseSpecies(line.split('|')[3]?.split(',')[0] ?? '') });
+    }
+  }
+  return ins;
+}
+
+/**
+ * How many swaps in a row switching to `species` would continue: 1 when it
+ * left a turn or two ago for the active, 2 when that was itself a swap back,
+ * and so on. 0 when it isn't a switch back.
+ */
+export function swapStreak(
+  ins: readonly { turn: number; species: string }[],
+  species: string,
+  turn: number,
+): number {
+  let streak = 0;
+  let later = turn;
+  let want = species;
+  for (let j = ins.length - 1; j >= 1; j--) {
+    const cur = ins[j]!;
+    if (later - cur.turn > 2 || ins[j - 1]!.species !== want) break;
+    streak++;
+    want = cur.species;
+    later = cur.turn;
+  }
+  return streak;
+}
+
+/** A first-strike KO this likely beats any switch (version 2). */
+const SURE_FIRST = 0.95;
+const SURE_KO = 0.85;
+/** How far a sure KO is kept ahead of everything else. */
+const SURE_KO_LEAD = 0.2;
+
 function makeCtx(state: AIState, params: Params, data: SetsFile): Ctx {
   const format = data.meta.format;
   return {
@@ -327,6 +372,8 @@ export function scoreActions(
   const foe = state.foeActive;
   const foes = foe ? foeCands(foe, data, known, state.foeMegaUsed) : [];
   const ownBySlot = new Map(state.own.map((m) => [m.slot, m]));
+  let switchLog: ReturnType<typeof switchIns> | undefined;
+  const ins = () => (switchLog ??= switchIns(view.log ?? [], state.side));
   const calcs = new Map<string, Pokemon>();
   const calcFor = (m: OwnMon, mega = isMegaForme(m.forme)) => {
     const key = `${m.slot}|${mega}`;
@@ -354,13 +401,16 @@ export function scoreActions(
         ? params.recover * Math.min(1 / 3, 1 - active.hpFrac)
         : 0;
     const freeHit = theirHit(ctx, calc, calcKey(mon, calc), foes).frac;
+    // Switching straight back to what just left wastes turns (version 2).
+    const streak = params.legacy ? 0 : swapStreak(ins(), mon.species, state.turn);
     return (
       params.position * gain -
       params.risk * freeHit -
       entry -
       params.switchPenalty +
       regen +
-      (resists(gen, mon, foes) ? params.resistBias : 0)
+      (resists(gen, mon, foes) ? params.resistBias : 0) -
+      (streak ? params.switchBack * 2 ** (streak - 1) : 0)
     );
   };
 
@@ -384,8 +434,11 @@ export function scoreActions(
   const foesLeft = Math.max(1, state.foeTotal - state.foe.filter((f) => f.fainted).length);
 
   // Switch prediction (§8.4): sometimes aim at the foe's likely switch-in instead.
+  // From version 2, not when the active is ours to knock out first: take the KO.
   let targets = foes;
-  if (foe && rng() < params.predictionRate && bestOwnHit(ctx, me, meCalc, foes).frac >= 0.5) {
+  const ownBest = foe ? bestOwnHit(ctx, me, meCalc, foes) : { frac: 0, ko: 0 };
+  const koFirst = !params.legacy && first * ownBest.ko >= 0.5;
+  if (foe && rng() < params.predictionRate && ownBest.frac >= 0.5 && !koFirst) {
     const bench = state.foe.filter((f) => !f.active && !f.fainted);
     let safest: { cands: FoeCand[]; dmg: number } | undefined;
     for (const b of bench) {
@@ -431,7 +484,20 @@ export function scoreActions(
       score = -stayCost + statusValue(id, ctx, me, foe, foes, taken, foesLeft);
     }
     if (mega) score += params.mega;
-    return { choice, kind: 'move', move: id, damage: dmg.frac, score };
+    const sure =
+      !params.legacy &&
+      targets === foes &&
+      !SELF_KO.has(id) &&
+      goesFirst >= SURE_FIRST &&
+      dmg.ko >= SURE_KO;
+    return {
+      choice,
+      kind: 'move',
+      move: id,
+      damage: dmg.frac,
+      score,
+      ...(sure ? { sure: true as const } : {}),
+    };
   });
 
   // Average players click their strongest attack a lot (§8.4).
@@ -439,6 +505,14 @@ export function scoreActions(
     .filter((s) => s.kind === 'move' && s.damage > 0)
     .sort((a, b) => b.damage - a.damage)[0];
   if (strongest) strongest.score += params.maxDamageBias;
+
+  // A KO before the foe can move outweighs any switch or setup: whatever it
+  // would have done never happens (version 2).
+  const sure = scored.filter((s) => s.sure);
+  if (sure.length) {
+    const rest = Math.max(-Infinity, ...scored.filter((s) => !s.sure).map((s) => s.score));
+    for (const s of sure) s.score = Math.max(s.score, rest + SURE_KO_LEAD);
+  }
   return scored;
 }
 

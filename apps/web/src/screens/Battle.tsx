@@ -34,18 +34,25 @@ import {
 import { CoachReview, CoachTip, CoachWarning } from '../battle/ui/Coach';
 import { ControlPanel, type Mark } from '../battle/ui/Controls';
 import { Field, type Anim, type Float, type Stage } from '../battle/ui/Field';
-import { EXPLAINERS, textLines } from '../battle/ui/labels';
+import { EXPLAINERS, explainer as explainerText, textLines } from '../battle/ui/labels';
 import { MonPopover } from '../battle/ui/MonPopover';
 import { Spotlight } from '../battle/ui/Spotlight';
 import { GiveUpDialog, LogList, LogSheet, MenuSheet } from '../battle/ui/sheets';
 import { BattleLog } from '../battle/ui/BattleLog';
 import type { Settings } from '../state/schema';
-import { likelyMoves, possibleSets } from '../lib/data';
+import { likelyMoves, possibleSets, speciesInfo } from '../lib/data';
 import { TypeChartSheet } from '../sheets/TypeChart';
 import { streakLine, type DaySummary } from '../lib/results';
 import { Button } from '../ui/bits';
 import type { ShareModel } from '../lib/share';
-import { battleSpeed, foeSpeed, lessonMoves, lessonSet, type SpeedCheck } from '../lib/speed';
+import {
+  battleSpeed,
+  foeSpeed,
+  lessonMoves,
+  lessonSet,
+  showdownRange,
+  type SpeedCheck,
+} from '../lib/speed';
 import { ShareButton, TryRows } from '../ui/results';
 import { ChevronIcon, CloseIcon, InfoIcon } from '../ui/icons';
 import { CoachBadge, DifficultyBadge } from '../ui/Difficulty';
@@ -709,16 +716,24 @@ export function Battle({
         )
       : undefined;
   // Who moves first: always shown (its Speed, and yours against it), hints or not.
+  // As on Showdown, the card shows the whole range a species' Speed can take;
+  // Beginner hints narrow the comparison to the sets this game has for it.
+  const revealedFoe = view?.revealed[foeSpecies];
+  const foeSets = !shownFoe || lessonFoe || !hinted ? [] : possibleSets(foeSpecies, revealedFoe);
   const speedCheck: SpeedCheck | undefined =
     view && shownFoe
       ? {
-          ...foeSpeed(
-            shownFoe.species,
-            lessonFoe
-              ? [lessonSet(lessonFoe)]
-              : possibleSets(foeSpecies, view.revealed[foeSpecies]),
-            { boost: shownFoe.boosts.spe, status: shownFoe.status, weather: view.weather },
-          ),
+          ...foeSpeed(shownFoe.species, lessonFoe ? [lessonSet(lessonFoe)] : foeSets, {
+            boost: shownFoe.boosts.spe,
+            status: shownFoe.status,
+            weather: view.weather,
+            ...(revealedFoe?.item && { item: revealedFoe.item }),
+            ...(revealedFoe?.ability && { ability: revealedFoe.ability }),
+          }),
+          ...(!lessonFoe && {
+            showdown: showdownRange(speciesInfo(shownFoe.species).baseStats.spe),
+            fromSets: foeSets.length > 0,
+          }),
           ...(active?.stats.spe && view.you
             ? {
                 mine: {
@@ -762,7 +777,7 @@ export function Battle({
       className="animate-sheet-in absolute inset-x-2 bottom-2 z-20 flex items-start gap-2 rounded-card bg-accent-soft px-3 py-2 text-[13px] shadow-card"
     >
       <InfoIcon width={16} height={16} className="mt-0.5 shrink-0 text-soft-ink" />
-      <span className="flex-1">{EXPLAINERS[explainer!]}</span>
+      <span className="flex-1">{explainerText(explainer!, gen)}</span>
       <button
         type="button"
         onClick={dismissExplainer}

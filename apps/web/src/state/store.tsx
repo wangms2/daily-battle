@@ -15,6 +15,20 @@ import { createStorage, type Storage } from './storage';
 /** How long after a change the save goes to the server (changes come in bursts). */
 const PUSH_DELAY_MS = 2000;
 
+/** Removes the game's keys from this browser (the owner's admin sign-in stays). */
+function eraseDevice() {
+  for (const store of [window.localStorage, window.sessionStorage]) {
+    try {
+      const keys = Array.from({ length: store.length }, (_, i) => store.key(i) ?? '');
+      for (const k of keys) {
+        if (k.startsWith('daily-battle:') && k !== 'daily-battle:admin') store.removeItem(k);
+      }
+    } catch {
+      // Storage blocked: there's nothing saved to erase.
+    }
+  }
+}
+
 export function StoreProvider({
   children,
   storage: given,
@@ -134,6 +148,15 @@ export function StoreProvider({
         setSession(null);
         setSyncedAt(null);
         return true;
+      },
+      async startOver() {
+        const me = latest.current.session;
+        // Nothing may push this device's save again, not even the page hiding.
+        latest.current.session = null;
+        setSession(null);
+        if (me) await account.signOut(me);
+        eraseDevice();
+        window.location.reload();
       },
     }),
     [session?.name, syncedAt, setSession, sync],

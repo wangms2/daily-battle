@@ -67,7 +67,20 @@ describe('MonPopover (a foe)', () => {
   it('says when a range could go either way', () => {
     const text = card({ lo: 236, hi: 328, mine: { species: 'Snorlax', speed: 240 } });
     expect(text).toContain('Speed 236–328');
-    expect(text).toContain('Could be faster or slower than Snorlax (240)');
+    expect(text).toContain('Possibly faster than Snorlax (240)');
+  });
+
+  it('shows Showdown’s range, and the sets’ range with Beginner hints', () => {
+    const mine = { species: 'Snorlax', speed: 240 };
+    const showdown: SpeedCheck['showdown'] = [184, 236, 299, 328];
+    const plain = card({ lo: 184, hi: 328, showdown, mine });
+    expect(plain).toContain('Speed 184–236–299–328');
+    expect(plain).toContain('before boosts, items and abilities');
+    expect(plain).not.toContain('Its sets');
+    cleanup();
+    const hinted = card({ lo: 236, hi: 328, showdown, fromSets: true, mine });
+    expect(hinted).toContain('Speed 184–236–299–328');
+    expect(hinted).toContain('Its sets 236–328');
   });
 
   it('lists the moves it likely has, when given', () => {

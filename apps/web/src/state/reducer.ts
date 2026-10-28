@@ -1,4 +1,4 @@
-import { difficultyTag, type Difficulty } from '@daily-battle/ai/version';
+import { canResume, difficultyTag, type Difficulty } from '@daily-battle/ai/version';
 import type { FormatId } from '@daily-battle/data/formats';
 import { mondayOf } from '@daily-battle/gen/dates';
 import { applyAiChoices, type AiChoices, type CoachMemo } from '../battle/frames';
@@ -316,7 +316,8 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         const a = attemptInProgress(day);
         if (
           a &&
-          (key < action.today || a.engine !== attemptEngine(action.engine, attemptDifficulty(a)))
+          (key < action.today ||
+            !canResume(a.engine, attemptEngine(action.engine, attemptDifficulty(a))))
         ) {
           days = { ...days, [key]: updateLast(day, (x) => ({ ...x, result: 'forfeit' })) };
         }
