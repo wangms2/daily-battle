@@ -7,6 +7,15 @@ describe('matchRoute', () => {
     expect(matchRoute('GET', '/api/rooms/BCDFG/socket')).toEqual({ kind: 'socket', code: 'BCDFG' });
   });
 
+  it('routes an admin deleting a player, by DELETE only', () => {
+    expect(matchRoute('DELETE', '/api/admin/accounts/Misty%20W')).toEqual({
+      kind: 'adminDelete',
+      name: 'Misty W',
+    });
+    expect(matchRoute('GET', '/api/admin/accounts/Misty')).toBeNull();
+    expect(matchRoute('DELETE', '/api/admin/accounts/%E0')).toBeNull();
+  });
+
   it('leaves everything else alone', () => {
     expect(matchRoute('GET', '/api/rooms')).toBeNull();
     expect(matchRoute('GET', '/api/rooms/bcdfg/socket')).toBeNull();

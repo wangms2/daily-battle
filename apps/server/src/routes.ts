@@ -8,11 +8,22 @@ export type Route =
   /** An account's request: its name (decoded) and the rest of the path. */
   | { kind: 'account'; name: string; path: '' | '/session' | '/save' }
   /** The admin page's stats (admin.ts). */
-  | { kind: 'admin' };
+  | { kind: 'admin' }
+  /** An admin deleting a player: their account and their history. */
+  | { kind: 'adminDelete'; name: string };
 
 export function matchRoute(method: string, pathname: string): Route | null {
   if (pathname === '/api/rooms') return method === 'POST' ? { kind: 'create' } : null;
   if (pathname === '/api/admin/stats') return method === 'GET' ? { kind: 'admin' } : null;
+  const d = /^\/api\/admin\/accounts\/([^/]+)$/.exec(pathname);
+  if (d) {
+    if (method !== 'DELETE') return null;
+    try {
+      return { kind: 'adminDelete', name: decodeURIComponent(d[1]!) };
+    } catch {
+      return null;
+    }
+  }
   const m = /^\/api\/rooms\/([^/]+)\/socket$/.exec(pathname);
   if (m && method === 'GET' && CODE_PATTERN.test(m[1]!)) return { kind: 'socket', code: m[1]! };
   const a = /^\/api\/accounts\/([^/]+)(\/session|\/save)?$/.exec(pathname);

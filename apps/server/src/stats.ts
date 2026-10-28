@@ -176,6 +176,51 @@ export function accountSeen(
 }
 
 /** Forgets a deleted account. */
+/**
+ * Forgets a player entirely (an admin's delete): their account's stats and
+ * their versus history (their game rows, every battle they were in, and their
+ * name in winners). Returns how much went.
+ */
+export async function forgetPlayer(db: Db, name: string) {
+  const key = nameKey(name);
+  const count = async (sql: string, ...values: unknown[]) =>
+    (await db
+      .prepare(sql)
+      .bind(...values)
+      .first<{ n: number }>())!.n;
+  const found = {
+    accounts: await count(`SELECT COUNT(*) n FROM accounts WHERE key = ?`, key),
+    progress: await count(`SELECT COUNT(*) n FROM account_games WHERE key = ?`, key),
+    games: await count(`SELECT COUNT(*) n FROM game_players WHERE lower(name) = ?`, key),
+    battles: await count(
+      `SELECT COUNT(*) n FROM battles WHERE lower(p1) = ? OR lower(p2) = ?`,
+      key,
+      key,
+    ),
+    wins: 0,
+  };
+  const won = (
+    await db
+      .prepare(`SELECT id, winners FROM games WHERE winners IS NOT NULL`)
+      .all<{ id: string; winners: string }>()
+  ).results.flatMap(({ id, winners }) => {
+    const names = winners.split(', ');
+    const kept = names.filter((n) => nameKey(n) !== key);
+    return kept.length === names.length ? [] : [{ id, winners: kept.join(', ') || null }];
+  });
+  found.wins = won.length;
+  await db.batch([
+    db.prepare(`DELETE FROM account_games WHERE key = ?`).bind(key),
+    db.prepare(`DELETE FROM accounts WHERE key = ?`).bind(key),
+    db.prepare(`DELETE FROM game_players WHERE lower(name) = ?`).bind(key),
+    db.prepare(`DELETE FROM battles WHERE lower(p1) = ? OR lower(p2) = ?`).bind(key, key),
+    ...won.map((w) =>
+      db.prepare(`UPDATE games SET winners = ? WHERE id = ?`).bind(w.winners, w.id),
+    ),
+  ]);
+  return found;
+}
+
 export function accountDeleted(db: Db, name: string) {
   const key = nameKey(name);
   return db.batch([

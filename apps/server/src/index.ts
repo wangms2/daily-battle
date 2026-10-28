@@ -3,7 +3,8 @@
 // straight to that room's Durable Object.
 import { makeCode } from '@daily-battle/versus';
 import type { Env } from './env';
-import { adminRequest } from './admin';
+import { adminRequest, isAdmin } from './admin';
+import { forgetPlayer } from './stats';
 import { nameKey } from './accounts';
 import { matchRoute, sameOrigin } from './routes';
 
@@ -18,6 +19,17 @@ export default {
     if (!route) return new Response('Not found', { status: 404 });
     // The admin token is the check (a GET, so browsers send no Origin).
     if (route.kind === 'admin') return adminRequest(env.DB, env.ADMIN_TOKEN, request);
+    // An admin deleting a player (curl, so no Origin): the token is the check.
+    if (route.kind === 'adminDelete') {
+      if (!env.DB || !env.ADMIN_TOKEN) return new Response('Not found', { status: 404 });
+      if (!(await isAdmin(request, env.ADMIN_TOKEN))) {
+        return Response.json({ error: 'unauthorized' }, { status: 401 });
+      }
+      const id = env.ACCOUNTS.idFromName(nameKey(route.name));
+      const account = await env.ACCOUNTS.get(id).wipe();
+      const stats = await forgetPlayer(env.DB, route.name);
+      return Response.json({ account, ...stats }, { headers: { 'Cache-Control': 'no-store' } });
+    }
     // Browsers leave Origin off same-site GETs. Reading a save needs the device's
     // token, which another site can't have, so it doesn't need the check.
     const tokenRead = route.kind === 'account' && request.method === 'GET';

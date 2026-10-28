@@ -721,6 +721,8 @@ The owner can see how the site is used: versus games and accounts. Data is kept 
 - **Games:** a list where each game opens to its players and battles.
 - **Accounts:** a search, with each account's progress per gen.
 
+**Deleting a player.** There's no button for it. `DELETE /api/admin/accounts/<name>` with the same bearer token (curl) erases the name's Account object: its password, devices and save. It also removes the stats: the account's rows, and its versus history (its `game_players` rows, every battle it was in, and its name in `winners`). It returns what it found. The player's own browser keeps its local save, but that device can no longer sync to the account.
+
 ## 19. Gen 6 OU (added Oct 2026)
 
 A third daily game, built in seven phases the same way as Gen 5 (§17). Each phase kept Gen 4's and Gen 5's output byte-for-byte: seed keys, golden fixtures, set ids, schedules, and AI choices. Nothing in `GENERATOR_VERSION` or the AI changed for them; every new rule is gated on Gen 6 data or format.

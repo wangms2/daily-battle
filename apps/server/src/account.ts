@@ -34,6 +34,13 @@ export class Account extends DurableObject<Env> {
     }
     return response;
   }
+
+  /** An admin's delete: the whole record (password, devices, save). Whether there was one. */
+  async wipe(): Promise<boolean> {
+    const had = !!(await this.ctx.storage.get('account'));
+    await this.ctx.storage.deleteAll();
+    return had;
+  }
 }
 
 function seenKind(method: string, path: string, status: number): SeenKind | 'deleted' | null {

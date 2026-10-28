@@ -11,6 +11,7 @@ import {
   accountDeleted,
   accountSeen,
   battleEnded,
+  forgetPlayer,
   gameEnded,
   gameStarted,
   record,
@@ -332,3 +333,68 @@ describe('admin API', () => {
 /** An admin view's answer, typed as the function that makes it. */
 const read = async <F extends (...args: never[]) => Promise<unknown>>(db: Db, query: string) =>
   (await (await admin(db, 'secret', query)).json()) as Awaited<ReturnType<F>>;
+
+describe('forgetPlayer', () => {
+  it('removes a player’s account, progress and versus history, and nobody else’s', async () => {
+    const db = memoryDb();
+    const run = (sql: string, ...v: unknown[]) =>
+      db
+        .prepare(sql)
+        .bind(...v)
+        .run();
+    for (const [key, name] of [
+      ['misty', 'Misty'],
+      ['brock', 'Brock'],
+    ]) {
+      await run(`INSERT INTO accounts (key, name, last_seen_at) VALUES (?, ?, 1)`, key, name);
+    }
+    await run(
+      `INSERT INTO account_games (key, format, days_played, wins, losses, clears, first_try_wins,
+         streak, best_streak, difficulty, coach, lessons, updated_at)
+       VALUES ('misty', 'gen3ou', 1, 1, 0, 1, 1, 1, 1, 'normal', 0, 0, 1)`,
+    );
+    for (const [id, winners] of [
+      ['g1', 'Misty, Brock'],
+      ['g2', 'Misty'],
+      ['g3', 'Brock'],
+    ]) {
+      await run(
+        `INSERT INTO games (id, room, format, pool_mode, lives, timer, rival, players, started_at, winners)
+         VALUES (?, 'R', 'gen3ou', 'weekly', 3, 'normal', 'normal', 2, 1, ?)`,
+        id,
+        winners,
+      );
+      for (const name of ['Misty', 'Brock']) {
+        await run(
+          `INSERT INTO game_players (game_id, name, team_size, wins, losses, auto_team, left_early)
+           VALUES (?, ?, 6, 0, 0, 0, 0)`,
+          id,
+          name,
+        );
+      }
+    }
+    await run(
+      `INSERT INTO battles (game_id, round, match, p1, p2, winner, reason, turns, ended_at)
+       VALUES ('g1', 1, 'a', 'Misty', 'Brock', 'Misty', 'win', 10, 1),
+              ('g1', 1, 'b', 'Brock', 'Rival', 'Brock', 'win', 10, 1)`,
+    );
+
+    expect(await forgetPlayer(db, 'MISTY')).toEqual({
+      accounts: 1,
+      progress: 1,
+      games: 3,
+      battles: 1,
+      wins: 2,
+    });
+    const all = async (sql: string) => (await db.prepare(sql).all()).results;
+    expect(await all(`SELECT key FROM accounts`)).toEqual([{ key: 'brock' }]);
+    expect(await all(`SELECT key FROM account_games`)).toEqual([]);
+    expect(await all(`SELECT DISTINCT name FROM game_players`)).toEqual([{ name: 'Brock' }]);
+    expect(await all(`SELECT match FROM battles`)).toEqual([{ match: 'b' }]);
+    expect(await all(`SELECT id, winners FROM games ORDER BY id`)).toEqual([
+      { id: 'g1', winners: 'Brock' },
+      { id: 'g2', winners: null },
+      { id: 'g3', winners: 'Brock' },
+    ]);
+  });
+});
