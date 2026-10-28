@@ -115,6 +115,11 @@ for (const scheme of ['light', 'dark'] as const) {
 
     await page.getByRole('button', { name: '1 change left' }).click();
     await shot(page, '11-brief-edit', project);
+    // An opponent's details take the change panel's place, with no sheet over the teams.
+    await page.getByRole('button', { name: /^About / }).last().click();
+    await expect(page.getByRole('region', { name: /^About / })).toBeVisible();
+    await shot(page, '11b-brief-scout', project);
+    await page.getByRole('button', { name: 'Done' }).click();
     await page
       .getByRole('button', { name: /^Change (?!team$)/ })
       .first()

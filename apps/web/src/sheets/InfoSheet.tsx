@@ -1,23 +1,10 @@
-// What a Pokémon is good for, before you commit to it. For the opponent it
-// shows species facts, plus its possible sets with Beginner hints on; never usage.
-import { useState } from 'react';
-import {
-  abilityInfo,
-  itemInfo,
-  matchups,
-  canMega,
-  possibleSets,
-  setsOf,
-  shortLabel,
-  speciesInfo,
-  topSet,
-} from '../lib/data';
+// What a Pokémon is good for, before you commit to it. An opponent shows what
+// its battle card would (FoeScout), never one of its sets.
+import { matchups, setsOf, speciesInfo, topSet, type Slot } from '../lib/data';
 import { getSprite } from '../lib/sprites';
 import { Sheet } from '../ui/Sheet';
 import { Button, TypeBadge } from '../ui/bits';
-import { Term } from '../ui/DetailCard';
-import { ItemIcon } from '../ui/ItemIcon';
-import { MoveList } from '../ui/MoveList';
+import { FoeScout } from '../ui/FoeScout';
 import { StatLines } from '../ui/StatLines';
 
 export function InfoSheet({
@@ -25,22 +12,25 @@ export function InfoSheet({
   open,
   onOpenChange,
   showRoles = true,
-  showPossibleSets = false,
+  foe,
   action,
 }: {
   species: string | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  /** Off for opponents: their sets are hidden. */
   showRoles?: boolean;
-  /** An opponent with Beginner hints on: the sets it might be running. */
-  showPossibleSets?: boolean;
+  /** An opponent: what its battle card shows, against your team. */
+  foe?: { hints: boolean; team: readonly Slot[] };
   action?: { label: string; onClick: () => void; disabled?: boolean };
 }) {
   if (!species) return null;
   return (
     <Sheet open={open} onOpenChange={onOpenChange} title={species}>
-      <InfoBody species={species} showRoles={showRoles} showPossibleSets={showPossibleSets} />
+      {foe ? (
+        <FoeScout species={species} hints={foe.hints} team={foe.team} />
+      ) : (
+        <InfoBody species={species} showRoles={showRoles} />
+      )}
       {action && (
         <Button className="mt-5 w-full" onClick={action.onClick} disabled={action.disabled}>
           {action.label}
@@ -51,15 +41,7 @@ export function InfoSheet({
 }
 
 /** A Pokémon's types, stats, roles and matchups: the info sheet's contents (or a panel's). */
-export function InfoBody({
-  species,
-  showRoles = true,
-  showPossibleSets = false,
-}: {
-  species: string;
-  showRoles?: boolean;
-  showPossibleSets?: boolean;
-}) {
+export function InfoBody({ species, showRoles = true }: { species: string; showRoles?: boolean }) {
   const info = speciesInfo(species);
   const m = matchups(species);
   const total = Object.values(info.baseStats).reduce((a, b) => a + b, 0);
@@ -76,10 +58,6 @@ export function InfoBody({
           <p className="text-[13px] text-muted">
             {info.tier} · Base stat total {total}
           </p>
-          {/* Beginner hints on a foe: a Mega is possible (which set it brings stays hidden). */}
-          {showPossibleSets && canMega(species) && (
-            <p className="text-[13px] font-semibold">Can Mega Evolve</p>
-          )}
         </div>
       </div>
 
@@ -89,8 +67,6 @@ export function InfoBody({
           Final stats are for the most used set ({topSet(species).label}).
         </p>
       )}
-
-      {showPossibleSets && <PossibleSets key={species} species={species} />}
 
       {showRoles && (
         <div className="mt-4">
@@ -144,48 +120,6 @@ export function MatchupRow({
         ) : (
           <span className="text-muted">None</span>
         )}
-      </div>
-    </div>
-  );
-}
-
-/** An opponent's possible sets as tabs, one shown at a time so the sheet stays short. */
-function PossibleSets({ species }: { species: string }) {
-  const sets = possibleSets(species);
-  const [i, setI] = useState(0);
-  const set = sets[i] ?? sets[0];
-  if (!set) return null;
-  return (
-    <div className="mt-4">
-      <h3 className="text-[13px] font-semibold text-muted">Possible sets</h3>
-      <div role="tablist" aria-label="Possible sets" className="mt-1.5 flex flex-wrap gap-1.5">
-        {sets.map((s, k) => (
-          <button
-            key={s.id}
-            type="button"
-            role="tab"
-            aria-selected={k === i}
-            onClick={() => setI(k)}
-            className={`rounded-full px-2.5 py-1 text-[13px] font-medium ${
-              k === i ? 'bg-accent text-on-accent' : 'bg-surface-2'
-            }`}
-          >
-            {shortLabel(s.label)}
-          </button>
-        ))}
-      </div>
-      <div role="tabpanel" aria-label={set.label} className="mt-2">
-        <MoveList moves={set.moves} />
-        <p className="mt-1.5 text-[13px] text-muted">
-          {set.item && (
-            <>
-              <ItemIcon name={set.item} className="size-5" />
-              <Term name={set.item} desc={itemInfo(set.item)} kind="Item" />
-            </>
-          )}
-          {set.item && ' · '}
-          <Term name={set.ability} desc={abilityInfo(set.ability)} kind="Ability" right />
-        </p>
       </div>
     </div>
   );

@@ -21,7 +21,8 @@ import { startBuilderMusic, stopBuilderMusic } from '../lib/audio';
 import { finalStats } from '../lib/stats';
 import { dayHeadline, streakLine, type DaySummary } from '../lib/results';
 import { getSprite, preloadSprites } from '../lib/sprites';
-import { InfoBody, InfoSheet } from '../sheets/InfoSheet';
+import { InfoSheet } from '../sheets/InfoSheet';
+import { FoeScout } from '../ui/FoeScout';
 import { ConfirmDialog } from '../sheets/misc';
 import { initialSet, SetCard, SetChooser, SetPicker } from '../sheets/SetPicker';
 import type { DayChange, DayState } from '../state/schema';
@@ -184,6 +185,8 @@ export function DailyBrief({
   const [pending, setPending] = useState<DayChange | null>(null);
   // Editing: the team slot being changed and the bench Pokémon coming in, picked in either order.
   const [pick, setPick] = useState<Pick>(NO_PICK);
+  // Editing: the opponent being looked at, shown where the change panel is.
+  const [scout, setScout] = useState<string | null>(null);
   const [coachAsk, setCoachAsk] = useState<string | null>(null);
 
   // The builder's track plays on while the lead is picked, until the day is decided.
@@ -206,6 +209,7 @@ export function DailyBrief({
   const setEditing = (on: boolean) => {
     setMode({ kind: on ? 'edit' : 'view' });
     setPick(NO_PICK);
+    setScout(null);
   };
   // Phones fit the change panel under the teams by shrinking them to one row each.
   const compact = editing && !wide;
@@ -309,14 +313,19 @@ export function DailyBrief({
             key={species}
             species={species}
             label={`About ${species}${hints && canMega(species) ? ', can Mega Evolve' : ''}`}
-            // While editing, the side panel is the change panel: details open over it.
+            // While editing, its details take the change panel's place (tap again to go back).
             onTap={() =>
-              panelOn && !editing
-                ? setFocus({ species, foe: true })
-                : setInfoFor({ species, foe: true })
+              editing
+                ? setScout((s) => (s === species ? null : species))
+                : panelOn
+                  ? setFocus({ species, foe: true })
+                  : setInfoFor({ species, foe: true })
             }
+            selected={editing && scout === species}
             badge={hints && canMega(species) ? <MegaMark text="Can Mega Evolve" /> : undefined}
-            hoverCard={wide && (!panelOn || editing) ? hoverOf(species) : undefined}
+            hoverCard={
+              wide && (!panelOn || editing) && scout !== species ? hoverOf(species) : undefined
+            }
             showTypes={!compact}
             showName={!compact}
           />
@@ -362,7 +371,7 @@ export function DailyBrief({
                     ? `${slot.species}, leading`
                     : `Lead with ${slot.species}`
               }
-              onTap={editing ? () => tapSlot(i) : () => onLead(slot.species)}
+              onTap={editing ? () => (setScout(null), tapSlot(i)) : () => onLead(slot.species)}
               onInfo={
                 editing
                   ? undefined
@@ -425,63 +434,88 @@ export function DailyBrief({
   // opponent stays in view and can still be tapped while you decide.
   const changePanel = editing && (
     <section
-      aria-label="Change your team"
+      aria-label={scout ? `About ${scout}` : 'Change your team'}
       className={clsx('flex min-h-0 flex-1 flex-col gap-2', wide && 'h-full')}
     >
-      <SectionLabel right={<span className="text-[12px] text-muted">Tap one to swap it in</span>}>
-        Bench
-      </SectionLabel>
-      <div
-        className={clsx(
-          'grid shrink-0 gap-2',
-          wide ? 'grid-cols-3 auto-rows-[92px]' : 'grid-cols-6 auto-rows-[60px]',
-        )}
-      >
-        {benchNow.map((species) => (
-          <PokemonTile
-            key={species}
-            species={species}
-            label={`Swap in ${species}`}
-            selected={pick.incoming === species}
-            showTypes={wide}
-            showName={wide}
-            onTap={() => tapBench(species)}
-            hoverCard={wide ? hoverOf(species) : undefined}
-          />
-        ))}
-      </div>
-      {shown ? (
-        <ChangeDetail
-          key={`${pick.incoming ? 'in' : 'set'}-${shown}`}
-          species={shown}
-          currentSetId={pick.incoming ? undefined : outgoing?.setId}
-          heading={
-            pick.incoming
-              ? outgoing
-                ? `for ${outgoing.species}`
-                : 'tap who it replaces'
-              : 'another set'
-          }
-          action={
-            !pick.incoming
-              ? 'Use this set'
-              : outgoing
-                ? `Bring in ${pick.incoming}`
-                : `Tap who ${pick.incoming} replaces`
-          }
-          ready={!!outgoing}
-          blocked={megaBlock}
-          onChoose={choose}
-        />
+      {scout ? (
+        <>
+          <div className="flex shrink-0 items-center justify-between gap-2">
+            <p className="flex min-w-0 items-baseline gap-1.5">
+              <span className="home-serif truncate text-[18px] leading-tight">{scout}</span>
+              <span className="text-[13px] text-muted">opponent</span>
+            </p>
+            <button
+              type="button"
+              onClick={() => setScout(null)}
+              className={clsx(chip, 'shrink-0 bg-surface-2')}
+            >
+              {shown ? 'Back to change' : 'Done'}
+            </button>
+          </div>
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+            <FoeScout species={scout} hints={hints} team={team} />
+          </div>
+        </>
       ) : (
         <>
-          <div className="flex min-h-0 flex-1 flex-col items-center gap-1 px-4 pt-6 text-center">
-            <p className="text-[14px] font-semibold">
-              Tap one of your Pokémon to give it another set, or a bench Pokémon to swap in.
-            </p>
-            <p className="text-[13px] text-muted">{rule}</p>
+          <SectionLabel
+            right={<span className="text-[12px] text-muted">Tap one to swap it in</span>}
+          >
+            Bench
+          </SectionLabel>
+          <div
+            className={clsx(
+              'grid shrink-0 gap-2',
+              wide ? 'grid-cols-3 auto-rows-[92px]' : 'grid-cols-6 auto-rows-[60px]',
+            )}
+          >
+            {benchNow.map((species) => (
+              <PokemonTile
+                key={species}
+                species={species}
+                label={`Swap in ${species}`}
+                selected={pick.incoming === species}
+                showTypes={wide}
+                showName={wide}
+                onTap={() => tapBench(species)}
+                hoverCard={wide ? hoverOf(species) : undefined}
+              />
+            ))}
           </div>
-          {ditch}
+          {shown ? (
+            <ChangeDetail
+              key={`${pick.incoming ? 'in' : 'set'}-${shown}`}
+              species={shown}
+              currentSetId={pick.incoming ? undefined : outgoing?.setId}
+              heading={
+                pick.incoming
+                  ? outgoing
+                    ? `for ${outgoing.species}`
+                    : 'tap who it replaces'
+                  : 'another set'
+              }
+              action={
+                !pick.incoming
+                  ? 'Use this set'
+                  : outgoing
+                    ? `Bring in ${pick.incoming}`
+                    : `Tap who ${pick.incoming} replaces`
+              }
+              ready={!!outgoing}
+              blocked={megaBlock}
+              onChoose={choose}
+            />
+          ) : (
+            <>
+              <div className="flex min-h-0 flex-1 flex-col items-center gap-1 px-4 pt-6 text-center">
+                <p className="text-[14px] font-semibold">
+                  Tap one of your Pokémon to give it another set, or a bench Pokémon to swap in.
+                </p>
+                <p className="text-[13px] text-muted">{rule}</p>
+              </div>
+              {ditch}
+            </>
+          )}
         </>
       )}
     </section>
@@ -624,7 +658,7 @@ export function DailyBrief({
                 </span>
               </p>
               {panelSlot.foe ? (
-                <InfoBody species={panelSlot.species} showRoles={false} showPossibleSets={hints} />
+                <FoeScout species={panelSlot.species} hints={hints} team={team} />
               ) : (
                 panelSlot.set && (
                   <SetCard species={panelSlot.species} set={panelSlot.set} badge={null} />
@@ -668,8 +702,7 @@ export function DailyBrief({
         species={infoFor?.species ?? null}
         open={!!infoFor}
         onOpenChange={(o) => !o && setInfoFor(null)}
-        showRoles={!infoFor?.foe}
-        showPossibleSets={!!infoFor?.foe && hints}
+        foe={infoFor?.foe ? { hints, team } : undefined}
       />
       <SetPicker
         key={`view-${setView?.species}`}

@@ -744,20 +744,35 @@ describe('home', () => {
 describe('playtest feedback', () => {
   const foe = () => schedule.days.find((d) => d.day === '2026-10-21')!.team[0]!.species;
 
-  it('lists an opponent’s possible sets with Beginner hints on, and not with them off', async () => {
+  it('shows an opponent’s likely moves with Beginner hints on, never its sets', async () => {
     const user = userEvent.setup();
     const { unmount } = renderApp(seeded({ team: { week: WEEK } }));
     await user.click(await screen.findByRole('button', { name: `About ${foe()}` }));
     const info = await screen.findByRole('dialog', { name: foe() });
-    const tabs = within(info).getAllByRole('tab');
-    expect(tabs.length).toBe(sets.species[foe()]!.sets.length);
+    expect(info).toHaveTextContent('Likely moves');
+    expect(
+      within(info).getByRole('list', { name: 'Speed against your team' }).children,
+    ).toHaveLength(6);
+    expect(within(info).queryByRole('tab')).not.toBeInTheDocument();
     unmount();
 
     renderApp(seeded({ hints: false, team: { week: WEEK } }));
     await user.click(await screen.findByRole('button', { name: `About ${foe()}` }));
     const plain = await screen.findByRole('dialog', { name: foe() });
-    expect(within(plain).queryByRole('tab')).not.toBeInTheDocument();
-    expect(plain).not.toHaveTextContent('Possible sets');
+    expect(plain).not.toHaveTextContent('Likely moves');
+    expect(plain).toHaveTextContent('before boosts, items and abilities');
+  });
+
+  it('shows an opponent in place of the change panel while editing, with no sheet', async () => {
+    const user = userEvent.setup();
+    renderApp(seeded({ team: { week: WEEK } }));
+    await user.click(await screen.findByRole('button', { name: '1 change left' }));
+    await user.click(screen.getByRole('button', { name: `About ${foe()}` }));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.getByRole('region', { name: `About ${foe()}` })).toHaveTextContent('Speed');
+    expect(screen.queryByRole('button', { name: /^Swap in / })).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Done' }));
+    expect(screen.getAllByRole('button', { name: /^Swap in / }).length).toBeGreaterThan(0);
   });
 
   it('puts Cancel on the change chip, next to the team, and nowhere else', async () => {
