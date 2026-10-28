@@ -682,45 +682,55 @@ describe('practice runs', () => {
   // A decided day is one that's been won: here, after a loss and a win.
   const decided = () => play(play(locked(), 1, 'loss'), 2, 'win');
 
-  it('only offers practice changes once the day is won, and never the daily change', () => {
-    const fresh = play(locked(), 1, 'loss');
-    const practice = { type: 'setPracticeChange', day: DAY, week: WEEK, change: swap } as const;
-    expect(gameReducer(fresh, practice)).toBe(fresh);
+  const practiceTeam = TEAM.map((s, i) => (i === swap.slot ? swap.to : s));
+
+  it('keeps a practice team for today apart from the weekly team', () => {
     const done = decided();
     expect(gameReducer(done, { type: 'applyChange', day: DAY, week: WEEK, change: swap })).toBe(
       done,
     );
-    const changed = gameReducer(done, practice);
-    expect(changed.days[DAY]!.practiceChange).toEqual(swap);
+    const set = { type: 'setPracticeTeam', day: DAY, team: practiceTeam } as const;
+    const changed = gameReducer(done, set);
+    expect(changed.days[DAY]!.practiceTeam).toEqual(practiceTeam);
     expect(changed.weeks[WEEK]!.team).toEqual(TEAM); // the weekly team is untouched
     expect(changed.days[DAY]!.swapUsed).toBe(false);
-    // Undo, and decide again.
-    const undone = gameReducer(changed, { ...practice, change: null });
-    expect(undone.days[DAY]!.practiceChange).toBeUndefined();
+    // A team that doesn't fit is refused; null goes back to the weekly team.
+    expect(gameReducer(done, { ...set, team: practiceTeam.slice(1) })).toBe(done);
+    const back = gameReducer(changed, { ...set, team: null });
+    expect(back.days[DAY]!.practiceTeam).toBeUndefined();
   });
 
-  it('decides afresh for each run: starting one clears the practice change', () => {
+  it('never carries a won practice run over to the weekly team', () => {
     const changed = gameReducer(decided(), {
-      type: 'setPracticeChange',
+      type: 'setPracticeTeam',
+      day: DAY,
+      team: practiceTeam,
+    });
+    const won = play(changed, 4, 'win');
+    expect(won.weeks[WEEK]!.team).toEqual(TEAM);
+    expect(won.days[DAY]!.practiceTeam).toEqual(practiceTeam);
+  });
+
+  it('decides per difficulty, and labels the shared change with where it was used', () => {
+    const hardWon = play(locked(), 1, 'win', { difficulty: 'hard' });
+    const onHard = {
+      type: 'applyChange',
       day: DAY,
       week: WEEK,
       change: swap,
-    });
-    const lost = play(changed, 4, 'loss', { practiceChange: swap });
-    expect(lost.days[DAY]!.practiceChange).toBeUndefined();
-    expect(lost.weeks[WEEK]!.team).toEqual(TEAM); // a lost practice run changes nothing
-  });
-
-  it('keeps the change of a practice run that wins, from tomorrow on', () => {
-    const won = play(decided(), 4, 'win', { practiceChange: swap });
-    expect(won.weeks[WEEK]!.team[1]).toEqual(swap.to);
-    const tomorrow = '2026-10-22';
-    expect(
-      gameReducer(won, { type: 'setLead', day: tomorrow, species: 'Gyarados' }).weeks[WEEK]!.team,
-    ).toContainEqual(swap.to);
+      difficulty: 'hard',
+      bucket: 'hard',
+    } as const;
+    expect(gameReducer(hardWon, onHard)).toBe(hardWon); // Hard is practice now
+    const onNormal = { ...onHard, difficulty: 'normal', bucket: 'normal' } as const;
+    const changed = gameReducer(hardWon, onNormal);
+    expect(changed.weeks[WEEK]!.team[1]).toEqual(swap.to);
+    expect(changed.days[DAY]!.changeOn).toBe('normal');
+    // One change a day, shared by every difficulty.
+    const again = { ...onNormal, change: { ...swap, from: swap.to, to: TEAM[1]! } };
+    expect(gameReducer(changed, again)).toBe(changed);
   });
 });
-
 describe('sound defaults', () => {
   it('starts on for a new player, a little quieter than half volume', () => {
     const { settings } = initialState();

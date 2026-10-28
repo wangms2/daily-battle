@@ -37,7 +37,10 @@ export function TeamBuilder({
   notice,
   size = 6,
   lockBody = 'It’s yours for the week. You get 1 change per day.',
+  practice = false,
 }: {
+  /** A practice team for today, not the weekly team: "Use", not "Lock in". */
+  practice?: boolean;
   schedule: ScheduleFile;
   hints: boolean;
   onLock: (team: Slot[]) => void;
@@ -291,7 +294,7 @@ export function TeamBuilder({
 
   const lockButton = (
     <Button className="h-12 w-full shrink-0" disabled={!full} onClick={() => setConfirmOpen(true)}>
-      {full ? 'Lock in team' : `Pick ${size - team.length} more`}
+      {full ? (practice ? 'Use this team' : 'Lock in team') : `Pick ${size - team.length} more`}
     </Button>
   );
 
@@ -512,9 +515,9 @@ export function TeamBuilder({
       <ConfirmDialog
         open={confirmOpen}
         onOpenChange={setConfirmOpen}
-        title="Lock in this team?"
+        title={practice ? 'Practice with this team?' : 'Lock in this team?'}
         body={lockBody}
-        confirm="Lock in"
+        confirm={practice ? 'Use team' : 'Lock in'}
         cancel="Keep editing"
         onConfirm={() => {
           setConfirmOpen(false);

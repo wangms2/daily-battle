@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Attempt, DayState } from '../state/schema';
-import { computeStats, summarizeDay } from './results';
+import { bestBucket, computeStats, summarizeDay } from './results';
 
 const TODAY = '2026-10-21';
 const attempt = (result: Attempt['result'], remaining = 0): Attempt => ({
@@ -68,6 +68,13 @@ describe('difficulties', () => {
   it('ends every streak when the team is ditched', () => {
     const h = history(day(hard(W)), { ...day(hard(W)), ditched: true });
     expect(computeStats(h, TODAY, 'hard').streak).toBe(0);
+  });
+
+  it('shares the hardest difficulty cleared, else the hardest played', () => {
+    expect(bestBucket(day(easy(W), W, hard(L)), 'easy')).toBe('normal');
+    expect(bestBucket(day(easy(L), hard(L)), 'easy')).toBe('hard');
+    expect(bestBucket(day({ ...W, coached: true }, L), 'easy')).toBe('coached');
+    expect(bestBucket(day(), 'easy')).toBe('easy');
   });
 });
 

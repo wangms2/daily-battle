@@ -115,7 +115,10 @@ for (const scheme of ['light', 'dark'] as const) {
 
     await page.getByRole('button', { name: '1 change left' }).click();
     await shot(page, '11-brief-edit', project);
-    await page.getByRole('button', { name: 'Swap' }).first().click();
+    await page
+      .getByRole('button', { name: /^Change (?!team$)/ })
+      .first()
+      .click();
     await shot(page, '12-brief-replace', project);
     await page
       .getByRole('button', { name: /^Bring in / })

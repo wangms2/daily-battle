@@ -357,10 +357,10 @@ test('a lost first try breaks the streak, and the result copies to share', async
   await expect(page.getByRole('button', { name: 'Stats. Streak 0' })).toBeVisible();
   // Still open, so the next run is a try, not practice, and the daily change stays.
   await expect(page.getByRole('button', { name: /^Try again · / })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Practice change' })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Practice changes' })).toHaveCount(0);
   // After three losses the team can still be changed (the streak is already gone).
   await page.getByRole('button', { name: 'Edit team' }).click();
-  await expect(page.getByRole('button', { name: 'Swap' }).first()).toBeVisible();
+  await expect(page.getByRole('button', { name: /^Change (?!team$)/ }).first()).toBeVisible();
   await expect(page.getByRole('button', { name: 'Pick a whole new team' })).toBeVisible();
   await page.getByRole('button', { name: 'Cancel' }).click();
   await noScroll(page, 'brief with result');
@@ -435,7 +435,10 @@ async function loseFirstTry(page: Page) {
 
 /** Swaps team slot `n` for the first Pokémon on the bench, through the brief's edit mode. */
 async function swapOne(page: Page, n: number) {
-  await page.getByRole('button', { name: 'Swap' }).nth(n).click();
+  await page
+    .getByRole('button', { name: /^Change (?!team$)/ })
+    .nth(n)
+    .click();
   await page
     .getByRole('button', { name: /^Bring in / })
     .first()
@@ -450,7 +453,7 @@ test('after a first-try loss the team changes freely and the changes stay', asyn
   await expect(card).toContainText('Streak reset');
   // The end card offers the team, already open for changes.
   await card.getByRole('button', { name: 'Change team' }).click();
-  await expect(page.getByRole('button', { name: 'Swap' }).first()).toBeVisible();
+  await expect(page.getByRole('button', { name: /^Change (?!team$)/ }).first()).toBeVisible();
   await noScroll(page, 'brief, editing after a loss');
   await swapOne(page, 0);
   // The daily change isn't spent: swap again right away.

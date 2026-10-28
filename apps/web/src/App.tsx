@@ -28,6 +28,7 @@ import { useMediaQuery } from './ui/useWide';
 import {
   attemptBucket,
   attemptDifficulty,
+  bestBucket,
   computeStats,
   dayHeadline,
   summarizeDay,
@@ -44,6 +45,7 @@ import {
   attemptEngine,
   attemptInProgress,
   dayDecided,
+  dayLost,
   withChange,
   type GameAction,
 } from './state/reducer';
@@ -263,13 +265,14 @@ export function App() {
     coached,
     stars: { firstTries: stats.firstTryWins, clears: stats.clears },
   });
-  // Every game played today on one card or text (DESIGN.md §11); this game reuses `share`.
+  // Every game played today on one card or text (DESIGN.md §11): each at its best
+  // difficulty today (the hardest cleared, else the hardest played).
   const todayShare = shareAll(
     (Object.keys(FORMATS) as FormatId[]).map((id) => {
-      if (id === format) return share;
       const gameDays = state.games[id].days;
-      const level = currentDifficulty(settings, id, gameDays[day]);
-      const b = gameBucket(id);
+      const b = bestBucket(gameDays[day], gameBucket(id));
+      if (id === format && b === bucket) return share;
+      const level = b === 'coached' ? currentDifficulty(settings, id, gameDays[day]) : b;
       const gameStats = computeStats(gameDays, day, b);
       return shareModel({
         day,
@@ -340,10 +343,16 @@ export function App() {
   }, [staleTeam, week, day, format, dispatchAny]);
 
   const inProgress = attemptInProgress(dayState);
-  // After today's counted tries, runs are practice and may carry a one-off change.
-  const practice = dayDecided(dayState);
-  const practiceChange = practice ? dayState.practiceChange : undefined;
-  const runTeam = weekState ? withChange(weekState.team, practiceChange) : [];
+  // Once this difficulty is cleared today, runs are practice and may use a practice team.
+  const practice = dayDecided(dayState, bucket);
+  const realTeam = weekState?.team ?? [];
+  const runTeam = (practice && dayState.practiceTeam) || realTeam;
+  // Building a practice team in the teambuilder (the weekly team stays as it is).
+  // Keyed by game and day, so switching either closes it.
+  const [practiceBuilderKey, setPracticeBuilderKey] = useState<string | null>(null);
+  const buildingPractice = practiceBuilderKey === `${format}|${day}`;
+  const setBuildingPractice = (on: boolean) =>
+    setPracticeBuilderKey(on ? `${format}|${day}` : null);
   // The attempt the battle screen shows; it stays put after the battle ends.
   const [battleTs, setBattleTs] = useState<number | null>(null);
 
@@ -374,7 +383,6 @@ export function App() {
           engine: attemptEngine(ENGINE_VERSION, difficulty),
           ...(difficulty !== 'normal' && { difficulty }),
           ...(coached && { coached: true as const }),
-          ...(practiceChange && { practiceChange }),
         },
       });
       setBattleTs(ts);
@@ -576,6 +584,30 @@ export function App() {
         }}
       />
     );
+  } else if (buildingPractice && practice && !inProgress && route !== 'battle') {
+    // A practice team: any six from the pool, for today's practice runs only.
+    screen = (
+      <TeamBuilder
+        notice="A practice team, just for today. Your real team and streak stay as they are."
+        schedule={schedule.schedule}
+        hints={settings.beginnerHints}
+        topBar={renderTopBar('Practice team')(
+          <button
+            type="button"
+            onClick={() => setBuildingPractice(false)}
+            className="rounded-chip px-2 py-1 text-[14px] font-semibold"
+          >
+            Cancel
+          </button>,
+        )}
+        lockBody="It’s for today’s practice runs only. Your real team isn’t changed."
+        practice
+        onLock={(team) => {
+          dispatch({ type: 'setPracticeTeam', day, team });
+          setBuildingPractice(false);
+        }}
+      />
+    );
   } else if (route === 'battle' && shownAttempt) {
     screen = (
       <BattleRoute
@@ -640,14 +672,24 @@ export function App() {
           fmtDay(day, { weekday: 'short', month: 'short', day: 'numeric' }),
         )}
         initialEdit={openEdit}
+        usingPracticeTeam={practice && !!dayState.practiceTeam}
+        lost={dayLost(dayState)}
         onDitch={() => {
-          dispatch({ type: 'ditchTeam', week, day });
           setOpenEdit(false);
+          if (practice) setBuildingPractice(true);
+          else dispatch({ type: 'ditchTeam', week, day });
         }}
         onLead={(species) => dispatch({ type: 'setLead', day, species })}
         onChange={(change) => {
-          if (practice) dispatch({ type: 'setPracticeChange', day, week, change });
-          else if (change) dispatch({ type: 'applyChange', day, week, change });
+          if (practice) {
+            dispatch({
+              type: 'setPracticeTeam',
+              day,
+              team: change ? withChange(runTeam, change) : null,
+            });
+          } else if (change) {
+            dispatch({ type: 'applyChange', day, week, change, difficulty, bucket });
+          }
         }}
         inProgress={!!inProgress}
         onStart={startBattle}

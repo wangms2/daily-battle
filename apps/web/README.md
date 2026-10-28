@@ -63,7 +63,7 @@ The full spec is in DESIGN.md §12 and the M6 and M7 plans.
 - **Weekly team:** locked once a week (6 Pokémon, any of each species' sets).
 - **Daily change:** one per local day, either swapping in a benched pool Pokémon or changing a set. The change sticks for the rest of the week, and the day records it (the share marks a swapped-in species with `*`).
 - **Lead:** chosen freely each day.
-- **Practice runs:** once today's counted tries are done, the daily change gives way to a practice change per run (`day.practiceChange`, cleared when a run starts). It never touches the weekly team, unless that run is won: then it carries over.
+- **Practice runs:** once the picked difficulty is cleared today, changes go to a practice team for today (`day.practiceTeam`, set by `setPracticeTeam`). It never touches the weekly team or a streak, and nothing carries over.
 - **Streak:** consecutive days won within 3 tries. The 3rd loss (giving up counts) or a missed day breaks it; later tries are practice. A first-try win gets a ⭐. Streaks and stats are derived from the saved attempts in `src/lib/results.ts`, not stored (state v2 dropped the old `stats` block).
 - **Results and sharing:** the end card shows today's tries as rows, the streak, and Share; the daily brief shows a summary strip once you've played. `src/lib/share.ts` builds the share text (DESIGN.md §11) and sends it with the Web Share API, the clipboard, or a sheet to copy from.
 - **Storage:** if storage is blocked, the app keeps working in memory and shows a notice.

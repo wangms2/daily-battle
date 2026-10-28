@@ -31,16 +31,14 @@ import { StarIcon } from '../ui/icons';
 import { ItemIcon } from '../ui/ItemIcon';
 import { MoveChips } from '../ui/MoveList';
 import { PokemonTile } from '../ui/PokemonTile';
+import { Sheet } from '../ui/Sheet';
 import type { ShareModel } from '../lib/share';
+import { DIFFICULTY_NAME } from '../lib/share';
 import { OtherGames } from '../ui/OtherGames';
 import { ShareButton } from '../ui/results';
 import { useMediaQuery, useWide } from '../ui/useWide';
 
-type Mode =
-  | { kind: 'view' }
-  | { kind: 'edit' }
-  /** Choosing who comes in for team slot `slot`. */
-  | { kind: 'replace'; slot: number };
+type Mode = { kind: 'view' } | { kind: 'edit' };
 
 /** A small Mega mark on a tile's corner. */
 function MegaMark({ text }: { text: string }) {
@@ -71,7 +69,13 @@ export function DailyBrief({
   onDifficulty,
   hardAvailable = true,
   coach,
+  usingPracticeTeam = false,
+  lost: lostProp,
 }: {
+  /** Practice runs use today's practice team instead of the weekly team. */
+  usingPracticeTeam?: boolean;
+  /** Today's tries (Normal's: the team is shared) are lost, so the team changes freely. */
+  lost?: boolean;
   /**
    * The daily coach, where it's offered: on or off for the next battle, and what
    * turning it on costs (asked first), if anything.
@@ -89,8 +93,8 @@ export function DailyBrief({
   /** Gen 5 on: the opponent sees your six before the battle, as you see theirs. */
   teamPreview?: boolean;
   /**
-   * Today's counted tries are done: the change applies to the next practice run
-   * only (and carries over if that run is won). `onChange(null)` undoes it.
+   * This difficulty is cleared today: runs are practice, and changes go to a
+   * practice team for today (`onChange(null)` goes back to the weekly team).
    */
   practice?: boolean;
   /** Today's result so far, the share text, and time to the next opponent. */
@@ -127,6 +131,8 @@ export function DailyBrief({
     kind: DayChange['kind'];
   } | null>(null);
   const [pending, setPending] = useState<DayChange | null>(null);
+  // Editing: the team slot whose change sheet is open.
+  const [changing, setChanging] = useState<number | null>(null);
   const [coachAsk, setCoachAsk] = useState<string | null>(null);
 
   // The builder's track plays on while the lead is picked, until the day is decided.
@@ -148,55 +154,46 @@ export function DailyBrief({
   const editing = mode.kind !== 'view';
   // Pool Pokémon not on the team. Bringing one in must keep Species Clause:
   // no second form of a Pokémon that stays on the team.
-  const bench = schedule.pool.species.filter(
-    (s) =>
-      !team.some((t, i) =>
-        mode.kind === 'replace' && i === mode.slot ? t.species === s : sameSpecies(t.species, s),
-      ),
-  );
+  const bench = (slot: number) =>
+    schedule.pool.species.filter(
+      (s) => !team.some((t, i) => (i === slot ? t.species === s : sameSpecies(t.species, s))),
+    );
 
   const describe = (c: DayChange) =>
     c.kind === 'replace'
       ? `${c.from.species} → ${c.to.species} (${findSet(c.to)?.label})`
       : `${c.from.species}: ${findSet(c.from)?.label} → ${findSet(c.to)?.label}`;
 
-  const practiceChange = practice ? dayState.practiceChange : undefined;
   // Tried today and not won: the streak is over, so the team can change freely.
-  const lost = result.summary.status === 'pending';
-  const changeChip = inProgress ? (
-    <span className="rounded-chip bg-surface-2 px-3 py-1.5 text-[13px] font-semibold text-muted">
-      Battle in progress
-    </span>
-  ) : practiceChange ? (
-    <button
-      type="button"
-      onClick={() => onChange(null)}
-      className="rounded-chip bg-accent-soft px-3 py-1.5 text-[13px] font-semibold text-soft-ink"
-    >
-      Undo practice change
-    </button>
-  ) : practice ? (
+  const lost = lostProp ?? result.summary.status === 'pending';
+  const chip = 'rounded-chip px-3 py-1.5 text-[13px] font-semibold';
+  const editChip = (label: string) => (
     <button
       type="button"
       onClick={() => setMode(editing ? { kind: 'view' } : { kind: 'edit' })}
-      className="rounded-chip bg-accent-soft px-3 py-1.5 text-[13px] font-semibold text-soft-ink"
+      className={clsx(chip, 'bg-accent-soft text-soft-ink')}
       aria-pressed={editing}
     >
-      {editing ? 'Cancel' : 'Practice change'}
+      {editing ? 'Cancel' : label}
     </button>
+  );
+  const changeChip = inProgress ? (
+    <span className={clsx(chip, 'bg-surface-2 text-muted')}>Battle in progress</span>
+  ) : practice ? (
+    <span className="flex items-center gap-1.5">
+      {usingPracticeTeam && !editing && (
+        <button type="button" onClick={() => onChange(null)} className={clsx(chip, 'bg-surface-2')}>
+          Back to my team
+        </button>
+      )}
+      {editChip('Practice changes')}
+    </span>
   ) : dayState.swapUsed && !lost ? (
-    <span className="rounded-chip bg-surface-2 px-3 py-1.5 text-[13px] font-semibold text-muted">
-      Change used
+    <span className={clsx(chip, 'bg-surface-2 text-muted')}>
+      {dayState.changeOn ? `Change used on ${DIFFICULTY_NAME[dayState.changeOn]}` : 'Change used'}
     </span>
   ) : (
-    <button
-      type="button"
-      onClick={() => setMode(editing ? { kind: 'view' } : { kind: 'edit' })}
-      className="rounded-chip bg-accent-soft px-3 py-1.5 text-[13px] font-semibold text-soft-ink"
-      aria-pressed={editing}
-    >
-      {editing ? 'Cancel' : lost ? 'Edit team' : '1 change left'}
-    </button>
+    editChip(lost ? 'Edit team' : '1 change left')
   );
 
   // Six tiles: 3×2 on phones, one row of six on wide screens, where the teams stack.
@@ -240,46 +237,30 @@ export function DailyBrief({
     );
   };
 
-  const opponentSection =
-    mode.kind === 'replace' ? (
-      <section className="flex min-h-0 flex-1 flex-col gap-2">
-        <SectionLabel>Who comes in for {team[mode.slot]!.species}?</SectionLabel>
-        <div className={sixGrid}>
-          {bench.map((species) => (
-            <PokemonTile
-              key={species}
-              species={species}
-              label={`Bring in ${species}`}
-              onTap={() => setPicker({ slot: mode.slot, species, kind: 'replace' })}
-              onInfo={() => setInfoFor({ species, foe: false })}
-            />
-          ))}
-        </div>
-      </section>
-    ) : (
-      <section className={clsx('flex flex-col gap-2', wide ? 'min-h-0 shrink' : 'min-h-0 flex-1')}>
-        <SectionLabel>Opponent</SectionLabel>
-        <div className={sixGrid}>
-          {opponent.team.map(({ species }) => (
-            <PokemonTile
-              key={species}
-              species={species}
-              label={`About ${species}${hints && canMega(species) ? ', can Mega Evolve' : ''}`}
-              onTap={() =>
-                panelOn ? setFocus({ species, foe: true }) : setInfoFor({ species, foe: true })
-              }
-              badge={hints && canMega(species) ? <MegaMark text="Can Mega Evolve" /> : undefined}
-              hoverCard={wide && !panelOn ? hoverOf(species) : undefined}
-            />
-          ))}
-        </div>
-      </section>
-    );
+  const opponentSection = (
+    <section className={clsx('flex flex-col gap-2', wide ? 'min-h-0 shrink' : 'min-h-0 flex-1')}>
+      <SectionLabel>Opponent</SectionLabel>
+      <div className={sixGrid}>
+        {opponent.team.map(({ species }) => (
+          <PokemonTile
+            key={species}
+            species={species}
+            label={`About ${species}${hints && canMega(species) ? ', can Mega Evolve' : ''}`}
+            onTap={() =>
+              panelOn ? setFocus({ species, foe: true }) : setInfoFor({ species, foe: true })
+            }
+            badge={hints && canMega(species) ? <MegaMark text="Can Mega Evolve" /> : undefined}
+            hoverCard={wide && !panelOn ? hoverOf(species) : undefined}
+          />
+        ))}
+      </div>
+    </section>
+  );
 
   const teamSection = (
     <section className={clsx('flex flex-col gap-2', wide ? 'min-h-0 shrink' : 'min-h-0 flex-1')}>
       <SectionLabel right={changeChip}>
-        {editing ? 'Pick a Pokémon to change' : 'Your team'}
+        {usingPracticeTeam ? 'Practice team' : 'Your team'}
       </SectionLabel>
       <div className={sixGrid}>
         {team.map((slot, i) => {
@@ -288,7 +269,6 @@ export function DailyBrief({
             <PokemonTile
               key={slot.species}
               species={slot.species}
-              showTypes={!editing}
               hoverCard={
                 wide && !editing && !panelOn ? hoverOf(slot.species, slot.setId) : undefined
               }
@@ -307,12 +287,12 @@ export function DailyBrief({
               }
               label={
                 editing
-                  ? `${slot.species}`
+                  ? `Change ${slot.species}`
                   : isLead
                     ? `${slot.species}, leading`
                     : `Lead with ${slot.species}`
               }
-              onTap={editing ? undefined : () => onLead(slot.species)}
+              onTap={editing ? () => setChanging(i) : () => onLead(slot.species)}
               onInfo={
                 editing
                   ? undefined
@@ -320,42 +300,22 @@ export function DailyBrief({
                       panelOn ? setFocus({ species: slot.species, foe: false }) : setSetView(slot)
               }
               infoLabel={`${slot.species}'s set`}
-              footer={
-                editing ? (
-                  <div className="grid grid-cols-2 gap-1 px-1 pb-1">
-                    <button
-                      type="button"
-                      onClick={() => setMode({ kind: 'replace', slot: i })}
-                      className={clsx(
-                        'min-h-8 rounded-lg text-[12px] font-semibold',
-                        mode.kind === 'replace' && mode.slot === i
-                          ? 'bg-accent text-on-accent'
-                          : 'bg-surface-2',
-                      )}
-                    >
-                      Swap
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setPicker({ slot: i, species: slot.species, kind: 'set' })}
-                      className="min-h-8 rounded-lg bg-surface-2 text-[12px] font-semibold"
-                    >
-                      Set
-                    </button>
-                  </div>
-                ) : undefined
-              }
             />
           );
         })}
       </div>
+      {editing && (
+        <p className="shrink-0 text-center text-[13px] text-muted">
+          Tap a Pokémon to change its set or swap it out
+        </p>
+      )}
     </section>
   );
 
   const { summary } = result;
   const start = editing ? (
     <Button variant="secondary" className="h-12 w-full shrink-0" onClick={() => setDitchOpen(true)}>
-      Pick a whole new team
+      {practice ? 'Build a practice team' : 'Pick a whole new team'}
     </Button>
   ) : (
     <Button className="h-12 w-full shrink-0" onClick={onStart}>
@@ -443,7 +403,7 @@ export function DailyBrief({
 
   const topBar = renderTopBar(
     // Cancel sits on the change chip, next to the team being changed.
-    editing ? <span>{practice ? 'Practice change' : 'Today’s change'}</span> : undefined,
+    editing ? <span>{practice ? 'Practice team' : 'Today’s change'}</span> : undefined,
   );
 
   return (
@@ -534,6 +494,38 @@ export function DailyBrief({
         showRoles={!infoFor?.foe}
         showPossibleSets={!!infoFor?.foe && hints}
       />
+      <Sheet
+        open={changing !== null && !picker}
+        onOpenChange={(o) => !o && setChanging(null)}
+        title={changing !== null ? `Change ${team[changing]!.species}` : 'Change'}
+        description="Give it another set, or swap in a Pokémon from your bench."
+        scroll
+      >
+        {changing !== null && (
+          <div className="space-y-3 pb-2">
+            <Button
+              variant="secondary"
+              className="w-full"
+              onClick={() =>
+                setPicker({ slot: changing, species: team[changing]!.species, kind: 'set' })
+              }
+            >
+              Another set for {team[changing]!.species}
+            </Button>
+            <SectionLabel>Or swap in</SectionLabel>
+            <div className="grid grid-cols-3 gap-2">
+              {bench(changing).map((species) => (
+                <PokemonTile
+                  key={species}
+                  species={species}
+                  label={`Bring in ${species}`}
+                  onTap={() => setPicker({ slot: changing, species, kind: 'replace' })}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+      </Sheet>
       <SetPicker
         key={`view-${setView?.species}`}
         species={setView?.species ?? null}
@@ -565,33 +557,28 @@ export function DailyBrief({
         }
         onChoose={(setId) => {
           if (!picker) return;
-          const from = team[picker.slot]!;
-          setPending({
+          const change: DayChange = {
             kind: picker.kind,
             slot: picker.slot,
-            from,
+            from: team[picker.slot]!,
             to: { species: picker.species, setId },
-          });
+          };
+          // Practice changes are free and for today only: no need to ask.
+          if (practice) onChange(change);
+          else setPending(change);
           setPicker(null);
+          setChanging(null);
         }}
       />
       <ConfirmDialog
         open={!!pending}
         onOpenChange={(o) => !o && setPending(null)}
-        title={
-          practice
-            ? 'Change for this practice run?'
-            : lost
-              ? 'Change your team?'
-              : 'Use today’s change?'
-        }
+        title={lost ? 'Change your team?' : 'Use today’s change?'}
         body={
           pending
-            ? practice
-              ? `${describe(pending)}. Just for your next practice run; win it and the change stays on your team.`
-              : lost
-                ? `${describe(pending)}. Your streak is over for today, so change as much as you like; it sticks for the rest of the week.`
-                : `${describe(pending)}. This sticks for the rest of the week.`
+            ? lost
+              ? `${describe(pending)}. Your streak is over for today, so change as much as you like; it sticks for the rest of the week.`
+              : `${describe(pending)}. It’s the one change for all difficulties today, and it sticks for the rest of the week.`
             : ''
         }
         confirm="Make change"
@@ -620,15 +607,17 @@ export function DailyBrief({
       <ConfirmDialog
         open={ditchOpen}
         onOpenChange={setDitchOpen}
-        danger
-        title="Start over with a new team?"
+        danger={!practice}
+        title={practice ? 'Build a practice team?' : 'Start over with a new team?'}
         body={
-          result.streak > 0
-            ? `You’ll build a new team from this week’s pool, and your ${result.streak}-day streak ends.`
-            : 'You’ll build a new team from this week’s pool.'
+          practice
+            ? 'Pick any six from this week’s pool to practice with today. Your real team and streak stay as they are.'
+            : result.streak > 0
+              ? `You’ll build a new team from this week’s pool, and your ${result.streak}-day streak ends.`
+              : 'You’ll build a new team from this week’s pool.'
         }
-        confirm="Pick new team"
-        cancel="Keep my team"
+        confirm={practice ? 'Build team' : 'Pick new team'}
+        cancel={practice ? 'Not now' : 'Keep my team'}
         onConfirm={() => {
           setDitchOpen(false);
           onDitch();

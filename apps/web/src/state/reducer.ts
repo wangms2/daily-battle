@@ -1,9 +1,8 @@
 import { canResume, difficultyTag, type Difficulty } from '@daily-battle/ai/version';
 import type { FormatId } from '@daily-battle/data/formats';
-import { mondayOf } from '@daily-battle/gen/dates';
 import { applyAiChoices, type AiChoices, type CoachMemo } from '../battle/frames';
 import { sameSpecies } from '../lib/data';
-import { attemptDifficulty, summarizeDay } from '../lib/results';
+import { attemptDifficulty, summarizeDay, type Bucket } from '../lib/results';
 import {
   emptyDay,
   type Attempt,
@@ -20,9 +19,18 @@ import {
 export type GameAction =
   | { type: 'lockTeam'; week: string; poolId: string; team: Slot[] }
   | { type: 'setLead'; day: string; species: string }
-  | { type: 'applyChange'; day: string; week: string; change: DayChange }
-  /** A change for the next practice run only (after today's counted tries). */
-  | { type: 'setPracticeChange'; day: string; week: string; change: DayChange | null }
+  /** Today's change to the shared team, made while playing `bucket` (on `difficulty`). */
+  | {
+      type: 'applyChange';
+      day: string;
+      week: string;
+      change: DayChange;
+      /** Defaults to Normal. */
+      difficulty?: Difficulty;
+      bucket?: Bucket;
+    }
+  /** Today's practice team, or null to go back to the weekly team. */
+  | { type: 'setPracticeTeam'; day: string; team: Slot[] | null }
   | { type: 'startAttempt'; day: string; attempt: Attempt }
   /** The coach was turned on mid-battle: the battle in progress is coached from now on. */
   | { type: 'coachAttempt'; day: string }
@@ -81,18 +89,29 @@ function changeFits(team: Slot[], change: DayChange): boolean {
   );
 }
 
-// Team rules follow Normal's tries only: the team is shared, and an Easy or Hard
-// loss doesn't free it up (DESIGN.md §4.5).
+// Free changes after a loss follow Normal's tries only: the team is shared, and an
+// Easy or Hard loss doesn't free it up (DESIGN.md §4.5).
 
 /** Tried today and not won yet: the streak is over for today, so the team may change freely. */
 export function dayLost(day: DayState | undefined): boolean {
   return summarizeDay(day, true).status === 'pending';
 }
 
-/** Today's counted tries are over (won, or a past day never won): further runs are practice. */
-export function dayDecided(day: DayState | undefined): boolean {
-  const status = summarizeDay(day, true).status;
+/**
+ * The bucket's counted tries are over today (won, or a past day never won):
+ * further runs of it are practice, with a practice team if the player wants one.
+ */
+export function dayDecided(day: DayState | undefined, bucket: Bucket = 'normal'): boolean {
+  const status = summarizeDay(day, true, bucket).status;
   return status === 'firstTry' || status === 'won' || status === 'failed';
+}
+
+/** Six Pokémon, no species twice (Species Clause: forms count as one). */
+function teamFits(team: Slot[]): boolean {
+  return (
+    team.length === 6 &&
+    !team.some((s, i) => team.slice(i + 1).some((t) => sameSpecies(s.species, t.species)))
+  );
 }
 
 function updateLast(day: DayState, change: (a: Attempt) => Attempt): DayState {
@@ -179,7 +198,14 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       if (attemptInProgress(state.days[action.day])) return state;
       const { [action.week]: _, ...weeks } = state.weeks;
       const day = state.days[action.day] ?? emptyDay();
-      const { change: _c, lead: _l, practiceChange: _p, ...rest } = day;
+      const {
+        change: _c,
+        changeOn: _o,
+        lead: _l,
+        practiceChange: _p,
+        practiceTeam: _t,
+        ...rest
+      } = day;
       return {
         ...state,
         weeks,
@@ -188,11 +214,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
     }
     case 'lockTeam': {
       if (state.weeks[action.week]) return state; // locked for the week
-      if (action.team.length !== 6) return state;
-      const clash = action.team.some((s, i) =>
-        action.team.slice(i + 1).some((t) => sameSpecies(s.species, t.species)),
-      );
-      if (clash) return state; // Species Clause
+      if (!teamFits(action.team)) return state;
       return {
         ...state,
         weeks: { ...state.weeks, [action.week]: { team: action.team, poolId: action.poolId } },
@@ -208,7 +230,8 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       const lost = dayLost(day); // after a loss the streak is gone: swap as much as you like
       if ((day.swapUsed && !lost) || !week) return state; // otherwise one change per day
       if (attemptInProgress(day)) return state; // not mid-battle
-      if (dayDecided(day)) return state; // after the counted tries, changes are practice only
+      // Once this difficulty is cleared, its changes are to the practice team instead.
+      if (dayDecided(day, action.bucket)) return state;
       if (!changeFits(week.team, action.change)) return state;
       const { from, to } = action.change;
       const team = withChange(week.team, action.change);
@@ -221,34 +244,37 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
           ...state.days,
           [action.day]: lost
             ? { ...day, lead }
-            : { ...day, swapUsed: true, change: action.change, lead },
+            : {
+                ...day,
+                swapUsed: true,
+                change: action.change,
+                changeOn: action.difficulty ?? 'normal',
+                lead,
+              },
         },
       };
     }
-    case 'setPracticeChange': {
+    case 'setPracticeTeam': {
       const day = state.days[action.day];
-      const week = state.weeks[action.week];
-      if (!day || !week || !dayDecided(day) || attemptInProgress(day)) return state;
-      if (action.change && !changeFits(week.team, action.change)) return state;
-      const { practiceChange: _, ...rest } = day;
+      if (!day || attemptInProgress(day)) return state;
+      if (action.team && !teamFits(action.team)) return state;
+      const { practiceTeam: _, ...rest } = day;
       return {
         ...state,
         days: {
           ...state.days,
-          [action.day]: action.change ? { ...rest, practiceChange: action.change } : rest,
+          [action.day]: action.team ? { ...rest, practiceTeam: action.team } : rest,
         },
       };
     }
     case 'startAttempt': {
       const day = state.days[action.day] ?? emptyDay();
       if (attemptInProgress(day)) return state;
-      // A practice change goes with the run that uses it; the next run decides afresh.
-      const { practiceChange: _, ...rest } = day;
       return {
         ...state,
         days: {
           ...state.days,
-          [action.day]: { ...rest, attempts: [...day.attempts, action.attempt] },
+          [action.day]: { ...day, attempts: [...day.attempts, action.attempt] },
         },
       };
     }
@@ -287,28 +313,19 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
     }
     case 'endAttempt': {
       const day = state.days[action.day];
-      const attempt = attemptInProgress(day);
-      if (!attempt) return state;
-      const days = {
-        ...state.days,
-        [action.day]: updateLast(day!, (a) => ({
-          ...a,
-          result: action.result,
-          remaining: action.remaining,
-        })),
+      if (!attemptInProgress(day)) return state;
+      // A practice run never changes the weekly team, won or not.
+      return {
+        ...state,
+        days: {
+          ...state.days,
+          [action.day]: updateLast(day!, (a) => ({
+            ...a,
+            result: action.result,
+            remaining: action.remaining,
+          })),
+        },
       };
-      // Winning a practice run keeps its change: the team carries it from tomorrow.
-      const weekKey = mondayOf(action.day);
-      const week = state.weeks[weekKey];
-      const change = attempt.practiceChange;
-      if (action.result === 'win' && change && week && changeFits(week.team, change)) {
-        return {
-          ...state,
-          days,
-          weeks: { ...state.weeks, [weekKey]: { ...week, team: withChange(week.team, change) } },
-        };
-      }
-      return { ...state, days };
     }
     case 'expireAttempts': {
       let days = state.days;

@@ -74,6 +74,22 @@ export function summarizeDay(
 /** Played but not won on the first try (or with the coach's help): the streak is over. */
 const breaks = (s: DaySummary) => s.helped || (s.status !== 'none' && s.status !== 'firstTry');
 
+/** Hardest first; coached tries rank below any regular difficulty. */
+const BUCKET_RANK: Bucket[] = ['hard', 'normal', 'easy', 'coached'];
+
+/**
+ * The bucket to show for a game played at several difficulties today: the
+ * hardest one cleared, else the hardest one played, else `fallback`.
+ */
+export function bestBucket(day: DayState | undefined, fallback: Bucket): Bucket {
+  const status = (b: Bucket) => summarizeDay(day, true, b).status;
+  return (
+    BUCKET_RANK.find((b) => status(b) === 'firstTry' || status(b) === 'won') ??
+    BUCKET_RANK.find((b) => status(b) !== 'none') ??
+    fallback
+  );
+}
+
 export interface Stats {
   streak: number;
   bestStreak: number;

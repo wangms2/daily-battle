@@ -281,14 +281,14 @@ describe('daily brief', () => {
     ).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: '1 change left' }));
-    await user.click(screen.getAllByRole('button', { name: 'Swap' })[0]!);
+    await user.click(screen.getByRole('button', { name: `Change ${team[0]!.species}` }));
     const bench = schedule.pool.species.find((s) => !team.some((t) => t.species === s))!;
     await user.click(screen.getByRole('button', { name: `Bring in ${bench}` }));
     await user.click(
       within(await screen.findByRole('dialog')).getAllByRole('button', { name: 'Bring in' })[0]!,
     );
     await user.click(await screen.findByRole('button', { name: 'Make change' }));
-    expect(await screen.findByText('Change used')).toBeInTheDocument();
+    expect(await screen.findByText('Change used on Normal')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: '1 change left' })).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: `Lead with ${bench}` })).toBeInTheDocument();
   });
@@ -405,7 +405,7 @@ describe('results and streak', () => {
     expect(screen.getByRole('button', { name: 'Stats. Streak 0' })).toBeInTheDocument();
   });
 
-  it('offers a practice change once the day is won, leaving the weekly team alone', async () => {
+  it('offers a practice team once the day is won, leaving the weekly team alone', async () => {
     const user = userEvent.setup();
     const state = seeded({ team: { week: WEEK } });
     state.games.gen4ou.days['2026-10-21'] = {
@@ -414,29 +414,34 @@ describe('results and streak', () => {
       attempts: [finished('loss', 0, 1), finished('win', 3, 2)],
     };
     renderApp(state);
-    expect(await screen.findByRole('button', { name: 'Practice change' })).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: 'Practice changes' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: '1 change left' })).not.toBeInTheDocument();
 
     const team = schedule.suggestedTeams[0]!.team;
     const bench = schedule.pool.species.find((s) => !team.some((t) => t.species === s))!;
-    await user.click(screen.getByRole('button', { name: 'Practice change' }));
-    await user.click(screen.getAllByRole('button', { name: 'Swap' })[1]!);
+    await user.click(screen.getByRole('button', { name: 'Practice changes' }));
+    await user.click(screen.getByRole('button', { name: `Change ${team[1]!.species}` }));
     await user.click(screen.getByRole('button', { name: `Bring in ${bench}` }));
     await user.click(
       within(await screen.findByRole('dialog')).getAllByRole('button', { name: 'Bring in' })[0]!,
     );
-    expect(
-      await screen.findByRole('dialog', { name: 'Change for this practice run?' }),
-    ).toHaveTextContent('Just for your next practice run');
-    await user.click(screen.getByRole('button', { name: 'Make change' }));
+    // Free and for today only: no confirm.
+    await user.click(await screen.findByRole('button', { name: 'Cancel' }));
     expect(await screen.findByRole('button', { name: `Lead with ${bench}` })).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: 'Undo practice change' }));
+    expect(screen.getByText('Practice team')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Back to my team' }));
     expect(screen.queryByRole('button', { name: `Lead with ${bench}` })).not.toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: `Lead with ${team[1]!.species}` }),
     ).toBeInTheDocument();
   });
 
+  it('says which difficulty used the shared daily change', async () => {
+    const state = seeded({ team: { week: WEEK } });
+    state.games.gen4ou.days['2026-10-21'] = { swapUsed: true, changeOn: 'hard', attempts: [] };
+    renderApp(state);
+    expect(await screen.findByText('Change used on Hard')).toBeInTheDocument();
+  });
   it('has no result strip before the first try', async () => {
     renderApp(seeded({ team: { week: WEEK } }));
     await screen.findByRole('button', { name: /^Start · / });

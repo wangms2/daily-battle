@@ -66,9 +66,11 @@ Daily swap (done on the daily brief screen, shown as "1 change left"):
 
 - One per day, resets at local midnight.
 - Either replace one team member with another of the 12 (choosing a set), or change the set of one existing member.
+- **How:** the chip turns on editing; the opponent stays on top and a line under your team says "Tap a Pokémon to change its set or swap it out". Tapping one opens a "Change X" sheet (as in versus prep): "Another set for X", or "Or swap in" with the bench.
 - Unused swaps do not accumulate.
 - **After a first-try loss** the streak is already over, so the team may change freely: any number of swaps and set changes, none using up the daily change, and they stay on the team for the rest of the week (the end card's "Change team" opens the brief ready to edit; the chip reads "Edit team"). **Pick a whole new team** (in edit mode, the code calls it "ditching") throws the weekly team away to build a new one from the pool; it ends a live streak for that day (`DayState.ditched`), and the confirmation says so.
-- Once the day is won, the daily swap is no longer offered. Instead each practice run may make one **practice change** (a swap or a set change) for that run only; the weekly team is untouched, and the next run decides afresh. If a practice run is won, its change stays on the team from then on.
+- **One change a day for all difficulties.** The team is shared, so the daily change is too; once used, the chip says where: "Change used on Hard" (`DayState.changeOn`).
+- **Practice team (revised Oct 2026).** Once the picked difficulty is cleared today, its runs are practice and the team is free to play with: "Practice changes" allows any number of swaps and set changes with no confirm, and **Build a practice team** opens the teambuilder on the week's pool. These go to a **practice team for today** (`DayState.practiceTeam`), shown as "Practice team" with **Back to my team**. The weekly team and every streak are never touched, and a won practice run no longer carries its change over. Undecided difficulties still use the weekly team and the daily change.
 
 ### 4.3 Daily battle
 
@@ -92,7 +94,7 @@ Daily swap (done on the daily brief screen, shown as "1 change left"):
 - Each game has a CPU difficulty, **Easy**, **Normal** (the default, and the AI of §8), or **Hard**, picked on the daily brief and remembered per game (`settings.difficulty`). An attempt records the difficulty it was played at.
 - **Each difficulty is its own daily**: the same opponent team and the same locked team, but its own first try, tries, streak, and stats. A day's status on Home and the end card is the picked difficulty's. Home shows an Easy or Hard badge on the game.
 - The picker is locked while a battle is in progress; switching difficulty never abandons a try.
-- **Team rules follow Normal's tries only** (`dayLost`, `dayDecided`, the practice change). The team is shared, so an Easy or Hard loss doesn't free it up. Ditching the team (§4.2) breaks every difficulty's streak.
+- **Free team edits after a loss follow Normal's tries only** (`dayLost`): the team is shared, so an Easy or Hard loss doesn't free it up. **Practice follows the picked difficulty** (`dayDecided(day, bucket)`): clearing Hard opens Hard's practice team while Normal is still undecided. Ditching the team (§4.2) breaks every difficulty's streak.
 - Normal is unchanged: same AI, same engine string, same saves, same share text.
 
 ### 4.6 CPU difficulty (added Oct 2026)
@@ -312,7 +314,7 @@ Versioned schema, now `version: 4`. v2 dropped the stored `stats` block (streaks
 {
   version: 2,
   weeks: { [weekKey]: { team: Slot[6], poolId: string } },
-  days: { [dayKey]: { swapUsed: boolean, change?: DayChange, lead?: string, practiceChange?: DayChange, attempts: Attempt[] } },
+  days: { [dayKey]: { swapUsed: boolean, change?: DayChange, changeOn?: Difficulty, lead?: string, practiceTeam?: Slot[6], attempts: Attempt[] } },
   settings: { beginnerHints: boolean, battleSpeed: 'normal'|'fast'|'instant', animations: boolean, shownExplainers: string[] }
 }
 Slot = { species, setId }
@@ -320,7 +322,7 @@ Attempt = { result: 'win'|'loss'|'forfeit'|'inProgress', remaining: number, ts: 
             team: Slot[6],   // as sent into battle, lead first
             battleSeed: string, aiSeed: string, choices: string[],  // seeds + choices enable resume (§7)
             engine: string,  // 'sim <version> ai <AI_VERSION>'; a mismatch on resume records a forfeit unless that AI version is still playable (§15)
-            practiceChange?: DayChange }  // a practice run's one-off change (§4.2)
+            practiceChange?: DayChange }  // legacy: a practice run's one-off change, before practice teams (§4.2)
 ```
 
 - Wrap all reads/writes in try/catch; the game must work if storage is unavailable (in-memory fallback with a notice).
@@ -369,13 +371,13 @@ Other headlines: `❌ Not cleared` (a past day never won, with `🔥 Streak rese
 Easy and Hard add the difficulty to the header, with that difficulty's tries and streak: `Pokémon Daily · Gen 4 OU · Hard · Oct 21`. Normal's header is unchanged. The image card shows the same header.
 
 - The last line is the link to play (the site's own address), so friends can tap through.
-- Each row shows that try's result and your Pokémon left out of 6 (green = alive; grey ⬜ = still standing on a try that was given up), led by one emoji (✅/❌, a first try too) so the squares line up. A practice run shared from its end card adds `🔁 🟩🟩🟩⬛⬛⬛ practice` (`practice, with Gengar` if it swapped one in). At most 7 lines plus the link.
+- Each row shows that try's result and your Pokémon left out of 6 (green = alive; grey ⬜ = still standing on a try that was given up), led by one emoji (✅/❌, a first try too) so the squares line up. A practice run shared from its end card adds `🔁 🟩🟩🟩⬛⬛⬛ practice` (`practice, with Gengar` on older runs that swapped one in). At most 7 lines plus the link.
 - Team: species only, lead first, from the deciding try (the win, or the latest try that counted); `*` marks a species swapped in that day.
 - **Share opens a choice: image or text.** Both say the same thing, built from one model (`lib/share.ts`).
   - **Text:** plain text that pastes anywhere, copied straight to the clipboard (never the share sheet), else shown to copy.
   - **Image:** a 1200×630 card in the app's light theme (`lib/shareCard.ts`), drawn on a canvas in the browser. Its header takes one colour from the game played, so the generation shows at a glance: Emerald green for Gen 3, Diamond's steel blue for Gen 4, black for Gen 5 (with a white ball button, for Black and White), and Y's red for Gen 6. The card shows the date, the headline (gold "⭐ First try" badge), the try rows as squares, a practice row when sharing one, the team as sprites with names (`*` and gold for the day's swap), the streak, and the site address. The sheet previews it; it goes to the share sheet as the image alone where files can be shared (phones; with text alongside, iOS's Copy and some apps keep only the text, and the card shows the address anyway), else the clipboard, else a download. The preview is a `blob:` image, which the CSP allows (`img-src 'self' data: blob:`).
 - Never include opponent species, sets, or turn counts.
-- **Share all.** With two or more games played today, the Share sheet has a **This game / All games** switch, and the game picker has a **Share all N games** button under the list (**Share today** with one game, which shares that game's full result). All games is compact, one game per pair of lines, in picker order, with no teams; games not played today are left out:
+- **Share all.** With two or more games played today, the Share sheet has a **This game / All games** switch, and the game picker has a **Share all N games** button under the list (**Share today** with one game, which shares that game's full result). All games is compact, one game per pair of lines, in picker order, with no teams; games not played today are left out. A game played at several difficulties shows its best one: the hardest cleared today, else the hardest played (Hard > Normal > Easy > Coached; `bestBucket`):
 
   ```
   Pokémon Daily · Oct 21

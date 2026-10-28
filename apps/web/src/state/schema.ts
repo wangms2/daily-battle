@@ -40,7 +40,7 @@ export interface Attempt {
    * neither judges again nor asks again (DESIGN.md §22).
    */
   coachLog?: (CoachMemo | null)[];
-  /** A practice run's one-off change; if the run is won, it carries over to the team. */
+  /** Saves before practice teams: a practice run's one-off change. No longer written or used. */
   practiceChange?: DayChange;
 }
 
@@ -59,13 +59,17 @@ export interface DayState {
   /** The player ditched their team today: the streak is over, whatever today's tries say. */
   ditched?: boolean;
   change?: DayChange;
+  /** The difficulty today's change was made on (the team is shared, so it's used for all). */
+  changeOn?: Difficulty;
   /** Species chosen to lead today. */
   lead?: string;
   /**
-   * Once today's counted tries are done, each practice run may make one change of
-   * its own, kept here until the run starts. It doesn't touch the weekly team
-   * unless that run is won.
+   * Once the difficulty being played is cleared for today, its runs are practice
+   * and may use this team instead: built or changed freely, today only. It never
+   * touches the weekly team.
    */
+  practiceTeam?: Slot[];
+  /** Saves before practice teams: a change for the next practice run. No longer used. */
   practiceChange?: DayChange;
   attempts: Attempt[];
 }
