@@ -104,6 +104,9 @@ const RIVAL_OPTIONS: Option<Difficulty>[] = DIFFICULTIES.map((d) => ({
   label: DIFFICULTY_NAME[d],
 }));
 
+/** Room for a pool's 12 before it arrives. */
+const POOL_SIZE_SPACES: string[] = Array.from({ length: 12 }, () => '');
+
 export function Lobby({
   room,
   you,
@@ -326,10 +329,12 @@ export function Lobby({
         </section>
 
         <section className="space-y-1 wide:col-start-2">
+          {/* Fixed heights, so switching between the two pools doesn't move the page: the
+              label row keeps Redraw all's height without it, and the 12 hold their row
+              while a new pool comes. */}
           <SectionLabel
             right={
-              editable &&
-              own && (
+              editable && own ? (
                 <button
                   type="button"
                   className="h-7 rounded-chip px-2 text-[13px] font-semibold text-accent hover:bg-surface-2"
@@ -337,30 +342,30 @@ export function Lobby({
                 >
                   Redraw all
                 </button>
+              ) : (
+                <span aria-hidden className="block h-7" />
               )
             }
           >
             {own ? 'Your 12 · everyone has their own' : 'The 12 · this week’s pool'}
           </SectionLabel>
-          {mine.length > 0 && (
-            <ul className="grid grid-cols-12 gap-0.5" aria-label="Your pool">
-              {/* All 12 appear together: a redraw keeps the old pool up until every
+          <ul className="grid grid-cols-12 gap-0.5" aria-label="Your pool">
+            {/* All 12 appear together: a redraw keeps the old pool up until every
                 new sprite has loaded, and the first draw holds empty spaces. */}
-              {(pool ?? mine.map(() => '')).map((sp, i) => (
-                <li key={sp || i} title={sp || undefined}>
-                  {sp ? (
-                    <img
-                      src={getSprite(sp, 'icon')}
-                      alt={sp}
-                      className="pixelated aspect-[4/3] w-full object-contain"
-                    />
-                  ) : (
-                    <span className="block aspect-[4/3] w-full" />
-                  )}
-                </li>
-              ))}
-            </ul>
-          )}
+            {(pool ?? (mine.length ? mine : POOL_SIZE_SPACES).map(() => '')).map((sp, i) => (
+              <li key={sp || i} title={sp || undefined}>
+                {sp ? (
+                  <img
+                    src={getSprite(sp, 'icon')}
+                    alt={sp}
+                    className="pixelated aspect-[4/3] w-full object-contain"
+                  />
+                ) : (
+                  <span className="block aspect-[4/3] w-full" />
+                )}
+              </li>
+            ))}
+          </ul>
         </section>
 
         {wide ? (
