@@ -708,9 +708,9 @@ export function Battle({
           view?.revealed[foeSpecies]?.moves ?? [],
         )
       : undefined;
-  // Who moves first: shown with beginner hints, and always in lessons.
+  // Who moves first: always shown (its Speed, and yours against it), hints or not.
   const speedCheck: SpeedCheck | undefined =
-    view && shownFoe && (settings.beginnerHints || lessonFoe || staged?.card)
+    view && shownFoe
       ? {
           ...foeSpeed(
             shownFoe.species,
