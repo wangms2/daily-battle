@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { memoryDb } from './memoryDb';
 import { parsePing, playerSeen, playerSummary, utcDay, type Ping } from './players';
+import { summary } from './admin';
 import { accountSeen, forgetPlayer } from './stats';
 
 const NOW = Date.UTC(2026, 9, 28, 12);
@@ -83,6 +84,14 @@ describe('players', () => {
     expect((await playerSummary(db, NOW)).today).toBe(0);
     expect((await playerSummary(db, NOW, day(1))).today).toBe(1);
     expect((await playerSummary(db, NOW, day(3))).today).toBe(0);
+  });
+
+  it('leaves the rest of the summary up when its tables are missing', async () => {
+    const db = memoryDb();
+    await db.prepare(`DROP TABLE player_days`).run();
+    const s = await summary(db, NOW);
+    expect(s.players).toBeUndefined();
+    expect(s.games).toBeDefined();
   });
 
   it('counts a ping once a day per activity, and links only real accounts', async () => {

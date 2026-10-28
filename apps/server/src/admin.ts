@@ -113,7 +113,11 @@ export async function summary(db: Db, now: number, today?: string | null) {
        FROM account_games GROUP BY format ORDER BY format`,
     weekDay,
   );
-  const players = await playerSummary(db, now, today);
+  // Without its tables (migration 0002 not applied yet) the rest still shows.
+  const players = await playerSummary(db, now, today).catch((e: unknown) => {
+    console.error('player summary failed', e);
+    return undefined;
+  });
   return { games: gameTotals, perDay, formats, accounts: accountTotals, progress, players };
 }
 
