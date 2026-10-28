@@ -1,6 +1,7 @@
 import type { Difficulty } from '@daily-battle/ai/version';
 import { DEFAULT_FORMAT, FORMATS, formatInfo, type FormatId } from '@daily-battle/data/formats';
 import { addDays, dayKey, weekKey } from '@daily-battle/gen/dates';
+import { useTrackPlays } from './lib/plays';
 import {
   Fragment,
   useEffect,
@@ -168,6 +169,8 @@ function poolIdOf(s: ScheduleFile): string {
 
 export function App() {
   const { state, dispatch: dispatchAny, storageAvailable } = useStore();
+  // Count this device's plays, anonymously (lib/plays.ts).
+  useTrackPlays();
   const account = useAccount();
   const now = useNow(1000);
   const day = dayKey(now);

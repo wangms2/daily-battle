@@ -4,7 +4,8 @@
 import { makeCode } from '@daily-battle/versus';
 import type { Env } from './env';
 import { adminRequest, isAdmin } from './admin';
-import { forgetPlayer } from './stats';
+import { parsePing, playerSeen } from './players';
+import { forgetPlayer, record } from './stats';
 import { nameKey } from './accounts';
 import { matchRoute, sameOrigin } from './routes';
 
@@ -34,6 +35,22 @@ export default {
     // token, which another site can't have, so it doesn't need the check.
     const tokenRead = route.kind === 'account' && request.method === 'GET';
     if (!tokenRead && !sameOrigin(request)) return new Response('Forbidden', { status: 403 });
+    if (route.kind === 'ping') {
+      // Small and best-effort: a bad ping is refused, a failed write only logged.
+      const text = await request.text();
+      if (text.length > 500) return new Response('Too big', { status: 413 });
+      let body: unknown;
+      try {
+        body = JSON.parse(text);
+      } catch {
+        body = null;
+      }
+      const now = Date.now();
+      const ping = parsePing(body, now);
+      if (!ping) return new Response('Bad ping', { status: 400 });
+      await record(env.DB, (db) => playerSeen(db, ping, now));
+      return new Response(null, { status: 204 });
+    }
     if (route.kind === 'account') {
       const id = env.ACCOUNTS.idFromName(nameKey(route.name));
       return env.ACCOUNTS.get(id).handle(route.name, route.path, request);

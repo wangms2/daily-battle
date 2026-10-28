@@ -1,5 +1,6 @@
 // Versus rooms with friends (DESIGN.md §18): `#versus` creates or joins a
 // room, `#versus/CODE` is the room itself.
+import { useNotePlay } from '../lib/plays';
 import { cleanName, ERROR_TEXT, normalizeCode, type ErrorCode } from '@daily-battle/versus';
 import { lazy, Suspense, useEffect, useState, type ReactNode } from 'react';
 import { startVersusMusic, stopVersusMusic } from '../lib/audio';
@@ -238,6 +239,15 @@ function RoomScreen({
 }) {
   const room = useRoom(code, autoJoinAs);
   const { status, match } = room;
+  // A game of yours starting counts as a Link Battle played (lib/plays.ts).
+  const notePlay = useNotePlay();
+  const building =
+    status.kind === 'joined' &&
+    status.room.phase === 'build' &&
+    status.room.players.some((p) => p.id === status.you);
+  useEffect(() => {
+    if (building) notePlay('versus');
+  }, [building, notePlay]);
   const [name, setName] = useState(savedName);
   const clean = cleanName(name);
   // The room's lobby, opened from your battle (it carries on meanwhile).

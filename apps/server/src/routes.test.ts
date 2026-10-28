@@ -7,6 +7,11 @@ describe('matchRoute', () => {
     expect(matchRoute('GET', '/api/rooms/BCDFG/socket')).toEqual({ kind: 'socket', code: 'BCDFG' });
   });
 
+  it('routes a device’s ping, by POST only', () => {
+    expect(matchRoute('POST', '/api/ping')).toEqual({ kind: 'ping' });
+    expect(matchRoute('GET', '/api/ping')).toBeNull();
+  });
+
   it('routes an admin deleting a player, by DELETE only', () => {
     expect(matchRoute('DELETE', '/api/admin/accounts/Misty%20W')).toEqual({
       kind: 'adminDelete',

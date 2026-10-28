@@ -1,10 +1,11 @@
 // The admin page's API (DESIGN.md §18a): read-only views of the stats, behind
 // the ADMIN_TOKEN secret. Off (404) when the secret or the database is missing.
-//   GET /api/admin/stats?view=summary
+//   GET /api/admin/stats?view=summary[&today=<the admin's local date>]
 //   GET /api/admin/stats?view=games[&before=<started_at>]
 //   GET /api/admin/stats?view=game&id=<game id>
 //   GET /api/admin/stats?view=accounts[&q=<name search>][&before=<last_seen_at>]
 import { same, sha256 } from './accounts';
+import { playerSummary } from './players';
 import type { Db } from './stats';
 
 const DAY = 24 * 60 * 60 * 1000;
@@ -32,7 +33,7 @@ export async function adminRequest(
   const before = Number(params.get('before')) || Number.MAX_SAFE_INTEGER;
   switch (params.get('view')) {
     case 'summary':
-      return json(await summary(db, now));
+      return json(await summary(db, now, params.get('today')));
     case 'games':
       return json(await games(db, before));
     case 'game': {
@@ -57,7 +58,7 @@ const rows = async <T>(db: Db, sql: string, ...values: unknown[]) =>
 /** `?, ?, ?` for an IN list. */
 const marks = (n: number) => Array(n).fill('?').join(', ');
 
-export async function summary(db: Db, now: number) {
+export async function summary(db: Db, now: number, today?: string | null) {
   const week = now - 7 * DAY;
   const month = now - 30 * DAY;
   const weekDay = new Date(week).toISOString().slice(0, 10);
@@ -112,7 +113,8 @@ export async function summary(db: Db, now: number) {
        FROM account_games GROUP BY format ORDER BY format`,
     weekDay,
   );
-  return { games: gameTotals, perDay, formats, accounts: accountTotals, progress };
+  const players = await playerSummary(db, now, today);
+  return { games: gameTotals, perDay, formats, accounts: accountTotals, progress, players };
 }
 
 interface PlayerRow {

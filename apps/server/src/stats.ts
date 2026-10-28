@@ -177,8 +177,8 @@ export function accountSeen(
 
 /** Forgets a deleted account. */
 /**
- * Forgets a player entirely (an admin's delete): their account's stats and
- * their versus history (their game rows, every battle they were in, and their
+ * Forgets a player entirely (an admin's delete): their account's stats, the
+ * devices counted under it (players.ts), and their versus history (their game rows, every battle they were in, and their
  * name in winners). Returns how much went.
  */
 export async function forgetPlayer(db: Db, name: string) {
@@ -198,6 +198,7 @@ export async function forgetPlayer(db: Db, name: string) {
       key,
     ),
     wins: 0,
+    devices: await count(`SELECT COUNT(*) n FROM players WHERE account_key = ?`, key),
   };
   const won = (
     await db
@@ -212,6 +213,10 @@ export async function forgetPlayer(db: Db, name: string) {
   await db.batch([
     db.prepare(`DELETE FROM account_games WHERE key = ?`).bind(key),
     db.prepare(`DELETE FROM accounts WHERE key = ?`).bind(key),
+    db
+      .prepare(`DELETE FROM player_days WHERE id IN (SELECT id FROM players WHERE account_key = ?)`)
+      .bind(key),
+    db.prepare(`DELETE FROM players WHERE account_key = ?`).bind(key),
     db.prepare(`DELETE FROM game_players WHERE lower(name) = ?`).bind(key),
     db.prepare(`DELETE FROM battles WHERE lower(p1) = ? OR lower(p2) = ?`).bind(key, key),
     ...won.map((w) =>

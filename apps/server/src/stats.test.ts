@@ -1,8 +1,3 @@
-/// <reference types="node" />
-import { readFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { DatabaseSync } from 'node:sqlite';
 import { AI_ID, type Match, type Player, type RoomState } from '@daily-battle/versus';
 import { describe, expect, it } from 'vitest';
 import { accounts, adminRequest, game, games, summary } from './admin';
@@ -16,31 +11,8 @@ import {
   gameStarted,
   record,
   type Db,
-  type Stmt,
 } from './stats';
-
-/** D1's interface over an in-memory SQLite with the real migrations. */
-function memoryDb(): Db {
-  const sqlite = new DatabaseSync(':memory:');
-  const here = dirname(fileURLToPath(import.meta.url));
-  sqlite.exec(readFileSync(join(here, '../migrations/0001_stats.sql'), 'utf8'));
-  const stmt = (sql: string, values: unknown[] = []): Stmt => {
-    const s = () => sqlite.prepare(sql);
-    const v = values as never[];
-    return {
-      bind: (...more) => stmt(sql, more),
-      run: async () => s().run(...v),
-      all: async <T>() => ({ results: s().all(...v) as T[] }),
-      first: async <T>() => (s().get(...v) as T | undefined) ?? null,
-    };
-  };
-  return {
-    prepare: (sql) => stmt(sql),
-    batch: async (statements) => {
-      for (const st of statements) await st.run();
-    },
-  };
-}
+import { memoryDb } from './memoryDb';
 
 const T0 = Date.UTC(2025, 5, 2, 12);
 const DAY = 24 * 60 * 60 * 1000;
@@ -385,6 +357,7 @@ describe('forgetPlayer', () => {
       games: 3,
       battles: 1,
       wins: 2,
+      devices: 0,
     });
     const all = async (sql: string) => (await db.prepare(sql).all()).results;
     expect(await all(`SELECT key FROM accounts`)).toEqual([{ key: 'brock' }]);

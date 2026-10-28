@@ -723,6 +723,13 @@ The owner can see how the site is used: versus games and accounts. Data is kept 
 
 **Deleting a player.** There's no button for it. `DELETE /api/admin/accounts/<name>` with the same bearer token (curl) erases the name's Account object: its password, devices and save. It also removes the stats: the account's rows, and its versus history (its `game_players` rows, every battle it was in, and its name in `winners`). It returns what it found. The player's own browser keeps its local save, but that device can no longer sync to the account.
 
+**Players.** Counted anonymously, to see how many people play.
+
+- **On the device** (`lib/plays.ts`): a random id (a UUID), kept in `daily-battle:player`, apart from the save. It isn't synced or merged, so each device keeps its own. When the save grows, the device sends `POST /api/ping` with `{id, day, activity}`. Growing means a daily try that began in the last 10 minutes (another device's tries arriving by sync don't count), a lesson's progress, or a type trainer answer. Joining a Link Battle that starts building counts too. Activities are `daily-<format>`, `lessons-<format>`, `trainer-<format>` and `versus`. Each is sent at most once a day, and opening the site sends nothing. The ping carries `since`, the save's earliest day, so a player from before counting isn't counted as new. A signed-in device also sends its account. No storage means no id and nothing sent, and a failed send is dropped.
+- **On the server** (`players.ts`, migration `0002_players.sql`): `parsePing` checks the id, the activity, and the day (within a day of UTC's). `players` keeps each id's first day, last day and account; the account is linked only if it exists. `player_days` keeps one row per id, day and activity.
+- **On the admin page:** a person is an account, or a device without one. Overview shows players today, this week and in 30 days; new this week, and returning players; how many of last week's new players came back the next day; all players; players per day; and players per activity. The page sends its own local date (`&today=`), since players' days are local.
+- **Limits:** without an account, one person on two devices, or after clearing site data, counts twice. Pings can be faked, but they only touch these counts.
+
 ## 19. Gen 6 OU (added Oct 2026)
 
 A third daily game, built in seven phases the same way as Gen 5 (§17). Each phase kept Gen 4's and Gen 5's output byte-for-byte: seed keys, golden fixtures, set ids, schedules, and AI choices. Nothing in `GENERATOR_VERSION` or the AI changed for them; every new rule is gated on Gen 6 data or format.

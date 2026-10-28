@@ -10,10 +10,13 @@ export type Route =
   /** The admin page's stats (admin.ts). */
   | { kind: 'admin' }
   /** An admin deleting a player: their account and their history. */
-  | { kind: 'adminDelete'; name: string };
+  | { kind: 'adminDelete'; name: string }
+  /** A device noting what it played today (players.ts). */
+  | { kind: 'ping' };
 
 export function matchRoute(method: string, pathname: string): Route | null {
   if (pathname === '/api/rooms') return method === 'POST' ? { kind: 'create' } : null;
+  if (pathname === '/api/ping') return method === 'POST' ? { kind: 'ping' } : null;
   if (pathname === '/api/admin/stats') return method === 'GET' ? { kind: 'admin' } : null;
   const d = /^\/api\/admin\/accounts\/([^/]+)$/.exec(pathname);
   if (d) {

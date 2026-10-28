@@ -1,6 +1,7 @@
 // The admin page (#admin, DESIGN.md §18a): versus games and accounts from the
 // stats API, behind the admin password. Not linked from the app; loaded only
 // when opened.
+import { dayKey } from '@daily-battle/gen/dates';
 import { FORMATS } from '@daily-battle/data/formats';
 import clsx from 'clsx';
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
@@ -28,6 +29,18 @@ interface Summary {
     coach: number;
     learners: number;
   }[];
+  /** Everyone who plays, counted anonymously per device or account (server players.ts). */
+  players?: {
+    total: number;
+    today: number;
+    week: number;
+    month: number;
+    newWeek: number;
+    returningWeek: number;
+    nextDay: { cohort: number; back: number };
+    perDay: { day: string; players: number }[];
+    activities: { activity: string; players: number }[];
+  };
 }
 
 class Unauthorized extends Error {}
@@ -89,7 +102,8 @@ export default function AdminPage() {
     }),
     [token, signOut],
   );
-  const summary = useQuery<Summary>(api, token ? 'view=summary' : null);
+  // Players send their local dates, so "today" is the admin's own.
+  const summary = useQuery<Summary>(api, token ? `view=summary&today=${dayKey(new Date())}` : null);
 
   if (!token) {
     return (
@@ -206,11 +220,72 @@ function Stat({ label, value, sub }: { label: string; value: ReactNode; sub?: Re
   );
 }
 
+/** "daily-gen3ou" as "Gen 3 daily", and so on. */
+function activityName(activity: string) {
+  if (activity === 'versus') return 'Link Battle';
+  const [kind, format] = activity.split('-');
+  const what = { daily: 'daily', lessons: 'lessons', trainer: 'type trainer' }[kind ?? ''];
+  return `${gen(format)} ${what ?? kind}`;
+}
+
+/** Everyone who plays: a person is an account, or a device without one. */
+function Players({ p }: { p: NonNullable<Summary['players']> }) {
+  const most = Math.max(1, ...p.perDay.map((d) => d.players));
+  const back = p.nextDay.cohort ? `${Math.round((100 * p.nextDay.back) / p.nextDay.cohort)}%` : '—';
+  return (
+    <>
+      <section className="grid grid-cols-2 gap-3 md:grid-cols-4">
+        <Stat
+          label="Players today"
+          value={p.today}
+          sub={`${p.week} this week · ${p.month} in 30 days`}
+        />
+        <Stat
+          label="New this week"
+          value={p.newWeek}
+          sub={`${p.returningWeek} returning players`}
+        />
+        <Stat
+          label="Back the next day"
+          value={back}
+          sub={`${p.nextDay.back} of ${p.nextDay.cohort} new players last week`}
+        />
+        <Stat label="All players" value={p.total} sub="since counting began" />
+      </section>
+
+      <section className="card flex flex-col gap-2 p-4">
+        <h2 className="text-[15px] font-semibold">Players per day (30 days)</h2>
+        <div className="flex h-32 items-end gap-[3px]" role="img" aria-label="Players per day">
+          {p.perDay.map((d) => (
+            <div
+              key={d.day}
+              title={`${d.day}: ${d.players}`}
+              className="flex-1 rounded-t-sm bg-accent"
+              style={{ height: `${(100 * d.players) / most}%`, minHeight: d.players ? 3 : 1 }}
+            />
+          ))}
+        </div>
+        {p.activities.length > 0 && (
+          <p className="text-[13px] text-muted">
+            In 30 days:{' '}
+            {p.activities.map((a) => `${activityName(a.activity)} ${a.players}`).join(' · ')}
+          </p>
+        )}
+        <p className="text-[12px] text-muted">
+          Counted per device, or once per account when signed in. Opening the site without playing
+          doesn’t count.
+        </p>
+      </section>
+    </>
+  );
+}
+
 function Overview({ s }: { s: Summary }) {
   const days = s.perDay;
   const most = Math.max(1, ...days.map((d) => d.games));
   return (
     <>
+      {s.players && <Players p={s.players} />}
       <section className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <Stat
           label="Versus games"
