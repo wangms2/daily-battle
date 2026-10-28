@@ -248,6 +248,90 @@ describe('sound', () => {
     expect(gains.at(-1)!.gain.value).toBeCloseTo(0.6 * 0.5);
   });
 
+  /** A Web Audio stand-in: `stuck` never resumes; `clock` is its currentTime (seconds). */
+  function contexts({ stuck = false, clock }: { stuck?: boolean; clock: () => number }) {
+    const made: { state: string; closed: boolean }[] = [];
+    vi.stubGlobal(
+      'AudioContext',
+      class {
+        state = stuck ? 'interrupted' : 'running';
+        closed = false;
+        destination = {};
+        constructor() {
+          made.push(this);
+        }
+        get currentTime() {
+          return clock();
+        }
+        resume = () => Promise.resolve();
+        close = () => ((this.closed = true), Promise.resolve());
+        createMediaElementSource = () => ({ connect: (n: unknown) => n, disconnect() {} });
+        createGain = () => ({ gain: { value: 1 }, connect: (n: unknown) => n, disconnect() {} });
+      },
+    );
+    return made;
+  }
+
+  it('rebuilds Web Audio that a tap can’t wake, and the music picks up where it was', async () => {
+    const made = contexts({ stuck: true, clock: () => 0 });
+    const audio = await engine();
+    audio.configureAudio(ON);
+    audio.startMusic('gen3ou');
+    FakeAudio.made[0]!.currentTime = 42;
+    const stop = audio.menuSounds();
+    try {
+      document.dispatchEvent(new Event('touchend'));
+      vi.advanceTimersByTime(400);
+      expect(made).toHaveLength(2);
+      expect(made[0]!.closed).toBe(true);
+      const now = FakeAudio.made.at(-1)!;
+      expect(now).not.toBe(FakeAudio.made[0]);
+      expect(now.src).toBe(FakeAudio.made[0]!.src);
+      expect(now.currentTime).toBe(42);
+      expect(FakeAudio.made[0]!.paused).toBe(true);
+    } finally {
+      stop();
+    }
+  });
+
+  it('after the app was away, rebuilds Web Audio that says running but has stopped', async () => {
+    const made = contexts({ clock: () => 5 });
+    const audio = await engine();
+    audio.configureAudio(ON);
+    audio.startMusic('gen3ou');
+    const stop = audio.menuSounds();
+    try {
+      // Running, and no check without having been away.
+      document.dispatchEvent(new Event('touchend'));
+      vi.advanceTimersByTime(400);
+      expect(made).toHaveLength(1);
+      // Back from the background: the next tap finds its clock stopped.
+      document.dispatchEvent(new Event('visibilitychange'));
+      document.dispatchEvent(new Event('touchend'));
+      vi.advanceTimersByTime(400);
+      expect(made).toHaveLength(2);
+    } finally {
+      stop();
+    }
+  });
+
+  it('leaves Web Audio alone when it came back fine', async () => {
+    const made = contexts({ clock: () => Date.now() / 1000 });
+    const audio = await engine();
+    audio.configureAudio(ON);
+    audio.startMusic('gen3ou');
+    const stop = audio.menuSounds();
+    try {
+      document.dispatchEvent(new Event('visibilitychange'));
+      document.dispatchEvent(new Event('touchend'));
+      vi.advanceTimersByTime(400);
+      expect(made).toHaveLength(1);
+      expect(FakeAudio.made).toHaveLength(1);
+    } finally {
+      stop();
+    }
+  });
+
   it('wakes Web Audio and a held-back track on the next tap', async () => {
     const resume = vi.fn(() => Promise.resolve());
     vi.stubGlobal(

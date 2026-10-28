@@ -252,10 +252,12 @@ function stopTrack() {
   track = null;
 }
 
-function startTrack(key: string) {
+/** Starts a track, fading in (from `at` seconds in, when picking up where it was). */
+function startTrack(key: string, at = 0) {
   if (track?.key === key) return;
   fadeOut();
   const now = loop(key);
+  if (at) now.currentTime = at;
   track = { key, now, next: null };
   setVolume(now, 0);
   play(now);
@@ -316,12 +318,55 @@ export function playCry(species: string, format: string, { faint = false } = {})
 
 /**
  * Called on every tap and key: browsers (iOS above all) only let sound start from
- * one. Wakes Web Audio and starts a track the browser held back.
+ * one. Wakes Web Audio and starts a track the browser held back. After the app
+ * was away, or while Web Audio isn't running, it also checks Web Audio came back.
  */
 function wake(): void {
   if (!settings.sound) return;
-  if (context && context.state !== 'running') void context.resume().catch(() => {});
+  const ctx = context;
+  if (ctx && ctx.state !== 'running') void ctx.resume().catch(() => {});
   if (track?.now.paused && !document.hidden) play(track.now);
+  if (ctx && (cameBack || ctx.state !== 'running')) check(ctx);
+  cameBack = false;
+}
+
+/** The app was in the background since the last tap (iOS may have stopped Web Audio). */
+let cameBack = false;
+let checking = false;
+/** How long after a tap Web Audio should be running, its clock moving. */
+const CHECK_MS = 400;
+
+/**
+ * iOS can leave Web Audio stuck after the app was away: still suspended after a
+ * tap, or "running" with its clock stopped and nothing coming out. Either way
+ * it's rebuilt, and the music picks up where it was.
+ */
+function check(ctx: AudioContext) {
+  if (checking) return;
+  checking = true;
+  const from = ctx.currentTime;
+  setTimeout(() => {
+    checking = false;
+    if (ctx !== context || document.hidden || !settings.sound) return;
+    // Safari's own state, 'interrupted', isn't in the types.
+    const state = ctx.state as string;
+    if (state !== 'running' || ctx.currentTime <= from) rebuild();
+  }, CHECK_MS);
+}
+
+/** A new Web Audio graph in place of a stuck one; the next tap wakes it. */
+function rebuild() {
+  const old = context;
+  const playing = track ? { key: track.key, at: track.now.currentTime } : null;
+  stopTrack();
+  if (effect) unplug(effect);
+  if (select) unplug(select);
+  effect = null;
+  select = null;
+  context = null;
+  master = null;
+  void old?.close?.().catch(() => {});
+  if (playing) startTrack(playing.key, playing.at);
 }
 
 /** Web Audio, made on first use (everything that plays shares it). */
@@ -477,14 +522,20 @@ export function playChime(): void {
 
 // Music pauses with the tab and picks up where it was when the player comes back.
 if (typeof document !== 'undefined') {
+  const back = () => {
+    // iOS suspends Web Audio in the background; the next tap checks it came back.
+    cameBack = true;
+    if (!track || !settings.sound) return;
+    if (context && context.state !== 'running') void context.resume().catch(() => {});
+    [track.now, track.next].forEach((e) => e && play(e));
+  };
   document.addEventListener('visibilitychange', () => {
-    if (!track) return;
-    const els = [track.now, track.next].filter((e): e is HTMLAudioElement => !!e);
-    if (document.hidden) els.forEach((e) => e.pause());
-    else if (settings.sound) {
-      // iOS suspends Web Audio in the background.
-      if (context && context.state !== 'running') void context.resume().catch(() => {});
-      els.forEach(play);
-    }
+    if (!document.hidden) return back();
+    track?.now.pause();
+    track?.next?.pause();
+  });
+  // A home-screen app can come back from memory without a visibility change.
+  window.addEventListener('pageshow', (e) => {
+    if (e.persisted) back();
   });
 }
