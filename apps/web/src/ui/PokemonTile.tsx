@@ -147,7 +147,8 @@ function Sprite({ species }: { species: string }) {
 
 /**
  * A compact horizontal Pokémon card for wide screens: sprite on the left,
- * name, types and role on the right, so a whole pool scans like a list.
+ * name and types on the right, so a whole pool scans like a list. (Its sets and
+ * roles are in the details panel beside it.)
  */
 export function PokemonRow({
   species,
@@ -156,7 +157,6 @@ export function PokemonRow({
   selected = false,
   dimmed = false,
   badge,
-  role,
   label,
   pop = false,
   active = false,
@@ -167,8 +167,6 @@ export function PokemonRow({
   selected?: boolean;
   dimmed?: boolean;
   badge?: ReactNode;
-  /** The set's role, under the types. */
-  role: string;
   label: string;
   pop?: boolean;
   /** Shown in the details panel. */
@@ -190,14 +188,15 @@ export function PokemonRow({
         onClick={onTap}
         aria-pressed={selected}
         aria-label={label}
-        className="flex h-[76px] w-full items-center gap-2 rounded-card py-1.5 pr-8 pl-2 text-left focus-visible:outline-2 focus-visible:outline-accent"
+        // Low enough that four rows leave the details panel room for a whole set.
+        className="flex h-[52px] w-full items-center gap-2 rounded-card pr-8 pl-2 text-left focus-visible:outline-2 focus-visible:outline-accent"
       >
-        <span className="grid size-16 shrink-0 place-items-center">
+        <span className="grid size-12 shrink-0 place-items-center">
           <img
             src={getSprite(species)}
             alt=""
             draggable={false}
-            className="pixelated max-h-16 max-w-16 object-contain"
+            className="pixelated max-h-12 max-w-12 object-contain"
           />
         </span>
         <span className="flex min-w-0 flex-col gap-0.5">
@@ -207,7 +206,6 @@ export function PokemonRow({
               <TypeBadge key={t} type={t} size="sm" />
             ))}
           </span>
-          <span className="truncate text-[12px] text-muted">{role}</span>
         </span>
       </button>
       {badge && <span className="pointer-events-none absolute top-1 left-1">{badge}</span>}

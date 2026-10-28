@@ -10,6 +10,7 @@ import {
   abilityInfo,
   formatEvs,
   itemInfo,
+  megaFor,
   setsOf,
   shortLabel,
   speciesInfo,
@@ -29,14 +30,14 @@ import { MegaPreview } from '../ui/MegaPreview';
  * hover) floats the whole text over it. It never changes the layout, so the
  * sheet never has to scroll.
  */
-function Description({ text }: { text: string }) {
+function Description({ text, lines = 2 }: { text: string; lines?: 1 | 2 }) {
   const { container, isOpen, trigger } = useDetailCards<HTMLDivElement>();
   const [clamped, setClamped] = useState(false);
   const el = useRef<HTMLParagraphElement>(null);
   useLayoutEffect(() => {
     const p = el.current;
     if (p) setClamped(p.scrollHeight > p.clientHeight + 1);
-  }, [text]);
+  }, [text, lines]);
   const shown = clamped && isOpen(0);
   return (
     <div ref={container} className="relative mt-1.5">
@@ -44,7 +45,8 @@ function Description({ text }: { text: string }) {
         ref={el}
         {...(clamped ? { ...trigger(0), role: 'button', tabIndex: 0, 'aria-label': text } : {})}
         className={clsx(
-          'line-clamp-2 text-[14px] leading-snug text-muted',
+          lines === 1 ? 'line-clamp-1' : 'line-clamp-2',
+          'text-[14px] leading-snug text-muted',
           clamped && 'cursor-pointer',
         )}
       >
@@ -82,7 +84,8 @@ export function SetCard({
           </span>
         )}
       </div>
-      <Description key={set.id} text={set.description} />
+      {/* A Mega set's preview needs the room: one line here, the rest a tap away. */}
+      <Description key={set.id} text={set.description} lines={megaFor(species, set) ? 1 : 2} />
       <MoveList moves={set.moves} className="mt-2" />
       <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-4 gap-y-0.5 text-[13px]">
         <dt className="text-muted">Item</dt>

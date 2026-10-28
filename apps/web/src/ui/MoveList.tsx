@@ -21,16 +21,29 @@ export function MoveList({ moves, className }: { moves: string[]; className?: st
               type="button"
               {...trigger(i)}
               aria-describedby={shown ? `move-info-${i}` : undefined}
+              aria-label={m}
               className="move-chip w-full truncate rounded-badge px-2.5 py-1.5 text-left text-[13px] font-medium"
               style={typeStyle(m)}
             >
-              {m}
+              <MoveName name={m} />
             </button>
             {shown && <MoveCard id={`move-info-${i}`} name={m} right={i % 2 === 1} />}
           </li>
         );
       })}
     </ul>
+  );
+}
+
+/** "Hidden Power Electric" is long for a chip: "Hidden Power" and its type's badge. */
+function MoveName({ name }: { name: string }) {
+  const hp = /^Hidden Power (\w+)$/.exec(name);
+  if (!hp) return name;
+  return (
+    <span className="flex items-center gap-1">
+      Hidden Power
+      <TypeBadge type={hp[1]!} size="sm" />
+    </span>
   );
 }
 

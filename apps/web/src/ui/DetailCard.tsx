@@ -9,11 +9,14 @@ import { useDetailCards } from './useDetailCards';
 export function DetailCardBox({
   id,
   right = false,
+  below = false,
   className = 'max-w-[min(16rem,80vw)]',
   children,
 }: {
   id: string;
   right?: boolean;
+  /** Open under the trigger (at the top of a scrolling panel, where above is cut off). */
+  below?: boolean;
   /** Width limits; the default fits a phone. */
   className?: string;
   children: ReactNode;
@@ -23,7 +26,8 @@ export function DetailCardBox({
       id={id}
       role="tooltip"
       className={clsx(
-        'card absolute bottom-full z-20 mb-1.5 w-64 p-2.5 text-left shadow-lg',
+        'card absolute z-20 w-64 p-2.5 text-left shadow-lg',
+        below ? 'top-full mt-1.5' : 'bottom-full mb-1.5',
         className,
         right ? 'right-0' : 'left-0',
       )}
@@ -42,12 +46,14 @@ export function Term({
   desc,
   kind,
   right = false,
+  below = false,
   className,
 }: {
   name: string;
   desc: string | undefined;
-  kind: 'Item' | 'Ability';
+  kind: 'Item' | 'Ability' | 'Pokédex';
   right?: boolean;
+  below?: boolean;
   className?: string;
 }) {
   const { container, isOpen, trigger } = useDetailCards<HTMLSpanElement>();
@@ -68,7 +74,7 @@ export function Term({
         {name}
       </button>
       {isOpen(0) && (
-        <DetailCardBox id={id} right={right}>
+        <DetailCardBox id={id} right={right} below={below}>
           <div className="flex items-baseline gap-1.5">
             <span className="truncate text-[14px] font-semibold">{name}</span>
             <span className="text-[12px] text-muted">{kind}</span>

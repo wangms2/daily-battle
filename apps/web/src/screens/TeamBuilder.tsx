@@ -14,6 +14,7 @@ import {
   ONE_MEGA_MESSAGE,
   randomTeam,
   sameSpecies,
+  shortLabel,
   topSet,
   type Slot,
 } from '../lib/data';
@@ -228,7 +229,7 @@ export function TeamBuilder({
                     key={slot.species}
                     src={getSprite(slot.species, 'icon')}
                     alt=""
-                    className="pixelated -mr-2 h-8 w-10 shrink-0 object-contain"
+                    className="pixelated -mr-2.5 h-8 w-10 shrink-0 object-contain"
                   />
                 ))}
               </span>
@@ -259,7 +260,11 @@ export function TeamBuilder({
     <button
       type="button"
       onClick={() => setChecklistOpen(true)}
-      className="flex h-8 shrink-0 items-center gap-2 rounded-xl px-1 text-left text-[13px]"
+      // Wide: the team panel has height to spare, so what's missing wraps instead of cutting off.
+      className={clsx(
+        'flex shrink-0 items-center gap-2 rounded-xl px-1 text-left text-[13px]',
+        wide ? 'min-h-8 py-1' : 'h-8',
+      )}
       aria-label={`Team checklist, ${done.length} of 5 covered. Show details`}
     >
       <span
@@ -270,7 +275,7 @@ export function TeamBuilder({
       >
         {done.length}/5
       </span>
-      <span className="min-w-0 flex-1 truncate text-muted">
+      <span className={clsx('min-w-0 flex-1 text-muted', !wide && 'truncate')}>
         {missing.length ? (
           <>
             Missing{' '}
@@ -310,7 +315,6 @@ export function TeamBuilder({
                   ? `${species}: one per team with ${clashOf(species)}`
                   : `Add ${species} to team`
             }
-            role={topSet(species).label}
             active={viewing === species}
           />
         );
@@ -350,9 +354,10 @@ export function TeamBuilder({
     <div className="game-ui flex h-full flex-col">
       {topBar}
       {wide ? (
-        <main className="grid min-h-0 flex-1 grid-cols-[1fr_380px] grid-rows-[minmax(0,1fr)] items-start gap-6 px-6 pb-6 pt-4">
+        <main className="grid min-h-0 flex-1 grid-cols-[1fr_360px] grid-rows-[minmax(0,1fr)] items-start gap-6 px-6 pb-6 pt-4">
           <section className="flex min-h-0 flex-col gap-3 self-stretch overflow-y-auto">
-            <SectionLabel>This week’s pool · pick 6</SectionLabel>
+            {/* The top bar names the week and the team panel counts the six: the height goes to the details. */}
+            <h2 className="sr-only">This week’s pool</h2>
             {poolGrid}
             <DetailsPanel
               key={viewing}
@@ -380,9 +385,10 @@ export function TeamBuilder({
             >
               Your team
             </SectionLabel>
-            <ul className="flex flex-col gap-1.5">
+            {/* Slots give up height (to 40px) before the Lock button would leave the screen. */}
+            <ul className="flex min-h-0 shrink flex-col gap-1.5">
               {traySlots.map((slot, i) => (
-                <li key={i} className="h-14">
+                <li key={i} className="h-14 min-h-10 shrink">
                   {slot ? (
                     <div
                       className={clsx(
@@ -405,7 +411,7 @@ export function TeamBuilder({
                             {slot.species}
                           </span>
                           <span className="block truncate text-[13px] text-muted">
-                            {findSet(slot)?.label}
+                            {shortLabel(findSet(slot)?.label ?? '')}
                           </span>
                         </span>
                       </button>

@@ -160,8 +160,9 @@ test('wide screens show a Pokédex entry, final stats and item icons; phones kee
     const panel = page.getByRole('region', { name: / details$/ });
     await expect(panel.getByLabel('Base and final stats')).toBeVisible();
     await expect(panel.locator('img[src*="/items/"]').first()).toBeAttached();
-    // The Pokédex entry loads on demand.
-    await expect(panel.locator('p.italic')).not.toBeEmpty();
+    // The Pokédex entry loads on demand, and opens from the name.
+    await panel.getByRole('heading').getByRole('button').click();
+    await expect(panel.getByRole('tooltip')).toContainText('Pokédex');
   }
 });
 
