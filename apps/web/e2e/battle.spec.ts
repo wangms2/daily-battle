@@ -440,10 +440,10 @@ async function swapOne(page: Page, n: number) {
     .nth(n)
     .click();
   await page
-    .getByRole('button', { name: /^Bring in / })
+    .getByRole('button', { name: /^Swap in / })
     .first()
     .click();
-  await page.getByRole('button', { name: 'Bring in' }).first().click();
+  await page.getByRole('button', { name: /^Bring in / }).click();
   await page.getByRole('button', { name: 'Make change' }).click();
 }
 

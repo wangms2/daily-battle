@@ -281,12 +281,15 @@ describe('daily brief', () => {
     ).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: '1 change left' }));
-    await user.click(screen.getByRole('button', { name: `Change ${team[0]!.species}` }));
     const bench = schedule.pool.species.find((s) => !team.some((t) => t.species === s))!;
+    // Either order: the bench Pokémon first, then who it replaces.
+    await user.click(screen.getByRole('button', { name: `Swap in ${bench}` }));
+    expect(screen.getByRole('button', { name: `Tap who ${bench} replaces` })).toBeDisabled();
+    // Nothing covers the opponent while you decide.
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.getAllByRole('button', { name: /^About / })).toHaveLength(6);
+    await user.click(screen.getByRole('button', { name: `Change ${team[0]!.species}` }));
     await user.click(screen.getByRole('button', { name: `Bring in ${bench}` }));
-    await user.click(
-      within(await screen.findByRole('dialog')).getAllByRole('button', { name: 'Bring in' })[0]!,
-    );
     await user.click(await screen.findByRole('button', { name: 'Make change' }));
     expect(await screen.findByText('Change used on Normal')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: '1 change left' })).not.toBeInTheDocument();
@@ -421,10 +424,8 @@ describe('results and streak', () => {
     const bench = schedule.pool.species.find((s) => !team.some((t) => t.species === s))!;
     await user.click(screen.getByRole('button', { name: 'Practice changes' }));
     await user.click(screen.getByRole('button', { name: `Change ${team[1]!.species}` }));
+    await user.click(screen.getByRole('button', { name: `Swap in ${bench}` }));
     await user.click(screen.getByRole('button', { name: `Bring in ${bench}` }));
-    await user.click(
-      within(await screen.findByRole('dialog')).getAllByRole('button', { name: 'Bring in' })[0]!,
-    );
     // Free and for today only: no confirm.
     await user.click(await screen.findByRole('button', { name: 'Cancel' }));
     expect(await screen.findByRole('button', { name: `Lead with ${bench}` })).toBeInTheDocument();

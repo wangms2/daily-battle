@@ -121,10 +121,11 @@ for (const scheme of ['light', 'dark'] as const) {
       .click();
     await shot(page, '12-brief-replace', project);
     await page
-      .getByRole('button', { name: /^Bring in / })
+      .getByRole('button', { name: /^Swap in / })
       .first()
       .click();
-    await page.getByRole('button', { name: 'Bring in' }).first().click();
+    await shot(page, '12b-brief-swap-pick', project);
+    await page.getByRole('button', { name: /^Bring in / }).click();
     await shot(page, '13-change-confirm', project);
     await page.getByRole('button', { name: 'Make change' }).click();
     await expect(page.getByText('Change used')).toBeVisible();

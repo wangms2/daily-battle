@@ -21,6 +21,7 @@ export function PokemonTile({
   label,
   pop = false,
   showTypes = true,
+  showName = true,
   infoLabel,
   onEdit,
   editLabel,
@@ -39,6 +40,8 @@ export function PokemonTile({
   label: string;
   pop?: boolean;
   showTypes?: boolean;
+  /** Off for a compact row: the sprite alone (the label still names it). */
+  showName?: boolean;
   infoLabel?: string;
   /** A pencil in the corner instead of ⓘ (e.g. change a picked Pokémon's set). */
   onEdit?: () => void;
@@ -59,6 +62,8 @@ export function PokemonTile({
         selected && 'is-selected',
         dimmed && 'opacity-45',
         pop && 'animate-pop',
+        // A tile's hover card must sit over the tiles after it.
+        hoverCard && hovered && 'z-30',
       )}
     >
       <button
@@ -71,14 +76,16 @@ export function PokemonTile({
         <span className="flex min-h-0 w-full flex-1 items-center justify-center">
           <Sprite species={species} />
         </span>
-        <span
-          className={clsx(
-            'w-full truncate text-center leading-tight font-semibold',
-            species.length >= 9 ? 'text-[11.5px] tracking-tight' : 'text-[12.5px]',
-          )}
-        >
-          {species}
-        </span>
+        {showName && (
+          <span
+            className={clsx(
+              'w-full truncate text-center leading-tight font-semibold',
+              species.length >= 9 ? 'text-[11.5px] tracking-tight' : 'text-[12.5px]',
+            )}
+          >
+            {species}
+          </span>
+        )}
         {showTypes && (
           <span className="flex gap-0.5">
             {types.map((t) => (

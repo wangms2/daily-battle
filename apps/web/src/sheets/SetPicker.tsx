@@ -4,7 +4,7 @@
 // one, starts selected, so a single tap confirms it. Nothing scrolls.
 import type { SetEntry } from '@daily-battle/data';
 import clsx from 'clsx';
-import { useLayoutEffect, useRef, useState, type KeyboardEvent } from 'react';
+import { useId, useLayoutEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { useDetailCards } from '../ui/useDetailCards';
 import {
   abilityInfo,
@@ -114,43 +114,34 @@ export function SetCard({
   );
 }
 
-export function SetPicker({
-  species,
-  open,
-  onOpenChange,
-  currentSetId,
-  onChoose,
-  onRemove,
-  chooseLabel = 'Use this set',
-  title,
-  blocked,
-}: {
-  species: string | null;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  /** The set it has now, if any; it starts selected. */
-  currentSetId?: string;
-  /** Omit for a read-only view. */
-  onChoose?: (setId: string) => void;
-  onRemove?: () => void;
-  chooseLabel?: string;
-  title?: string;
-  /** Why a set can't be chosen (one Mega per team), if it can't. */
-  blocked?: (setId: string) => string | undefined;
-}) {
-  const sets = species ? setsOf(species) : [];
-  const common = species && sets.length ? topSet(species).id : undefined;
-  const [selected, setSelected] = useState(
-    sets.some((s) => s.id === currentSetId) ? currentSetId! : common,
-  );
-  const tabs = useRef<(HTMLButtonElement | null)[]>([]);
+/** The set it starts on: the current one, else the most used. */
+export function initialSet(species: string, currentSetId?: string): string {
+  const sets = setsOf(species);
+  return sets.some((s) => s.id === currentSetId) ? currentSetId! : topSet(species).id;
+}
 
-  if (!species) return null;
+/**
+ * A species' sets as tabs over the selected set's card: the body of the set
+ * picker, also shown inline (the daily brief's change panel).
+ */
+export function SetChooser({
+  species,
+  currentSetId,
+  selected,
+  onSelect,
+}: {
+  species: string;
+  currentSetId?: string;
+  selected: string;
+  onSelect: (setId: string) => void;
+}) {
+  const sets = setsOf(species);
+  const common = topSet(species).id;
+  const tabs = useRef<(HTMLButtonElement | null)[]>([]);
+  const id = useId();
   const info = speciesInfo(species);
   const set = sets.find((s) => s.id === selected) ?? sets[0]!;
   const badge = set.id === currentSetId ? 'Current' : set.id === common ? 'Most used' : null;
-  const unchanged = set.id === currentSetId;
-  const why = unchanged ? undefined : blocked?.(set.id);
 
   // Arrow keys move between tabs (WAI-ARIA tabs pattern).
   const onKey = (e: KeyboardEvent, i: number) => {
@@ -158,12 +149,12 @@ export function SetPicker({
     if (!step) return;
     e.preventDefault();
     const next = (i + step + sets.length) % sets.length;
-    setSelected(sets[next]!.id);
+    onSelect(sets[next]!.id);
     tabs.current[next]?.focus();
   };
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange} title={title ?? `${species} · pick a set`}>
+    <>
       <div className="mb-2 flex items-center gap-2">
         <img
           src={getSprite(species, 'icon')}
@@ -192,12 +183,12 @@ export function SetPicker({
               }}
               type="button"
               role="tab"
-              id={`set-tab-${s.id}`}
+              id={`${id}-tab-${s.id}`}
               aria-selected={s.id === set.id}
-              aria-controls="set-panel"
+              aria-controls={`${id}-panel`}
               aria-label={s.label}
               tabIndex={s.id === set.id ? 0 : -1}
-              onClick={() => setSelected(s.id)}
+              onClick={() => onSelect(s.id)}
               onKeyDown={(e) => onKey(e, i)}
               className={clsx(
                 'flex min-h-11 items-center justify-center rounded-[6px] px-1.5 py-1 text-center text-[13px] leading-tight font-semibold',
@@ -213,11 +204,57 @@ export function SetPicker({
       )}
       <div
         role={sets.length > 1 ? 'tabpanel' : undefined}
-        id="set-panel"
-        aria-labelledby={sets.length > 1 ? `set-tab-${set.id}` : undefined}
+        id={`${id}-panel`}
+        aria-labelledby={sets.length > 1 ? `${id}-tab-${set.id}` : undefined}
       >
         <SetCard species={species} set={set} badge={badge} />
       </div>
+    </>
+  );
+}
+
+export function SetPicker({
+  species,
+  open,
+  onOpenChange,
+  currentSetId,
+  onChoose,
+  onRemove,
+  chooseLabel = 'Use this set',
+  title,
+  blocked,
+}: {
+  species: string | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  /** The set it has now, if any; it starts selected. */
+  currentSetId?: string;
+  /** Omit for a read-only view. */
+  onChoose?: (setId: string) => void;
+  onRemove?: () => void;
+  chooseLabel?: string;
+  title?: string;
+  /** Why a set can't be chosen (one Mega per team), if it can't. */
+  blocked?: (setId: string) => string | undefined;
+}) {
+  const [selected, setSelected] = useState(() =>
+    species ? initialSet(species, currentSetId) : '',
+  );
+
+  if (!species) return null;
+  const sets = setsOf(species);
+  const set = sets.find((s) => s.id === selected) ?? sets[0]!;
+  const unchanged = set.id === currentSetId;
+  const why = unchanged ? undefined : blocked?.(set.id);
+
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange} title={title ?? `${species} · pick a set`}>
+      <SetChooser
+        species={species}
+        currentSetId={currentSetId}
+        selected={set.id}
+        onSelect={setSelected}
+      />
       {onChoose && (
         <>
           <Button
