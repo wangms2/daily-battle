@@ -295,18 +295,52 @@ describe('sound', () => {
       document.body.innerHTML = '';
     }
   });
-  it('plays the select sound as a control is pressed, not again when the click follows', async () => {
+  it('plays the select sound as a mouse presses a control, not again when the click follows', async () => {
     const audio = await engine();
     audio.configureAudio(ON);
     document.body.innerHTML = '<button>Play</button>';
     const stop = audio.menuSounds();
     try {
       const button = document.querySelector('button')!;
-      button.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, button: 0 }));
+      const down = { bubbles: true, button: 0, pointerType: 'mouse' };
+      button.dispatchEvent(new PointerEvent('pointerdown', down));
       expect(FakeAudio.made).toHaveLength(1);
       // The pointer's own click (detail 1) doesn't play it a second time.
       button.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
       expect(FakeAudio.made).toHaveLength(1);
+    } finally {
+      stop();
+      document.body.innerHTML = '';
+    }
+  });
+  it('plays the select sound as a touch lands, but in a scrolling list only on a tap', async () => {
+    const audio = await engine();
+    audio.configureAudio(ON);
+    document.body.innerHTML =
+      '<button id="menu">Play</button>' +
+      '<div id="list" style="overflow-y: auto"><button>Lesson 1</button><button>Lesson 2</button></div>';
+    // jsdom has no layout: the list is taller than its box, so it scrolls.
+    const list = document.getElementById('list')!;
+    Object.defineProperty(list, 'scrollHeight', { value: 900 });
+    Object.defineProperty(list, 'clientHeight', { value: 400 });
+    const stop = audio.menuSounds();
+    try {
+      const touch = { bubbles: true, button: 0, pointerType: 'touch' };
+      const tap = new MouseEvent('click', { bubbles: true, detail: 1 });
+      // Most screens don't scroll: the sound starts as the finger lands, once.
+      const menu = document.getElementById('menu')!;
+      menu.dispatchEvent(new PointerEvent('pointerdown', touch));
+      expect(FakeAudio.made).toHaveLength(1);
+      menu.dispatchEvent(tap);
+      expect(FakeAudio.made).toHaveLength(1);
+      // A finger lands on a lesson and scrolls the list: no click, no sound.
+      const [first, second] = list.querySelectorAll('button');
+      first!.dispatchEvent(new PointerEvent('pointerdown', touch));
+      expect(FakeAudio.made).toHaveLength(1);
+      // A real tap there: the sound comes with its click.
+      second!.dispatchEvent(new PointerEvent('pointerdown', touch));
+      second!.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
+      expect(FakeAudio.made).toHaveLength(2);
     } finally {
       stop();
       document.body.innerHTML = '';

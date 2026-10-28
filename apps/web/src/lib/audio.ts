@@ -400,25 +400,45 @@ export function playSelect(): void {
 /** What counts as a control, for the select sound. */
 const CONTROL = 'button, a[href], [role="button"], [role="radio"], [role="switch"], [role="tab"]';
 
+/** Whether `el` is inside something that scrolls right now (a touch there may be a scroll). */
+function inScroller(el: Element): boolean {
+  for (let p = el.parentElement; p; p = p.parentElement) {
+    const { overflowX, overflowY } = getComputedStyle(p);
+    const scrolls = (o: string) => o === 'auto' || o === 'scroll';
+    if (scrolls(overflowY) && p.scrollHeight > p.clientHeight + 1) return true;
+    if (scrolls(overflowX) && p.scrollWidth > p.clientWidth + 1) return true;
+  }
+  const page = document.scrollingElement;
+  return !!page && page.scrollHeight > page.clientHeight + 1;
+}
+
 /**
  * Plays the select sound on every tap of a control, in menus and battles alike
  * (moves, switches, sheets). Returns the cleanup.
  */
 export function menuSounds(root: Document = document): () => void {
-  const onControl = (target: EventTarget | null) => {
+  const control = (target: EventTarget | null) => {
     const el = (target as Element | null)?.closest?.(CONTROL);
-    if (!el || el.matches(':disabled, [aria-disabled="true"]')) return;
-    playSelect();
+    return el && !el.matches(':disabled, [aria-disabled="true"]') ? el : null;
   };
-  // The sound starts as the control is pressed, not when it's let go.
+  const onControl = (target: EventTarget | null) => {
+    if (control(target)) playSelect();
+  };
+  // The sound starts as the control is pressed, not when it's let go. Except a
+  // touch inside something that scrolls (the Learn list): that touch may be a
+  // scroll, so it waits for the click, which a scroll never sends.
+  let pressed = false;
   const onDown = (e: PointerEvent) => {
     wake();
-    if (e.button === 0) onControl(e.target);
+    const el = e.button === 0 ? control(e.target) : null;
+    pressed = !!el && (e.pointerType === 'mouse' || !inScroller(el));
+    if (pressed) playSelect();
   };
-  // A keyboard press (Enter or Space) clicks without a pointer: detail is 0.
+  // A tap's click, or a keyboard press (Enter or Space: detail is 0, no pointer).
   const onClick = (e: MouseEvent) => {
     wake();
-    if (e.detail === 0) onControl(e.target);
+    if (e.detail === 0 || !pressed) onControl(e.target);
+    pressed = false;
   };
   // iOS only lets sound start from a touch's end or a key, not its start.
   const events = ['touchend', 'keydown'] as const;
