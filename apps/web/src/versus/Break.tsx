@@ -8,7 +8,7 @@ import clsx from 'clsx';
 import { useState } from 'react';
 import { useNow } from '../state/context';
 import { Button, SectionLabel } from '../ui/bits';
-import { Hearts, Standings } from './bits';
+import { Hearts, IconStrip, Standings } from './bits';
 import { Countdown } from './Countdown';
 import { LeaveButton, type Common } from './GameScreens';
 import { Page } from './Page';
@@ -176,6 +176,12 @@ function NextUp({ room, you, sinceNext }: { room: RoomView; you: string; sinceNe
           {!shuffling && !foe && <p className="text-[12px] text-muted">The AI</p>}
         </div>
       </div>
+      {!shuffling && foe && room.settings.pool === 'random' && (
+        <div className="anim-slide-in mt-4 space-y-1">
+          <p className="text-[12px] text-muted">{foe.name}’s 12</p>
+          <IconStrip species={foe.pool} label={`${foe.name}’s 12`} className="justify-center" />
+        </div>
+      )}
     </section>
   );
 }

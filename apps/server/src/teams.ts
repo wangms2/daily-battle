@@ -1,14 +1,19 @@
-// Pools and teams for a room's game: the 12 everyone builds from, checking a
-// built team, a team for anyone who didn't build in time, and the AI's.
+// Pools and teams for a room's game: each player's 12 (or the week's, for
+// everyone), checking a built team, a team for anyone who didn't build in
+// time, and the AI's.
 import { setsFor } from '@daily-battle/data';
 import { generateOpponent, generatePool, teamSets, type Style } from '@daily-battle/gen';
 import type { Pool, RoomSettings, Slot } from '@daily-battle/versus';
 import { teamProblems } from '@daily-battle/sim-bridge';
 import type { PokemonSet } from '@pkmn/sim';
 
-/** A random pool for the room: the same generator as the weekly pools, keyed by the room. */
-export function randomPool(format: string, code: string, draw: number): Pool {
-  const pool = generatePool(`room:${code}:${draw}`, setsFor(format));
+/**
+ * A random pool: the same generator as the weekly pools, keyed by the room
+ * and draw, and by the player for their own 12.
+ */
+export function randomPool(format: string, code: string, draw: number, player?: string): Pool {
+  const key = player ? `room:${code}:${draw}:${player}` : `room:${code}:${draw}`;
+  const pool = generatePool(key, setsFor(format));
   return { species: pool.species, source: 'random', draw };
 }
 

@@ -274,6 +274,7 @@ function RoomScreen({
           <PrepScreen
             match={match}
             room={view}
+            you={you}
             onChange={room.change}
             onLead={room.lead}
             onReady={room.ready}

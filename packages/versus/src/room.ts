@@ -27,7 +27,7 @@ export interface RoomSettings {
   format: FormatId;
   lives: number;
   timer: TimerId;
-  /** A new random pool for the room, or this week's daily pool for the game. */
+  /** A random 12 for each player, or this week's daily pool for everyone. */
   pool: 'random' | 'weekly';
   /** The host's week (its Monday, `YYYY-MM-DD`), for this week's pool. */
   week?: string;
@@ -42,7 +42,11 @@ export const DEFAULT_SETTINGS: RoomSettings = {
   pool: 'random',
 };
 
-/** The 12 Pokémon everyone builds from, and where they came from. */
+/**
+ * The room's pool: the 12 everyone builds from in weekly mode. In random mode
+ * each player has their own 12 (`Player.pool`); this one is only a fallback
+ * for players without one, and counts the draws.
+ */
 export interface Pool {
   species: string[];
   source: 'random' | 'weekly';
@@ -58,6 +62,8 @@ export interface Player {
   token: string;
   /** A handicap: how many Pokémon this player brings. */
   teamSize: TeamSize;
+  /** Their own 12 in random mode; null (or missing, in older rooms) builds from the room's pool. */
+  pool?: string[] | null;
   /** Lives left in this game. */
   lives: number;
   /** Built from the pool; each round's change stays on it. Null until built. */
@@ -137,6 +143,8 @@ export interface RoomView {
     id: string;
     name: string;
     teamSize: TeamSize;
+    /** The 12 they build and change from: public, so opponents can scout them. */
+    pool: string[];
     online: boolean;
     lives: number;
     built: boolean;
@@ -279,13 +287,14 @@ export const fail = (error: ErrorCode): Result => ({ ok: false, error });
 
 /** A player as they start a game (or wait in the lobby for one). */
 export const freshPlayer = (
-  p: Pick<Player, 'id' | 'name' | 'token' | 'teamSize'>,
+  p: Pick<Player, 'id' | 'name' | 'token' | 'teamSize' | 'pool'>,
   lives: number,
 ): Player => ({
   id: p.id,
   name: p.name,
   token: p.token,
   teamSize: p.teamSize,
+  pool: p.pool ?? null,
   lives,
   team: null,
   place: null,
@@ -319,6 +328,28 @@ export function joinRoom(
     ok: true,
     state: { ...state, hostId: state.hostId ?? player.id, players: [...state.players, player] },
   };
+}
+
+/** The 12 a player builds and changes from: their own, or the room's. */
+export const poolOf = (state: Pick<RoomState, 'players' | 'pool'>, id: string): string[] =>
+  state.players.find((p) => p.id === id)?.pool ?? state.pool?.species ?? [];
+
+/**
+ * Gives each player their pool for the room's settings, in the lobby: in
+ * random mode, anyone without one gets `draw(player)`; in weekly mode they
+ * all build from the room's pool. `fresh` redraws everyone.
+ */
+export function dealPools(
+  state: RoomState,
+  draw: (player: Player) => string[],
+  fresh = false,
+): RoomState {
+  if (state.phase !== 'lobby') return state;
+  const own = state.settings.pool === 'random';
+  const players = state.players.map((p) =>
+    own ? (p.pool && !fresh ? p : { ...p, pool: draw(p) }) : p.pool ? { ...p, pool: null } : p,
+  );
+  return players.every((p, i) => p === state.players[i]) ? state : { ...state, players };
 }
 
 export const playerByToken = (state: RoomState, token: string): Player | undefined =>
@@ -409,6 +440,7 @@ export function roomView(state: RoomState, online: ReadonlySet<string>, now: num
       id: p.id,
       name: p.name,
       teamSize: p.teamSize,
+      pool: poolOf(state, p.id),
       online: online.has(p.id),
       lives: p.lives,
       built: !!p.team,

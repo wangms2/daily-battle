@@ -9,6 +9,10 @@ describe('pools and teams', () => {
       expect(a.species).toHaveLength(12);
       expect(randomPool(format, 'BCDFG', 0).species).toEqual(a.species);
       expect(randomPool(format, 'BCDFG', 1).species).not.toEqual(a.species);
+      // Each player's own 12: the same each time, and not the same as another's.
+      const mine = randomPool(format, 'BCDFG', 0, 'p1').species;
+      expect(randomPool(format, 'BCDFG', 0, 'p1').species).toEqual(mine);
+      expect(randomPool(format, 'BCDFG', 0, 'p2').species).not.toEqual(mine);
     }
   });
 

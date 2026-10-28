@@ -96,8 +96,8 @@ const TIMER_OPTIONS: Option<TimerId>[] = (Object.keys(TIMERS) as TimerId[]).map(
   hint: `${TIMERS[id].perTurn}s a turn`,
 }));
 const POOL_OPTIONS: Option<RoomSettings['pool']>[] = [
-  { value: 'random', label: 'New random pool' },
-  { value: 'weekly', label: 'This week’s pool' },
+  { value: 'random', label: 'A random 12 each', hint: 'Fewer mirror matches' },
+  { value: 'weekly', label: 'This week’s 12', hint: 'The same for everyone' },
 ];
 const RIVAL_OPTIONS: Option<Difficulty>[] = DIFFICULTIES.map((d) => ({
   value: d,
@@ -131,7 +131,9 @@ export function Lobby({
   const [copied, setCopied] = useState(false);
   const [editingRules, setEditingRules] = useState(false);
   const wide = useWide();
-  const pool = useSpritesReady(room.pool?.species ?? [], 'icon');
+  const own = room.settings.pool === 'random';
+  const mine = room.players.find((p) => p.id === you)?.pool ?? room.pool?.species ?? [];
+  const pool = useSpritesReady(mine, 'icon');
   // A big room gets compact rows.
   const dense = room.players.length > 4;
   const link = `${window.location.origin}/#versus/${room.code}`;
@@ -159,7 +161,7 @@ export function Lobby({
     `${formatInfo(room.settings.format).name} OU`,
     `${lives} ${lives === 1 ? 'life' : 'lives'}`,
     `${TIMERS[room.settings.timer].perTurn}s a turn`,
-    room.settings.pool === 'weekly' ? 'This week’s 12' : 'Random 12',
+    own ? 'A random 12 each' : 'This week’s 12',
     `Rival ${DIFFICULTY_NAME[rival]}`,
   ];
 
@@ -327,24 +329,24 @@ export function Lobby({
           <SectionLabel
             right={
               editable &&
-              room.settings.pool === 'random' && (
+              own && (
                 <button
                   type="button"
                   className="h-7 rounded-chip px-2 text-[13px] font-semibold text-accent hover:bg-surface-2"
                   onClick={onRedraw}
                 >
-                  Redraw
+                  Redraw all
                 </button>
               )
             }
           >
-            The 12 · {room.pool?.source === 'weekly' ? 'this week’s pool' : 'random pool'}
+            {own ? 'Your 12 · everyone has their own' : 'The 12 · this week’s pool'}
           </SectionLabel>
-          {room.pool && (
-            <ul className="grid grid-cols-12 gap-0.5" aria-label="The pool">
+          {mine.length > 0 && (
+            <ul className="grid grid-cols-12 gap-0.5" aria-label="Your pool">
               {/* All 12 appear together: a redraw keeps the old pool up until every
                 new sprite has loaded, and the first draw holds empty spaces. */}
-              {(pool ?? room.pool.species.map(() => '')).map((sp, i) => (
+              {(pool ?? mine.map(() => '')).map((sp, i) => (
                 <li key={sp || i} title={sp || undefined}>
                   {sp ? (
                     <img

@@ -57,9 +57,17 @@ export function Standings({ room, you }: { room: RoomView; you: string }) {
 }
 
 /** A row of Pokémon icons, e.g. the pool or a foe's team. */
-export function IconStrip({ species, label }: { species: string[]; label: string }) {
+export function IconStrip({
+  species,
+  label,
+  className,
+}: {
+  species: string[];
+  label: string;
+  className?: string;
+}) {
   return (
-    <ul className="flex flex-wrap gap-1" aria-label={label}>
+    <ul className={clsx('flex flex-wrap gap-1', className)} aria-label={label}>
       {species.map((s) => (
         <li key={s} title={s}>
           <img src={getSprite(s, 'icon')} alt={s} className="pixelated h-8 w-10 object-contain" />

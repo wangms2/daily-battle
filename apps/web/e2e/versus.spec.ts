@@ -333,10 +333,18 @@ test('a room of three builds teams and plays to a winner', async ({ page, browse
   for (const name of ['Red', 'Blue', 'Green']) {
     await teamSize(red, name, 3);
   }
-  await expect(red.getByRole('list', { name: 'The pool' }).getByRole('listitem')).toHaveCount(12);
+  // Each player has their own 12.
+  const twelve = (p: Page) =>
+    p
+      .getByRole('list', { name: 'Your pool' })
+      .getByRole('img')
+      .evaluateAll((els) => els.map((e) => e.getAttribute('alt')));
+  await expect(red.getByRole('list', { name: 'Your pool' }).getByRole('img')).toHaveCount(12);
+  await expect(blue.getByRole('list', { name: 'Your pool' }).getByRole('img')).toHaveCount(12);
+  expect(await twelve(red)).not.toEqual(await twelve(blue));
   await red.getByRole('button', { name: 'Start the game' }).click();
 
-  // Everyone builds three from the pool; the first round starts when all are in.
+  // Everyone builds three from their 12; the first round starts when all are in.
   for (const p of all) await build(p, 3);
 
   // Round 1: three players, so one faces the AI. Blue makes a change first.
@@ -345,6 +353,9 @@ test('a room of three builds teams and plays to a winner', async ({ page, browse
   let vsAi = 0;
   for (const p of all) {
     if (await p.getByRole('heading', { name: 'Round 1 · vs Rival (AI)' }).isVisible()) vsAi++;
+    // Facing a player, you see the 12 their change can come from.
+    else
+      await expect(p.getByRole('list', { name: /’s 12$/ }).getByRole('listitem')).toHaveCount(12);
   }
   expect(vsAi).toBe(1);
   await axe(blue);

@@ -1,5 +1,5 @@
 // Before a round's battle (DESIGN.md §18): you see who you face and their six
-// species, make your one change (another Pokémon from the pool, or another
+// species, make your one change (another Pokémon from your 12, or another
 // set), pick your lead, and say you're ready. Your change stays hidden from
 // the foe until the battle starts, and it stays on your team after.
 import { formatInfo } from '@daily-battle/data/formats';
@@ -19,6 +19,7 @@ import type { LocalMatch } from './useRoom';
 export function PrepScreen({
   match,
   room,
+  you,
   onChange,
   onLead,
   onReady,
@@ -27,6 +28,7 @@ export function PrepScreen({
 }: {
   match: LocalMatch;
   room: RoomView;
+  you: string;
   onChange: (change: Change | null) => void;
   onLead: (species: string) => void;
   onReady: () => void;
@@ -42,7 +44,12 @@ export function PrepScreen({
   // The slot being changed, then the Pokémon being picked for it (its set next).
   const [editing, setEditing] = useState<number | null>(null);
   const [picking, setPicking] = useState<{ slot: number; species: string } | null>(null);
-  const pool = room.pool?.species ?? [];
+  const pool = room.players.find((p) => p.id === you)?.pool ?? [];
+  // In random mode the foe has their own 12: what they could change to.
+  const foePool =
+    !match.opponent.ai && room.settings.pool === 'random'
+      ? room.players.find((p) => p.id === match.opponent.id)?.pool
+      : undefined;
   const bench = (slot: number) =>
     pool.filter(
       (s) =>
@@ -74,6 +81,12 @@ export function PrepScreen({
             ? 'The AI keeps its team as it is.'
             : `${room.round > 1 ? 'As it stood after last round' : 'As built'}. ${foe} may make a change too.`}
         </p>
+        {foePool && (
+          <>
+            <p className="pt-1 text-[12px] text-muted">{foe}’s 12, which their change comes from</p>
+            <IconStrip species={foePool} label={`${foe}’s 12`} />
+          </>
+        )}
       </section>
 
       <section className="space-y-2">

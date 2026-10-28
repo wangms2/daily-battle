@@ -52,7 +52,7 @@ export function LeaveButton({ onLeave, inGame }: { onLeave: () => void; inGame: 
   );
 }
 
-/** Builds your team from the room's 12, then waits for everyone else. */
+/** Builds your team from your 12, then waits for everyone else. */
 export function BuildScreen({
   room,
   you,
@@ -74,7 +74,7 @@ export function BuildScreen({
       generatorVersion: 0,
       dataBuiltAt: '',
       week: '',
-      pool: { species: room.pool!.species, candidate: 0 },
+      pool: { species: me.pool, candidate: 0 },
       suggestedTeams: [],
       days: [],
     };
@@ -88,7 +88,7 @@ export function BuildScreen({
         topBar={
           <header className="flex h-12 shrink-0 items-center justify-between gap-2 px-3 pt-[env(safe-area-inset-top)] wide:px-6">
             <h1 className="home-serif text-[16px]">
-              Build your team · {me.teamSize} of {room.pool!.species.length}
+              Build your team · {me.teamSize} of {me.pool.length}
             </h1>
             {timer}
           </header>
@@ -117,7 +117,7 @@ export function BuildScreen({
         ))}
       </ul>
       <p className="text-[13px] text-muted">
-        Anyone still building when time runs out gets the pool’s most used Pokémon.
+        Anyone still building when time runs out gets their pool’s most used Pokémon.
       </p>
       <LeaveButton onLeave={onLeave} inGame />
     </Page>

@@ -35,6 +35,8 @@ import {
   parseClientMessage,
   playAgain,
   playerByToken,
+  poolOf,
+  dealPools,
   spectatorByToken,
   prepDone,
   putMatch,
@@ -107,6 +109,8 @@ export class Room extends DurableObject<Env> {
         const { format } = this.room.settings;
         this.room = { ...this.room, pool: randomPool(format, this.room.code, 0) };
       }
+      // A lobby from before players had their own 12 deals them.
+      if (this.room) this.room = this.dealt(this.room);
       if (this.room !== saved && this.room) await ctx.storage.put('room', this.room);
     });
   }
@@ -316,20 +320,28 @@ export class Room extends DurableObject<Env> {
 
   // The lobby
 
-  /** The pool for the room's settings: a random draw, or this week's daily pool. */
+  /** The pool for the room's settings: random 12s for each player, or this week's for all. */
   private async withPool(ws: WebSocket | null, room: RoomState, draw = 0): Promise<RoomState> {
     const { settings } = room;
     if (settings.pool === 'weekly') {
       const pool = await weeklyPool(this.env.ASSETS, settings);
-      if (pool) return { ...room, pool };
+      if (pool) return this.dealt({ ...room, pool });
       if (ws) this.send(ws, { type: 'error', code: 'noPool' });
-      return { ...room, settings: { ...settings, pool: 'random' }, pool: this.random(room, draw) };
+      const random = { ...settings, pool: 'random' as const };
+      return this.dealt({ ...room, settings: random, pool: this.random(room, draw) }, true);
     }
-    return { ...room, pool: this.random(room, draw) };
+    return this.dealt({ ...room, pool: this.random(room, draw) }, true);
   }
 
   private random(room: RoomState, draw: number) {
     return randomPool(room.settings.format, room.code, draw);
+  }
+
+  /** Everyone in the lobby with the pool they build from: `fresh` redraws everyone's. */
+  private dealt(room: RoomState, fresh = false): RoomState {
+    const { format } = room.settings;
+    const draw = room.pool?.draw ?? 0;
+    return dealPools(room, (p) => randomPool(format, room.code, draw, p.id).species, fresh);
   }
 
   private async redraw(ws: WebSocket, me: string) {
@@ -372,8 +384,7 @@ export class Room extends DurableObject<Env> {
   private async beginGame(now: number) {
     const room = this.room!;
     const { format } = room.settings;
-    const pool = room.pool!.species;
-    const filled = fillTeams(room, (p) => autoTeam(format, pool, p.teamSize));
+    const filled = fillTeams(room, (p) => autoTeam(format, poolOf(room, p.id), p.teamSize));
     this.room = filled;
     for (const p of filled.players) this.sendTo(p.id, { type: 'team', team: p.team });
     // The first round is paired like any other (all lives are equal).
@@ -430,7 +441,7 @@ export class Room extends DurableObject<Env> {
       const team = withChange(match.slots[side], change);
       if (!legalTeam(match.format, team)) return this.send(ws, { type: 'error', code: 'badTeam' });
     }
-    const next = updatePrep(match, side, update, room.pool!.species);
+    const next = updatePrep(match, side, update, poolOf(room, me));
     if (!next) return this.send(ws, { type: 'error', code: 'notYourTurn' });
     if (prepDone(next, now)) return this.beginBattle(next, now);
     await this.save(putMatch(room, next));
@@ -526,11 +537,13 @@ export class Room extends DurableObject<Env> {
       engine = (await import('./engines')).hardEngine(genOf(match.format));
     }
     const difficulty = match.aiDifficulty === 'hard' && !engine ? 'normal' : match.aiDifficulty;
+    // Hard guesses its foe's unseen Pokémon from the 12 they built from.
+    const foe = match.players[match.ai === 'p1' ? 'p2' : 'p1'];
     policy = aiFor({
       difficulty: difficulty ?? 'normal',
       style,
       data,
-      ...(engine && { engine, pool: this.room?.pool?.species ?? [] }),
+      ...(engine && { engine, pool: this.room ? poolOf(this.room, foe) : [] }),
     });
     this.policies.set(match.id, policy);
     return policy;
@@ -598,8 +611,8 @@ export class Room extends DurableObject<Env> {
   // Storage and the alarm
 
   private async save(room: RoomState) {
-    this.room = room;
-    await this.ctx.storage.put('room', room);
+    this.room = this.dealt(room);
+    await this.ctx.storage.put('room', this.room);
     await this.schedule();
   }
 

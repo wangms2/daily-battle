@@ -1,4 +1,4 @@
-// A game in a room (DESIGN.md §18): everyone builds from the pool, then
+// A game in a room (DESIGN.md §18): everyone builds from their pool, then
 // rounds of battles until one player has lives left. Pure functions over the
 // room's state; the room server deals teams, runs the battles, and keeps time.
 import { AI_ID, SIDES, type Match, type Slot } from './match';
@@ -7,6 +7,7 @@ import {
   fail,
   freshPlayer,
   MAX_PLAYERS,
+  poolOf,
   type ErrorCode,
   type MatchSummary,
   type Pairing,
@@ -26,7 +27,7 @@ export function cannotStartGame(state: RoomState, by: string): ErrorCode | null 
   if (state.hostId !== by) return 'notHost';
   if (state.phase !== 'lobby') return 'started';
   if (state.players.length < 2) return 'notEnough';
-  if (!state.pool) return 'noPool';
+  if (!state.players.every((p) => poolOf(state, p.id).length)) return 'noPool';
   return null;
 }
 
@@ -45,18 +46,19 @@ export function startBuild(state: RoomState, now: number): RoomState {
 }
 
 /**
- * Sets a player's team from the pool: their team size, distinct species, all
- * from the pool. (The room server checks set ids and legality first.)
+ * Sets a player's team from their pool: their team size, distinct species,
+ * all from their pool. (The room server checks set ids and legality first.)
  */
 export function submitTeam(state: RoomState, by: string, team: Slot[]): Result {
   const player = state.players.find((p) => p.id === by);
   if (!player || player.left) return fail('notJoined');
   if (state.phase !== 'build' || player.team) return fail('notYourTurn');
   const species = team.map((s) => s.species);
+  const pool = poolOf(state, by);
   if (
     team.length !== player.teamSize ||
     new Set(species).size !== species.length ||
-    !species.every((s) => state.pool!.species.includes(s))
+    !species.every((s) => pool.includes(s))
   ) {
     return fail('badTeam');
   }

@@ -18,7 +18,9 @@ import {
   applyCommand,
   canWatch,
   createRoom,
+  dealPools,
   joinRoom,
+  poolOf,
   type Player,
   type Result,
   type RoomState,
@@ -82,6 +84,49 @@ describe('starting and building', () => {
     s = fillTeams(s, (p) => team(p.teamSize, 6));
     expect(s.players[1]!.team).toEqual(team(6, 6));
     expect(s.players[0]!.team).toEqual(team(6));
+  });
+
+  it('builds from each player’s own 12, kept through a new game', () => {
+    const OTHER = 'MNOPQRSTUVWX'.split('').map((c) => `Mon${c}`);
+    let s = dealPools(room(['Ash', 'Misty']), (p) => (p.id === 'id0' ? POOL : OTHER));
+    expect(poolOf(s, 'id0')).toEqual(POOL);
+    expect(poolOf(s, 'id1')).toEqual(OTHER);
+    s = startBuild(s, 0);
+    expect(poolOf(s, 'id1')).toEqual(OTHER);
+    expect(submitTeam(s, 'id1', team(6)).ok).toBe(false); // Ash's Pokémon
+    s = ok(
+      submitTeam(
+        s,
+        'id1',
+        OTHER.slice(0, 6).map((species) => ({ species, setId: 'x' })),
+      ),
+    );
+    expect(s.players[1]!.team).toHaveLength(6);
+  });
+});
+
+describe('dealPools', () => {
+  const draw = (p: Player) => [`${p.id}-pool`];
+
+  it('gives a random 12 to anyone without one, and redraws all when fresh', () => {
+    const s = dealPools(room(['Ash', 'Misty']), draw);
+    expect(s.players.map((p) => p.pool)).toEqual([['id0-pool'], ['id1-pool']]);
+    expect(dealPools(s, () => ['new'])).toBe(s);
+    expect(dealPools(s, () => ['new'], true).players.map((p) => p.pool)).toEqual([
+      ['new'],
+      ['new'],
+    ]);
+  });
+
+  it('shares the room’s pool in weekly mode, and leaves a game alone', () => {
+    const s = dealPools(room(['Ash', 'Misty']), draw);
+    const weekly = { ...s, settings: { ...s.settings, pool: 'weekly' as const } };
+    expect(dealPools(weekly, draw).players.map((p) => p.pool)).toEqual([null, null]);
+    expect(poolOf(dealPools(weekly, draw), 'id1')).toEqual(POOL);
+    const playing = { ...room(['Ash', 'Misty']), phase: 'build' as const };
+    expect(dealPools(playing, draw)).toBe(playing);
+    // A player from a room older than their own pools builds from the room's.
+    expect(poolOf(playing, 'id0')).toEqual(POOL);
   });
 });
 
