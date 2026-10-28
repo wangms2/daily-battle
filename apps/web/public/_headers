@@ -1,12 +1,13 @@
 # Cloudflare Pages response headers. Everything is self-hosted, so the CSP only
-# allows this origin (inline style attributes are used for HP bars and sprites;
-# blob: images are the share card's preview; 'wasm-unsafe-eval' lets the battle
-# worker compile the Hard AI's engine).
+# allows this origin, plus Cloudflare Web Analytics' beacon (lib/analytics.ts):
+# its script, and where it reports. Inline style attributes are used for HP bars
+# and sprites; blob: images are the share card's preview; 'wasm-unsafe-eval'
+# lets the battle worker compile the Hard AI's engine.
 /*
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=()
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; worker-src 'self'; manifest-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'wasm-unsafe-eval' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://cloudflareinsights.com; worker-src 'self'; manifest-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'
 
 # Hashed build output never changes.
 /assets/*
