@@ -84,17 +84,27 @@ export const stab: Lesson = {
     },
     {
       kind: 'battle',
-      intro: 'Two on two against the Easy AI. Look for moves that match your Pokémon’s type.',
-      // Both of yours outspeed both foes; every matchup is neutral or resisted only by type.
-      player: [
-        { species: 'Metagross', moves: ['Meteor Mash', 'Earthquake'] },
-        { species: 'Swampert', moves: ['Surf', 'Ice Beam'] },
+      intro:
+        'Your Starmie against two foes and the Easy AI. Everyone is low on HP, so each move must knock the foe out. Thunderbolt has more power than Psychic, but which one matches Starmie’s type?',
+      // Starmie alone, so switching (lesson 6) never comes up, and it outspeeds
+      // both foes, so Speed (lesson 7) never decides a turn. Both moves are
+      // special (lesson 5). Every Pokémon starts low, so each turn is one
+      // knockout, and a wrong pick lets the foe knock Starmie out:
+      // - Snorlax is neutral to both: Psychic with the bonus (90 × 1.5) beats
+      //   Thunderbolt (95). Psychic always knocks it out; Thunderbolt never does.
+      // - Skarmory resists Psychic and is weak to Electric, so the bonus can't
+      //   save Psychic: Thunderbolt knocks it out, Psychic doesn't.
+      player: [{ species: 'Starmie', moves: ['Psychic', 'Thunderbolt'] }],
+      foe: [
+        { species: 'Snorlax', moves: ['Body Slam'] },
+        { species: 'Skarmory', moves: ['Drill Peck'] },
       ],
-      foe: [URSARING, { species: 'Snorlax', moves: ['Body Slam'] }],
       seed: 'course:stab:battle',
+      hp: { p1: [25], p2: [17, 55] },
       noLuck: true,
-      takeaway: 'A move of your Pokémon’s own type hits 1.5× as hard. Look for the match.',
-      hint: 'Use moves that match your Pokémon’s type: Meteor Mash for Metagross, Surf for Swampert.',
+      takeaway:
+        'A move of your Pokémon’s own type hits 1.5× as hard, often harder than a move with more power. But a resisted move stays weak, bonus or not.',
+      hint: 'Psychic matches Starmie’s type: use it on Snorlax. Skarmory is part Steel, which resists Psychic, and Electric is super effective on it: use Thunderbolt.',
     },
   ],
 };
