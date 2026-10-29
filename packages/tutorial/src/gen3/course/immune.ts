@@ -118,21 +118,24 @@ export const immune: Lesson = {
     },
     {
       kind: 'battle',
-      intro: 'Two on two against the Easy AI. Before each move, check: can the foe take it at all?',
-      // Both of yours outspeed both foes; Electric does nothing to Swampert.
-      player: [
-        { species: 'Starmie', moves: ['Surf', 'Ice Beam', 'Thunderbolt'] },
-        { species: 'Jolteon', moves: ['Thunderbolt', 'Shadow Ball'] },
-      ],
+      intro:
+        'Your Snorlax against two foes and the Easy AI. Before each move, check: can the foe take it at all?',
+      // Snorlax alone, so switching (lesson 6) never comes up. Each foe is
+      // immune to some of its moves: Gengar takes nothing from Earthquake
+      // (Levitate) or Brick Break (Ghost), so only Shadow Ball works. Blissey
+      // (Normal) takes nothing from Shadow Ball; it starts hurt, so super
+      // effective Brick Break knocks it out and neutral Earthquake doesn't.
+      player: [{ species: 'Snorlax', moves: ['Earthquake', 'Shadow Ball', 'Brick Break'] }],
       foe: [
-        { species: 'Swampert', moves: ['Earthquake', 'Surf'] },
-        { species: 'Dusclops', moves: ['Seismic Toss'] },
+        { species: 'Gengar', moves: ['Shadow Ball', 'Thunderbolt'], ability: 'Levitate' },
+        { species: 'Blissey', moves: ['Seismic Toss'] },
       ],
       seed: 'course:immune:battle',
-      hp: { p2: [80, 80] },
+      hp: { p2: [null, 55] },
       noLuck: true,
-      takeaway: 'A move the foe is immune to does nothing at all. Check its types first.',
-      hint: 'Swampert is Ground type, so Thunderbolt does nothing to it. Dusclops is a Ghost: Shadow Ball hits it hard.',
+      takeaway:
+        'A move the foe is immune to does nothing at all. Check its types and ability first.',
+      hint: 'Gengar floats (Levitate) and is a Ghost: only Shadow Ball hits it. Blissey is Normal, so Shadow Ball does nothing: use Brick Break.',
     },
   ],
 };
