@@ -10,12 +10,13 @@ import type { Difficulty } from '@daily-battle/ai/version';
 import type { FormatId } from '@daily-battle/data/formats';
 import { Fragment, type CSSProperties } from 'react';
 import { MASCOT } from '../lib/genColors';
-import { isShareAll, type ShareAll, type ShareModel } from '../lib/share';
+import { isShareAll, type AnyShare } from '../lib/share';
 import { getSprite } from '../lib/sprites';
 import { CoachBadge, DifficultyBadge } from '../ui/Difficulty';
 import { Friends } from '../ui/Friends';
 import { ShareAllButton } from '../ui/results';
 import { CheckIcon, ChevronIcon, FlameIcon, GearIcon } from '../ui/icons';
+import { ProfileButton } from '../ui/Profile';
 
 export interface GameRow {
   id: FormatId;
@@ -63,7 +64,7 @@ export function Home({
   /** Opens Learn mode (the Gen 3 tutorial). */
   onLearn: () => void;
   /** Today's played games to share; null before any is played. */
-  share?: ShareModel | ShareAll | null;
+  share?: AnyShare | null;
   onPick: (id: FormatId) => void;
   onBack: () => void;
   onSettings: () => void;
@@ -83,14 +84,17 @@ export function Home({
               Back
             </button>
           </div>
-          <button
-            type="button"
-            onClick={onSettings}
-            className="grid size-10 place-items-center rounded-full text-white/85 hover:bg-white/10"
-            aria-label="Settings"
-          >
-            <GearIcon />
-          </button>
+          <div className="flex items-center gap-1">
+            <ProfileButton />
+            <button
+              type="button"
+              onClick={onSettings}
+              className="grid size-10 place-items-center rounded-full text-white/85 hover:bg-white/10"
+              aria-label="Settings"
+            >
+              <GearIcon />
+            </button>
+          </div>
         </header>
 
         <div

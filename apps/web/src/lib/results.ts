@@ -39,6 +39,9 @@ export interface DaySummary {
 /** Each difficulty's own tries and streak, or the coached ones (any difficulty). */
 export type Bucket = Difficulty | 'coached';
 
+/** Every bucket, easiest first: the order a game's share lists them in. */
+export const BUCKETS: readonly Bucket[] = ['easy', 'normal', 'hard', 'coached'];
+
 const won = (a: Attempt) => a.result === 'win';
 
 /** Attempts saved before difficulties (and all Normal ones) have none. */

@@ -44,7 +44,7 @@ import { likelyMoves, possibleSets, speciesInfo } from '../lib/data';
 import { TypeChartSheet } from '../sheets/TypeChart';
 import { streakLine, type DaySummary } from '../lib/results';
 import { Button } from '../ui/bits';
-import type { ShareModel } from '../lib/share';
+import type { ShareGame, ShareModel } from '../lib/share';
 import {
   battleSpeed,
   foeSpeed,
@@ -87,7 +87,8 @@ export interface DayResult {
   summary: DaySummary;
   streak: number;
   /** What sharing today says (as text or the image card). */
-  share: ShareModel;
+  /** This game's share: every difficulty played today. */
+  share: ShareModel | ShareGame;
   /** This battle's attempt. */
   ts: number;
   /** After a win: the offer to protect the player's name with a password (ProtectCard). */

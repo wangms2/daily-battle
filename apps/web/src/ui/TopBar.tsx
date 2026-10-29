@@ -5,6 +5,7 @@ import type { FormatId } from '@daily-battle/data/formats';
 import type { CSSProperties, ReactNode } from 'react';
 import { LIDS } from '../lib/genColors';
 import { ChevronIcon, FlameIcon, GearIcon } from './icons';
+import { ProfileButton } from './Profile';
 
 export function TopBar({
   title,
@@ -19,7 +20,7 @@ export function TopBar({
   /** Makes the title a back button (to the day's page). */
   onTitle?: () => void;
   streak?: number;
-  /** The streak badge that opens stats; left out where no one game is shown. */
+  /** The streak badge that opens the trainer card at this game; left out where no one game is shown. */
   onStats?: () => void;
   onSettings: () => void;
   /** Replaces the title (e.g. edit mode's Cancel). */
@@ -61,6 +62,7 @@ export function TopBar({
               {streak}
             </button>
           )}
+          <ProfileButton />
           <button
             type="button"
             onClick={onSettings}

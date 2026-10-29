@@ -1,9 +1,8 @@
-// The player's name in Settings (DESIGN.md §10): rename it while it's only on
+// The player's name on the trainer card (DESIGN.md §10): rename it while it's only on
 // this device, protect it with a password, sign in to a protected name from
 // another device, sign out, or delete the account.
 import { cleanName } from '@daily-battle/versus';
 import { useState, type FormEvent } from 'react';
-import { ChevronIcon } from '../ui/icons';
 import { useAccount } from '../state/context';
 import { useNameCheck } from '../state/useNameCheck';
 import { Button } from '../ui/bits';
@@ -242,29 +241,5 @@ export function TrainerSection({
         </p>
       )}
     </div>
-  );
-}
-
-/** Settings' row for the player's name; it opens the Trainer page in place. */
-export function TrainerRow({ name, onOpen }: { name: string | undefined; onOpen: () => void }) {
-  const account = useAccount();
-  const shown = account.name ?? name;
-  return (
-    <>
-      <button
-        type="button"
-        onClick={onOpen}
-        className="flex min-h-12 w-full items-center justify-between gap-4 py-1 text-left"
-      >
-        <span className="text-[15px] font-medium">Trainer</span>
-        <span className="flex min-w-0 items-center gap-1 text-[15px] text-muted">
-          <span className="truncate">
-            {account.name ? '🔒 ' : ''}
-            {shown ?? 'Sign in'}
-          </span>
-          <ChevronIcon className="size-4 shrink-0" aria-hidden />
-        </span>
-      </button>
-    </>
   );
 }

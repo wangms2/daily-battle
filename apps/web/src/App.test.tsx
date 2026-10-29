@@ -394,6 +394,38 @@ describe('results and streak', () => {
     expect(text).toContain('Gen 6 OU · Streak reset\n❌ ');
   });
 
+  it('shares every difficulty played in a game, and the 🔥 opens the trainer card there', async () => {
+    const user = userEvent.setup();
+    const state = seeded({ team: { week: WEEK } });
+    state.games.gen4ou.days['2026-10-21'] = {
+      swapUsed: false,
+      attempts: [{ ...finished('win', 5, 1), difficulty: 'easy' }, finished('loss', 0, 2)],
+    };
+    renderApp(state);
+    const strip = await screen.findByRole('region', { name: 'Today’s result' });
+    await user.click(within(strip).getByRole('button', { name: 'Share' }));
+    const sheet = await screen.findByRole('dialog', { name: 'Share your result' });
+    await user.click(within(sheet).getByRole('button', { name: 'Copy text' }));
+    expect(await navigator.clipboard.readText()).toMatch(
+      /^Pokémon Daily · Gen 4 OU · Oct 21\nEasy · 🔥 1-day streak · ⭐ 1 · ✓ 1\n⭐ .*\nNormal · Streak reset\n❌ /,
+    );
+    await user.keyboard('{Escape}');
+
+    await user.click(screen.getByRole('button', { name: /^Stats\. Streak/ }));
+    const card = await screen.findByRole('dialog', { name: 'Trainer card' });
+    const gen4 = within(card).getByRole('region', { name: 'Gen 4 OU' });
+    expect(gen4).toHaveAttribute('data-focus', 'true');
+    expect(within(gen4).getByLabelText(/^Easy: 1-day streak/)).toBeInTheDocument();
+    expect(within(gen4).getByLabelText(/^Normal: 0-day streak/)).toBeInTheDocument();
+    expect(within(gen4).queryByLabelText(/^Hard:/)).not.toBeInTheDocument();
+    expect(within(card).getByRole('region', { name: 'Gen 3 OU' })).toHaveTextContent(
+      'Not played yet',
+    );
+    // One game today: its own share, no "Share all".
+    expect(within(card).getByRole('button', { name: 'Share Gen 4' })).toBeInTheDocument();
+    expect(within(card).queryByRole('button', { name: /^Share all/ })).not.toBeInTheDocument();
+  });
+
   it('resets the streak when today isn’t won on the first try, and says so', async () => {
     const state = seeded({ team: { week: WEEK } });
     state.games.gen4ou.days['2026-10-20'] = { swapUsed: false, attempts: [finished('win', 2, 1)] };

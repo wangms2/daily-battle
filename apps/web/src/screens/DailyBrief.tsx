@@ -32,7 +32,7 @@ import { StarIcon } from '../ui/icons';
 import { ItemIcon } from '../ui/ItemIcon';
 import { MoveChips } from '../ui/MoveList';
 import { PokemonTile } from '../ui/PokemonTile';
-import type { ShareModel } from '../lib/share';
+import type { ShareGame, ShareModel } from '../lib/share';
 import { DIFFICULTY_NAME } from '../lib/share';
 import { OtherGames } from '../ui/OtherGames';
 import { ShareButton } from '../ui/results';
@@ -161,7 +161,7 @@ export function DailyBrief({
    */
   practice?: boolean;
   /** Today's result so far, the share text, and time to the next opponent. */
-  result: { summary: DaySummary; streak: number; share: ShareModel; countdown: string };
+  result: { summary: DaySummary; streak: number; share: ShareModel | ShareGame; countdown: string };
   schedule: ScheduleFile;
   day: string;
   team: Slot[];

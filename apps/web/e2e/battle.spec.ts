@@ -223,7 +223,7 @@ test('a run after the day is won is practice, and never shows in the share', asy
     .getByRole('button', { name: 'Copy text' })
     .click();
   const copied = await page.evaluate(() => (window as unknown as { copied: string }).copied);
-  expect(copied).toContain('⭐ First try! 4/6 left');
+  expect(copied.split('\n')[1]).toBe('⭐ 🟩🟩🟩🟩⬛⬛ First try!');
   // Practice runs are never shared.
   expect(copied).not.toMatch(/practice|🔁/u);
 });
@@ -366,6 +366,21 @@ test('a lost first try breaks the streak, and the result copies to share', async
   await noScroll(page, 'brief with result');
   await page.screenshot({ path: `${dir}/29-brief-result.png` });
 
+  // The 🔥 opens the trainer card at this game: its Normal row, and today's share.
+  await page.getByRole('button', { name: 'Stats. Streak 0' }).click();
+  const trainer = page.getByRole('dialog', { name: 'Trainer card' });
+  await expect(
+    trainer.getByRole('region', { name: 'Gen 4 OU' }).getByLabel(/^Normal: 0-day streak, best 1/),
+  ).toBeVisible();
+  await expect(trainer.getByRole('button', { name: 'Share Gen 4' })).toBeVisible();
+  expect(
+    await trainer.evaluate((el) => el.scrollWidth <= el.clientWidth),
+    'no sideways scroll',
+  ).toBe(true);
+  await page.waitForTimeout(300);
+  await page.screenshot({ path: `${dir}/31-trainer-card.png` });
+  await page.keyboard.press('Escape');
+
   await strip.getByRole('button', { name: 'Share' }).click();
   const choice = page.getByRole('dialog', { name: 'Share your result' });
   // The card image is drawn for the preview; the image button waits for it.
@@ -382,12 +397,10 @@ test('a lost first try breaks the streak, and the result copies to share', async
   await expect(page.getByRole('status')).toContainText('Text copied');
   const copied = await page.evaluate(() => (window as unknown as { copied: string }).copied);
   const lines = copied.split('\n');
-  expect(lines.slice(0, 2)).toEqual([
-    'Pokémon Daily · Gen 4 OU · Oct 21',
-    'Not cleared yet · 3 tries',
-  ]);
-  for (const row of lines.slice(2, 5)) expect(row).toMatch(/^❌ ⬜+⬛*$/u); // given up: grey
-  expect(copied).toContain('🔥 Streak reset');
+  expect(lines[0]).toBe('Pokémon Daily · Gen 4 OU · Oct 21');
+  // The deciding try's squares (given up: grey), then the streak; no team.
+  expect(lines[1]).toMatch(/^❌ ⬜+⬛* Not cleared yet · 3 tries$/u);
+  expect(lines[2]).toMatch(/^Streak reset/);
   for (const s of schedule.days.find((d) => d.day === '2026-10-21')!.team) {
     if (!TEAM.some((t) => t.species === s.species)) expect(copied).not.toContain(s.species);
   }

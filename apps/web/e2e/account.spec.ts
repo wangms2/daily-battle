@@ -51,8 +51,7 @@ function player(name: string) {
 }
 
 async function openTrainer(page: Page) {
-  await page.getByRole('button', { name: 'Settings' }).click();
-  await page.getByRole('button', { name: /^Trainer/ }).click();
+  await page.getByRole('button', { name: 'Trainer card' }).click();
 }
 
 test('a protected name brings its streak to another device, and a wrong password doesn’t', async ({
@@ -138,6 +137,7 @@ test('starting over erases this device and signs out, but keeps the account', as
   await page.getByLabel('Password').fill('pikachu');
   await page.getByRole('button', { name: 'Protect', exact: true }).click();
   await expect(page.getByText(/^Protected ·/)).toBeVisible();
+  await page.keyboard.press('Escape');
   await page.getByRole('button', { name: 'Settings', exact: true }).click();
 
   await page.getByRole('button', { name: 'Start over…' }).click();

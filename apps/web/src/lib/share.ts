@@ -3,7 +3,7 @@
 import type { Difficulty } from '@daily-battle/ai/version';
 import type { FormatId } from '@daily-battle/data/formats';
 import type { Attempt, DayChange } from '../state/schema';
-import { condenseTries, streakBroken, tryCount, type DaySummary } from './results';
+import { streakBroken, tryCount, type DaySummary } from './results';
 
 export interface ShareArgs {
   /** `YYYY-MM-DD` */
@@ -135,36 +135,35 @@ export function shareModel({
 const squares = (r: ShareRow) =>
   (r.result === 'forfeit' ? '⬜' : '🟩').repeat(r.remaining) +
   '⬛'.repeat(Math.max(0, 6 - r.remaining));
-const mark = (r: ShareRow) => (r.result === 'win' ? '✅' : '❌');
 
 export function shareText(args: ShareArgs): string {
   return formatShareText(shareModel(args));
 }
 
+/**
+ * The compact text (the image has the team and every try):
+ * Pokémon Daily · Gen 4 OU · Hard · Oct 21
+ * ⭐ 🟩🟩🟩🟩⬛⬛ First try!
+ * 🔥 5-day streak · ⭐ 10 · ✓ 23
+ */
 export function formatShareText(m: ShareModel): string {
-  const lines = [`Pokémon Daily · ${shareHeader(m)}`];
-  const icon =
-    m.status === 'firstTry' ? '⭐ ' : m.cleared ? '✅ ' : m.status === 'failed' ? '❌ ' : '';
-  lines.push(`${icon}${m.headline}`);
-  // One row per try, each led by one emoji so the squares line up. Past ten
-  // tries, the middle ones become a count.
-  for (const r of condenseTries(m.rows, 10)) {
-    lines.push('more' in r ? `⋯ ${tryCount(r.more)} more` : `${mark(r)} ${squares(r)}`);
-  }
-  if (m.team.length) {
-    lines.push(m.team.map((s) => (s.swapped ? `${s.species}*` : s.species)).join(', '));
-  }
-  if (m.streak) lines.push(`🔥 ${m.streak}`);
-  if (m.stars) lines.push(starsText(m.stars));
+  const lines = [`Pokémon Daily · ${shareHeader(m)}`, resultLine(m)];
+  const extra = [streakText(m), m.stars && starsShort(m.stars)].filter(Boolean).join(' · ');
+  if (extra) lines.push(extra);
   if (m.url) lines.push(m.url);
   return lines.join('\n');
 }
 
-const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
+/** "⭐ 🟩🟩🟩🟩⬛⬛ First try!": the deciding try's squares and the short headline. */
+const resultLine = (m: ShareModel) => {
+  const icon = m.status === 'firstTry' ? '⭐' : m.cleared ? '✅' : '❌';
+  const last = m.rows.at(-1);
+  return [icon, last && squares(last), shortHeadline(m)].filter(Boolean).join(' ');
+};
 
-/** "⭐ 10 first tries · ✓ 23 clears" */
-export const starsText = (s: Stars) =>
-  `⭐ ${plural(s.firstTries, 'first try', 'first tries')} · ✓ ${plural(s.clears, 'clear', 'clears')}`;
+/** "🔥 5-day streak", "Streak reset", or nothing. */
+const streakText = (m: ShareModel) =>
+  m.streak && (m.streak === 'Streak reset' ? m.streak : `🔥 ${m.streak}`);
 
 /** "⭐ 10 · ✓ 23", for the compact share. */
 export const starsShort = (s: Stars) => `⭐ ${s.firstTries} · ✓ ${s.clears}`;
@@ -187,7 +186,7 @@ export function shareAll(games: ShareModel[], url?: string): ShareModel | ShareA
   return { date: played[0]!.date, games: played, ...(url && { url }) };
 }
 
-export const isShareAll = (m: ShareModel | ShareAll): m is ShareAll => 'games' in m;
+export const isShareAll = (m: AnyShare): m is ShareAll => 'games' in m;
 
 /** "First try!", "Won on try 2", "Not cleared yet · 2 tries": the squares show what's left. */
 export function shortHeadline(m: ShareModel): string {
@@ -211,18 +210,82 @@ export const gameLabel = (m: ShareModel) =>
 export function formatShareAllText(all: ShareAll): string {
   const lines = [`Pokémon Daily · ${all.date}`];
   for (const m of all.games) {
-    const streak = m.streak && (m.streak === 'Streak reset' ? m.streak : `🔥 ${m.streak}`);
-    lines.push([gameLabel(m), streak, m.stars && starsShort(m.stars)].filter(Boolean).join(' · '));
-    const icon = m.status === 'firstTry' ? '⭐' : m.cleared ? '✅' : '❌';
-    lines.push(`${icon} ${squares(m.rows.at(-1)!)} ${shortHeadline(m)}`);
+    lines.push(
+      [gameLabel(m), streakText(m), m.stars && starsShort(m.stars)].filter(Boolean).join(' · '),
+    );
+    lines.push(resultLine(m));
   }
   if (all.url) lines.push(all.url);
   return lines.join('\n');
 }
 
-/** The text for either kind of share. */
-export const anyShareText = (m: ShareModel | ShareAll) =>
-  isShareAll(m) ? formatShareAllText(m) : formatShareText(m);
+/**
+ * One game played at two or more difficulties today (DESIGN.md §11). Each
+ * difficulty (and the coached tries) gets its own compact line pair, as in the
+ * all-games share; the team is shared, so the image shows it once.
+ */
+export interface ShareGame {
+  game?: string;
+  format?: FormatId;
+  date: string;
+  /** Each difficulty played today: Easy, Normal, Hard, then Coached. */
+  levels: ShareModel[];
+  /** The deciding try's team at the best difficulty (`bestBucket`). */
+  team: ShareModel['team'];
+  url?: string;
+}
+
+/**
+ * A game's share: one difficulty is its own full share; two or more are a
+ * `ShareGame` with `best`'s team. Null before any try today.
+ */
+export function shareGame(levels: ShareModel[], best: ShareModel): ShareModel | ShareGame | null {
+  const played = levels.filter((m) => m.status !== 'none');
+  if (played.length < 2) return played[0] ?? null;
+  return {
+    ...(best.game && { game: best.game }),
+    ...(best.format && { format: best.format }),
+    date: best.date,
+    levels: played,
+    team: best.team,
+    ...(best.url && { url: best.url }),
+  };
+}
+
+export const isShareGame = (m: AnyShare): m is ShareGame => 'levels' in m;
+
+export type AnyShare = ShareModel | ShareAll | ShareGame;
+
+/** "Easy", "Normal", "Hard", "Coached", "Easy · Coached": a difficulty's line in a game's share. */
+export const levelLabel = (m: ShareModel) =>
+  [m.level, m.coached && 'Coached'].filter(Boolean).join(' · ') || 'Normal';
+
+/**
+ * Pokémon Daily · Gen 4 OU · Oct 21
+ * Easy · 🔥 3-day streak · ⭐ 4 · ✓ 6
+ * ⭐ 🟩🟩🟩🟩🟩⬛ First try!
+ * Hard
+ * ❌ ⬛⬛⬛⬛⬛⬛ Not cleared yet · 1 try
+ */
+export function formatShareGameText(g: ShareGame): string {
+  const lines = [`Pokémon Daily · ${shareHeader(g)}`];
+  for (const m of g.levels) {
+    lines.push(
+      [levelLabel(m), streakText(m), m.stars && starsShort(m.stars)].filter(Boolean).join(' · '),
+    );
+    lines.push(resultLine(m));
+  }
+  if (g.url) lines.push(g.url);
+  return lines.join('\n');
+}
+
+/** The text for any kind of share. */
+export const anyShareText = (m: AnyShare) =>
+  isShareAll(m)
+    ? formatShareAllText(m)
+    : isShareGame(m)
+      ? formatShareGameText(m)
+      : formatShareText(m);
 
 export type ShareOutcome = 'shared' | 'copied' | 'manual';
 

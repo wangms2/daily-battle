@@ -6,7 +6,9 @@ import headers from '../../public/_headers?raw';
 import {
   anyShareText,
   imageMode,
+  isShareGame,
   shareAll,
+  shareGame,
   shareImage,
   shareModel,
   shareResult,
@@ -91,96 +93,32 @@ describe('share text', () => {
     );
   });
 
-  it('celebrates a first-try win', () => {
+  it('is compact: the header, the deciding try’s squares, then the streak; no team', () => {
     expect(text([a('win', 4)], 5)).toBe(
-      [
-        'Pokémon Daily · Oct 21',
-        '⭐ First try! 4/6 left',
-        '✅ 🟩🟩🟩🟩⬛⬛',
-        'Hippowdon, Azelf, Celebi, Heatran, Jirachi, Lucario',
-        '🔥 5-day streak',
-      ].join('\n'),
+      ['Pokémon Daily · Oct 21', '⭐ 🟩🟩🟩🟩⬛⬛ First try!', '🔥 5-day streak'].join('\n'),
     );
-  });
-
-  it('shows each try that counted when won on try 3, with the swap marked', () => {
     expect(text([a('loss', 0), a('forfeit', 1), a('win', 2)], 0, { change: swap })).toBe(
-      [
-        'Pokémon Daily · Oct 21',
-        '✅ Won on try 3 · 2/6 left',
-        '❌ ⬛⬛⬛⬛⬛⬛',
-        '❌ ⬜⬛⬛⬛⬛⬛', // given up: grey
-        '✅ 🟩🟩⬛⬛⬛⬛',
-        'Hippowdon, Azelf, Celebi, Heatran*, Jirachi, Lucario',
-        '🔥 Streak reset', // only first-try wins keep it
-      ].join('\n'),
+      ['Pokémon Daily · Oct 21', '✅ 🟩🟩⬛⬛⬛⬛ Won on try 3', 'Streak reset'].join('\n'),
     );
   });
 
-  it('says when a past day was never cleared', () => {
+  it('says when a day isn’t cleared, or not yet', () => {
     expect(text([a('loss', 2), a('loss', 0), a('loss', 1)], 0, { isToday: false })).toBe(
-      [
-        'Pokémon Daily · Oct 21',
-        '❌ Not cleared',
-        '❌ 🟩🟩⬛⬛⬛⬛',
-        '❌ ⬛⬛⬛⬛⬛⬛',
-        '❌ 🟩⬛⬛⬛⬛⬛',
-        'Hippowdon, Azelf, Celebi, Heatran, Jirachi, Lucario',
-        '🔥 Streak reset',
-      ].join('\n'),
+      ['Pokémon Daily · Oct 21', '❌ 🟩⬛⬛⬛⬛⬛ Not cleared', 'Streak reset'].join('\n'),
     );
+    expect(text([a('loss', 1)], 0).split('\n')[1]).toBe('❌ 🟩⬛⬛⬛⬛⬛ Not cleared yet · 1 try');
   });
 
-  it('lists every try up to a late win, however many', () => {
-    const t = text([a('loss', 0), a('loss', 0), a('loss', 0), a('loss', 1), a('win', 3)], 0);
-    expect(t.split('\n').slice(1, 7)).toEqual([
-      '✅ Won on try 5 · 3/6 left',
-      '❌ ⬛⬛⬛⬛⬛⬛',
-      '❌ ⬛⬛⬛⬛⬛⬛',
-      '❌ ⬛⬛⬛⬛⬛⬛',
-      '❌ 🟩⬛⬛⬛⬛⬛',
-      '✅ 🟩🟩🟩⬛⬛⬛',
-    ]);
-    expect(t).toContain('🔥 Streak reset');
-  });
-
-  it('keeps the ends of a day past ten tries: the first, a count, and the last two', () => {
-    const tries = [a('loss', 2), ...Array.from({ length: 12 }, () => a('loss', 0)), a('win', 1)];
-    expect(text(tries, 0).split('\n').slice(1, 6)).toEqual([
-      '✅ Won on try 14 · 1/6 left',
-      '❌ 🟩🟩⬛⬛⬛⬛',
-      '⋯ 11 tries more',
-      '❌ ⬛⬛⬛⬛⬛⬛',
-      '✅ 🟩⬛⬛⬛⬛⬛',
-    ]);
-    // Ten fit whole.
-    const ten = Array.from({ length: 10 }, () => a('loss', 0));
-    expect(text(ten, 0)).not.toContain('⋯');
-  });
-
-  it('shares a day still in progress, the streak already reset', () => {
-    expect(text([a('loss', 1)], 0)).toBe(
-      [
-        'Pokémon Daily · Oct 21',
-        'Not cleared yet · 1 try',
-        '❌ 🟩⬛⬛⬛⬛⬛',
-        'Hippowdon, Azelf, Celebi, Heatran, Jirachi, Lucario',
-        '🔥 Streak reset',
-      ].join('\n'),
+  it('greys out a try that was given up', () => {
+    expect(text([a('forfeit', 2)], 0).split('\n')[1]).toBe(
+      '❌ ⬜⬜⬛⬛⬛⬛ Not cleared yet · 1 try',
     );
   });
 
   it('never shares practice runs after the win', () => {
     const practice = { ...a('win', 6), practiceChange: swap };
-    const tries = [a('win', 4), a('loss', 0), practice];
-    expect(text(tries, 5)).toBe(
-      [
-        'Pokémon Daily · Oct 21',
-        '⭐ First try! 4/6 left',
-        '✅ 🟩🟩🟩🟩⬛⬛',
-        'Hippowdon, Azelf, Celebi, Heatran, Jirachi, Lucario',
-        '🔥 5-day streak',
-      ].join('\n'),
+    expect(text([a('win', 4), a('loss', 0), practice], 5).split('\n')[1]).toBe(
+      '⭐ 🟩🟩🟩🟩⬛⬛ First try!',
     );
   });
 
@@ -189,12 +127,10 @@ describe('share text', () => {
     const share = (stars: { firstTries: number; clears: number }) =>
       shareText({ day: DAY, summary: summarizeDay(day, true), streak: 0, stars }).split('\n');
     // Won on try 2: the streak is reset, but the collection stays.
-    expect(share({ firstTries: 10, clears: 23 })).toContain('⭐ 10 first tries · ✓ 23 clears');
-    expect(share({ firstTries: 1, clears: 1 })).toContain('⭐ 1 first try · ✓ 1 clear');
+    expect(share({ firstTries: 10, clears: 23 })).toContain('Streak reset · ⭐ 10 · ✓ 23');
     // Nothing to show before the first clear.
-    expect(share({ firstTries: 0, clears: 0 }).join('\n')).not.toMatch(/clears?$/m);
+    expect(share({ firstTries: 0, clears: 0 }).join('\n')).not.toContain('✓');
   });
-
   it('ends with the link to play', () => {
     const t = text([a('win', 4)], 5, { url: 'https://battle.peanutbuilds.com' });
     expect(t.split('\n').slice(-2)).toEqual(['🔥 5-day streak', 'https://battle.peanutbuilds.com']);
@@ -208,10 +144,9 @@ describe('share text', () => {
       text([a('win', 4)], 5, { url }),
       text([a('loss', 0), a('loss', 0), a('win', 1), a('win', 6)], 1, { url }),
       text([a('loss', 0), a('loss', 0), a('loss', 0), a('win', 1)], 0, { url }),
-      // Past ten tries the middle becomes a count, so even a long day stays short.
       text([...Array.from({ length: 30 }, () => a('loss', 0)), a('win', 1)], 0, { url }),
     ]) {
-      expect(t.split('\n').length).toBeLessThanOrEqual(16); // header, rows (five if condensed), team, streak, link
+      expect(t.split('\n').length).toBeLessThanOrEqual(4); // header, result, streak, link
       for (const s of opponents) if (!ours.has(s)) expect(t).not.toContain(s);
       expect(t).not.toMatch(/turn/i);
     }
@@ -265,6 +200,36 @@ describe('share all', () => {
         'Gen 5 OU · Streak reset',
         '✅ 🟩🟩⬛⬛⬛⬛ Won on try 2',
         'Gen 6 OU · Streak reset',
+        '❌ ⬛⬛⬛⬛⬛⬛ Not cleared yet · 1 try',
+        'https://battle.example/#daily',
+      ].join('\n'),
+    );
+  });
+
+  it('lists each difficulty played today in a game’s own share', () => {
+    const easy = game('Gen 4 OU', [a('win', 5)], 3, 'easy', { firstTries: 4, clears: 6 });
+    const normal = game('Gen 4 OU', [], 0);
+    const hard = shareModel({
+      day: DAY,
+      summary: summarizeDay(
+        { swapUsed: false, attempts: [{ ...a('loss', 0), difficulty: 'hard' }] },
+        true,
+        'hard',
+      ),
+      streak: 0,
+      game: 'Gen 4 OU',
+      difficulty: 'hard',
+    });
+    // One difficulty is that difficulty's own share.
+    expect(shareGame([easy, normal], easy)).toBe(easy);
+    const both = shareGame([easy, normal, hard], easy)!;
+    expect(isShareGame(both) && both.team).toEqual(easy.team);
+    expect(anyShareText(both)).toBe(
+      [
+        'Pokémon Daily · Gen 4 OU · Oct 21',
+        'Easy · 🔥 3-day streak · ⭐ 4 · ✓ 6',
+        '⭐ 🟩🟩🟩🟩🟩⬛ First try!',
+        'Hard · Streak reset',
         '❌ ⬛⬛⬛⬛⬛⬛ Not cleared yet · 1 try',
         'https://battle.example/#daily',
       ].join('\n'),

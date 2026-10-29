@@ -9,11 +9,9 @@ import {
   type Checklist,
 } from '../lib/data';
 import { getSprite } from '../lib/sprites';
-import type { Stats } from '../lib/results';
 import type { Settings } from '../state/schema';
 import { useAccount } from '../state/context';
 import { Sheet } from '../ui/Sheet';
-import { TrainerRow, TrainerSection } from './Trainer';
 import { Button, Switch, TypeBadge } from '../ui/bits';
 import { CheckIcon, ChevronIcon, CloseIcon } from '../ui/icons';
 
@@ -101,59 +99,6 @@ export function WelcomeSheet({
   );
 }
 
-function StatTile({ value, label }: { value: ReactNode; label: string }) {
-  return (
-    <div className="rounded-card bg-surface-2 px-3 py-3 text-center">
-      <div className="home-serif text-[24px] tabular-nums">{value}</div>
-      <div className="text-[12px] text-muted">{label}</div>
-    </div>
-  );
-}
-
-export function StatsSheet({
-  open,
-  onOpenChange,
-  stats,
-  game,
-  todayLabel,
-  countdown,
-}: {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  stats: Stats;
-  /** "Gen 5 OU": the game these stats are for. */
-  game?: string;
-  todayLabel: string;
-  countdown: string;
-}) {
-  return (
-    <Sheet
-      open={open}
-      onOpenChange={onOpenChange}
-      title={game ? `Your ${game} stats` : 'Your stats'}
-    >
-      <div className="card px-4 py-3">
-        <div className="text-[13px] text-muted">Today</div>
-        <div className="text-[16px] font-semibold">{todayLabel}</div>
-      </div>
-      <div className="mt-3 grid grid-cols-3 gap-2">
-        <StatTile value={stats.streak} label="Streak" />
-        <StatTile value={stats.bestStreak} label="Best streak" />
-        <StatTile value={`⭐ ${stats.firstTryWins}`} label="First-try wins" />
-        <StatTile value={`${stats.firstTryRate}%`} label="First-try rate" />
-        <StatTile value={stats.daysPlayed} label="Days played" />
-        <StatTile
-          value={stats.triesPerClear === null ? '–' : stats.triesPerClear.toFixed(1)}
-          label="Tries per clear"
-        />
-      </div>
-      <p className="mt-4 text-center text-[14px] text-muted">
-        Next opponent in <span className="font-semibold text-ink tabular-nums">{countdown}</span>
-      </p>
-    </Sheet>
-  );
-}
-
 /** A 0–100% slider for one kind of sound (Settings). */
 function VolumeSlider({
   label,
@@ -207,8 +152,8 @@ export function SettingsSheet({
   const speeds: Settings['battleSpeed'][] = ['slow', 'normal', 'fast'];
   const account = useAccount();
   const [erasing, setErasing] = useState(false);
-  // The Trainer page opens in place of the list, with a way back; closing resets it.
-  const [page, setPage] = useState<'main' | 'trainer' | 'startOver'>('main');
+  // Start over opens in place of the list, with a way back; closing resets it.
+  const [page, setPage] = useState<'main' | 'startOver'>('main');
   const close = (o: boolean) => {
     if (!o) setPage('main');
     onOpenChange(o);
@@ -227,15 +172,10 @@ export function SettingsSheet({
     <Sheet
       open={open}
       onOpenChange={close}
-      title={page === 'trainer' ? 'Trainer' : page === 'startOver' ? 'Start over' : 'Settings'}
+      title={page === 'startOver' ? 'Start over' : 'Settings'}
       size="md"
     >
-      {page === 'trainer' ? (
-        <div>
-          {back}
-          <TrainerSection name={settings.name} onRename={(name) => onChange('name', name)} />
-        </div>
-      ) : page === 'startOver' ? (
+      {page === 'startOver' ? (
         <div className="grid gap-3">
           {back}
           <p className="text-[15px]">
@@ -245,8 +185,8 @@ export function SettingsSheet({
           {account.name && (
             <p className="text-[14px] text-muted">
               You’ll be signed out of 🔒 {account.name}. Its saved copy stays on the server, so
-              signing in again brings it back. To erase that too, delete the account in Trainer
-              first.
+              signing in again brings it back. To erase that too, delete the account on your trainer
+              card first.
             </p>
           )}
           <div className="grid grid-cols-2 gap-2">
@@ -270,7 +210,6 @@ export function SettingsSheet({
           {/* Two columns on wide screens: the game on the left, sound on the right. */}
           <div className="wide:grid wide:grid-cols-2 wide:gap-8">
             <div className="divide-y divide-line">
-              <TrainerRow name={settings.name} onOpen={() => setPage('trainer')} />
               <Switch
                 checked={settings.beginnerHints}
                 onCheckedChange={(v) => onChange('beginnerHints', v)}

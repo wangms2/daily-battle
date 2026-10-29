@@ -12,7 +12,9 @@ import {
   shareResult,
   type ImageMode,
   type ImageOutcome,
+  type AnyShare,
   type ShareAll,
+  type ShareGame,
   type ShareModel,
   type ShareOutcome,
 } from '../lib/share';
@@ -186,7 +188,7 @@ export function TextShareButton({
 }
 
 /** The card for `share`, drawn when `open` turns on and redrawn when its text changes. */
-function useCard(share: ShareModel | ShareAll, text: string, open: boolean) {
+function useCard(share: AnyShare, text: string, open: boolean) {
   const [image, setImage] = useState<{ blob: Blob; url: string } | 'failed' | null>(null);
   useEffect(() => {
     if (!open) return;
@@ -223,7 +225,7 @@ export function ShareButton({
   className,
   children = 'Share',
 }: {
-  share: ShareModel;
+  share: ShareModel | ShareGame;
   variant?: 'primary' | 'secondary';
   className?: string;
   children?: ReactNode;
@@ -252,7 +254,7 @@ export function ShareAllButton({
   className,
   children,
 }: {
-  share: ShareModel | ShareAll;
+  share: AnyShare;
   variant?: 'primary' | 'secondary';
   className?: string;
   children: ReactNode;
@@ -277,7 +279,7 @@ function ShareSheetButton({
   className,
   children,
 }: {
-  share: ShareModel | ShareAll;
+  share: AnyShare;
   /** Offers "All games" next to `share`. */
   all?: ShareAll | null;
   /** Shows the other games to play under the buttons. */

@@ -20,6 +20,13 @@ export const GearIcon = (p: SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
+export const ProfileIcon = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}>
+    <circle cx="12" cy="8" r="4" />
+    <path d="M4 21a8 8 0 0 1 16 0" />
+  </svg>
+);
+
 export const FlameIcon = (p: SVGProps<SVGSVGElement>) => (
   <svg {...base(p)}>
     <path d="M12 22c4 0 7-2.7 7-7 0-3.5-2.5-6.5-4-8-.5 2-1.5 3.5-3 4 0-3-1.5-6-4-9 0 4-5 6.5-5 12 0 4.3 3 8 9 8z" />

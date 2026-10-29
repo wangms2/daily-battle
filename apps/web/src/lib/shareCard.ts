@@ -8,9 +8,13 @@ import { LIDS, MASCOT } from './genColors';
 import { condenseTries, tryCount } from './results';
 import {
   isShareAll,
+  isShareGame,
+  levelLabel,
   shareHeader,
   shortHeadline,
+  type AnyShare,
   type ShareAll,
+  type ShareGame,
   type ShareModel,
   type ShareRow,
   type Stars,
@@ -345,9 +349,44 @@ function headerUrl(ctx: CanvasRenderingContext2D, url: string | undefined) {
   ctx.fillText(url.replace(/^https?:\/\//, ''), LEFT, MID + 42);
 }
 
+/** The team at the right: two rows of three, sprites standing on a shadow, names under them. */
+function drawTeam(
+  ctx: CanvasRenderingContext2D,
+  team: ShareModel['team'],
+  sprites: (HTMLImageElement | null)[],
+) {
+  const cellW = 160;
+  const gridX = RIGHT - cellW * 3;
+  team.forEach((s, i) => {
+    const cx = gridX + (i % 3) * cellW + cellW / 2;
+    const base = 322 + Math.floor(i / 3) * 160; // sprite baseline
+    const img = sprites[i];
+    if (img) {
+      // The sprite itself (without its empty margin), as large as fits its 136px cell,
+      // up to 2×, standing on the shadow.
+      const b = trimmed(img);
+      const k = fitScale(b, 136, 2);
+      const w = b.w * k;
+      const h = b.h * k;
+      groundShadow(ctx, cx, base + 2, Math.max(36, w * 0.5));
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(img, b.x, b.y, b.w, b.h, cx - w / 2, base - h, w, h);
+    }
+    ctx.textBaseline = 'alphabetic';
+    ctx.textAlign = 'center';
+    ctx.font = font(600, 17);
+    ctx.fillStyle = s.swapped ? C.gold : C.text;
+    ctx.fillText(s.swapped ? `${s.species}*` : s.species, cx, base + 28, cellW - 8);
+    ctx.textAlign = 'left';
+  });
+}
+
+const loadTeam = (team: ShareModel['team']) =>
+  Promise.all(team.map((s) => loadImage(getSprite(s.species, 'front'))));
+
 export async function drawShareCard(m: ShareModel): Promise<HTMLCanvasElement> {
   await loadFonts();
-  const sprites = await Promise.all(m.team.map((s) => loadImage(getSprite(s.species, 'front'))));
+  const sprites = await loadTeam(m.team);
   const { canvas, ctx } = blankCard();
   const left = LEFT;
   const right = RIGHT;
@@ -395,31 +434,7 @@ export async function drawShareCard(m: ShareModel): Promise<HTMLCanvasElement> {
     y += ROW_H;
   }
 
-  // Team: two rows of three, sprites standing on a shadow, names under them.
-  const cellW = 160;
-  const gridX = right - cellW * 3;
-  m.team.forEach((s, i) => {
-    const cx = gridX + (i % 3) * cellW + cellW / 2;
-    const base = 322 + Math.floor(i / 3) * 160; // sprite baseline
-    const img = sprites[i];
-    if (img) {
-      // The sprite itself (without its empty margin), as large as fits its 136px cell,
-      // up to 2×, standing on the shadow.
-      const b = trimmed(img);
-      const k = fitScale(b, 136, 2);
-      const w = b.w * k;
-      const h = b.h * k;
-      groundShadow(ctx, cx, base + 2, Math.max(36, w * 0.5));
-      ctx.imageSmoothingEnabled = false;
-      ctx.drawImage(img, b.x, b.y, b.w, b.h, cx - w / 2, base - h, w, h);
-    }
-    ctx.textBaseline = 'alphabetic';
-    ctx.textAlign = 'center';
-    ctx.font = font(600, 17);
-    ctx.fillStyle = s.swapped ? C.gold : C.text;
-    ctx.fillText(s.swapped ? `${s.species}*` : s.species, cx, base + 28, cellW - 8);
-    ctx.textAlign = 'left';
-  });
+  drawTeam(ctx, m.team, sprites);
 
   // The game's stars, bottom right, under the team: kept whatever the streak.
   if (m.stars) starPills(ctx, m.stars, right, CARD_H - 70, 20, false);
@@ -531,9 +546,58 @@ export async function drawShareAllCard(all: ShareAll): Promise<HTMLCanvasElement
   return canvas;
 }
 
-/** The PNG for either kind of share. */
-export async function anyShareCardBlob(m: ShareModel | ShareAll): Promise<Blob | null> {
-  const canvas = await (isShareAll(m) ? drawShareAllCard(m) : drawShareCard(m));
+const LEVEL_ROW = 80;
+
+/**
+ * One game at several difficulties: the game's lid, a row for each difficulty
+ * on the left (its ball and name with the short headline, then the deciding
+ * try's squares and the streak), and the shared team on the right.
+ */
+export async function drawShareGameCard(g: ShareGame): Promise<HTMLCanvasElement> {
+  await loadFonts();
+  const sprites = await loadTeam(g.team);
+  const { canvas, ctx } = blankCard();
+  const colors = g.format ? LIDS[g.format] : CLAY;
+  drawLid(ctx, colors, shareHeader(g));
+
+  const gap = g.levels.length > 3 ? 12 : GAME_GAP;
+  const top = 196;
+  const bottom = CARD_H - 28;
+  const height = g.levels.length * LEVEL_ROW + (g.levels.length - 1) * gap;
+  // The left column ends before the team's first sprite.
+  const colRight = RIGHT - 160 * 3 - 24;
+  let y = top + Math.max(0, (bottom - top - height) / 2);
+  for (const m of g.levels) {
+    drawBall(ctx, LEFT + 13, y + 14, 13, ballFor(m.level), colors.button);
+    const x = LEFT + 36;
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = C.text;
+    ctx.font = serif(26);
+    const label = levelLabel(m);
+    ctx.fillText(label, x, y + 14);
+    const labelW = ctx.measureText(label).width;
+    ctx.fillStyle = m.status === 'pending' ? C.muted : C.text;
+    ctx.font = font(600, 19);
+    const head = m.status === 'firstTry' ? '⭐ First try!' : shortHeadline(m);
+    ctx.fillText(head, x + labelW + 14, y + 16, colRight - (x + labelW + 14));
+    // Squares end at LEFT + 320, leaving room for the streak before the team.
+    tryRow(ctx, m.rows.at(-1)!, LEFT, y + 34);
+    if (m.streak) streakPill(ctx, m.streak, colRight, y + 40, 16);
+    y += LEVEL_ROW + gap;
+  }
+
+  drawTeam(ctx, g.team, sprites);
+  headerUrl(ctx, g.url);
+  return canvas;
+}
+
+/** The PNG for any kind of share. */
+export async function anyShareCardBlob(m: AnyShare): Promise<Blob | null> {
+  const canvas = await (isShareAll(m)
+    ? drawShareAllCard(m)
+    : isShareGame(m)
+      ? drawShareGameCard(m)
+      : drawShareCard(m));
   return new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
 }
 

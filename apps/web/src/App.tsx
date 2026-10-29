@@ -4,6 +4,7 @@ import { addDays, dayKey, weekKey } from '@daily-battle/gen/dates';
 import { useTrackPlays } from './lib/plays';
 import {
   Fragment,
+  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -20,7 +21,9 @@ import { savedName, saveName } from './versus/saved';
 import { Home } from './screens/Home';
 import { TeamBuilder } from './screens/TeamBuilder';
 import { AboutSheet } from './sheets/About';
-import { ConfirmDialog, SettingsSheet, StatsSheet, WelcomeSheet } from './sheets/misc';
+import { ConfirmDialog, SettingsSheet, WelcomeSheet } from './sheets/misc';
+import { TrainerCard } from './sheets/TrainerCard';
+import { TrainerProvider } from './ui/Profile';
 import { configureAudio, menuSounds } from './lib/audio';
 import { setActiveFormat } from './lib/data';
 import { setSpriteStyle } from './lib/sprites';
@@ -29,7 +32,9 @@ import {
   attemptBucket,
   attemptDifficulty,
   bestBucket,
+  BUCKETS,
   computeStats,
+  type Bucket,
   dayHeadline,
   summarizeDay,
 } from './lib/results';
@@ -39,7 +44,14 @@ import type { ScheduleFile } from '@daily-battle/gen/schedule';
 import { hardAvailable } from './battle/hardEngine';
 import { currentDifficulty } from './lib/difficulty';
 import { ENGINE_VERSION, randomSeed } from './lib/seed';
-import { DIFFICULTY_NAME, shareAll, shareModel } from './lib/share';
+import {
+  DIFFICULTY_NAME,
+  isShareAll,
+  shareAll,
+  shareGame,
+  shareModel,
+  type ShareModel,
+} from './lib/share';
 import { GamesProvider } from './ui/OtherGames';
 import {
   attemptEngine,
@@ -208,7 +220,9 @@ export function App() {
       dispatchAny({ type: 'setSetting', key: 'format', value: linked });
     go('play');
   }, [linked, state.settings.format, dispatchAny, go]);
-  const [statsOpen, setStatsOpen] = useState(false);
+  // The trainer card, and the game it opened at (a game's 🔥).
+  const [trainer, setTrainer] = useState<{ focus?: FormatId } | null>(null);
+  const openTrainer = useCallback((focus?: FormatId) => setTrainer(focus ? { focus } : {}), []);
   // After a loss, the end card's "Change team" opens the brief with the team editable.
   const [openEdit, setOpenEdit] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -265,33 +279,48 @@ export function App() {
     coached,
     stars: { firstTries: stats.firstTryWins, clears: stats.clears },
   });
+  // A game's share at one bucket; the current one is `share` itself.
+  const modelFor = (id: FormatId, b: Bucket): ShareModel => {
+    if (id === format && b === bucket) return share;
+    const gameDays = state.games[id].days;
+    const level = b === 'coached' ? currentDifficulty(settings, id, gameDays[day]) : b;
+    const gameStats = computeStats(gameDays, day, b);
+    return shareModel({
+      day,
+      summary: summarizeDay(gameDays[day], true, b),
+      streak: gameStats.streak,
+      stars: { firstTries: gameStats.firstTryWins, clears: gameStats.clears },
+      change: gameDays[day]?.change,
+      url: shareUrl(),
+      game: `${formatInfo(id).name} OU`,
+      format: id,
+      difficulty: level,
+      coached: b === 'coached',
+    });
+  };
+  const ids = Object.keys(FORMATS) as FormatId[];
+  const bestOf = (id: FormatId) =>
+    modelFor(id, bestBucket(state.games[id].days[day], gameBucket(id)));
   // Every game played today on one card or text (DESIGN.md §11): each at its best
   // difficulty today (the hardest cleared, else the hardest played).
-  const todayShare = shareAll(
-    (Object.keys(FORMATS) as FormatId[]).map((id) => {
-      const gameDays = state.games[id].days;
-      const b = bestBucket(gameDays[day], gameBucket(id));
-      if (id === format && b === bucket) return share;
-      const level = b === 'coached' ? currentDifficulty(settings, id, gameDays[day]) : b;
-      const gameStats = computeStats(gameDays, day, b);
-      return shareModel({
-        day,
-        summary: summarizeDay(gameDays[day], true, b),
-        streak: gameStats.streak,
-        stars: { firstTries: gameStats.firstTryWins, clears: gameStats.clears },
-        change: gameDays[day]?.change,
-        url: shareUrl(),
-        game: `${formatInfo(id).name} OU`,
-        format: id,
-        difficulty: level,
-        coached: b === 'coached',
-      });
-    }),
-    shareUrl(),
-  );
+  const todayShare = shareAll(ids.map(bestOf), shareUrl());
+  // Each game's own share: every difficulty played today, the team once.
+  const gameShares = ids.map((id) => ({
+    id,
+    name: `${formatInfo(id).name} OU`,
+    share: shareGame(
+      BUCKETS.map((b) => modelFor(id, b)),
+      bestOf(id),
+    ),
+  }));
+  const thisGameShare = gameShares.find((g) => g.id === format)?.share ?? share;
+  // One game played today: the picker shares that game, every difficulty in it.
+  const homeShare =
+    todayShare && !isShareAll(todayShare)
+      ? (gameShares.find((g) => g.share)?.share ?? todayShare)
+      : todayShare;
   const countdown = countdownTo(now, addDays(day, 1));
   // The other games, for the "Play another generation" row on the result and share screens.
-  const ids = Object.keys(FORMATS) as FormatId[];
   const games = ids
     .filter((id) => id !== format)
     .map((id) => ({
@@ -421,7 +450,7 @@ export function App() {
       onTitle={() => go('daily')}
       left={left}
       streak={stats.streak}
-      onStats={() => setStatsOpen(true)}
+      onStats={() => setTrainer({ focus: format })}
       onSettings={() => setSettingsOpen(true)}
       format={format}
     />
@@ -519,7 +548,7 @@ export function App() {
         onPlay={() => go('daily')}
         onFriends={() => go('versus')}
         onLearn={() => go('learn')}
-        share={todayShare}
+        share={homeShare}
         onPick={(id) => {
           if (id !== format) dispatchAny({ type: 'setSetting', key: 'format', value: id });
           go('play');
@@ -643,7 +672,7 @@ export function App() {
           summary,
           streak: stats.streak,
           // The same share as the brief's: practice runs never show in it.
-          share,
+          share: thisGameShare,
           ...(protectOffer && { protect: protectOffer }),
         }}
         {...(shownAttempt === inProgress &&
@@ -699,7 +728,7 @@ export function App() {
           coach: { on: coached, warning: coachCost, onChange: setCoach },
         })}
         hardAvailable={hardAvailable(format)}
-        result={{ summary, streak: stats.streak, share, countdown }}
+        result={{ summary, streak: stats.streak, share: thisGameShare, countdown }}
       />
     );
   }
@@ -735,9 +764,11 @@ export function App() {
           </button>
         </div>
       )}
-      <GamesProvider value={otherGames}>
-        <Fragment key={format}>{screen}</Fragment>
-      </GamesProvider>
+      <TrainerProvider value={openTrainer}>
+        <GamesProvider value={otherGames}>
+          <Fragment key={format}>{screen}</Fragment>
+        </GamesProvider>
+      </TrainerProvider>
       {askName && (
         <NameScreen
           onDone={(name) => {
@@ -768,17 +799,22 @@ export function App() {
           setCoach(true);
         }}
       />
-      <StatsSheet
-        open={statsOpen}
-        onOpenChange={setStatsOpen}
-        stats={stats}
-        game={[
-          `${game.name} OU`,
-          coached ? 'Coached' : difficulty !== 'normal' && DIFFICULTY_NAME[difficulty],
-        ]
-          .filter(Boolean)
-          .join(' · ')}
-        todayLabel={dayHeadline(summary)}
+      <TrainerCard
+        open={!!trainer}
+        onOpenChange={(o) => !o && setTrainer(null)}
+        focus={trainer?.focus}
+        name={settings.name}
+        onRename={(name) => setSetting('name', name)}
+        games={ids.map((id) => ({
+          id,
+          name: `${formatInfo(id).name} OU`,
+          rows: BUCKETS.map((b) => ({
+            bucket: b,
+            stats: computeStats(state.games[id].days, day, b),
+          })),
+          share: gameShares.find((g) => g.id === id)?.share ?? null,
+        }))}
+        shareAll={todayShare}
         countdown={countdown}
       />
       <TypeChartSheet open={typeChartOpen} onOpenChange={setTypeChartOpen} />

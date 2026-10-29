@@ -86,6 +86,7 @@ Daily swap (done on the daily brief screen, shown as "1 change left"):
 - **Streak (revised after M9a):** consecutive days won **on the first try**. A lost first try breaks it at once (a forfeit or an abandoned try counts as a loss; reload resumes, §7, so a reload can't dodge one), and so does a missed day. There's no limit on tries: every try counts until the day is won (the result is "won on try N"), and runs after a win are practice, which are never shared. No streak freezes.
 - **First-try wins are the best result.** They're celebrated simply: a ⭐ "First try!" headline in the share and a gold badge on the result card, plus a first-try count in stats.
 - Also track: best streak, first-try rate, days played, clears (days eventually won), average tries per clear.
+- **The trainer card** (sheets/TrainerCard.tsx): a profile button beside the gear in every header (the landing, the picker, the game, Learn) opens it, and a game's 🔥 opens it scrolled to that game. Top to bottom: the name and password (protect, sign in, sign out, delete; §10.1), today's shares (**Share all N games** with two or more, and a button per game played today) with the countdown to the next opponent, totals (⭐ first tries, ✓ clears, best streak), and a block per game in its colour with a row for each difficulty played (Easy, Normal, Hard, Coached): streak, best, ⭐ and ✓. Settings no longer has a Trainer page.
 - A day shows one of: not played, first-try win, won on a later try, not cleared yet (today, tried but not won), or not cleared (a past day never won).
 - Streaks and stats are derived from the saved attempts (`apps/web/src/lib/results.ts`), not stored.
 
@@ -335,53 +336,52 @@ Attempt = { result: 'win'|'loss'|'forfeit'|'inProgress', remaining: number, ts: 
 Showdown-style, and as simple as possible: no email, no sign-up step.
 
 - **A name when the game first opens.** The first time, once the landing has loaded, it dims and a card rises with Pikachu standing on its edge, asking the player's name (a link straight into a game or room skips it). Once they're met, the card slides away. The card (`screens/NameScreen.tsx`) is in the landing's style, a Professor-style "What's your name?" with a random suggestion (🎲). It's `settings.name`, local only, and versus uses it too (`versus/saved.ts`). A player who already has a versus name isn't asked.
-- **Protecting it.** After a win, the end card offers to protect the name with a password (5+ characters). It stays there until the name is protected, and it's also in Settings › Trainer. Protecting registers the name on the server with this device's save. Like Showdown, an unprotected name isn't reserved; a protected one is taken. Picking a name (the name card, Settings › Trainer) checks it a moment after typing stops (`GET /api/accounts/<name>` → `{taken}`) and won't take a protected one.
-- **Other devices.** Sign in with the name and password, from the name screen ("Played on another device?") or Settings › Trainer. The saves are merged (`state/merge.ts`): days and tries are combined (each try once), weeks keep the team that played more, lessons finished and the type trainer combine, and this device's preferences win. Streaks are derived, so they span both devices.
+- **Protecting it.** After a win, the end card offers to protect the name with a password (5+ characters). It stays there until the name is protected, and it's also on the trainer card. Protecting registers the name on the server with this device's save. Like Showdown, an unprotected name isn't reserved; a protected one is taken. Picking a name (the name card, the trainer card) checks it a moment after typing stops (`GET /api/accounts/<name>` → `{taken}`) and won't take a protected one.
+- **Other devices.** Sign in with the name and password, from the name screen ("Played on another device?") or the trainer card. The saves are merged (`state/merge.ts`): days and tries are combined (each try once), weeks keep the team that played more, lessons finished and the type trainer combine, and this device's preferences win. Streaks are derived, so they span both devices.
 - **Sync.** Signed in, the save is pushed 2 s after a change and when the page is hidden; on opening, the server's save is merged in. A push over a newer save (another device's) gets 409, and the client merges and pushes again. Offline, play carries on and syncs later. Sessions don't expire; a signed-in device is never asked again.
 - **Server** (`apps/server/src/accounts.ts`): one Durable Object per name (case and spacing don't make a new name), holding the PBKDF2-SHA256 hash (100k rounds, random salt), the SHA-256 of each device's token (up to 10), and the save (up to 1 MB). Ten wrong passwords in a row pause sign-in for 15 minutes. Routes: `POST /api/accounts/<name>` (protect), `POST|DELETE …/session` (sign in, sign out), `GET|PUT …/save`, `DELETE …` (delete, with the password).
 - **No email, so no reset:** a forgotten password can't be recovered. The device's progress stays on the device regardless.
-- **Starting over.** Settings › "Start over…" (a small link under About, then a confirm page with a red button) erases this browser's `daily-battle:` keys and reloads to the first visit. Signed in, it signs out first and nothing more is pushed; the account's server copy stays (signing in brings it back), so deleting it is a separate step in Trainer. The owner can also wipe an account with `DELETE /api/admin/accounts/<name>` (the admin token).
+- **Starting over.** Settings › "Start over…" (a small link under About, then a confirm page with a red button) erases this browser's `daily-battle:` keys and reloads to the first visit. Signed in, it signs out first and nothing more is pushed; the account's server copy stays (signing in brings it back), so deleting it is a separate step on the trainer card. The owner can also wipe an account with `DELETE /api/admin/accounts/<name>` (the admin token).
 
 ## 11. Share format
 
-First-try win:
+The text is compact: the header, the deciding try's squares with the short headline, the streak and stars, and the link. No team (the image has it).
 
 ```
 Pokémon Daily · Gen 4 OU · Oct 21
-⭐ First try! 4/6 left
-✅ 🟩🟩🟩🟩⬛⬛
-Hippowdon, Azelf, Celebi, Heatran*, Jirachi, Lucario
-🔥 5-day streak
+⭐ 🟩🟩🟩🟩⬛⬛ First try!
+🔥 5-day streak · ⭐ 10 · ✓ 23
+https://battle.peanutbuilds.com/#daily
 ```
 
-Won on a later try (one row per try, up to the win; past ten tries the middle becomes a count: the first, `⋯ 11 tries more`, and the last two):
+Won on a later try: `✅ 🟩🟩⬛⬛⬛⬛ Won on try 3`. Other headlines: `❌ ⬛⬛⬛⬛⬛⬛ Not cleared` (a past day never won, with `Streak reset`) and `Not cleared yet · 3 tries` mid-day. The squares are the deciding try's: the win, else the latest try. Practice runs after a win are never shared. The stars are that difficulty's ⭐ first-try wins and ✓ clears, left out while both are 0.
+
+Easy and Hard add the difficulty to the header, with that difficulty's tries and streak: `Pokémon Daily · Gen 4 OU · Hard · Oct 21`. Normal's header is unchanged.
+
+**Several difficulties in one game.** The team is shared across difficulties, so a game's own share (its result's Share, and its button on the trainer card) lists every difficulty played that day, easiest first, Coached last, a line pair each:
 
 ```
 Pokémon Daily · Gen 4 OU · Oct 21
-✅ Won on try 3 · 2/6 left
-❌ 🟩⬛⬛⬛⬛⬛
-❌ ⬜⬜⬛⬛⬛⬛
-✅ 🟩🟩⬛⬛⬛⬛
-Hippowdon, Azelf, Celebi, Heatran*, Jirachi, Lucario
-🔥 6-day streak
+Easy · 🔥 3-day streak · ⭐ 4 · ✓ 6
+⭐ 🟩🟩🟩🟩🟩⬛ First try!
+Hard · Streak reset
+❌ ⬛⬛⬛⬛⬛⬛ Not cleared yet · 1 try
+https://battle.peanutbuilds.com/#daily
 ```
 
-Other headlines: `❌ Not cleared` (a past day never won, with `🔥 Streak reset`) and `Not cleared yet · 3 tries` mid-day. Practice runs after a win are never shared.
-
-Easy and Hard add the difficulty to the header, with that difficulty's tries and streak: `Pokémon Daily · Gen 4 OU · Hard · Oct 21`. Normal's header is unchanged. The image card shows the same header.
+Its image has a row per difficulty (a ball, the name, the headline, the squares and that difficulty's streak) and the team once, from the best one (as Share all picks).
 
 - The last line is the link to play (the site's own address), so friends can tap through.
-- Each row shows that try's result and your Pokémon left out of 6 (green = alive; grey ⬜ = still standing on a try that was given up), led by one emoji (✅/❌, a first try too) so the squares line up. A practice run shared from its end card adds `🔁 🟩🟩🟩⬛⬛⬛ practice` (`practice, with Gengar` on older runs that swapped one in). At most 7 lines plus the link.
-- Team: species only, lead first, from the deciding try (the win, or the latest try that counted); `*` marks a species swapped in that day.
+- Squares: your Pokémon left out of 6 (green = alive; grey ⬜ = still standing on a try that was given up), led by one emoji (⭐ a first try, ✅ a later win, ❌ not cleared) so they line up.
 - **Share opens a choice: image or text.** Both say the same thing, built from one model (`lib/share.ts`).
   - **Text:** plain text that pastes anywhere, copied straight to the clipboard (never the share sheet), else shown to copy.
-  - **Image:** a 1200×630 card in the app's light theme (`lib/shareCard.ts`), drawn on a canvas in the browser. Its header takes one colour from the game played, so the generation shows at a glance: Emerald green for Gen 3, Diamond's steel blue for Gen 4, black for Gen 5 (with a white ball button, for Black and White), and Y's red for Gen 6. The card shows the date, the headline (gold "⭐ First try" badge), the try rows as squares, a practice row when sharing one, the team as sprites with names (`*` and gold for the day's swap), the streak, and the site address. The sheet previews it; it goes to the share sheet as the image alone where files can be shared (phones; with text alongside, iOS's Copy and some apps keep only the text, and the card shows the address anyway), else the clipboard, else a download. The preview is a `blob:` image, which the CSP allows (`img-src 'self' data: blob:`).
+  - **Image:** a 1200×630 card in the app's light theme (`lib/shareCard.ts`), drawn on a canvas in the browser. Its header takes one colour from the game played, so the generation shows at a glance: Emerald green for Gen 3, Diamond's steel blue for Gen 4, black for Gen 5 (with a white ball button, for Black and White), and Y's red for Gen 6. The card shows the date, the headline (gold "⭐ First try" badge), the try rows as squares, the team as sprites with names (`*` and gold for the day's swap), the streak, and the site address. The sheet previews it; it goes to the share sheet as the image alone where files can be shared (phones; with text alongside, iOS's Copy and some apps keep only the text, and the card shows the address anyway), else the clipboard, else a download. The preview is a `blob:` image, which the CSP allows (`img-src 'self' data: blob:`).
 - Never include opponent species, sets, or turn counts.
-- **Share all.** With two or more games played today, the Share sheet has a **This game / All games** switch, and the game picker has a **Share all N games** button under the list (**Share today** with one game, which shares that game's full result). All games is compact, one game per pair of lines, in picker order, with no teams; games not played today are left out. A game played at several difficulties shows its best one: the hardest cleared today, else the hardest played (Hard > Normal > Easy > Coached; `bestBucket`):
+- **Share all.** With two or more games played today, the Share sheet has a **This game / All games** switch, and the game picker has a **Share all N games** button under the list (**Share today** with one game, which shares that game's own share, every difficulty in it). All games is compact, one game per pair of lines, in picker order, with no teams; games not played today are left out. A game played at several difficulties shows its best one: the hardest cleared today, else the hardest played (Hard > Normal > Easy > Coached; `bestBucket`):
 
   ```
   Pokémon Daily · Oct 21
-  Gen 3 OU · Easy · 🔥 5-day streak
+  Gen 3 OU · Easy · 🔥 5-day streak · ⭐ 10 · ✓ 23
   ⭐ 🟩🟩🟩🟩⬛⬛ First try!
   Gen 4 OU · Streak reset
   ✅ 🟩🟩⬛⬛⬛⬛ Won on try 2

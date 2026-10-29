@@ -13,7 +13,7 @@ import type {
   View,
 } from '../battle/frames';
 import { summarizeDay } from '../lib/results';
-import { formatShareText, shareModel } from '../lib/share';
+import { anyShareText, shareModel } from '../lib/share';
 import { initialState, type Attempt, type Settings } from '../state/schema';
 import { GamesProvider } from '../ui/OtherGames';
 import type { ComponentProps } from 'react';
@@ -586,7 +586,7 @@ describe('battle screen', () => {
       expect(card).toHaveTextContent('Streak reset'); // won, but not on the first try
       expect(props.onEnd).toHaveBeenCalledWith({ result: 'win', remaining: 3 });
       await shareText(card, 'Copy text');
-      expect(writeText).toHaveBeenCalledWith(formatShareText(result.share));
+      expect(writeText).toHaveBeenCalledWith(anyShareText(result.share));
       expect(share).not.toHaveBeenCalled();
       await userEvent.click(within(card).getByRole('button', { name: 'Play again' }));
       expect(props.onRunItBack).toHaveBeenCalled();
@@ -660,7 +660,7 @@ describe('battle screen', () => {
       expect(within(card).getByRole('button', { name: 'Try again' })).toBeInTheDocument();
       await shareText(card, 'Copy text');
       expect(writeText).toHaveBeenCalledWith(
-        formatShareText(dayResult([tried('loss', 1, 1)], 0).share),
+        anyShareText(dayResult([tried('loss', 1, 1)], 0).share),
       );
       expect(await screen.findByRole('status')).toHaveTextContent('Text copied');
     } finally {
