@@ -892,6 +892,8 @@ export function Battle({
       hints={settings.beginnerHints}
       disabled={playing}
       onChoose={pick}
+      // Its details cards open above the coach's note (the panel below), not over it.
+      cardsAbove
       {...(staged.card && staged.card !== 'foe' && !played && { show: staged.card })}
       // Practice: the controls work until the player picks; then the tags show. A turn the
       // player taps through shows them once it's played.

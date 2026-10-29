@@ -23,7 +23,7 @@ export const split: Lesson = {
       position: { p1: [SWAMPERT], p2: [BLISSEY], seed: 'course:split:look1' },
       card: 'move Surf',
       before:
-        'Hold a move to see its details. Here’s Surf’s: it says Special, because in Gen 3 every Water move is special.',
+        'In Gen 3, a move’s type decides whether it’s physical or special. Hold a move to see which: Surf is a Water move, so it’s special.',
       spotlight: { before: ['move Surf', 'move-details'] },
     },
     {
@@ -113,15 +113,31 @@ export const split: Lesson = {
     {
       kind: 'battle',
       intro:
-        'Two on two against the Easy AI: a special wall and a physical wall. Hit each one’s weaker side.',
-      // Both of yours outspeed both foes.
-      player: [SWAMPERT, METAGROSS],
-      foe: [BLISSEY, { species: 'Forretress', moves: ['Earthquake'] }],
+        'Your Salamence against two foes and the Easy AI. Everyone is low on HP, so each move must knock the foe out. Check each foe’s Defense and Special Defense first.',
+      // Salamence alone, so switching (lesson 6) never comes up, and it outspeeds
+      // both foes, so Speed (lesson 7) never decides a turn. Its physical moves
+      // don't match its type, and its special moves are equally strong, so:
+      // - Donphan (Defense 120, Special Defense 60) takes neutral damage from
+      //   all four. Special moves hit its weaker side, and of those, Dragon Claw
+      //   matches Salamence's type (lesson 4): it knocks Donphan out; Crunch and
+      //   the physical moves (even Earthquake, the strongest) don't.
+      // - Blissey (Defense 10, Special Defense 135): physical moves hit its
+      //   weaker side, and of those, Brick Break is super effective (lesson 2):
+      //   it knocks Blissey out; Earthquake, with more power, doesn't.
+      // Salamence starts low, so a wrong pick lets the foe knock it out.
+      player: [
+        {
+          species: 'Salamence',
+          moves: ['Dragon Claw', 'Crunch', 'Earthquake', 'Brick Break'],
+        },
+      ],
+      foe: [{ species: 'Donphan', moves: ['Rock Slide'] }, BLISSEY],
       seed: 'course:split:battle',
+      hp: { p1: [25], p2: [35, 60] },
       noLuck: true,
       takeaway:
-        'Physical moves hit Defense; special moves hit Special Defense. Aim at the weaker one.',
-      hint: 'Blissey’s Defense is tiny: hit it with Earthquake or Meteor Mash. Forretress’s Special Defense is lower: use Surf or Psychic.',
+        'Physical moves hit Defense; special moves hit Special Defense. Aim at the weaker one, then pick the best move of that kind.',
+      hint: 'Donphan’s Special Defense is lower: use a special move, and Dragon Claw matches Salamence’s type. Blissey’s Defense is tiny: use a physical move, and Brick Break is super effective on it.',
     },
   ],
 };

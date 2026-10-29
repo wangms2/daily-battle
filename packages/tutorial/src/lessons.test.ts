@@ -1,5 +1,7 @@
 import { engineBuilt, loadEngine } from '@daily-battle/engine-wasm/node';
+import { legalChoices } from '@daily-battle/sim-bridge';
 import { describe, expect, it } from 'vitest';
+import { playBattle } from './battle';
 import { winCheck } from './coach/guide';
 import { battlePressure, practiceCheck } from './coach/lesson-check';
 import { LESSONS } from './index';
@@ -56,6 +58,23 @@ describe('lessonProblems', () => {
     expect(problems).toContain('a practice needs exactly one best answer');
     expect(problems).toContain('the foe moves first, so the demo would stop before your move');
   });
+});
+
+// Lesson battles play to an end whatever you pick, losing included.
+describe('lesson battles end cleanly', () => {
+  for (const [format, lessons] of Object.entries(LESSONS))
+    for (const lesson of lessons)
+      for (const [n, step] of lesson.steps.entries())
+        if (step.kind === 'battle')
+          it(`${lesson.id} step ${n + 1}`, () => {
+            for (let i = 1; i <= 4; i++) {
+              const r = playBattle(format, step, ({ request }) => {
+                const legal = legalChoices(request);
+                return legal.includes(`move ${i}`) ? `move ${i}` : legal[0]!;
+              });
+              expect(r.winner).not.toBeNull();
+            }
+          });
 });
 
 // Practice positions: the best answer is the judge's

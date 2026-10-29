@@ -231,6 +231,8 @@ export class BattleSession {
       const message = text.slice(newline + 1);
       if (message.startsWith('|request|')) {
         const json = message.slice('|request|'.length) as Protocol.RequestJSON;
+        // The sim sends `null` when the battle ends with a side's last Pokémon fainting.
+        if (json === 'null') return;
         s.request = Protocol.parseRequest(json);
         // Gives the client this side's own full team info (never the opponent's).
         s.client.update(s.request);

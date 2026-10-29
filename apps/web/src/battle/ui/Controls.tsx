@@ -387,6 +387,7 @@ export function ControlPanel({
   onChoose,
   marks,
   show,
+  cardsAbove = false,
 }: {
   controls: Controls | null;
   team: TeamMember[];
@@ -405,6 +406,12 @@ export function ControlPanel({
    * a move's details, or a teammate's card.
    */
   show?: string;
+  /**
+   * Details cards open above the nearest positioned ancestor instead of the
+   * controls: a lesson's coach note sits right above them on phones, and the
+   * card mustn't cover it.
+   */
+  cardsAbove?: boolean;
 }) {
   const marking = !!marks && !disabled;
   // Hover and focus cards belong to the turn they opened in too: a button that
@@ -456,6 +463,7 @@ export function ControlPanel({
   }, [off, controls]);
 
   const pinnedChoice = pinned && !off ? switchFor(pinned) : undefined;
+  const root = clsx('short:gap-1 flex shrink-0 flex-col', !cardsAbove && 'relative');
   const tooltip = pinned ? (
     <div data-bench-card data-spot="team-card" className="absolute bottom-full left-0 z-30 mb-2">
       <MonPopover foe={false} member={pinned}>
@@ -491,7 +499,7 @@ export function ControlPanel({
   if (controls?.kind === 'switch') {
     const last = controls.switches.length === 1;
     return (
-      <div ref={panel} className="short:gap-1 relative flex shrink-0 flex-col gap-2">
+      <div ref={panel} className={clsx(root, 'gap-2')}>
         {tooltip}
         <p className="display text-[14px]">
           {last ? 'Send in your last Pokémon' : 'Who comes in?'}
@@ -526,7 +534,7 @@ export function ControlPanel({
   const mega = !!megaOn && canMega && megaOn.at === controls;
   const withMega = (choice: string) => (mega ? `${choice} mega` : choice);
   return (
-    <div ref={panel} className="short:gap-1 relative flex shrink-0 flex-col gap-1.5">
+    <div ref={panel} className={clsx(root, 'gap-1.5')}>
       {tooltip}
       <p
         className={clsx(
