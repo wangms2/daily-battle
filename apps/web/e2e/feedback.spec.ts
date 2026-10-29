@@ -98,7 +98,6 @@ test('an opponent’s info shows its likely moves with hints on, and fits', asyn
       ? page.getByRole('complementary', { name: `${foe} details` })
       : page.getByRole('dialog', { name: foe });
   await expect(sheet.getByRole('list', { name: 'Moves' })).toBeVisible();
-  await expect(sheet.getByRole('list', { name: 'Speed against your team' })).toBeVisible();
   await noScroll(page, 'foe info');
   await shot(page, '04-foe-sets', info.project.name);
 });

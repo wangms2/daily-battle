@@ -9,7 +9,16 @@ import { TypeBadge } from './bits';
 import { DetailCardBox } from './DetailCard';
 import { useDetailCards } from './useDetailCards';
 
-export function MoveList({ moves, className }: { moves: string[]; className?: string }) {
+export function MoveList({
+  moves,
+  className,
+  compact = false,
+}: {
+  moves: string[];
+  className?: string;
+  /** Shorter chips, for tight places. */
+  compact?: boolean;
+}) {
   const { container, isOpen, trigger } = useDetailCards<HTMLUListElement>();
   return (
     <ul ref={container} className={clsx('grid grid-cols-2 gap-1.5', className)} aria-label="Moves">
@@ -22,7 +31,10 @@ export function MoveList({ moves, className }: { moves: string[]; className?: st
               {...trigger(i)}
               aria-describedby={shown ? `move-info-${i}` : undefined}
               aria-label={m}
-              className="move-chip w-full truncate rounded-badge px-2.5 py-1.5 text-left text-[13px] font-medium"
+              className={clsx(
+                'move-chip w-full truncate rounded-badge px-2.5 text-left text-[13px] font-medium',
+                compact ? 'py-1' : 'py-1.5',
+              )}
               style={typeStyle(m)}
             >
               <MoveName name={m} />

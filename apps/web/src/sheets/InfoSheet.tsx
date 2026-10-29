@@ -1,6 +1,6 @@
 // What a Pokémon is good for, before you commit to it. An opponent shows what
 // its battle card would (FoeScout), never one of its sets.
-import { matchups, setsOf, speciesInfo, topSet, type Slot } from '../lib/data';
+import { matchups, setsOf, speciesInfo, topSet } from '../lib/data';
 import { getSprite } from '../lib/sprites';
 import { Sheet } from '../ui/Sheet';
 import { Button, TypeBadge } from '../ui/bits';
@@ -20,14 +20,14 @@ export function InfoSheet({
   onOpenChange: (open: boolean) => void;
   showRoles?: boolean;
   /** An opponent: what its battle card shows, against your team. */
-  foe?: { hints: boolean; team: readonly Slot[] };
+  foe?: { hints: boolean };
   action?: { label: string; onClick: () => void; disabled?: boolean };
 }) {
   if (!species) return null;
   return (
     <Sheet open={open} onOpenChange={onOpenChange} title={species}>
       {foe ? (
-        <FoeScout species={species} hints={foe.hints} team={foe.team} />
+        <FoeScout species={species} hints={foe.hints} />
       ) : (
         <InfoBody species={species} showRoles={showRoles} />
       )}

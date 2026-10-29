@@ -26,7 +26,7 @@ import { FoeScout } from '../ui/FoeScout';
 import { ConfirmDialog } from '../sheets/misc';
 import { initialSet, SetCard, SetChooser, SetPicker } from '../sheets/SetPicker';
 import type { DayChange, DayState } from '../state/schema';
-import { Button, SectionLabel } from '../ui/bits';
+import { Button, SectionLabel, TypeBadge } from '../ui/bits';
 import { CoachToggle, DifficultyPicker } from '../ui/Difficulty';
 import { StarIcon } from '../ui/icons';
 import { ItemIcon } from '../ui/ItemIcon';
@@ -78,16 +78,22 @@ function ChangeDetail({
   const why = unchanged ? undefined : blocked(selected);
   return (
     <>
-      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
-        <p className="mb-1 flex items-baseline gap-1.5">
-          <span className="home-serif text-[18px] leading-tight">{species}</span>
-          <span className="text-[13px] text-muted">{heading}</span>
-        </p>
+      <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain">
+        <div className="mb-1 flex min-w-0 items-center gap-1.5">
+          <span className="home-serif truncate text-[18px] leading-tight">{species}</span>
+          <span className="truncate text-[13px] text-muted">{heading}</span>
+          <span className="ml-auto flex shrink-0 gap-1">
+            {speciesInfo(species).types.map((t) => (
+              <TypeBadge key={t} type={t} size="sm" />
+            ))}
+          </span>
+        </div>
         <SetChooser
           species={species}
           currentSetId={currentSetId}
           selected={selected}
           onSelect={setSelected}
+          compact
         />
       </div>
       {why && (
@@ -265,7 +271,7 @@ export function DailyBrief({
     wide
       ? clsx(editing ? 'h-40' : 'h-52', 'min-h-28 shrink grid-cols-6 grid-rows-1')
       : compact
-        ? 'shrink-0 grid-cols-6 auto-rows-[60px]'
+        ? 'shrink-0 grid-cols-6 auto-rows-[60px] [@media(max-height:700px)]:auto-rows-[50px]'
         : 'min-h-0 flex-1 grid-cols-3 grid-rows-2',
   );
   const sectionClass = clsx(
@@ -452,8 +458,8 @@ export function DailyBrief({
               {shown ? 'Back to change' : 'Done'}
             </button>
           </div>
-          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
-            <FoeScout species={scout} hints={hints} team={team} />
+          <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain">
+            <FoeScout species={scout} hints={hints} />
           </div>
         </>
       ) : (
@@ -466,7 +472,9 @@ export function DailyBrief({
           <div
             className={clsx(
               'grid shrink-0 gap-2',
-              wide ? 'grid-cols-3 auto-rows-[92px]' : 'grid-cols-6 auto-rows-[60px]',
+              wide
+                ? 'grid-cols-3 auto-rows-[92px]'
+                : 'grid-cols-6 auto-rows-[60px] [@media(max-height:700px)]:auto-rows-[50px]',
             )}
           >
             {benchNow.map((species) => (
@@ -658,7 +666,7 @@ export function DailyBrief({
                 </span>
               </p>
               {panelSlot.foe ? (
-                <FoeScout species={panelSlot.species} hints={hints} team={team} />
+                <FoeScout species={panelSlot.species} hints={hints} />
               ) : (
                 panelSlot.set && (
                   <SetCard species={panelSlot.species} set={panelSlot.set} badge={null} />
@@ -702,7 +710,7 @@ export function DailyBrief({
         species={infoFor?.species ?? null}
         open={!!infoFor}
         onOpenChange={(o) => !o && setInfoFor(null)}
-        foe={infoFor?.foe ? { hints, team } : undefined}
+        foe={infoFor?.foe ? { hints } : undefined}
       />
       <SetPicker
         key={`view-${setView?.species}`}

@@ -69,45 +69,75 @@ export function SetCard({
   species,
   set,
   badge,
+  compact = false,
 }: {
   species: string;
   set: SetEntry;
   badge: string | null;
+  /** No description: for tight places (the daily brief's change panel). */
+  compact?: boolean;
 }) {
   return (
-    <article className="card flex flex-col p-3.5" aria-label={set.label}>
+    <article
+      className={clsx('card flex flex-col', compact ? 'px-2.5 py-2' : 'p-3.5')}
+      aria-label={set.label}
+    >
       <div className="flex items-start justify-between gap-2">
-        <h3 className="display text-[16px] leading-tight">{set.label}</h3>
+        <h3 className={clsx('display leading-tight', compact ? 'text-[14px]' : 'text-[16px]')}>
+          {set.label}
+        </h3>
         {badge && (
-          <span className="shrink-0 rounded-badge bg-accent-soft px-2 py-0.5 text-[12px] font-semibold text-soft-ink">
+          <span
+            className={clsx(
+              'shrink-0 rounded-badge bg-accent-soft px-2 font-semibold text-soft-ink',
+              compact ? 'text-[11px]' : 'py-0.5 text-[12px]',
+            )}
+          >
             {badge}
           </span>
         )}
       </div>
       {/* A Mega set's preview needs the room: one line here, the rest a tap away. */}
-      <Description key={set.id} text={set.description} lines={megaFor(species, set) ? 1 : 2} />
-      <MoveList moves={set.moves} className="mt-2" />
-      <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-4 gap-y-0.5 text-[13px]">
-        <dt className="text-muted">Item</dt>
-        <dd className="font-medium">
-          {set.item ? (
+      {!compact && (
+        <Description key={set.id} text={set.description} lines={megaFor(species, set) ? 1 : 2} />
+      )}
+      <MoveList moves={set.moves} className={compact ? 'mt-1' : 'mt-2'} compact={compact} />
+      {/* Compact: one line; the final stats below stand in for the EV spread. */}
+      {compact ? (
+        <p className="mt-1.5 truncate text-[13px] font-medium">
+          {set.item && (
             <>
               <ItemIcon name={set.item} />
               <Term name={set.item} desc={itemInfo(set.item)} kind="Item" />
+              <span className="text-muted"> · </span>
             </>
-          ) : (
-            'None'
           )}
-        </dd>
-        <dt className="text-muted">Ability</dt>
-        <dd className="font-medium">
           <Term name={set.ability} desc={abilityInfo(set.ability)} kind="Ability" />
-        </dd>
-        <dt className="text-muted">Nature</dt>
-        <dd className="font-medium">
-          {set.nature} · {formatEvs(set.evs)}
-        </dd>
-      </dl>
+          <span className="text-muted"> · {set.nature}</span>
+        </p>
+      ) : (
+        <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-4 gap-y-0.5 text-[13px]">
+          <dt className="text-muted">Item</dt>
+          <dd className="font-medium">
+            {set.item ? (
+              <>
+                <ItemIcon name={set.item} />
+                <Term name={set.item} desc={itemInfo(set.item)} kind="Item" />
+              </>
+            ) : (
+              'None'
+            )}
+          </dd>
+          <dt className="text-muted">Ability</dt>
+          <dd className="font-medium">
+            <Term name={set.ability} desc={abilityInfo(set.ability)} kind="Ability" />
+          </dd>
+          <dt className="text-muted">Nature</dt>
+          <dd className="font-medium">
+            {set.nature} · {formatEvs(set.evs)}
+          </dd>
+        </dl>
+      )}
       <FinalStatsRow species={species} set={set} />
       <MegaPreview species={species} set={set} />
     </article>
@@ -129,11 +159,14 @@ export function SetChooser({
   currentSetId,
   selected,
   onSelect,
+  compact = false,
 }: {
   species: string;
   currentSetId?: string;
   selected: string;
   onSelect: (setId: string) => void;
+  /** Tight places: no header row (the caller shows the types), shorter tabs, no description. */
+  compact?: boolean;
 }) {
   const sets = setsOf(species);
   const common = topSet(species).id;
@@ -155,24 +188,26 @@ export function SetChooser({
 
   return (
     <>
-      <div className="mb-2 flex items-center gap-2">
-        <img
-          src={getSprite(species, 'icon')}
-          alt=""
-          className="pixelated h-8 w-10 object-contain"
-        />
-        {info.types.map((t) => (
-          <TypeBadge key={t} type={t} />
-        ))}
-        <span className="ml-auto text-[13px] text-muted">
-          {sets.length} set{sets.length === 1 ? '' : 's'}
-        </span>
-      </div>
+      {!compact && (
+        <div className="mb-2 flex items-center gap-2">
+          <img
+            src={getSprite(species, 'icon')}
+            alt=""
+            className="pixelated h-8 w-10 object-contain"
+          />
+          {info.types.map((t) => (
+            <TypeBadge key={t} type={t} />
+          ))}
+          <span className="ml-auto text-[13px] text-muted">
+            {sets.length} set{sets.length === 1 ? '' : 's'}
+          </span>
+        </div>
+      )}
       {sets.length > 1 && (
         <div
           role="tablist"
           aria-label="Sets"
-          className="seg mb-2 grid gap-1 p-1"
+          className={clsx('seg grid gap-1 p-1', compact ? 'mb-1' : 'mb-2')}
           style={{ gridTemplateColumns: `repeat(${sets.length}, minmax(0, 1fr))` }}
         >
           {sets.map((s, i) => (
@@ -191,7 +226,8 @@ export function SetChooser({
               onClick={() => onSelect(s.id)}
               onKeyDown={(e) => onKey(e, i)}
               className={clsx(
-                'flex min-h-11 items-center justify-center rounded-[6px] px-1.5 py-1 text-center text-[13px] leading-tight font-semibold',
+                'flex items-center justify-center rounded-[6px] px-1.5 py-1 text-center text-[13px] leading-tight font-semibold',
+                compact ? 'min-h-8' : 'min-h-11',
                 s.id === set.id ? 'bg-surface text-ink shadow-card' : 'text-muted',
               )}
             >
@@ -207,7 +243,7 @@ export function SetChooser({
         id={`${id}-panel`}
         aria-labelledby={sets.length > 1 ? `${id}-tab-${set.id}` : undefined}
       >
-        <SetCard species={species} set={set} badge={badge} />
+        <SetCard species={species} set={set} badge={badge} compact={compact} />
       </div>
     </>
   );

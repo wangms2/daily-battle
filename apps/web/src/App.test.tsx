@@ -750,8 +750,7 @@ describe('playtest feedback', () => {
     await user.click(await screen.findByRole('button', { name: `About ${foe()}` }));
     const info = await screen.findByRole('dialog', { name: foe() });
     expect(within(info).getByRole('list', { name: 'Moves' })).toBeInTheDocument();
-    const vs = within(info).getByRole('list', { name: 'Speed against your team' });
-    for (const slot of schedule.suggestedTeams[0]!.team) expect(vs).toHaveTextContent(slot.species);
+    expect(info).not.toHaveTextContent('faster than');
     expect(within(info).queryByRole('tab')).not.toBeInTheDocument();
     unmount();
 
