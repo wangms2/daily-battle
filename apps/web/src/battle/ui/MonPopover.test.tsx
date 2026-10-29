@@ -2,7 +2,7 @@ import { cleanup, render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { speciesInfo } from '../../lib/data';
 import type { MonView } from '../frames';
-import { MonPopover } from './MonPopover';
+import { hpPercent, MonPopover } from './MonPopover';
 import type { SpeedCheck } from '../../lib/speed';
 
 const foe = (species: string): MonView => ({
@@ -96,5 +96,32 @@ describe('MonPopover (a foe)', () => {
     expect(
       card({ lo: 200, hi: 230, scarf: 345, mine: { species: 'Jolteon', speed: 360 } }),
     ).not.toContain('Scarf');
+  });
+});
+
+describe('MonPopover (yours)', () => {
+  it('shows HP as a percentage too, so you can tell what hazards would do', () => {
+    render(
+      <MonPopover
+        foe={false}
+        member={{
+          slot: 0,
+          species: 'Tyranitar',
+          hp: 12,
+          hpExact: { hp: 50, max: 404 },
+          status: '',
+          fainted: false,
+          active: false,
+          item: '',
+          ability: '',
+          moves: [],
+          stats: {},
+        }}
+      />,
+    );
+    // Just under 12.5%: one Stealth Rock on a neutral Pokémon would take it out.
+    expect(screen.getByRole('tooltip')).toHaveTextContent('12.4% (50/404)');
+    expect(hpPercent(1, 2000)).toBe('0.1%');
+    expect(hpPercent(404, 404)).toBe('100%');
   });
 });

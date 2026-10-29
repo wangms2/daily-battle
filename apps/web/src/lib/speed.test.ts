@@ -7,6 +7,8 @@ import {
   speedStat,
   speedVerdict,
   theoreticalRange,
+  showdownNote,
+  showdownNow,
 } from './speed';
 
 const set = (spe: number, nature = 'Serious', item = '', ability = '') => ({
@@ -35,6 +37,22 @@ describe('Speed', () => {
     expect(battleSpeed(200, { status: 'par', ability: 'Quick Feet' })).toBe(300);
     expect(battleSpeed(200, { ability: 'Swift Swim', weather: 'RainDance' })).toBe(400);
     expect(battleSpeed(200, { ability: 'Swift Swim' })).toBe(200);
+  });
+
+  it('applies the foe’s visible Speed stage and paralysis to Showdown’s line', () => {
+    // Tyranitar after a Dragon Dance.
+    const dd = showdownNow(61, 1);
+    expect(dd.showdown).toEqual([171, 237, 331, 364]);
+    expect(showdownNote(dd.shown)).toBe('with its +1 Speed, before items and abilities');
+    const par = showdownNow(61, -1, 'par');
+    expect(par.showdown).toEqual([19, 26, 36, 40]);
+    expect(showdownNote(par.shown)).toBe(
+      'with its -1 Speed and paralysis, before items and abilities',
+    );
+    expect(showdownNow(61).showdown).toEqual([114, 158, 221, 243]);
+    expect(showdownNote(showdownNow(61, 0, 'brn').shown)).toBe(
+      'before boosts, items and abilities',
+    );
   });
 
   it('ranges over the sets the foe could be running', () => {

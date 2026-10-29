@@ -10,8 +10,9 @@ export function textLines(text: string): string[] {
 
 export const EXPLAINERS: Record<string, string> = {
   stealthrock:
-    'Stealth Rock hurts every Pokémon that switches in on that side, more if it’s weak to Rock.',
-  spikes: 'Spikes hurt grounded Pokémon that switch in. Up to three layers stack.',
+    'Stealth Rock hurts every Pokémon that switches in on that side until it’s cleared, by a share of its max HP that depends on Rock: 12.5% if neutral, 25% if weak (50% if 4× weak), 6.25% if it resists (3.125% if 4×).',
+  spikes:
+    'Spikes hurt grounded Pokémon (not Flying-types or Levitate) that switch in on that side until cleared: 12.5% of max HP with one layer, 16.7% with two, 25% with three.',
   toxicspikes: 'Toxic Spikes poison grounded Pokémon that switch in.',
   reflect: 'Reflect halves damage from physical attacks for five turns.',
   lightscreen: 'Light Screen halves damage from special attacks for five turns.',
@@ -41,6 +42,9 @@ export const EXPLAINERS: Record<string, string> = {
 export function explainer(id: string, gen: number): string | undefined {
   if (id === 'par' && gen >= 7) {
     return 'Paralysis halves Speed and sometimes stops a Pokémon from moving.';
+  }
+  if (id === 'spikes' && gen >= 5) {
+    return EXPLAINERS.spikes!.replace('or Levitate)', 'Levitate or an Air Balloon)');
   }
   return EXPLAINERS[id];
 }

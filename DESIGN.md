@@ -450,10 +450,10 @@ One toggle, clearly labeled, available on the home screen and in the battle menu
 
 When on:
 
-- **First-time explainers:** a one-line dismissible tooltip the first time each mechanic appears (Stealth Rock, Choice lock, Toxic, sleep, and so on). Shown once each, tracked in `settings.shownExplainers`.
+- **First-time explainers:** a one-line dismissible tooltip the first time each mechanic appears (Stealth Rock, Choice lock, Toxic, sleep, and so on). Hazards give their exact damage (Stealth Rock 12.5% of max HP scaled by Rock weakness; Spikes 12.5/16.7/25% by layer). Your own Pokémon's card shows HP as Showdown does, "12.4% (50/404)", so hazard KOs are easy to read. Shown once each, tracked in `settings.shownExplainers`.
 - **Type-effectiveness labels** on move buttons against the opposing active Pokémon: the bottom line keeps the type and adds a short tag by the PP (Super, Super ×4, Neutral, Weak, Weak ×¼, No effect; Status for status moves), spelled out in the move's details card.
 - **Team checklist** in the team builder (hazards, removal, attackers, defense) and the brief's tip line. With hints off, the builder never tells the player what their team is missing.
-- **Speed range** line in Pokémon tooltips: a foe's card always shows Showdown's line ("Speed 184–236–299–328": 0 IVs and a slowing nature, 0 and 252 EVs neutral, 252 EVs and a boosting nature; before boosts, items and abilities) and whether it's faster, slower or possibly faster than yours. With hints on, it adds "Its sets", the range from this game's sets for it (boosts, paralysis and weather applied), and the comparison uses that.
+- **Speed range** line in Pokémon tooltips: a foe's card always shows Showdown's line ("Speed 184–236–299–328": 0 IVs and a slowing nature, 0 and 252 EVs neutral, 252 EVs and a boosting nature; with its visible Speed stage and paralysis applied, as noted under it, but before items and abilities) and whether it's faster, slower or possibly faster than yours. With hints on, it adds "Its sets", the range from this game's sets for it (boosts, paralysis and weather applied), and the comparison uses that.
 - **Team-builder checklist** and shared-weakness list (§12.2a).
 
 - **Opponent info on the brief:** only what its battle card shows, never one of its sets. That means types, possible abilities, base stats, and Showdown's Speed range (no comparisons against your team). With Beginner hints on, it also shows its likely moves and the Speed range of this game's sets for it (plus a Choice Scarf's), as the battle card does. No usage numbers.

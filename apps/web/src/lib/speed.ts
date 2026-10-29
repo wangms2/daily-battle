@@ -31,6 +31,31 @@ export function showdownRange(base: number): [number, number, number, number] {
   ];
 }
 
+/** Showdown's range with the foe's visible Speed stage and paralysis applied (not items or abilities). */
+export function showdownNow(
+  base: number,
+  boost = 0,
+  status?: string,
+): Pick<SpeedCheck, 'showdown' | 'shown'> {
+  const par = status === 'par';
+  const s = { boost, ...(par && { status }) };
+  return {
+    showdown: showdownRange(base).map((v) => battleSpeed(v, s)) as [number, number, number, number],
+    shown: { boost: Math.max(-6, Math.min(6, boost)), par },
+  };
+}
+
+/** The note under Showdown's line: what it includes and what it doesn't. */
+export function showdownNote(shown?: SpeedCheck['shown']): string {
+  const has = [
+    shown?.boost ? `${shown.boost > 0 ? '+' : ''}${shown.boost} Speed` : '',
+    shown?.par ? 'paralysis' : '',
+  ].filter(Boolean);
+  return has.length
+    ? `with its ${has.join(' and ')}, before items and abilities`
+    : 'before boosts, items and abilities';
+}
+
 /** The slowest and fastest of Showdown's range. */
 export function theoreticalRange(base: number): [number, number] {
   const r = showdownRange(base);
@@ -82,8 +107,10 @@ export function battleSpeed(stat: number, s: SpeedState): number {
 
 /** The Speed facts behind a foe's card. */
 export interface SpeedCheck {
-  /** Showdown's line (`showdownRange`), unless the foe's set is known (a lesson). */
+  /** Showdown's line (`showdownRange`), unless the foe's set is known (a lesson), with `shown` applied. */
   showdown?: [number, number, number, number];
+  /** What's visible on the foe and already in `showdown`: its Speed stage, paralysis. */
+  shown?: { boost: number; par: boolean };
   /** `lo`–`hi` come from this game's sets for it (Beginner hints), so the card shows them too. */
   fromSets?: boolean;
   /** The foe's Speed now, for the comparison: one number when every set agrees. */

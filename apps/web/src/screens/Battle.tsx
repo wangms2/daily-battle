@@ -50,7 +50,7 @@ import {
   foeSpeed,
   lessonMoves,
   lessonSet,
-  showdownRange,
+  showdownNow,
   type SpeedCheck,
 } from '../lib/speed';
 import { ShareButton, TryRows } from '../ui/results';
@@ -732,7 +732,11 @@ export function Battle({
             ...(revealedFoe?.ability && { ability: revealedFoe.ability }),
           }),
           ...(!lessonFoe && {
-            showdown: showdownRange(speciesInfo(shownFoe.species).baseStats.spe),
+            ...showdownNow(
+              speciesInfo(shownFoe.species).baseStats.spe,
+              shownFoe.boosts.spe,
+              shownFoe.status,
+            ),
             fromSets: foeSets.length > 0,
           }),
           ...(active?.stats.spe && view.you

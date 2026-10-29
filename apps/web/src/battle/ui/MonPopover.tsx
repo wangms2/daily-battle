@@ -8,7 +8,7 @@ import { Term } from '../../ui/DetailCard';
 import { ItemIcon } from '../../ui/ItemIcon';
 import { MoveChips } from '../../ui/MoveList';
 import type { MonView, Revealed, TeamMember } from '../frames';
-import { scarfFlips, speedVerdict, type SpeedCheck } from '../../lib/speed';
+import { scarfFlips, showdownNote, speedVerdict, type SpeedCheck } from '../../lib/speed';
 import { boostLabels, STATUS_LABEL } from './labels';
 
 const VERDICT = {
@@ -17,6 +17,16 @@ const VERDICT = {
   tie: ['=', 'Ties with'],
   either: ['◆', 'Possibly faster than'],
 } as const;
+
+/**
+ * Your HP as Showdown shows it: a percentage to one decimal (so you can tell
+ * whether Stealth Rock's 12.5% or 25% would knock it out), never rounded to 0.
+ */
+export function hpPercent(hp: number, max: number): string {
+  if (max <= 0) return '0%';
+  const pct = Math.max(hp > 0 ? 0.1 : 0, Math.round((hp / max) * 1000) / 10);
+  return `${pct}%`;
+}
 
 type Props = {
   className?: string;
@@ -56,7 +66,7 @@ export function MonPopover(props: Props) {
       : `${props.mon.hp}%`
     : props.member.fainted
       ? 'Fainted'
-      : `${props.member.hpExact.hp}/${props.member.hpExact.max}`;
+      : `${hpPercent(props.member.hpExact.hp, props.member.hpExact.max)} (${props.member.hpExact.hp}/${props.member.hpExact.max})`;
   // A foe's HP is on its plate already: its card keeps to what the plate doesn't show.
   const first = [
     props.foe && !props.benched ? '' : hp,
@@ -226,7 +236,7 @@ export function MonPopover(props: Props) {
             )}
           </p>
           {speed.showdown && (
-            <p className="text-[11.5px] text-muted">before boosts, items and abilities</p>
+            <p className="text-[11.5px] text-muted">{showdownNote(speed.shown)}</p>
           )}
           {speed.fromSets && (
             <p>
