@@ -83,7 +83,9 @@ test('the checklist sheet shows coverage gaps without overflowing', async ({ pag
   await shot(page, '03-checklist', info.project.name);
 });
 
-test('an opponent’s possible sets show with hints on, and fit', async ({ page }, info) => {
+test('an opponent’s info shows its likely moves with hints on, and fits', async ({
+  page,
+}, info) => {
   await open(page, state({ team: true }));
   await page.getByRole('button', { name: /^Start · / }).waitFor();
   await page.waitForLoadState('networkidle');
@@ -95,8 +97,9 @@ test('an opponent’s possible sets show with hints on, and fit', async ({ page 
     page.viewportSize()!.width >= 1280
       ? page.getByRole('complementary', { name: `${foe} details` })
       : page.getByRole('dialog', { name: foe });
-  await expect(sheet.getByRole('tablist', { name: 'Possible sets' })).toBeVisible();
-  await noScroll(page, 'foe info with possible sets');
+  await expect(sheet.getByRole('list', { name: 'Moves' })).toBeVisible();
+  await expect(sheet.getByRole('list', { name: 'Speed against your team' })).toBeVisible();
+  await noScroll(page, 'foe info');
   await shot(page, '04-foe-sets', info.project.name);
 });
 

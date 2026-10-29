@@ -4,6 +4,7 @@
 // weighed against each of your six, as the battle card weighs it against the
 // one that's out.
 import clsx from 'clsx';
+import type { ReactNode } from 'react';
 import {
   abilityInfo,
   canMega,
@@ -23,17 +24,23 @@ import { TypeBadge } from './bits';
 import { Term } from './DetailCard';
 import { MoveChips } from './MoveList';
 
-const VERDICT = {
-  faster: ['▲', 'Faster than', 'text-bad'],
-  slower: ['▼', 'Slower than', 'text-good'],
-  tie: ['=', 'Ties with', 'text-muted'],
-  either: ['◆', 'Possibly faster than', 'text-muted'],
-} as const;
+// Grouped as the battle card words it, faster foes first (they're the threat).
+const VERDICTS = [
+  ['faster', '▲', 'Faster than', 'text-bad'],
+  ['either', '◆', 'Possibly faster than', 'text-muted'],
+  ['tie', '=', 'Ties with', 'text-muted'],
+  ['slower', '▼', 'Slower than', 'text-good'],
+] as const;
 
-function Heading({ children }: { children: string }) {
-  return <h3 className="mt-4 mb-1.5 text-[13px] font-semibold text-muted">{children}</h3>;
+/** A labelled row, label on the left (as the matchup rows are), to keep it short. */
+function Row({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div className="grid grid-cols-[4.5rem_1fr] items-start gap-2">
+      <span className="pt-0.5 text-muted">{label}</span>
+      <div className="min-w-0">{children}</div>
+    </div>
+  );
 }
-
 export function FoeScout({
   species,
   hints,
@@ -65,12 +72,12 @@ export function FoeScout({
   yours.sort((a, b) => b.mine.speed - a.mine.speed);
 
   return (
-    <div className="text-[13px]">
+    <div className="grid gap-2 text-[13px]">
       <div className="flex items-center gap-3">
         <img
           src={getSprite(species)}
           alt=""
-          className="pixelated size-16 shrink-0 object-contain"
+          className="pixelated size-14 shrink-0 object-contain"
         />
         <div className="min-w-0 space-y-1">
           <div className="flex gap-1">
@@ -86,75 +93,80 @@ export function FoeScout({
                 <Term name={a} desc={abilityInfo(a)} kind="Ability" />
               </span>
             ))}
+            {hints && canMega(species) && (
+              <span className="font-semibold text-ink"> · Can Mega Evolve</span>
+            )}
           </p>
-          {hints && canMega(species) && <p className="font-semibold">Can Mega Evolve</p>}
         </div>
       </div>
 
-      <Heading>Base stats</Heading>
-      <dl
-        className="flex justify-between gap-1 rounded-chip bg-surface-2 px-2.5 py-1.5 tabular-nums"
-        aria-label="Base stats"
-      >
-        {STAT_IDS.map((k) => (
-          <div key={k} className="flex flex-col items-center">
-            <dt className="text-[11px] text-muted">{STAT_LABEL[k]}</dt>
-            <dd className={clsx('text-[14px]', info.baseStats[k] >= 100 && 'font-bold')}>
-              {info.baseStats[k]}
-            </dd>
-          </div>
-        ))}
-      </dl>
+      <Row label="Base stats">
+        <dl className="flex justify-between gap-1 tabular-nums" aria-label="Base stats">
+          {STAT_IDS.map((k) => (
+            <div key={k} className="flex flex-col items-center leading-tight">
+              <dt className="text-[10.5px] text-muted">{STAT_LABEL[k]}</dt>
+              <dd className={clsx(info.baseStats[k] >= 100 && 'font-bold')}>{info.baseStats[k]}</dd>
+            </div>
+          ))}
+        </dl>
+      </Row>
 
-      <Heading>Speed</Heading>
-      <p className="tabular-nums" aria-label="Speed range">
-        <span className="font-semibold">{sd[0]}</span>
-        <span className="text-muted">
-          –{sd[1]}–{sd[2]}–
-        </span>
-        <span className="font-semibold">{sd[3]}</span>
-        <span className="text-[11.5px] text-muted"> before boosts, items and abilities</span>
-      </p>
-      {hints && sets.length > 0 && (
-        <p className="tabular-nums">
-          <span className="text-muted">Its sets here </span>
-          <span className="font-semibold">
-            {speed.lo === speed.hi ? speed.lo : `${speed.lo}–${speed.hi}`}
+      <Row label="Speed">
+        <p className="tabular-nums" aria-label="Speed range">
+          <span className="font-semibold">{sd[0]}</span>
+          <span className="text-muted">
+            –{sd[1]}–{sd[2]}–
           </span>
-          {speed.scarf && <span className="text-muted"> · {speed.scarf} with a Choice Scarf</span>}
+          <span className="font-semibold">{sd[3]}</span>
+          <span className="text-[11.5px] text-muted"> before boosts, items, abilities</span>
         </p>
-      )}
-      <ul className="mt-1.5 space-y-0.5 tabular-nums" aria-label="Speed against your team">
-        {yours.map(({ mine, verdict, scarf }) => (
-          <li key={mine.species} className="flex items-baseline gap-1.5">
-            <span aria-hidden className={clsx('w-3 shrink-0 text-center', VERDICT[verdict][2])}>
-              {VERDICT[verdict][0]}
+        {hints && sets.length > 0 && (
+          <p className="tabular-nums">
+            <span className="text-muted">Its sets here </span>
+            <span className="font-semibold">
+              {speed.lo === speed.hi ? speed.lo : `${speed.lo}–${speed.hi}`}
             </span>
-            <span className="min-w-0">
-              {VERDICT[verdict][1]} {mine.species} ({mine.speed})
-              {scarf && <span className="text-muted"> · faster with a Scarf</span>}
-            </span>
-          </li>
-        ))}
-      </ul>
+            {speed.scarf && <span className="text-muted"> · Scarf {speed.scarf}</span>}
+          </p>
+        )}
+        <ul className="mt-0.5 tabular-nums" aria-label="Speed against your team">
+          {VERDICTS.map(([v, mark, words, tone]) => {
+            const them = yours.filter((y) => y.verdict === v);
+            if (!them.length) return null;
+            return (
+              <li key={v}>
+                <span aria-hidden className={clsx('mr-1', tone)}>
+                  {mark}
+                </span>
+                {words}{' '}
+                {them.map(({ mine, scarf }, i) => (
+                  <span key={mine.species} className="whitespace-nowrap">
+                    {i > 0 && ', '}
+                    {mine.species} <span className="text-muted">{mine.speed}</span>
+                    {scarf && v !== 'either' && (
+                      <span className="text-muted"> (a Scarf outspeeds)</span>
+                    )}
+                  </span>
+                ))}
+              </li>
+            );
+          })}
+        </ul>
+      </Row>
 
       {likely.length > 0 && (
-        <>
-          <Heading>Likely moves</Heading>
+        <Row label="Likely">
           <MoveChips moves={likely} />
-        </>
+        </Row>
       )}
 
-      <Heading>Matchups</Heading>
-      <div className="grid gap-2">
-        <MatchupRow
-          label="Weak to"
-          types={m.weak.map((w) => w.type)}
-          extra={(t) => (m.weak.find((w) => w.type === t)!.mult === 4 ? '×4' : '')}
-        />
-        <MatchupRow label="Resists" types={m.resist.map((r) => r.type)} />
-        {m.immune.length > 0 && <MatchupRow label="Immune" types={m.immune} />}
-      </div>
+      <MatchupRow
+        label="Weak to"
+        types={m.weak.map((w) => w.type)}
+        extra={(t) => (m.weak.find((w) => w.type === t)!.mult === 4 ? '×4' : '')}
+      />
+      <MatchupRow label="Resists" types={m.resist.map((r) => r.type)} />
+      {m.immune.length > 0 && <MatchupRow label="Immune" types={m.immune} />}
     </div>
   );
 }

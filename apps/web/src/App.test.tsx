@@ -749,18 +749,17 @@ describe('playtest feedback', () => {
     const { unmount } = renderApp(seeded({ team: { week: WEEK } }));
     await user.click(await screen.findByRole('button', { name: `About ${foe()}` }));
     const info = await screen.findByRole('dialog', { name: foe() });
-    expect(info).toHaveTextContent('Likely moves');
-    expect(
-      within(info).getByRole('list', { name: 'Speed against your team' }).children,
-    ).toHaveLength(6);
+    expect(within(info).getByRole('list', { name: 'Moves' })).toBeInTheDocument();
+    const vs = within(info).getByRole('list', { name: 'Speed against your team' });
+    for (const slot of schedule.suggestedTeams[0]!.team) expect(vs).toHaveTextContent(slot.species);
     expect(within(info).queryByRole('tab')).not.toBeInTheDocument();
     unmount();
 
     renderApp(seeded({ hints: false, team: { week: WEEK } }));
     await user.click(await screen.findByRole('button', { name: `About ${foe()}` }));
     const plain = await screen.findByRole('dialog', { name: foe() });
-    expect(plain).not.toHaveTextContent('Likely moves');
-    expect(plain).toHaveTextContent('before boosts, items and abilities');
+    expect(within(plain).queryByRole('list', { name: 'Moves' })).not.toBeInTheDocument();
+    expect(plain).toHaveTextContent('before boosts, items, abilities');
   });
 
   it('shows an opponent in place of the change panel while editing, with no sheet', async () => {
