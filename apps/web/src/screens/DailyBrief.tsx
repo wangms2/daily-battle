@@ -266,10 +266,11 @@ export function DailyBrief({
   // Six tiles: 3×2 on phones, one row of six on wide screens, where the teams stack.
   // On wide screens the rows are a fixed, shorter height (the page centers them),
   // instead of stretching tall tiles over the whole window; on a short window they shrink.
+  // Editing keeps the same size, so nothing moves when it starts.
   const sixGrid = clsx(
     'grid gap-2',
     wide
-      ? clsx(editing ? 'h-40' : 'h-52', 'min-h-28 shrink grid-cols-6 grid-rows-1')
+      ? 'h-52 min-h-28 shrink grid-cols-6 grid-rows-1'
       : compact
         ? 'shrink-0 grid-cols-6 auto-rows-[60px] [@media(max-height:700px)]:auto-rows-[50px]'
         : 'min-h-0 flex-1 grid-cols-3 grid-rows-2',
@@ -329,9 +330,7 @@ export function DailyBrief({
             }
             selected={editing && scout === species}
             badge={hints && canMega(species) ? <MegaMark text="Can Mega Evolve" /> : undefined}
-            hoverCard={
-              wide && (!panelOn || editing) && scout !== species ? hoverOf(species) : undefined
-            }
+            hoverCard={wide && !panelOn && !editing ? hoverOf(species) : undefined}
             showTypes={!compact}
             showName={!compact}
           />
@@ -459,7 +458,7 @@ export function DailyBrief({
             </button>
           </div>
           <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain">
-            <FoeScout species={scout} hints={hints} />
+            <FoeScout species={scout} hints={hints} compact />
           </div>
         </>
       ) : (
@@ -473,7 +472,7 @@ export function DailyBrief({
             className={clsx(
               'grid shrink-0 gap-2',
               wide
-                ? 'grid-cols-3 auto-rows-[92px]'
+                ? 'grid-cols-3 auto-rows-[84px]'
                 : 'grid-cols-6 auto-rows-[60px] [@media(max-height:700px)]:auto-rows-[50px]',
             )}
           >
@@ -486,7 +485,6 @@ export function DailyBrief({
                 showTypes={wide}
                 showName={wide}
                 onTap={() => tapBench(species)}
-                hoverCard={wide ? hoverOf(species) : undefined}
               />
             ))}
           </div>
@@ -519,9 +517,9 @@ export function DailyBrief({
                 <p className="text-[14px] font-semibold">
                   Tap one of your Pokémon to give it another set, or a bench Pokémon to swap in.
                 </p>
-                <p className="text-[13px] text-muted">{rule}</p>
+                {!wide && <p className="text-[13px] text-muted">{rule}</p>}
               </div>
-              {ditch}
+              {!wide && ditch}
             </>
           )}
         </>
@@ -568,7 +566,8 @@ export function DailyBrief({
 
   // After a finished try: how today went, the streak, and Share.
   const decided = summary.status !== 'none' && summary.status !== 'pending';
-  const strip = summary.status !== 'none' && !editing && (
+  // A computer keeps it while editing, so the teams don't move.
+  const strip = summary.status !== 'none' && (!editing || wide) && (
     <section
       aria-label="Today’s result"
       className={clsx(
@@ -632,47 +631,59 @@ export function DailyBrief({
             {/* Two rows across the team's width: how today went, then how to play. */}
             <div className="mt-2 flex w-full flex-col gap-3">
               {strip}
+              {/* Editing swaps this row's contents, not its size, so nothing moves. */}
               <div
                 className={clsx(
-                  'flex items-center gap-4',
-                  level ? 'justify-between' : 'justify-center',
+                  'flex min-h-12 items-center gap-4',
+                  level || editing ? 'justify-between' : 'justify-center',
                 )}
               >
-                {level}
-                <div className="w-full max-w-sm">{start}</div>
+                {editing ? (
+                  <>
+                    <p className="min-w-0 text-[13px] text-muted">{rule}</p>
+                    <div className="w-full max-w-sm shrink-0">{ditch}</div>
+                  </>
+                ) : (
+                  <>
+                    {level}
+                    <div className="w-full max-w-sm">{start}</div>
+                  </>
+                )}
               </div>
             </div>
           </div>
-          {editing && (
+          {/* A computer has room: details (or the change) beside the teams instead of a
+              sheet over them. One panel, same size and place in both modes. */}
+          {editing ? (
             <aside className="card flex w-[360px] shrink-0 flex-col self-stretch p-4">
               {changePanel}
             </aside>
-          )}
-          {/* A computer has room: details beside the teams instead of a sheet over them. */}
-          {panelOn && !editing && panelSlot && (
-            <aside
-              aria-label={`${panelSlot.species} details`}
-              className="card w-[340px] shrink-0 self-start overflow-y-auto p-4"
-              style={{ maxHeight: '100%' }}
-            >
-              <p className="mb-2 flex items-baseline justify-between gap-2">
-                <span className="home-serif text-[20px]">{panelSlot.species}</span>
-                <span className="text-[12px] font-semibold tracking-wider text-muted uppercase">
-                  {panelSlot.foe
-                    ? 'Opponent'
-                    : panelSlot.species === lead
-                      ? 'Your lead'
-                      : 'Your team'}
-                </span>
-              </p>
-              {panelSlot.foe ? (
-                <FoeScout species={panelSlot.species} hints={hints} />
-              ) : (
-                panelSlot.set && (
-                  <SetCard species={panelSlot.species} set={panelSlot.set} badge={null} />
-                )
-              )}
-            </aside>
+          ) : (
+            panelOn &&
+            panelSlot && (
+              <aside
+                aria-label={`${panelSlot.species} details`}
+                className="card w-[360px] shrink-0 self-stretch overflow-x-hidden overflow-y-auto p-4"
+              >
+                <p className="mb-2 flex items-baseline justify-between gap-2">
+                  <span className="home-serif text-[20px]">{panelSlot.species}</span>
+                  <span className="text-[12px] font-semibold tracking-wider text-muted uppercase">
+                    {panelSlot.foe
+                      ? 'Opponent'
+                      : panelSlot.species === lead
+                        ? 'Your lead'
+                        : 'Your team'}
+                  </span>
+                </p>
+                {panelSlot.foe ? (
+                  <FoeScout species={panelSlot.species} hints={hints} />
+                ) : (
+                  panelSlot.set && (
+                    <SetCard species={panelSlot.species} set={panelSlot.set} badge={null} />
+                  )
+                )}
+              </aside>
+            )
           )}
         </main>
       ) : (

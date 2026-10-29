@@ -32,10 +32,13 @@ function Row({ label, children }: { label: string; children: ReactNode }) {
 export function FoeScout({
   species,
   hints,
+  compact,
 }: {
   species: string;
   /** Beginner hints: its likely moves, and its Speed from this game's sets. */
   hints: boolean;
+  /** The edit-team scout: just the Speed range, no notes under it. */
+  compact?: boolean;
 }) {
   const info = speciesInfo(species);
   const m = matchups(species);
@@ -91,9 +94,11 @@ export function FoeScout({
             –{sd[1]}–{sd[2]}–
           </span>
           <span className="font-semibold">{sd[3]}</span>
-          <span className="text-[11.5px] text-muted"> before boosts, items, abilities</span>
+          {!compact && (
+            <span className="text-[11.5px] text-muted"> before boosts, items, abilities</span>
+          )}
         </p>
-        {hints && sets.length > 0 && (
+        {hints && !compact && sets.length > 0 && (
           <p className="tabular-nums">
             <span className="text-muted">Its sets here </span>
             <span className="font-semibold">
