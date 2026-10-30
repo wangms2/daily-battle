@@ -23,6 +23,7 @@
   },
   "devDependencies": {
     "@pkmn/client": "catalog:",
+    "@pkmn/sim": "catalog:",
     "tsx": "^4.23.15"
   }
 }

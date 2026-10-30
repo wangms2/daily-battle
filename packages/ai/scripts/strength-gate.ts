@@ -9,6 +9,7 @@ import { fileURLToPath } from 'node:url';
 import { FORMATS, setsFor } from '@daily-battle/data';
 import {
   addDays,
+  findSet,
   generateOpponent,
   generatePool,
   rngFor,
@@ -18,7 +19,10 @@ import {
 import { engineBuilt, loadEngine } from '@daily-battle/engine-wasm/node';
 import type { Engine } from '@daily-battle/engine-wasm';
 import { deriveSeed, runBattle, type Policy } from '@daily-battle/sim-bridge';
-import { HARD_DEFAULTS, HardPolicy } from '../src/index';
+import { HARD_DEFAULTS, HardPolicy, type KnownSets } from '../src/index';
+import { MatrixPolicy } from '../src/advanced/matrix';
+import { EndgamePolicy } from '../src/advanced/endgame';
+import { HalvingPolicy } from '../src/advanced/halving';
 
 type PokemonSet = ReturnType<typeof toPokemonSet>;
 
@@ -40,10 +44,47 @@ const boostOf = (s: string | undefined) => {
 const A_BOOST = boostOf(arg('a-boost'));
 /** `--a-variety 0.9`: a side's near-tie band (HardPolicyOptions.variety). */
 const varietyOf = (s: string | undefined) => (s ? { variety: Number(s) } : {});
+/**
+ * `--a-matrix 8,20000,5,3000,0.1`: the challenger is the coach's game-theoretic
+ * root (MatrixPolicy) with worlds, screen, top, cell, and floor (`--a` is then ignored).
+ */
+const A_MATRIX = (() => {
+  const s = arg('a-matrix');
+  if (!s) return undefined;
+  const [worlds, screen, top, cell, floor] = s.split(',').map((x) => (x ? Number(x) : undefined));
+  return { worlds, screen, top, cell, floor };
+})();
+/**
+ * `--a-endgame 3,5,2,8`: the endgame solver takes the challenger's decisions
+ * with at most `each` Pokémon per side and `total` overall, `depth` turns deep
+ * over `worlds` worlds (any blank keeps the default).
+ */
+/** `--a-halving 150000,8,1`: the challenger is HalvingPolicy (iterations, worlds, early-stop share). */
+const A_HALVING = (() => {
+  const s = arg('a-halving');
+  if (s === undefined) return undefined;
+  const [iterations, worlds, stop] = s.split(',').map((x) => (x ? Number(x) : undefined));
+  return { iterations, worlds, stop };
+})();
+const A_ENDGAME = (() => {
+  const s = arg('a-endgame');
+  if (s === undefined) return undefined;
+  const [each, total, depth, worlds, rule] = s.split(',');
+  const n = (x: string | undefined) => (x ? Number(x) : undefined);
+  return {
+    each: n(each),
+    total: n(total),
+    depth: n(depth),
+    worlds: n(worlds),
+    rule: (rule || undefined) as 'maximin' | 'nash' | undefined,
+  };
+})();
 const B_BOOST = boostOf(arg('b-boost'));
 const FORMAT_IDS = (arg('formats') ?? Object.keys(FORMATS).join(',')).split(',');
 const N = Number(arg('n') ?? 100);
 const JOBS = Number(arg('jobs') ?? 1);
+/** Stop after this many minutes and report the battles finished so far. */
+const MINUTES = Number(arg('minutes') ?? Infinity);
 const A = {
   ...budget(arg('a'), { iterations: 1_000_000, worlds: 32 }),
   ...varietyOf(arg('a-variety')),
@@ -68,21 +109,27 @@ interface Outcome extends Task {
   /** The challenger's searched decisions, and those where a near-tie was drawn. */
   searchedA: number;
   variedA: number;
+  /** Decisions the endgame solver took, its total and longest time. */
+  solvedA: number;
+  solveMsA: number;
+  solveMaxA: number;
 }
 
-function poolTeam(format: string, i: number, week: string): PokemonSet[] {
+function poolTeam(format: string, i: number, week: string) {
   const sets = setsFor(format);
   const rng = rngFor(`gate:pool-team:${format}:${i}`);
   const species = [...generatePool(week, sets).species];
   const team: PokemonSet[] = [];
+  const known: KnownSets = {};
   for (let k = 0; k < 6; k++) {
     const name = species.splice(Math.floor(rng() * species.length), 1)[0]!;
     const options = sets.species[name]!.sets;
     let r = rng();
     const set = options.find((s) => (r -= s.weight) < 0) ?? options[options.length - 1]!;
     team.push(toPokemonSet(name, set));
+    known[name] = set;
   }
-  return team;
+  return { team, known };
 }
 
 const engines = new Map<string, Engine>();
@@ -116,12 +163,41 @@ function playTask({ format, i, swap }: Task): Outcome {
   const week = addDays(START, 7 * Math.floor(i / 7));
   const day = addDays(week, i % 7);
   const pool = generatePool(week, sets).species;
-  const mine = poolTeam(format, i, week);
-  const daily = teamSets(sets, generateOpponent(day, sets).team);
+  const { team: mine, known: knownMine } = poolTeam(format, i, week);
+  const slots = generateOpponent(day, sets).team;
+  const daily = teamSets(sets, slots);
+  // `--a-informed`: the challenger knows the foe's exact sets (the ceiling for better beliefs).
+  const informed = process.argv.includes('--a-informed')
+    ? {
+        knownSets: swap
+          ? knownMine
+          : Object.fromEntries(slots.map((s) => [s.species, findSet(sets, s)])),
+      }
+    : {};
   const ta = { ms: 0, n: 0 };
   const tb = { ms: 0, n: 0 };
-  const hardA = new HardPolicy({ engine: engineFor(format, 'a'), data: sets, pool, ...A });
-  const a = timed(hardA, ta);
+  const hardA = new HardPolicy({
+    engine: engineFor(format, 'a'),
+    data: sets,
+    pool,
+    ...A,
+    ...informed,
+  });
+  const matrixA = A_MATRIX
+    ? new MatrixPolicy({ engine: engineFor(format, 'a'), data: sets, pool, ...A_MATRIX })
+    : A_HALVING
+      ? new HalvingPolicy({ engine: engineFor(format, 'a'), data: sets, pool, ...A_HALVING })
+      : undefined;
+  const endgameA = A_ENDGAME
+    ? new EndgamePolicy({
+        engine: engineFor(format, 'a'),
+        inner: matrixA ?? hardA,
+        data: sets,
+        pool,
+        ...A_ENDGAME,
+      })
+    : undefined;
+  const a = timed(endgameA ?? matrixA ?? hardA, ta);
   const b = timed(new HardPolicy({ engine: engineFor(format, 'b'), data: sets, pool, ...B }), tb);
   // Same battle seed both ways round, so each matchup's luck is mirrored.
   const result = runBattle({
@@ -144,6 +220,9 @@ function playTask({ format, i, swap }: Task): Outcome {
     decB: tb.n,
     searchedA: hardA.stats.searched,
     variedA: hardA.stats.varied,
+    solvedA: endgameA?.stats.solved ?? 0,
+    solveMsA: endgameA?.stats.ms ?? 0,
+    solveMaxA: endgameA?.stats.maxMs ?? 0,
   };
 }
 
@@ -155,14 +234,15 @@ if (child > 0) {
   process.exit(0);
 }
 
-const tasks: Task[] = FORMAT_IDS.flatMap((format) =>
-  Array.from({ length: N }, (_, i) => [
+// Matchup-major, so a run cut short by --minutes still covers every gen evenly.
+const tasks: Task[] = Array.from({ length: N }, (_, i) =>
+  FORMAT_IDS.flatMap((format) => [
     { format, i, swap: false },
     { format, i, swap: true },
-  ]).flat(),
-);
+  ]),
+).flat();
 console.log(
-  `strength gate: ${A.iterations}x${A.worlds}${arg('a-boost') ? ` boost ${arg('a-boost')}` : ''} vs ` +
+  `strength gate: ${A_MATRIX ? `matrix ${arg('a-matrix')}` : `${A.iterations}x${A.worlds}`}${arg('a-boost') ? ` boost ${arg('a-boost')}` : ''} vs ` +
     `${B.iterations}x${B.worlds}${arg('b-boost') ? ` boost ${arg('b-boost')}` : ''}, ` +
     `${FORMAT_IDS.join(',')}, ${N} matchups x 2 sides, ${JOBS} job(s)`,
 );
@@ -175,27 +255,47 @@ const report = (o: Outcome) => {
       `  ${outcomes.length}/${tasks.length} battles, ${((performance.now() - t0) / 60000).toFixed(1)} min`,
     );
 };
-if (JOBS <= 1) tasks.forEach((t) => report(playTask(t)));
-else {
+if (JOBS <= 1) {
+  for (const t of tasks) {
+    if (performance.now() - t0 > MINUTES * 60000) break;
+    report(playTask(t));
+  }
+} else {
   const self = fileURLToPath(import.meta.url);
-  await Promise.all(
-    Array.from(
-      { length: JOBS },
-      (_, shard) =>
-        new Promise<void>((resolve, reject) => {
-          const p = fork(self, [...process.argv.slice(2), '--child', String(shard), String(JOBS)], {
-            execArgv: process.execArgv,
-            env: { ...process.env, GATE_TASKS: JSON.stringify(tasks) },
-          });
-          p.on('message', (m) => report(m as Outcome));
-          p.on('error', reject);
-          p.on('exit', (code) =>
-            code ? reject(new Error(`shard ${shard} exited ${code}`)) : resolve(),
-          );
-        }),
+  const children: ReturnType<typeof fork>[] = [];
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  await Promise.race([
+    Promise.all(
+      Array.from(
+        { length: JOBS },
+        (_, shard) =>
+          new Promise<void>((resolve, reject) => {
+            const p = fork(
+              self,
+              [...process.argv.slice(2), '--child', String(shard), String(JOBS)],
+              {
+                execArgv: process.execArgv,
+                env: { ...process.env, GATE_TASKS: JSON.stringify(tasks) },
+              },
+            );
+            children.push(p);
+            p.on('message', (m) => report(m as Outcome));
+            p.on('error', reject);
+            p.on('exit', (code) =>
+              code ? reject(new Error(`shard ${shard} exited ${code}`)) : resolve(),
+            );
+          }),
+      ),
     ),
-  );
+    new Promise<void>((resolve) => {
+      if (Number.isFinite(MINUTES)) timer = setTimeout(resolve, MINUTES * 60000);
+    }),
+  ]);
+  clearTimeout(timer);
+  for (const p of children) if (p.exitCode === null) p.kill();
 }
+if (outcomes.length < tasks.length)
+  console.log(`  stopped at the time cap: ${outcomes.length}/${tasks.length} battles`);
 
 const pct = (x: number) => `${(100 * x).toFixed(1)}%`;
 /** Win rate with a 95% interval over matchups (each matchup's two sides averaged, since they share luck). */
@@ -247,4 +347,11 @@ const searched = outcomes.reduce((a, o) => a + o.searchedA, 0);
 const varied = outcomes.reduce((a, o) => a + o.variedA, 0);
 if (varied)
   console.log(`  challenger drew a near-tie in ${pct(varied / searched)} of searched decisions`);
+const solved = outcomes.reduce((a, o) => a + o.solvedA, 0);
+if (A_ENDGAME)
+  console.log(
+    `  endgame solver: ${solved} decisions, ` +
+      `${(outcomes.reduce((a, o) => a + o.solveMsA, 0) / Math.max(1, solved)).toFixed(0)} ms avg, ` +
+      `${Math.max(0, ...outcomes.map((o) => o.solveMaxA)).toFixed(0)} ms max`,
+  );
 console.log(pass ? 'PASS' : 'FAIL (need >= 60% pooled, every gen above 50%)');

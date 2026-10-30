@@ -59,4 +59,42 @@ describe.skipIf(!engineBuilt(4))('engine (gen 4)', () => {
   it('reports the version recorded with Hard attempts', () => {
     expect(loadEngine(4).version).toBe(WASM_VERSION);
   });
+
+  it('extracts the value network features', () => {
+    const engine = loadEngine(4);
+    const meta = engine.featuresMeta();
+    const { floats, ids } = engine.features(STATE);
+    expect(floats.length).toBe(meta.floats);
+    expect(meta.floats).toBe(meta.tokens * meta.monF + meta.fieldF);
+    expect(ids.length).toBe(meta.tokens * meta.ids);
+
+    // Alakazam: own, active, alive, full HP, 251 HP, 365 Speed.
+    const zam = floats.subarray(0, meta.monF);
+    expect([...zam.subarray(0, 4)]).toEqual([1, 1, 1, 1]);
+    expect(zam[4]).toBeCloseTo(251 / 500);
+    expect(zam[9]).toBeCloseTo(365 / 500);
+    expect(zam[30]).toBe(1); // no status
+    // Psychic: special, 90 power, and it deals real damage to Terrakion.
+    const psychic = zam.subarray(40, 40 + 29);
+    expect(psychic[20]).toBeCloseTo(90 / 150);
+    expect([...psychic.subarray(21, 24)]).toEqual([0, 1, 0]);
+    expect(psychic[28]).toBeGreaterThan(0.3);
+    // Skarmory is benched, so no damage shares.
+    expect(floats[meta.monF + 1]).toBe(0);
+    expect(floats[meta.monF + 40 + 28]).toBe(0);
+
+    // Terrakion: the foe's active, and Close Combat threatens Alakazam.
+    const terrakion = floats.subarray(6 * meta.monF, 7 * meta.monF);
+    expect([...terrakion.subarray(0, 4)]).toEqual([0, 1, 1, 1]);
+    expect(terrakion[40 + 28]).toBeGreaterThan(0);
+
+    // The field token marks Gen 4.
+    expect(floats[12 * meta.monF + 18 + 1]).toBe(1);
+
+    // Ids name the Pokémon and moves.
+    expect(meta.names.species[ids[0]!]).toBe('ALAKAZAM');
+    expect(meta.names.items[ids[1]!]).toBe('LIFEORB');
+    expect(meta.names.moves[ids[3]!]).toBe('PSYCHIC');
+    expect(meta.names.species[ids[6 * meta.ids]!]).toBe('TERRAKION');
+  });
 });

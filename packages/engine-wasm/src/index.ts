@@ -44,10 +44,30 @@ interface Exports {
     seedHi: number,
     option: number,
   ): void;
+  search_pair(
+    ptr: number,
+    len: number,
+    iterations: number,
+    seedLo: number,
+    seedHi: number,
+    option1: number,
+    option2: number,
+  ): void;
   options(ptr: number, len: number): void;
+  search_subset(
+    ptr: number,
+    len: number,
+    iterations: number,
+    seedLo: number,
+    seedHi: number,
+    mask: number,
+  ): void;
+  endgame(ptr: number, len: number, depth: number): void;
   roundtrip(ptr: number, len: number): void;
   check(ptr: number, len: number): void;
   damage(ptr: number, len: number): void;
+  features(ptr: number, len: number): void;
+  features_meta(ptr: number, len: number): void;
 }
 
 /** Thrown when the engine panics (an unsupported name or a malformed state). */
@@ -104,7 +124,18 @@ export class Engine {
   }
 
   #call(
-    name: 'search' | 'search_fixed' | 'options' | 'roundtrip' | 'check' | 'damage',
+    name:
+      | 'search'
+      | 'search_fixed'
+      | 'search_pair'
+      | 'search_subset'
+      | 'endgame'
+      | 'options'
+      | 'roundtrip'
+      | 'check'
+      | 'damage'
+      | 'features'
+      | 'features_meta',
     input: string,
     ...args: number[]
   ): string {
@@ -151,6 +182,50 @@ export class Engine {
     ) as SearchResult;
   }
 
+  /**
+   * Both sides held to one root option each (indexes into `options(state)`):
+   * the value of that pair of choices, `s1[0].s / n`, from side one's view.
+   */
+  searchPair(
+    state: string,
+    iterations: number,
+    seed: number,
+    option1: number,
+    option2: number,
+  ): SearchResult {
+    const lo = seed >>> 0;
+    const hi = Math.floor(seed / 2 ** 32) >>> 0;
+    return JSON.parse(
+      this.#call('search_pair', state, iterations >>> 0, lo, hi, option1 >>> 0, option2 >>> 0),
+    ) as SearchResult;
+  }
+
+  /**
+   * Like `search`, with side one limited to the root options whose bits are
+   * set in `mask` (bit I is `options(state).s1[I]`).
+   */
+  searchSubset(state: string, iterations: number, seed: number, mask: number): SearchResult {
+    const lo = seed >>> 0;
+    const hi = Math.floor(seed / 2 ** 32) >>> 0;
+    return JSON.parse(
+      this.#call('search_subset', state, iterations >>> 0, lo, hi, mask >>> 0),
+    ) as SearchResult;
+  }
+
+  /**
+   * Exhaustive expectiminimax `depth` turns deep (deterministic, no
+   * iterations): each pair of root options' value, `m[i * s2.length + j]`,
+   * in evaluation units from side one's view. For endgames, where the tree
+   * is small enough.
+   */
+  endgame(state: string, depth: number): { s1: string[]; s2: string[]; m: number[] } {
+    return JSON.parse(this.#call('endgame', state, depth >>> 0)) as {
+      s1: string[];
+      s2: string[];
+      m: number[];
+    };
+  }
+
   /** Root options per side, as the engine sees them. */
   options(state: string): { s1: string[]; s2: string[] } {
     const s1: string[] = [];
@@ -184,6 +259,46 @@ export class Engine {
     const parse = (x: string) => (x === '0' ? [] : x.split(',').map(Number));
     return [parse(a), parse(b)];
   }
+
+  /**
+   * The value network's inputs for a state (layout in `featuresMeta`): float
+   * features and per-Pokémon embedding ids.
+   */
+  features(state: string): { floats: Float32Array; ids: Uint16Array } {
+    const meta = this.featuresMeta();
+    this.#call('features', state);
+    const e = this.#exports;
+    const bytes = new Uint8Array(e.memory.buffer, e.out_ptr(), e.out_len()).slice();
+    const floats = new Float32Array(bytes.buffer, 0, meta.floats);
+    const ids = new Uint16Array(bytes.buffer, meta.floats * 4, meta.tokens * meta.ids);
+    return { floats, ids };
+  }
+
+  #featureSizes?: FeaturesMeta;
+
+  /** The feature layout and this gen's id → name tables. */
+  featuresMeta(): FeaturesMeta {
+    this.#featureSizes ??= JSON.parse(this.#call('features_meta', '')) as FeaturesMeta;
+    return this.#featureSizes;
+  }
+}
+
+export interface FeaturesMeta {
+  floats: number;
+  tokens: number;
+  ids: number;
+  monF: number;
+  fieldF: number;
+  names: {
+    gen: number;
+    version: number;
+    itemOffset: number;
+    abilityOffset: number;
+    species: string[];
+    moves: string[];
+    items: string[];
+    abilities: string[];
+  };
 }
 
 export { ENGINE_GENS, engineFile, hasEngine, WASM_VERSION } from './version';

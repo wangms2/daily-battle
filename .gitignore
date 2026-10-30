@@ -19,3 +19,7 @@ playwright-report/
 
 # Rust build output (packages/engine-wasm)
 target/
+
+# Value network training data and Python env (tools/net)
+tools/net/data/
+tools/net/.venv/

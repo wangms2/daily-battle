@@ -16,6 +16,8 @@ use poke_engine::state::State;
 use std::fmt::Write;
 use std::str::FromStr;
 
+pub mod features;
+
 static mut OUT: Vec<u8> = Vec::new();
 
 fn set_out(s: String) {
@@ -167,6 +169,116 @@ pub extern "C" fn search_fixed(
     set_out(out);
 }
 
+/// Like `search`, with both sides held to one root option each (indexes in
+/// `options` order): the value of that pair of choices, played out by MCTS
+/// from the next turn on. The coach fills its option-by-reply table this way.
+#[no_mangle]
+pub extern "C" fn search_pair(
+    ptr: *mut u8,
+    len: usize,
+    iterations: u32,
+    seed_lo: u32,
+    seed_hi: u32,
+    option1: u32,
+    option2: u32,
+) {
+    install_panic_hook();
+    let serialized = input(ptr, len);
+    let mut state = State::deserialize(&serialized);
+    let (s1, s2) = state.root_get_all_options();
+    let one = s1
+        .into_iter()
+        .nth(option1 as usize)
+        .expect("search_pair: no such side one option");
+    let two = s2
+        .into_iter()
+        .nth(option2 as usize)
+        .expect("search_pair: no such side two option");
+    let seed = ((seed_hi as u64) << 32) | seed_lo as u64;
+    let result = perform_mcts_seeded(&mut state, vec![one], vec![two], iterations, seed);
+    let mut out = String::with_capacity(128);
+    let _ = write!(out, "{{\"n\":{},\"s1\":", result.iteration_count);
+    side_json(&mut out, &result.s1);
+    out.push_str(",\"s2\":");
+    side_json(&mut out, &result.s2);
+    out.push('}');
+    set_out(out);
+}
+
+/// Like `search`, with side one limited to the root options whose bits are set
+/// in `mask` (bit I is option I in `options` order; options past 32 are always
+/// kept). The coach narrows its candidates this way between rounds, so the
+/// budget goes to the contenders while the foe still replies blind.
+#[no_mangle]
+pub extern "C" fn search_subset(
+    ptr: *mut u8,
+    len: usize,
+    iterations: u32,
+    seed_lo: u32,
+    seed_hi: u32,
+    mask: u32,
+) {
+    install_panic_hook();
+    let serialized = input(ptr, len);
+    let mut state = State::deserialize(&serialized);
+    let (s1, s2) = state.root_get_all_options();
+    let kept: Vec<MoveChoice> = s1
+        .into_iter()
+        .enumerate()
+        .filter(|(i, _)| *i >= 32 || mask & (1 << i) != 0)
+        .map(|(_, c)| c)
+        .collect();
+    assert!(!kept.is_empty(), "search_subset: empty mask");
+    let seed = ((seed_hi as u64) << 32) | seed_lo as u64;
+    let result = perform_mcts_seeded(&mut state, kept, s2, iterations, seed);
+    let mut out = String::with_capacity(512);
+    let _ = write!(out, "{{\"n\":{},\"s1\":", result.iteration_count);
+    side_json(&mut out, &result.s1);
+    out.push_str(",\"s2\":");
+    side_json(&mut out, &result.s2);
+    out.push('}');
+    set_out(out);
+}
+
+/// Exhaustive expectiminimax to a fixed `depth` (turns), for endgames: every
+/// pair of root options, with chance branches weighted exactly and later turns
+/// solved as each side's safest choice. Deterministic. Output:
+/// `{"s1":[c…],"s2":[c…],"m":[…]}` with `m` row-major (side one's options by
+/// side two's), in the evaluation's units, from side one's view.
+#[no_mangle]
+pub extern "C" fn endgame(ptr: *mut u8, len: usize, depth: u32) {
+    install_panic_hook();
+    let mut state = State::deserialize(&input(ptr, len));
+    let (s1, s2) = state.root_get_all_options();
+    let keys1: Vec<String> = s1.iter().map(choice_key).collect();
+    let keys2: Vec<String> = s2.iter().map(choice_key).collect();
+    let go = std::sync::Arc::new(std::sync::Mutex::new(true));
+    let m = poke_engine::search::expectiminimax_search(
+        &mut state,
+        depth.clamp(1, 6) as i8,
+        s1,
+        s2,
+        false,
+        &go,
+    );
+    let list = |keys: &[String]| {
+        keys.iter()
+            .map(|k| format!("\"{}\"", k))
+            .collect::<Vec<_>>()
+            .join(",")
+    };
+    let cells: Vec<String> = m
+        .iter()
+        .map(|x| if x.is_finite() { x.to_string() } else { "0".to_string() })
+        .collect();
+    set_out(format!(
+        "{{\"s1\":[{}],\"s2\":[{}],\"m\":[{}]}}",
+        list(&keys1),
+        list(&keys2),
+        cells.join(",")
+    ));
+}
+
 /// The root options for both sides, one per line: `s1 move:0`, `s2 switch:3`, ….
 #[no_mangle]
 pub extern "C" fn options(ptr: *mut u8, len: usize) {
@@ -246,6 +358,42 @@ pub extern "C" fn damage(ptr: *mut u8, len: usize) {
         out.push('\n');
     }
     set_out(out);
+}
+
+/// The value network's input features for a state (see `features.rs`):
+/// `FLOATS` little-endian f32s, then `TOKENS * IDS` u16 embedding ids, as raw bytes.
+#[no_mangle]
+pub extern "C" fn features(ptr: *mut u8, len: usize) {
+    install_panic_hook();
+    let state = State::deserialize(&input(ptr, len));
+    let f = features::features(&state);
+    let mut out = Vec::with_capacity(f.floats.len() * 4 + f.ids.len() * 2);
+    for v in &f.floats {
+        out.extend_from_slice(&v.to_le_bytes());
+    }
+    for v in &f.ids {
+        out.extend_from_slice(&v.to_le_bytes());
+    }
+    unsafe {
+        *std::ptr::addr_of_mut!(OUT) = out;
+    }
+}
+
+/// The features' layout: `{"version","gen","floats","tokens","ids","monF","fieldF",…}` plus name tables.
+#[no_mangle]
+pub extern "C" fn features_meta(ptr: *mut u8, len: usize) {
+    install_panic_hook();
+    let _ = input(ptr, len);
+    let names = features::names_json();
+    set_out(format!(
+        "{{\"floats\":{},\"tokens\":{},\"ids\":{},\"monF\":{},\"fieldF\":{},\"names\":{}}}",
+        features::FLOATS,
+        features::TOKENS,
+        features::IDS,
+        features::MON_F,
+        features::FIELD_F,
+        names
+    ));
 }
 
 /// getrandom's custom backend for wasm32. The engine only draws from rngs we

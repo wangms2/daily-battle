@@ -388,6 +388,9 @@ importers:
       '@pkmn/client':
         specifier: 'catalog:'
         version: 0.7.3
+      '@pkmn/sim':
+        specifier: 'catalog:'
+        version: 0.10.11
       tsx:
         specifier: ^4.23.15
         version: 4.23.15

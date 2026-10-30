@@ -30,6 +30,23 @@ export interface HardPolicyOptions {
    * and one is drawn in proportion to value (1: always the best).
    */
   variety?: number;
+  /** Called with each searched decision, for training data (tools/net). */
+  record?: (r: DecisionRecord) => void;
+}
+
+/** One searched decision, as the value network's training data. */
+export interface DecisionRecord {
+  turn: number;
+  /** The top-weight world's engine state, the deciding side as side one. */
+  state: string;
+  /** Side one's options (engine keys) and their visit shares, weighted across worlds. */
+  s1: { c: string; p: number }[];
+  /** The foe's options in that world and their visit shares. */
+  s2: { c: string; p: number }[];
+  /** The choice made. */
+  pick: string;
+  /** The engine key of the choice made, if it has one. */
+  pickKey?: string;
 }
 
 // 200k beat 40k 57% head to head (120 games, Gen 4); 150k keeps a mid-range phone under ~2 s.
@@ -175,6 +192,38 @@ export interface WorldClaim {
   give(result: SearchResult): void;
 }
 
+/** The training record for a searched decision (HardPolicyOptions.record). */
+function record(
+  view: SideView,
+  worlds: PreparedWorld[],
+  searched: WorldSearch[],
+  pick: string,
+): DecisionRecord {
+  const request = view.request as Parameters<typeof toChoice>[1];
+  const s1 = new Map<string, number>();
+  for (const { weight, result } of searched) {
+    if (!result.n) continue;
+    for (const o of result.s1) s1.set(o.c, (s1.get(o.c) ?? 0) + (weight * o.v) / result.n);
+  }
+  const total = [...s1.values()].reduce((a, b) => a + b, 0) || 1;
+  let top = 0;
+  worlds.forEach((w, i) => {
+    if (w.weight > worlds[top]!.weight) top = i;
+  });
+  const res = searched[top]!.result;
+  const shares = (list: SearchResult['s1']) =>
+    list.map((o) => ({ c: o.c, p: res.n ? o.v / res.n : 0 }));
+  const pickKey = [...s1.keys()].find((c) => toChoice(c, request) === pick);
+  return {
+    turn: view.battle.turn,
+    state: worlds[top]!.state,
+    s1: [...s1].map(([c, v]) => ({ c, p: v / total })),
+    s2: shares(res.s2),
+    pick,
+    ...(pickKey ? { pickKey } : {}),
+  };
+}
+
 const settled = (choice: string): DecisionJob => ({
   step: () => false,
   claim: () => undefined,
@@ -232,6 +281,7 @@ export class HardPolicy implements Policy {
       const best = this.best(searched, request, legal, rng);
       if (best) this.stats.searched++;
       pick = best ?? this.fallback.choose(view, rng);
+      if (best && this.options.record) this.options.record(record(view, worlds!, searched, pick));
     };
     // Searches world `i` here; with `all`, ones handed out too (never given back).
     const search = (all: boolean): boolean => {

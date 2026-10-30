@@ -12,6 +12,8 @@ export default tseslint.config(
       '**/anim/vendor/**',
       '**/.wrangler/**',
       '**/target/**',
+      'tools/net/.venv/**',
+      'tools/net/data/**',
     ],
   },
   js.configs.recommended,
