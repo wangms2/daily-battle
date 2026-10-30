@@ -5,7 +5,15 @@
 //   npx tsx scripts/selfplay.ts --out ../../tools/net/data/raw/run1 [--formats gen3ou,...]
 //     [--n 100000] [--jobs 19] [--minutes 600] [--seed run1] [--start 2026-03-02]
 import { execSync, fork } from 'node:child_process';
-import { appendFileSync, mkdirSync, writeFileSync } from 'node:fs';
+import {
+  appendFileSync,
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  truncateSync,
+  writeFileSync,
+} from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { FORMATS, setsFor, type SetEntry, type SetsFile } from '@daily-battle/data';
@@ -172,14 +180,24 @@ const taskAt = (k: number): Task => ({
 
 /** Battles per worker process before it's replaced, so memory can't creep up overnight. */
 const RECYCLE = Number(arg('recycle') ?? 150);
+/** Task numbers finished in earlier sessions of this run (written by the parent at start). */
+const DONE_FILE = join(OUT, `${SEED}-done.json`);
 
 const child = process.argv.indexOf('--child');
 if (child > 0) {
   const [shard, jobs, from] = process.argv.slice(child + 1).map(Number);
   const file = join(OUT, `${SEED}-${shard}.jsonl`);
+  const done = new Set(
+    existsSync(DONE_FILE) ? (JSON.parse(readFileSync(DONE_FILE, 'utf8')) as number[]) : [],
+  );
   let played = 0;
   for (let k = from!; k < TASKS; k += jobs!) {
-    if (played++ >= RECYCLE) process.exit(RECYCLE_EXIT);
+    if (done.has(k)) continue;
+    if (played++ >= RECYCLE) {
+      // Hand over at k: tell the parent where to resume.
+      process.send!({ resume: k });
+      process.exit(RECYCLE_EXIT);
+    }
     let battle: ReturnType<typeof playTask>;
     try {
       battle = playTask(taskAt(k));
@@ -199,8 +217,27 @@ if (child > 0) {
 }
 
 mkdirSync(OUT, { recursive: true });
+
+// Resume: battles already in this run's files are skipped (by task number, so
+// --jobs may change), and a line cut off by an interruption is dropped.
+const doneTasks: number[] = [];
+const formatIndex = new Map(FORMAT_IDS.map((f, j) => [f, j]));
+for (const f of readdirSync(OUT).filter((f) => f.startsWith(`${SEED}-`) && f.endsWith('.jsonl'))) {
+  const path = join(OUT, f);
+  const text = readFileSync(path, 'utf8');
+  const end = text.lastIndexOf('\n') + 1;
+  if (end < text.length) truncateSync(path, Buffer.byteLength(text.slice(0, end)));
+  for (const line of text.slice(0, end).split('\n')) {
+    if (!line) continue;
+    const b = JSON.parse(line) as { format: string; i: number; swap: boolean };
+    const j = formatIndex.get(b.format);
+    if (j !== undefined) doneTasks.push(b.i * 2 * FORMAT_IDS.length + j * 2 + (b.swap ? 1 : 0));
+  }
+}
+writeFileSync(DONE_FILE, JSON.stringify(doneTasks));
+if (doneTasks.length) console.log(`resuming: ${doneTasks.length} battles already done`);
 writeFileSync(
-  join(OUT, `${SEED}-run.json`),
+  join(OUT, `${SEED}-run-${Date.now()}.json`),
   JSON.stringify(
     {
       seed: SEED,
@@ -236,7 +273,11 @@ function runShard(shard: number): Promise<void> {
       );
       children.add(p);
       p.on('message', (m) => {
-        const msg = m as { k: number; decisions: number; error?: boolean };
+        const msg = m as { k: number; decisions: number; error?: boolean; resume?: number };
+        if (msg.resume !== undefined) {
+          next = msg.resume;
+          return;
+        }
         next = msg.k + JOBS;
         battles++;
         if (msg.error) errors++;
