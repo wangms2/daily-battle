@@ -616,7 +616,7 @@ describe('battle screen', () => {
     expect(card).toHaveTextContent('🔥 1-day streak');
   });
 
-  it('goes on to the next game once the day is won, and back to the brief while open', async () => {
+  it('goes on to the next game once the day is won, and back to the brief to try again', async () => {
     const user = userEvent.setup();
     const onPlay = vi.fn();
     const games = [
@@ -643,8 +643,10 @@ describe('battle screen', () => {
     const open = renderBattle(fakeBackend([TURN_1]).backend, {
       result: dayResult([tried('loss', 1, 1)], 0),
     });
-    await user.click(within(await winBattle()).getByRole('button', { name: 'Back to today' }));
+    // Try again goes to the brief, to pick a lead (or use the change) first.
+    await user.click(within(await winBattle()).getByRole('button', { name: 'Try again' }));
     expect(open.onExit).toHaveBeenCalled();
+    expect(open.onRunItBack).not.toHaveBeenCalled();
     expect(open.onDayDone).not.toHaveBeenCalled();
   });
 

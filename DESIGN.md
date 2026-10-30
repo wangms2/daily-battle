@@ -413,7 +413,7 @@ Its image has a row per difficulty (a ball, the name, the headline, the squares 
 2. **Weekly team builder**: pool of 12, role-named set picker, recommended team, lock (§12.2a).
 3. **Daily brief**: opponent species, your team, lead picker, daily swap ("1 change left"), Start.
 4. **Battle**: Showdown-style layout and flow (§12.2b). Mobile-first.
-5. **Result** (a card over the field): outcome, a ⭐ for a first-try win, today's tries as rows, the streak, Share, Try again / Play again, then the next unplayed generation ("Play Gen 5 OU"; "Done for today" once all are done, to the picker), or Back to today while the day is open.
+5. **Result** (a card over the field): outcome, a ⭐ for a first-try win, today's tries as rows, the streak, Share, Try again / Play again, then the next unplayed generation ("Play Gen 5 OU"; "Done for today" once all are done, to the picker). While the day is open, Try again goes back to the brief, so you can pick a lead (or use the change) before the next try, and Change team opens editing there.
 
 ### 12.2a Team builder (should be a pleasure to use)
 

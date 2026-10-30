@@ -1075,7 +1075,11 @@ export function Battle({
       <div className="mt-4 grid gap-2">
         <ShareButton share={r.share} />
         <div className="grid grid-cols-2 gap-2">
-          <Button variant="secondary" onClick={onRunItBack}>
+          {/* A real try goes back to the brief first: pick a lead, maybe use the change. */}
+          <Button
+            variant="secondary"
+            onClick={r.summary.status === 'pending' ? onExit : onRunItBack}
+          >
             {r.summary.status === 'pending' ? 'Try again' : 'Play again'}
           </Button>
           {r.summary.status === 'pending' ? (
@@ -1092,15 +1096,6 @@ export function Battle({
             </Button>
           )}
         </div>
-        {r.summary.status === 'pending' && (
-          <button
-            type="button"
-            onClick={onExit}
-            className="min-h-9 text-[13px] font-semibold text-muted"
-          >
-            Back to today
-          </button>
-        )}
       </div>
       {/* Once the day's decided, the other games are one tap away. */}
       {r.summary.status !== 'pending' && <OtherGames className="mt-4 text-left" />}

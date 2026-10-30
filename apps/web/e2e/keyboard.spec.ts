@@ -81,7 +81,7 @@ test('plays a whole battle with only the keyboard', async ({ page }) => {
   // Focus lands on the result card.
   await expect(over).toBeFocused();
   const won = (await over.textContent())!.includes('First try');
-  await tabTo(page, (el) => /^(Back to today|Play Gen \d OU)$/.test(el.textContent ?? ''));
+  await tabTo(page, (el) => /^(Try again|Play Gen \d OU)$/.test(el.textContent ?? ''));
   await page.keyboard.press('Enter');
   // A win goes on to the next generation; otherwise back to the brief.
   await expect(

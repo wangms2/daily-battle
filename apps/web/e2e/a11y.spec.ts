@@ -117,7 +117,7 @@ for (const scheme of ['light', 'dark'] as const) {
       await page.getByRole('button', { name: 'Forfeit' }).last().click();
       await expect(page.getByRole('dialog', { name: 'Battle over' })).toBeVisible();
       await check(page, 'end card');
-      await page.getByRole('button', { name: 'Back to today' }).click();
+      await page.getByRole('button', { name: 'Try again' }).click();
       await expect(page.getByRole('region', { name: 'Today’s result' })).toBeVisible();
       await check(page, 'brief with result');
     });

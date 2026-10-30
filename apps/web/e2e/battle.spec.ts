@@ -130,7 +130,8 @@ test('plays a full battle and stays on our own hosts', async ({ page }) => {
     await next.click();
     await expect(page.locator('header').first()).toContainText(gen);
   } else {
-    await page.getByRole('button', { name: 'Back to today' }).click();
+    // Try again goes back to the brief, to pick a lead first.
+    await over.getByRole('button', { name: 'Try again' }).click();
     // Today's result now shows on the brief.
     await expect(page.getByRole('region', { name: 'Today’s result' })).toBeVisible();
     await expect(page.getByRole('button', { name: /^Try again · / })).toBeVisible();
@@ -349,7 +350,8 @@ test('a lost first try breaks the streak, and the result copies to share', async
       await noScroll(page, 'end card, 3 tries');
       await page.screenshot({ path: `${dir}/28-end-tries.png` });
     }
-    await card.getByRole('button', { name: 'Back to today' }).click();
+    // Back to the brief, to pick a lead and maybe change the team.
+    await card.getByRole('button', { name: 'Try again' }).click();
   }
 
   const strip = page.getByRole('region', { name: 'Today’s result' });
