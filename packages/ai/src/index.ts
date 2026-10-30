@@ -20,6 +20,8 @@ export {
   prepareWorlds,
   searchWorld,
   searchWorlds,
+  type DecisionJob,
+  type WorldClaim,
   type HardPolicyOptions,
   type HardStats,
   type PreparedWorld,

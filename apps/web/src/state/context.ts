@@ -50,3 +50,18 @@ export function useNow(intervalMs = 60_000): Date {
   }, [clock, intervalMs]);
   return now;
 }
+
+/**
+ * `key` of the current time (the day, say), checked every `intervalMs` but
+ * re-rendering only when it changes: a whole screen can follow the day without
+ * redrawing every second.
+ */
+export function useClockKey(key: (now: Date) => string, intervalMs = 1000): string {
+  const clock = useContext(ClockContext);
+  const [value, setValue] = useState(() => key(clock()));
+  useEffect(() => {
+    const id = setInterval(() => setValue(key(clock())), intervalMs);
+    return () => clearInterval(id);
+  }, [clock, key, intervalMs]);
+  return value;
+}

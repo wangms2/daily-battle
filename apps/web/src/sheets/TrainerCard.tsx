@@ -58,7 +58,8 @@ export function TrainerCard({
   games: TrainerGame[];
   /** Every game played today; offered when two or more are. */
   shareAll: AnyShare | null;
-  countdown: string;
+  /** Ticks on its own. */
+  countdown: ReactNode;
 }) {
   const focused = useRef<HTMLElement>(null);
   useEffect(() => {

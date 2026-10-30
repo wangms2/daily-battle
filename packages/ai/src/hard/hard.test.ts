@@ -1,7 +1,7 @@
 import { setsFor } from '@daily-battle/data';
 import type { Engine } from '@daily-battle/engine-wasm';
 import { engineBuilt, loadEngine } from '@daily-battle/engine-wasm/node';
-import { deriveSeed, makeRng, randomTeam, runBattle } from '@daily-battle/sim-bridge';
+import { deriveSeed, makeRng, randomTeam, runBattle, type Policy } from '@daily-battle/sim-bridge';
 import { describe, expect, it } from 'vitest';
 import { strongBot } from '../bots';
 import { engineId, engineMove } from './names';
@@ -45,15 +45,31 @@ function names(state: string): string[] {
   return out.map((n) => n.toLowerCase());
 }
 
-function battle(format: string, i: number, engine: Engine) {
+function battle(format: string, i: number, engine: Engine, helper?: Engine) {
   const data = setsFor(format);
   const rng = makeRng(deriveSeed('hard-test:teams', i));
   const hard = new HardPolicy({ engine, data, iterations: 3000, worlds: 4 });
+  // As the web's helper workers do: some worlds searched by another engine and
+  // given back out of order, one handed out and never given back.
+  const policy: Policy = helper
+    ? {
+        choose: (view, rng) => {
+          const job = hard.think(view, rng);
+          const claims = [job.claim(), job.claim(), job.claim()];
+          job.step();
+          for (const claim of [claims[2], claims[0]]) {
+            const w = claim?.world;
+            if (w) claim.give(helper.search(w.state, w.iterations, w.seed));
+          }
+          return job.result();
+        },
+      }
+    : hard;
   const result = runBattle({
     format,
     seed: deriveSeed('hard-test:battle', i),
     maxTurns: 60,
-    p1: { team: randomTeam(rng, data), policy: hard, seed: deriveSeed('hard-test:p1', i) },
+    p1: { team: randomTeam(rng, data), policy, seed: deriveSeed('hard-test:p1', i) },
     p2: {
       team: randomTeam(rng, data),
       policy: strongBot({ data }),
@@ -71,6 +87,14 @@ describe.each(FORMATS)('Hard AI %s', (format) => {
     const b = battle(format, 0, loadEngine(gen));
     const log = (r: typeof a) => r.result.spectatorLog.filter((l) => !l.startsWith('|t:|'));
     expect(log(b)).toEqual(log(a));
+  }, 60_000);
+
+  it('chooses the same with worlds searched elsewhere, in any order', () => {
+    const a = battle(format, 1, loadEngine(gen));
+    const b = battle(format, 1, loadEngine(gen), loadEngine(gen));
+    const log = (r: typeof a) => r.result.spectatorLog.filter((l) => !l.startsWith('|t:|'));
+    expect(log(b)).toEqual(log(a));
+    expect(b.hard.stats).toEqual(a.hard.stats);
   }, 60_000);
 
   it('translates every state into one the engine accepts, with known names', () => {

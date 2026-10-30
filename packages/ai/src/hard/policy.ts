@@ -144,6 +144,36 @@ export function searchWorlds(
   }));
 }
 
+/**
+ * One decision, searched a world at a time (`step`), so the battle worker can
+ * do it while you choose (DESIGN.md §7). Run to the end it gives exactly what
+ * `choose` would: `choose` is this job, run at once.
+ */
+export interface DecisionJob {
+  /** Does one slice of the work (one world not handed out); true while there's more. */
+  step(): boolean;
+  /**
+   * Hands out a world to search elsewhere (another worker), or nothing if none
+   * is left. Results are combined in world order however they arrive, so the
+   * choice is the same; a world never given back is searched by `result`.
+   */
+  claim(): WorldClaim | undefined;
+  /** Finishes any work left and gives the choice. */
+  result(): string;
+}
+
+/** A world handed out by `DecisionJob.claim`, and where its search goes. */
+export interface WorldClaim {
+  world: PreparedWorld;
+  give(result: SearchResult): void;
+}
+
+const settled = (choice: string): DecisionJob => ({
+  step: () => false,
+  claim: () => undefined,
+  result: () => choice,
+});
+
 export class HardPolicy implements Policy {
   readonly stats: HardStats = { decisions: 0, searched: 0, errors: [] };
   private readonly engine: Engine;
@@ -160,35 +190,85 @@ export class HardPolicy implements Policy {
   }
 
   choose(view: SideView, rng: Rng): string {
-    const legal = legalChoices(view.request);
-    if (legal.length <= 1) return legal[0] ?? 'default';
-    this.stats.decisions++;
-    if (view.request.requestType !== 'team') {
-      try {
-        const pick = this.search(view, rng, legal);
-        if (pick) {
-          this.stats.searched++;
-          return pick;
-        }
-      } catch (err) {
-        this.note(String((err as Error)?.message ?? err));
-      }
-    }
-    return this.fallback.choose(view, rng);
+    return this.think(view, rng).result();
   }
 
-  private search(view: SideView, rng: Rng, legal: string[]): string | undefined {
+  /**
+   * The decision as a job. `rng` is drawn from as the job runs, so it should be
+   * this decision's own (the battle engine derives one per decision).
+   */
+  think(view: SideView, rng: Rng): DecisionJob {
+    const legal = legalChoices(view.request);
+    if (legal.length <= 1) return settled(legal[0] ?? 'default');
+    this.stats.decisions++;
     const request = view.request;
-    if (request.requestType === 'wait' || request.requestType === 'team') return undefined;
+    if (request.requestType === 'team' || request.requestType === 'wait')
+      return settled(this.fallback.choose(view, rng));
+    let worlds: PreparedWorld[] | undefined;
+    // By world index; `claimed` ones are being searched elsewhere.
+    const results: (SearchResult | undefined)[] = [];
+    const claimed = new Set<number>();
+    let pick: string | undefined;
+    const fail = (err: unknown) => {
+      this.note(String((err as Error)?.message ?? err));
+      pick = this.fallback.choose(view, rng);
+    };
+    const prepare = (): PreparedWorld[] | undefined => {
+      try {
+        return (worlds ??= prepareWorlds(view, this.data, rng, this.options));
+      } catch (err) {
+        fail(err);
+      }
+    };
+    const finish = () => {
+      const searched = worlds!.map((world, i) => ({ weight: world.weight, result: results[i]! }));
+      const best = this.best(searched, request, legal);
+      if (best) this.stats.searched++;
+      pick = best ?? this.fallback.choose(view, rng);
+    };
+    // Searches world `i` here; with `all`, ones handed out too (never given back).
+    const search = (all: boolean): boolean => {
+      if (pick !== undefined || !prepare()) return false;
+      try {
+        const i = worlds!.findIndex((_, i) => !results[i] && (all || !claimed.has(i)));
+        if (i >= 0) results[i] = searchWorld(this.engine, request, worlds![i]!);
+        if (results.filter(Boolean).length < worlds!.length) return i >= 0;
+        finish();
+      } catch (err) {
+        fail(err);
+      }
+      return false;
+    };
+    return {
+      step: () => search(false),
+      claim: () => {
+        if (pick !== undefined || !prepare()) return undefined;
+        const i = worlds!.findIndex((_, i) => !results[i] && !claimed.has(i));
+        if (i < 0) return undefined;
+        claimed.add(i);
+        return {
+          world: worlds![i]!,
+          give: (result) => {
+            if (pick === undefined && !results[i]) results[i] = result;
+          },
+        };
+      },
+      result: () => {
+        while (search(true));
+        return pick!;
+      },
+    };
+  }
+
+  /** The legal choice with the highest value, weighted across the worlds searched. */
+  private best(
+    results: WorldSearch[],
+    request: Parameters<typeof toChoice>[1],
+    legal: string[],
+  ): string | undefined {
     const legalSet = new Set(legal);
     const value = new Map<string, number>();
-    for (const { weight, result } of searchWorlds(
-      this.engine,
-      view,
-      this.data,
-      rng,
-      this.options,
-    )) {
+    for (const { weight, result } of results) {
       if (!result.n) continue;
       for (const option of result.s1) {
         const choice = toChoice(option.c, request);

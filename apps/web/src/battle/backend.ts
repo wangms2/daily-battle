@@ -53,8 +53,28 @@ let shared: Worker | null = null;
 
 /** Starts the worker (and its ~1 MB of simulator code) before it's needed. */
 export function warmBattleWorker(): Worker {
-  shared ??= new Worker(new URL('./battle.worker.ts', import.meta.url), { type: 'module' });
+  if (!shared) {
+    shared = new Worker(new URL('./battle.worker.ts', import.meta.url), { type: 'module' });
+    // Background work (Hard thinking ahead, the coach's judge) pauses while the
+    // page is hidden, to save battery (DESIGN.md §7).
+    if (typeof document !== 'undefined') {
+      const worker = shared;
+      const tell = () => worker.postMessage({ type: 'visibility', hidden: document.hidden });
+      tell();
+      document.addEventListener('visibilitychange', tell);
+    }
+  }
   return shared;
+}
+
+/** Also fetches and compiles the Hard engine for the format, so Start doesn't wait for it. */
+export function warmHardEngine(format: string) {
+  hint({ type: 'warm', format });
+}
+
+/** A message the worker doesn't answer, sent straight away (outside the queue). */
+function hint(msg: Extract<ToWorker, { type: 'visibility' | 'warm' }>) {
+  if (typeof Worker !== 'undefined') warmBattleWorker().postMessage(msg);
 }
 
 /**

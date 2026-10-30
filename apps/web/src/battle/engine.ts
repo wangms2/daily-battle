@@ -1,6 +1,12 @@
 // The battle engine that runs inside the worker: a BattleSession, the
 // opponent AI, and a presenter that turns the player's side into frames.
-import { aiFor, UtilityPolicy } from '@daily-battle/ai';
+import {
+  aiFor,
+  HardPolicy,
+  UtilityPolicy,
+  type DecisionJob,
+  type WorldClaim,
+} from '@daily-battle/ai';
 import { DEFAULT_FORMAT, setsFor } from '@daily-battle/data';
 import type { Engine } from '@daily-battle/engine-wasm';
 import {
@@ -80,6 +86,12 @@ export class BattleEngine {
    * coach checks its advice against it (DESIGN.md §22). Never sent or saved.
    */
   private pending?: { view: SideView; choice: string; read?: FoeRead };
+  /**
+   * Hard: the opponent's decision on this turn, searched a slice at a time while
+   * you choose (`ponder`, DESIGN.md §7). It's finished and made before your
+   * choice goes in, so the turn plays exactly as if it were searched at once.
+   */
+  private thinking?: DecisionJob;
 
   /**
    * Hard needs `engine`, poke-engine for the format's gen; `budget` is for tests.
@@ -151,6 +163,7 @@ export class BattleEngine {
     // comes in lead first, so keep that order. It's the same on every resume,
     // so it isn't one of the recorded choices.
     if (this.session.request('p1')?.requestType === 'team') {
+      this.settleAi();
       this.session.choose('p1', `team ${this.sets.map((_, i) => i + 1).join('')}`);
       this.advanceAi();
     }
@@ -160,6 +173,7 @@ export class BattleEngine {
       // so its review and one-time tips survive a resume.
       this.coachSees(choice, this.start.coachLog?.[this.decisions] ?? undefined);
       this.made.push(choice);
+      this.settleAi();
       this.session.choose('p1', choice);
       this.advanceAi();
     }
@@ -167,6 +181,7 @@ export class BattleEngine {
   }
 
   choose(choice: string): TurnPackage {
+    this.settleAi();
     this.coachSees(choice);
     this.made.push(choice);
     // A move hidden information blocks (the foe's Imprison) comes back as
@@ -335,11 +350,38 @@ export class BattleEngine {
   }
 
   forfeit(): TurnPackage {
+    this.thinking = undefined;
     this.session.forfeit('p1');
     return this.package(false);
   }
 
-  /** The opponent answers every request it has. */
+  /** Hard: searches a slice (one world) of the opponent's decision; true while there's more. */
+  ponder(): boolean {
+    return !!this.thinking?.step();
+  }
+
+  /** Hard: a world of the opponent's decision for another worker to search, if one's left. */
+  claimWorld(): WorldClaim | undefined {
+    return this.thinking?.claim();
+  }
+
+  /** You have a decision to make (not just waiting on the opponent). */
+  private youChoose(): boolean {
+    const type = this.session.request('p1')?.requestType;
+    return type === 'move' || type === 'switch';
+  }
+
+  /** Hard: finishes the opponent's decision, if it's still being searched, and makes it. */
+  private settleAi() {
+    const job = this.thinking;
+    if (!job) return;
+    this.thinking = undefined;
+    const choice = job.result();
+    this.aiLog.push(choice);
+    this.session.choose('p2', choice);
+  }
+
+  /** The opponent answers every request it has; on Hard, one made while you choose waits for `ponder`. */
   private advanceAi() {
     this.pending = undefined;
     for (
@@ -363,7 +405,20 @@ export class BattleEngine {
         if (saved !== undefined) this.reported = Math.min(this.reported, this.aiLog.length);
         this.replay = [];
         const rng = makeRng(deriveSeed(this.start.aiSeed, this.aiLog.length));
-        choice = this.ai.choose(view, rng);
+        const job =
+          this.ai instanceof HardPolicy
+            ? this.ai.think(view, rng)
+            : {
+                step: () => false,
+                claim: () => undefined,
+                result: () => this.ai.choose(view, rng),
+              };
+        // While you choose, the search runs in the worker's spare time (`ponder`).
+        if (this.youChoose()) {
+          this.thinking = job;
+          return;
+        }
+        choice = job.result();
       }
       this.aiLog.push(choice);
       this.session.choose('p2', choice);

@@ -62,7 +62,7 @@ import {
   type GameAction,
 } from './state/reducer';
 import { emptyDay, type Settings } from './state/schema';
-import { useAccount, useNow, useStore } from './state/context';
+import { useAccount, useClockKey, useNow, useStore } from './state/context';
 import { Button } from './ui/bits';
 import { TopBar } from './ui/TopBar';
 import { VersusRoute } from './versus/VersusRoute';
@@ -93,6 +93,11 @@ function countdownTo(now: Date, nextDay: string): string {
   const m = Math.floor((ms % 3_600_000) / 60_000);
   const s = Math.floor((ms % 60_000) / 1000);
   return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+}
+
+/** Time left until the day `to` starts, ticking every second on its own (not the whole app). */
+function Countdown({ to }: { to: string }) {
+  return <>{countdownTo(useNow(1000), to)}</>;
 }
 
 /** The part of the app a route is in: the home screens, versus, Learn, today's game, or the battle. */
@@ -186,9 +191,8 @@ export function App() {
   // Count this device's plays, anonymously (lib/plays.ts).
   useTrackPlays();
   const account = useAccount();
-  const now = useNow(1000);
-  const day = dayKey(now);
-  const week = weekKey(now);
+  const day = useClockKey(dayKey);
+  const week = useClockKey(weekKey);
   const [route, go] = useHashRoute();
   // Until a player picks a game (on the picker), Gen 4 OU is the default.
   const format = state.settings.format ?? DEFAULT_FORMAT;
@@ -319,7 +323,7 @@ export function App() {
     todayShare && !isShareAll(todayShare)
       ? (gameShares.find((g) => g.share)?.share ?? todayShare)
       : todayShare;
-  const countdown = countdownTo(now, addDays(day, 1));
+  const countdown = <Countdown to={addDays(day, 1)} />;
   // The other games, for the "Play another generation" row on the result and share screens.
   const games = ids
     .filter((id) => id !== format)

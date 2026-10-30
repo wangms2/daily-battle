@@ -275,7 +275,11 @@ export type ToWorker =
       turn: { p1?: string; p2?: string };
       spots: string[];
       whole?: boolean;
-    };
+    }
+  /** Unanswered hints (DESIGN.md §7): the page is hidden or not (background work pauses). */
+  | { type: 'visibility'; hidden: boolean }
+  /** Fetch and compile the Hard engine for the format now, ahead of a start. */
+  | { type: 'warm'; format: string };
 
 export type FromWorker =
   | { type: 'package'; pkg: TurnPackage }

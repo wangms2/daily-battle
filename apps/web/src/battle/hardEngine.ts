@@ -16,13 +16,13 @@ const modules = new Map<number, Promise<WasmModule>>();
 export const hardAvailable = (format: string): boolean =>
   Object.keys(urls).some((path) => path.endsWith(`/${engineFile(genOf(format))}`));
 
-/** A fresh engine for the format's generation (the module compiles once). */
-export async function loadHardEngine(format: string): Promise<Engine> {
+/** The format's compiled module (compiled once per gen). */
+export function loadHardModule(format: string): Promise<WasmModule> {
   const gen = genOf(format);
   let module = modules.get(gen);
   if (!module) {
     const entry = Object.entries(urls).find(([path]) => path.endsWith(`/${engineFile(gen)}`));
-    if (!entry) throw new Error(`Hard isn't available for Gen ${gen}`);
+    if (!entry) return Promise.reject(new Error(`Hard isn't available for Gen ${gen}`));
     module = entry[1]()
       .then((url) => fetch(url))
       .then((res) => {
@@ -36,5 +36,10 @@ export async function loadHardEngine(format: string): Promise<Engine> {
       });
     modules.set(gen, module);
   }
-  return new Engine(await module);
+  return module;
+}
+
+/** A fresh engine for the format's generation (the module compiles once). */
+export async function loadHardEngine(format: string): Promise<Engine> {
+  return new Engine(await loadHardModule(format));
 }

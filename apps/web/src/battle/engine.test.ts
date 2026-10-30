@@ -552,14 +552,42 @@ describe.skipIf(!engineBuilt(4))('BattleEngine on Hard', () => {
   }, 60_000);
 
   it('searches again from a saved choice that no longer fits', () => {
-    const resumed = new BattleEngine(
-      { ...s, aiChoices: ['switch 9'] },
-      loadEngine(4),
-      budget,
-    ).begin();
-    expect(resumed.aiChoices?.from).toBe(0);
-    expect(resumed.aiChoices?.choices[0]).not.toBe('switch 9');
+    const engine = new BattleEngine({ ...s, aiChoices: ['switch 9'] }, loadEngine(4), budget);
+    const first = engine.begin();
+    const pkg = engine.choose(first.controls!.moves[0]!.choice);
+    expect(pkg.aiChoices?.from).toBe(0);
+    expect(pkg.aiChoices?.choices[0]).not.toBe('switch 9');
   }, 30_000);
+
+  it('thinks while you choose: the turn comes first, and the battle is the same however far it got', () => {
+    const run = (ponder: number) => {
+      const wasm = loadEngine(4);
+      const search = vi.spyOn(wasm, 'search');
+      const engine = new BattleEngine(s, wasm, budget);
+      const packages = [engine.begin()];
+      // The first turn is sent before the opponent's search starts.
+      expect(search).not.toHaveBeenCalled();
+      const pick = makeRng('5,5,5,5');
+      let ai: AiChoices | undefined = packages[0]!.aiChoices;
+      for (let turn = 0; !packages.at(-1)!.end && turn < 10; turn++) {
+        for (let i = 0; i < ponder && engine.ponder(); i++);
+        const c = packages.at(-1)!.controls!;
+        const options = [
+          ...c.moves.filter((m) => !m.disabled).map((m) => m.choice),
+          ...c.switches.map((x) => x.choice),
+        ];
+        packages.push(engine.choose(c.only ?? options[Math.floor(pick() * options.length)]!));
+        ai = mergeAiChoices(ai, packages.at(-1)!.aiChoices);
+      }
+      return { packages, ai };
+    };
+    const atOnce = run(0);
+    for (const ponder of [1, Infinity]) {
+      const thought = run(ponder);
+      expect(thought.ai).toEqual(atOnce.ai);
+      expect(thought.packages.map((p) => p.frames)).toEqual(atOnce.packages.map((p) => p.frames));
+    }
+  }, 60_000);
 });
 
 describe.skipIf(!engineBuilt(3))('the guided replay', () => {

@@ -4,7 +4,7 @@ import type { Difficulty } from '@daily-battle/ai/version';
 import type { ScheduleFile } from '@daily-battle/gen/schedule';
 import clsx from 'clsx';
 import { useEffect, useState, type ReactNode } from 'react';
-import { warmBattleWorker } from '../battle/backend';
+import { warmBattleWorker, warmHardEngine } from '../battle/backend';
 import {
   activeFormat,
   canMega,
@@ -161,7 +161,13 @@ export function DailyBrief({
    */
   practice?: boolean;
   /** Today's result so far, the share text, and time to the next opponent. */
-  result: { summary: DaySummary; streak: number; share: ShareModel | ShareGame; countdown: string };
+  result: {
+    summary: DaySummary;
+    streak: number;
+    share: ShareModel | ShareGame;
+    /** Ticks on its own. */
+    countdown: ReactNode;
+  };
   schedule: ScheduleFile;
   day: string;
   team: Slot[];
@@ -206,10 +212,15 @@ export function DailyBrief({
   useEffect(() => {
     preloadSprites(opponent.team.map((s) => s.species));
   }, [opponent]);
-  // Load the battle engine while the player looks at the opponent.
+  // Load the battle engine while the player looks at the opponent, and Hard's
+  // search engine (the coach's judge uses it too) when it'll be needed.
   useEffect(() => {
     if (typeof Worker !== 'undefined') warmBattleWorker();
   }, []);
+  const needsSearch = (difficulty === 'hard' && hardAvailable) || !!coach?.on;
+  useEffect(() => {
+    if (needsSearch) warmHardEngine(activeFormat());
+  }, [needsSearch]);
 
   const editing = mode.kind !== 'view';
   const setEditing = (on: boolean) => {
@@ -578,9 +589,12 @@ export function DailyBrief({
       <div className="min-w-0 flex-1">
         <p className="truncate text-[14px] font-semibold">{dayHeadline(summary)}</p>
         <p className="truncate text-[12.5px] text-muted">
-          {[streakLine(summary, result.streak), decided && `Next in ${result.countdown}`]
-            .filter(Boolean)
-            .join(' · ')}
+          {streakLine(summary, result.streak)}
+          {decided && (
+            <>
+              {streakLine(summary, result.streak) && ' · '}Next in {result.countdown}
+            </>
+          )}
         </p>
       </div>
       <ShareButton share={result.share} variant="secondary" className="h-9 shrink-0 px-4" />
