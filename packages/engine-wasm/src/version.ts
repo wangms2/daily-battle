@@ -5,7 +5,7 @@
 export const ENGINE_GENS = [3, 4, 5, 6] as const;
 
 /** Must match `version()` in rust/src/lib.rs (a test checks): bump both when search results could change. */
-export const WASM_VERSION = 1;
+export const WASM_VERSION = 2;
 
 export const hasEngine = (gen: number): boolean => (ENGINE_GENS as readonly number[]).includes(gen);
 

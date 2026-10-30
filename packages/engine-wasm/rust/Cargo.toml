@@ -12,7 +12,7 @@ path = "src/lib.rs"
 
 [dependencies]
 # Our fork adds perform_mcts_seeded (no clock, seeded rng) so a search is reproducible.
-poke-engine = { git = "https://github.com/wangms2/poke-engine", rev = "b394462aa5acf9acd3b591a380be68421212675b", default-features = false }
+poke-engine = { git = "https://github.com/wangms2/poke-engine", rev = "3bbc65ad54c22945c36e227cd40abb8e652e8698", default-features = false }
 # rand pulls in getrandom; on wasm32 we supply a "custom" backend that's never used.
 getrandom = { version = "0.3", default-features = false }
 

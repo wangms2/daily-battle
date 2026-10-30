@@ -61,9 +61,19 @@ pub extern "C" fn out_len() -> usize {
 }
 
 /// Bumped when the wrapper's behavior changes; the AI records it in the engine version.
+/// 2: the TS wrapper sets tuned boost weights (DEFAULT_BOOST_EVAL) on every instance.
 #[no_mangle]
 pub extern "C" fn version() -> u32 {
-    1
+    2
+}
+
+/// Sets the evaluation's stat-boost weights for this instance (see poke-engine's
+/// `eval_params`): `scale` multiplies boosts' value; `curve` bit 1 values stages
+/// linearly, bit 2 applies the tuning to side two only. (1.0, 0) is upstream's
+/// evaluation.
+#[no_mangle]
+pub extern "C" fn set_boost_eval(scale: f32, curve: u32) {
+    poke_engine::eval_params::set_boost_eval(scale, curve);
 }
 
 // Gen 1-3 engines have no Mega, Tera, or Team Preview choices.

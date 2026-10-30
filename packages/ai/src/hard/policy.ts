@@ -25,15 +25,22 @@ export interface HardPolicyOptions {
   worlds?: number;
   /** Informed mode: the foe's real sets. Never set for real play. */
   knownSets?: KnownSets;
+  /**
+   * Choices whose value is at least this fraction of the best's are near-ties,
+   * and one is drawn in proportion to value (1: always the best).
+   */
+  variety?: number;
 }
 
 // 200k beat 40k 57% head to head (120 games, Gen 4); 150k keeps a mid-range phone under ~2 s.
-export const HARD_DEFAULTS = { iterations: 150_000, worlds: 8 } as const;
+export const HARD_DEFAULTS = { iterations: 150_000, worlds: 8, variety: 0.9 } as const;
 
 export interface HardStats {
   decisions: number;
   /** Decisions made by search (the rest fell back). */
   searched: number;
+  /** Searched decisions where a near-tie, not the best, was drawn. */
+  varied: number;
   /** Engine errors, for diagnosing gaps (most recent few). */
   errors: string[];
 }
@@ -175,7 +182,7 @@ const settled = (choice: string): DecisionJob => ({
 });
 
 export class HardPolicy implements Policy {
-  readonly stats: HardStats = { decisions: 0, searched: 0, errors: [] };
+  readonly stats: HardStats = { decisions: 0, searched: 0, varied: 0, errors: [] };
   private readonly engine: Engine;
   private readonly data: SetsFile;
   private readonly fallback: UtilityPolicy;
@@ -222,7 +229,7 @@ export class HardPolicy implements Policy {
     };
     const finish = () => {
       const searched = worlds!.map((world, i) => ({ weight: world.weight, result: results[i]! }));
-      const best = this.best(searched, request, legal);
+      const best = this.best(searched, request, legal, rng);
       if (best) this.stats.searched++;
       pick = best ?? this.fallback.choose(view, rng);
     };
@@ -260,11 +267,15 @@ export class HardPolicy implements Policy {
     };
   }
 
-  /** The legal choice with the highest value, weighted across the worlds searched. */
+  /**
+   * The legal choice with the highest value (visit share, weighted across the
+   * worlds searched), or a near-tie drawn by value (`variety`).
+   */
   private best(
     results: WorldSearch[],
     request: Parameters<typeof toChoice>[1],
     legal: string[],
+    rng: Rng,
   ): string | undefined {
     const legalSet = new Set(legal);
     const value = new Map<string, number>();
@@ -286,7 +297,22 @@ export class HardPolicy implements Policy {
         bestValue = v;
       }
     }
-    if (!best) this.note(`no legal engine option (legal: ${legal.join(', ')})`);
+    if (!best) {
+      this.note(`no legal engine option (legal: ${legal.join(', ')})`);
+      return best;
+    }
+    const variety = this.options.variety ?? HARD_DEFAULTS.variety;
+    if (variety >= 1) return best;
+    const ties = legal.filter((c) => (value.get(c) ?? -1) >= variety * bestValue);
+    if (ties.length < 2) return best;
+    let r = rng() * ties.reduce((sum, c) => sum + value.get(c)!, 0);
+    for (const choice of ties) {
+      r -= value.get(choice)!;
+      if (r < 0) {
+        if (choice !== best) this.stats.varied++;
+        return choice;
+      }
+    }
     return best;
   }
 

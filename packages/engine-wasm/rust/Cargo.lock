@@ -211,7 +211,7 @@ dependencies = [
 [[package]]
 name = "poke-engine"
 version = "0.0.48"
-source = "git+https://github.com/wangms2/poke-engine?rev=b394462aa5acf9acd3b591a380be68421212675b#b394462aa5acf9acd3b591a380be68421212675b"
+source = "git+https://github.com/wangms2/poke-engine?rev=3bbc65ad54c22945c36e227cd40abb8e652e8698#3bbc65ad54c22945c36e227cd40abb8e652e8698"
 dependencies = [
  "clap",
  "dashmap",

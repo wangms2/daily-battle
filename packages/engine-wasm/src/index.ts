@@ -34,6 +34,7 @@ interface Exports {
   out_ptr(): number;
   out_len(): number;
   version(): number;
+  set_boost_eval(scale: number, curve: number): void;
   search(ptr: number, len: number, iterations: number, seedLo: number, seedHi: number): void;
   search_fixed(
     ptr: number,
@@ -57,9 +58,23 @@ export class EngineError extends Error {
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 
+/**
+ * The boost weights every engine starts with (`setBoostEval`): the foe's
+ * boosts count double and every stage counts, so the search stops a sweep
+ * it has no answer to (left alone, +4 to +6 looked nearly free). The
+ * searcher's own boosts keep upstream's weights.
+ */
+export const DEFAULT_BOOST_EVAL = { scale: 2, linear: true, foeOnly: true } as const;
+
+const curveOf = (linear: boolean, foeOnly: boolean) => (linear ? 1 : 0) | (foeOnly ? 2 : 0);
+
 export class Engine {
   #module: WasmModule;
   #exports!: Exports;
+  #boostEval: [number, number] = [
+    DEFAULT_BOOST_EVAL.scale,
+    curveOf(DEFAULT_BOOST_EVAL.linear, DEFAULT_BOOST_EVAL.foeOnly),
+  ];
 
   constructor(module: WasmModule) {
     this.#module = module;
@@ -68,6 +83,19 @@ export class Engine {
 
   #instantiate(): void {
     this.#exports = new WebAssembly.Instance(this.#module, {}).exports as unknown as Exports;
+    this.#exports.set_boost_eval(...this.#boostEval);
+  }
+
+  /**
+   * The evaluation's stat-boost weights for this instance: `scale` multiplies
+   * boosts' value; `linear` values each stage equally instead of the
+   * flattening table; `foeOnly` applies the tuning to side two only (side one,
+   * the searcher, keeps upstream's weights for its own boosts).
+   * `setBoostEval(1)` is upstream poke-engine; the default is DEFAULT_BOOST_EVAL.
+   */
+  setBoostEval(scale: number, linear = false, foeOnly = false): void {
+    this.#boostEval = [scale, curveOf(linear, foeOnly)];
+    this.#exports.set_boost_eval(...this.#boostEval);
   }
 
   #out(): string {

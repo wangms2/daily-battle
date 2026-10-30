@@ -10,6 +10,7 @@
   },
   "scripts": {
     "eval": "tsx scripts/eval.ts",
+    "strength-gate": "tsx scripts/strength-gate.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

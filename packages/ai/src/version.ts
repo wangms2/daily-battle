@@ -16,9 +16,12 @@ export const AI_VERSION = 2;
 /** Older AI versions Easy and Normal can still play, so their saved battles resume. */
 export const RESUMABLE_AI: readonly number[] = [1];
 
-/** The same for Easy's preset and Hard's search (translation, worlds, budget); Normal ignores them. */
+/**
+ * The same for Easy's preset and Hard's search (translation, worlds, budget); Normal ignores them.
+ * Hard 2: near-ties are drawn (`variety`).
+ */
 export const EASY_VERSION = 1;
-export const HARD_VERSION = 1;
+export const HARD_VERSION = 2;
 
 export const DIFFICULTIES = ['easy', 'normal', 'hard'] as const;
 export type Difficulty = (typeof DIFFICULTIES)[number];
@@ -33,7 +36,7 @@ export function difficultyTag(difficulty: Difficulty): string {
   return '';
 }
 
-/** The AI part of an attempt's engine string: `ai 2`, `ai 2 easy 1`, `ai 2 hard 1 e1`. */
+/** The AI part of an attempt's engine string: `ai 2`, `ai 2 easy 1`, `ai 2 hard 2 e2`. */
 export const aiVersion = (difficulty: Difficulty): string =>
   `ai ${AI_VERSION}${difficultyTag(difficulty)}`;
 
