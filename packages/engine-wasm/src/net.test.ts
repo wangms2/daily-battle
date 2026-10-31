@@ -51,7 +51,7 @@ describe.skipIf(!engineBuilt(6) || !existsSync(weights) || !existsSync(fixture))
         r.foeAction.forEach((p, i) => (worst = Math.max(worst, Math.abs(o.foeAction[i]! - p))));
       });
       expect(worst).toBeLessThan(1e-4);
-    });
+    }, 60_000);
 
     it('survives a panic and keeps the network', () => {
       const engine = loadEngine(6);

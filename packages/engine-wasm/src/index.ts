@@ -70,6 +70,7 @@ interface Exports {
   features_meta(ptr: number, len: number): void;
   net_load(ptr: number, len: number): void;
   net_forward(ptr: number, len: number): void;
+  observe(ptr: number, len: number): void;
 }
 
 /** Thrown when the engine panics (an unsupported name or a malformed state). */
@@ -138,7 +139,8 @@ export class Engine {
       | 'check'
       | 'damage'
       | 'features'
-      | 'features_meta',
+      | 'features_meta'
+      | 'observe',
     input: string,
     ...args: number[]
   ): string {
@@ -292,6 +294,57 @@ export class Engine {
   #net?: Uint8Array;
 
   /**
+   * Observation v2 for side one of a world state (features.rs `observe`), the
+   * network's input: `known` describes the foe's six slots in the state's order,
+   * `events` the battle so far, oldest first.
+   */
+  observe(
+    state: string,
+    turn: number,
+    known: readonly NetKnown[],
+    events: readonly NetEvent[],
+  ): { floats: Float32Array; ids: Uint16Array } {
+    const b = (x: boolean) => (x ? 1 : 0);
+    const lines = [state, String(turn)];
+    for (let i = 0; i < 6; i++) {
+      const k = known[i] ?? UNSEEN;
+      const r = Math.round;
+      lines.push(
+        [
+          b(k.seen),
+          b(k.item),
+          b(k.ability),
+          ...k.moves.map(b),
+          ...k.base.map(r),
+          r(k.speed[0]),
+          r(k.speed[1]),
+        ].join(' '),
+      );
+    }
+    for (const e of events) {
+      lines.push(
+        [
+          e.kind,
+          b(e.mine),
+          e.turn,
+          e.species,
+          e.move,
+          b(e.mega),
+          e.hpOwn.toFixed(4),
+          e.hpFoe.toFixed(4),
+        ].join(' '),
+      );
+    }
+    this.#call('observe', lines.join('\n'));
+    const e = this.#exports;
+    const bytes = new Uint8Array(e.memory.buffer, e.out_ptr(), e.out_len()).slice();
+    return {
+      floats: new Float32Array(bytes.buffer, 0, NET_OBS.floats),
+      ids: new Uint16Array(bytes.buffer, NET_OBS.floats * 4, NET_OBS.ids),
+    };
+  }
+
+  /**
    * Loads the Master network (a .dbnet file from tools/net/export.py) into this
    * engine; it's reloaded automatically if the instance restarts after a panic.
    */
@@ -333,6 +386,45 @@ export class Engine {
 
 /** Observation v2 sizes (features.rs OBS_FLOATS, OBS_IDS; 14 action slots). */
 export const NET_OBS = { floats: 2567, ids: 116, actions: 14 } as const;
+
+/** What the viewer knows of one foe Pokémon (features.rs `Known`). */
+export interface NetKnown {
+  /** It has been on the field. */
+  seen: boolean;
+  item: boolean;
+  ability: boolean;
+  /** Per move slot of the state's set. */
+  moves: [boolean, boolean, boolean, boolean];
+  /** Base stats of its current forme: HP, Atk, Def, SpA, SpD, Spe. */
+  base: [number, number, number, number, number, number];
+  /** The lowest and highest Speed (stat × Choice Scarf) the evidence allows. */
+  speed: [number, number];
+}
+
+const UNSEEN: NetKnown = {
+  seen: false,
+  item: false,
+  ability: false,
+  moves: [false, false, false, false],
+  base: [0, 0, 0, 0, 0, 0],
+  speed: [0, 0],
+};
+
+/** One battle event (features.rs `Event`), with embedding ids from `featuresMeta().names`. */
+export interface NetEvent {
+  /** 1: a move was used; 2: a Pokémon switched in. */
+  kind: 1 | 2;
+  /** By the viewer's side. */
+  mine: boolean;
+  turn: number;
+  species: number;
+  /** The move's id (moves only; 0 otherwise). */
+  move: number;
+  mega: boolean;
+  /** Both active Pokémon's HP fractions at the end of that step. */
+  hpOwn: number;
+  hpFoe: number;
+}
 
 export interface NetInput {
   floats: ArrayLike<number>;

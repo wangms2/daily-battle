@@ -399,6 +399,63 @@ pub extern "C" fn features_meta(ptr: *mut u8, len: usize) {
 
 static mut NET: Option<net::Net> = None;
 
+/// Observation v2 (features::observe) for side one of a world state, as the
+/// network sees it. Input lines: the state; the turn; six foe-slot lines
+/// `seen item ability m0 m1 m2 m3 hp atk def spa spd spe speedLo speedHi`
+/// (flags 0/1, base stats, Speed bounds); then one event per line, oldest
+/// first: `kind mine turn species move mega hpOwn hpFoe` (embedding ids).
+/// Output: OBS_FLOATS f32 then OBS_IDS u16, little-endian.
+#[no_mangle]
+pub extern "C" fn observe(ptr: *mut u8, len: usize) {
+    install_panic_hook();
+    let text = input(ptr, len);
+    let mut lines = text.lines();
+    let state = State::deserialize(lines.next().expect("observe: no state"));
+    let turn: u32 = lines.next().and_then(|l| l.trim().parse().ok()).expect("observe: no turn");
+    let mut known = [features::Known::default(); 6];
+    for k in known.iter_mut() {
+        let v: Vec<u32> =
+            lines.next().expect("observe: missing foe line").split_whitespace().map(|x| x.parse().unwrap()).collect();
+        assert!(v.len() == 15, "observe: foe line needs 15 numbers");
+        *k = features::Known {
+            seen: v[0] != 0,
+            item: v[1] != 0,
+            ability: v[2] != 0,
+            moves: [v[3] != 0, v[4] != 0, v[5] != 0, v[6] != 0],
+            base: [v[7] as u16, v[8] as u16, v[9] as u16, v[10] as u16, v[11] as u16, v[12] as u16],
+            speed: (v[13] as u16, v[14] as u16),
+        };
+    }
+    let history: Vec<features::Event> = lines
+        .filter(|l| !l.trim().is_empty())
+        .map(|l| {
+            let v: Vec<&str> = l.split_whitespace().collect();
+            assert!(v.len() == 8, "observe: event needs 8 fields");
+            features::Event {
+                kind: v[0].parse().unwrap(),
+                by_side_one: v[1] == "1",
+                turn: v[2].parse().unwrap(),
+                species: v[3].parse().unwrap(),
+                mv: v[4].parse().unwrap(),
+                mega: v[5] == "1",
+                hp_one: v[6].parse().unwrap(),
+                hp_two: v[7].parse().unwrap(),
+            }
+        })
+        .collect();
+    let f = features::observe(&state, true, &known, &history, turn);
+    let mut out = Vec::with_capacity(f.floats.len() * 4 + f.ids.len() * 2);
+    for v in &f.floats {
+        out.extend_from_slice(&v.to_le_bytes());
+    }
+    for v in &f.ids {
+        out.extend_from_slice(&v.to_le_bytes());
+    }
+    unsafe {
+        *std::ptr::addr_of_mut!(OUT) = out;
+    }
+}
+
 /// Loads the Master network from a .dbnet file's bytes (tools/net/export.py)
 /// into this instance. Returns `{"params":N}`.
 #[no_mangle]

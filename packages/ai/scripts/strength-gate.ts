@@ -5,6 +5,7 @@
 // `--a`/`--b` are `<iterations>x<worlds>`; `--b` defaults to Hard's own budget.
 // Pass (the plan): >= 60% pooled, with each gen's 95% interval above 50%.
 import { fork } from 'node:child_process';
+import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { FORMATS, setsFor } from '@daily-battle/data';
 import {
@@ -19,7 +20,7 @@ import {
 import { engineBuilt, loadEngine } from '@daily-battle/engine-wasm/node';
 import type { Engine } from '@daily-battle/engine-wasm';
 import { deriveSeed, runBattle, type Policy } from '@daily-battle/sim-bridge';
-import { HARD_DEFAULTS, HardPolicy, type KnownSets } from '../src/index';
+import { HARD_DEFAULTS, HardPolicy, NetPolicy, type KnownSets } from '../src/index';
 import { MatrixPolicy } from '../src/advanced/matrix';
 import { EndgamePolicy } from '../src/advanced/endgame';
 import { HalvingPolicy } from '../src/advanced/halving';
@@ -42,6 +43,16 @@ const boostOf = (s: string | undefined) => {
   return { scale: Number(scale), linear: flags.includes('linear'), foe: flags.includes('foe') };
 };
 const A_BOOST = boostOf(arg('a-boost'));
+/**
+ * `--a-net <file.dbnet>[,worlds]`: the challenger is the Master network alone
+ * (NetPolicy, no search) over `worlds` sampled worlds (default 4).
+ */
+const A_NET = (() => {
+  const s = arg('a-net');
+  if (!s) return undefined;
+  const [path, worlds] = s.split(',');
+  return { net: new Uint8Array(readFileSync(path!)), worlds: worlds ? Number(worlds) : 4 };
+})();
 /** `--a-variety 0.9`: a side's near-tie band (HardPolicyOptions.variety). */
 const varietyOf = (s: string | undefined) => (s ? { variety: Number(s) } : {});
 /**
@@ -197,7 +208,10 @@ function playTask({ format, i, swap }: Task): Outcome {
         ...A_ENDGAME,
       })
     : undefined;
-  const a = timed(endgameA ?? matrixA ?? hardA, ta);
+  const netA = A_NET
+    ? new NetPolicy({ engine: engineFor(format, 'a'), data: sets, pool, ...A_NET })
+    : undefined;
+  const a = timed(netA ?? endgameA ?? matrixA ?? hardA, ta);
   const b = timed(new HardPolicy({ engine: engineFor(format, 'b'), data: sets, pool, ...B }), tb);
   // Same battle seed both ways round, so each matchup's luck is mirrored.
   const result = runBattle({
@@ -208,6 +222,7 @@ function playTask({ format, i, swap }: Task): Outcome {
   });
   const challenger = swap ? 'p2' : 'p1';
   const score = result.winner === null ? 0.5 : result.winner === challenger ? 1 : 0;
+  if (netA?.stats.errors.length) console.error(`net (${format}): ${netA.stats.errors[0]}`);
   return {
     format,
     i,
@@ -218,7 +233,7 @@ function playTask({ format, i, swap }: Task): Outcome {
     decA: ta.n,
     msB: tb.ms,
     decB: tb.n,
-    searchedA: hardA.stats.searched,
+    searchedA: netA?.stats.net ?? hardA.stats.searched,
     variedA: hardA.stats.varied,
     solvedA: endgameA?.stats.solved ?? 0,
     solveMsA: endgameA?.stats.ms ?? 0,
@@ -242,7 +257,7 @@ const tasks: Task[] = Array.from({ length: N }, (_, i) =>
   ]),
 ).flat();
 console.log(
-  `strength gate: ${A_MATRIX ? `matrix ${arg('a-matrix')}` : `${A.iterations}x${A.worlds}`}${arg('a-boost') ? ` boost ${arg('a-boost')}` : ''} vs ` +
+  `strength gate: ${A_NET ? `net ${arg('a-net')}` : A_MATRIX ? `matrix ${arg('a-matrix')}` : `${A.iterations}x${A.worlds}`}${arg('a-boost') ? ` boost ${arg('a-boost')}` : ''} vs ` +
     `${B.iterations}x${B.worlds}${arg('b-boost') ? ` boost ${arg('b-boost')}` : ''}, ` +
     `${FORMAT_IDS.join(',')}, ${N} matchups x 2 sides, ${JOBS} job(s)`,
 );
@@ -348,6 +363,16 @@ const varied = outcomes.reduce((a, o) => a + o.variedA, 0);
 if (varied)
   console.log(`  challenger drew a near-tie in ${pct(varied / searched)} of searched decisions`);
 const solved = outcomes.reduce((a, o) => a + o.solvedA, 0);
+if (A_NET)
+  console.log(
+    `  network made ${pct(
+      searched /
+        Math.max(
+          1,
+          outcomes.reduce((a, o) => a + o.decA, 0),
+        ),
+    )} of all decisions (the rest: forced or fallback)`,
+  );
 if (A_ENDGAME)
   console.log(
     `  endgame solver: ${solved} decisions, ` +

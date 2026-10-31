@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { EngineError, WASM_VERSION } from './index';
+import { EngineError, NET_OBS, WASM_VERSION, type NetKnown } from './index';
 import { engineBuilt, loadEngine } from './node';
 
 // poke-engine's documented example state (State::deserialize docs): Alakazam vs Terrakion.
@@ -96,5 +96,31 @@ describe.skipIf(!engineBuilt(4))('engine (gen 4)', () => {
     expect(meta.names.items[ids[1]!]).toBe('LIFEORB');
     expect(meta.names.moves[ids[3]!]).toBe('PSYCHIC');
     expect(meta.names.species[ids[6 * meta.ids]!]).toBe('TERRAKION');
+  });
+
+  it('builds the play-time observation, hiding what the viewer has not seen', () => {
+    const engine = loadEngine(4);
+    const lead: NetKnown = {
+      seen: true,
+      item: false,
+      ability: false,
+      moves: [false, false, false, false],
+      base: [91, 129, 90, 72, 90, 108],
+      speed: [0, 1e4],
+    };
+    const hidden = engine.observe(STATE, 1, [lead], []);
+    expect(hidden.floats.length).toBe(NET_OBS.floats);
+    expect(hidden.ids.length).toBe(NET_OBS.ids);
+    expect(engine.observe(STATE, 1, [lead], [])).toEqual(hidden);
+
+    const revealed = engine.observe(
+      STATE,
+      1,
+      [{ ...lead, item: true, moves: [true, true, true, true] }],
+      [],
+    );
+    expect([...revealed.ids]).not.toEqual([...hidden.ids]);
+    const unseen = engine.observe(STATE, 1, [], []);
+    expect([...unseen.floats]).not.toEqual([...hidden.floats]);
   });
 });
