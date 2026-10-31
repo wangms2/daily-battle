@@ -644,6 +644,66 @@ impl VecEnv {
     fn state(&self, i: usize) -> PyResult<String> {
         self.games.get(i).map(|g| g.state.serialize()).ok_or_else(|| PyValueError::new_err("no such battle"))
     }
+
+    /// Observations of standalone engine states, side one deciding (the warm start's
+    /// recorded positions). Conservative knowledge: of the foe only the active and
+    /// fainted Pokémon count as seen, with no moves, item or ability revealed, Speed
+    /// from the base-stat prior, and no history. Returns floats [k, OBS_FLOATS],
+    /// ids [k, OBS_IDS] and side one's legal mask [k, 14]; a state that fails to
+    /// load gets an all-false mask.
+    fn observe_states<'py>(
+        &self,
+        py: Python<'py>,
+        states: Vec<String>,
+        turns: Vec<u32>,
+    ) -> PyResult<(Bound<'py, PyAny>, Bound<'py, PyAny>, Bound<'py, PyAny>)> {
+        if states.len() != turns.len() {
+            return Err(PyValueError::new_err("states and turns differ in length"));
+        }
+        let k = states.len();
+        let cat = self.cat.clone();
+        let (floats, ids, mask) = py.allow_threads(move || {
+            let mut floats = vec![0f32; k * OBS_FLOATS];
+            let mut ids = vec![0u16; k * OBS_IDS];
+            let mut mask = vec![false; k * ACTIONS];
+            floats
+                .par_chunks_mut(OBS_FLOATS)
+                .zip(ids.par_chunks_mut(OBS_IDS))
+                .zip(mask.par_chunks_mut(ACTIONS))
+                .zip(states.par_iter().zip(turns.par_iter()))
+                .for_each(|(((f, i), m), (s, &turn))| {
+                    let r = catch_unwind(AssertUnwindSafe(|| {
+                        let state = State::deserialize(s);
+                        let foe = &state.side_two;
+                        let active = foe.active_index as usize;
+                        let mut known = [Known::default(); 6];
+                        for (j, kn) in known.iter_mut().enumerate() {
+                            let p = &foe.pokemon.pkmn[j];
+                            *kn = Known::unrevealed(cat.base_of(p));
+                            kn.seen = j == active || (p.hp <= 0 && p.id != PokemonName::NONE);
+                        }
+                        let obs = observe(&state, true, &known, &[], turn);
+                        let (opts, _) = state.root_get_all_options();
+                        (obs, opts)
+                    }));
+                    if let Ok((obs, opts)) = r {
+                        f.copy_from_slice(&obs.floats);
+                        i.copy_from_slice(&obs.ids);
+                        for c in &opts {
+                            if let Some(a) = slot_of(c) {
+                                m[a] = true;
+                            }
+                        }
+                    }
+                });
+            (floats, ids, mask)
+        });
+        Ok((
+            PyArray1::from_vec(py, floats).reshape([k, OBS_FLOATS])?.into_any(),
+            PyArray1::from_vec(py, ids).reshape([k, OBS_IDS])?.into_any(),
+            PyArray1::from_vec(py, mask).reshape([k, ACTIONS])?.into_any(),
+        ))
+    }
 }
 
 /// Observation layout, for the model.
