@@ -67,6 +67,7 @@ def args():
     p.add_argument("--steps", type=int, default=32, help="rollout length per update")
     p.add_argument("--epochs", type=int, default=2)
     p.add_argument("--minibatch", type=int, default=4096)
+    p.add_argument("--micro", type=int, default=2048, help="split each minibatch's forward/backward (memory); 0 = whole")
     p.add_argument("--lr", type=float, default=2e-4)
     p.add_argument("--wd", type=float, default=0.01)
     p.add_argument("--clip", type=float, default=0.2)
@@ -404,70 +405,75 @@ def main():
         for _ in range(a.epochs):
             perm = flat[torch.randperm(N, device=dev)]
             for s in range(0, N, a.minibatch):
-                idx = perm[s : s + a.minibatch]
-                fidx = idx ^ 1
-                f, i, m = Ff[idx].float(), Fi[idx], Fm[idx]
-                with torch.autocast("cuda", torch.bfloat16):
-                    o = net(f, i, m)
-                logits = o["policy"].float()
-                logp_all = masked_logp(logits, m)
-                lp = logp_all.gather(1, Fa[idx][:, None]).squeeze(1)
-                ratio = torch.exp(lp - Flp[idx])
-                ad = Fadv[idx]
-                ad = (ad - ad.mean()) / (ad.std() + 1e-8)
-                pg = -torch.min(ratio * ad, ratio.clamp(1 - a.clip, 1 + a.clip) * ad).mean()
-                p = logp_all.exp() * m
-                ent = -(p * logp_all).sum(1).mean()
-                nleg = m.sum(1).clamp(min=1)
-                za = -(logp_all.sum(1) / nleg).mean()
-                vloss = F.binary_cross_entropy_with_logits(o["value"].float(), Fret[idx].clamp(0, 1))
-                # Foe next action: the other row's real action, where it acted.
-                fv = Fv[fidx]
-                fm = Fm[fidx]
-                fl = o["foe_action"].float().masked_fill(~fm, -1e9)
-                ft = Fa[fidx]
-                if fv.any():
-                    loss_foe = F.cross_entropy(fl[fv], ft[fv])
-                    foe_acc = (fl[fv].argmax(1) == ft[fv]).float().mean().item()
-                else:
-                    loss_foe, foe_acc = torch.zeros((), device=dev), 0.0
-                # Foe sets, on seen foe slots.
-                seen = f[:, : 12 * MON_F].view(-1, 12, MON_F)[:, 6:, SEEN] > 0.5
-                tr = Ftr[idx].long()
-                if seen.any():
-                    it_l, ab_l, mv_l = o["item"][seen].float(), o["ability"][seen].float(), o["moves"][seen].float()
-                    it_t, ab_t, mv_t = tr[..., 1][seen], tr[..., 2][seen], tr[..., 3:][seen]
-                    multi = torch.zeros_like(mv_l)
-                    multi.scatter_(1, mv_t, 1.0)
-                    multi[:, 0] = 0.0  # id 0 = no move
-                    loss_sets = F.cross_entropy(it_l, it_t) + F.cross_entropy(ab_l, ab_t) + F.binary_cross_entropy_with_logits(
-                        mv_l, multi, reduction="sum"
-                    ) / max(1, len(mv_l)) / 4
-                    item_acc = (it_l.argmax(1) == it_t).float().mean().item()
-                    abil_acc = (ab_l.argmax(1) == ab_t).float().mean().item()
-                else:
-                    loss_sets, item_acc, abil_acc = torch.zeros((), device=dev), 0.0, 0.0
-                loss = pw * (pg - ent_coef * ent + a.za * za) + a.vf * vloss + a.foe * loss_foe + a.sets * loss_sets
+                mb = perm[s : s + a.minibatch]
+                # Advantages normalized over the whole minibatch; micro-batches only
+                # split the forward/backward to save memory (one optimizer step).
+                ad_mb = Fadv[mb]
+                ad_mb = (ad_mb - ad_mb.mean()) / (ad_mb.std() + 1e-8)
                 opt.zero_grad(set_to_none=True)
-                loss.backward()
+                for idx, ad in zip(mb.split(a.micro or len(mb)), ad_mb.split(a.micro or len(mb))):
+                    w = len(idx) / len(mb)
+                    fidx = idx ^ 1
+                    f, i, m = Ff[idx].float(), Fi[idx], Fm[idx]
+                    with torch.autocast("cuda", torch.bfloat16):
+                        o = net(f, i, m)
+                    logits = o["policy"].float()
+                    logp_all = masked_logp(logits, m)
+                    lp = logp_all.gather(1, Fa[idx][:, None]).squeeze(1)
+                    ratio = torch.exp(lp - Flp[idx])
+                    pg = -torch.min(ratio * ad, ratio.clamp(1 - a.clip, 1 + a.clip) * ad).mean()
+                    p = logp_all.exp() * m
+                    ent = -(p * logp_all).sum(1).mean()
+                    nleg = m.sum(1).clamp(min=1)
+                    za = -(logp_all.sum(1) / nleg).mean()
+                    vloss = F.binary_cross_entropy_with_logits(o["value"].float(), Fret[idx].clamp(0, 1))
+                    # Foe next action: the other row's real action, where it acted.
+                    fv = Fv[fidx]
+                    fm = Fm[fidx]
+                    fl = o["foe_action"].float().masked_fill(~fm, -1e9)
+                    ft = Fa[fidx]
+                    if fv.any():
+                        loss_foe = F.cross_entropy(fl[fv], ft[fv])
+                        foe_acc = (fl[fv].argmax(1) == ft[fv]).float().mean().item()
+                    else:
+                        loss_foe, foe_acc = torch.zeros((), device=dev), 0.0
+                    # Foe sets, on seen foe slots.
+                    seen = f[:, : 12 * MON_F].view(-1, 12, MON_F)[:, 6:, SEEN] > 0.5
+                    tr = Ftr[idx].long()
+                    if seen.any():
+                        it_l, ab_l, mv_l = o["item"][seen].float(), o["ability"][seen].float(), o["moves"][seen].float()
+                        it_t, ab_t, mv_t = tr[..., 1][seen], tr[..., 2][seen], tr[..., 3:][seen]
+                        multi = torch.zeros_like(mv_l)
+                        multi.scatter_(1, mv_t, 1.0)
+                        multi[:, 0] = 0.0  # id 0 = no move
+                        loss_sets = F.cross_entropy(it_l, it_t) + F.cross_entropy(ab_l, ab_t) + F.binary_cross_entropy_with_logits(
+                            mv_l, multi, reduction="sum"
+                        ) / max(1, len(mv_l)) / 4
+                        item_acc = (it_l.argmax(1) == it_t).float().mean().item()
+                        abil_acc = (ab_l.argmax(1) == ab_t).float().mean().item()
+                    else:
+                        loss_sets, item_acc, abil_acc = torch.zeros((), device=dev), 0.0, 0.0
+                    loss = pw * (pg - ent_coef * ent + a.za * za) + a.vf * vloss + a.foe * loss_foe + a.sets * loss_sets
+                    (loss * w).backward()
+                    with torch.no_grad():
+                        lr_ = lp - Flp[idx]
+                        acc["kl"] += w * ((lr_.exp() - 1) - lr_).mean().item()
+                        acc["clipfrac"] += w * ((ratio - 1).abs() > a.clip).float().mean().item()
+                    acc["pg"] += w * pg.item()
+                    acc["vloss"] += w * vloss.item()
+                    acc["ent"] += w * ent.item()
+                    acc["za"] += w * za.item()
+                    acc["foe_acc"] += w * foe_acc
+                    acc["item_acc"] += w * item_acc
+                    acc["abil_acc"] += w * abil_acc
+                    acc["loss_foe"] += w * loss_foe.item()
+                    acc["loss_sets"] += w * loss_sets.item()
+                    del o, logits, logp_all, loss
                 if not pw:
                     for p in trunk:  # heads only: AdamW skips params without grads (no decay either)
                         p.grad = None
                 torch.nn.utils.clip_grad_norm_(net.parameters(), a.grad_clip)
                 opt.step()
-                with torch.no_grad():
-                    lr_ = lp - Flp[idx]
-                    acc["kl"] += ((lr_.exp() - 1) - lr_).mean().item()
-                    acc["clipfrac"] += ((ratio - 1).abs() > a.clip).float().mean().item()
-                acc["pg"] += pg.item()
-                acc["vloss"] += vloss.item()
-                acc["ent"] += ent.item()
-                acc["za"] += za.item()
-                acc["foe_acc"] += foe_acc
-                acc["item_acc"] += item_acc
-                acc["abil_acc"] += abil_acc
-                acc["loss_foe"] += loss_foe.item()
-                acc["loss_sets"] += loss_sets.item()
                 nb += 1
             if not math.isfinite(acc["pg"]):
                 break
