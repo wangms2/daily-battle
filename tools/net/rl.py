@@ -34,7 +34,9 @@ import torch.nn.functional as F
 
 HERE = Path(__file__).parent
 sys.path.insert(0, str(HERE))
-from model import ACTIONS, MON_F, OBS_FLOATS, OBS_IDS, Config, Net  # noqa: E402
+if os.environ.get("PE_ENV_DIR"):  # staged env builds, e.g. while training holds the .pyd files
+    sys.path.insert(0, os.environ["PE_ENV_DIR"])
+from model import ACTIONS, MON_F, OBS_FLOATS, OBS_IDS, Config, Net, load, upgrade  # noqa: E402
 
 SEEN = 40  # mon float: the viewer has seen this Pokémon
 DMG = 28  # move float: damage share of the foe's HP (own active only)
@@ -225,8 +227,7 @@ def player(spec, dev, rng, net=None):
     if spec == "net":
         return net_player(net, dev)
     if spec.startswith("net:"):
-        n = Net(Config()).to(dev)
-        n.load_state_dict(torch.load(spec[4:], map_location=dev, weights_only=False)["model"])
+        n = load(Net(Config()).to(dev), torch.load(spec[4:], map_location=dev, weights_only=False)["model"])
         return net_player(n, dev)
     if spec.startswith("mcts:"):
         iters = int(spec[5:])
@@ -287,12 +288,20 @@ def main():
     st = dict(update=0, decisions=0, games=0, seconds=0.0)
     if a.resume and ckpt_path.exists():
         ck = torch.load(ckpt_path, map_location=dev, weights_only=False)
+        padded = upgrade(ck["model"])
         net.load_state_dict(ck["model"])
         opt.load_state_dict(ck["opt"])
+        # An older observation layout: pad Adam's moments for the new inputs with zeros.
+        for name, p in net.named_parameters():
+            if name in padded:
+                for k in ("exp_avg", "exp_avg_sq"):
+                    m = opt.state[p][k]
+                    opt.state[p][k] = torch.cat([m, m.new_zeros(m.shape[0], p.shape[1] - m.shape[1])], 1)
+                print(f"upgraded {name} from {padded[name]} to {p.shape[1]} inputs")
         st = ck["state"]
         print(f"resumed {ckpt_path} at update {st['update']}, {st['games']:,} games")
     elif a.init:
-        net.load_state_dict(torch.load(a.init, map_location=dev, weights_only=False)["model"])
+        load(net, torch.load(a.init, map_location=dev, weights_only=False)["model"])
         st["init"] = str(Path(a.init).resolve())
         print(f"init from {a.init}")
     net.train()

@@ -17,6 +17,7 @@ logits (ACTIONS f32). The outputs use the f16-rounded weights, so the WASM must
 match them to float precision.
 """
 import argparse
+import os
 import struct
 import sys
 from pathlib import Path
@@ -24,7 +25,7 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from model import ACTIONS, OBS_FLOATS, OBS_IDS, Config, Net
+from model import ACTIONS, OBS_FLOATS, OBS_IDS, Config, Net, load
 
 HERE = Path(__file__).parent
 MAGIC = b"DBNET\0\0\0"
@@ -85,11 +86,12 @@ def main():
     a = p.parse_args()
     torch.set_num_threads(4)
     sys.path.insert(0, str(HERE))
+    if os.environ.get("PE_ENV_DIR"):  # staged env builds, e.g. while training holds the .pyd files
+        sys.path.insert(0, os.environ["PE_ENV_DIR"])
 
     ck_path = Path(a.checkpoint) if a.checkpoint else latest_snapshot(HERE / "data" / "rl" / "pilot")
     ck = torch.load(ck_path, map_location="cpu", weights_only=False)
-    net = Net(Config())
-    net.load_state_dict(ck["model"])
+    net = load(Net(Config()), ck["model"])
     net.eval()
     out = Path(a.out)
     out.parent.mkdir(parents=True, exist_ok=True)

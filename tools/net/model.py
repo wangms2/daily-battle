@@ -1,9 +1,10 @@
 """Model v2 for self-play RL (plan-rl R3): a small pre-RMSNorm transformer over
-observation v2 (features.rs OBS_VERSION 2), Jaxcalibur-style.
+observation v3 (features.rs OBS_VERSION 3), Jaxcalibur-style.
 
 Tokens, in order: field 1, own team 6, foe team 6, own active's moves 4,
-history 16; the 12 matchup tokens join halfway. Each token type has its own
-input encoder and FFN weights; attention is shared.
+history 16; the 24 matchup tokens (each own slot vs up to 4 foe slots) join
+halfway. Each token type has its own input encoder and FFN weights; attention
+is shared.
 
 Heads:
 - policy over 14 action slots (moves 0-3, mega moves 4-7, switches 8-13), masked;
@@ -19,15 +20,19 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-# Observation v2 layout (pe_env_genN.dims()).
+# Observation v3 layout (pe_env_genN.dims()).
 TOKENS, MON_F, MON_BASE, MOVE_F, MON_IDS = 12, 165, 45, 30, 7
-FIELD_F, HIST, HIST_F, HIST_IDS, MATCH, MATCH_F = 315, 16, 8, 2, 12, 12
+FIELD_F, HIST, HIST_F, HIST_IDS = 315, 16, 8, 2
+# Matchups: each own slot against up to MATCH_FOES foe slots; token k is own slot k // MATCH_FOES.
+MATCH_FOES = 4
+MATCH, MATCH_F = 6 * MATCH_FOES, 20
+MATCH_FOE_SLOT = slice(12, 18)  # the foe slot, one-hot
 ACTIONS = 14
 VOCAB = dict(species=1536, move=1024, item=512, ability=768)
 UNK = {k: v - 1 for k, v in VOCAB.items()}
 OBS_FLOATS = TOKENS * MON_F + FIELD_F + HIST * HIST_F + MATCH * MATCH_F
 OBS_IDS = TOKENS * MON_IDS + HIST * HIST_IDS
-assert (OBS_FLOATS, OBS_IDS) == (2567, 116)
+assert (OBS_FLOATS, OBS_IDS) == (2903, 116)
 
 # Token types and the order of the main sequence.
 FIELD, OWN, FOE, MOVES, HISTORY, MATCHUP = range(6)
@@ -142,7 +147,7 @@ class Net(nn.Module):
         return ids
 
     def forward(self, floats, ids, mask):
-        """floats [B, 2567] float, ids [B, 116] int, mask [B, 14] bool. Returns a dict of
+        """floats [B, 2903] float, ids [B, 116] int, mask [B, 14] bool. Returns a dict of
         logits: policy [B,14] (masked), value [B], foe_action [B,14], item [B,6,512],
         ability [B,6,768], moves [B,6,1024]."""
         b = floats.shape[0]
@@ -185,7 +190,8 @@ class Net(nn.Module):
         hist = hist + self.hist_pos
         x = torch.cat([self.enc_field(field).unsqueeze(1), own, foe, moves, hist], 1)
         x = self.in_norm(x)
-        match = self.in_norm(self.enc_match(match_f) + slots)
+        match_slots = slots[:6].repeat_interleave(MATCH_FOES, 0) + match_f[..., MATCH_FOE_SLOT] @ slots[6:]
+        match = self.in_norm(self.enc_match(match_f) + match_slots)
 
         segments = SEGMENTS
         for i, blk in enumerate(self.blocks):
@@ -214,6 +220,25 @@ class Net(nn.Module):
 
 def count(m):
     return sum(p.numel() for p in m.parameters())
+
+
+def upgrade(sd):
+    """A state dict from an older observation layout, made loadable: observation v2 had
+    12-float matchup tokens; v3's 20 floats start with the same 12, so the new
+    inputs' weights start at zero. Returns the slot of each padded parameter's name."""
+    w = sd.get("enc_match.weight")
+    if w is not None and w.shape[1] < MATCH_F:
+        sd["enc_match.weight"] = torch.cat([w, w.new_zeros(w.shape[0], MATCH_F - w.shape[1])], 1)
+        return {"enc_match.weight": w.shape[1]}
+    return {}
+
+
+def load(net, sd):
+    """Loads `sd` into `net`, upgrading older layouts (see `upgrade`)."""
+    sd = dict(sd)
+    upgrade(sd)
+    net.load_state_dict(sd)
+    return net
 
 
 def _bench():

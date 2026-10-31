@@ -123,4 +123,35 @@ describe.skipIf(!engineBuilt(4))('engine (gen 4)', () => {
     const unseen = engine.observe(STATE, 1, [], []);
     expect([...unseen.floats]).not.toEqual([...hidden.floats]);
   });
+
+  it('keeps hidden foe items, abilities and stats out of the damage numbers', () => {
+    const engine = loadEngine(4);
+    const sash =
+      'terrakion,100,Rock,Fighting,Rock,Fighting,323,323,NONE,NONE,FOCUSSASH,SERIOUS,,357,216';
+    expect(STATE).toContain(sash);
+    const banded = STATE.replace(
+      sash,
+      'terrakion,100,Rock,Fighting,Rock,Fighting,323,323,JUSTIFIED,JUSTIFIED,CHOICEBAND,SERIOUS,,400,250',
+    );
+    const movesSeen: NetKnown = {
+      seen: true,
+      item: false,
+      ability: false,
+      moves: [true, true, true, true],
+      base: [91, 129, 90, 72, 90, 108],
+      speed: [0, 1e4],
+    };
+    const a = engine.observe(STATE, 1, [movesSeen], []);
+    const b = engine.observe(banded, 1, [movesSeen], []);
+    expect([...b.floats]).toEqual([...a.floats]);
+    expect([...b.ids]).toEqual([...a.ids]);
+    // Close Combat's damage to Alakazam shows (matchup token 0, foe damage).
+    const m0 = NET_OBS.floats - 24 * 20;
+    expect(a.floats[m0 + 4]).toBeGreaterThan(0);
+
+    const itemSeen = { ...movesSeen, item: true };
+    const c = engine.observe(STATE, 1, [itemSeen], []);
+    const d = engine.observe(banded, 1, [itemSeen], []);
+    expect(d.floats[m0 + 4]).toBeGreaterThan(c.floats[m0 + 4]!);
+  });
 });

@@ -264,7 +264,7 @@ pub fn features(state: &State) -> Features {
 
 // ---- Observation v2 ------------------------------------------------------
 
-pub const OBS_VERSION: u32 = 2;
+pub const OBS_VERSION: u32 = 3;
 /// A move: the v1 move features plus "known to the viewer".
 pub const MOVE2_F: usize = MOVE_F + 1;
 /// A Pokémon's own floats: the v1 40, plus seen, item known, ability known, and
@@ -275,10 +275,14 @@ pub const MON2_F: usize = MON2_BASE + 4 * MOVE2_F;
 pub const HIST: usize = 16;
 pub const HIST_F: usize = 8;
 pub const HIST_IDS: usize = 2;
-/// Matchups: each of the viewer's six against the foe's active Pokémon, then
-/// each of the foe's six against the viewer's active one.
-pub const MATCH: usize = 12;
-pub const MATCH_F: usize = 4 + 4 + 4;
+/// Matchups (Jaxcalibur-style): each of the viewer's six against up to
+/// `MATCH_FOES` of the foe's (its active one first, then its other seen,
+/// unfainted ones in slot order). Token `k` pairs own slot `k / MATCH_FOES`.
+pub const MATCH_FOES: usize = 4;
+pub const MATCH: usize = 6 * MATCH_FOES;
+/// Damage both ways (4 + 4), present, faster / slower / either, the foe's slot
+/// (one-hot), and whether each side's Pokémon is the active one.
+pub const MATCH_F: usize = 4 + 4 + 4 + 6 + 2;
 pub const OBS_FLOATS: usize = TOKENS * MON2_F + FIELD_F + HIST * HIST_F + MATCH * MATCH_F;
 pub const OBS_IDS: usize = TOKENS * IDS + HIST * HIST_IDS;
 /// The "unknown" id of each table (its last), for whatever the viewer hasn't seen.
@@ -463,54 +467,110 @@ fn neutral(side: &mut Side, i: usize) {
     side.volatile_statuses = Default::default();
 }
 
-/// One matchup token: `a` attacks `b` (each move's best share of HP), `b` attacks `a`
-/// (its moves known to the viewer only), and whether `a` is surely faster, surely
-/// slower, or either, going by the foe's Speed bounds (Speed stats, no boosts).
-fn push_matchup(f: &mut Vec<f32>, state: &State, viewer_one: bool, own_slot: Option<usize>, foe_slot: Option<usize>, foe_known: &[Known; 6]) {
+/// The board as the viewer can know it: the foe's unrevealed items and abilities
+/// become none, and its stats the public estimates (`Known.base`; HP keeps its
+/// visible fraction). Damage numbers come from this, so they never leak a
+/// hidden Assault Vest, Levitate or EV spread; the network learns to guess those.
+pub fn public_view(state: &State, viewer_one: bool, foe_known: &[Known; 6]) -> State {
+    use poke_engine::engine::abilities::Abilities;
+    use poke_engine::engine::items::Items;
+    let mut s = state.clone();
+    let foe = if viewer_one { &mut s.side_two } else { &mut s.side_one };
+    for (i, k) in foe_known.iter().enumerate() {
+        let p = &mut foe.pokemon[pokemon_index(i)];
+        if !k.item {
+            p.item = Items::NONE;
+        }
+        if !k.ability {
+            p.ability = Abilities::NONE;
+        }
+        if k.base[0] == 0 {
+            continue;
+        }
+        let b = k.base.map(|v| v as i16);
+        let frac = hp_frac(p);
+        p.maxhp = 2 * b[0] + 141;
+        p.hp = if p.hp > 0 { ((frac * p.maxhp as f32).round() as i16).max(1) } else { 0 };
+        p.attack = 2 * b[1] + 36;
+        p.defense = 2 * b[2] + 36;
+        p.special_attack = 2 * b[3] + 36;
+        p.special_defense = 2 * b[4] + 36;
+        p.speed = 2 * b[5] + 36;
+    }
+    s
+}
+
+/// The foe slots the matchup tokens cover: its active one, then its other seen,
+/// unfainted ones in slot order.
+fn match_foes(state: &State, viewer_one: bool, known: &[Known; 6]) -> Vec<usize> {
+    let foe = if viewer_one { &state.side_two } else { &state.side_one };
+    let active = foe.active_index as usize;
+    let mut out = vec![active];
+    for j in 0..6 {
+        let p = &foe.pokemon[pokemon_index(j)];
+        if j != active && known[j].seen && p.hp > 0 && out.len() < MATCH_FOES {
+            out.push(j);
+        }
+    }
+    out
+}
+
+/// One matchup token: own slot `i` attacks foe slot `j` (each move's best share
+/// of HP), `j` attacks `i` (its moves known to the viewer only), whether `i` is
+/// surely faster, surely slower, or either, going by the foe's Speed bounds
+/// (Speed stats, no boosts), `j` one-hot, and which of the two are active.
+/// Benched Pokémon are compared without boosts or volatiles; the active pair
+/// keeps them. `state` is the public view.
+fn push_matchup(f: &mut Vec<f32>, state: &State, viewer_one: bool, i: usize, j: Option<usize>, foe_known: &[Known; 6]) {
     let start = f.len();
     f.resize(start + MATCH_F, 0.0);
+    let Some(j) = j else { return };
     let mut s = state.clone();
     let (own, foe) = if viewer_one { (&mut s.side_one, &mut s.side_two) } else { (&mut s.side_two, &mut s.side_one) };
-    if let Some(i) = own_slot {
+    let (own_active, foe_active) = (own.active_index as usize == i, foe.active_index as usize == j);
+    if !own_active {
         neutral(own, i);
     }
-    if let Some(j) = foe_slot {
+    if !foe_active {
         neutral(foe, j);
     }
-    let foe_index = foe.active_index as usize;
     let (a, b) = (own.get_active_immutable(), foe.get_active_immutable());
-    if a.hp <= 0 || b.hp <= 0 || !foe_known[foe_index].seen {
+    if a.hp <= 0 || b.hp <= 0 {
         return;
     }
-    let (own_speed, (lo, hi)) = (effective_speed(a), foe_known[foe_index].speed);
+    let (own_speed, (lo, hi)) = (effective_speed(a), foe_known[j].speed);
     let d_own = damage_shares(&s, viewer_one);
     let d_foe = damage_shares(&s, !viewer_one);
     let x = &mut f[start..];
     x[..4].copy_from_slice(&d_own);
-    for i in 0..4 {
-        if foe_known[foe_index].moves[i] {
-            x[4 + i] = d_foe[i];
+    for m in 0..4 {
+        if foe_known[j].moves[m] {
+            x[4 + m] = d_foe[m];
         }
     }
     x[8] = 1.0;
     x[9] = (own_speed > hi) as u8 as f32;
     x[10] = (own_speed < lo) as u8 as f32;
     x[11] = (own_speed >= lo && own_speed <= hi) as u8 as f32;
+    x[12 + j] = 1.0;
+    x[18] = own_active as u8 as f32;
+    x[19] = foe_active as u8 as f32;
 }
 
-/// Observation v2 of `state` for one side: its own team fully, the foe's only as
+/// Observation v3 of `state` for one side: its own team fully, the foe's only as
 /// far as `foe_known` says, the last `HIST` of `history` (oldest first), and the
 /// matchup tokens. `turn` is the current turn, for the events' ages.
 pub fn observe(state: &State, viewer_one: bool, foe_known: &[Known; 6], history: &[Event], turn: u32) -> Features {
-    // Damage numbers use the true board: a player deduces hidden items and
-    // abilities from damage anyway (owner, Oct 31).
     let mut floats = Vec::with_capacity(OBS_FLOATS);
     let mut ids = Vec::with_capacity(OBS_IDS);
     let (own, foe) = if viewer_one { (&state.side_one, &state.side_two) } else { (&state.side_two, &state.side_one) };
-    let d_own = damage_shares(state, viewer_one);
-    let d_foe = damage_shares(state, !viewer_one);
     let own_active = own.active_index as usize;
     let foe_active = foe.active_index as usize;
+    let mut known = *foe_known;
+    known[foe_active].seen = true;
+    let public = public_view(state, viewer_one, &known);
+    let d_own = damage_shares(&public, viewer_one);
+    let d_foe = damage_shares(&public, !viewer_one);
     for (i, p) in own.pokemon.into_iter().enumerate() {
         push_mon2(&mut floats, &mut ids, p, true, i == own_active, &d_own, Known::ALL);
     }
@@ -566,13 +626,11 @@ pub fn observe(state: &State, viewer_one: bool, foe_known: &[Known; 6], history:
         ids.push(if e.kind == 1 { e.mv } else { UNKNOWN_MOVE });
     }
 
-    let mut known = *foe_known;
-    known[foe_active].seen = true;
+    let foes = match_foes(&public, viewer_one, &known);
     for i in 0..6 {
-        push_matchup(&mut floats, state, viewer_one, Some(i), None, &known);
-    }
-    for j in 0..6 {
-        push_matchup(&mut floats, state, viewer_one, None, Some(j), &known);
+        for t in 0..MATCH_FOES {
+            push_matchup(&mut floats, &public, viewer_one, i, foes.get(t).copied(), &known);
+        }
     }
     debug_assert_eq!(floats.len(), OBS_FLOATS);
     debug_assert_eq!(ids.len(), OBS_IDS);

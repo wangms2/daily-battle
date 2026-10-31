@@ -385,7 +385,7 @@ export class Engine {
 }
 
 /** Observation v2 sizes (features.rs OBS_FLOATS, OBS_IDS; 14 action slots). */
-export const NET_OBS = { floats: 2567, ids: 116, actions: 14 } as const;
+export const NET_OBS = { floats: 2903, ids: 116, actions: 14 } as const;
 
 /** What the viewer knows of one foe Pokémon (features.rs `Known`). */
 export interface NetKnown {

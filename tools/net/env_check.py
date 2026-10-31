@@ -1,4 +1,4 @@
-"""Hand-check of observation v2 in the self-play env (plan R1/R2).
+"""Hand-check of observation v3 in the self-play env (plan R1/R2).
 
     .venv\\Scripts\\python.exe env_check.py [--gens 3,4,5,6] [--n 256] [--steps 300]
 
@@ -6,11 +6,15 @@ Checks, every step, each row against the foe row's own (fully visible) view:
 - an unseen foe token has only `exists` set and unknown ids;
 - a seen foe's species and each revealed move id are the foe's real ones;
 - the foe's true Speed lies inside its Speed bounds;
-- history ids and the move tokens agree on what's revealed.
+- history ids and the move tokens agree on what's revealed;
+- matchup tokens name only seen foes, in order, and show the foe's damage for
+  revealed moves only.
 Then prints one battle's reveals turn by turn for reading by eye.
+Set PE_ENV_DIR to check staged env builds.
 """
 import argparse
 import importlib
+import os
 import sys
 from pathlib import Path
 
@@ -18,9 +22,14 @@ import numpy as np
 
 HERE = Path(__file__).parent
 sys.path.insert(0, str(HERE))
+if os.environ.get("PE_ENV_DIR"):  # staged env builds, e.g. while training holds the .pyd files
+    sys.path.insert(0, os.environ["PE_ENV_DIR"])
 MON = 165
 BASE = 45
 MOVE2 = 30
+MATCH_FOES = 4
+MATCH_F = 20
+MATCH0 = 2903 - 6 * MATCH_FOES * MATCH_F
 UNK = {"species": 1535, "item": 511, "ability": 767, "move": 1023}
 
 
@@ -30,6 +39,49 @@ def foe_tok(floats, i):
 
 def own_tok(floats, i):
     return floats[:, i * MON : (i + 1) * MON]
+
+
+def match_tok(floats, i, t):
+    k = i * MATCH_FOES + t
+    return floats[:, MATCH0 + k * MATCH_F : MATCH0 + (k + 1) * MATCH_F]
+
+
+def check_matchups(floats, fail):
+    """Matchup tokens (obs v3): own slot i vs the foe's active, then its other seen,
+    unfainted slots. Foe damage shows only for revealed moves; empty tokens are zero."""
+    foe_seen = np.stack([foe_tok(floats, j)[:, 40] > 0.5 for j in range(6)], 1)
+    foe_active = np.stack([foe_tok(floats, j)[:, 1] > 0.5 for j in range(6)], 1)
+    own_active = np.stack([own_tok(floats, i)[:, 1] > 0.5 for i in range(6)], 1)
+    rows = np.arange(len(floats))
+    for i in range(6):
+        prev = np.full(len(floats), -1)
+        for t in range(MATCH_FOES):
+            x = match_tok(floats, i, t)
+            on = x[:, 8] > 0.5
+            if np.abs(x[~on]).max(initial=0) > 0:
+                fail("match-empty", "an empty matchup token has floats")
+            onehot = x[:, 12:18]
+            tagged = onehot.sum(1) > 0.5
+            j = onehot.argmax(1)
+            if (onehot.sum(1) > 1.5).any():
+                fail("match-onehot", "a matchup token names two foe slots")
+            if (tagged & ~foe_seen[rows, j] & ~foe_active[rows, j]).any():
+                fail("match-unseen", "a matchup token names an unseen foe")
+            if t == 0 and (tagged & ~foe_active[rows, j]).any():
+                fail("match-order", "the first matchup token isn't the foe's active")
+            if t > 0 and (tagged & (j <= prev) & ~foe_active[rows, prev.clip(0)]).any():
+                fail("match-order", "matchup foes out of slot order")
+            prev = np.where(tagged, j, prev)
+            if (on & ((x[:, 18] > 0.5) != own_active[:, i])).any():
+                fail("match-own-active", "own-active flag wrong")
+            if (on & ((x[:, 19] > 0.5) != foe_active[rows, j])).any():
+                fail("match-foe-active", "foe-active flag wrong")
+            for m in range(4):
+                known = np.zeros(len(floats), bool)
+                for jj in range(6):
+                    known |= (j == jj) & (foe_tok(floats, jj)[:, BASE + m * MOVE2 + MOVE2 - 1] > 0.5)
+                if (on & ~known & (x[:, 4 + m] != 0)).any():
+                    fail("match-foe-move", "foe damage shown for an unrevealed move")
 
 
 def check(gen: int, n: int, steps: int, seed: int):
@@ -47,6 +99,7 @@ def check(gen: int, n: int, steps: int, seed: int):
     for _ in range(steps):
         floats, ids, mask, needs = env.observe()
         ids = ids.astype(np.int64)
+        check_matchups(floats, fail)
         other = np.arange(2 * n) ^ 1
         for i in range(6):
             f = foe_tok(floats, i)

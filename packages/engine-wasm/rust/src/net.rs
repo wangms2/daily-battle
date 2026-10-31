@@ -15,11 +15,16 @@ pub const FIELD_F: usize = 315;
 pub const HIST: usize = 16;
 pub const HIST_F: usize = 8;
 pub const HIST_IDS: usize = 2;
-pub const MATCH: usize = 12;
-pub const MATCH_F: usize = 12;
+pub const MATCH_FOES: usize = 4;
+pub const MATCH: usize = 6 * MATCH_FOES;
+pub const MATCH_F: usize = 20;
+/// Where a matchup token's foe slot one-hot starts.
+const MATCH_FOE_SLOT: usize = 12;
 pub const ACTIONS: usize = 14;
 pub const OBS_FLOATS: usize = TOKENS * MON_F + FIELD_F + HIST * HIST_F + MATCH * MATCH_F;
 pub const OBS_IDS: usize = TOKENS * MON_IDS + HIST * HIST_IDS;
+const _: () = assert!(OBS_FLOATS == crate::features::OBS_FLOATS && OBS_IDS == crate::features::OBS_IDS);
+const _: () = assert!(MATCH_F == crate::features::MATCH_F && MATCH_FOES == crate::features::MATCH_FOES);
 
 /// Token types, as model.py's FIELD, OWN, FOE, MOVES, HISTORY, MATCHUP.
 const TYPES: usize = 6;
@@ -302,7 +307,7 @@ impl Net {
         &table[i * self.emb..(i + 1) * self.emb]
     }
 
-    /// `floats` OBS_FLOATS, `ids` OBS_IDS, `mask` ACTIONS (features.rs observation v2).
+    /// `floats` OBS_FLOATS, `ids` OBS_IDS, `mask` ACTIONS (features.rs observation v3).
     pub fn forward(&self, floats: &[f32], ids: &[u16], mask: &[bool]) -> Output {
         let d = self.d;
         let mons = &floats[..TOKENS * MON_F];
@@ -362,8 +367,21 @@ impl Net {
             tok(&mut x, 17 + k, &self.enc_hist.call(&v), Some(&self.hist_pos[k * d..(k + 1) * d]));
         }
         for k in 0..MATCH {
-            let v = self.enc_match.call(&match_f[k * MATCH_F..(k + 1) * MATCH_F]);
-            tok(&mut x, SEQ + k, &v, Some(&self.slot[k * d..(k + 1) * d]));
+            let mf = &match_f[k * MATCH_F..(k + 1) * MATCH_F];
+            let mut v = self.enc_match.call(mf);
+            let own = k / MATCH_FOES;
+            for (o, s) in v.iter_mut().zip(&self.slot[own * d..(own + 1) * d]) {
+                *o += s;
+            }
+            for j in 0..6 {
+                let w = mf[MATCH_FOE_SLOT + j];
+                if w != 0.0 {
+                    for (o, s) in v.iter_mut().zip(&self.slot[(6 + j) * d..(7 + j) * d]) {
+                        *o += w * s;
+                    }
+                }
+            }
+            tok(&mut x, SEQ + k, &v, None);
         }
         for t in 0..total {
             rms_norm(&mut x[t * d..(t + 1) * d], &self.in_norm);
