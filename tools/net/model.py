@@ -2,7 +2,7 @@
 observation v3 (features.rs OBS_VERSION 3), Jaxcalibur-style.
 
 Tokens, in order: field 1, own team 6, foe team 6, own active's moves 4,
-history 16; the 24 matchup tokens (each own slot vs up to 4 foe slots) join
+history 16; the 36 matchup tokens (each own slot vs up to 6 foe slots) join
 halfway. Each token type has its own input encoder and FFN weights; attention
 is shared.
 
@@ -24,7 +24,7 @@ import torch.nn.functional as F
 TOKENS, MON_F, MON_BASE, MOVE_F, MON_IDS = 12, 165, 45, 30, 7
 FIELD_F, HIST, HIST_F, HIST_IDS = 315, 16, 8, 2
 # Matchups: each own slot against up to MATCH_FOES foe slots; token k is own slot k // MATCH_FOES.
-MATCH_FOES = 4
+MATCH_FOES = 6
 MATCH, MATCH_F = 6 * MATCH_FOES, 20
 MATCH_FOE_SLOT = slice(12, 18)  # the foe slot, one-hot
 ACTIONS = 14
@@ -32,7 +32,7 @@ VOCAB = dict(species=1536, move=1024, item=512, ability=768)
 UNK = {k: v - 1 for k, v in VOCAB.items()}
 OBS_FLOATS = TOKENS * MON_F + FIELD_F + HIST * HIST_F + MATCH * MATCH_F
 OBS_IDS = TOKENS * MON_IDS + HIST * HIST_IDS
-assert (OBS_FLOATS, OBS_IDS) == (2903, 116)
+assert (OBS_FLOATS, OBS_IDS) == (3143, 116)
 
 # Token types and the order of the main sequence.
 FIELD, OWN, FOE, MOVES, HISTORY, MATCHUP = range(6)
@@ -147,7 +147,7 @@ class Net(nn.Module):
         return ids
 
     def forward(self, floats, ids, mask):
-        """floats [B, 2903] float, ids [B, 116] int, mask [B, 14] bool. Returns a dict of
+        """floats [B, 3143] float, ids [B, 116] int, mask [B, 14] bool. Returns a dict of
         logits: policy [B,14] (masked), value [B], foe_action [B,14], item [B,6,512],
         ability [B,6,768], moves [B,6,1024]."""
         b = floats.shape[0]

@@ -27,9 +27,9 @@ if os.environ.get("PE_ENV_DIR"):  # staged env builds, e.g. while training holds
 MON = 165
 BASE = 45
 MOVE2 = 30
-MATCH_FOES = 4
+MATCH_FOES = 6
 MATCH_F = 20
-MATCH0 = 2903 - 6 * MATCH_FOES * MATCH_F
+MATCH0 = 3143 - 6 * MATCH_FOES * MATCH_F
 UNK = {"species": 1535, "item": 511, "ability": 767, "move": 1023}
 
 

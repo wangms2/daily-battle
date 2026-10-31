@@ -146,7 +146,7 @@ describe.skipIf(!engineBuilt(4))('engine (gen 4)', () => {
     expect([...b.floats]).toEqual([...a.floats]);
     expect([...b.ids]).toEqual([...a.ids]);
     // Close Combat's damage to Alakazam shows (matchup token 0, foe damage).
-    const m0 = NET_OBS.floats - 24 * 20;
+    const m0 = NET_OBS.floats - 36 * 20;
     expect(a.floats[m0 + 4]).toBeGreaterThan(0);
 
     const itemSeen = { ...movesSeen, item: true };

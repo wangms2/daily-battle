@@ -278,7 +278,7 @@ pub const HIST_IDS: usize = 2;
 /// Matchups (Jaxcalibur-style): each of the viewer's six against up to
 /// `MATCH_FOES` of the foe's (its active one first, then its other seen,
 /// unfainted ones in slot order). Token `k` pairs own slot `k / MATCH_FOES`.
-pub const MATCH_FOES: usize = 4;
+pub const MATCH_FOES: usize = 6;
 pub const MATCH: usize = 6 * MATCH_FOES;
 /// Damage both ways (4 + 4), present, faster / slower / either, the foe's slot
 /// (one-hot), and whether each side's Pokémon is the active one.

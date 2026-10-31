@@ -227,6 +227,8 @@ impl Game {
                     self.c.unknown_base += 1;
                 }
                 self.known[1 - side][i] = Known::unrevealed(cat.base_of(p));
+                // Team Preview (Gen 5 on) lists all six species up front, never their sets.
+                self.known[1 - side][i].seen = features::gen() >= 5 && p.id != PokemonName::NONE;
             }
         }
         self.advance(cat, MoveChoice::Switch(PokemonIndex::P0), MoveChoice::Switch(PokemonIndex::P0), false);
@@ -725,7 +727,7 @@ impl VecEnv {
                         for (j, kn) in known.iter_mut().enumerate() {
                             let p = &foe.pokemon.pkmn[j];
                             *kn = Known::unrevealed(cat.base_of(p));
-                            kn.seen = j == active || (p.hp <= 0 && p.id != PokemonName::NONE);
+                            kn.seen = j == active || (p.hp <= 0 || features::gen() >= 5) && p.id != PokemonName::NONE;
                         }
                         let obs = observe(&state, true, &known, &[], turn);
                         let (opts, _) = state.root_get_all_options();

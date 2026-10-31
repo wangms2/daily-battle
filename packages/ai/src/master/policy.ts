@@ -278,7 +278,8 @@ export class NetPolicy implements Policy {
       );
     };
     return {
-      seen: tracker.foeAppeared.includes(key),
+      // Team Preview (Gen 5 on) lists every foe species up front, as in the env.
+      seen: tracker.foeAppeared.includes(key) || (this.gen.num >= 5 && !!c),
       item: !!(c?.item || c?.lastItem),
       ability: !!c?.ability,
       moves: [has(f.set.moves[0]), has(f.set.moves[1]), has(f.set.moves[2]), has(f.set.moves[3])],

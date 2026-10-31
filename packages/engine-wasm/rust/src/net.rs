@@ -15,7 +15,7 @@ pub const FIELD_F: usize = 315;
 pub const HIST: usize = 16;
 pub const HIST_F: usize = 8;
 pub const HIST_IDS: usize = 2;
-pub const MATCH_FOES: usize = 4;
+pub const MATCH_FOES: usize = 6;
 pub const MATCH: usize = 6 * MATCH_FOES;
 pub const MATCH_F: usize = 20;
 /// Where a matchup token's foe slot one-hot starts.
