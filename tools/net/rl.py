@@ -37,6 +37,7 @@ from model import ACTIONS, MON_F, OBS_FLOATS, OBS_IDS, Config, Net  # noqa: E402
 
 SEEN = 40  # mon float: the viewer has seen this Pokémon
 DMG = 28  # move float: damage share of the foe's HP (own active only)
+EVAL_BOTS = ("greedy", "mcts:1000")  # in-training evals; mcts = full-information Hard-proxy
 
 
 def bot_actions(kind, f, m, rng):
@@ -83,6 +84,7 @@ def args():
     p.add_argument("--eval-minutes", type=float, default=10)
     p.add_argument("--eval-games", type=int, default=200, help="per gen, vs random")
     p.add_argument("--init", default="", help="start weights (e.g. the warm start)")
+    p.add_argument("--critic-warmup", type=int, default=8, help="with --init: updates that train only value/aux heads")
     p.add_argument("--resume", action="store_true")
     p.add_argument("--baseline", action="store_true", help="only print greedy vs random and exit")
     return p.parse_args()
@@ -205,39 +207,65 @@ def to_dev(obs, dev):
     )
 
 
-@torch.no_grad()
-def eval_vs(net, bot, gens, games, seed, catalog, dev, player="net"):
-    """`player` ("net": greedy policy, no search; or a bot name) vs the `bot`. The
-    player is side one in even battles and side two in odd ones. Returns {gen: score}."""
-    if net is not None:
+def net_player(net, dev):
+    @torch.no_grad()
+    def play(env, f, i, m, rows):
         net.eval()
+        ft, it, mt, _ = to_dev((f[rows], i[rows], m[rows], m[rows, 0]), dev)
+        with torch.autocast("cuda", torch.bfloat16):
+            return net(ft.float(), it, mt)["policy"].float().argmax(1).cpu().numpy()
+
+    return play
+
+
+def player(spec, dev, rng, net=None):
+    """A player for `match`: a net, "random", "greedy", "mcts:<iterations>" (full-information
+    poke-engine MCTS, the Hard-proxy) or "net:<checkpoint>"."""
+    if spec == "net":
+        return net_player(net, dev)
+    if spec.startswith("net:"):
+        n = Net(Config()).to(dev)
+        n.load_state_dict(torch.load(spec[4:], map_location=dev, weights_only=False)["model"])
+        return net_player(n, dev)
+    if spec.startswith("mcts:"):
+        iters = int(spec[5:])
+        return lambda env, f, i, m, rows: env.mcts_actions(rows.tolist(), iters, int(rng.integers(1 << 62)))
+    return lambda env, f, i, m, rows: bot_actions(spec, f[rows], m[rows], rng)
+
+
+def match(a, b, gens, games, seed, catalog, battles=256):
+    """Player `a` vs player `b` (from `player`), `games` per gen; `a` is side one in
+    even battles and side two in odd ones. Returns {gen: a's score}."""
     res = {}
-    rng = np.random.default_rng(seed)
     for g in gens:
-        n = 256
+        n = min(battles, games)
         env = importlib.import_module(f"pe_env_gen{g}").VecEnv(n, seed * 7 + g, catalog, 0.3)
-        net_row = np.arange(n) * 2 + (np.arange(n) % 2)
-        is_net = np.zeros(2 * n, bool)
-        is_net[net_row] = True
+        a_row = np.arange(n) * 2 + (np.arange(n) % 2)
+        is_a = np.zeros(2 * n, bool)
+        is_a[a_row] = True
         score = played = 0.0
         while played < games:
             f, i, m, needs = env.observe()
-            acts = bot_actions(bot, f, m, rng)
-            sel = np.nonzero(is_net & needs)[0]
-            if len(sel) and player == "net":
-                ft, it, mt, _ = to_dev((f[sel], i[sel], m[sel], needs[sel]), dev)
-                with torch.autocast("cuda", torch.bfloat16):
-                    acts[sel] = net(ft.float(), it, mt)["policy"].float().argmax(1).cpu().numpy()
-            elif len(sel):
-                acts[sel] = bot_actions(player, f[sel], m[sel], rng)
+            acts = np.zeros(2 * n, np.int64)
+            for mine, p in ((is_a, a), (~is_a, b)):
+                rows = np.nonzero(mine & needs)[0]
+                if len(rows):
+                    acts[rows] = p(env, f, i, m, rows)
             r, d = env.step(acts)
-            fin = d[net_row]
-            score += r[net_row][fin].sum()
+            fin = d[a_row]
+            score += r[a_row][fin].sum()
             played += fin.sum()
-        res[g] = score / played
+        res[g] = float(score / played)
+    return res
+
+
+def eval_vs(net, bot, gens, games, seed, catalog, dev, player_spec="net"):
+    """`player_spec` (default the net: greedy policy, no search) vs `bot`. Returns {gen: score}."""
+    rng = np.random.default_rng(seed)
+    out = match(player(player_spec, dev, rng, net), player(bot, dev, rng, net), gens, games, seed, catalog)
     if net is not None:
         net.train()
-    return res
+    return out
 
 
 def main():
@@ -247,7 +275,7 @@ def main():
     gens = [int(g) for g in a.gens.split(",")]
     catalog = str(HERE / "data" / "catalog")
     if a.baseline:
-        print("greedy vs random:", eval_vs(None, "random", gens, a.eval_games, a.seed, catalog, dev, player="greedy"))
+        print("greedy vs random:", eval_vs(None, "random", gens, a.eval_games, a.seed, catalog, dev, player_spec="greedy"))
         return
     out = HERE / "data" / "rl" / a.run
     out.mkdir(parents=True, exist_ok=True)
@@ -264,8 +292,11 @@ def main():
         print(f"resumed {ckpt_path} at update {st['update']}, {st['games']:,} games")
     elif a.init:
         net.load_state_dict(torch.load(a.init, map_location=dev, weights_only=False)["model"])
+        st["init"] = str(Path(a.init).resolve())
         print(f"init from {a.init}")
     net.train()
+    HEADS = ("value.", "foe_move.", "foe_switch.", "set_item.", "set_ability.", "set_moves.")
+    trunk = [p for n, p in net.named_parameters() if not n.startswith(HEADS)]
 
     envs = Envs(gens, a.battles, a.seed + st["update"], a.varied, catalog)
     R, T = envs.R, a.steps
@@ -280,7 +311,7 @@ def main():
         log.writerow(
             ["update", "hours", "games", "decisions", "dps", "samples", "ent_coef", "pg", "vloss", "ent", "za",
              "kl", "clipfrac", "ev", "foe_acc", "item_acc", "abil_acc", "loss_foe", "loss_sets", "avg_turns",
-             "draws", "illegal", "panics"] + [f"vs_{b}_g{g}" for b in ("random", "greedy") for g in gens]
+             "draws", "illegal", "panics", "vs_prev", "vs_init"] + [f"vs_{b.replace(':', '')}_g{g}" for b in EVAL_BOTS for g in gens]
         )
 
     # Initial observations.
@@ -291,7 +322,7 @@ def main():
     sec0 = st["seconds"]
     last_ckpt = last_eval = time.time()
     stats0 = envs.stats()
-    evals = {}
+    evals, refs = {}, {}
 
     def save():
         st["seconds"] = sec0 + time.time() - t0
@@ -306,6 +337,8 @@ def main():
         hours = (sec0 + elapsed) / 3600
         frac = min(1.0, hours / a.anneal_hours) if a.anneal_hours else 1.0
         ent_coef = a.ent + (a.ent_end - a.ent) * frac
+        # A warm-started policy comes with a fresh value head: fit the critic before trusting its advantages.
+        pw = 0.0 if st.get("init") and st["update"] < a.critic_warmup else 1.0
         tr0 = time.time()
 
         # ---- Rollout ----
@@ -404,9 +437,12 @@ def main():
                     abil_acc = (ab_l.argmax(1) == ab_t).float().mean().item()
                 else:
                     loss_sets, item_acc, abil_acc = torch.zeros((), device=dev), 0.0, 0.0
-                loss = pg + a.vf * vloss - ent_coef * ent + a.za * za + a.foe * loss_foe + a.sets * loss_sets
+                loss = pw * (pg - ent_coef * ent + a.za * za) + a.vf * vloss + a.foe * loss_foe + a.sets * loss_sets
                 opt.zero_grad(set_to_none=True)
                 loss.backward()
+                if not pw:
+                    for p in trunk:  # heads only: AdamW skips params without grads (no decay either)
+                        p.grad = None
                 torch.nn.utils.clip_grad_norm_(net.parameters(), a.grad_clip)
                 opt.step()
                 with torch.no_grad():
@@ -446,16 +482,24 @@ def main():
         stats0 = s1
 
         if time.time() - last_eval >= a.eval_minutes * 60 or (budget and time.time() - t0 + dt >= budget):
-            evals = {b: eval_vs(net, b, gens, a.eval_games, st["update"], catalog, dev) for b in ("random", "greedy")}
+            evals = {b: eval_vs(net, b, gens, a.eval_games, st["update"], catalog, dev) for b in EVAL_BOTS}
+            # Cycle check (vs the latest snapshot) and tripwire (vs the warm start).
+            snaps = sorted(out.glob("snap-*.pt"), key=lambda p: int(p.stem[5:]))
+            for name, ref in (("prev", snaps[-1] if snaps else None), ("init", st.get("init"))):
+                if ref:
+                    r = eval_vs(net, f"net:{ref}", gens, a.eval_games // 2, st["update"], catalog, dev)
+                    refs[name] = sum(r.values()) / len(r)
             last_eval = time.time()
         row = [st["update"], f"{(sec0 + time.time() - t0) / 3600:.3f}", st["games"], st["decisions"], f"{N / dt:.0f}", N,
                f"{ent_coef:.4f}"] + [f"{acc[k]:.4f}" for k in ("pg", "vloss", "ent", "za", "kl", "clipfrac")] + [
             f"{ev.item():.3f}", f"{acc['foe_acc']:.3f}", f"{acc['item_acc']:.3f}", f"{acc['abil_acc']:.3f}",
             f"{acc['loss_foe']:.3f}", f"{acc['loss_sets']:.3f}", f"{turns:.1f}", f"{draws:.3f}", s1["illegal"],
-            s1["panics"]] + [f"{evals[b][g]:.3f}" if evals else "" for b in ("random", "greedy") for g in gens]
+            s1["panics"], f"{refs['prev']:.3f}" if evals and "prev" in refs else "", f"{refs['init']:.3f}" if evals and "init" in refs else ""] + [f"{evals[b][g]:.3f}" if evals else "" for b in EVAL_BOTS for g in gens]
         log.writerow(row)
         logf.flush()
         ev_s = " | ".join(f"{b} " + " ".join(f"g{g}:{evals[b][g]:.2f}" for g in gens) for b in evals) if evals else ""
+        if evals:
+            ev_s += "".join(f" | vs {k} {v:.3f}" for k, v in refs.items())
         print(
             f"u{st['update']} {st['games']:,}g {N / dt:,.0f}dps (roll {t_roll:.1f}s/{dt:.1f}s) ent {acc['ent']:.2f} "
             f"v {acc['vloss']:.3f} ev {ev.item():.2f} kl {acc['kl']:.4f} foe {acc['foe_acc']:.2f} "
@@ -463,7 +507,7 @@ def main():
             flush=True,
         )
         if evals:
-            evals = {}
+            evals, refs = {}, {}
         if time.time() - last_ckpt >= a.ckpt_minutes * 60:
             save()
             torch.save(dict(model=net.state_dict(), state=dict(st)), out / f"snap-{int(st['games'])}.pt")

@@ -20,6 +20,7 @@ use numpy::{PyArray1, PyArrayMethods, PyReadonlyArray1};
 use poke_engine::engine::generate_instructions::generate_instructions_from_move_pair;
 use poke_engine::engine::state::MoveChoice;
 use poke_engine::instruction::Instruction;
+use poke_engine::mcts::perform_mcts_seeded;
 use poke_engine::pokemon::PokemonName;
 use poke_engine::state::{LastUsedMove, Pokemon, PokemonIndex, PokemonStatus, SideReference, State};
 use pyo3::exceptions::PyValueError;
@@ -643,6 +644,50 @@ impl VecEnv {
     /// One battle's state string, for debugging.
     fn state(&self, i: usize) -> PyResult<String> {
         self.games.get(i).map(|g| g.state.serialize()).ok_or_else(|| PyValueError::new_err("no such battle"))
+    }
+
+    /// Full-information MCTS picks ("Hard-proxy"): for each row (battle row / 2,
+    /// side row % 2) that must act, poke-engine's MCTS on the true state for
+    /// `iterations`, and the most-visited option of that side. Returns actions [len]
+    /// (0 for rows that needn't act).
+    fn mcts_actions<'py>(
+        &self,
+        py: Python<'py>,
+        rows: Vec<usize>,
+        iterations: u32,
+        seed: u64,
+    ) -> PyResult<Bound<'py, PyArray1<i64>>> {
+        if rows.iter().any(|&r| r / 2 >= self.games.len()) {
+            return Err(PyValueError::new_err("row out of range"));
+        }
+        let games = &self.games;
+        let out: Vec<i64> = py.allow_threads(|| {
+            rows.par_iter()
+                .enumerate()
+                .map(|(k, &r)| {
+                    let (g, side) = (&games[r / 2], r % 2);
+                    if !g.needs(side) {
+                        return 0;
+                    }
+                    let res = catch_unwind(AssertUnwindSafe(|| {
+                        let mut state = g.state.clone();
+                        let (s1, s2) = state.root_get_all_options();
+                        let s = seed.wrapping_mul(0x9E37_79B9_7F4A_7C15).wrapping_add(k as u64);
+                        let result = perform_mcts_seeded(&mut state, s1, s2, iterations, s);
+                        let list = if side == 0 { result.s1 } else { result.s2 };
+                        list.iter()
+                            .filter_map(|o| slot_of(&o.move_choice).map(|a| (o.visits, a)))
+                            .max()
+                            .map(|(_, a)| a as i64)
+                    }));
+                    match res {
+                        Ok(Some(a)) => a,
+                        _ => g.options[side].iter().find_map(slot_of).unwrap_or(0) as i64,
+                    }
+                })
+                .collect()
+        });
+        Ok(PyArray1::from_vec(py, out))
     }
 
     /// Observations of standalone engine states, side one deciding (the warm start's
