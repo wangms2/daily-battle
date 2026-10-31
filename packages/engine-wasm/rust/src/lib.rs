@@ -17,6 +17,7 @@ use std::fmt::Write;
 use std::str::FromStr;
 
 pub mod features;
+pub mod net;
 
 static mut OUT: Vec<u8> = Vec::new();
 
@@ -394,6 +395,49 @@ pub extern "C" fn features_meta(ptr: *mut u8, len: usize) {
         features::FIELD_F,
         names
     ));
+}
+
+static mut NET: Option<net::Net> = None;
+
+/// Loads the Master network from a .dbnet file's bytes (tools/net/export.py)
+/// into this instance. Returns `{"params":N}`.
+#[no_mangle]
+pub extern "C" fn net_load(ptr: *mut u8, len: usize) {
+    install_panic_hook();
+    let bytes = unsafe { Vec::from_raw_parts(ptr, len, len) };
+    let n = net::Net::load(&bytes).unwrap_or_else(|e| panic!("{e}"));
+    set_out(format!("{{\"params\":{}}}", n.params()));
+    unsafe {
+        *std::ptr::addr_of_mut!(NET) = Some(n);
+    }
+}
+
+/// Runs the loaded network on a batch of observations (features.rs v2). Input,
+/// per row: OBS_FLOATS f32, OBS_IDS u16, ACTIONS u8 legal mask (little-endian).
+/// Output, per row: ACTIONS policy logits, the value logit, ACTIONS foe-action
+/// logits, as f32.
+#[no_mangle]
+pub extern "C" fn net_forward(ptr: *mut u8, len: usize) {
+    install_panic_hook();
+    let bytes = unsafe { Vec::from_raw_parts(ptr, len, len) };
+    let n = unsafe { (*std::ptr::addr_of!(NET)).as_ref() }.expect("no network loaded");
+    let row = net::OBS_FLOATS * 4 + net::OBS_IDS * 2 + net::ACTIONS;
+    assert!(len % row == 0, "net_forward: {len} bytes isn't a whole number of rows");
+    let mut out = Vec::with_capacity(len / row * (2 * net::ACTIONS + 1) * 4);
+    for r in bytes.chunks_exact(row) {
+        let (f, rest) = r.split_at(net::OBS_FLOATS * 4);
+        let (i, m) = rest.split_at(net::OBS_IDS * 2);
+        let floats: Vec<f32> = f.chunks_exact(4).map(|c| f32::from_le_bytes(c.try_into().unwrap())).collect();
+        let ids: Vec<u16> = i.chunks_exact(2).map(|c| u16::from_le_bytes([c[0], c[1]])).collect();
+        let mask: Vec<bool> = m.iter().map(|&b| b != 0).collect();
+        let o = n.forward(&floats, &ids, &mask);
+        for v in o.policy.iter().chain(std::iter::once(&o.value)).chain(o.foe_action.iter()) {
+            out.extend_from_slice(&v.to_le_bytes());
+        }
+    }
+    unsafe {
+        *std::ptr::addr_of_mut!(OUT) = out;
+    }
 }
 
 /// getrandom's custom backend for wasm32. The engine only draws from rngs we

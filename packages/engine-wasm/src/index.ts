@@ -68,6 +68,8 @@ interface Exports {
   damage(ptr: number, len: number): void;
   features(ptr: number, len: number): void;
   features_meta(ptr: number, len: number): void;
+  net_load(ptr: number, len: number): void;
+  net_forward(ptr: number, len: number): void;
 }
 
 /** Thrown when the engine panics (an unsupported name or a malformed state). */
@@ -104,6 +106,7 @@ export class Engine {
   #instantiate(): void {
     this.#exports = new WebAssembly.Instance(this.#module, {}).exports as unknown as Exports;
     this.#exports.set_boost_eval(...this.#boostEval);
+    if (this.#net) this.#callBytes('net_load', this.#net);
   }
 
   /**
@@ -139,8 +142,13 @@ export class Engine {
     input: string,
     ...args: number[]
   ): string {
+    this.#callBytes(name, encoder.encode(input), ...args);
+    return this.#out();
+  }
+
+  /** Calls an export with raw input bytes; the result is left in the output buffer. */
+  #callBytes(name: keyof Exports, bytes: Uint8Array, ...args: number[]): void {
     const e = this.#exports;
-    const bytes = encoder.encode(input);
     const ptr = e.alloc(bytes.length);
     new Uint8Array(e.memory.buffer, ptr, bytes.length).set(bytes);
     try {
@@ -152,7 +160,6 @@ export class Engine {
       this.#instantiate();
       throw new EngineError(message.startsWith('panic') ? message : String(err));
     }
-    return this.#out();
   }
 
   /** The wrapper's version, recorded alongside the AI version for replays. */
@@ -281,6 +288,66 @@ export class Engine {
     this.#featureSizes ??= JSON.parse(this.#call('features_meta', '')) as FeaturesMeta;
     return this.#featureSizes;
   }
+
+  #net?: Uint8Array;
+
+  /**
+   * Loads the Master network (a .dbnet file from tools/net/export.py) into this
+   * engine; it's reloaded automatically if the instance restarts after a panic.
+   */
+  netLoad(bytes: Uint8Array): { params: number } {
+    this.#callBytes('net_load', bytes);
+    this.#net = bytes;
+    return JSON.parse(this.#out()) as { params: number };
+  }
+
+  /**
+   * Runs the loaded network on observations (features.rs v2): `rows` of floats
+   * (NET_OBS.floats each), ids (NET_OBS.ids) and legal masks (NET_OBS.actions).
+   */
+  netForward(rows: readonly NetInput[]): NetOutput[] {
+    const { floats: nf, ids: ni, actions: na } = NET_OBS;
+    const row = nf * 4 + ni * 2 + na;
+    const buf = new Uint8Array(rows.length * row);
+    const view = new DataView(buf.buffer);
+    rows.forEach((r, k) => {
+      let at = k * row;
+      for (let i = 0; i < nf; i++, at += 4) view.setFloat32(at, r.floats[i] ?? 0, true);
+      for (let i = 0; i < ni; i++, at += 2) view.setUint16(at, r.ids[i] ?? 0, true);
+      for (let i = 0; i < na; i++, at++) buf[at] = r.mask[i] ? 1 : 0;
+    });
+    this.#callBytes('net_forward', buf);
+    const e = this.#exports;
+    const out = new DataView(e.memory.buffer, e.out_ptr(), e.out_len());
+    const per = 2 * na + 1;
+    return rows.map((_, k) => {
+      const f = (i: number) => out.getFloat32((k * per + i) * 4, true);
+      return {
+        policy: Array.from({ length: na }, (_, i) => f(i)),
+        value: f(na),
+        foeAction: Array.from({ length: na }, (_, i) => f(na + 1 + i)),
+      };
+    });
+  }
+}
+
+/** Observation v2 sizes (features.rs OBS_FLOATS, OBS_IDS; 14 action slots). */
+export const NET_OBS = { floats: 2567, ids: 116, actions: 14 } as const;
+
+export interface NetInput {
+  floats: ArrayLike<number>;
+  ids: ArrayLike<number>;
+  /** Legal action slots: moves 0-3, mega moves 4-7, switches 8-13. */
+  mask: ArrayLike<boolean | number>;
+}
+
+export interface NetOutput {
+  /** Logits over the 14 action slots; illegal ones are -1e9. */
+  policy: number[];
+  /** Win-chance logit (sigmoid gives the probability). */
+  value: number;
+  /** Logits for the foe's next action, same slots. */
+  foeAction: number[];
 }
 
 export interface FeaturesMeta {
