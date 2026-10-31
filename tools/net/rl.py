@@ -28,6 +28,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import numpy as np
+import psutil
 import torch
 import torch.nn.functional as F
 
@@ -497,6 +498,9 @@ def main():
             s1["panics"], f"{refs['prev']:.3f}" if evals and "prev" in refs else "", f"{refs['init']:.3f}" if evals and "init" in refs else ""] + [f"{evals[b][g]:.3f}" if evals else "" for b in EVAL_BOTS for g in gens]
         log.writerow(row)
         logf.flush()
+        with open(out / "mem.csv", "a") as mf:  # separate file so log.csv's header stays stable on resume
+            mf.write(f"{st['update']},{psutil.Process().memory_info().rss >> 20},"
+                     f"{torch.cuda.memory_reserved() >> 20}\n")
         ev_s = " | ".join(f"{b} " + " ".join(f"g{g}:{evals[b][g]:.2f}" for g in gens) for b in evals) if evals else ""
         if evals:
             ev_s += "".join(f" | vs {k} {v:.3f}" for k, v in refs.items())
