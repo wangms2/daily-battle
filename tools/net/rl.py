@@ -1,0 +1,477 @@
+"""PPO self-play trainer (plan-rl R4), Jaxcalibur-style.
+
+All four gen envs (pe_env_gen3..6) run side by side and every update mixes
+them. Both sides of every battle are played by the current net. Each env's
+step + observe runs on a worker thread (Rust releases the GIL and uses rayon)
+while the GPU infers the next env, so CPU and GPU overlap.
+
+Rows act only on turns they must choose (`needs`). A row's trajectory is its
+own acting steps; the battle's result (1 win, 0 loss, 0.5 draw) lands on its
+last acting step. GAE with gamma 1.
+
+Losses: PPO-clip policy, value (BCE on lambda-returns), entropy, zero-avoiding
+(-mean log pi over legal actions), foe next action (the other row's real
+action), and foe item / ability / moves (true sets from `truth()`, on seen foe
+slots).
+
+    .venv\\Scripts\\python.exe rl.py --run smoke --minutes 10
+    .venv\\Scripts\\python.exe rl.py --run main --hours 60 --resume
+"""
+import argparse
+import csv
+import importlib
+import math
+import os
+import sys
+import time
+from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
+
+import numpy as np
+import torch
+import torch.nn.functional as F
+
+HERE = Path(__file__).parent
+sys.path.insert(0, str(HERE))
+from model import ACTIONS, MON_F, OBS_FLOATS, OBS_IDS, Config, Net  # noqa: E402
+
+SEEN = 40  # mon float: the viewer has seen this Pokémon
+DMG = 28  # move float: damage share of the foe's HP (own active only)
+
+
+def bot_actions(kind, f, m, rng):
+    """Baseline opponents: "random" (uniform legal) or "greedy" (the own active's
+    hardest-hitting move, mega if it can; a random switch when it can't attack)."""
+    rand = (rng.random(m.shape) * m).argmax(1)
+    if kind == "random":
+        return rand.astype(np.int64)
+    mons = f[:, : 12 * MON_F].reshape(-1, 12, MON_F)
+    active = mons[:, :6, 1].argmax(1)
+    am = mons[np.arange(len(f)), active, 45:].reshape(-1, 4, 30)[:, :, DMG]
+    dmg = np.where(m[:, :4] | m[:, 4:8], am + 1e-3, -1.0)
+    best = dmg.argmax(1)
+    can = dmg.max(1) >= 0
+    out = np.where(m[np.arange(len(f)), 4 + best], 4 + best, best)
+    return np.where(can, out, rand).astype(np.int64)
+
+
+def args():
+    p = argparse.ArgumentParser()
+    p.add_argument("--run", required=True, help="run name; output in data/rl/<run>")
+    p.add_argument("--gens", default="3,4,5,6")
+    p.add_argument("--battles", type=int, default=4096, help="battles in flight, split across gens")
+    p.add_argument("--steps", type=int, default=32, help="rollout length per update")
+    p.add_argument("--epochs", type=int, default=2)
+    p.add_argument("--minibatch", type=int, default=4096)
+    p.add_argument("--lr", type=float, default=2e-4)
+    p.add_argument("--wd", type=float, default=0.01)
+    p.add_argument("--clip", type=float, default=0.2)
+    p.add_argument("--lam", type=float, default=0.95)
+    p.add_argument("--ent", type=float, default=0.01, help="entropy coef at the start")
+    p.add_argument("--ent-end", type=float, default=0.002, help="entropy coef after --anneal-hours")
+    p.add_argument("--anneal-hours", type=float, default=24)
+    p.add_argument("--za", type=float, default=0.003, help="zero-avoiding coef")
+    p.add_argument("--vf", type=float, default=0.5)
+    p.add_argument("--foe", type=float, default=0.2, help="foe-action loss coef")
+    p.add_argument("--sets", type=float, default=0.1, help="foe set-heads loss coef")
+    p.add_argument("--grad-clip", type=float, default=1.0)
+    p.add_argument("--varied", type=float, default=0.3)
+    p.add_argument("--seed", type=int, default=1)
+    p.add_argument("--minutes", type=float, default=0, help="stop after this long (0 = use --hours)")
+    p.add_argument("--hours", type=float, default=0)
+    p.add_argument("--ckpt-minutes", type=float, default=30)
+    p.add_argument("--eval-minutes", type=float, default=10)
+    p.add_argument("--eval-games", type=int, default=200, help="per gen, vs random")
+    p.add_argument("--init", default="", help="start weights (e.g. the warm start)")
+    p.add_argument("--resume", action="store_true")
+    p.add_argument("--baseline", action="store_true", help="only print greedy vs random and exit")
+    return p.parse_args()
+
+
+class Envs:
+    """The gen envs as one row space: rows [off_g, off_g + 2 n_g) belong to gen g.
+    Rows 2i and 2i+1 are the two sides of a battle, so a row's foe is row ^ 1."""
+
+    def __init__(self, gens, battles, seed, varied, catalog):
+        self.gens = gens
+        per = battles // len(gens)
+        self.envs = [importlib.import_module(f"pe_env_gen{g}").VecEnv(per, seed * 101 + g, catalog, varied) for g in gens]
+        self.rows = [2 * e.n for e in self.envs]
+        self.off = np.concatenate([[0], np.cumsum(self.rows)]).tolist()
+        self.R = self.off[-1]
+        self.pool = ThreadPoolExecutor(len(gens))
+
+    @staticmethod
+    def _step(env, actions):
+        r, d = env.step(actions)
+        return r, d, env.observe(), env.truth()
+
+    def submit(self, g, actions):
+        return self.pool.submit(self._step, self.envs[g], actions)
+
+    def stats(self):
+        tot = {}
+        for e in self.envs:
+            for k, v in e.stats().items():
+                tot[k] = tot.get(k, 0) + v
+        return tot
+
+
+def masked_logp(logits, mask):
+    logp = torch.log_softmax(logits, -1)
+    return torch.where(mask, logp, torch.zeros_like(logp))
+
+
+def sample(logits):
+    return torch.distributions.Categorical(logits=logits).sample()
+
+
+class Buffer:
+    def __init__(self, T, R, dev):
+        z = lambda *s, dt=torch.float32: torch.zeros(*s, dtype=dt, device=dev)  # noqa: E731
+        self.floats = z(T, R, OBS_FLOATS, dt=torch.float16)
+        self.ids = z(T, R, OBS_IDS, dt=torch.int16)
+        self.mask = z(T, R, ACTIONS, dt=torch.bool)
+        self.truth = z(T, R, 42, dt=torch.int16)
+        self.valid = z(T, R, dt=torch.bool)
+        self.action = z(T, R, dt=torch.long)
+        self.logp = z(T, R)
+        self.value = z(T, R)
+        self.reward = z(T, R)
+        self.done = z(T, R, dt=torch.bool)
+
+
+def gae(buf, last_value, lam):
+    """Per-row GAE over acting steps only, gamma 1. A battle's reward goes to the
+    row's last acting step before (or at) the step where it ended."""
+    T, R = buf.valid.shape
+    adv = torch.zeros(T, R, device=buf.valid.device)
+    nv = last_value.clone()
+    na = torch.zeros(R, device=nv.device)
+    pend = torch.zeros(R, device=nv.device)
+    for t in reversed(range(T)):
+        d = buf.done[t]
+        pend = torch.where(d, buf.reward[t], pend)
+        nv = torch.where(d, torch.zeros_like(nv), nv)
+        na = torch.where(d, torch.zeros_like(na), na)
+        v = buf.valid[t]
+        delta = pend + nv - buf.value[t]
+        a = delta + lam * na
+        adv[t] = torch.where(v, a, adv[t])
+        nv = torch.where(v, buf.value[t], nv)
+        na = torch.where(v, a, na)
+        pend = torch.where(v, torch.zeros_like(pend), pend)
+    return adv, adv + buf.value
+
+
+@torch.no_grad()
+def act(net, f, i, m, needs):
+    """Sample actions for the rows that must act. Returns (actions, logp, value) for all
+    rows (zeros elsewhere)."""
+    R = f.shape[0]
+    a = torch.zeros(R, dtype=torch.long, device=f.device)
+    lp = torch.zeros(R, device=f.device)
+    v = torch.zeros(R, device=f.device)
+    idx = needs.nonzero().squeeze(1)
+    if len(idx):
+        with torch.autocast("cuda", torch.bfloat16):
+            out = net(f[idx].float(), i[idx], m[idx])
+        logits = out["policy"].float()
+        s = sample(logits)
+        a[idx] = s
+        lp[idx] = torch.log_softmax(logits, -1).gather(1, s[:, None]).squeeze(1)
+        v[idx] = torch.sigmoid(out["value"].float())
+    return a, lp, v
+
+
+@torch.no_grad()
+def values(net, f, i, m):
+    out = []
+    for s in range(0, f.shape[0], 8192):
+        with torch.autocast("cuda", torch.bfloat16):
+            mm = m[s : s + 8192].clone()
+            mm[~mm.any(1), 0] = True
+            out.append(torch.sigmoid(net(f[s : s + 8192].float(), i[s : s + 8192], mm)["value"].float()))
+    return torch.cat(out)
+
+
+def to_dev(obs, dev):
+    f, i, m, n = obs
+    return (
+        torch.from_numpy(f).to(dev, non_blocking=True).half(),
+        torch.from_numpy(i.view(np.int16)).to(dev, non_blocking=True),
+        torch.from_numpy(m).to(dev, non_blocking=True),
+        torch.from_numpy(n).to(dev, non_blocking=True),
+    )
+
+
+@torch.no_grad()
+def eval_vs(net, bot, gens, games, seed, catalog, dev, player="net"):
+    """`player` ("net": greedy policy, no search; or a bot name) vs the `bot`. The
+    player is side one in even battles and side two in odd ones. Returns {gen: score}."""
+    if net is not None:
+        net.eval()
+    res = {}
+    rng = np.random.default_rng(seed)
+    for g in gens:
+        n = 256
+        env = importlib.import_module(f"pe_env_gen{g}").VecEnv(n, seed * 7 + g, catalog, 0.3)
+        net_row = np.arange(n) * 2 + (np.arange(n) % 2)
+        is_net = np.zeros(2 * n, bool)
+        is_net[net_row] = True
+        score = played = 0.0
+        while played < games:
+            f, i, m, needs = env.observe()
+            acts = bot_actions(bot, f, m, rng)
+            sel = np.nonzero(is_net & needs)[0]
+            if len(sel) and player == "net":
+                ft, it, mt, _ = to_dev((f[sel], i[sel], m[sel], needs[sel]), dev)
+                with torch.autocast("cuda", torch.bfloat16):
+                    acts[sel] = net(ft.float(), it, mt)["policy"].float().argmax(1).cpu().numpy()
+            elif len(sel):
+                acts[sel] = bot_actions(player, f[sel], m[sel], rng)
+            r, d = env.step(acts)
+            fin = d[net_row]
+            score += r[net_row][fin].sum()
+            played += fin.sum()
+        res[g] = score / played
+    if net is not None:
+        net.train()
+    return res
+
+
+def main():
+    a = args()
+    dev = "cuda"
+    torch.manual_seed(a.seed)
+    gens = [int(g) for g in a.gens.split(",")]
+    catalog = str(HERE / "data" / "catalog")
+    if a.baseline:
+        print("greedy vs random:", eval_vs(None, "random", gens, a.eval_games, a.seed, catalog, dev, player="greedy"))
+        return
+    out = HERE / "data" / "rl" / a.run
+    out.mkdir(parents=True, exist_ok=True)
+    ckpt_path = out / "last.pt"
+
+    net = Net(Config()).to(dev)
+    opt = torch.optim.AdamW(net.parameters(), lr=a.lr, weight_decay=a.wd, betas=(0.9, 0.99))
+    st = dict(update=0, decisions=0, games=0, seconds=0.0)
+    if a.resume and ckpt_path.exists():
+        ck = torch.load(ckpt_path, map_location=dev, weights_only=False)
+        net.load_state_dict(ck["model"])
+        opt.load_state_dict(ck["opt"])
+        st = ck["state"]
+        print(f"resumed {ckpt_path} at update {st['update']}, {st['games']:,} games")
+    elif a.init:
+        net.load_state_dict(torch.load(a.init, map_location=dev, weights_only=False)["model"])
+        print(f"init from {a.init}")
+    net.train()
+
+    envs = Envs(gens, a.battles, a.seed + st["update"], a.varied, catalog)
+    R, T = envs.R, a.steps
+    buf = Buffer(T, R, dev)
+    print(f"gens {gens}, {R // 2} battles, {R} rows, rollout {T} -> up to {T * R:,} samples/update")
+
+    log_path = out / "log.csv"
+    new_log = not log_path.exists()
+    logf = open(log_path, "a", newline="")
+    log = csv.writer(logf)
+    if new_log:
+        log.writerow(
+            ["update", "hours", "games", "decisions", "dps", "samples", "ent_coef", "pg", "vloss", "ent", "za",
+             "kl", "clipfrac", "ev", "foe_acc", "item_acc", "abil_acc", "loss_foe", "loss_sets", "avg_turns",
+             "draws", "illegal", "panics"] + [f"vs_{b}_g{g}" for b in ("random", "greedy") for g in gens]
+        )
+
+    # Initial observations.
+    obs = [to_dev(e.observe(), dev) for e in envs.envs]
+    truth = [torch.from_numpy(e.truth().view(np.int16)).to(dev) for e in envs.envs]
+    budget = (a.minutes * 60) if a.minutes else (a.hours * 3600)
+    t0 = time.time()
+    sec0 = st["seconds"]
+    last_ckpt = last_eval = time.time()
+    stats0 = envs.stats()
+    evals = {}
+
+    def save():
+        st["seconds"] = sec0 + time.time() - t0
+        tmp = out / "last.tmp"
+        torch.save(dict(model=net.state_dict(), opt=opt.state_dict(), state=st, args=vars(a)), tmp)
+        os.replace(tmp, ckpt_path)
+
+    while True:
+        elapsed = time.time() - t0
+        if budget and elapsed >= budget:
+            break
+        hours = (sec0 + elapsed) / 3600
+        frac = min(1.0, hours / a.anneal_hours) if a.anneal_hours else 1.0
+        ent_coef = a.ent + (a.ent_end - a.ent) * frac
+        tr0 = time.time()
+
+        # ---- Rollout ----
+        net.eval()
+        futs = [None] * len(gens)
+        for t in range(T):
+            for g in range(len(gens)):
+                lo, hi = envs.off[g], envs.off[g + 1]
+                if futs[g] is not None:
+                    r, d, o, tr = futs[g].result()
+                    buf.reward[t - 1, lo:hi] = torch.from_numpy(r).to(dev)
+                    buf.done[t - 1, lo:hi] = torch.from_numpy(d).to(dev)
+                    obs[g] = to_dev(o, dev)
+                    truth[g] = torch.from_numpy(tr.view(np.int16)).to(dev)
+                f, i, m, n = obs[g]
+                buf.floats[t, lo:hi] = f
+                buf.ids[t, lo:hi] = i
+                buf.mask[t, lo:hi] = m
+                buf.valid[t, lo:hi] = n
+                buf.truth[t, lo:hi] = truth[g]
+                acts, lp, v = act(net, f, i, m, n)
+                buf.action[t, lo:hi] = acts
+                buf.logp[t, lo:hi] = lp
+                buf.value[t, lo:hi] = v
+                futs[g] = envs.submit(g, acts.cpu().numpy())
+        for g in range(len(gens)):
+            lo, hi = envs.off[g], envs.off[g + 1]
+            r, d, o, tr = futs[g].result()
+            buf.reward[T - 1, lo:hi] = torch.from_numpy(r).to(dev)
+            buf.done[T - 1, lo:hi] = torch.from_numpy(d).to(dev)
+            obs[g] = to_dev(o, dev)
+            truth[g] = torch.from_numpy(tr.view(np.int16)).to(dev)
+        last_v = torch.cat([values(net, *obs[g][:3]) for g in range(len(gens))])
+        adv, ret = gae(buf, last_v, a.lam)
+        t_roll = time.time() - tr0
+
+        # ---- PPO update ----
+        net.train()
+        flat = buf.valid.flatten().nonzero().squeeze(1)
+        N = len(flat)
+        # Rows 2i/2i+1 are one battle and R is even, so a sample's foe is at index ^ 1.
+        Ff = buf.floats.view(T * R, -1)
+        Fi = buf.ids.view(T * R, -1)
+        Fm = buf.mask.view(T * R, -1)
+        Fv = buf.valid.flatten()
+        Fa = buf.action.flatten()
+        Ftr = buf.truth.view(T * R, 6, 7)
+        Flp, Fval = buf.logp.flatten(), buf.value.flatten()
+        Fadv, Fret = adv.flatten(), ret.flatten()
+        acc = dict(pg=0.0, vloss=0.0, ent=0.0, za=0.0, kl=0.0, clipfrac=0.0, foe_acc=0.0, item_acc=0.0,
+                   abil_acc=0.0, loss_foe=0.0, loss_sets=0.0)
+        nb = 0
+        for _ in range(a.epochs):
+            perm = flat[torch.randperm(N, device=dev)]
+            for s in range(0, N, a.minibatch):
+                idx = perm[s : s + a.minibatch]
+                fidx = idx ^ 1
+                f, i, m = Ff[idx].float(), Fi[idx], Fm[idx]
+                with torch.autocast("cuda", torch.bfloat16):
+                    o = net(f, i, m)
+                logits = o["policy"].float()
+                logp_all = masked_logp(logits, m)
+                lp = logp_all.gather(1, Fa[idx][:, None]).squeeze(1)
+                ratio = torch.exp(lp - Flp[idx])
+                ad = Fadv[idx]
+                ad = (ad - ad.mean()) / (ad.std() + 1e-8)
+                pg = -torch.min(ratio * ad, ratio.clamp(1 - a.clip, 1 + a.clip) * ad).mean()
+                p = logp_all.exp() * m
+                ent = -(p * logp_all).sum(1).mean()
+                nleg = m.sum(1).clamp(min=1)
+                za = -(logp_all.sum(1) / nleg).mean()
+                vloss = F.binary_cross_entropy_with_logits(o["value"].float(), Fret[idx].clamp(0, 1))
+                # Foe next action: the other row's real action, where it acted.
+                fv = Fv[fidx]
+                fm = Fm[fidx]
+                fl = o["foe_action"].float().masked_fill(~fm, -1e9)
+                ft = Fa[fidx]
+                if fv.any():
+                    loss_foe = F.cross_entropy(fl[fv], ft[fv])
+                    foe_acc = (fl[fv].argmax(1) == ft[fv]).float().mean().item()
+                else:
+                    loss_foe, foe_acc = torch.zeros((), device=dev), 0.0
+                # Foe sets, on seen foe slots.
+                seen = f[:, : 12 * MON_F].view(-1, 12, MON_F)[:, 6:, SEEN] > 0.5
+                tr = Ftr[idx].long()
+                if seen.any():
+                    it_l, ab_l, mv_l = o["item"][seen].float(), o["ability"][seen].float(), o["moves"][seen].float()
+                    it_t, ab_t, mv_t = tr[..., 1][seen], tr[..., 2][seen], tr[..., 3:][seen]
+                    multi = torch.zeros_like(mv_l)
+                    multi.scatter_(1, mv_t, 1.0)
+                    multi[:, 0] = 0.0  # id 0 = no move
+                    loss_sets = F.cross_entropy(it_l, it_t) + F.cross_entropy(ab_l, ab_t) + F.binary_cross_entropy_with_logits(
+                        mv_l, multi, reduction="sum"
+                    ) / max(1, len(mv_l)) / 4
+                    item_acc = (it_l.argmax(1) == it_t).float().mean().item()
+                    abil_acc = (ab_l.argmax(1) == ab_t).float().mean().item()
+                else:
+                    loss_sets, item_acc, abil_acc = torch.zeros((), device=dev), 0.0, 0.0
+                loss = pg + a.vf * vloss - ent_coef * ent + a.za * za + a.foe * loss_foe + a.sets * loss_sets
+                opt.zero_grad(set_to_none=True)
+                loss.backward()
+                torch.nn.utils.clip_grad_norm_(net.parameters(), a.grad_clip)
+                opt.step()
+                with torch.no_grad():
+                    lr_ = lp - Flp[idx]
+                    acc["kl"] += ((lr_.exp() - 1) - lr_).mean().item()
+                    acc["clipfrac"] += ((ratio - 1).abs() > a.clip).float().mean().item()
+                acc["pg"] += pg.item()
+                acc["vloss"] += vloss.item()
+                acc["ent"] += ent.item()
+                acc["za"] += za.item()
+                acc["foe_acc"] += foe_acc
+                acc["item_acc"] += item_acc
+                acc["abil_acc"] += abil_acc
+                acc["loss_foe"] += loss_foe.item()
+                acc["loss_sets"] += loss_sets.item()
+                nb += 1
+            if not math.isfinite(acc["pg"]):
+                break
+        for k in acc:
+            acc[k] /= max(nb, 1)
+        if not all(math.isfinite(v) for v in acc.values()):
+            save_bad = out / f"nan-{st['update']}.pt"
+            torch.save(dict(model=net.state_dict(), state=st), save_bad)
+            raise SystemExit(f"non-finite loss at update {st['update']}; saved {save_bad}")
+        with torch.no_grad():
+            vr = Fret[flat]
+            ev = 1 - (vr - Fval[flat]).var() / (vr.var() + 1e-8)
+
+        dt = time.time() - tr0
+        st["update"] += 1
+        st["decisions"] += N
+        s1 = envs.stats()
+        games = s1["games"] - stats0["games"]
+        st["games"] += games
+        turns = (s1["turns"] - stats0["turns"]) / max(games, 1)
+        draws = (s1["draws"] - stats0["draws"]) / max(games, 1)
+        stats0 = s1
+
+        if time.time() - last_eval >= a.eval_minutes * 60 or (budget and time.time() - t0 + dt >= budget):
+            evals = {b: eval_vs(net, b, gens, a.eval_games, st["update"], catalog, dev) for b in ("random", "greedy")}
+            last_eval = time.time()
+        row = [st["update"], f"{(sec0 + time.time() - t0) / 3600:.3f}", st["games"], st["decisions"], f"{N / dt:.0f}", N,
+               f"{ent_coef:.4f}"] + [f"{acc[k]:.4f}" for k in ("pg", "vloss", "ent", "za", "kl", "clipfrac")] + [
+            f"{ev.item():.3f}", f"{acc['foe_acc']:.3f}", f"{acc['item_acc']:.3f}", f"{acc['abil_acc']:.3f}",
+            f"{acc['loss_foe']:.3f}", f"{acc['loss_sets']:.3f}", f"{turns:.1f}", f"{draws:.3f}", s1["illegal"],
+            s1["panics"]] + [f"{evals[b][g]:.3f}" if evals else "" for b in ("random", "greedy") for g in gens]
+        log.writerow(row)
+        logf.flush()
+        ev_s = " | ".join(f"{b} " + " ".join(f"g{g}:{evals[b][g]:.2f}" for g in gens) for b in evals) if evals else ""
+        print(
+            f"u{st['update']} {st['games']:,}g {N / dt:,.0f}dps (roll {t_roll:.1f}s/{dt:.1f}s) ent {acc['ent']:.2f} "
+            f"v {acc['vloss']:.3f} ev {ev.item():.2f} kl {acc['kl']:.4f} foe {acc['foe_acc']:.2f} "
+            f"item {acc['item_acc']:.2f} turns {turns:.0f} {ev_s}",
+            flush=True,
+        )
+        if evals:
+            evals = {}
+        if time.time() - last_ckpt >= a.ckpt_minutes * 60:
+            save()
+            torch.save(dict(model=net.state_dict(), state=dict(st)), out / f"snap-{int(st['games'])}.pt")
+            last_ckpt = time.time()
+    save()
+    torch.save(dict(model=net.state_dict(), state=dict(st)), out / f"snap-{int(st['games'])}.pt")
+    print(f"done: {st['update']} updates, {st['games']:,} games, {st['decisions']:,} decisions")
+
+
+if __name__ == "__main__":
+    main()
