@@ -87,6 +87,8 @@ def args():
     p.add_argument("--ckpt-minutes", type=float, default=30)
     p.add_argument("--eval-minutes", type=float, default=10)
     p.add_argument("--eval-games", type=int, default=200, help="per gen, vs random")
+    p.add_argument("--eval10k-games", type=int, default=100, help="per gen vs mcts:10000, the main yardstick now (0 = off)")
+    p.add_argument("--eval10k-every", type=int, default=2, help="run it every N eval rounds")
     p.add_argument("--init", default="", help="start weights (e.g. the warm start)")
     p.add_argument("--critic-warmup", type=int, default=8, help="with --init: updates that train only value/aux heads")
     p.add_argument("--resume", action="store_true")
@@ -334,6 +336,7 @@ def main():
     last_ckpt = last_eval = time.time()
     stats0 = envs.stats()
     evals, refs = {}, {}
+    n_evals = 0
 
     def save():
         st["seconds"] = sec0 + time.time() - t0
@@ -505,6 +508,14 @@ def main():
                 if ref:
                     r = eval_vs(net, f"net:{ref}", gens, a.eval_games // 2, st["update"], catalog, dev)
                     refs[name] = sum(r.values()) / len(r)
+            n_evals += 1
+            if a.eval10k_games and n_evals % a.eval10k_every == 0:
+                r10 = eval_vs(net, "mcts:10000", gens, a.eval10k_games, st["update"], catalog, dev)
+                with open(out / "eval10k.csv", "a") as ef:  # separate file so log.csv's header stays stable on resume
+                    ef.write(f"{st['update']},{(sec0 + time.time() - t0) / 3600:.3f},{st['games']},"
+                             + ",".join(f"{r10[g]:.3f}" for g in gens) + "\n")
+                print(f"u{st['update']} mcts:10000 " + " ".join(f"g{g}:{r10[g]:.2f}" for g in gens)
+                      + f" | all {sum(r10.values()) / len(r10):.3f}", flush=True)
             last_eval = time.time()
         row = [st["update"], f"{(sec0 + time.time() - t0) / 3600:.3f}", st["games"], st["decisions"], f"{N / dt:.0f}", N,
                f"{ent_coef:.4f}"] + [f"{acc[k]:.4f}" for k in ("pg", "vloss", "ent", "za", "kl", "clipfrac")] + [

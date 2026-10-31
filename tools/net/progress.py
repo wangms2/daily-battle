@@ -47,6 +47,16 @@ def main():
         nxt = h + a.every
     print("Goal: net alone 50% vs Hard (~86% vs MCTS-1000). Above ~85% vs MCTS-1000 the yardstick saturates:"
           " re-check snapshots with eval.py vs mcts:20000.")
+    p10 = Path(__file__).parent / "data" / "rl" / a.run / "eval10k.csv"
+    if p10.exists():
+        r10 = [list(map(float, l.split(","))) for l in p10.read_text().split() if l]
+        print("\nMain yardstick: win rate vs full-information MCTS-10000 (its strength vs real Hard is not"
+              " calibrated; confirm with the Showdown gate)")
+        print(f"{'hours':>6} {'games':>11} {'vs MCTS-10k':>12} {'Elo vs it':>10}  per gen")
+        for i, r in enumerate(r10):
+            w = r10[max(0, i - a.window + 1): i + 1]
+            p = sum(sum(x[3:]) / len(x[3:]) for x in w) / len(w)
+            print(f"{r[1]:6.1f} {int(r[2]):11,} {p:12.1%} {elo(p):+10.0f}  " + " ".join(f"{v:.2f}" for v in r[3:]))
 
 
 if __name__ == "__main__":
