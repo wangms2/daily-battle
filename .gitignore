@@ -23,3 +23,6 @@ target/
 # Value network training data and Python env (tools/net)
 tools/net/data/
 tools/net/.venv/
+# Self-play env builds (tools/net/env/build.ps1)
+tools/net/*.pyd
+__pycache__/

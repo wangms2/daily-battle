@@ -1,0 +1,36 @@
+[package]
+name = "pe-env"
+version = "0.1.0"
+edition = "2021"
+publish = false
+license = "MIT"
+description = "Daily Battle's self-play environment: many poke-engine battles stepped in parallel, for PPO in tools/net."
+
+[lib]
+name = "pe_env"
+crate-type = ["cdylib"]
+path = "src/lib.rs"
+
+[dependencies]
+# Same fork and rev as packages/engine-wasm, so training and play share mechanics.
+poke-engine = { git = "https://github.com/wangms2/poke-engine", rev = "3bbc65ad54c22945c36e227cd40abb8e652e8698", default-features = false }
+pyo3 = { version = "0.25", features = ["extension-module"] }
+numpy = "0.25"
+rayon = "1"
+rand = { version = "0.9", features = ["small_rng"] }
+
+[features]
+gen3 = ["poke-engine/gen3"]
+gen4 = ["poke-engine/gen4"]
+gen5 = ["poke-engine/gen5"]
+gen6 = ["poke-engine/gen6"]
+# Not built yet; declared so features.rs's gen checks compile cleanly.
+gen7 = ["poke-engine/gen7"]
+gen8 = ["poke-engine/gen8"]
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+panic = "unwind"
+debug = false

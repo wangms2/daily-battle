@@ -228,6 +228,12 @@ function foeMon(foe: WorldFoe, gen: Gen, genNum: number, format: string): Mon {
 const turns = (c: { minDuration?: number; maxDuration?: number } | undefined, fallback = 5) =>
   c ? c.minDuration || c.maxDuration || fallback : 0;
 
+/** A fresh, full-HP engine Pokémon for a set (the self-play env's team catalog, tools/net). */
+export function engineMonFromSet(species: string, set: SetEntry, format: string): string {
+  const gen = genFor(format);
+  return serializeMon(foeMon({ species, set }, gen, gen.num, format));
+}
+
 function sideConditions(side: ClientSide, active: ClientMon | null | undefined): string {
   const sc = side.sideConditions as Record<
     string,

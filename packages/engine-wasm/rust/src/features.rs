@@ -7,10 +7,13 @@
 //! floats (weather, terrain, each side's conditions and its active Pokémon's
 //! boosts and volatile statuses, and the gen). Bump `VERSION` whenever a
 //! feature changes meaning; append rather than reorder.
+//!
+//! `observe` is observation v2, for the self-play network: either side's view,
+//! only what that side has seen of the foe, recent events, and matchup tokens.
 
 use poke_engine::choices::MoveCategory;
 use poke_engine::engine::generate_instructions::calculate_both_damage_rolls;
-use poke_engine::state::{Pokemon, PokemonStatus, Side, State};
+use poke_engine::state::{Pokemon, PokemonIndex, PokemonStatus, Side, State};
 
 pub const VERSION: u32 = 1;
 
@@ -257,6 +260,331 @@ pub fn features(state: &State) -> Features {
     push_side(&mut floats, &state.side_two);
     debug_assert_eq!(floats.len(), FLOATS);
     Features { floats, ids }
+}
+
+// ---- Observation v2 ------------------------------------------------------
+
+pub const OBS_VERSION: u32 = 2;
+/// A move: the v1 move features plus "known to the viewer".
+pub const MOVE2_F: usize = MOVE_F + 1;
+/// A Pokémon's own floats: the v1 40, plus seen, item known, ability known, and
+/// the Speed bounds the viewer has (both its true Speed for the viewer's own).
+pub const MON2_BASE: usize = 45;
+pub const MON2_F: usize = MON2_BASE + 4 * MOVE2_F;
+/// Recent events (a move used or a switch-in), newest last.
+pub const HIST: usize = 16;
+pub const HIST_F: usize = 8;
+pub const HIST_IDS: usize = 2;
+/// Matchups: each of the viewer's six against the foe's active Pokémon, then
+/// each of the foe's six against the viewer's active one.
+pub const MATCH: usize = 12;
+pub const MATCH_F: usize = 4 + 4 + 4;
+pub const OBS_FLOATS: usize = TOKENS * MON2_F + FIELD_F + HIST * HIST_F + MATCH * MATCH_F;
+pub const OBS_IDS: usize = TOKENS * IDS + HIST * HIST_IDS;
+/// The "unknown" id of each table (its last), for whatever the viewer hasn't seen.
+pub const UNKNOWN_SPECIES: u16 = (SPECIES_VOCAB - 1) as u16;
+pub const UNKNOWN_ITEM: u16 = (ITEM_VOCAB - 1) as u16;
+pub const UNKNOWN_ABILITY: u16 = (ABILITY_VOCAB - 1) as u16;
+pub const UNKNOWN_MOVE: u16 = (MOVE_VOCAB - 1) as u16;
+
+/// What a viewer knows of one foe Pokémon. Its stats are only known as far as
+/// the public base stats and the evidence go: `base` gives estimates (31 IVs,
+/// no EVs, level 100) and `speed` bounds its Speed stat, narrowed by observed
+/// turn order.
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub struct Known {
+    pub seen: bool,
+    pub item: bool,
+    pub ability: bool,
+    pub moves: [bool; 4],
+    /// Base stats (HP, Atk, Def, SpA, SpD, Spe) of its current forme.
+    pub base: [u16; 6],
+    /// The lowest and highest Speed it could have in turn order (its Speed stat
+    /// times any item multiplier, such as a Choice Scarf), given the evidence.
+    pub speed: (u16, u16),
+}
+
+impl Known {
+    pub const ALL: Known = Known {
+        seen: true,
+        item: true,
+        ability: true,
+        moves: [true; 4],
+        base: [0; 6],
+        speed: (0, 0),
+    };
+
+    /// Nothing revealed yet: Speed anywhere from 0 IVs and a hindering nature
+    /// up to 31 IVs, 252 EVs and a boosting one.
+    pub fn unrevealed(base: [u16; 6]) -> Known {
+        Known { base, speed: speed_range(base[5]), ..Default::default() }
+    }
+
+    /// After a forme change (Mega Evolution): new base stats, Speed evidence reset.
+    pub fn set_base(&mut self, base: [u16; 6]) {
+        self.base = base;
+        self.speed = speed_range(base[5]);
+    }
+
+    /// Evidence that its Speed is at least (`faster`) or at most `other` (ties go either way).
+    /// Outspeeding its highest possible stat means a Choice Scarf (×1.5), as a
+    /// player would conclude; the bounds widen to match.
+    pub fn observe_speed(&mut self, faster: bool, other: u16) {
+        let (lo, hi) = self.speed;
+        self.speed = if faster {
+            if other > hi {
+                (other, (hi as u32 * 3 / 2).max(other as u32).min(u16::MAX as u32) as u16)
+            } else {
+                (lo.max(other), hi)
+            }
+        } else if other < lo {
+            // Slower than it can be: something we don't model. Keep what this says.
+            (other / 2, other)
+        } else {
+            (lo, hi.min(other))
+        };
+    }
+
+    /// Its Speed evidence is stale (its item changed hands): back to the prior.
+    pub fn reset_speed(&mut self) {
+        self.speed = speed_range(self.base[5]);
+    }
+}
+
+pub fn speed_range(base: u16) -> (u16, u16) {
+    let b = base as u32;
+    (((2 * b + 5) * 9 / 10) as u16, ((2 * b + 99) * 11 / 10) as u16)
+}
+
+/// Speed as turn order sees it, before boosts and field effects: the stat,
+/// times 1.5 with a Choice Scarf.
+pub fn effective_speed(p: &Pokemon) -> u16 {
+    let s = p.speed.max(0) as u32;
+    let s = if format!("{:?}", p.item) == "CHOICESCARF" { s * 3 / 2 } else { s };
+    s.min(u16::MAX as u32) as u16
+}
+
+/// One event, in absolute terms (side one or two).
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub struct Event {
+    /// 1: a move was used; 2: a Pokémon switched in.
+    pub kind: u8,
+    pub by_side_one: bool,
+    /// The turn it happened on.
+    pub turn: u32,
+    /// The acting (or incoming) Pokémon's species id.
+    pub species: u16,
+    /// The move's id (moves only).
+    pub mv: u16,
+    pub mega: bool,
+    /// Both active Pokémon's HP fractions at the end of that turn.
+    pub hp_one: f32,
+    pub hp_two: f32,
+}
+
+pub fn pokemon_index(i: usize) -> PokemonIndex {
+    match i {
+        0 => PokemonIndex::P0,
+        1 => PokemonIndex::P1,
+        2 => PokemonIndex::P2,
+        3 => PokemonIndex::P3,
+        4 => PokemonIndex::P4,
+        _ => PokemonIndex::P5,
+    }
+}
+
+pub fn hp_frac(p: &Pokemon) -> f32 {
+    if p.maxhp > 0 {
+        clamp(p.hp as f32 / p.maxhp as f32, 0.0, 1.0)
+    } else {
+        0.0
+    }
+}
+
+fn push_mon2(f: &mut Vec<f32>, ids: &mut Vec<u16>, p: &Pokemon, own: bool, active: bool, dmg: &[f32; 4], k: Known) {
+    let start = f.len();
+    f.resize(start + MON2_F, 0.0);
+    let x = &mut f[start..];
+    let exists = p.id != poke_engine::pokemon::PokemonName::NONE;
+    x[0] = own as u8 as f32;
+    if !k.seen {
+        // Only that it exists (team sizes are public) and, being unseen, hasn't fainted.
+        x[2] = exists as u8 as f32;
+        ids.extend_from_slice(&[UNKNOWN_SPECIES, UNKNOWN_ITEM, UNKNOWN_ABILITY]);
+        ids.extend_from_slice(&[UNKNOWN_MOVE; 4]);
+        return;
+    }
+    let mut v1 = Vec::with_capacity(MON_F);
+    let mut v1_ids = Vec::with_capacity(IDS);
+    push_mon(&mut v1, &mut v1_ids, p, own, active, dmg);
+    x[..40].copy_from_slice(&v1[..40]);
+    if own {
+        x[43] = effective_speed(p) as f32 / 500.0;
+        x[44] = x[43];
+    } else {
+        // Only public estimates of the foe's stats; its Speed as bounded by evidence.
+        let b = k.base.map(|v| v as f32);
+        x[4] = (2.0 * b[0] + 141.0) / 500.0;
+        for s in 1..6 {
+            x[4 + s] = (2.0 * b[s] + 36.0) / 500.0;
+        }
+        x[43] = k.speed.0 as f32 / 500.0;
+        x[44] = k.speed.1 as f32 / 500.0;
+    }
+    x[40] = 1.0;
+    x[41] = k.item as u8 as f32;
+    x[42] = k.ability as u8 as f32;
+    for i in 0..4 {
+        if !k.moves[i] {
+            continue;
+        }
+        let m = &mut x[MON2_BASE + i * MOVE2_F..MON2_BASE + (i + 1) * MOVE2_F];
+        m[..MOVE_F].copy_from_slice(&v1[40 + i * MOVE_F..40 + (i + 1) * MOVE_F]);
+        m[MOVE_F] = 1.0;
+    }
+    ids.push(v1_ids[0]);
+    ids.push(if k.item { v1_ids[1] } else { UNKNOWN_ITEM });
+    ids.push(if k.ability { v1_ids[2] } else { UNKNOWN_ABILITY });
+    for i in 0..4 {
+        ids.push(if k.moves[i] { v1_ids[3 + i] } else { UNKNOWN_MOVE });
+    }
+}
+
+fn neutral(side: &mut Side, i: usize) {
+    side.active_index = pokemon_index(i);
+    side.attack_boost = 0;
+    side.defense_boost = 0;
+    side.special_attack_boost = 0;
+    side.special_defense_boost = 0;
+    side.speed_boost = 0;
+    side.accuracy_boost = 0;
+    side.evasion_boost = 0;
+    side.substitute_health = 0;
+    side.volatile_statuses = Default::default();
+}
+
+/// One matchup token: `a` attacks `b` (each move's best share of HP), `b` attacks `a`
+/// (its moves known to the viewer only), and whether `a` is surely faster, surely
+/// slower, or either, going by the foe's Speed bounds (Speed stats, no boosts).
+fn push_matchup(f: &mut Vec<f32>, state: &State, viewer_one: bool, own_slot: Option<usize>, foe_slot: Option<usize>, foe_known: &[Known; 6]) {
+    let start = f.len();
+    f.resize(start + MATCH_F, 0.0);
+    let mut s = state.clone();
+    let (own, foe) = if viewer_one { (&mut s.side_one, &mut s.side_two) } else { (&mut s.side_two, &mut s.side_one) };
+    if let Some(i) = own_slot {
+        neutral(own, i);
+    }
+    if let Some(j) = foe_slot {
+        neutral(foe, j);
+    }
+    let foe_index = foe.active_index as usize;
+    let (a, b) = (own.get_active_immutable(), foe.get_active_immutable());
+    if a.hp <= 0 || b.hp <= 0 || !foe_known[foe_index].seen {
+        return;
+    }
+    let (own_speed, (lo, hi)) = (effective_speed(a), foe_known[foe_index].speed);
+    let d_own = damage_shares(&s, viewer_one);
+    let d_foe = damage_shares(&s, !viewer_one);
+    let x = &mut f[start..];
+    x[..4].copy_from_slice(&d_own);
+    for i in 0..4 {
+        if foe_known[foe_index].moves[i] {
+            x[4 + i] = d_foe[i];
+        }
+    }
+    x[8] = 1.0;
+    x[9] = (own_speed > hi) as u8 as f32;
+    x[10] = (own_speed < lo) as u8 as f32;
+    x[11] = (own_speed >= lo && own_speed <= hi) as u8 as f32;
+}
+
+/// Observation v2 of `state` for one side: its own team fully, the foe's only as
+/// far as `foe_known` says, the last `HIST` of `history` (oldest first), and the
+/// matchup tokens. `turn` is the current turn, for the events' ages.
+pub fn observe(state: &State, viewer_one: bool, foe_known: &[Known; 6], history: &[Event], turn: u32) -> Features {
+    // Damage numbers use the true board: a player deduces hidden items and
+    // abilities from damage anyway (owner, Oct 31).
+    let mut floats = Vec::with_capacity(OBS_FLOATS);
+    let mut ids = Vec::with_capacity(OBS_IDS);
+    let (own, foe) = if viewer_one { (&state.side_one, &state.side_two) } else { (&state.side_two, &state.side_one) };
+    let d_own = damage_shares(state, viewer_one);
+    let d_foe = damage_shares(state, !viewer_one);
+    let own_active = own.active_index as usize;
+    let foe_active = foe.active_index as usize;
+    for (i, p) in own.pokemon.into_iter().enumerate() {
+        push_mon2(&mut floats, &mut ids, p, true, i == own_active, &d_own, Known::ALL);
+    }
+    for (i, p) in foe.pokemon.into_iter().enumerate() {
+        let mut k = foe_known[i];
+        // The foe's damage to us is only shown for moves we've seen.
+        let mut d = d_foe;
+        for m in 0..4 {
+            if !k.moves[m] {
+                d[m] = 0.0;
+            }
+        }
+        if i == foe_active {
+            k.seen = true;
+        }
+        push_mon2(&mut floats, &mut ids, p, false, i == foe_active, &d, k);
+    }
+
+    let start = floats.len();
+    floats.resize(start + 9 + 1 + 5 + 1 + 2 + 7, 0.0);
+    let x = &mut floats[start..];
+    x[(state.weather.weather_type as usize).min(8)] = 1.0;
+    x[9] = clamp(state.weather.turns_remaining as f32 / 8.0, -1.0, 1.0);
+    x[10 + (state.terrain.terrain_type as usize).min(4)] = 1.0;
+    x[15] = state.terrain.turns_remaining as f32 / 8.0;
+    x[16] = state.trick_room.active as u8 as f32;
+    x[17] = state.trick_room.turns_remaining as f32 / 5.0;
+    x[18 + (gen() as usize).saturating_sub(3).min(6)] = 1.0;
+    push_side(&mut floats, own);
+    push_side(&mut floats, foe);
+
+    let recent = &history[history.len().saturating_sub(HIST)..];
+    for slot in 0..HIST {
+        let start = floats.len();
+        floats.resize(start + HIST_F, 0.0);
+        // Right-aligned: the newest event is always the last token.
+        let Some(e) = (slot + recent.len()).checked_sub(HIST).and_then(|i| recent.get(i)) else {
+            ids.extend_from_slice(&[UNKNOWN_SPECIES, UNKNOWN_MOVE]);
+            continue;
+        };
+        let mine = e.by_side_one == viewer_one;
+        let x = &mut floats[start..];
+        x[0] = 1.0;
+        x[1] = mine as u8 as f32;
+        x[2] = (e.kind == 1) as u8 as f32;
+        x[3] = (e.kind == 2) as u8 as f32;
+        x[4] = e.mega as u8 as f32;
+        let (hp_own, hp_foe) = if viewer_one { (e.hp_one, e.hp_two) } else { (e.hp_two, e.hp_one) };
+        x[5] = hp_own;
+        x[6] = hp_foe;
+        x[7] = (turn.saturating_sub(e.turn) as f32 / 8.0).min(2.0);
+        ids.push(e.species);
+        ids.push(if e.kind == 1 { e.mv } else { UNKNOWN_MOVE });
+    }
+
+    let mut known = *foe_known;
+    known[foe_active].seen = true;
+    for i in 0..6 {
+        push_matchup(&mut floats, state, viewer_one, Some(i), None, &known);
+    }
+    for j in 0..6 {
+        push_matchup(&mut floats, state, viewer_one, None, Some(j), &known);
+    }
+    debug_assert_eq!(floats.len(), OBS_FLOATS);
+    debug_assert_eq!(ids.len(), OBS_IDS);
+    Features { floats, ids }
+}
+
+/// A Pokémon's embedding ids (species, item, ability, moves), for set targets and events.
+pub fn mon_ids(p: &Pokemon) -> [u16; IDS] {
+    let mut f = Vec::new();
+    let mut ids = Vec::new();
+    push_mon(&mut f, &mut ids, p, true, false, &[0.0; 4]);
+    [ids[0], ids[1], ids[2], ids[3], ids[4], ids[5], ids[6]]
 }
 
 /// A JSON table of names by embedding id (species, moves, items, abilities)

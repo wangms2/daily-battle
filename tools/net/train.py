@@ -34,6 +34,8 @@ VOCAB = dict(species=1536, items=512, abilities=768, moves=1024)
 # future pool adds before the net is retrained).
 UNKNOWN = {k: v - 1 for k, v in VOCAB.items()}
 ID_DROPOUT = 0.15
+VALUE_WEIGHT = 1.0
+DROPOUT = 0.0
 
 SIZES = {
     "small": dict(d=128, layers=3, heads=4, ffn=256, dm=48),
@@ -42,19 +44,24 @@ SIZES = {
 
 
 class Data:
-    def __init__(self, path: Path):
+    def __init__(self, path: Path, frac: float = 1.0, in_ram: bool = False):
         m = json.loads((path / "meta.json").read_text())
         self.meta = m
         n = m["rows"]
         self.n = n
         self.x = np.memmap(path / "x.bin", np.float16, "r", shape=(n, m["floats"]))
         self.ids = np.memmap(path / "ids.bin", np.uint16, "r", shape=(n, m["tokens"] * m["ids"]))
+        if in_ram:
+            self.x, self.ids = np.array(self.x), np.array(self.ids)
         self.y = np.fromfile(path / "y.bin", np.float32).reshape(n, m["y"])
         L = m["yLayout"]
         battle = self.y[:, L["battle"]].astype(np.int64)
         # A fixed hash of the battle number, so the split is stable as data grows.
-        val = ((battle * 2654435761) % 2**32) % 10 == 0
-        self.train_idx = np.nonzero(~val)[0]
+        h = (battle * 2654435761) % 2**32
+        val = h % 10 == 0
+        # Learning-curve subsets keep whole battles and a fixed validation set.
+        keep = ~val & ((h // 10) % 1000 < frac * 1000)
+        self.train_idx = np.nonzero(keep)[0]
         self.val_idx = np.nonzero(val)[0]
 
     def batch(self, idx: np.ndarray, device: torch.device):
@@ -83,7 +90,7 @@ class Net(nn.Module):
         )
         self.field_in = nn.Sequential(nn.LayerNorm(self.field_f), nn.Linear(self.field_f, d))
         self.pos = nn.Parameter(torch.zeros(self.tokens + 1, d))
-        layer = nn.TransformerEncoderLayer(d, heads, ffn, dropout=0.0, batch_first=True, norm_first=True, activation="gelu")
+        layer = nn.TransformerEncoderLayer(d, heads, ffn, dropout=DROPOUT, batch_first=True, norm_first=True, activation="gelu")
         self.encoder = nn.TransformerEncoder(layer, layers, enable_nested_tensor=False)
         self.norm = nn.LayerNorm(d)
         self.value = nn.Sequential(nn.Linear(2 * d, d), nn.GELU(), nn.Linear(d, 1))
@@ -191,7 +198,7 @@ def losses(out, y: torch.Tensor, L: dict):
         "moves_hit": hits.float().sum((-1, -2)),
         "moves_n": (fm >= 0).float().sum((-1, -2)),
     }
-    total = lv + lp + 0.5 * lf + 0.1 * ls
+    total = lv * VALUE_WEIGHT + lp + 0.5 * lf + 0.1 * ls
     return total.mean(), stats
 
 
@@ -278,19 +285,26 @@ def main():
     ap.add_argument("--out", type=Path, default=None)
     ap.add_argument("--eval-every", type=int, default=0, help="steps between evals (0: once per epoch)")
     ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--frac", type=float, default=1.0, help="fraction of training battles to use (learning curves)")
+    ap.add_argument("--steps", type=int, default=0, help="fixed step budget, overrides --epochs")
+    ap.add_argument("--in-ram", action="store_true", help="load x/ids into RAM instead of memory-mapping")
+    ap.add_argument("--value-weight", type=float, default=1.0)
+    ap.add_argument("--dropout", type=float, default=0.0)
     args = ap.parse_args()
+    global VALUE_WEIGHT, DROPOUT
+    VALUE_WEIGHT, DROPOUT = args.value_weight, args.dropout
 
     torch.manual_seed(args.seed)
     rng = np.random.default_rng(args.seed)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    data = Data(args.data)
+    data = Data(args.data, args.frac, args.in_ram)
     model = Net(data.meta, **SIZES[args.size]).to(device)
     params = sum(p.numel() for p in model.parameters())
     print(f"{device}; {data.n} rows, train {len(data.train_idx)} / val {len(data.val_idx)}; {args.size} {params / 1e6:.2f}M params")
     print(f"baselines (val value log loss): coin {math.log(2):.4f}, HP+count logistic {hp_baseline(data):.4f}")
 
     steps_per_epoch = max(1, len(data.train_idx) // args.batch)
-    total = int(args.epochs * steps_per_epoch)
+    total = args.steps or int(args.epochs * steps_per_epoch)
     eval_every = args.eval_every or steps_per_epoch
     opt = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.wd, betas=(0.9, 0.98))
     warm = min(500, total // 10 + 1)
