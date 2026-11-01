@@ -273,8 +273,26 @@ def eval_vs(net, bot, gens, games, seed, catalog, dev, player_spec="net"):
     return out
 
 
+def no_power_throttling():
+    """Windows moves windowless background processes to E-cores (EcoQoS) while the user is
+    idle; on the 12700K that cut rollout speed ~4x overnight. Opt this process out."""
+    if sys.platform != "win32":
+        return
+    import ctypes
+
+    class State(ctypes.Structure):
+        _fields_ = [("Version", ctypes.c_ulong), ("ControlMask", ctypes.c_ulong), ("StateMask", ctypes.c_ulong)]
+
+    k = ctypes.windll.kernel32
+    k.GetCurrentProcess.restype = ctypes.c_void_p
+    s = State(1, 1, 0)  # control EXECUTION_SPEED, state off
+    if not k.SetProcessInformation(ctypes.c_void_p(k.GetCurrentProcess()), 4, ctypes.byref(s), ctypes.sizeof(s)):
+        print("warning: could not disable power throttling", flush=True)
+
+
 def main():
     a = args()
+    no_power_throttling()
     dev = "cuda"
     torch.manual_seed(a.seed)
     gens = [int(g) for g in a.gens.split(",")]
