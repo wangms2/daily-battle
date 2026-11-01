@@ -425,12 +425,13 @@ def main():
         nb = 0
         for _ in range(a.epochs):
             perm = flat[torch.randperm(N, device=dev)]
-            for s in range(0, N, a.minibatch):
-                mb = perm[s : s + a.minibatch]
+            # Near-equal minibatches: a fixed-size split could leave a 1-sample tail, whose
+            # std() is NaN (crashed the run at update 2210).
+            for mb in perm.tensor_split(max(1, round(N / a.minibatch))):
                 # Advantages normalized over the whole minibatch; micro-batches only
                 # split the forward/backward to save memory (one optimizer step).
                 ad_mb = Fadv[mb]
-                ad_mb = (ad_mb - ad_mb.mean()) / (ad_mb.std() + 1e-8)
+                ad_mb = (ad_mb - ad_mb.mean()) / (ad_mb.std(unbiased=False) + 1e-8)
                 opt.zero_grad(set_to_none=True)
                 for idx, ad in zip(mb.split(a.micro or len(mb)), ad_mb.split(a.micro or len(mb))):
                     w = len(idx) / len(mb)
