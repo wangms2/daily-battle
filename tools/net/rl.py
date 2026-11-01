@@ -312,6 +312,8 @@ def main():
         padded = upgrade(ck["model"])
         net.load_state_dict(ck["model"])
         opt.load_state_dict(ck["opt"])
+        for g in opt.param_groups:  # the saved state restores the old values; the CLI wins
+            g["lr"], g["weight_decay"] = a.lr, a.wd
         # An older observation layout: pad Adam's moments for the new inputs with zeros.
         for name, p in net.named_parameters():
             if name in padded:
@@ -320,7 +322,7 @@ def main():
                     opt.state[p][k] = torch.cat([m, m.new_zeros(m.shape[0], p.shape[1] - m.shape[1])], 1)
                 print(f"upgraded {name} from {padded[name]} to {p.shape[1]} inputs")
         st = ck["state"]
-        print(f"resumed {ckpt_path} at update {st['update']}, {st['games']:,} games")
+        print(f"resumed {ckpt_path} at update {st['update']}, {st['games']:,} games, lr {a.lr:g}")
     elif a.init:
         load(net, torch.load(a.init, map_location=dev, weights_only=False)["model"])
         st["init"] = str(Path(a.init).resolve())
