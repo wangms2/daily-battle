@@ -162,7 +162,13 @@ export interface TurnPackage {
   controls: Controls | null;
   /** Mechanics that appeared in these frames, for first-time explainers. */
   explainers: string[];
-  end: { winner: Who | null; youLeft: number; foeLeft: number } | null;
+  end: {
+    winner: Who | null;
+    youLeft: number;
+    foeLeft: number;
+    /** Your Pokémon that fainted, by team species (a Mega as its base). */
+    youFainted?: string[];
+  } | null;
   /** True when this package rebuilds a resumed battle (show it without playback). */
   resumed: boolean;
   /** Hard: the AI's new choices, to save (they replace any saved from index `from`). */

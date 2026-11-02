@@ -35,7 +35,13 @@ export type GameAction =
   /** The coach was turned on mid-battle: the battle in progress is coached from now on. */
   | { type: 'coachAttempt'; day: string }
   | { type: 'recordChoice'; day: string; choice: string; ai?: AiChoices; memo?: CoachMemo }
-  | { type: 'endAttempt'; day: string; result: 'win' | 'loss' | 'forfeit'; remaining: number }
+  | {
+      type: 'endAttempt';
+      day: string;
+      result: 'win' | 'loss' | 'forfeit';
+      remaining: number;
+      fainted?: string[];
+    }
   /** Unfinished attempts from past days, or from another engine version, become forfeits. */
   | { type: 'expireAttempts'; today: string; engine: string }
   /**
@@ -323,6 +329,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
             ...a,
             result: action.result,
             remaining: action.remaining,
+            ...(action.fainted && { fainted: action.fainted }),
           })),
         },
       };

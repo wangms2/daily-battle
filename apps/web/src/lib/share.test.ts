@@ -153,6 +153,26 @@ describe('share text', () => {
   });
 });
 
+describe('share card rows', () => {
+  const rows = (attempts: Attempt[]) =>
+    shareModel({ day: DAY, summary: summarizeDay({ swapUsed: false, attempts }, true), streak: 1 })
+      .rows;
+
+  it('marks which of the team fainted, in team order', () => {
+    const [r] = rows([{ ...a('win', 4), fainted: ['Celebi', 'Lucario'] }]);
+    expect(r!.team).toEqual(
+      TEAM.map((s) => ({
+        species: s.species,
+        fainted: s.species === 'Celebi' || s.species === 'Lucario',
+      })),
+    );
+  });
+
+  it('leaves the team out for a try saved without its faints', () => {
+    expect(rows([a('win', 4)])[0]!.team).toBeUndefined();
+  });
+});
+
 describe('share all', () => {
   const game = (
     name: string,

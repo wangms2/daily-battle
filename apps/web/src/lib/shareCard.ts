@@ -5,7 +5,6 @@
 // Drawn on a canvas in the browser from self-hosted assets, so nothing leaves
 // the device until the player shares it.
 import { LIDS, MASCOT } from './genColors';
-import { condenseTries, tryCount } from './results';
 import {
   isShareAll,
   isShareGame,
@@ -148,14 +147,78 @@ function mark(ctx: CanvasRenderingContext2D, won: boolean, x: number, y: number)
 
 const SQ = 40;
 const SQ_GAP = 8;
-const ROW_H = 52;
-/** Try rows that fit between the headline and the address (rows start at y 270). */
-const MAX_ROWS = 5;
 
-/** One try: its mark, then six squares (green = Pokémon left). Returns the right edge. */
-function tryRow(ctx: CanvasRenderingContext2D, r: ShareRow, x: number, y: number): number {
+/** Box icons are 40×30; a row of them, drawn at whole or half steps so pixels stay crisp. */
+const ICON_W = 40;
+const ICON_H = 30;
+
+/** An icon in greys and faded: a Pokémon that fainted. */
+function faded(img: HTMLImageElement): HTMLCanvasElement | HTMLImageElement {
+  try {
+    const c = document.createElement('canvas');
+    c.width = img.width;
+    c.height = img.height;
+    const g = c.getContext('2d');
+    if (!g) return img;
+    g.drawImage(img, 0, 0);
+    const d = g.getImageData(0, 0, c.width, c.height);
+    for (let i = 0; i < d.data.length; i += 4) {
+      const v = 0.3 * d.data[i]! + 0.59 * d.data[i + 1]! + 0.11 * d.data[i + 2]!;
+      // A mid grey, a little see-through: clearly out, still recognisable.
+      const l = 95 + v * 0.45;
+      d.data[i] = d.data[i + 1] = d.data[i + 2] = l;
+      d.data[i + 3] = d.data[i + 3]! * 0.8;
+    }
+    g.putImageData(d, 0, 0);
+    return c;
+  } catch {
+    return img;
+  }
+}
+
+/** Each try's team icons, by row, loaded once per card. */
+type Icons = Map<string, HTMLImageElement | null>;
+
+const loadIcons = (rows: ShareRow[]): Promise<Icons> => {
+  const names = [...new Set(rows.flatMap((r) => r.team?.map((s) => s.species) ?? []))];
+  return Promise.all(names.map((n) => loadImage(getSprite(n, 'icon')))).then(
+    (imgs) => new Map(names.map((n, i) => [n, imgs[i]!])),
+  );
+};
+
+/**
+ * One try: its mark, then the team's icons, fainted ones greyed (or, for a try
+ * saved without its team, six squares: green = Pokémon left). Returns the right edge.
+ */
+function tryRow(
+  ctx: CanvasRenderingContext2D,
+  r: ShareRow,
+  x: number,
+  y: number,
+  icons?: Icons,
+  k = 2,
+): number {
   mark(ctx, r.result === 'win', x + 12, y + SQ / 2);
   let sx = x + 40;
+  if (r.team && icons) {
+    const w = ICON_W * k;
+    const h = ICON_H * k;
+    // Icons carry empty sides; neighbours overlap into them.
+    const step = w - 6 * k;
+    ctx.imageSmoothingEnabled = false;
+    // Those still standing first, then the fainted, each in team order.
+    const order = [...r.team.filter((s) => !s.fainted), ...r.team.filter((s) => s.fainted)];
+    for (const s of order) {
+      const img = icons.get(s.species);
+      if (img) {
+        // Icons sit low in their box; centre the box on the row, nudged up a touch.
+        const src = s.fainted || r.result === 'forfeit' ? faded(img) : img;
+        ctx.drawImage(src, sx, y + SQ / 2 - h / 2 - 4, w, h);
+      }
+      sx += step;
+    }
+    return sx - step + w;
+  }
   for (let i = 0; i < 6; i++) {
     roundRect(ctx, sx, y, SQ, SQ, 7);
     if (i < r.remaining) {
@@ -340,42 +403,63 @@ function streakPill(
   });
 }
 
-/** Where to play, in white under the title on the lid, so the card's body stays calm. */
-function headerUrl(ctx: CanvasRenderingContext2D, url: string | undefined) {
-  if (!url) return;
+/** Who played and where to play, in white under the title on the lid, so the card's body stays calm. */
+function headerUrl(ctx: CanvasRenderingContext2D, url: string | undefined, trainer?: string) {
   ctx.textBaseline = 'middle';
+  let x = LEFT;
+  if (trainer) {
+    ctx.fillStyle = '#ffffff';
+    ctx.font = font(600, 21);
+    const t = `Trainer ${trainer}`;
+    ctx.fillText(t, x, MID + 42);
+    x += ctx.measureText(t).width;
+  }
+  if (!url) return;
   ctx.fillStyle = 'rgb(255 255 255 / 0.78)';
   ctx.font = font(500, 21);
-  ctx.fillText(url.replace(/^https?:\/\//, ''), LEFT, MID + 42);
+  ctx.fillText(`${trainer ? ' · ' : ''}${url.replace(/^https?:\/\//, '')}`, x, MID + 42);
 }
 
-/** The team at the right: two rows of three, sprites standing on a shadow, names under them. */
+/**
+ * The team, sprites standing on a shadow, names under them: two rows of three at
+ * the right, or (`row`) one row of six across the card, under the headline.
+ */
 function drawTeam(
   ctx: CanvasRenderingContext2D,
   team: ShareModel['team'],
   sprites: (HTMLImageElement | null)[],
+  /** Which of `team` fainted in the deciding try: they're greyed, after those still standing. */
+  fainted?: boolean[],
+  row = false,
 ) {
-  const cellW = 160;
-  const gridX = RIGHT - cellW * 3;
-  team.forEach((s, i) => {
-    const cx = gridX + (i % 3) * cellW + cellW / 2;
-    const base = 322 + Math.floor(i / 3) * 160; // sprite baseline
-    const img = sprites[i];
+  const cellW = row ? (RIGHT - LEFT) / 6 : 160;
+  const gridX = row ? LEFT : RIGHT - cellW * 3;
+  const room = row ? 150 : 136;
+  const slots = team.map((_, i) => i);
+  const order = fainted
+    ? [...slots.filter((i) => !fainted[i]), ...slots.filter((i) => fainted[i])]
+    : slots;
+  order.forEach((t, i) => {
+    const s = team[t]!;
+    const out = !!fainted?.[t];
+    const cx = gridX + (row ? i : i % 3) * cellW + cellW / 2;
+    const base = row ? 452 : 322 + Math.floor(i / 3) * 160; // sprite baseline
+    const img = sprites[t];
     if (img) {
-      // The sprite itself (without its empty margin), as large as fits its 136px cell,
+      // The sprite itself (without its empty margin), as large as fits its cell,
       // up to 2×, standing on the shadow.
       const b = trimmed(img);
-      const k = fitScale(b, 136, 2);
+      const k = fitScale(b, room, 2);
       const w = b.w * k;
       const h = b.h * k;
       groundShadow(ctx, cx, base + 2, Math.max(36, w * 0.5));
       ctx.imageSmoothingEnabled = false;
-      ctx.drawImage(img, b.x, b.y, b.w, b.h, cx - w / 2, base - h, w, h);
+      ctx.drawImage(out ? faded(img) : img, b.x, b.y, b.w, b.h, cx - w / 2, base - h, w, h);
     }
     ctx.textBaseline = 'alphabetic';
     ctx.textAlign = 'center';
     ctx.font = font(600, 17);
-    ctx.fillStyle = s.swapped ? C.gold : C.text;
+    ctx.fillStyle = out ? C.muted : s.swapped ? C.gold : C.text;
     ctx.fillText(s.swapped ? `${s.species}*` : s.species, cx, base + 28, cellW - 8);
     ctx.textAlign = 'left';
   });
@@ -397,7 +481,7 @@ export async function drawShareCard(m: ShareModel): Promise<HTMLCanvasElement> {
   if (m.streak) streakPill(ctx, m.streak, right, mid - 18);
 
   // Headline.
-  let y = 222;
+  const y = 222;
   ctx.textBaseline = 'middle';
   if (m.status === 'firstTry') {
     const w = pill(ctx, '⭐ First try', left, y - 21, {
@@ -419,27 +503,15 @@ export async function drawShareCard(m: ShareModel): Promise<HTMLCanvasElement> {
     ctx.fillText(m.headline, x, y);
   }
 
-  // The tries that counted. The left column fits MAX_ROWS above the address;
-  // a longer day keeps its first try, a count, and its last tries.
-  y = 270;
-  for (const r of condenseTries(m.rows, MAX_ROWS, MAX_ROWS - 2)) {
-    if ('more' in r) {
-      ctx.textBaseline = 'middle';
-      ctx.fillStyle = C.muted;
-      ctx.font = font(600, 22);
-      ctx.fillText(`⋯ ${tryCount(r.more)} more`, left + 40, y + SQ / 2);
-    } else {
-      tryRow(ctx, r, left, y);
-    }
-    y += ROW_H;
-  }
-
-  drawTeam(ctx, m.team, sprites);
+  // The team greys out who fainted in the deciding try (a forfeit, all of them).
+  const last = m.rows.at(-1);
+  const fainted = last?.team && last.team.map((s) => s.fainted || last.result === 'forfeit');
+  drawTeam(ctx, m.team, sprites, fainted, true);
 
   // The game's stars, bottom right, under the team: kept whatever the streak.
   if (m.stars) starPills(ctx, m.stars, right, CARD_H - 70, 20, false);
 
-  headerUrl(ctx, m.url);
+  headerUrl(ctx, m.url, m.trainer);
   return canvas;
 }
 
@@ -482,6 +554,7 @@ export async function drawShareAllCard(all: ShareAll): Promise<HTMLCanvasElement
       return mascot ? loadImage(getSprite(mascot.species, 'front', undefined, mascot.gen)) : null;
     }),
   );
+  const icons = await loadIcons(all.games.map((m) => m.rows.at(-1)!));
   const { canvas, ctx } = blankCard();
   drawLid(ctx, CLAY, all.date);
 
@@ -534,7 +607,7 @@ export async function drawShareAllCard(all: ShareAll): Promise<HTMLCanvasElement
     }
 
     // The deciding try's squares, then the streak at the right edge.
-    tryRow(ctx, m.rows.at(-1)!, 560, y + (GAME_ROW - SQ) / 2);
+    tryRow(ctx, m.rows.at(-1)!, 464, y + (GAME_ROW - SQ) / 2, icons);
     // With stars, the streak sits above them; alone, it's centred.
     if (m.streak) streakPill(ctx, m.streak, RIGHT, m.stars ? y + 4 : y + GAME_ROW / 2 - 16, 18);
     if (m.stars)
@@ -542,7 +615,7 @@ export async function drawShareAllCard(all: ShareAll): Promise<HTMLCanvasElement
     y += GAME_ROW + gap;
   });
 
-  headerUrl(ctx, all.url);
+  headerUrl(ctx, all.url, all.trainer);
   return canvas;
 }
 
@@ -555,7 +628,10 @@ const LEVEL_ROW = 80;
  */
 export async function drawShareGameCard(g: ShareGame): Promise<HTMLCanvasElement> {
   await loadFonts();
-  const sprites = await loadTeam(g.team);
+  const [sprites, icons] = await Promise.all([
+    loadTeam(g.team),
+    loadIcons(g.levels.map((m) => m.rows.at(-1)!)),
+  ]);
   const { canvas, ctx } = blankCard();
   const colors = g.format ? LIDS[g.format] : CLAY;
   drawLid(ctx, colors, shareHeader(g));
@@ -581,13 +657,13 @@ export async function drawShareGameCard(g: ShareGame): Promise<HTMLCanvasElement
     const head = m.status === 'firstTry' ? '⭐ First try!' : shortHeadline(m);
     ctx.fillText(head, x + labelW + 14, y + 16, colRight - (x + labelW + 14));
     // Squares end at LEFT + 320, leaving room for the streak before the team.
-    tryRow(ctx, m.rows.at(-1)!, LEFT, y + 34);
+    tryRow(ctx, m.rows.at(-1)!, LEFT, y + 34, icons, 1);
     if (m.streak) streakPill(ctx, m.streak, colRight, y + 40, 16);
     y += LEVEL_ROW + gap;
   }
 
   drawTeam(ctx, g.team, sprites);
-  headerUrl(ctx, g.url);
+  headerUrl(ctx, g.url, g.trainer);
   return canvas;
 }
 

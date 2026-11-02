@@ -23,6 +23,8 @@ export interface ShareArgs {
   coached?: boolean;
   /** This game's days won ever, at this difficulty: on the first try, and on any try. */
   stars?: Stars;
+  /** The player's name, on the image card's lid. */
+  trainer?: string;
 }
 
 /** A game's collection, kept whatever the streak: ⭐ first-try wins and ✓ clears (any try). */
@@ -35,6 +37,8 @@ export interface ShareRow {
   result: 'win' | 'loss' | 'forfeit';
   /** Pokémon left, 0–6. */
   remaining: number;
+  /** The try's team, lead first, and which of them fainted; absent on tries saved before it was kept. */
+  team?: { species: string; fainted: boolean }[];
 }
 
 /** What a share says, whether as text or as the image card (lib/shareCard.ts). */
@@ -61,6 +65,7 @@ export interface ShareModel {
   /** The game's stars so far; absent before its first clear. */
   stars?: Stars;
   url?: string;
+  trainer?: string;
 }
 
 export const DIFFICULTY_NAME: Record<Difficulty, string> = {
@@ -76,6 +81,9 @@ export const shareHeader = (m: Pick<ShareModel, 'game' | 'level' | 'coached' | '
 const row = (a: Attempt): ShareRow => ({
   result: a.result === 'inProgress' ? 'loss' : a.result,
   remaining: a.remaining,
+  ...(a.fainted && {
+    team: a.team.map((s) => ({ species: s.species, fainted: a.fainted!.includes(s.species) })),
+  }),
 });
 
 export function shareModel({
@@ -89,6 +97,7 @@ export function shareModel({
   difficulty,
   coached,
   stars,
+  trainer,
 }: ShareArgs): ShareModel {
   const { status, counted, tries, winTry } = summary;
   const date = new Date(`${day}T12:00:00`).toLocaleDateString('en-US', {
@@ -128,6 +137,7 @@ export function shareModel({
     streak: streakBroken(summary) ? 'Streak reset' : streak > 0 ? `${streak}-day streak` : null,
     ...(stars && stars.clears > 0 && { stars }),
     url,
+    ...(trainer && { trainer }),
   };
 }
 
@@ -177,13 +187,15 @@ export interface ShareAll {
   /** Today's played games, in picker order. */
   games: ShareModel[];
   url?: string;
+  trainer?: string;
 }
 
 /** Today's played games as one share: the single game's own share, or the compact one. */
 export function shareAll(games: ShareModel[], url?: string): ShareModel | ShareAll | null {
   const played = games.filter((m) => m.status !== 'none');
   if (played.length < 2) return played[0] ?? null;
-  return { date: played[0]!.date, games: played, ...(url && { url }) };
+  const trainer = played[0]!.trainer;
+  return { date: played[0]!.date, games: played, ...(url && { url }), ...(trainer && { trainer }) };
 }
 
 export const isShareAll = (m: AnyShare): m is ShareAll => 'games' in m;
@@ -233,6 +245,7 @@ export interface ShareGame {
   /** The deciding try's team at the best difficulty (`bestBucket`). */
   team: ShareModel['team'];
   url?: string;
+  trainer?: string;
 }
 
 /**
@@ -249,6 +262,7 @@ export function shareGame(levels: ShareModel[], best: ShareModel): ShareModel | 
     levels: played,
     team: best.team,
     ...(best.url && { url: best.url }),
+    ...(best.trainer && { trainer: best.trainer }),
   };
 }
 

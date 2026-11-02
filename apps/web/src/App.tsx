@@ -282,6 +282,7 @@ export function App() {
     difficulty,
     coached,
     stars: { firstTries: stats.firstTryWins, clears: stats.clears },
+    trainer: settings.name,
   });
   // A game's share at one bucket; the current one is `share` itself.
   const modelFor = (id: FormatId, b: Bucket): ShareModel => {
@@ -300,6 +301,7 @@ export function App() {
       format: id,
       difficulty: level,
       coached: b === 'coached',
+      trainer: settings.name,
     });
   };
   const ids = Object.keys(FORMATS) as FormatId[];

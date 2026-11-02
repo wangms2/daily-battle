@@ -462,6 +462,9 @@ export class SidePresenter {
               (this.sets.length || you.totalPokemon || 6) -
               you.team.filter((p) => p.fainted).length,
             foeLeft: (foe.totalPokemon || 6) - foe.team.filter((p) => p.fainted).length,
+            youFainted: you.team
+              .filter((p) => p.fainted)
+              .map((p) => teamSpecies(this.dex, p.speciesForme)),
           }
         : null,
       resumed,

@@ -89,7 +89,7 @@ describe('SidePresenter', () => {
 
   it('agrees between the two sides on who moved and who won', () => {
     for (let i = 1; i < 4; i++) {
-      const { session, packages } = versus(i);
+      const { teams, session, packages } = versus(i);
       expect(session.ended).toBe(true);
       const moves = (side: SideID, who: 'you' | 'foe') =>
         packages[side]
@@ -103,6 +103,10 @@ describe('SidePresenter', () => {
       expect(e2.winner === 'you').toBe(session.winner === 'p2');
       expect(e1.youLeft).toBe(e2.foeLeft);
       expect(e1.foeLeft).toBe(e2.youLeft);
+      expect(e1.youFainted).toHaveLength(6 - e1.youLeft);
+      expect(e2.youFainted).toHaveLength(6 - e2.youLeft);
+      // By team species, so the share card can find them in the team.
+      for (const s of e1.youFainted!) expect(teams.p1.map((t) => t.species)).toContain(s);
     }
   }, 60_000);
 

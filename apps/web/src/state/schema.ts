@@ -12,6 +12,8 @@ export interface Attempt {
   result: 'win' | 'loss' | 'forfeit' | 'inProgress';
   /** Player Pokémon remaining at the end. */
   remaining: number;
+  /** The species that fainted, for the share card; absent on attempts saved before it was kept. */
+  fainted?: string[];
   ts: number;
   lead: string;
   /** The team as sent into battle, lead first (so resume uses the same team). */

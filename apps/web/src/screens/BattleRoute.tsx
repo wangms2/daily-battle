@@ -83,8 +83,15 @@ export function BattleRoute({
           ...(memo && { memo }),
         })
       }
-      onEnd={({ result, remaining }) =>
-        dispatch({ type: 'endAttempt', day, result, remaining, format })
+      onEnd={({ result, remaining, fainted }) =>
+        dispatch({
+          type: 'endAttempt',
+          day,
+          result,
+          remaining,
+          ...(fainted && { fainted }),
+          format,
+        })
       }
       onExit={onExit}
       onDayDone={onDayDone}

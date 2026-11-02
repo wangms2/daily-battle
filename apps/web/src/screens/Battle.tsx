@@ -174,6 +174,8 @@ const TOUR: { spots: string[]; text: string }[] = [
 export interface BattleOutcome {
   result: 'win' | 'loss' | 'forfeit';
   remaining: number;
+  /** Your Pokémon that fainted, by species, when the battle reported them. */
+  fainted?: string[];
 }
 
 export function Battle({
@@ -416,6 +418,7 @@ export function Battle({
       onEndRef.current({
         result: pkg.end.winner === 'you' ? 'win' : 'loss',
         remaining: pkg.end.youLeft,
+        ...(pkg.end.youFainted && { fainted: pkg.end.youFainted }),
       });
     }
   }, []);
@@ -571,7 +574,11 @@ export function Battle({
           ended.current = true;
           setGaveUp(true);
           setEnd(pkg.end);
-          onEndRef.current({ result: 'forfeit', remaining: pkg.end?.youLeft ?? 0 });
+          onEndRef.current({
+            result: 'forfeit',
+            remaining: pkg.end?.youLeft ?? 0,
+            ...(pkg.end?.youFainted && { fainted: pkg.end.youFainted }),
+          });
         }
         setControls(null);
         setPlaying(false);
