@@ -1,17 +1,22 @@
 // Weekly team builder (DESIGN.md §12.2a). Phone: one screen, no scrolling:
 // the recommended team, the 4×3 pool, the checklist, the tray, and Lock in.
 // Wide: compact pool cards on the left, the team panel on the right.
+import type { Core } from '@daily-battle/data';
 import type { ScheduleFile } from '@daily-battle/gen/schedule';
 import clsx from 'clsx';
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import {
   activeFormat,
+  addCore,
   CHECK_ITEMS,
   checklist,
+  coresIn,
   findSet,
+  joinNames,
   megaClash,
   megaFor,
   ONE_MEGA_MESSAGE,
+  pairings,
   randomTeam,
   sameSpecies,
   shortLabel,
@@ -87,9 +92,13 @@ export function TeamBuilder({
   const [checklistOpen, setChecklistOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   // undo: the team before; reroll: offers another random team in place.
-  const [snack, setSnack] = useState<{ message: string; undo?: Slot[]; reroll?: boolean } | null>(
-    null,
-  );
+  // wrap: a longer message, on two lines.
+  const [snack, setSnack] = useState<{
+    message: string;
+    undo?: Slot[];
+    reroll?: boolean;
+    wrap?: boolean;
+  } | null>(null);
   // Wide: the Pokémon in the details panel, and the set previewed for it.
   const [viewing, setViewing] = useState<string | null>(null);
   const [preview, setPreview] = useState<string | undefined>();
@@ -99,6 +108,27 @@ export function TeamBuilder({
   };
 
   const pool = schedule.pool.species;
+  // Cores whose members are all in the pool: the week's seeded two, and any that completed by chance.
+  const poolCores = useMemo(() => coresIn(pool), [pool]);
+  const seeded = useMemo(
+    () => poolCores.filter((c) => schedule.pool.cores?.includes(c.id)),
+    [poolCores, schedule.pool.cores],
+  );
+  const [tab, setTab] = useState<'team' | 'cores'>('team');
+  const showTab = seeded.length > 0 ? tab : 'team';
+  // Who each Pokémon not on the team pairs with (through any core), for the ring on its tile.
+  const pairs = useMemo(
+    () =>
+      pairings(
+        team.map((s) => s.species),
+        poolCores,
+      ),
+    [team, poolCores],
+  );
+  const partnerOf = (species: string) => {
+    const found = pairs.get(species);
+    return found && joinNames([...new Set(found.flatMap((p) => p.withTeam))]);
+  };
   const index = (species: string) => team.findIndex((s) => s.species === species);
   const full = team.length === size;
   /** A form of a species already on the team (Species Clause allows one Rotom). */
@@ -140,6 +170,18 @@ export function TeamBuilder({
     if (megaBlocked(species, setId)) return;
     setPopped(species);
     setTeam((t) => [...t, { species, setId }]);
+    // Say who it pairs with, when they're in the pool and not on the team yet.
+    const mine = poolCores.filter((c) => c.members.includes(species));
+    const partners = [
+      ...new Set(
+        mine
+          .flatMap((c) => c.members)
+          .filter((m) => m !== species && !team.some((s) => s.species === m)),
+      ),
+    ];
+    if (partners.length) {
+      setSnack({ message: `Pairs with ${joinNames(partners)}`, wrap: true });
+    }
   };
 
   // Wide: a click adds with the previewed (or most used) set; the panel can change it.
@@ -157,6 +199,18 @@ export function TeamBuilder({
     setSnack({ message: 'Recommended team added', undo: team });
     setTeam(recommended.map((slot) => ({ ...slot })));
   };
+  // A core's members, each with its most used set; a member already here keeps its set.
+  const applyCore = (core: Core) => {
+    const plan = addCore(core, team, size);
+    if ('blocked' in plan) {
+      setSnack({ message: plan.blocked, wrap: true });
+    } else if (!plan.add.length) {
+      setSnack({ message: `${core.name} is already on your team`, wrap: true });
+    } else {
+      setSnack({ message: `${core.name} added`, undo: team, wrap: true });
+      setTeam([...team, ...plan.add]);
+    }
+  };
   // Any Pokémon, any sets; tap again for another. Undo goes back to before the first roll.
   const applyRandom = () => {
     setSnack({ message: 'Random team', undo: snack?.reroll ? snack.undo : team, reroll: true });
@@ -171,11 +225,32 @@ export function TeamBuilder({
   // The undo message takes the button's place, so it never covers controls.
   const recommendRow = (
     <div className="flex shrink-0 flex-col gap-1">
-      <div className="flex items-baseline gap-2">
-        <h2 className="display text-[12px] tracking-wider text-muted uppercase">
-          Recommended team
+      <div className="flex h-6 items-center gap-2">
+        <h2 className="display shrink-0 text-[12px] tracking-wider text-muted uppercase">
+          {showTab === 'cores' ? 'Cores this week' : 'Recommended team'}
         </h2>
-        <span className="truncate text-[12px] text-muted">Strong and ready to battle</span>
+        <span className="min-w-0 flex-1 truncate text-[12px] text-muted">
+          {showTab === 'cores' ? 'Add a pair in one tap' : 'Strong and ready to battle'}
+        </span>
+        {seeded.length > 0 && (
+          <div className="seg flex shrink-0 p-0.5" role="radiogroup" aria-label="Suggestions">
+            {(['team', 'cores'] as const).map((t) => (
+              <button
+                key={t}
+                type="button"
+                role="radio"
+                aria-checked={showTab === t}
+                onClick={() => setTab(t)}
+                className={clsx(
+                  'min-h-5 rounded-lg px-2 text-[11px] font-semibold',
+                  showTab === t ? 'bg-surface text-ink shadow-card' : 'text-muted',
+                )}
+              >
+                {t === 'team' ? 'Team' : 'Cores'}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
       {snack ? (
         <div
@@ -187,7 +262,7 @@ export function TeamBuilder({
           {snack.undo && <CheckIcon width={16} height={16} className="text-soft-ink" />}
           <span
             className={
-              snack.undo
+              snack.undo && !snack.wrap
                 ? 'min-w-0 flex-1 truncate text-[14px] font-semibold'
                 : 'min-w-0 flex-1 text-[13px] leading-4 font-semibold'
             }
@@ -219,7 +294,35 @@ export function TeamBuilder({
         </div>
       ) : (
         <div className="flex h-10 gap-2">
-          {recommended && (
+          {showTab === 'cores' &&
+            seeded.map((core) => (
+              <button
+                key={core.id}
+                type="button"
+                onClick={() => applyCore(core)}
+                aria-label={`Add ${core.name}. ${core.why}`}
+                title={core.why}
+                className="chip flex h-10 min-w-0 flex-1 items-center gap-1 pr-2 pl-1 active:scale-[0.99]"
+              >
+                <span className="flex min-w-0 flex-1 items-center overflow-hidden">
+                  {core.members.map((m) => (
+                    <img
+                      key={m}
+                      src={getSprite(m, 'icon')}
+                      alt=""
+                      className="pixelated -mr-3 h-8 w-10 shrink-0 object-contain"
+                    />
+                  ))}
+                </span>
+                <span
+                  aria-hidden
+                  className="shrink-0 text-[18px] leading-none font-bold text-accent"
+                >
+                  +
+                </span>
+              </button>
+            ))}
+          {showTab === 'team' && recommended && (
             <button
               type="button"
               onClick={applyRecommended}
@@ -246,11 +349,11 @@ export function TeamBuilder({
             title="Random team"
             className={clsx(
               'chip flex h-10 shrink-0 items-center justify-center gap-1.5 active:scale-[0.97]',
-              recommended ? 'w-10' : 'px-4 text-[14px] font-semibold',
+              showTab === 'cores' || recommended ? 'w-10' : 'px-4 text-[14px] font-semibold',
             )}
           >
             <DiceIcon width={20} height={20} />
-            {!recommended && 'Random team'}
+            {showTab === 'team' && !recommended && 'Random team'}
           </button>
         </div>
       )}
@@ -319,6 +422,7 @@ export function TeamBuilder({
                   : `Add ${species} to team`
             }
             active={viewing === species}
+            partner={partnerOf(species)}
           />
         );
       })}
@@ -338,6 +442,7 @@ export function TeamBuilder({
             onInfo={i < 0 ? () => setInfoFor(species) : undefined}
             onEdit={i >= 0 ? () => setPickerFor(species) : undefined}
             editLabel={i >= 0 ? `${species}, ${findSet(team[i]!)?.label}. Change set` : undefined}
+            partner={partnerOf(species)}
             label={
               i >= 0
                 ? `Remove ${species} from team`
@@ -374,6 +479,7 @@ export function TeamBuilder({
               inTeam={!!viewing && index(viewing) >= 0}
               full={full}
               onToggle={() => viewing && toggleWide(viewing)}
+              cores={poolCores}
             />
           </section>
           <aside className="card flex min-h-0 flex-col gap-3 self-stretch overflow-y-auto p-4">
@@ -454,6 +560,7 @@ export function TeamBuilder({
 
       <InfoSheet
         species={infoFor}
+        cores={poolCores}
         open={!!infoFor}
         onOpenChange={(o) => !o && setInfoFor(null)}
         action={

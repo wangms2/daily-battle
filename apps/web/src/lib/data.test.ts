@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import {
+  addCore,
   canMega,
+  coresIn,
+  joinNames,
+  pairings,
   megaFor,
   ouSpecies,
   randomTeam,
@@ -16,6 +20,7 @@ import {
   possibleSets,
   sameSpecies,
   setsOf,
+  topSet,
 } from './data';
 
 // Gen 4 OU, the default active format.
@@ -165,6 +170,67 @@ describe('randomTeam', () => {
         const megas = randomTeam(pool, 6).filter((s) => megaFor(s.species, findSet(s)));
         expect(megas.length).toBeLessThanOrEqual(1);
       }
+    } finally {
+      setActiveFormat('gen4ou');
+    }
+  });
+});
+
+describe('cores', () => {
+  const POOL = ['Swampert', 'Skarmory', 'Dragonite', 'Magnezone', 'Metagross', 'Heatran'];
+  const slot = (species: string) => ({ species, setId: topSet(species).id });
+
+  it('finds the cores whose members are all in the pool', () => {
+    const ids = coresIn(POOL).map((c) => c.id);
+    expect(ids).toEqual(
+      expect.arrayContaining(['swampert-skarmory', 'dragonite-magnezone', 'dragonite-metagross']),
+    );
+    // Heatran + Celebi: Celebi isn't in the pool.
+    expect(ids).not.toContain('heatran-celebi');
+  });
+
+  it('pairs each Pokémon with the teammates it shares a core with, through every core', () => {
+    const found = pairings(['Dragonite'], coresIn(POOL));
+    expect([...found.keys()].sort()).toEqual(['Magnezone', 'Metagross']);
+    expect(found.get('Magnezone')!.map((p) => p.core.id)).toEqual(['dragonite-magnezone']);
+    expect(found.get('Magnezone')![0]!.withTeam).toEqual(['Dragonite']);
+    // Teammates are never listed as partners, and no team means no pairings.
+    expect(pairings(['Dragonite', 'Magnezone'], coresIn(POOL)).has('Magnezone')).toBe(false);
+    expect(pairings([], coresIn(POOL)).size).toBe(0);
+  });
+
+  it('adds a core’s missing members with their most used sets, keeping a member already there', () => {
+    const core = coresIn(POOL).find((c) => c.id === 'swampert-skarmory')!;
+    expect(addCore(core, [], 6)).toEqual({ add: [slot('Swampert'), slot('Skarmory')] });
+    const mine = { species: 'Skarmory', setId: setsOf('Skarmory').at(-1)!.id };
+    expect(addCore(core, [mine], 6)).toEqual({ add: [slot('Swampert')] });
+    expect(addCore(core, [slot('Swampert'), slot('Skarmory')], 6)).toEqual({ add: [] });
+  });
+
+  it('says how many to remove when there is no room', () => {
+    const core = coresIn(POOL).find((c) => c.id === 'swampert-skarmory')!;
+    const team = ['Heatran', 'Metagross', 'Dragonite', 'Magnezone', 'Starmie'].map(slot);
+    expect(addCore(core, team, 6)).toEqual({
+      blocked: 'Remove 1 Pokémon to add Swampert + Skarmory',
+    });
+    expect(addCore(core, team, 5)).toEqual({
+      blocked: 'Remove 2 Pokémon to add Swampert + Skarmory',
+    });
+  });
+
+  it('joins names for a sentence', () => {
+    expect(joinNames(['Skarmory'])).toBe('Skarmory');
+    expect(joinNames(['Skarmory', 'Blissey'])).toBe('Skarmory and Blissey');
+    expect(joinNames(['Skarmory', 'Blissey', 'Swampert'])).toBe('Skarmory, Blissey, and Swampert');
+  });
+
+  it('won’t add a second Mega (Gen 6)', () => {
+    setActiveFormat('gen6ou');
+    try {
+      const core = coresIn(['Venusaur', 'Heatran']).find((c) => c.id === 'venusaur-heatran')!;
+      // Latias's most used set holds a Mega Stone, and so does Venusaur's.
+      const result = addCore(core, [slot('Latias')], 6);
+      expect(result).toEqual({ blocked: expect.stringContaining('Latias has the Mega Stone') });
     } finally {
       setActiveFormat('gen4ou');
     }

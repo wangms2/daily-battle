@@ -1,11 +1,13 @@
 // Read-only helpers over the set data and species facts of the game being
 // shown (Gen 4, 5, or 6 OU). No simulator code here.
 import {
+  coresFor,
   DEFAULT_FORMAT,
   FORMATS,
   formatInfo,
   playerSets,
   setsFor,
+  type Core,
   type SetEntry,
   type SetsFile,
 } from '@daily-battle/data';
@@ -213,6 +215,71 @@ export function randomTeam(
     if (!same(team, current)) break;
   }
   return team;
+}
+
+/** Every core of the game whose members are all in `pool`: they can make a team together. */
+export const coresIn = (pool: string[]): Core[] =>
+  coresFor(format).filter((c) => c.members.every((m) => pool.includes(m)));
+
+/** A core a Pokémon would complete or extend, and the teammates already in it. */
+export interface Pairing {
+  core: Core;
+  withTeam: string[];
+}
+
+/**
+ * For each Pokémon not on the team: the cores it shares with Pokémon that are
+ * (the builder rings it and says who it pairs with). A Pokémon can pair through
+ * several cores, or with several teammates in one trio.
+ */
+export function pairings(team: string[], cores: Core[]): Map<string, Pairing[]> {
+  const out = new Map<string, Pairing[]>();
+  for (const core of cores) {
+    const withTeam = core.members.filter((m) => team.includes(m));
+    if (!withTeam.length) continue;
+    for (const m of core.members) {
+      if (team.includes(m)) continue;
+      out.set(m, [...(out.get(m) ?? []), { core, withTeam }]);
+    }
+  }
+  return out;
+}
+
+/** "Skarmory", "Skarmory and Blissey", "Skarmory, Blissey, and Swampert". */
+export const joinNames = (names: string[]): string =>
+  names.length < 3 ? names.join(' and ') : `${names.slice(0, -1).join(', ')}, and ${names.at(-1)}`;
+
+/**
+ * Adding a core to a team: the members not already on it, each with its most
+ * used set (a member already there keeps the set you gave it), or why it can't
+ * be added (no room, a second form of a Pokémon, a second Mega).
+ */
+export function addCore(
+  core: Core,
+  team: Slot[],
+  size: number,
+): { add: Slot[] } | { blocked: string } {
+  const missing = core.members.filter((m) => !team.some((s) => s.species === m));
+  const clash = missing.find((m) => team.some((s) => sameSpecies(s.species, m)));
+  if (clash) {
+    const other = team.find((s) => sameSpecies(s.species, clash))!.species;
+    return { blocked: `One per team: ${other} is a form of the same Pokémon` };
+  }
+  const room = size - team.length;
+  if (missing.length > room) {
+    const n = missing.length - room;
+    return { blocked: `Remove ${n} Pokémon to add ${core.name}` };
+  }
+  const running = [...team];
+  const add: Slot[] = [];
+  for (const species of missing) {
+    const slot = { species, setId: topSet(species).id };
+    const other = megaClash(running, slot);
+    if (other) return { blocked: `${ONE_MEGA_MESSAGE} ${other} has the Mega Stone.` };
+    running.push(slot);
+    add.push(slot);
+  }
+  return { add };
 }
 
 /** Whether any of a species' sets can Mega Evolve (for the "Can Mega Evolve" hint). */

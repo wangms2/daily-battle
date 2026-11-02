@@ -5,6 +5,8 @@ import { getSprite } from '../lib/sprites';
 import { Sheet } from '../ui/Sheet';
 import { Button, TypeBadge } from '../ui/bits';
 import { FoeScout } from '../ui/FoeScout';
+import type { Core } from '@daily-battle/data';
+import { CoreNotes } from '../ui/CoreNotes';
 import { StatLines } from '../ui/StatLines';
 
 export function InfoSheet({
@@ -14,6 +16,7 @@ export function InfoSheet({
   showRoles = true,
   foe,
   action,
+  cores,
 }: {
   species: string | null;
   open: boolean;
@@ -22,6 +25,8 @@ export function InfoSheet({
   /** An opponent: what its battle card shows, against your team. */
   foe?: { hints: boolean };
   action?: { label: string; onClick: () => void; disabled?: boolean };
+  /** The cores in this week's pool: the ones this Pokémon is in are listed. */
+  cores?: Core[];
 }) {
   if (!species) return null;
   return (
@@ -29,7 +34,7 @@ export function InfoSheet({
       {foe ? (
         <FoeScout species={species} hints={foe.hints} />
       ) : (
-        <InfoBody species={species} showRoles={showRoles} />
+        <InfoBody species={species} showRoles={showRoles} cores={cores} />
       )}
       {action && (
         <Button className="mt-5 w-full" onClick={action.onClick} disabled={action.disabled}>
@@ -41,7 +46,15 @@ export function InfoSheet({
 }
 
 /** A Pokémon's types, stats, roles and matchups: the info sheet's contents (or a panel's). */
-export function InfoBody({ species, showRoles = true }: { species: string; showRoles?: boolean }) {
+export function InfoBody({
+  species,
+  showRoles = true,
+  cores,
+}: {
+  species: string;
+  showRoles?: boolean;
+  cores?: Core[];
+}) {
   const info = speciesInfo(species);
   const m = matchups(species);
   const total = Object.values(info.baseStats).reduce((a, b) => a + b, 0);
@@ -68,6 +81,7 @@ export function InfoBody({ species, showRoles = true }: { species: string; showR
         </p>
       )}
 
+      {cores && <CoreNotes species={species} cores={cores} />}
       {showRoles && (
         <div className="mt-4">
           <h3 className="text-[13px] font-semibold text-muted">Roles</h3>

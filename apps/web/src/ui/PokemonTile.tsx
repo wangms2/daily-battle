@@ -3,7 +3,7 @@ import { useState, type ReactNode } from 'react';
 import { speciesInfo } from '../lib/data';
 import { getSprite } from '../lib/sprites';
 import { TypeBadge } from './bits';
-import { InfoIcon, PencilIcon } from './icons';
+import { InfoIcon, LinkIcon, PencilIcon } from './icons';
 import { useMediaQuery } from './useWide';
 
 /**
@@ -26,6 +26,7 @@ export function PokemonTile({
   onEdit,
   editLabel,
   hoverCard,
+  partner,
 }: {
   species: string;
   onTap?: () => void;
@@ -48,6 +49,8 @@ export function PokemonTile({
   editLabel?: string;
   /** A card shown while a mouse is over the tile (desktop); touch ignores it. */
   hoverCard?: ReactNode;
+  /** "Skarmory": a Pokémon on your team that this one pairs with (a core). It's ringed. */
+  partner?: string;
 }) {
   const { types } = speciesInfo(species);
   const [hovered, setHovered] = useState(false);
@@ -60,6 +63,7 @@ export function PokemonTile({
         // A mouse over a tile you can tap lifts it a little.
         onTap && 'tile-hover',
         selected && 'is-selected',
+        partner && !selected && 'is-partner',
         dimmed && 'opacity-45',
         pop && 'animate-pop',
         // A tile's hover card must sit over the tiles after it.
@@ -96,6 +100,7 @@ export function PokemonTile({
       </button>
       {footer}
       {badge && <span className="pointer-events-none absolute top-1 left-1">{badge}</span>}
+      {partner && !selected && !badge && <PairBadge partner={partner} />}
       {hoverCard && hovered && (
         <div
           role="tooltip"
@@ -126,6 +131,19 @@ export function PokemonTile({
         )
       )}
     </div>
+  );
+}
+
+/** The small link in a ringed tile's corner: it pairs with a teammate (the name is for readers). */
+function PairBadge({ partner }: { partner: string }) {
+  return (
+    <span
+      title={`Pairs with ${partner}`}
+      className="pointer-events-none absolute top-1 left-1 grid size-5 place-items-center rounded-full bg-gold text-on-gold"
+    >
+      <LinkIcon width={12} height={12} />
+      <span className="sr-only">Pairs with {partner}</span>
+    </span>
   );
 }
 
@@ -167,6 +185,7 @@ export function PokemonRow({
   label,
   pop = false,
   active = false,
+  partner,
 }: {
   species: string;
   onTap: () => void;
@@ -178,6 +197,8 @@ export function PokemonRow({
   pop?: boolean;
   /** Shown in the details panel. */
   active?: boolean;
+  /** "Skarmory": a Pokémon on your team that this one pairs with (a core). It's ringed. */
+  partner?: string;
 }) {
   const { types } = speciesInfo(species);
   return (
@@ -186,6 +207,7 @@ export function PokemonRow({
         'card relative min-w-0 transition-[opacity,box-shadow]',
         selected && 'is-selected',
         active && 'outline-2 outline-offset-2 outline-gold',
+        partner && !selected && 'is-partner',
         dimmed && 'opacity-45',
         pop && 'animate-pop',
       )}
@@ -208,10 +230,16 @@ export function PokemonRow({
         </span>
         <span className="flex min-w-0 flex-col gap-0.5">
           <span className="truncate text-[14px] leading-tight font-semibold">{species}</span>
-          <span className="flex gap-0.5">
+          <span className="flex min-w-0 items-center gap-0.5">
             {types.map((t) => (
               <TypeBadge key={t} type={t} size="sm" />
             ))}
+            {partner && !selected && (
+              <span className="ml-1 flex min-w-0 items-center gap-0.5 text-[11px] font-semibold">
+                <LinkIcon width={11} height={11} className="shrink-0 text-gold" />
+                <span className="truncate">{partner}</span>
+              </span>
+            )}
           </span>
         </span>
       </button>

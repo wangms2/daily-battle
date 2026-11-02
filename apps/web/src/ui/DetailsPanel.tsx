@@ -17,6 +17,8 @@ import { useFlavor } from '../lib/flavor';
 import { getSprite } from '../lib/sprites';
 import { MatchupRow } from '../sheets/InfoSheet';
 import { ItemIcon } from './ItemIcon';
+import type { Core } from '@daily-battle/data';
+import { CoreNotes } from './CoreNotes';
 import { StatLines } from './StatLines';
 import { Term } from './DetailCard';
 import { MoveList } from './MoveList';
@@ -30,6 +32,7 @@ export function DetailsPanel({
   inTeam,
   full,
   onToggle,
+  cores,
 }: {
   species: string | null;
   /** The set shown: the member's own, or the one previewed. */
@@ -38,6 +41,8 @@ export function DetailsPanel({
   inTeam: boolean;
   full: boolean;
   onToggle: () => void;
+  /** The cores in this week's pool: the ones this Pokémon is in are listed. */
+  cores?: Core[];
 }) {
   const tabs = useRef<(HTMLButtonElement | null)[]>([]);
   const flavor = useFlavor(species);
@@ -197,6 +202,7 @@ export function DetailsPanel({
             {m.immune.length > 0 && <MatchupRow label="Immune" types={m.immune} />}
           </div>
         </div>
+        {cores && <CoreNotes species={species} cores={cores} />}
       </div>
     </section>
   );
