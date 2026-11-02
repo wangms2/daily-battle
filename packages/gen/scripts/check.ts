@@ -34,12 +34,16 @@ const poolAttempts: number[] = [];
 const poolCounts = new Map<string, number>();
 const hasMove = (species: string, moves: string[]) =>
   sets.species[species]!.sets.some((s) => s.moves.some((m) => moves.includes(m)));
+const coreCounts = new Map<number, number>();
+const coreSeen = new Map<string, number>();
 let withSpikes = 0;
 let withRemover = 0;
 const belowOuCounts = new Map<number, number>();
 for (let k = 0; k < n; k++) {
   const pool = generatePool(addDays(START, 7 * k), sets);
   poolAttempts.push(pool.attempts);
+  coreCounts.set(pool.cores.length, (coreCounts.get(pool.cores.length) ?? 0) + 1);
+  for (const id of pool.cores) coreSeen.set(id, (coreSeen.get(id) ?? 0) + 1);
   for (const s of pool.species) poolCounts.set(s, (poolCounts.get(s) ?? 0) + 1);
   if (pool.species.some((s) => hasMove(s, ['Spikes', 'Toxic Spikes']))) withSpikes++;
   if (pool.species.some((s) => hasMove(s, ['Rapid Spin', 'Defog']))) withRemover++;
@@ -75,6 +79,16 @@ console.log(
     .map(([k, c]) => `${k}: ${pct(c)}`)
     .join(', ')}`,
 );
+console.log(
+  `  cores per pool: ${[...coreCounts]
+    .sort((x, y) => y[0] - x[0])
+    .map(([k, c]) => `${k}: ${pct(c)}`)
+    .join(', ')}`,
+);
+const coresRanked = [...coreSeen].sort((x, y) => y[1] - x[1]);
+const coreLine = ([id, c]: [string, number]) => `${id} ${pct(c)}`;
+console.log(`  most seeded cores: ${coresRanked.slice(0, 4).map(coreLine).join(', ')}`);
+console.log(`  least seeded cores: ${coresRanked.slice(-3).map(coreLine).join(', ')}`);
 const belowOuByUsage = Object.entries(sets.species)
   .filter(([, e]) => !['OU', '(OU)'].includes(e.tier))
   .sort((a, b) => b[1].usage - a[1].usage);

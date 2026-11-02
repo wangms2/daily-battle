@@ -65,6 +65,15 @@ How a curated set's options become one concrete set (`src/resolve.ts`):
 - **The AI's guess** at a player's set gives it 5% (`playerSetPrior`, `FUN_SET_PRIOR`), so a revealed Belly Drum narrows to it instead of an unknown set.
 - **Species kept by hand.** `BUILD_RULES[format].include` keeps a species below the UU cut with its lower tier's sets: Gen 4 Charizard (NU), home to Gen 4 Bellyzard.
 
+## Cores (Nov 2026)
+
+`<format>/cores.json` lists the hand-picked cores for each game (12 in Gen 3, 16 in Gen 4, 15 in Gen 5, 20 in Gen 6): 2–3 Pokémon that play well together, each with a `kind` (offensive or defensive) and a one-line `why` (90 characters at most, about the Pokémon's types and abilities). `coresFor(format)` loads them.
+
+Each core comes from a vetted source: a Smogon article, the ADV cores guide, or a cores-thread post other players reacted to (DPP, BW, BW2, and ORAS threads). Cores are checked on default sets: a **defensive** core can't have two members weak to the same type with nothing in the core resisting it (offensive cores may share weaknesses), and no core contains another as a subset. The reviewed proposals, with each core's source, reactions, and check results, are in `reports/cores-proposals-<format>.md`.
+
+- **Pokémon, not sets.** A core works with every member's most-used set (the builder's default), so "Add core" gives each member that set. `src/cores.test.ts` checks it: those sets must pass the format's validator together (and Gen 6's one Mega).
+- The pool generator seeds each week with two cores, and the builder shows them (`packages/gen`, `apps/web`).
+
 ## Refreshing
 
 ```sh

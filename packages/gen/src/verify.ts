@@ -2,7 +2,7 @@
 // Written separately from the generators' own predicates (pool.ts, opponent.ts,
 // traits.ts), scanning moves, EVs, and types directly, so a bug in one is
 // unlikely to hide in the other.
-import { genOf, type SetEntry, type SetsFile } from '@daily-battle/data';
+import { coresFor, genOf, type SetEntry, type SetsFile } from '@daily-battle/data';
 import { Dex, TeamValidator } from '@pkmn/sim';
 import { CONFIG } from './config';
 import type { DailyOpponent } from './opponent';
@@ -21,12 +21,23 @@ export function verifyPool(pool: WeeklyPool, data: SetsFile, majorTypes: string[
   if (species.length !== CONFIG.pool.size) problems.push(`size ${species.length}`);
   if (new Set(species).size !== species.length) problems.push('duplicate species');
   if (species.some((s) => !data.species[s])) problems.push('unknown species');
+  // A pool's cores must be real, have all their members in the pool, and not overlap.
+  const known = coresFor(data.meta.format);
+  const seeded = pool.cores.map((id) => known.find((c) => c.id === id));
+  if (seeded.some((c) => !c)) problems.push('unknown core');
+  for (const core of seeded) {
+    if (core && !core.members.every((m) => species.includes(m)))
+      problems.push(`core ${core.id} incomplete`);
+  }
+  const seededMembers = seeded.flatMap((c) => c?.members ?? []);
+  if (new Set(seededMembers).size !== seededMembers.length) problems.push('cores overlap');
 
   const anySet = (pred: (s: SetEntry) => boolean) => species.filter((sp) => allSets(sp).some(pred));
   // Spikes and hazard removal are soft constraints, so only Stealth Rock is
-  // required; Gen 3 has none, so there it's Spikes.
-  const hazard = genOf(data.meta.format) >= 4 ? 'Stealth Rock' : 'Spikes';
-  if (!anySet((s) => s.moves.includes(hazard)).length) problems.push(`no ${hazard}`);
+  // required, and from Gen 4 (Gen 3 has none).
+  if (genOf(data.meta.format) >= 4 && !anySet((s) => s.moves.includes('Stealth Rock')).length) {
+    problems.push('no Stealth Rock');
+  }
   const belowOu = species.filter((s) => !['OU', '(OU)'].includes(data.species[s]?.tier ?? ''));
   if (belowOu.length < CONFIG.pool.belowOuMin || belowOu.length > CONFIG.pool.belowOuMax) {
     problems.push(`${belowOu.length} below-OU species`);

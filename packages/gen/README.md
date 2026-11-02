@@ -20,6 +20,8 @@ generateWeek('2026-10-19'); // { pool, opponents: [Mon..Sun] }, what M5's schedu
 
 ## Weekly pool (12 species)
 
+**Cores (Nov 2026).** Each pool is seeded with two cores (`packages/data/<format>/cores.json`): hand-picked groups of 2–3 Pokémon that play well together, one offensive and one defensive, sharing no Pokémon. A core is weighted down by how many cores share its most-shared Pokémon, so a Pokémon in five cores comes up about as often as one in a single core. The cores are drawn once and kept while the rest of the pool is filled (redrawn after 200 attempts; after 2,000 the pool takes one core, then none, so one always comes out). Core members come first in `species`, count toward the quotas below, and the pool records the cores' ids (`pool.cores`).
+
 Each pool has a quota of 2–4 **below-OU** species (tier other than `OU`/`(OU)`: UU, UUBL, NU, PU), chosen uniformly per attempt. The quota and the rest are drawn separately, without replacement:
 
 - **OU species** are weighted by **√usage**.
@@ -28,7 +30,7 @@ Each pool has a quota of 2–4 **below-OU** species (tier other than `OU`/`(OU)`
 The pool is redrawn until all of these hold:
 
 - **Top-tier cap:** at most 4 of the 15 most-used species.
-- **Stealth Rock:** at least 1 setter (required).
+- **Stealth Rock:** at least 1 setter (required from Gen 4; Gen 3 has no required hazard).
 - **Type coverage:** every _major offensive type_ has a checker in the pool, meaning a species that resists it, is immune by type, or has an immunity ability its sets use (Levitate, Flash Fire, and so on).
   - Major types are the STAB attacking types with at least 5% of usage-weighted share. Currently: Water, Steel, Dragon, Ground, Electric, Dark, Fighting, Ghost, Fire.
 - **Role mix:** at least 3 offensive, 2 defensive, and 2 utility species.
@@ -36,7 +38,7 @@ The pool is redrawn until all of these hold:
 
 Spikes and removal are handled differently from the rules above:
 
-- **Spikes:** each week decides up front, 50/50, whether its pool includes a Spikes or Toxic Spikes setter, and the pool is redrawn until it matches. So about half of pools have one.
+- **Spikes are up to the draw.** There's no quota (an earlier rule decided each week, 50/50, whether the pool had a Spikes setter).
 - **Hazard removal is soft:** a pool with no remover (Rapid Spin or Defog) is accepted half the time. In practice about 75% of pools have one.
 
 The player may pick any of a species' sets, so a species counts for a trait if any of its sets has it.
@@ -92,6 +94,6 @@ Same algorithm, seeded `gen6ou:gen<N>:…` like Gen 5, with two rules that only 
 
 ## Gen 3 OU
 
-Same algorithm, seeded `gen3ou:gen<N>:…`. Gen 3 has no Stealth Rock, so a pool needs a Spikes setter in its place, and every Gen 3 pool has one (the per-week Spikes draw still happens but doesn't apply). Gen 4 to 6 pools and their random draws are unchanged.
+Same algorithm, seeded `gen3ou:gen<N>:…`. Gen 3 has no Stealth Rock, so its pools have no required hazard.
 
 `src/__fixtures__/golden-gen3ou.json` pins three weeks. The constraint tests (1000 weeks of pools, and any 6 of a pool legal with any sets) pass for Gen 3.

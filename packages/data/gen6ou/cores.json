@@ -1,0 +1,142 @@
+[
+  {
+    "id": "venusaur-heatran",
+    "name": "Venusaur + Heatran",
+    "kind": "defensive",
+    "members": ["Venusaur", "Heatran"],
+    "why": "Heatran resists Venusaur's weaknesses; Venusaur resists Heatran's Water, Ground, Fighting."
+  },
+  {
+    "id": "garchomp-skarmory",
+    "name": "Garchomp + Skarmory",
+    "kind": "defensive",
+    "members": ["Garchomp", "Skarmory"],
+    "why": "Skarmory resists Garchomp's Dragon and Fairy; Garchomp resists Fire, ignores Electric."
+  },
+  {
+    "id": "rotom-wash-tornadus-therian",
+    "name": "Rotom-Wash + Tornadus-Therian",
+    "kind": "defensive",
+    "members": ["Rotom-Wash", "Tornadus-Therian"],
+    "why": "Rotom-Wash takes Tornadus's Electric and Ice hits; Tornadus ignores Rotom's Ground hole."
+  },
+  {
+    "id": "talonflame-gastrodon",
+    "name": "Talonflame + Gastrodon",
+    "kind": "defensive",
+    "members": ["Talonflame", "Gastrodon"],
+    "why": "Gastrodon takes Talonflame's Water hits and Rocks; Talonflame resists Gastrodon's Grass."
+  },
+  {
+    "id": "clefable-magnezone",
+    "name": "Clefable + Magnezone",
+    "kind": "defensive",
+    "members": ["Clefable", "Magnezone"],
+    "why": "Magnezone resists Poison and Steel, Clefable's weaknesses; Clefable resists Fighting."
+  },
+  {
+    "id": "altaria-magnezone",
+    "name": "Altaria + Magnezone",
+    "kind": "offensive",
+    "members": ["Altaria", "Magnezone"],
+    "why": "Magnezone resists Altaria's Ice, Rock, Dragon; Altaria resists Fire, Fighting."
+  },
+  {
+    "id": "altaria-talonflame",
+    "name": "Altaria + Talonflame",
+    "kind": "offensive",
+    "members": ["Altaria", "Talonflame"],
+    "why": "Talonflame weakens the Ferrothorn and Amoonguss that check Altaria, so Altaria can sweep."
+  },
+  {
+    "id": "metagross-thundurus",
+    "name": "Metagross + Thundurus",
+    "kind": "offensive",
+    "members": ["Metagross", "Thundurus"],
+    "why": "Thundurus's Electric moves hit the Skarmory, Slowbro, and Mandibuzz that wall Metagross."
+  },
+  {
+    "id": "landorus-therian-rotom-wash",
+    "name": "Landorus-Therian + Rotom-Wash",
+    "kind": "offensive",
+    "members": ["Landorus-Therian", "Rotom-Wash"],
+    "why": "Rotom-Wash resists Landorus's Ice and Water; Landorus ignores Rotom's Ground weakness."
+  },
+  {
+    "id": "metagross-garchomp",
+    "name": "Metagross + Garchomp",
+    "kind": "offensive",
+    "members": ["Metagross", "Garchomp"],
+    "why": "Metagross resists Garchomp's Dragon, Fairy, Ice weaknesses; Garchomp resists Fire."
+  },
+  {
+    "id": "lucario-latios",
+    "name": "Lucario + Latios",
+    "kind": "offensive",
+    "members": ["Lucario", "Latios"],
+    "why": "Latios covers every Lucario weakness; Lucario resists Latios's Bug, Dark, Dragon, Ice."
+  },
+  {
+    "id": "rotom-wash-scizor",
+    "name": "Rotom-Wash + Scizor",
+    "kind": "offensive",
+    "members": ["Rotom-Wash", "Scizor"],
+    "why": "Rotom-Wash resists Fire, Scizor's 4× weakness; Scizor resists Rotom's Grass weakness."
+  },
+  {
+    "id": "keldeo-scizor",
+    "name": "Keldeo + Scizor",
+    "kind": "offensive",
+    "members": ["Keldeo", "Scizor"],
+    "why": "Scizor resists Keldeo's Grass, Flying, Psychic, Fairy; Keldeo resists Fire."
+  },
+  {
+    "id": "dragonite-magnezone",
+    "name": "Dragonite + Magnezone",
+    "kind": "offensive",
+    "members": ["Dragonite", "Magnezone"],
+    "why": "Magnezone resists Dragonite's Ice, Rock, Dragon, Fairy; Dragonite resists Fire."
+  },
+  {
+    "id": "diancie-talonflame",
+    "name": "Diancie + Talonflame",
+    "kind": "offensive",
+    "members": ["Diancie", "Talonflame"],
+    "why": "Magic Bounce blocks Rocks for Talonflame, which resists Diancie's Steel, Grass, Fighting."
+  },
+  {
+    "id": "gyarados-latios",
+    "name": "Gyarados + Latios",
+    "kind": "offensive",
+    "members": ["Gyarados", "Latios"],
+    "why": "Latios resists Gyarados's Electric, Grass, Fighting; Gyarados resists its Ghost and Dark."
+  },
+  {
+    "id": "heracross-jirachi",
+    "name": "Heracross + Jirachi",
+    "kind": "offensive",
+    "members": ["Heracross", "Jirachi"],
+    "why": "Jirachi resists Heracross's Flying, Psychic, Fairy weaknesses; Heracross resists Ground."
+  },
+  {
+    "id": "manectric-weavile",
+    "name": "Manectric + Weavile",
+    "kind": "offensive",
+    "members": ["Manectric", "Weavile"],
+    "why": "Weavile traps Latios, Manectric's best switch-in; Manectric beats Weavile's Water checks."
+  },
+  {
+    "id": "latias-terrakion",
+    "name": "Latias + Terrakion",
+    "kind": "offensive",
+    "members": ["Latias", "Terrakion"],
+    "why": "Latias floats over Ground and resists Water, Grass, Psychic; Terrakion resists Bug, Dark."
+  },
+  {
+    "id": "latios-heatran",
+    "name": "Latios + Heatran",
+    "kind": "offensive",
+    "members": ["Latios", "Heatran"],
+    "why": "Heatran resists Latios's Bug, Dragon, Fairy, Ice; Latios floats over Ground."
+  }
+]

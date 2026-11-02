@@ -1,0 +1,86 @@
+[
+  {
+    "id": "swampert-skarmory",
+    "name": "Swampert + Skarmory",
+    "kind": "defensive",
+    "members": ["Swampert", "Skarmory"],
+    "why": "Swampert shrugs off Electric and Fire; Skarmory resists Swampert's 4× Grass weakness."
+  },
+  {
+    "id": "skarmory-blissey",
+    "name": "Skarmory + Blissey",
+    "kind": "defensive",
+    "members": ["Skarmory", "Blissey"],
+    "why": "Skarmory walls physical hits, Blissey special ones; Skarmory sets Spikes."
+  },
+  {
+    "id": "gyarados-steelix-magneton",
+    "name": "Gyarados + Steelix + Magneton",
+    "kind": "defensive",
+    "members": ["Gyarados", "Steelix", "Magneton"],
+    "why": "Gyarados and Steelix cover each other's weaknesses; Magneton traps Skarmory."
+  },
+  {
+    "id": "celebi-milotic-magneton",
+    "name": "Celebi + Milotic + Magneton",
+    "kind": "defensive",
+    "members": ["Celebi", "Milotic", "Magneton"],
+    "why": "Milotic and Celebi cover each other's weaknesses; Magneton traps Skarmory."
+  },
+  {
+    "id": "claydol-moltres-vaporeon",
+    "name": "Claydol + Moltres + Vaporeon",
+    "kind": "defensive",
+    "members": ["Claydol", "Moltres", "Vaporeon"],
+    "why": "Vaporeon switches in on the Water types that threaten Moltres and Claydol; Claydol spins."
+  },
+  {
+    "id": "magneton-claydol",
+    "name": "Magneton + Claydol",
+    "kind": "defensive",
+    "members": ["Magneton", "Claydol"],
+    "why": "Magneton resists most of Claydol's weaknesses; Claydol spins, Magneton traps Skarmory."
+  },
+  {
+    "id": "salamence-magneton",
+    "name": "Salamence + Magneton",
+    "kind": "offensive",
+    "members": ["Salamence", "Magneton"],
+    "why": "Magneton traps Skarmory and resists the Ice, Rock, and Dragon moves Salamence fears."
+  },
+  {
+    "id": "jirachi-salamence-tyranitar",
+    "name": "Jirachi + Salamence + Tyranitar",
+    "kind": "offensive",
+    "members": ["Jirachi", "Salamence", "Tyranitar"],
+    "why": "Jirachi resists Salamence's Ice, Rock, Dragon holes; Salamence and Tyranitar hit hard."
+  },
+  {
+    "id": "cloyster-gengar-jolteon",
+    "name": "Cloyster + Gengar + Jolteon",
+    "kind": "offensive",
+    "members": ["Cloyster", "Gengar", "Jolteon"],
+    "why": "Cloyster sets Spikes, Gengar blocks spin, and Jolteon pivots in on their weak spots."
+  },
+  {
+    "id": "magneton-dugtrio",
+    "name": "Magneton + Dugtrio",
+    "kind": "offensive",
+    "members": ["Magneton", "Dugtrio"],
+    "why": "Both trap and remove the walls, such as Skarmory, that stop their team."
+  },
+  {
+    "id": "metagross-dragonite",
+    "name": "Metagross + Dragonite",
+    "kind": "offensive",
+    "members": ["Metagross", "Dragonite"],
+    "why": "Metagross resists Ice, Rock, Dragon; Dragonite resists Fire and ignores Ground."
+  },
+  {
+    "id": "forretress-flygon",
+    "name": "Forretress + Flygon",
+    "kind": "defensive",
+    "members": ["Forretress", "Flygon"],
+    "why": "Flygon resists Fire, Forretress's 4× weakness; Forretress resists Flygon's Ice and Dragon."
+  }
+]

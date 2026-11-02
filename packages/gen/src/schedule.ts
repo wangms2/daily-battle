@@ -10,7 +10,8 @@ export interface ScheduleFile {
   dataBuiltAt: string;
   /** Monday of the week, `YYYY-MM-DD`. */
   week: string;
-  pool: { species: string[]; candidate: number };
+  /** `cores`: the ids of the cores it was seeded with (absent in weeks built before cores). */
+  pool: { species: string[]; candidate: number; cores?: string[] };
   /** The builder's recommended team: none or one (older files had up to three). */
   suggestedTeams: { team: TeamSlot[] }[];
   /** Monday first. The client shows only species from these teams. */
@@ -33,6 +34,12 @@ export function parseSchedule(json: unknown): ScheduleFile {
   if (!isDay(f.week)) fail('bad week');
   if (!Array.isArray(f.pool?.species) || f.pool.species.length !== 12)
     fail('pool must have 12 species');
+  if (
+    f.pool.cores !== undefined &&
+    !(Array.isArray(f.pool.cores) && f.pool.cores.every((c) => typeof c === 'string'))
+  ) {
+    fail('bad pool cores');
+  }
   if (!Array.isArray(f.suggestedTeams) || !f.suggestedTeams.every((s) => isTeam(s.team))) {
     fail('bad suggested teams');
   }

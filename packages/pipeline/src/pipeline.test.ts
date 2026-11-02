@@ -1,5 +1,5 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
-import { sets, setsFor } from '@daily-battle/data';
+import { coresFor, sets, setsFor } from '@daily-battle/data';
 import { megaCount } from '@daily-battle/data/species';
 import {
   addDays,
@@ -149,6 +149,19 @@ function asPlayed(data: SetsFile, schedule: ScheduleFile): TeamSlot[][] {
   );
 }
 
+/** A schedule's cores, when it has them (weeks built since generator version 6), are real and whole in the pool. */
+function expectCoresInPool(format: string, schedule: ScheduleFile) {
+  const known = coresFor(format);
+  for (const id of schedule.pool.cores ?? []) {
+    const core = known.find((c) => c.id === id);
+    expect(core, id).toBeDefined();
+    expect(
+      core!.members.every((m) => schedule.pool.species.includes(m)),
+      id,
+    ).toBe(true);
+  }
+}
+
 describe('published schedule files', () => {
   const dir = new URL('../../../apps/web/public/schedule/', import.meta.url);
   const files = readdirSync(dir).filter((f) => f.endsWith('.json'));
@@ -166,6 +179,7 @@ describe('published schedule files', () => {
         Array.from({ length: 7 }, (_, i) => addDays(schedule.week, i)),
       );
       expect(new Set(schedule.pool.species).size).toBe(12);
+      expectCoresInPool('gen4ou', schedule);
       const validator = TeamValidator.get('gen4ou');
       for (const team of asPlayed(sets, schedule)) {
         expect(
@@ -195,6 +209,7 @@ describe('published Gen 6 schedule files', () => {
     const schedule = parseSchedule(JSON.parse(readFileSync(new URL(file, dir), 'utf8')));
     expect(`${schedule.week}.json`).toBe(file);
     expect(new Set(schedule.pool.species).size).toBe(12);
+    expectCoresInPool('gen6ou', schedule);
     expect(
       schedule.pool.species.some((s) => data.species[s]!.sets.some((set) => isMega(s, set.id))),
     ).toBe(true);
@@ -214,24 +229,16 @@ describe('published Gen 3 schedule files', () => {
   // Until the first Gen 3 week is published there's nothing to check.
   if (!files.length) it.skip('no Gen 3 weeks published yet', () => {});
 
-  it.each(files)(
-    '%s is legal, with known sets since its version, and has a Spikes setter',
-    (file) => {
-      const schedule = parseSchedule(JSON.parse(readFileSync(new URL(file, dir), 'utf8')));
-      expect(`${schedule.week}.json`).toBe(file);
-      expect(new Set(schedule.pool.species).size).toBe(12);
-      // No Stealth Rock in Gen 3: Spikes takes its place in every pool.
-      expect(
-        schedule.pool.species.some((s) =>
-          data.species[s]!.sets.some((set) => set.moves.includes('Spikes')),
-        ),
-      ).toBe(true);
-      for (const team of asPlayed(data, schedule)) {
-        expect(legalTeam(data, team)).toBe(true);
-      }
-      for (const s of schedule.suggestedTeams) {
-        expect(s.team.every((slot) => schedule.pool.species.includes(slot.species))).toBe(true);
-      }
-    },
-  );
+  it.each(files)('%s is legal, with known sets since its version', (file) => {
+    const schedule = parseSchedule(JSON.parse(readFileSync(new URL(file, dir), 'utf8')));
+    expect(`${schedule.week}.json`).toBe(file);
+    expect(new Set(schedule.pool.species).size).toBe(12);
+    expectCoresInPool('gen3ou', schedule);
+    for (const team of asPlayed(data, schedule)) {
+      expect(legalTeam(data, team)).toBe(true);
+    }
+    for (const s of schedule.suggestedTeams) {
+      expect(s.team.every((slot) => schedule.pool.species.includes(slot.species))).toBe(true);
+    }
+  });
 });

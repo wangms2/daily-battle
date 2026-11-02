@@ -5,6 +5,10 @@ import { Sheet } from '../ui/Sheet';
 
 const CREDITS: [string, string][] = [
   ['Sets and usage data', 'Smogon, used with permission.'],
+  [
+    'Team cores',
+    'Pairings drawn from Smogon’s cores threads and articles for each generation, and Showdown’s Random Battle sets for fun sets.',
+  ],
   ['Battle simulator and text', '@pkmn (Pokémon Showdown’s simulator), MIT licensed.'],
   [
     'Sprites, item icons, Pokédex text',

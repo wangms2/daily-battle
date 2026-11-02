@@ -1,4 +1,4 @@
-import { FORMATS, setsFor, type FormatId } from '@daily-battle/data';
+import { coresFor, FORMATS, setsFor, type FormatId } from '@daily-battle/data';
 import { Dex, TeamValidator } from '@pkmn/sim';
 import { describe, expect, it } from 'vitest';
 import { addDays } from './dates';
@@ -35,6 +35,31 @@ describe.each(Object.keys(FORMATS) as FormatId[])('generated %s content', (forma
       if (problems.length) failures.push(`${opponent.day}: ${problems.join(', ')}`);
     }
     expect(failures).toEqual([]);
+  }, 120_000);
+
+  it('seeds every pool with two whole cores that share no Pokémon, one of each kind', () => {
+    const known = coresFor(format);
+    const seen = new Set<string>();
+    let mixed = 0;
+    for (let i = 0; i < N; i++) {
+      const pool = generatePool(addDays(START, 7 * i), sets);
+      const cores = pool.cores.map((id) => known.find((c) => c.id === id)!);
+      expect(cores, pool.week).toHaveLength(2);
+      for (const core of cores) {
+        expect(
+          core.members.every((m) => pool.species.includes(m)),
+          `${pool.week} ${core.id}`,
+        ).toBe(true);
+        seen.add(core.id);
+      }
+      if (new Set(cores.map((c) => c.kind)).size === 2) mixed++;
+      const members = cores.flatMap((c) => c.members);
+      expect(new Set(members).size, pool.week).toBe(members.length);
+    }
+    // The second core prefers the other kind, so nearly every week has one of each.
+    expect(mixed / N).toBeGreaterThan(0.95);
+    // Over a thousand weeks, every core comes up.
+    expect(known.filter((c) => !seen.has(c.id)).map((c) => c.id)).toEqual([]);
   }, 120_000);
 
   it('lets a player build any 6 of a pool with any sets', () => {

@@ -1,0 +1,107 @@
+[
+  {
+    "id": "skarmory-gastrodon",
+    "name": "Skarmory + Gastrodon",
+    "kind": "defensive",
+    "members": ["Skarmory", "Gastrodon"],
+    "why": "Gastrodon takes Skarmory's Electric and Fire hits; Skarmory resists Gastrodon's 4× Grass."
+  },
+  {
+    "id": "slowking-skarmory-excadrill",
+    "name": "Slowking + Skarmory + Excadrill",
+    "kind": "defensive",
+    "members": ["Slowking", "Skarmory", "Excadrill"],
+    "why": "Slowking and Skarmory cover each other's weaknesses; Excadrill is immune to Electric."
+  },
+  {
+    "id": "garchomp-alakazam-ferrothorn",
+    "name": "Garchomp + Alakazam + Ferrothorn",
+    "kind": "defensive",
+    "members": ["Garchomp", "Alakazam", "Ferrothorn"],
+    "why": "Layered hazards wear down Steel types, and Rough Skin and Iron Barbs punish U-turn."
+  },
+  {
+    "id": "tyranitar-keldeo-scizor",
+    "name": "Tyranitar + Keldeo + Scizor",
+    "kind": "offensive",
+    "members": ["Tyranitar", "Keldeo", "Scizor"],
+    "why": "Tyranitar removes Keldeo's counters; Scizor resists Keldeo's Grass, Flying, Psychic holes."
+  },
+  {
+    "id": "magnezone-latios-kyurem-black",
+    "name": "Magnezone + Latios + Kyurem-Black",
+    "kind": "offensive",
+    "members": ["Magnezone", "Latios", "Kyurem-Black"],
+    "why": "Magnezone traps the Steels that wall Latios and Kyurem-Black; Latios floats over Ground."
+  },
+  {
+    "id": "scizor-rotom-wash",
+    "name": "Scizor + Rotom-Wash",
+    "kind": "offensive",
+    "members": ["Scizor", "Rotom-Wash"],
+    "why": "Rotom-Wash resists Fire, Scizor's 4× weakness; Scizor resists Rotom's Grass weakness."
+  },
+  {
+    "id": "landorus-therian-jirachi",
+    "name": "Landorus-Therian + Jirachi",
+    "kind": "offensive",
+    "members": ["Landorus-Therian", "Jirachi"],
+    "why": "Jirachi resists Landorus's 4× Ice weakness; Landorus ignores Jirachi's Ground weakness."
+  },
+  {
+    "id": "tornadus-mamoswine-ferrothorn",
+    "name": "Tornadus + Mamoswine + Ferrothorn",
+    "kind": "offensive",
+    "members": ["Tornadus", "Mamoswine", "Ferrothorn"],
+    "why": "Mamoswine breaks Zapdos so Tornadus can sweep; Ferrothorn covers their Fighting hole."
+  },
+  {
+    "id": "scizor-tentacruel",
+    "name": "Scizor + Tentacruel",
+    "kind": "offensive",
+    "members": ["Scizor", "Tentacruel"],
+    "why": "Tentacruel handles Volcarona and spins; Scizor handles Psychic types and resists Grass."
+  },
+  {
+    "id": "rotom-wash-mamoswine",
+    "name": "Rotom-Wash + Mamoswine",
+    "kind": "offensive",
+    "members": ["Rotom-Wash", "Mamoswine"],
+    "why": "Mamoswine's Ice and Ground moves beat the Grass types that threaten Rotom-Wash."
+  },
+  {
+    "id": "hydreigon-starmie",
+    "name": "Hydreigon + Starmie",
+    "kind": "offensive",
+    "members": ["Hydreigon", "Starmie"],
+    "why": "Starmie resists Hydreigon's Fighting and Ice; Hydreigon resists Starmie's Dark, Ghost."
+  },
+  {
+    "id": "volcarona-keldeo",
+    "name": "Volcarona + Keldeo",
+    "kind": "offensive",
+    "members": ["Volcarona", "Keldeo"],
+    "why": "Volcarona hits Keldeo's Grass checks; Keldeo hits the Rock types that wall Volcarona."
+  },
+  {
+    "id": "latios-heatran",
+    "name": "Latios + Heatran",
+    "kind": "offensive",
+    "members": ["Latios", "Heatran"],
+    "why": "Heatran resists Latios's weaknesses; Latios floats over Ground and resists Water."
+  },
+  {
+    "id": "heatran-venusaur",
+    "name": "Heatran + Venusaur",
+    "kind": "defensive",
+    "members": ["Heatran", "Venusaur"],
+    "why": "Heatran resists Venusaur's weaknesses; Venusaur resists Heatran's Water, Ground, Fighting."
+  },
+  {
+    "id": "jellicent-ferrothorn",
+    "name": "Jellicent + Ferrothorn",
+    "kind": "defensive",
+    "members": ["Jellicent", "Ferrothorn"],
+    "why": "Ferrothorn resists all four of Jellicent's weaknesses; Jellicent resists Fire, Fighting."
+  }
+]

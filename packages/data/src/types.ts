@@ -109,6 +109,22 @@ export interface ChaosStats {
   data: Record<string, ChaosSpecies>;
 }
 
+/**
+ * A hand-picked group of 2–3 Pokémon that play well together
+ * (`<format>/cores.json`). Pokémon, not sets: it works with each member's most
+ * used set, which "Add core" in the builder picks.
+ */
+export interface Core {
+  /** Members' names joined, e.g. `swampert-skarmory`. */
+  id: string;
+  /** "Swampert + Skarmory". */
+  name: string;
+  kind: 'offensive' | 'defensive';
+  members: string[];
+  /** One plain line on why they work together (90 characters at most). */
+  why: string;
+}
+
 /** `sources/<format>-randbats.json`: Showdown's Random Battle roles, by species id. */
 export interface RandbatsFile {
   url: string;

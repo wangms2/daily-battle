@@ -1,0 +1,114 @@
+[
+  {
+    "id": "swampert-skarmory",
+    "name": "Swampert + Skarmory",
+    "kind": "defensive",
+    "members": ["Swampert", "Skarmory"],
+    "why": "Swampert shrugs off Electric and Fire; Skarmory resists Swampert's 4× Grass weakness."
+  },
+  {
+    "id": "heatran-celebi",
+    "name": "Heatran + Celebi",
+    "kind": "defensive",
+    "members": ["Heatran", "Celebi"],
+    "why": "Heatran resists most of Celebi's weaknesses; Celebi resists Water, Ground, Fighting."
+  },
+  {
+    "id": "hippowdon-starmie-skarmory",
+    "name": "Hippowdon + Starmie + Skarmory",
+    "kind": "defensive",
+    "members": ["Hippowdon", "Starmie", "Skarmory"],
+    "why": "Water, Ground, and Steel cover each other's holes, with Rocks, Spikes, and Rapid Spin."
+  },
+  {
+    "id": "crobat-quagsire-heatran",
+    "name": "Crobat + Quagsire + Heatran",
+    "kind": "defensive",
+    "members": ["Crobat", "Quagsire", "Heatran"],
+    "why": "Crobat checks Grass, Quagsire Water and Electric; Heatran sets Rocks and covers the rest."
+  },
+  {
+    "id": "scizor-tyranitar",
+    "name": "Scizor + Tyranitar",
+    "kind": "offensive",
+    "members": ["Scizor", "Tyranitar"],
+    "why": "Tyranitar resists Fire, Scizor's only weakness; Scizor resists its Bug, Grass, Steel."
+  },
+  {
+    "id": "dragonite-magnezone",
+    "name": "Dragonite + Magnezone",
+    "kind": "offensive",
+    "members": ["Dragonite", "Magnezone"],
+    "why": "Magnezone resists Ice, Rock, Dragon; Dragonite resists Fire and Fighting, ignores Ground."
+  },
+  {
+    "id": "dragonite-metagross",
+    "name": "Dragonite + Metagross",
+    "kind": "offensive",
+    "members": ["Dragonite", "Metagross"],
+    "why": "Metagross resists Ice, Rock, and Dragon; Dragonite resists Fire and ignores Ground."
+  },
+  {
+    "id": "gyarados-jolteon",
+    "name": "Gyarados + Jolteon",
+    "kind": "offensive",
+    "members": ["Gyarados", "Jolteon"],
+    "why": "Jolteon absorbs Electric, Gyarados's 4× weakness; Gyarados ignores Ground."
+  },
+  {
+    "id": "kingdra-scizor",
+    "name": "Kingdra + Scizor",
+    "kind": "offensive",
+    "members": ["Kingdra", "Scizor"],
+    "why": "Scizor resists Dragon, Kingdra's only weakness; Kingdra resists Scizor's Fire weakness."
+  },
+  {
+    "id": "flygon-scizor",
+    "name": "Flygon + Scizor",
+    "kind": "offensive",
+    "members": ["Flygon", "Scizor"],
+    "why": "Scizor resists Flygon's Ice and Dragon weaknesses; Flygon resists Fire, Scizor's weakness."
+  },
+  {
+    "id": "infernape-weavile",
+    "name": "Infernape + Weavile",
+    "kind": "offensive",
+    "members": ["Infernape", "Weavile"],
+    "why": "Infernape resists Weavile's Bug, Rock, Steel, Fire weaknesses; Weavile ignores Psychic."
+  },
+  {
+    "id": "breloom-tyranitar",
+    "name": "Breloom + Tyranitar",
+    "kind": "offensive",
+    "members": ["Breloom", "Tyranitar"],
+    "why": "Tyranitar resists Fire, Flying, Psychic, and Poison; Breloom resists Ground, Water, Grass."
+  },
+  {
+    "id": "flygon-magnezone",
+    "name": "Flygon + Magnezone",
+    "kind": "offensive",
+    "members": ["Flygon", "Magnezone"],
+    "why": "Magnezone resists Flygon's Ice and Dragon weaknesses; Flygon floats over Ground."
+  },
+  {
+    "id": "zapdos-breloom",
+    "name": "Zapdos + Breloom",
+    "kind": "offensive",
+    "members": ["Zapdos", "Breloom"],
+    "why": "Breloom resists Zapdos's Rock weakness, and Zapdos resists Breloom's 4× Flying."
+  },
+  {
+    "id": "infernape-tyranitar",
+    "name": "Infernape + Tyranitar",
+    "kind": "offensive",
+    "members": ["Infernape", "Tyranitar"],
+    "why": "Tyranitar resists Infernape's Flying and Psychic; Infernape resists its Grass, Steel, Bug."
+  },
+  {
+    "id": "dragonite-kingdra-flygon",
+    "name": "Dragonite + Kingdra + Flygon",
+    "kind": "offensive",
+    "members": ["Dragonite", "Kingdra", "Flygon"],
+    "why": "Kingdra draws in Steel and Ground walls so Dragonite sweeps and Flygon cleans up."
+  }
+]

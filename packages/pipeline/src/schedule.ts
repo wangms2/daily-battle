@@ -61,7 +61,7 @@ export async function buildWeek(
     generatorVersion: GENERATOR_VERSION,
     dataBuiltAt: data.meta.builtAt,
     week,
-    pool: { species: pool.pool.species, candidate: pool.candidate },
+    pool: { species: pool.pool.species, candidate: pool.candidate, cores: pool.pool.cores },
     suggestedTeams: pool.suggested.map(({ team }) => ({ team })),
     days: days.map(({ opponent, candidate }) => ({
       day: opponent.day,
