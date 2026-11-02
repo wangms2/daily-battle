@@ -1,4 +1,4 @@
-import type { SetEntry, SetsFile } from '@daily-battle/data';
+import { playerSets, type SetEntry, type SetsFile } from '@daily-battle/data';
 import type { PokemonSet } from '@pkmn/sim';
 
 export interface TeamSlot {
@@ -21,8 +21,9 @@ export function toPokemonSet(species: string, set: SetEntry): PokemonSet {
   };
 }
 
+/** A slot's set: a standard set or the species' fun set (players can pick either). */
 export function findSet(data: SetsFile, slot: TeamSlot): SetEntry {
-  const set = data.species[slot.species]?.sets.find((s) => s.id === slot.setId);
+  const set = playerSets(data.species[slot.species]).find((s) => s.id === slot.setId);
   if (!set) throw new Error(`Unknown set ${slot.species} / ${slot.setId}`);
   return set;
 }

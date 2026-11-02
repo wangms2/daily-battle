@@ -1,13 +1,24 @@
 import { sets as defaultSets, type SetEntry, type SetsFile } from '@daily-battle/data';
 import { oneMegaProblem } from '@daily-battle/data/species';
-import { teamSets, toPokemonSet, type Rng, type TeamSlot } from '@daily-battle/gen';
+import { offeredSets, teamSets, toPokemonSet, type Rng, type TeamSlot } from '@daily-battle/gen';
 import { TeamValidator, type PokemonSet } from '@pkmn/sim';
 import type { KnownSets } from '@daily-battle/ai';
 
 function pickSet(sets: SetEntry[], rng: Rng): SetEntry {
-  let r = rng();
+  let r = rng() * sets.reduce((a, s) => a + s.weight, 0);
   for (const s of sets) if ((r -= s.weight) < 0) return s;
   return sets[sets.length - 1]!;
+}
+
+/**
+ * The standard sets a player can pick for a species in `week`: those the
+ * builder offers (see offeredSets), or every standard set without a week.
+ * Fun sets are left out of simulated teams.
+ */
+export function weekSets(data: SetsFile, species: string, week?: string): SetEntry[] {
+  const standard = data.species[species]!.sets;
+  if (!week) return standard;
+  return offeredSets(data, species, week).filter((s) => standard.includes(s));
 }
 
 /** Legal for the format's validator and our own team rules (one Mega, Gen 6 on). */
@@ -28,6 +39,8 @@ export function poolTeams(
   n: number,
   rng: Rng,
   data: SetsFile = defaultSets,
+  /** The week, so teams use only the sets the builder offers then. */
+  week?: string,
 ): TeamSlot[][] {
   const teams: TeamSlot[][] = [];
   for (let guard = 0; teams.length < n && guard < n * 50; guard++) {
@@ -35,7 +48,7 @@ export function poolTeams(
     const team: TeamSlot[] = [];
     for (let k = 0; k < 6; k++) {
       const name = left.splice(Math.floor(rng() * left.length), 1)[0]!;
-      team.push({ species: name, setId: pickSet(data.species[name]!.sets, rng).id });
+      team.push({ species: name, setId: pickSet(weekSets(data, name, week), rng).id });
     }
     if (legalTeam(data, team)) teams.push(team);
   }

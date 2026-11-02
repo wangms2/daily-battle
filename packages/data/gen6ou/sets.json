@@ -3,7 +3,7 @@
     "format": "gen6ou",
     "method": "curated-usage-weighted-v1",
     "simVersion": "0.10.11",
-    "builtAt": "2026-11-02T19:29:16.932Z",
+    "builtAt": "2026-11-02T19:56:23.978Z",
     "sources": {
       "sets": {
         "url": "https://raw.githubusercontent.com/pkmn/smogon/main/data/sets/gen6ou.json",
@@ -291,7 +291,39 @@
             "spe": 31
           }
         }
-      ]
+      ],
+      "fun": {
+        "id": "clefable-fun-belly-drum",
+        "sourceName": "Belly Drum",
+        "label": "Belly Drum sweeper",
+        "description": "Magic Guard means Life Orb costs it nothing: Belly Drum, heal, then hit hard.",
+        "weight": 0,
+        "moves": [
+          "Belly Drum",
+          "Return",
+          "Fire Punch",
+          "Soft-Boiled"
+        ],
+        "item": "Life Orb",
+        "ability": "Magic Guard",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 252,
+          "atk": 252,
+          "def": 0,
+          "spa": 0,
+          "spd": 4,
+          "spe": 0
+        },
+        "ivs": {
+          "hp": 31,
+          "atk": 31,
+          "def": 31,
+          "spa": 31,
+          "spd": 31,
+          "spe": 31
+        }
+      }
     },
     "Landorus-Therian": {
       "usage": 0.2299,
@@ -2358,7 +2390,39 @@
             "spe": 31
           }
         }
-      ]
+      ],
+      "fun": {
+        "id": "lopunny-fun-choice-scarf-healing-wish",
+        "sourceName": "Choice Scarf Healing Wish",
+        "label": "Choice Scarf support",
+        "description": "Outspeeds and hits, Tricks its Scarf onto a wall, or faints with Healing Wish to fully heal a teammate.",
+        "weight": 0,
+        "moves": [
+          "Return",
+          "High Jump Kick",
+          "Switcheroo",
+          "Healing Wish"
+        ],
+        "item": "Choice Scarf",
+        "ability": "Limber",
+        "nature": "Jolly",
+        "evs": {
+          "hp": 4,
+          "atk": 252,
+          "def": 0,
+          "spa": 0,
+          "spd": 0,
+          "spe": 252
+        },
+        "ivs": {
+          "hp": 31,
+          "atk": 31,
+          "def": 31,
+          "spa": 31,
+          "spd": 31,
+          "spe": 31
+        }
+      }
     },
     "Tyranitar": {
       "usage": 0.093,
@@ -2699,7 +2763,39 @@
             "spe": 31
           }
         }
-      ]
+      ],
+      "fun": {
+        "id": "mew-fun-swords-dance",
+        "sourceName": "Swords Dance",
+        "label": "Swords Dance sweeper",
+        "description": "Mew can learn almost anything; this one boosts with Swords Dance and attacks physically.",
+        "weight": 0,
+        "moves": [
+          "Swords Dance",
+          "Drain Punch",
+          "Knock Off",
+          "Zen Headbutt"
+        ],
+        "item": "Life Orb",
+        "ability": "Synchronize",
+        "nature": "Jolly",
+        "evs": {
+          "hp": 4,
+          "atk": 252,
+          "def": 0,
+          "spa": 0,
+          "spd": 0,
+          "spe": 252
+        },
+        "ivs": {
+          "hp": 31,
+          "atk": 31,
+          "def": 31,
+          "spa": 31,
+          "spd": 31,
+          "spe": 31
+        }
+      }
     },
     "Alakazam": {
       "usage": 0.0802,
@@ -3221,7 +3317,39 @@
             "spe": 31
           }
         }
-      ]
+      ],
+      "fun": {
+        "id": "charizard-fun-mega-x-belly-drum",
+        "sourceName": "Mega X Belly Drum",
+        "label": "Mega Belly Drum sweeper",
+        "description": "Mega Evolves with Tough Claws, Belly Drums, and hits with maxed Flare Blitz and Dragon Claw.",
+        "weight": 0,
+        "moves": [
+          "Belly Drum",
+          "Flare Blitz",
+          "Dragon Claw",
+          "Earthquake"
+        ],
+        "item": "Charizardite X",
+        "ability": "Blaze",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 4,
+          "atk": 252,
+          "def": 0,
+          "spa": 0,
+          "spd": 0,
+          "spe": 252
+        },
+        "ivs": {
+          "hp": 31,
+          "atk": 31,
+          "def": 31,
+          "spa": 31,
+          "spd": 31,
+          "spe": 31
+        }
+      }
     },
     "Venusaur": {
       "usage": 0.0612,
@@ -4723,7 +4851,39 @@
             "spe": 31
           }
         }
-      ]
+      ],
+      "fun": {
+        "id": "shuckle-fun-red-card-hazard-lead",
+        "sourceName": "Red Card hazard lead",
+        "label": "Hazard lead",
+        "description": "Sets Sticky Web and Stealth Rock, Red Cards attackers away, and goes out with Final Gambit.",
+        "weight": 0,
+        "moves": [
+          "Sticky Web",
+          "Stealth Rock",
+          "Final Gambit",
+          "Infestation"
+        ],
+        "item": "Red Card",
+        "ability": "Sturdy",
+        "nature": "Calm",
+        "evs": {
+          "hp": 248,
+          "atk": 0,
+          "def": 8,
+          "spa": 0,
+          "spd": 252,
+          "spe": 0
+        },
+        "ivs": {
+          "hp": 31,
+          "atk": 31,
+          "def": 31,
+          "spa": 31,
+          "spd": 31,
+          "spe": 31
+        }
+      }
     },
     "Quagsire": {
       "usage": 0.0278,
@@ -7582,7 +7742,39 @@
             "spe": 31
           }
         }
-      ]
+      ],
+      "fun": {
+        "id": "whimsicott-fun-subseed-encore",
+        "sourceName": "SubSeed Encore",
+        "label": "Substitute + Leech Seed staller",
+        "description": "Prankster Substitute, Leech Seed, and Encore lock foes into useless moves while it drains them.",
+        "weight": 0,
+        "moves": [
+          "Substitute",
+          "Leech Seed",
+          "Encore",
+          "Moonblast"
+        ],
+        "item": "Leftovers",
+        "ability": "Prankster",
+        "nature": "Timid",
+        "evs": {
+          "hp": 252,
+          "atk": 0,
+          "def": 0,
+          "spa": 4,
+          "spd": 0,
+          "spe": 252
+        },
+        "ivs": {
+          "hp": 31,
+          "atk": 31,
+          "def": 31,
+          "spa": 31,
+          "spd": 31,
+          "spe": 31
+        }
+      }
     },
     "Sharpedo": {
       "usage": 0.0053,
@@ -8477,7 +8669,39 @@
             "spe": 31
           }
         }
-      ]
+      ],
+      "fun": {
+        "id": "sceptile-fun-subseed",
+        "sourceName": "SubSeed",
+        "label": "Substitute + Leech Seed staller",
+        "description": "Skips the Mega Stone to hide behind Substitute and drain foes with Leech Seed and Giga Drain.",
+        "weight": 0,
+        "moves": [
+          "Substitute",
+          "Leech Seed",
+          "Giga Drain",
+          "Hidden Power Fire"
+        ],
+        "item": "Leftovers",
+        "ability": "Overgrow",
+        "nature": "Timid",
+        "evs": {
+          "hp": 4,
+          "atk": 0,
+          "def": 0,
+          "spa": 252,
+          "spd": 0,
+          "spe": 252
+        },
+        "ivs": {
+          "hp": 31,
+          "atk": 30,
+          "def": 31,
+          "spa": 30,
+          "spd": 31,
+          "spe": 30
+        }
+      }
     },
     "Absol": {
       "usage": 0.0031,
@@ -9205,7 +9429,39 @@
             "spe": 31
           }
         }
-      ]
+      ],
+      "fun": {
+        "id": "aggron-fun-rock-polish",
+        "sourceName": "Rock Polish",
+        "label": "Rock Polish sweeper",
+        "description": "Skips the Mega Stone: Rock Head means Head Smash has no recoil, and Rock Polish gives it Speed.",
+        "weight": 0,
+        "moves": [
+          "Rock Polish",
+          "Head Smash",
+          "Earthquake",
+          "Heavy Slam"
+        ],
+        "item": "Life Orb",
+        "ability": "Rock Head",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 4,
+          "atk": 252,
+          "def": 0,
+          "spa": 0,
+          "spd": 0,
+          "spe": 252
+        },
+        "ivs": {
+          "hp": 31,
+          "atk": 31,
+          "def": 31,
+          "spa": 31,
+          "spd": 31,
+          "spe": 31
+        }
+      }
     },
     "Toxicroak": {
       "usage": 0.002,

@@ -79,7 +79,11 @@ describe('LiveBattle', () => {
     for (const side of SIDES) {
       const update = JSON.stringify(battle.update(side, 0));
       // The foe's moves never show before they're used (only the leads are out).
-      for (const set of foeSets(side).slice(1)) expect(update).not.toContain(set.species);
+      // (A species both teams have shows up anyway, as your own.)
+      const own = new Set(m.teams[side].map((s) => s.species));
+      for (const set of foeSets(side).slice(1)) {
+        if (!own.has(set.species)) expect(update).not.toContain(set.species);
+      }
     }
     expect(battle.choose('p1', 'switch 1')).toBe('illegal'); // already active
     expect(battle.choose('p1', 'move 9')).toBe('illegal');

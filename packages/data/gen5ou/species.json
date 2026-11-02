@@ -2233,6 +2233,16 @@
       "contact": false,
       "desc": "All healthy allies aid in damaging the target."
     },
+    "Belly Drum": {
+      "type": "Normal",
+      "category": "Status",
+      "power": 0,
+      "accuracy": true,
+      "pp": 10,
+      "priority": 0,
+      "contact": false,
+      "desc": "User loses 50% max HP. Maximizes Attack."
+    },
     "Blizzard": {
       "type": "Ice",
       "category": "Special",

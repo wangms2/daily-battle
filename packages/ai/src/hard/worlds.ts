@@ -2,7 +2,7 @@
 // unseen Pokémon) are sampled into a few concrete "worlds" the engine can
 // search with full information. Everything comes from what the AI may know:
 // its own view, the public set data, and the public weekly pool.
-import type { SetEntry, SetsFile } from '@daily-battle/data';
+import { playerSetPrior, type SetEntry, type SetsFile } from '@daily-battle/data';
 import type { Rng, SideView } from '@daily-battle/sim-bridge';
 import { candidates, type KnownSets } from '../belief';
 import { isMegaForme, megaFormeOf, type AIState } from '../state';
@@ -35,7 +35,8 @@ function pick<T>(items: readonly T[], weights: readonly number[], rng: Rng): num
 
 /** Usage-weighted sets of a species no one has seen yet. */
 function unseenSets(data: SetsFile, species: string, megaUsed: boolean): SetEntry[] {
-  const all = data.species[species]?.sets ?? [];
+  // The player may have picked the species' fun set: a small share of the worlds.
+  const all = playerSetPrior(data.species[species]);
   if (!megaUsed) return all;
   const fit = all.filter((s) => !megaFormeOf(data.meta.format, species, s.item));
   return fit.length ? fit : all;

@@ -1,0 +1,103 @@
+{
+  "Snorlax": {
+    "name": "Belly Drum",
+    "label": "Belly Drum sweeper",
+    "description": "Maxes its Attack in one turn, heals with its Sitrus Berry, then bulldozes through.",
+    "moves": ["Belly Drum", "Return", "Earthquake", "Seed Bomb"],
+    "item": "Sitrus Berry",
+    "ability": "Thick Fat",
+    "nature": "Adamant",
+    "evs": {
+      "hp": 252,
+      "atk": 252,
+      "spd": 4
+    }
+  },
+  "Darmanitan": {
+    "name": "Belly Drum",
+    "label": "Belly Drum sweeper",
+    "description": "Sheer Force and a maxed Attack: if it lands Belly Drum, little survives.",
+    "moves": ["Belly Drum", "Flare Blitz", "Superpower", "Rock Slide"],
+    "item": "Sitrus Berry",
+    "ability": "Sheer Force",
+    "nature": "Adamant",
+    "evs": {
+      "hp": 4,
+      "atk": 252,
+      "spe": 252
+    }
+  },
+  "Clefable": {
+    "name": "Belly Drum",
+    "label": "Belly Drum sweeper",
+    "description": "Magic Guard means Life Orb costs it nothing: Belly Drum, heal, then hit hard.",
+    "moves": ["Belly Drum", "Return", "Fire Punch", "Soft-Boiled"],
+    "item": "Life Orb",
+    "ability": "Magic Guard",
+    "nature": "Adamant",
+    "evs": {
+      "hp": 252,
+      "atk": 252,
+      "spd": 4
+    }
+  },
+  "Salamence": {
+    "name": "Mixed attacker",
+    "label": "Mixed attacker",
+    "description": "Splits its power between Draco Meteor and Outrage so neither kind of wall stops it.",
+    "moves": ["Draco Meteor", "Fire Blast", "Earthquake", "Outrage"],
+    "item": "Life Orb",
+    "ability": "Intimidate",
+    "nature": "Naive",
+    "evs": {
+      "atk": 4,
+      "spa": 252,
+      "spe": 252
+    }
+  },
+  "Ferrothorn": {
+    "name": "Curse",
+    "label": "Curse sweeper",
+    "description": "Curse boosts on a slow, bulky body: its Gyro Ball and Power Whip only get stronger.",
+    "moves": ["Curse", "Gyro Ball", "Power Whip", "Leech Seed"],
+    "item": "Leftovers",
+    "ability": "Iron Barbs",
+    "nature": "Relaxed",
+    "evs": {
+      "hp": 252,
+      "atk": 252,
+      "def": 4
+    }
+  },
+  "Metagross": {
+    "name": "Agility",
+    "label": "Agility sweeper",
+    "description": "Doubles its Speed with Agility, then sweeps with Life Orb Meteor Mash and Zen Headbutt.",
+    "moves": ["Agility", "Meteor Mash", "Zen Headbutt", "Earthquake"],
+    "item": "Life Orb",
+    "ability": "Clear Body",
+    "nature": "Adamant",
+    "evs": {
+      "hp": 4,
+      "atk": 252,
+      "spe": 252
+    }
+  },
+  "Dusclops": {
+    "name": "Trick Room",
+    "label": "Trick Room setter",
+    "description": "Sets Trick Room so its slow teammates move first, and burns or chips anything in the way.",
+    "moves": ["Trick Room", "Night Shade", "Will-O-Wisp", "Pain Split"],
+    "item": "Eviolite",
+    "ability": "Pressure",
+    "nature": "Relaxed",
+    "evs": {
+      "hp": 252,
+      "def": 252,
+      "spd": 4
+    },
+    "ivs": {
+      "spe": 0
+    }
+  }
+}

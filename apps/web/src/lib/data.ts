@@ -4,6 +4,7 @@ import {
   DEFAULT_FORMAT,
   FORMATS,
   formatInfo,
+  playerSets,
   setsFor,
   type SetEntry,
   type SetsFile,
@@ -16,6 +17,7 @@ import {
   type SpeciesFile,
   type SpeciesInfo,
 } from '@daily-battle/data/species';
+import { offeredSets } from '@daily-battle/gen/offered';
 
 let format: string = DEFAULT_FORMAT;
 let sets: SetsFile = setsFor(format);
@@ -34,6 +36,17 @@ export function setActiveFormat(id: string): void {
 
 export const activeFormat = () => format;
 
+let offerKey: string | undefined;
+
+/**
+ * Whose sets on offer the builder shows: the week's Monday in the daily game,
+ * the room in versus (offeredSets keys its pick by it). Called before rendering,
+ * like setActiveFormat. Without one, every set is offered.
+ */
+export function setOfferKey(key: string | undefined): void {
+  offerKey = key;
+}
+
 export interface Slot {
   species: string;
   setId: string;
@@ -44,17 +57,31 @@ export const toId = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
 /** The game's OU Pokémon: every species with sets. */
 export const ouSpecies = () => Object.keys(sets.species);
 
+const speciesEntry = (species: string) => sets.species[species];
+
+/** A species' standard sets: what opponents and the recommended team use. */
 export function setsOf(species: string): SetEntry[] {
   return sets.species[species]?.sets ?? [];
 }
 
 /**
- * The set a slot names. A set merged away in a data update (one that did the
- * same job as another) falls back to the species' most common set, so saved
- * teams keep working.
+ * The sets a player can pick: at most three on offer (the most used, another
+ * standard set, and the fun set; see offeredSets), keeping `current`, a set
+ * the player already has.
+ */
+export function playerSetsOf(species: string, current?: string): SetEntry[] {
+  return offerKey
+    ? offeredSets(sets, species, offerKey, current)
+    : playerSets(sets.species[species]);
+}
+
+/**
+ * The set a slot names, on offer or not (a fun set too). A set merged away in
+ * a data update (one that did the same job as another) falls back to the
+ * species' most common set, so saved teams keep working.
  */
 export function findSet(slot: Slot): SetEntry | undefined {
-  const sets = setsOf(slot.species);
+  const sets = playerSets(speciesEntry(slot.species));
   return sets.find((s) => s.id === slot.setId) ?? (sets.length ? topSet(slot.species) : undefined);
 }
 
@@ -177,7 +204,10 @@ export function randomTeam(
     while (team.length < size && left.length) {
       const species = left.splice(Math.floor(random() * left.length), 1)[0]!;
       if (team.some((s) => sameSpecies(s.species, species))) continue;
-      const allowed = setsOf(species).filter((set) => !megaClash(team, { species, setId: set.id }));
+      // The standard sets on offer: a surprise team never takes a fun set.
+      const allowed = playerSetsOf(species)
+        .filter((set) => setsOf(species).includes(set))
+        .filter((set) => !megaClash(team, { species, setId: set.id }));
       if (allowed.length) team.push({ species, setId: pick(allowed).id });
     }
     if (!same(team, current)) break;

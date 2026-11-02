@@ -25,7 +25,7 @@ import { ConfirmDialog, SettingsSheet, WelcomeSheet } from './sheets/misc';
 import { TrainerCard } from './sheets/TrainerCard';
 import { TrainerProvider } from './ui/Profile';
 import { configureAudio, menuSounds } from './lib/audio';
-import { setActiveFormat } from './lib/data';
+import { setActiveFormat, setOfferKey } from './lib/data';
 import { setSpriteStyle } from './lib/sprites';
 import { useMediaQuery } from './ui/useWide';
 import {
@@ -198,6 +198,8 @@ export function App() {
   const format = state.settings.format ?? DEFAULT_FORMAT;
   const game = formatInfo(format);
   setActiveFormat(format);
+  // The builder offers each Pokémon's sets for this week (lib/data setOfferKey).
+  setOfferKey(week);
   // Animations off (or the system asking for less motion) means still sprites everywhere.
   const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
   setSpriteStyle(state.settings.animations && !reducedMotion ? 'animated' : 'still');

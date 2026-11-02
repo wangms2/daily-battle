@@ -24,4 +24,5 @@ export const SOURCES = {
 export const OUTPUT = root(`${FORMAT.id}/sets.json`);
 export const OVERRIDES = root(`${FORMAT.id}/role-overrides.json`);
 export const CURATION = root(`${FORMAT.id}/set-curation.json`);
+export const FUN = root(`${FORMAT.id}/fun-sets.json`);
 export const SPECIES = root(`${FORMAT.id}/species.json`);

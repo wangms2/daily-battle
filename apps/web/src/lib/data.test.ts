@@ -5,12 +5,14 @@ import {
   ouSpecies,
   randomTeam,
   setActiveFormat,
+  setOfferKey,
   likelyMoves,
   abilityInfo,
   defenseGaps,
   findSet,
   itemInfo,
   offenseGaps,
+  playerSetsOf,
   possibleSets,
   sameSpecies,
   setsOf,
@@ -38,6 +40,39 @@ describe('likelyMoves', () => {
     expect(likelyMoves(sets, ['Rock Slide', 'Earthquake', 'Hidden Power'])).not.toContain(
       'Hidden Power Bug',
     );
+  });
+});
+
+describe('fun sets', () => {
+  it("come last in a player's choices, never in the standard sets or a foe's", () => {
+    const fun = playerSetsOf('Snorlax').at(-1)!;
+    expect(fun.id).toMatch(/-fun-/);
+    expect(playerSetsOf('Snorlax').slice(0, -1)).toEqual(setsOf('Snorlax'));
+    expect(setsOf('Snorlax')).not.toContainEqual(fun);
+    expect(possibleSets('Snorlax')).not.toContainEqual(fun);
+  });
+
+  it('are found from a saved team', () => {
+    const fun = playerSetsOf('Snorlax').at(-1)!;
+    expect(findSet({ species: 'Snorlax', setId: fun.id })).toBe(fun);
+  });
+});
+
+describe('sets on offer', () => {
+  it("shows at most three of a week's sets, keeps your current one, and still finds the rest", () => {
+    setOfferKey('2026-11-09');
+    try {
+      // Clefable has four standard sets and a fun set.
+      const offered = playerSetsOf('Clefable');
+      expect(offered).toHaveLength(3);
+      expect(offered.at(-1)!.id).toMatch(/-fun-/);
+      for (const set of setsOf('Clefable')) {
+        expect(playerSetsOf('Clefable', set.id)).toContain(set);
+        expect(findSet({ species: 'Clefable', setId: set.id })).toBe(set);
+      }
+    } finally {
+      setOfferKey(undefined);
+    }
   });
 });
 

@@ -5,7 +5,14 @@
 import { formatInfo } from '@daily-battle/data/formats';
 import { withChange, type Change, type RoomView } from '@daily-battle/versus';
 import { useState, type ReactNode } from 'react';
-import { findSet, megaClash, ONE_MEGA_MESSAGE, sameSpecies, setActiveFormat } from '../lib/data';
+import {
+  findSet,
+  megaClash,
+  ONE_MEGA_MESSAGE,
+  sameSpecies,
+  setActiveFormat,
+  setOfferKey,
+} from '../lib/data';
 import { SetPicker } from '../sheets/SetPicker';
 import { Button, SectionLabel } from '../ui/bits';
 import { StarIcon } from '../ui/icons';
@@ -38,6 +45,7 @@ export function PrepScreen({
 }) {
   // Tiles and set cards read the room's game, which may not be the daily game.
   setActiveFormat(match.format);
+  setOfferKey(room.settings.week ?? room.code);
   const foe = match.opponent.ai ? 'Rival (AI)' : match.opponent.name;
   const team = withChange(match.slots, match.change);
   const lead = match.lead ?? team[0]!.species;

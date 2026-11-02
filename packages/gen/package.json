@@ -8,6 +8,7 @@
     ".": "./src/index.ts",
     "./checklist": "./src/checklist.ts",
     "./dates": "./src/dates.ts",
+    "./offered": "./src/offered.ts",
     "./report": "./src/report.ts",
     "./schedule": "./src/schedule.ts"
   },

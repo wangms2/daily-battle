@@ -5,11 +5,12 @@ import { buildSets, type SetCuration } from '../src/build';
 import type {
   ChaosStats,
   CuratedSets,
+  FunSets,
   RandbatsFile,
   RoleOverrides,
   SourcesMeta,
 } from '../src/types';
-import { CURATION, FORMAT_ID, OUTPUT, OVERRIDES, SOURCES } from './paths';
+import { CURATION, FORMAT_ID, FUN, OUTPUT, OVERRIDES, SOURCES } from './paths';
 
 const readJson = <T>(path: string) => JSON.parse(readFileSync(path, 'utf8')) as T;
 
@@ -22,6 +23,7 @@ const { file, dropped } = buildSets({
   overrides: existsSync(OVERRIDES) ? readJson<RoleOverrides>(OVERRIDES) : {},
   curation: existsSync(CURATION) ? readJson<SetCuration>(CURATION) : {},
   randbats: readJson<RandbatsFile>(SOURCES.randbats),
+  fun: existsSync(FUN) ? readJson<FunSets>(FUN) : {},
 });
 writeFileSync(OUTPUT, `${JSON.stringify(file, null, 2)}\n`);
 
@@ -33,5 +35,6 @@ console.log(
   `Wrote ${species.length} species, ${species.reduce((a, s) => a + s.sets.length, 0)} sets.`,
 );
 console.log(`Sets per species: ${histogram.join(', ')}`);
+console.log(`Fun sets: ${species.filter((s) => s.fun).length}`);
 console.log(`Dropped ${dropped.length} sets:`);
 for (const d of dropped) console.log(`  ${d.species} / ${d.set}: ${d.reason}`);

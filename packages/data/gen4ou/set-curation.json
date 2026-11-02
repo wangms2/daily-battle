@@ -14,7 +14,8 @@
     "Registeel": ["Rain Dance Support"],
     "Moltres": ["Toxic Stall"],
     "Ambipom": ["Offensive Baton Pass"],
-    "Steelix": ["Torment"]
+    "Steelix": ["Torment"],
+    "Charizard": ["Belly Drum", "Sunny Day"]
   },
   "add": {
     "Roserade": {

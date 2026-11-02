@@ -1933,6 +1933,25 @@
         "Early Bird",
         "Scrappy"
       ]
+    },
+    "Charizard": {
+      "types": [
+        "Fire",
+        "Flying"
+      ],
+      "baseStats": {
+        "hp": 78,
+        "atk": 84,
+        "def": 78,
+        "spa": 109,
+        "spd": 85,
+        "spe": 100
+      },
+      "tier": "NU",
+      "num": 6,
+      "abilities": [
+        "Blaze"
+      ]
     }
   },
   "moves": {
@@ -2015,6 +2034,16 @@
       "priority": 0,
       "contact": false,
       "desc": "User switches, passing stat changes and more."
+    },
+    "Belly Drum": {
+      "type": "Normal",
+      "category": "Status",
+      "power": 0,
+      "accuracy": true,
+      "pp": 10,
+      "priority": 0,
+      "contact": false,
+      "desc": "User loses 50% max HP. Maximizes Attack."
     },
     "Blizzard": {
       "type": "Ice",
@@ -2165,6 +2194,16 @@
       "priority": 0,
       "contact": false,
       "desc": "20% chance to make the target flinch."
+    },
+    "Destiny Bond": {
+      "type": "Ghost",
+      "category": "Status",
+      "power": 0,
+      "accuracy": true,
+      "pp": 5,
+      "priority": 0,
+      "contact": false,
+      "desc": "If an opponent knocks out the user, it also faints."
     },
     "Discharge": {
       "type": "Electric",
@@ -3246,6 +3285,16 @@
       "contact": false,
       "desc": "10% chance to paralyze the target."
     },
+    "Torment": {
+      "type": "Dark",
+      "category": "Status",
+      "power": 0,
+      "accuracy": 100,
+      "pp": 15,
+      "priority": 0,
+      "contact": false,
+      "desc": "Target can't select the same move twice in a row."
+    },
     "Toxic": {
       "type": "Poison",
       "category": "Status",
@@ -3408,8 +3457,10 @@
     "Occa Berry": "Halves damage taken from a supereffective Fire-type attack. Single use.",
     "Passho Berry": "Halves damage taken from a supereffective Water-type attack. Single use.",
     "Petaya Berry": "Raises holder's Sp. Atk by 1 stage when at 1/4 max HP or less. Single use.",
+    "Salac Berry": "Raises holder's Speed by 1 stage when at 1/4 max HP or less. Single use.",
     "Sharp Beak": "Holder's Flying-type attacks have 1.2x power.",
     "Silk Scarf": "Holder's Normal-type attacks have 1.2x power.",
+    "Sitrus Berry": "Restores 1/4 max HP when at 1/2 max HP or less. Single use.",
     "Toxic Orb": "At the end of every turn, this item attempts to badly poison the holder."
   },
   "abilities": {

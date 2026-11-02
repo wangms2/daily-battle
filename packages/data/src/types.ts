@@ -36,6 +36,12 @@ export interface SpeciesEntry {
    */
   setSource: string;
   sets: SetEntry[];
+  /**
+   * A creative set for players only (`<format>/fun-sets.json`): shown with the
+   * standard sets in the builder, never on opponents or the recommended team,
+   * and a small share of the AI's guess at a player's set. Weight 0.
+   */
+  fun?: SetEntry;
 }
 
 export interface SourcesMeta {
@@ -79,6 +85,12 @@ export interface CuratedSet {
 /** Species name → set name → set. */
 export type CuratedSets = Record<string, Record<string, CuratedSet>>;
 
+/** `<format>/fun-sets.json`: at most one hand-written fun set per species, by species name. */
+export type FunSets = Record<
+  string,
+  CuratedSet & { name: string; label: string; description: string }
+>;
+
 /**
  * Per-species entry in a Smogon chaos stats file, trimmed to the fields we use.
  * `Natures` isn't in the chaos file; `refresh` sums `Spreads` by nature to make it.
@@ -97,7 +109,6 @@ export interface ChaosStats {
   data: Record<string, ChaosSpecies>;
 }
 
-/** Hand-reviewed label/description edits, keyed by set id. */
 /** `sources/<format>-randbats.json`: Showdown's Random Battle roles, by species id. */
 export interface RandbatsFile {
   url: string;
@@ -105,4 +116,5 @@ export interface RandbatsFile {
   species: Record<string, { sets?: { role: string; movepool: string[] }[] }>;
 }
 
+/** Hand-reviewed label/description edits, keyed by set id. */
 export type RoleOverrides = Record<string, { label?: string; description?: string }>;

@@ -36,7 +36,7 @@ const file = fileURLToPath(
 );
 const schedule = parseSchedule(JSON.parse(readFileSync(file, 'utf8')));
 const pool = schedule.pool.species;
-const players = poolTeams(pool, n, rngFor(`difficulty-report:${week}`), data).map((t) =>
+const players = poolTeams(pool, n, rngFor(`difficulty-report:${week}`), data, week).map((t) =>
   teamSets(data, t),
 );
 

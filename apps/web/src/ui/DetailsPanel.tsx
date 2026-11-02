@@ -8,7 +8,7 @@ import {
   formatEvs,
   itemInfo,
   matchups,
-  setsOf,
+  playerSetsOf,
   shortLabel,
   speciesInfo,
   topSet,
@@ -55,7 +55,7 @@ export function DetailsPanel({
 
   const info = speciesInfo(species);
   const m = matchups(species);
-  const sets = setsOf(species);
+  const sets = playerSetsOf(species, setId);
   const common = topSet(species).id;
   const set = sets.find((s) => s.id === setId) ?? sets.find((s) => s.id === common)!;
 

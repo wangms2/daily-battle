@@ -9,6 +9,7 @@ import { assignRoles, megaForm } from './roles';
 import type {
   ChaosStats,
   CuratedSets,
+  FunSets,
   RandbatsFile,
   RoleOverrides,
   SetEntry,
@@ -31,17 +32,19 @@ export const UU_MIN_USAGE = 0.001;
  * disguises it on the brief), plus Wobbuffet in Gen 3. `avoidAbilities` are legal on a set but can make a
  * team illegal (gen5ou bans Drizzle with Swift Swim and Drought with Chlorophyll),
  * so sets use the species' other abilities and any 6 of a pool stay legal.
+ * `include` keeps species below the UU cut by hand, with their lower tier's sets.
  */
 export const BUILD_RULES: Record<
   FormatId,
-  { exclude: string[]; avoidAbilities: string[]; noBoostPassers?: boolean }
+  { exclude: string[]; avoidAbilities: string[]; noBoostPassers?: boolean; include?: string[] }
 > = {
   // Wobbuffet traps with Shadow Tag and turns hits back with Counter and Mirror
   // Coat, which against a hidden set plays as a coin flip, not a battle. ADV's
   // One Boost Passer Clause allows one Baton Passer that can raise its stats
   // per team, so those sets are left out and any 6 of a pool stay legal.
   gen3ou: { exclude: ['Ditto', 'Wobbuffet'], avoidAbilities: [], noBoostPassers: true },
-  gen4ou: { exclude: [], avoidAbilities: [] },
+  // Charizard is NU in Gen 4, but a favourite, and home to Bellyzard (its fun set).
+  gen4ou: { exclude: [], avoidAbilities: [], include: ['Charizard'] },
   gen5ou: { exclude: ['Ditto', 'Zoroark'], avoidAbilities: ['Swift Swim', 'Chlorophyll'] },
   // Gen 6 OU has no team-wide ability bans, so Swift Swim and Chlorophyll are back.
   gen6ou: { exclude: ['Ditto', 'Zoroark'], avoidAbilities: [] },
@@ -144,6 +147,8 @@ export interface BuildInput {
   curation?: SetCuration;
   /** Random Battle roles: their moves are preferred in a curated set's slashed slots. */
   randbats?: RandbatsFile;
+  /** Hand-written fun sets, one per species at most (players only). */
+  fun?: FunSets;
 }
 
 /**
@@ -222,6 +227,13 @@ export function buildSets(
     if (stats[name]!.usage < UU_MIN_USAGE) continue;
     if (input.curated[name]) picks.push({ name, setSource: format.id });
     else if (input.curatedUU[name]) picks.push({ name, setSource: format.uu });
+  }
+  for (const name of rules.include ?? []) {
+    if (picks.some((p) => p.name === name)) continue;
+    if (!stats[name]) throw new Error(`Included species ${name} has no usage stats`);
+    if (input.curated[name]) picks.push({ name, setSource: format.id });
+    else if (input.curatedUU[name]) picks.push({ name, setSource: format.uu });
+    else throw new Error(`Included species ${name} has no curated sets`);
   }
 
   for (const { name, setSource } of picks) {
@@ -349,13 +361,52 @@ export function buildSets(
       const mega = megaFormOf(dex, name, s.item);
       return mega ? [dex.species.get(mega).tier] : [];
     });
+    const funSource = input.fun?.[name];
     species[name] = {
       usage: Math.round(stats[name]!.usage * 1e6) / 1e6,
       tier: higherTier(dex.species.get(name).tier, ...megaTiers),
       setSource,
       sets,
+      ...(funSource && { fun: funSet(name, funSource) }),
     };
   }
+
+  // Fun sets are written by hand, so a mistake stops the build rather than dropping quietly.
+  function funSet(name: string, source: FunSets[string]): SetEntry {
+    const where = `Fun set ${name} / ${source.name}`;
+    const set = resolveSet(
+      name,
+      source,
+      usageShares(stats[name]!),
+      format.gen,
+      rules.avoidAbilities,
+    );
+    if (!set) throw new Error(`${where}: repeats a move`);
+    if (rules.noBoostPassers && boostPasser(dex, set)) {
+      throw new Error(`${where}: Baton Passes stat boosts`);
+    }
+    const problems =
+      validator.validateSet({ name, gender: '', level: 100, ...structuredClone(set) }, {}) ??
+      validator.validateTeam([{ name, gender: '', level: 100, ...structuredClone(set) }]);
+    if (problems) throw new Error(`${where}: ${problems.join(' ')}`);
+    const { moves, item, ability, nature, evs, ivs } = set;
+    return {
+      id: `${toID(name)}-fun-${slug(source.name)}`,
+      sourceName: source.name,
+      label: source.label,
+      description: source.description,
+      weight: 0,
+      moves,
+      item,
+      ability,
+      nature,
+      evs,
+      ivs,
+    };
+  }
+  const unknown = Object.keys(input.fun ?? {}).filter((name) => !species[name]);
+  if (unknown.length)
+    throw new Error(`Fun sets for species not in the data: ${unknown.join(', ')}`);
 
   return {
     file: {

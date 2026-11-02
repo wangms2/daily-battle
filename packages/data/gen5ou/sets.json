@@ -3,7 +3,7 @@
     "format": "gen5ou",
     "method": "curated-usage-weighted-v1",
     "simVersion": "0.10.11",
-    "builtAt": "2026-11-02T19:29:14.110Z",
+    "builtAt": "2026-11-02T19:56:22.560Z",
     "sources": {
       "sets": {
         "url": "https://data.pkmn.cc/sets/gen5ou.json",
@@ -465,7 +465,39 @@
             "spe": 0
           }
         }
-      ]
+      ],
+      "fun": {
+        "id": "ferrothorn-fun-curse",
+        "sourceName": "Curse",
+        "label": "Curse sweeper",
+        "description": "Curse boosts on a slow, bulky body: its Gyro Ball and Power Whip only get stronger.",
+        "weight": 0,
+        "moves": [
+          "Curse",
+          "Gyro Ball",
+          "Power Whip",
+          "Leech Seed"
+        ],
+        "item": "Leftovers",
+        "ability": "Iron Barbs",
+        "nature": "Relaxed",
+        "evs": {
+          "hp": 252,
+          "atk": 252,
+          "def": 4,
+          "spa": 0,
+          "spd": 0,
+          "spe": 0
+        },
+        "ivs": {
+          "hp": 31,
+          "atk": 31,
+          "def": 31,
+          "spa": 31,
+          "spd": 31,
+          "spe": 31
+        }
+      }
     },
     "Garchomp": {
       "usage": 0.263126,
@@ -3686,7 +3718,39 @@
             "spe": 31
           }
         }
-      ]
+      ],
+      "fun": {
+        "id": "salamence-fun-mixed-attacker",
+        "sourceName": "Mixed attacker",
+        "label": "Mixed attacker",
+        "description": "Splits its power between Draco Meteor and Outrage so neither kind of wall stops it.",
+        "weight": 0,
+        "moves": [
+          "Draco Meteor",
+          "Fire Blast",
+          "Earthquake",
+          "Outrage"
+        ],
+        "item": "Life Orb",
+        "ability": "Intimidate",
+        "nature": "Naive",
+        "evs": {
+          "hp": 0,
+          "atk": 4,
+          "def": 0,
+          "spa": 252,
+          "spd": 0,
+          "spe": 252
+        },
+        "ivs": {
+          "hp": 31,
+          "atk": 31,
+          "def": 31,
+          "spa": 31,
+          "spd": 31,
+          "spe": 31
+        }
+      }
     },
     "Clefable": {
       "usage": 0.033609,
@@ -3757,7 +3821,39 @@
             "spe": 31
           }
         }
-      ]
+      ],
+      "fun": {
+        "id": "clefable-fun-belly-drum",
+        "sourceName": "Belly Drum",
+        "label": "Belly Drum sweeper",
+        "description": "Magic Guard means Life Orb costs it nothing: Belly Drum, heal, then hit hard.",
+        "weight": 0,
+        "moves": [
+          "Belly Drum",
+          "Return",
+          "Fire Punch",
+          "Soft-Boiled"
+        ],
+        "item": "Life Orb",
+        "ability": "Magic Guard",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 252,
+          "atk": 252,
+          "def": 0,
+          "spa": 0,
+          "spd": 4,
+          "spe": 0
+        },
+        "ivs": {
+          "hp": 31,
+          "atk": 31,
+          "def": 31,
+          "spa": 31,
+          "spd": 31,
+          "spe": 31
+        }
+      }
     },
     "Victini": {
       "usage": 0.032607,
@@ -4176,7 +4272,39 @@
             "spe": 31
           }
         }
-      ]
+      ],
+      "fun": {
+        "id": "metagross-fun-agility",
+        "sourceName": "Agility",
+        "label": "Agility sweeper",
+        "description": "Doubles its Speed with Agility, then sweeps with Life Orb Meteor Mash and Zen Headbutt.",
+        "weight": 0,
+        "moves": [
+          "Agility",
+          "Meteor Mash",
+          "Zen Headbutt",
+          "Earthquake"
+        ],
+        "item": "Life Orb",
+        "ability": "Clear Body",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 4,
+          "atk": 252,
+          "def": 0,
+          "spa": 0,
+          "spd": 0,
+          "spe": 252
+        },
+        "ivs": {
+          "hp": 31,
+          "atk": 31,
+          "def": 31,
+          "spa": 31,
+          "spd": 31,
+          "spe": 31
+        }
+      }
     },
     "Seismitoad": {
       "usage": 0.022621,
@@ -6374,7 +6502,39 @@
             "spe": 31
           }
         }
-      ]
+      ],
+      "fun": {
+        "id": "darmanitan-fun-belly-drum",
+        "sourceName": "Belly Drum",
+        "label": "Belly Drum sweeper",
+        "description": "Sheer Force and a maxed Attack: if it lands Belly Drum, little survives.",
+        "weight": 0,
+        "moves": [
+          "Belly Drum",
+          "Flare Blitz",
+          "Superpower",
+          "Rock Slide"
+        ],
+        "item": "Sitrus Berry",
+        "ability": "Sheer Force",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 4,
+          "atk": 252,
+          "def": 0,
+          "spa": 0,
+          "spd": 0,
+          "spe": 252
+        },
+        "ivs": {
+          "hp": 31,
+          "atk": 31,
+          "def": 31,
+          "spa": 31,
+          "spd": 31,
+          "spe": 31
+        }
+      }
     },
     "Suicune": {
       "usage": 0.016541,
@@ -8721,7 +8881,39 @@
             "spe": 31
           }
         }
-      ]
+      ],
+      "fun": {
+        "id": "dusclops-fun-trick-room",
+        "sourceName": "Trick Room",
+        "label": "Trick Room setter",
+        "description": "Sets Trick Room so its slow teammates move first, and burns or chips anything in the way.",
+        "weight": 0,
+        "moves": [
+          "Trick Room",
+          "Night Shade",
+          "Will-O-Wisp",
+          "Pain Split"
+        ],
+        "item": "Eviolite",
+        "ability": "Pressure",
+        "nature": "Relaxed",
+        "evs": {
+          "hp": 252,
+          "atk": 0,
+          "def": 252,
+          "spa": 0,
+          "spd": 4,
+          "spe": 0
+        },
+        "ivs": {
+          "hp": 31,
+          "atk": 31,
+          "def": 31,
+          "spa": 31,
+          "spd": 31,
+          "spe": 0
+        }
+      }
     },
     "Swampert": {
       "usage": 0.001951,
@@ -9165,7 +9357,39 @@
             "spe": 31
           }
         }
-      ]
+      ],
+      "fun": {
+        "id": "snorlax-fun-belly-drum",
+        "sourceName": "Belly Drum",
+        "label": "Belly Drum sweeper",
+        "description": "Maxes its Attack in one turn, heals with its Sitrus Berry, then bulldozes through.",
+        "weight": 0,
+        "moves": [
+          "Belly Drum",
+          "Return",
+          "Earthquake",
+          "Seed Bomb"
+        ],
+        "item": "Sitrus Berry",
+        "ability": "Thick Fat",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 252,
+          "atk": 252,
+          "def": 0,
+          "spa": 0,
+          "spd": 4,
+          "spe": 0
+        },
+        "ivs": {
+          "hp": 31,
+          "atk": 31,
+          "def": 31,
+          "spa": 31,
+          "spd": 31,
+          "spe": 31
+        }
+      }
     },
     "Yanmega": {
       "usage": 0.001275,

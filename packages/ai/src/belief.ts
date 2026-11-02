@@ -1,6 +1,11 @@
 // What the AI believes about each foe Pokémon's hidden set (DESIGN.md §8.2):
 // the species' usage-weighted sets, filtered by everything revealed so far.
-import { sets as defaultSets, type SetEntry, type SetsFile } from '@daily-battle/data';
+import {
+  sets as defaultSets,
+  playerSetPrior,
+  type SetEntry,
+  type SetsFile,
+} from '@daily-battle/data';
 import { isMegaForme, megaFormeOf, moveId, toId, type FoeMon } from './state';
 
 export interface Candidate {
@@ -53,7 +58,8 @@ export function candidates(
   const knownSet = known?.[foe.species];
   if (knownSet) return [{ set: knownSet, weight: 1 }];
 
-  const all = megaFit(data.species[foe.species]?.sets ?? [], foe, data, foeMegaUsed);
+  // The player may have picked the species' fun set: a small share of the guess.
+  const all = megaFit(playerSetPrior(data.species[foe.species]), foe, data, foeMegaUsed);
   // Items can change hands (Trick, Knock Off), so relax the item check if nothing fits.
   let fit = all.filter((s) => consistent(s, foe));
   if (!fit.length) fit = all.filter((s) => consistent(s, foe, false));

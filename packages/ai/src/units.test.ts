@@ -1,4 +1,4 @@
-import { sets } from '@daily-battle/data';
+import { FUN_SET_PRIOR, sets } from '@daily-battle/data';
 import { deriveSeed, makeRng, randomTeam, runBattle } from '@daily-battle/sim-bridge';
 import { describe, expect, it } from 'vitest';
 import { candidates } from './belief';
@@ -37,6 +37,15 @@ describe('belief', () => {
     const roost = candidates(foe('Scizor', { moves: ['roost'] }));
     expect(roost.every((c) => c.set.moves.includes('Roost'))).toBe(true);
     expect(roost.reduce((a, c) => a + c.weight, 0)).toBeCloseTo(1);
+  });
+
+  it("gives a species' fun set a small share, and all of it once a fun move shows", () => {
+    const fun = sets.species['Snorlax']!.fun!;
+    const cands = candidates(foe('Snorlax'));
+    expect(cands.find((c) => c.set.id === fun.id)?.weight).toBeCloseTo(FUN_SET_PRIOR);
+    expect(cands.reduce((a, c) => a + c.weight, 0)).toBeCloseTo(1);
+    const drum = candidates(foe('Snorlax', { moves: ['bellydrum'] }));
+    expect(drum.map((c) => c.set.id)).toEqual([fun.id]);
   });
 
   it('falls back to a synthetic set instead of an empty belief', () => {

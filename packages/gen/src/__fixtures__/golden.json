@@ -15,7 +15,7 @@
           "Starmie",
           "Mamoswine",
           "Aerodactyl",
-          "Blastoise",
+          "Omastar",
           "Rhyperior",
           "Cloyster"
         ],
@@ -25,7 +25,7 @@
         {
           "generatorVersion": 5,
           "day": "2026-10-19",
-          "style": "balance",
+          "style": "offense",
           "team": [
             {
               "species": "Gyarados",
@@ -36,8 +36,8 @@
               "setId": "cresselia-calm-mind"
             },
             {
-              "species": "Milotic",
-              "setId": "milotic-resttalk"
+              "species": "Raikou",
+              "setId": "raikou-calm-mind-protect"
             },
             {
               "species": "Swampert",
@@ -57,7 +57,7 @@
         {
           "generatorVersion": 5,
           "day": "2026-10-20",
-          "style": "offense",
+          "style": "balance",
           "team": [
             {
               "species": "Bronzong",
@@ -68,8 +68,8 @@
               "setId": "uxie-trickscarf"
             },
             {
-              "species": "Ludicolo",
-              "setId": "ludicolo-rain-dance-special-attacker"
+              "species": "Hitmontop",
+              "setId": "hitmontop-rapid-spin"
             },
             {
               "species": "Lucario",
@@ -100,8 +100,8 @@
               "setId": "starmie-defensive-rapid-spin"
             },
             {
-              "species": "Toxicroak",
-              "setId": "toxicroak-swords-dance"
+              "species": "Sceptile",
+              "setId": "sceptile-swords-dance"
             },
             {
               "species": "Empoleon",
@@ -136,12 +136,12 @@
               "setId": "flygon-mixed-attacker"
             },
             {
-              "species": "Ambipom",
-              "setId": "ambipom-attacking-lead"
+              "species": "Venusaur",
+              "setId": "venusaur-subseed"
             },
             {
-              "species": "Blastoise",
-              "setId": "blastoise-utility"
+              "species": "Omastar",
+              "setId": "omastar-rain-dance-special-attacker"
             },
             {
               "species": "Lucario",
@@ -156,8 +156,8 @@
           "style": "balance",
           "team": [
             {
-              "species": "Gastrodon",
-              "setId": "gastrodon-curse"
+              "species": "Snorlax",
+              "setId": "snorlax-utility"
             },
             {
               "species": "Skarmory",
@@ -217,11 +217,11 @@
         {
           "generatorVersion": 5,
           "day": "2026-10-25",
-          "style": "balance",
+          "style": "stall",
           "team": [
             {
-              "species": "Mamoswine",
-              "setId": "mamoswine-physical-attacker"
+              "species": "Blissey",
+              "setId": "blissey-wish-support"
             },
             {
               "species": "Tyranitar",
@@ -263,8 +263,8 @@
           "Breloom",
           "Milotic",
           "Crobat",
-          "Blaziken",
-          "Gastrodon"
+          "Cloyster",
+          "Ludicolo"
         ],
         "attempts": 3
       },
@@ -272,11 +272,11 @@
         {
           "generatorVersion": 5,
           "day": "2026-10-26",
-          "style": "balance",
+          "style": "stall",
           "team": [
             {
-              "species": "Hariyama",
-              "setId": "hariyama-attacking-lead"
+              "species": "Heracross",
+              "setId": "heracross-choice-scarf"
             },
             {
               "species": "Celebi",
@@ -287,8 +287,8 @@
               "setId": "porygon2-trick-room"
             },
             {
-              "species": "Gengar",
-              "setId": "gengar-utility"
+              "species": "Skarmory",
+              "setId": "skarmory-specially-defensive"
             },
             {
               "species": "Flygon",
@@ -304,7 +304,7 @@
         {
           "generatorVersion": 5,
           "day": "2026-10-27",
-          "style": "balance",
+          "style": "stall",
           "team": [
             {
               "species": "Spiritomb",
@@ -315,16 +315,16 @@
               "setId": "starmie-offensive-rapid-spin"
             },
             {
-              "species": "Magneton",
-              "setId": "magneton-choice-scarf"
+              "species": "Hippowdon",
+              "setId": "hippowdon-physically-defensive"
             },
             {
               "species": "Gastrodon",
               "setId": "gastrodon-curse"
             },
             {
-              "species": "Hariyama",
-              "setId": "hariyama-attacking-lead"
+              "species": "Heracross",
+              "setId": "heracross-choice-scarf"
             },
             {
               "species": "Bronzong",
@@ -336,34 +336,34 @@
         {
           "generatorVersion": 5,
           "day": "2026-10-28",
-          "style": "offense",
+          "style": "balance",
           "team": [
             {
-              "species": "Azelf",
-              "setId": "azelf-standard-lead"
-            },
-            {
-              "species": "Flygon",
-              "setId": "flygon-choice-scarf"
-            },
-            {
-              "species": "Hitmonlee",
-              "setId": "hitmonlee-life-orb"
-            },
-            {
-              "species": "Magnezone",
-              "setId": "magnezone-choice-scarf"
-            },
-            {
-              "species": "Arcanine",
-              "setId": "arcanine-life-orb"
+              "species": "Scyther",
+              "setId": "scyther-choice-band"
             },
             {
               "species": "Kingdra",
-              "setId": "kingdra-dragon-dance"
+              "setId": "kingdra-choice-specs"
+            },
+            {
+              "species": "Lucario",
+              "setId": "lucario-swords-dance"
+            },
+            {
+              "species": "Tangrowth",
+              "setId": "tangrowth-physical-tank"
+            },
+            {
+              "species": "Tyranitar",
+              "setId": "tyranitar-choice-scarf"
+            },
+            {
+              "species": "Gyarados",
+              "setId": "gyarados-offensive-dragon-dance"
             }
           ],
-          "attempts": 2
+          "attempts": 1
         },
         {
           "generatorVersion": 5,
@@ -403,31 +403,31 @@
           "style": "balance",
           "team": [
             {
-              "species": "Cresselia",
-              "setId": "cresselia-calm-mind"
+              "species": "Weavile",
+              "setId": "weavile-standard"
             },
             {
-              "species": "Starmie",
-              "setId": "starmie-defensive-rapid-spin"
+              "species": "Cloyster",
+              "setId": "cloyster-support"
             },
             {
-              "species": "Dragonite",
-              "setId": "dragonite-mixed"
+              "species": "Gyarados",
+              "setId": "gyarados-offensive-dragon-dance"
             },
             {
-              "species": "Rotom-Mow",
-              "setId": "rotommow-utility"
+              "species": "Flygon",
+              "setId": "flygon-choice-scarf"
             },
             {
-              "species": "Azelf",
-              "setId": "azelf-standard-lead"
+              "species": "Nidoking",
+              "setId": "nidoking-mixed-attacker"
             },
             {
-              "species": "Infernape",
-              "setId": "infernape-mixed-attacker"
+              "species": "Latias",
+              "setId": "latias-choice-scarf"
             }
           ],
-          "attempts": 2
+          "attempts": 1
         },
         {
           "generatorVersion": 5,
@@ -447,12 +447,12 @@
               "setId": "mamoswine-physical-attacker"
             },
             {
-              "species": "Clefable",
-              "setId": "clefable-support"
+              "species": "Rotom-Heat",
+              "setId": "rotomheat-choice-scarf"
             },
             {
-              "species": "Honchkrow",
-              "setId": "honchkrow-life-orb"
+              "species": "Claydol",
+              "setId": "claydol-support"
             },
             {
               "species": "Empoleon",
@@ -487,8 +487,8 @@
               "setId": "celebi-utility"
             },
             {
-              "species": "Nidoqueen",
-              "setId": "nidoqueen-specially-defensive-toxic-spikes"
+              "species": "Kabutops",
+              "setId": "kabutops-lead"
             }
           ],
           "attempts": 1
@@ -508,7 +508,7 @@
           "Empoleon",
           "Celebi",
           "Electivire",
-          "Honchkrow",
+          "Claydol",
           "Uxie",
           "Hariyama",
           "Porygon2"
@@ -562,8 +562,8 @@
               "setId": "tyranitar-choice-scarf"
             },
             {
-              "species": "Arcanine",
-              "setId": "arcanine-life-orb"
+              "species": "Drapion",
+              "setId": "drapion-bulky-swords-dance"
             },
             {
               "species": "Hitmontop",
@@ -590,8 +590,8 @@
               "setId": "starmie-defensive-rapid-spin"
             },
             {
-              "species": "Celebi",
-              "setId": "celebi-utility"
+              "species": "Forretress",
+              "setId": "forretress-specially-defensive"
             },
             {
               "species": "Zapdos",
@@ -622,8 +622,8 @@
               "setId": "bronzong-tank"
             },
             {
-              "species": "Lucario",
-              "setId": "lucario-swords-dance"
+              "species": "Magnezone",
+              "setId": "magnezone-choice-scarf"
             },
             {
               "species": "Gyarados",

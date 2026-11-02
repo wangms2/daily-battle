@@ -25,7 +25,7 @@ import {
 } from '@daily-battle/gen';
 import { PIPELINE } from './config';
 import type { Job } from './job';
-import { legalTeam } from './sample';
+import { legalTeam, weekSets } from './sample';
 import type { Simulator } from './simulate';
 
 type Config = typeof PIPELINE.recommend;
@@ -44,10 +44,10 @@ interface Option {
   sets: SetEntry[];
 }
 
-/** Each species' common sets (at least its most used one). */
-function optionsFor(species: string[], data: SetsFile, minWeight: number): Option[] {
+/** Each species' common sets on offer in `week` (at least its most used one). */
+function optionsFor(species: string[], data: SetsFile, minWeight: number, week: string): Option[] {
   return species.map((name) => {
-    const all = data.species[name]!.sets;
+    const all = weekSets(data, name, week);
     const common = all.filter((s) => s.weight >= minWeight);
     return {
       species: name,
@@ -171,7 +171,7 @@ export async function recommendTeam(
   cfg: Config = PIPELINE.recommend,
   log: (msg: string) => void = () => {},
 ): Promise<Recommendation | undefined> {
-  const options = optionsFor(species, data, cfg.minSetWeight);
+  const options = optionsFor(species, data, cfg.minSetWeight, week);
   const meets = rulesFor(options, data);
   const rng = rngFor(`pipeline:recommend:${week}`);
 

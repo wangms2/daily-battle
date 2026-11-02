@@ -2,6 +2,7 @@
 // use, and the type chart, so the UI never has to load the simulator's dex.
 import { Dex } from '@pkmn/sim';
 import { genOf } from './formats';
+import { playerSets } from './player-sets';
 import { megaForm, megaName } from './roles';
 import type { SetsFile, StatID } from './types';
 
@@ -73,7 +74,8 @@ export function buildSpecies(sets: SetsFile): SpeciesFile {
       abilities: Object.values(s.abilities),
     };
     const megas: Record<string, MegaInfo> = {};
-    for (const set of entry.sets) {
+    // Fun sets count: a fun Mega (Charizard X with Belly Drum) needs its Mega's facts too.
+    for (const set of playerSets(entry)) {
       const forme = megaForm(name, set.item, dex);
       if (!forme || megas[set.item]) continue;
       const m = dex.species.get(forme);
@@ -93,7 +95,7 @@ export function buildSpecies(sets: SetsFile): SpeciesFile {
   }
   const moves: SpeciesFile['moves'] = {};
   for (const name of [
-    ...new Set(Object.values(sets.species).flatMap((e) => e.sets.flatMap((s) => s.moves))),
+    ...new Set(Object.values(sets.species).flatMap((e) => playerSets(e).flatMap((s) => s.moves))),
   ].sort()) {
     const m = dex.moves.get(name);
     if (!m.exists) throw new Error(`Unknown move in sets: ${name}`);
@@ -111,7 +113,7 @@ export function buildSpecies(sets: SetsFile): SpeciesFile {
         text === m ? m.shortDesc || m.desc : `Type set by the user's IVs: ${m.type} on this set.`,
     };
   }
-  const all = Object.values(sets.species).flatMap((e) => e.sets);
+  const all = Object.values(sets.species).flatMap(playerSets);
   const describe = (kind: 'items' | 'abilities', names: string[]) => {
     const out: Record<string, string> = {};
     for (const name of [...new Set(names.filter(Boolean))].sort()) {

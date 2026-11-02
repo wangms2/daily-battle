@@ -1,0 +1,213 @@
+{
+  "Charizard": {
+    "name": "Bellyzard",
+    "label": "Belly Drum sweeper",
+    "description": "Maxes its Attack with Belly Drum behind a Substitute, then sweeps after its Salac Berry kicks in.",
+    "moves": ["Belly Drum", "Substitute", "Earthquake", "Hidden Power Flying"],
+    "item": "Salac Berry",
+    "ability": "Blaze",
+    "nature": "Adamant",
+    "evs": {
+      "hp": 4,
+      "atk": 252,
+      "spe": 252
+    }
+  },
+  "Heracross": {
+    "name": "Endure Reversal",
+    "label": "Reversal attacker",
+    "description": "Endures a hit to drop to 1 HP, then its Salac Berry and full-power Reversal take over.",
+    "moves": ["Endure", "Reversal", "Megahorn", "Rock Slide"],
+    "item": "Salac Berry",
+    "ability": "Swarm",
+    "nature": "Jolly",
+    "evs": {
+      "hp": 4,
+      "atk": 252,
+      "spe": 252
+    }
+  },
+  "Blaziken": {
+    "name": "Swords Dance Reversal",
+    "label": "Reversal attacker",
+    "description": "Boosts with Swords Dance, Endures to 1 HP, then hits back with Reversal after its Salac Berry.",
+    "moves": ["Swords Dance", "Endure", "Reversal", "Fire Blast"],
+    "item": "Salac Berry",
+    "ability": "Blaze",
+    "nature": "Hasty",
+    "evs": {
+      "hp": 4,
+      "atk": 252,
+      "spe": 252
+    }
+  },
+  "Snorlax": {
+    "name": "Belly Drum",
+    "label": "Belly Drum sweeper",
+    "description": "Maxes its Attack in one turn and tries to bulldoze through with Return.",
+    "moves": ["Belly Drum", "Return", "Shadow Ball", "Earthquake"],
+    "item": "Leftovers",
+    "ability": "Thick Fat",
+    "nature": "Adamant",
+    "evs": {
+      "hp": 252,
+      "atk": 252,
+      "spd": 4
+    }
+  },
+  "Smeargle": {
+    "name": "Belly Drum Extreme Speed",
+    "label": "Belly Drum sweeper",
+    "description": "Puts a foe to sleep, Belly Drums behind a Substitute, then sweeps with priority Extreme Speed.",
+    "moves": ["Spore", "Belly Drum", "Extreme Speed", "Substitute"],
+    "item": "Salac Berry",
+    "ability": "Own Tempo",
+    "nature": "Jolly",
+    "evs": {
+      "hp": 4,
+      "atk": 252,
+      "spe": 252
+    }
+  },
+  "Swampert": {
+    "name": "Curse",
+    "label": "Curse sweeper",
+    "description": "Stacks Curse boosts and heals with Rest, turning its bulk into a slow, heavy sweep.",
+    "moves": ["Curse", "Earthquake", "Rock Slide", "Rest"],
+    "item": "Leftovers",
+    "ability": "Torrent",
+    "nature": "Adamant",
+    "evs": {
+      "hp": 252,
+      "atk": 252,
+      "spd": 4
+    }
+  },
+  "Tyranitar": {
+    "name": "Special Tyranitar",
+    "label": "Special attacker",
+    "description": "Surprises its usual counters with special Crunch, Fire Blast, Thunderbolt, and Ice Beam.",
+    "moves": ["Crunch", "Fire Blast", "Thunderbolt", "Ice Beam"],
+    "item": "Leftovers",
+    "ability": "Sand Stream",
+    "nature": "Modest",
+    "evs": {
+      "hp": 252,
+      "spa": 252,
+      "spd": 4
+    }
+  },
+  "Lapras": {
+    "name": "Dragon Dance",
+    "label": "Dragon Dance sweeper",
+    "description": "Boosts its Attack and Speed with Dragon Dance, then sweeps with a bulky body behind it.",
+    "moves": ["Dragon Dance", "Return", "Ice Beam", "Rest"],
+    "item": "Leftovers",
+    "ability": "Water Absorb",
+    "nature": "Adamant",
+    "evs": {
+      "hp": 252,
+      "atk": 252,
+      "spe": 4
+    }
+  },
+  "Marowak": {
+    "name": "Belly Drum",
+    "label": "Belly Drum sweeper",
+    "description": "Doubles its huge Thick Club Attack again with Belly Drum, then swings for the knockout.",
+    "moves": ["Belly Drum", "Earthquake", "Rock Slide", "Double-Edge"],
+    "item": "Thick Club",
+    "ability": "Rock Head",
+    "nature": "Adamant",
+    "evs": {
+      "hp": 252,
+      "atk": 252,
+      "spd": 4
+    }
+  },
+  "Gyarados": {
+    "name": "Taunt Dragon Dance",
+    "label": "Dragon Dance sweeper",
+    "description": "Taunts walls so they can't stop it, Dragon Dances, then sweeps.",
+    "moves": ["Dragon Dance", "Taunt", "Hidden Power Flying", "Earthquake"],
+    "item": "Leftovers",
+    "ability": "Intimidate",
+    "nature": "Adamant",
+    "evs": {
+      "hp": 4,
+      "atk": 252,
+      "spe": 252
+    }
+  },
+  "Gengar": {
+    "name": "Hypnosis Destiny Bond",
+    "label": "Sleep lead",
+    "description": "Puts a foe to sleep, then takes an attacker down with it using Destiny Bond.",
+    "moves": ["Hypnosis", "Destiny Bond", "Thunderbolt", "Ice Punch"],
+    "item": "Leftovers",
+    "ability": "Levitate",
+    "nature": "Timid",
+    "evs": {
+      "hp": 4,
+      "spa": 252,
+      "spe": 252
+    }
+  },
+  "Electrode": {
+    "name": "Screen lead",
+    "label": "Screen lead",
+    "description": "Taunts the foe's lead, sets Light Screen for the team, then Explodes.",
+    "moves": ["Taunt", "Light Screen", "Explosion", "Thunderbolt"],
+    "item": "Leftovers",
+    "ability": "Static",
+    "nature": "Timid",
+    "evs": {
+      "hp": 4,
+      "spa": 252,
+      "spe": 252
+    }
+  },
+  "Kingdra": {
+    "name": "Dragon Dance",
+    "label": "Dragon Dance sweeper",
+    "description": "Boosts with Dragon Dance and hits hard on both sides with Hydro Pump and Hidden Power Flying.",
+    "moves": ["Dragon Dance", "Hydro Pump", "Ice Beam", "Hidden Power Flying"],
+    "item": "Leftovers",
+    "ability": "Swift Swim",
+    "nature": "Naive",
+    "evs": {
+      "hp": 4,
+      "atk": 252,
+      "spe": 252
+    }
+  },
+  "Scizor": {
+    "name": "Agility Reversal",
+    "label": "Reversal attacker",
+    "description": "Speeds up with Agility, Endures to 1 HP, then sweeps with Reversal after its Liechi Berry.",
+    "moves": ["Agility", "Endure", "Reversal", ["Hidden Power Ghost", "Swords Dance"]],
+    "item": "Liechi Berry",
+    "ability": "Swarm",
+    "nature": "Adamant",
+    "evs": {
+      "hp": 108,
+      "atk": 252,
+      "spe": 148
+    }
+  },
+  "Misdreavus": {
+    "name": "Imprison",
+    "label": "Imprison support",
+    "description": "Seals off any move it shares with the foe, so attackers relying on Thunderbolt or Hidden Power go quiet.",
+    "moves": ["Hidden Power Ice", "Thunderbolt", "Thunder Wave", "Imprison"],
+    "item": "Leftovers",
+    "ability": "Levitate",
+    "nature": "Modest",
+    "evs": {
+      "hp": 236,
+      "def": 68,
+      "spa": 124,
+      "spd": 80
+    }
+  }
+}

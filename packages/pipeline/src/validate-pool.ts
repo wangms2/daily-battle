@@ -86,6 +86,7 @@ async function checkPool(
     cfg.teams,
     rngFor(`pipeline:pool-teams:${week}:c${candidate}`),
     data,
+    week,
   );
   const winRates = rater(week, candidate, sim, data, cfg);
   const rates = await winRates(teams, cfg.opponents, cfg.seeds, 'screen');

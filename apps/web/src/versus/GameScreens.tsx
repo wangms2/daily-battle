@@ -5,7 +5,7 @@ import type { RoomView, Slot } from '@daily-battle/versus';
 import type { ScheduleFile } from '@daily-battle/gen/schedule';
 import clsx from 'clsx';
 import { useState, type ReactNode } from 'react';
-import { setActiveFormat } from '../lib/data';
+import { setActiveFormat, setOfferKey } from '../lib/data';
 import { TeamBuilder } from '../screens/TeamBuilder';
 import { ConfirmDialog } from '../sheets/misc';
 import { Button, SectionLabel } from '../ui/bits';
@@ -65,6 +65,7 @@ export function BuildScreen({
   right,
 }: Common & { team: Slot[] | null; hints: boolean; onSubmit: (team: Slot[]) => void }) {
   setActiveFormat(room.settings.format);
+  setOfferKey(room.settings.week ?? room.code);
   const me = room.players.find((p) => p.id === you)!;
   const timer = <Countdown ms={room.timeLeftMs} at={at} label="Time to build" />;
   if (!team) {

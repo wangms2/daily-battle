@@ -3,7 +3,7 @@
     "format": "gen4ou",
     "method": "curated-usage-weighted-v1",
     "simVersion": "0.10.11",
-    "builtAt": "2026-11-02T19:29:19.726Z",
+    "builtAt": "2026-11-02T20:05:16.370Z",
     "sources": {
       "sets": {
         "url": "https://data.pkmn.cc/sets/gen4ou.json",
@@ -1481,7 +1481,39 @@
             "spe": 31
           }
         }
-      ]
+      ],
+      "fun": {
+        "id": "gengar-fun-destiny-bond-lead",
+        "sourceName": "Destiny Bond lead",
+        "label": "Destiny Bond lead",
+        "description": "Taunts the foe's lead and takes a sweeper down with it using Destiny Bond, safe behind Focus Sash.",
+        "weight": 0,
+        "moves": [
+          "Taunt",
+          "Destiny Bond",
+          "Shadow Ball",
+          "Focus Blast"
+        ],
+        "item": "Focus Sash",
+        "ability": "Levitate",
+        "nature": "Timid",
+        "evs": {
+          "hp": 4,
+          "atk": 0,
+          "def": 0,
+          "spa": 252,
+          "spd": 0,
+          "spe": 252
+        },
+        "ivs": {
+          "hp": 31,
+          "atk": 31,
+          "def": 31,
+          "spa": 31,
+          "spd": 31,
+          "spe": 31
+        }
+      }
     },
     "Skarmory": {
       "usage": 0.154753,
@@ -1854,7 +1886,39 @@
             "spe": 31
           }
         }
-      ]
+      ],
+      "fun": {
+        "id": "swampert-fun-curse",
+        "sourceName": "Curse",
+        "label": "Curse sweeper",
+        "description": "Stacks Curse boosts and heals with Rest, turning its bulk into a slow, heavy sweep.",
+        "weight": 0,
+        "moves": [
+          "Curse",
+          "Earthquake",
+          "Waterfall",
+          "Rest"
+        ],
+        "item": "Leftovers",
+        "ability": "Torrent",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 252,
+          "atk": 252,
+          "def": 0,
+          "spa": 0,
+          "spd": 4,
+          "spe": 0
+        },
+        "ivs": {
+          "hp": 31,
+          "atk": 31,
+          "def": 31,
+          "spa": 31,
+          "spd": 31,
+          "spe": 31
+        }
+      }
     },
     "Zapdos": {
       "usage": 0.135045,
@@ -2909,7 +2973,39 @@
             "spe": 31
           }
         }
-      ]
+      ],
+      "fun": {
+        "id": "clefable-fun-belly-drum",
+        "sourceName": "Belly Drum",
+        "label": "Belly Drum sweeper",
+        "description": "Magic Guard means Life Orb costs it nothing: Belly Drum, heal, then hit hard.",
+        "weight": 0,
+        "moves": [
+          "Belly Drum",
+          "Return",
+          "Fire Punch",
+          "Soft-Boiled"
+        ],
+        "item": "Life Orb",
+        "ability": "Magic Guard",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 252,
+          "atk": 252,
+          "def": 0,
+          "spa": 0,
+          "spd": 4,
+          "spe": 0
+        },
+        "ivs": {
+          "hp": 31,
+          "atk": 31,
+          "def": 31,
+          "spa": 31,
+          "spd": 31,
+          "spe": 31
+        }
+      }
     },
     "Rotom-Heat": {
       "usage": 0.097543,
@@ -4198,7 +4294,39 @@
             "spe": 0
           }
         }
-      ]
+      ],
+      "fun": {
+        "id": "rhyperior-fun-rock-polish",
+        "sourceName": "Rock Polish",
+        "label": "Rock Polish sweeper",
+        "description": "Doubles its Speed with Rock Polish, then sweeps with Life Orb Stone Edge and Earthquake.",
+        "weight": 0,
+        "moves": [
+          "Rock Polish",
+          "Stone Edge",
+          "Earthquake",
+          "Megahorn"
+        ],
+        "item": "Life Orb",
+        "ability": "Solid Rock",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 4,
+          "atk": 252,
+          "def": 0,
+          "spa": 0,
+          "spd": 0,
+          "spe": 252
+        },
+        "ivs": {
+          "hp": 31,
+          "atk": 31,
+          "def": 31,
+          "spa": 31,
+          "spd": 31,
+          "spe": 31
+        }
+      }
     },
     "Tentacruel": {
       "usage": 0.026337,
@@ -4269,7 +4397,39 @@
             "spe": 31
           }
         }
-      ]
+      ],
+      "fun": {
+        "id": "tentacruel-fun-swords-dance",
+        "sourceName": "Swords Dance",
+        "label": "Swords Dance sweeper",
+        "description": "Trades its usual spinning role for Swords Dance and physical hits.",
+        "weight": 0,
+        "moves": [
+          "Swords Dance",
+          "Waterfall",
+          "Poison Jab",
+          "Knock Off"
+        ],
+        "item": "Life Orb",
+        "ability": "Clear Body",
+        "nature": "Jolly",
+        "evs": {
+          "hp": 0,
+          "atk": 252,
+          "def": 0,
+          "spa": 0,
+          "spd": 4,
+          "spe": 252
+        },
+        "ivs": {
+          "hp": 31,
+          "atk": 31,
+          "def": 31,
+          "spa": 31,
+          "spd": 31,
+          "spe": 31
+        }
+      }
     },
     "Nidoqueen": {
       "usage": 0.025135,
@@ -4958,7 +5118,39 @@
             "spe": 31
           }
         }
-      ]
+      ],
+      "fun": {
+        "id": "snorlax-fun-belly-drum",
+        "sourceName": "Belly Drum",
+        "label": "Belly Drum sweeper",
+        "description": "Maxes its Attack in one turn and tries to bulldoze through with Return.",
+        "weight": 0,
+        "moves": [
+          "Belly Drum",
+          "Return",
+          "Earthquake",
+          "Crunch"
+        ],
+        "item": "Leftovers",
+        "ability": "Thick Fat",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 252,
+          "atk": 252,
+          "def": 0,
+          "spa": 0,
+          "spd": 4,
+          "spe": 0
+        },
+        "ivs": {
+          "hp": 31,
+          "atk": 31,
+          "def": 31,
+          "spa": 31,
+          "spd": 31,
+          "spe": 31
+        }
+      }
     },
     "Ludicolo": {
       "usage": 0.020325,
@@ -6478,7 +6670,39 @@
             "spe": 31
           }
         }
-      ]
+      ],
+      "fun": {
+        "id": "dusknoir-fun-trick-room",
+        "sourceName": "Trick Room",
+        "label": "Trick Room setter",
+        "description": "Flips the speed order with Trick Room, then its slow, strong attacks move first.",
+        "weight": 0,
+        "moves": [
+          "Trick Room",
+          "Shadow Sneak",
+          "Earthquake",
+          "Ice Punch"
+        ],
+        "item": "Life Orb",
+        "ability": "Pressure",
+        "nature": "Brave",
+        "evs": {
+          "hp": 252,
+          "atk": 252,
+          "def": 4,
+          "spa": 0,
+          "spd": 0,
+          "spe": 0
+        },
+        "ivs": {
+          "hp": 31,
+          "atk": 31,
+          "def": 31,
+          "spa": 31,
+          "spd": 31,
+          "spe": 0
+        }
+      }
     },
     "Registeel": {
       "usage": 0.007949,
@@ -7668,7 +7892,39 @@
             "spe": 31
           }
         }
-      ]
+      ],
+      "fun": {
+        "id": "azumarill-fun-belly-drum",
+        "sourceName": "Belly Drum",
+        "label": "Belly Drum sweeper",
+        "description": "Huge Power plus Belly Drum: one boost turns every hit into a knockout.",
+        "weight": 0,
+        "moves": [
+          "Belly Drum",
+          "Waterfall",
+          "Return",
+          "Ice Punch"
+        ],
+        "item": "Sitrus Berry",
+        "ability": "Huge Power",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 252,
+          "atk": 252,
+          "def": 0,
+          "spa": 0,
+          "spd": 4,
+          "spe": 0
+        },
+        "ivs": {
+          "hp": 31,
+          "atk": 31,
+          "def": 31,
+          "spa": 31,
+          "spd": 31,
+          "spe": 31
+        }
+      }
     },
     "Blaziken": {
       "usage": 0.005452,
@@ -8151,7 +8407,39 @@
             "spe": 31
           }
         }
-      ]
+      ],
+      "fun": {
+        "id": "crobat-fun-nasty-plot",
+        "sourceName": "Nasty Plot",
+        "label": "Nasty Plot sweeper",
+        "description": "Boosts with Nasty Plot and uses its blazing Speed for a special sweep.",
+        "weight": 0,
+        "moves": [
+          "Nasty Plot",
+          "Air Slash",
+          "Heat Wave",
+          "Roost"
+        ],
+        "item": "Life Orb",
+        "ability": "Inner Focus",
+        "nature": "Timid",
+        "evs": {
+          "hp": 0,
+          "atk": 0,
+          "def": 4,
+          "spa": 252,
+          "spd": 0,
+          "spe": 252
+        },
+        "ivs": {
+          "hp": 31,
+          "atk": 31,
+          "def": 31,
+          "spa": 31,
+          "spd": 31,
+          "spe": 31
+        }
+      }
     },
     "Staraptor": {
       "usage": 0.004597,
@@ -8563,7 +8851,39 @@
             "spe": 31
           }
         }
-      ]
+      ],
+      "fun": {
+        "id": "steelix-fun-torment",
+        "sourceName": "Torment",
+        "label": "Torment staller",
+        "description": "Torments the foe so it can't repeat a move, hiding behind Substitute while Toxic wears it down.",
+        "weight": 0,
+        "moves": [
+          "Torment",
+          "Substitute",
+          "Toxic",
+          "Earthquake"
+        ],
+        "item": "Leftovers",
+        "ability": "Sturdy",
+        "nature": "Careful",
+        "evs": {
+          "hp": 252,
+          "atk": 124,
+          "def": 0,
+          "spa": 0,
+          "spd": 132,
+          "spe": 0
+        },
+        "ivs": {
+          "hp": 31,
+          "atk": 31,
+          "def": 31,
+          "spa": 31,
+          "spd": 31,
+          "spe": 31
+        }
+      }
     },
     "Mesprit": {
       "usage": 0.003324,
@@ -10681,6 +11001,141 @@
           }
         }
       ]
+    },
+    "Charizard": {
+      "usage": 0.002966,
+      "tier": "NU",
+      "setSource": "gen4uu",
+      "sets": [
+        {
+          "id": "charizard-special-attacker",
+          "sourceName": "Special Attacker",
+          "label": "Life Orb attacker",
+          "description": "Gives up a little HP with each attack for a big boost in power.",
+          "weight": 0.6604,
+          "moves": [
+            "Fire Blast",
+            "Air Slash",
+            "Hidden Power Grass",
+            "Roost"
+          ],
+          "item": "Life Orb",
+          "ability": "Blaze",
+          "nature": "Timid",
+          "evs": {
+            "hp": 0,
+            "atk": 0,
+            "def": 4,
+            "spa": 252,
+            "spd": 0,
+            "spe": 252
+          },
+          "ivs": {
+            "hp": 31,
+            "atk": 30,
+            "def": 31,
+            "spa": 30,
+            "spd": 31,
+            "spe": 31
+          }
+        },
+        {
+          "id": "charizard-dragon-dance",
+          "sourceName": "Dragon Dance",
+          "label": "Dragon Dance sweeper",
+          "description": "Boosts itself with Dragon Dance, then tries to sweep through the opposing team.",
+          "weight": 0.2008,
+          "moves": [
+            "Dragon Dance",
+            "Flare Blitz",
+            "Earthquake",
+            "Thunder Punch"
+          ],
+          "item": "Life Orb",
+          "ability": "Blaze",
+          "nature": "Jolly",
+          "evs": {
+            "hp": 0,
+            "atk": 252,
+            "def": 4,
+            "spa": 0,
+            "spd": 0,
+            "spe": 252
+          },
+          "ivs": {
+            "hp": 31,
+            "atk": 31,
+            "def": 31,
+            "spa": 31,
+            "spd": 31,
+            "spe": 31
+          }
+        },
+        {
+          "id": "charizard-swords-dance",
+          "sourceName": "Swords Dance",
+          "label": "Swords Dance sweeper",
+          "description": "Boosts itself with Swords Dance, then tries to sweep through the opposing team.",
+          "weight": 0.1388,
+          "moves": [
+            "Swords Dance",
+            "Fire Punch",
+            "Earthquake",
+            "Thunder Punch"
+          ],
+          "item": "Life Orb",
+          "ability": "Blaze",
+          "nature": "Jolly",
+          "evs": {
+            "hp": 0,
+            "atk": 252,
+            "def": 4,
+            "spa": 0,
+            "spd": 0,
+            "spe": 252
+          },
+          "ivs": {
+            "hp": 31,
+            "atk": 31,
+            "def": 31,
+            "spa": 31,
+            "spd": 31,
+            "spe": 31
+          }
+        }
+      ],
+      "fun": {
+        "id": "charizard-fun-bellyzard",
+        "sourceName": "Bellyzard",
+        "label": "Belly Drum sweeper",
+        "description": "Belly Drums behind a Substitute, then sweeps once its Salac Berry kicks in.",
+        "weight": 0,
+        "moves": [
+          "Belly Drum",
+          "Substitute",
+          "Fire Punch",
+          "Earthquake"
+        ],
+        "item": "Salac Berry",
+        "ability": "Blaze",
+        "nature": "Jolly",
+        "evs": {
+          "hp": 0,
+          "atk": 252,
+          "def": 4,
+          "spa": 0,
+          "spd": 0,
+          "spe": 252
+        },
+        "ivs": {
+          "hp": 30,
+          "atk": 31,
+          "def": 31,
+          "spa": 31,
+          "spd": 31,
+          "spe": 31
+        }
+      }
     }
   }
 }

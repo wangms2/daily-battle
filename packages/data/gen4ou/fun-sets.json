@@ -1,0 +1,162 @@
+{
+  "Azumarill": {
+    "name": "Belly Drum",
+    "label": "Belly Drum sweeper",
+    "description": "Huge Power plus Belly Drum: one boost turns every hit into a knockout.",
+    "moves": ["Belly Drum", "Waterfall", "Return", "Ice Punch"],
+    "item": "Sitrus Berry",
+    "ability": "Huge Power",
+    "nature": "Adamant",
+    "evs": {
+      "hp": 252,
+      "atk": 252,
+      "spd": 4
+    }
+  },
+  "Snorlax": {
+    "name": "Belly Drum",
+    "label": "Belly Drum sweeper",
+    "description": "Maxes its Attack in one turn and tries to bulldoze through with Return.",
+    "moves": ["Belly Drum", "Return", "Earthquake", "Crunch"],
+    "item": "Leftovers",
+    "ability": "Thick Fat",
+    "nature": "Adamant",
+    "evs": {
+      "hp": 252,
+      "atk": 252,
+      "spd": 4
+    }
+  },
+  "Clefable": {
+    "name": "Belly Drum",
+    "label": "Belly Drum sweeper",
+    "description": "Magic Guard means Life Orb costs it nothing: Belly Drum, heal, then hit hard.",
+    "moves": ["Belly Drum", "Return", "Fire Punch", "Soft-Boiled"],
+    "item": "Life Orb",
+    "ability": "Magic Guard",
+    "nature": "Adamant",
+    "evs": {
+      "hp": 252,
+      "atk": 252,
+      "spd": 4
+    }
+  },
+  "Swampert": {
+    "name": "Curse",
+    "label": "Curse sweeper",
+    "description": "Stacks Curse boosts and heals with Rest, turning its bulk into a slow, heavy sweep.",
+    "moves": ["Curse", "Earthquake", "Waterfall", "Rest"],
+    "item": "Leftovers",
+    "ability": "Torrent",
+    "nature": "Adamant",
+    "evs": {
+      "hp": 252,
+      "atk": 252,
+      "spd": 4
+    }
+  },
+  "Gengar": {
+    "name": "Destiny Bond lead",
+    "label": "Destiny Bond lead",
+    "description": "Taunts the foe's lead and takes a sweeper down with it using Destiny Bond, safe behind Focus Sash.",
+    "moves": ["Taunt", "Destiny Bond", "Shadow Ball", "Focus Blast"],
+    "item": "Focus Sash",
+    "ability": "Levitate",
+    "nature": "Timid",
+    "evs": {
+      "hp": 4,
+      "spa": 252,
+      "spe": 252
+    }
+  },
+  "Rhyperior": {
+    "name": "Rock Polish",
+    "label": "Rock Polish sweeper",
+    "description": "Doubles its Speed with Rock Polish, then sweeps with Life Orb Stone Edge and Earthquake.",
+    "moves": ["Rock Polish", "Stone Edge", "Earthquake", "Megahorn"],
+    "item": "Life Orb",
+    "ability": "Solid Rock",
+    "nature": "Adamant",
+    "evs": {
+      "hp": 4,
+      "atk": 252,
+      "spe": 252
+    }
+  },
+  "Tentacruel": {
+    "name": "Swords Dance",
+    "label": "Swords Dance sweeper",
+    "description": "Trades its usual spinning role for Swords Dance and physical hits.",
+    "moves": ["Swords Dance", "Waterfall", "Poison Jab", "Knock Off"],
+    "item": "Life Orb",
+    "ability": "Clear Body",
+    "nature": "Jolly",
+    "evs": {
+      "atk": 252,
+      "spd": 4,
+      "spe": 252
+    }
+  },
+  "Dusknoir": {
+    "name": "Trick Room",
+    "label": "Trick Room setter",
+    "description": "Flips the speed order with Trick Room, then its slow, strong attacks move first.",
+    "moves": ["Trick Room", "Shadow Sneak", "Earthquake", "Ice Punch"],
+    "item": "Life Orb",
+    "ability": "Pressure",
+    "nature": "Brave",
+    "evs": {
+      "hp": 252,
+      "atk": 252,
+      "def": 4
+    },
+    "ivs": {
+      "spe": 0
+    }
+  },
+  "Steelix": {
+    "name": "Torment",
+    "label": "Torment staller",
+    "description": "Torments the foe so it can't repeat a move, hiding behind Substitute while Toxic wears it down.",
+    "moves": ["Torment", "Substitute", "Toxic", ["Earthquake", "Gyro Ball"]],
+    "item": "Leftovers",
+    "ability": "Sturdy",
+    "nature": ["Careful", "Sassy"],
+    "evs": {
+      "hp": 252,
+      "atk": 124,
+      "spd": 132
+    }
+  },
+  "Crobat": {
+    "name": "Nasty Plot",
+    "label": "Nasty Plot sweeper",
+    "description": "Boosts with Nasty Plot and uses its blazing Speed for a special sweep.",
+    "moves": ["Nasty Plot", "Air Slash", "Heat Wave", "Roost"],
+    "item": "Life Orb",
+    "ability": "Inner Focus",
+    "nature": "Timid",
+    "evs": {
+      "def": 4,
+      "spa": 252,
+      "spe": 252
+    }
+  },
+  "Charizard": {
+    "name": "Bellyzard",
+    "label": "Belly Drum sweeper",
+    "description": "Belly Drums behind a Substitute, then sweeps once its Salac Berry kicks in.",
+    "moves": ["Belly Drum", "Substitute", "Fire Punch", ["Thunder Punch", "Earthquake"]],
+    "item": "Salac Berry",
+    "ability": "Blaze",
+    "nature": "Jolly",
+    "evs": {
+      "atk": 252,
+      "def": 4,
+      "spe": 252
+    },
+    "ivs": {
+      "hp": 30
+    }
+  }
+}

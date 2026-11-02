@@ -10,8 +10,15 @@ import {
   type SetCuration,
 } from './build';
 import { FORMATS, type FormatId } from './formats';
-import { setsFor } from './index';
-import type { ChaosStats, CuratedSets, RandbatsFile, RoleOverrides, SourcesMeta } from './types';
+import { playerSets, setsFor } from './index';
+import type {
+  ChaosStats,
+  CuratedSets,
+  FunSets,
+  RandbatsFile,
+  RoleOverrides,
+  SourcesMeta,
+} from './types';
 
 const readJson = <T>(rel: string) =>
   JSON.parse(readFileSync(new URL(rel, import.meta.url), 'utf8')) as T;
@@ -26,18 +33,20 @@ describe.each(FORMAT_IDS)('%s/sets.json', (format) => {
     expect(sets.meta.format).toBe(format);
   });
 
-  it(`has the top ${SPECIES_COUNT} species plus UU-tier species with real OU usage`, () => {
+  it(`has the top ${SPECIES_COUNT} species plus UU-tier species with real OU usage, and any kept by hand`, () => {
     expect(entries.length).toBeGreaterThan(SPECIES_COUNT);
     for (const [species, entry] of entries.slice(SPECIES_COUNT)) {
+      // Species kept by hand (Gen 4 Charizard) may sit below UU.
+      if (BUILD_RULES[format].include?.includes(species)) continue;
       expect(UU_TIERS, species).toContain(entry.tier);
       expect(entry.usage, species).toBeGreaterThanOrEqual(UU_MIN_USAGE);
     }
   });
 
-  it("passes the format's validator for every set", () => {
+  it("passes the format's validator for every set, fun sets too", () => {
     const validator = TeamValidator.get(format);
-    const problems = entries.flatMap(([species, { sets: speciesSets }]) =>
-      speciesSets.flatMap((s) => {
+    const problems = entries.flatMap(([species, entry]) =>
+      playerSets(entry).flatMap((s) => {
         const errors = validator.validateSet(
           { name: species, species, gender: '', level: 100, ...structuredClone(s) },
           {},
@@ -51,14 +60,28 @@ describe.each(FORMAT_IDS)('%s/sets.json', (format) => {
   it('passes the team rules for every set on its own (e.g. Baton Pass Stat Trap Clause)', () => {
     // Some clauses only run on whole teams, so validateSet above can't see them.
     const validator = TeamValidator.get(format);
-    const problems = entries.flatMap(([species, { sets: speciesSets }]) =>
-      speciesSets.flatMap((s) => {
+    const problems = entries.flatMap(([species, entry]) =>
+      playerSets(entry).flatMap((s) => {
         const team = [{ name: species, species, gender: '', level: 100, ...structuredClone(s) }];
         const errors = validator.validateTeam(team);
         return errors ? [`${s.id}: ${errors.join(' ')}`] : [];
       }),
     );
     expect(problems).toEqual([]);
+  });
+
+  it('keeps fun sets apart: one per species, weight 0, its own id, never among the standard sets', () => {
+    const fun = entries.filter(([, e]) => e.fun);
+    expect(fun.length).toBeGreaterThan(0);
+    for (const [species, { fun: f, sets: standard }] of fun) {
+      expect(f!.id, species).toMatch(/-fun-/);
+      expect(f!.weight, species).toBe(0);
+      expect(f!.label && f!.description, species).toBeTruthy();
+      expect(
+        standard.some((s) => s.id === f!.id || s.id.includes('-fun-')),
+        species,
+      ).toBe(false);
+    }
   });
 
   it('leaves out excluded species and avoided abilities', () => {
@@ -74,7 +97,9 @@ describe.each(FORMAT_IDS)('%s/sets.json', (format) => {
     // Every part of a complex ban showing up somewhere in the data would let a
     // pool hold an illegal team, even though each set passes on its own.
     const used = new Set(
-      entries.flatMap(([, e]) => e.sets.flatMap((s) => [s.ability, s.item, ...s.moves].map(toID))),
+      entries.flatMap(([, e]) =>
+        playerSets(e).flatMap((s) => [s.ability, s.item, ...s.moves].map(toID)),
+      ),
     );
     const complex = Dex.formats.get(format).banlist.filter((b) => b.includes('++'));
     const reachable = complex.filter((b) => b.split('++').every((part) => used.has(toID(part))));
@@ -120,6 +145,7 @@ describe.each(FORMAT_IDS)('%s/sets.json', (format) => {
         overrides: readJson<RoleOverrides>(`../${format}/role-overrides.json`),
         curation: readJson<SetCuration>(`../${format}/set-curation.json`),
         randbats: readJson<RandbatsFile>(`../sources/${format}-randbats.json`),
+        fun: readJson<FunSets>(`../${format}/fun-sets.json`),
       },
       { builtAt: sets.meta.builtAt },
     );

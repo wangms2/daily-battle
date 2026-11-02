@@ -11,7 +11,7 @@ import {
   formatEvs,
   itemInfo,
   megaFor,
-  setsOf,
+  playerSetsOf,
   shortLabel,
   speciesInfo,
   topSet,
@@ -146,7 +146,7 @@ export function SetCard({
 
 /** The set it starts on: the current one, else the most used. */
 export function initialSet(species: string, currentSetId?: string): string {
-  const sets = setsOf(species);
+  const sets = playerSetsOf(species, currentSetId);
   return sets.some((s) => s.id === currentSetId) ? currentSetId! : topSet(species).id;
 }
 
@@ -168,7 +168,7 @@ export function SetChooser({
   /** Tight places: no header row (the caller shows the types), shorter tabs, no description. */
   compact?: boolean;
 }) {
-  const sets = setsOf(species);
+  const sets = playerSetsOf(species, currentSetId);
   const common = topSet(species).id;
   const tabs = useRef<(HTMLButtonElement | null)[]>([]);
   const id = useId();
@@ -278,7 +278,7 @@ export function SetPicker({
   );
 
   if (!species) return null;
-  const sets = setsOf(species);
+  const sets = playerSetsOf(species, currentSetId);
   const set = sets.find((s) => s.id === selected) ?? sets[0]!;
   const unchanged = set.id === currentSetId;
   const why = unchanged ? undefined : blocked?.(set.id);

@@ -9,6 +9,7 @@ export {
   type Style,
 } from './opponent';
 export { generatePool, poolProblems, type WeeklyPool } from './pool';
+export { MAX_OFFERED_SETS, offeredSets } from './offered';
 export { rngFor, type Rng } from './rng';
 export { isBulky, typeMultiplier, typesOf } from './traits';
 export { findSet, teamSets, toPokemonSet, type TeamSlot } from './sets';

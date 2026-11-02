@@ -3116,6 +3116,16 @@
       "contact": true,
       "desc": "Hits first. First turn out only. 100% flinch chance."
     },
+    "Final Gambit": {
+      "type": "Fighting",
+      "category": "Special",
+      "power": 0,
+      "accuracy": 100,
+      "pp": 5,
+      "priority": 0,
+      "contact": false,
+      "desc": "Does damage equal to the user's HP. User faints."
+    },
     "Fire Blast": {
       "type": "Fire",
       "category": "Special",
@@ -3305,6 +3315,16 @@
       "priority": 0,
       "contact": false,
       "desc": "Eliminates all stat changes."
+    },
+    "Head Smash": {
+      "type": "Rock",
+      "category": "Physical",
+      "power": 150,
+      "accuracy": 80,
+      "pp": 5,
+      "priority": 0,
+      "contact": true,
+      "desc": "Has 1/2 recoil."
     },
     "Heal Bell": {
       "type": "Normal",
@@ -3535,6 +3555,16 @@
       "priority": 0,
       "contact": false,
       "desc": "No foe can use any move known by the user."
+    },
+    "Infestation": {
+      "type": "Bug",
+      "category": "Special",
+      "power": 20,
+      "accuracy": 100,
+      "pp": 20,
+      "priority": 0,
+      "contact": true,
+      "desc": "Traps and damages the target for 4-5 turns."
     },
     "Iron Head": {
       "type": "Steel",
@@ -4519,6 +4549,7 @@
     "Metagrossite": "If held by a Metagross, this item allows it to Mega Evolve in battle.",
     "Mystic Water": "Holder's Water-type attacks have 1.2x power.",
     "Pinsirite": "If held by a Pinsir, this item allows it to Mega Evolve in battle.",
+    "Red Card": "If holder survives a hit, attacker is forced to switch to a random ally. Single use.",
     "Rocky Helmet": "If holder is hit by a contact move, the attacker loses 1/6 of its max HP.",
     "Sceptilite": "If held by a Sceptile, this item allows it to Mega Evolve in battle.",
     "Scizorite": "If held by a Scizor, this item allows it to Mega Evolve in battle.",
@@ -4587,6 +4618,7 @@
     "Pure Power": "This Pokemon's Attack is doubled.",
     "Rain Dish": "If Rain Dance is active, this Pokemon heals 1/16 of its max HP each turn.",
     "Regenerator": "This Pokemon restores 1/3 of its maximum HP, rounded down, when it switches out.",
+    "Rock Head": "This Pokemon does not take recoil damage besides Struggle/Life Orb/crash damage.",
     "Rough Skin": "Pokemon making contact with this Pokemon lose 1/8 of their max HP.",
     "Sand Stream": "On switch-in, this Pokemon summons Sandstorm.",
     "Sap Sipper": "This Pokemon's Attack is raised 1 stage if hit by a Grass move; Grass immunity.",

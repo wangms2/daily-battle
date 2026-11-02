@@ -7,6 +7,7 @@ import type { SetsFile } from './types';
 
 export * from './formats';
 export type { SetEntry, SetsFile, SpeciesEntry, Stats, StatID } from './types';
+export { FUN_SET_PRIOR, playerSetPrior, playerSets } from './player-sets';
 
 /** The Gen 4 OU set snapshot (see README for how it's built). */
 export const sets = gen4ou as SetsFile;

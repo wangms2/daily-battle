@@ -1887,6 +1887,16 @@
       "contact": true,
       "desc": "10% chance to freeze the target."
     },
+    "Imprison": {
+      "type": "Psychic",
+      "category": "Status",
+      "power": 0,
+      "accuracy": true,
+      "pp": 10,
+      "priority": 0,
+      "contact": false,
+      "desc": "No foe can use any move known by the user."
+    },
     "Iron Tail": {
       "type": "Steel",
       "category": "Physical",
@@ -1926,6 +1936,16 @@
       "priority": 0,
       "contact": false,
       "desc": "1/8 of target's HP is restored to user every turn."
+    },
+    "Light Screen": {
+      "type": "Psychic",
+      "category": "Status",
+      "power": 0,
+      "accuracy": true,
+      "pp": 30,
+      "priority": 0,
+      "contact": false,
+      "desc": "For 5 turns, special damage to allies is halved."
     },
     "Lovely Kiss": {
       "type": "Normal",
@@ -2461,6 +2481,7 @@
   "items": {
     "Choice Band": "Holder's Attack is 1.5x, but it can only select the first move it executes.",
     "Leftovers": "At the end of every turn, holder restores 1/16 of its max HP.",
+    "Liechi Berry": "Raises holder's Attack by 1 stage when at 1/4 max HP or less. Single use.",
     "Magnet": "Holder's Electric-type attacks have 1.1x power.",
     "Petaya Berry": "Raises holder's Sp. Atk by 1 stage when at 1/4 max HP or less. Single use.",
     "Salac Berry": "Raises holder's Speed by 1 stage when at 1/4 max HP or less. Single use.",

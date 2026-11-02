@@ -40,6 +40,7 @@ export async function buildWeek(
     teamCount,
     rngFor(`pipeline:player-teams:${week}`),
     data,
+    week,
   ).map((team) => teamSets(data, team));
   const poolSets = poolSetsOf(pool.pool.species, data);
 
@@ -105,6 +106,7 @@ export async function rebuildDays(
     Math.ceil(PIPELINE.opponent.samples / 2),
     rngFor(`pipeline:player-teams:${week}`),
     data,
+    week,
   ).map((team) => teamSets(data, team));
   const poolSets = poolSetsOf(species, data);
 

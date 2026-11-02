@@ -1,0 +1,114 @@
+{
+  "Charizard": {
+    "name": "Mega X Belly Drum",
+    "label": "Mega Belly Drum sweeper",
+    "description": "Mega Evolves with Tough Claws, Belly Drums, and hits with maxed Flare Blitz and Dragon Claw.",
+    "moves": ["Belly Drum", "Flare Blitz", "Dragon Claw", "Earthquake"],
+    "item": "Charizardite X",
+    "ability": "Blaze",
+    "nature": "Adamant",
+    "evs": {
+      "hp": 4,
+      "atk": 252,
+      "spe": 252
+    }
+  },
+  "Clefable": {
+    "name": "Belly Drum",
+    "label": "Belly Drum sweeper",
+    "description": "Magic Guard means Life Orb costs it nothing: Belly Drum, heal, then hit hard.",
+    "moves": ["Belly Drum", "Return", "Fire Punch", "Soft-Boiled"],
+    "item": "Life Orb",
+    "ability": "Magic Guard",
+    "nature": "Adamant",
+    "evs": {
+      "hp": 252,
+      "atk": 252,
+      "spd": 4
+    }
+  },
+  "Lopunny": {
+    "name": "Choice Scarf Healing Wish",
+    "label": "Choice Scarf support",
+    "description": "Outspeeds and hits, Tricks its Scarf onto a wall, or faints with Healing Wish to fully heal a teammate.",
+    "moves": ["Return", "High Jump Kick", "Switcheroo", "Healing Wish"],
+    "item": "Choice Scarf",
+    "ability": "Limber",
+    "nature": "Jolly",
+    "evs": {
+      "hp": 4,
+      "atk": 252,
+      "spe": 252
+    }
+  },
+  "Aggron": {
+    "name": "Rock Polish",
+    "label": "Rock Polish sweeper",
+    "description": "Skips the Mega Stone: Rock Head means Head Smash has no recoil, and Rock Polish gives it Speed.",
+    "moves": ["Rock Polish", "Head Smash", "Earthquake", "Heavy Slam"],
+    "item": "Life Orb",
+    "ability": "Rock Head",
+    "nature": "Adamant",
+    "evs": {
+      "hp": 4,
+      "atk": 252,
+      "spe": 252
+    }
+  },
+  "Mew": {
+    "name": "Swords Dance",
+    "label": "Swords Dance sweeper",
+    "description": "Mew can learn almost anything; this one boosts with Swords Dance and attacks physically.",
+    "moves": ["Swords Dance", "Drain Punch", "Knock Off", "Zen Headbutt"],
+    "item": "Life Orb",
+    "ability": "Synchronize",
+    "nature": "Jolly",
+    "evs": {
+      "hp": 4,
+      "atk": 252,
+      "spe": 252
+    }
+  },
+  "Whimsicott": {
+    "name": "SubSeed Encore",
+    "label": "Substitute + Leech Seed staller",
+    "description": "Prankster Substitute, Leech Seed, and Encore lock foes into useless moves while it drains them.",
+    "moves": ["Substitute", "Leech Seed", "Encore", "Moonblast"],
+    "item": "Leftovers",
+    "ability": "Prankster",
+    "nature": "Timid",
+    "evs": {
+      "hp": 252,
+      "spa": 4,
+      "spe": 252
+    }
+  },
+  "Sceptile": {
+    "name": "SubSeed",
+    "label": "Substitute + Leech Seed staller",
+    "description": "Skips the Mega Stone to hide behind Substitute and drain foes with Leech Seed and Giga Drain.",
+    "moves": ["Substitute", "Leech Seed", "Giga Drain", "Hidden Power Fire"],
+    "item": "Leftovers",
+    "ability": "Overgrow",
+    "nature": "Timid",
+    "evs": {
+      "hp": 4,
+      "spa": 252,
+      "spe": 252
+    }
+  },
+  "Shuckle": {
+    "name": "Red Card hazard lead",
+    "label": "Hazard lead",
+    "description": "Sets Sticky Web and Stealth Rock, Red Cards attackers away, and goes out with Final Gambit.",
+    "moves": ["Sticky Web", "Stealth Rock", "Final Gambit", "Infestation"],
+    "item": "Red Card",
+    "ability": "Sturdy",
+    "nature": "Calm",
+    "evs": {
+      "hp": 248,
+      "def": 8,
+      "spd": 252
+    }
+  }
+}

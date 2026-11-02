@@ -1,6 +1,6 @@
 // What a Pokémon is good for, before you commit to it. An opponent shows what
 // its battle card would (FoeScout), never one of its sets.
-import { matchups, setsOf, speciesInfo, topSet } from '../lib/data';
+import { matchups, playerSetsOf, speciesInfo, topSet } from '../lib/data';
 import { getSprite } from '../lib/sprites';
 import { Sheet } from '../ui/Sheet';
 import { Button, TypeBadge } from '../ui/bits';
@@ -72,7 +72,7 @@ export function InfoBody({ species, showRoles = true }: { species: string; showR
         <div className="mt-4">
           <h3 className="text-[13px] font-semibold text-muted">Roles</h3>
           <div className="mt-1.5 flex flex-wrap gap-1.5">
-            {setsOf(species).map((s) => (
+            {playerSetsOf(species).map((s) => (
               <span
                 key={s.id}
                 className="rounded-full bg-surface-2 px-2.5 py-1 text-[13px] font-medium"

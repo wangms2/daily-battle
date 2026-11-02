@@ -3,7 +3,7 @@
     "format": "gen3ou",
     "method": "curated-usage-weighted-v1",
     "simVersion": "0.10.11",
-    "builtAt": "2026-11-02T19:29:08.533Z",
+    "builtAt": "2026-11-02T19:56:19.638Z",
     "sources": {
       "sets": {
         "url": "https://raw.githubusercontent.com/pkmn/smogon/main/data/sets/gen3ou.json",
@@ -156,7 +156,39 @@
             "spe": 31
           }
         }
-      ]
+      ],
+      "fun": {
+        "id": "tyranitar-fun-special-tyranitar",
+        "sourceName": "Special Tyranitar",
+        "label": "Special attacker",
+        "description": "Surprises its usual counters with special Crunch, Fire Blast, Thunderbolt, and Ice Beam.",
+        "weight": 0,
+        "moves": [
+          "Crunch",
+          "Fire Blast",
+          "Thunderbolt",
+          "Ice Beam"
+        ],
+        "item": "Leftovers",
+        "ability": "Sand Stream",
+        "nature": "Modest",
+        "evs": {
+          "hp": 252,
+          "atk": 0,
+          "def": 0,
+          "spa": 252,
+          "spd": 4,
+          "spe": 0
+        },
+        "ivs": {
+          "hp": 31,
+          "atk": 31,
+          "def": 31,
+          "spa": 31,
+          "spd": 31,
+          "spe": 31
+        }
+      }
     },
     "Swampert": {
       "usage": 0.4142,
@@ -291,7 +323,39 @@
             "spe": 31
           }
         }
-      ]
+      ],
+      "fun": {
+        "id": "swampert-fun-curse",
+        "sourceName": "Curse",
+        "label": "Curse sweeper",
+        "description": "Stacks Curse boosts and heals with Rest, turning its bulk into a slow, heavy sweep.",
+        "weight": 0,
+        "moves": [
+          "Curse",
+          "Earthquake",
+          "Rock Slide",
+          "Rest"
+        ],
+        "item": "Leftovers",
+        "ability": "Torrent",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 252,
+          "atk": 252,
+          "def": 0,
+          "spa": 0,
+          "spd": 4,
+          "spe": 0
+        },
+        "ivs": {
+          "hp": 31,
+          "atk": 31,
+          "def": 31,
+          "spa": 31,
+          "spd": 31,
+          "spe": 31
+        }
+      }
     },
     "Skarmory": {
       "usage": 0.3888,
@@ -664,7 +728,39 @@
             "spe": 31
           }
         }
-      ]
+      ],
+      "fun": {
+        "id": "gengar-fun-hypnosis-destiny-bond",
+        "sourceName": "Hypnosis Destiny Bond",
+        "label": "Sleep lead",
+        "description": "Puts a foe to sleep, then takes an attacker down with it using Destiny Bond.",
+        "weight": 0,
+        "moves": [
+          "Hypnosis",
+          "Destiny Bond",
+          "Thunderbolt",
+          "Ice Punch"
+        ],
+        "item": "Leftovers",
+        "ability": "Levitate",
+        "nature": "Timid",
+        "evs": {
+          "hp": 4,
+          "atk": 0,
+          "def": 0,
+          "spa": 252,
+          "spd": 0,
+          "spe": 252
+        },
+        "ivs": {
+          "hp": 31,
+          "atk": 31,
+          "def": 31,
+          "spa": 31,
+          "spd": 31,
+          "spe": 31
+        }
+      }
     },
     "Blissey": {
       "usage": 0.3142,
@@ -1424,7 +1520,39 @@
             "spe": 31
           }
         }
-      ]
+      ],
+      "fun": {
+        "id": "snorlax-fun-belly-drum",
+        "sourceName": "Belly Drum",
+        "label": "Belly Drum sweeper",
+        "description": "Maxes its Attack in one turn and tries to bulldoze through with Return.",
+        "weight": 0,
+        "moves": [
+          "Belly Drum",
+          "Return",
+          "Shadow Ball",
+          "Earthquake"
+        ],
+        "item": "Leftovers",
+        "ability": "Thick Fat",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 252,
+          "atk": 252,
+          "def": 0,
+          "spa": 0,
+          "spd": 4,
+          "spe": 0
+        },
+        "ivs": {
+          "hp": 31,
+          "atk": 31,
+          "def": 31,
+          "spa": 31,
+          "spd": 31,
+          "spe": 31
+        }
+      }
     },
     "Claydol": {
       "usage": 0.1871,
@@ -2102,7 +2230,39 @@
             "spe": 31
           }
         }
-      ]
+      ],
+      "fun": {
+        "id": "heracross-fun-endure-reversal",
+        "sourceName": "Endure Reversal",
+        "label": "Reversal attacker",
+        "description": "Endures a hit to drop to 1 HP, then its Salac Berry and full-power Reversal take over.",
+        "weight": 0,
+        "moves": [
+          "Endure",
+          "Reversal",
+          "Megahorn",
+          "Rock Slide"
+        ],
+        "item": "Salac Berry",
+        "ability": "Swarm",
+        "nature": "Jolly",
+        "evs": {
+          "hp": 4,
+          "atk": 252,
+          "def": 0,
+          "spa": 0,
+          "spd": 0,
+          "spe": 252
+        },
+        "ivs": {
+          "hp": 31,
+          "atk": 31,
+          "def": 31,
+          "spa": 31,
+          "spd": 31,
+          "spe": 31
+        }
+      }
     },
     "Charizard": {
       "usage": 0.0533,
@@ -2141,7 +2301,39 @@
             "spe": 31
           }
         }
-      ]
+      ],
+      "fun": {
+        "id": "charizard-fun-bellyzard",
+        "sourceName": "Bellyzard",
+        "label": "Belly Drum sweeper",
+        "description": "Maxes its Attack with Belly Drum behind a Substitute, then sweeps after its Salac Berry kicks in.",
+        "weight": 0,
+        "moves": [
+          "Belly Drum",
+          "Substitute",
+          "Earthquake",
+          "Hidden Power Flying"
+        ],
+        "item": "Salac Berry",
+        "ability": "Blaze",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 4,
+          "atk": 252,
+          "def": 0,
+          "spa": 0,
+          "spd": 0,
+          "spe": 252
+        },
+        "ivs": {
+          "hp": 30,
+          "atk": 30,
+          "def": 30,
+          "spa": 30,
+          "spd": 30,
+          "spe": 31
+        }
+      }
     },
     "Moltres": {
       "usage": 0.051,
@@ -2251,7 +2443,39 @@
             "spe": 31
           }
         }
-      ]
+      ],
+      "fun": {
+        "id": "gyarados-fun-taunt-dragon-dance",
+        "sourceName": "Taunt Dragon Dance",
+        "label": "Dragon Dance sweeper",
+        "description": "Taunts walls so they can't stop it, Dragon Dances, then sweeps.",
+        "weight": 0,
+        "moves": [
+          "Dragon Dance",
+          "Taunt",
+          "Hidden Power Flying",
+          "Earthquake"
+        ],
+        "item": "Leftovers",
+        "ability": "Intimidate",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 4,
+          "atk": 252,
+          "def": 0,
+          "spa": 0,
+          "spd": 0,
+          "spe": 252
+        },
+        "ivs": {
+          "hp": 30,
+          "atk": 30,
+          "def": 30,
+          "spa": 30,
+          "spd": 30,
+          "spe": 31
+        }
+      }
     },
     "Medicham": {
       "usage": 0.0452,
@@ -2858,7 +3082,39 @@
             "spe": 31
           }
         }
-      ]
+      ],
+      "fun": {
+        "id": "smeargle-fun-belly-drum-extreme-speed",
+        "sourceName": "Belly Drum Extreme Speed",
+        "label": "Belly Drum sweeper",
+        "description": "Puts a foe to sleep, Belly Drums behind a Substitute, then sweeps with priority Extreme Speed.",
+        "weight": 0,
+        "moves": [
+          "Spore",
+          "Belly Drum",
+          "Extreme Speed",
+          "Substitute"
+        ],
+        "item": "Salac Berry",
+        "ability": "Own Tempo",
+        "nature": "Jolly",
+        "evs": {
+          "hp": 4,
+          "atk": 252,
+          "def": 0,
+          "spa": 0,
+          "spd": 0,
+          "spe": 252
+        },
+        "ivs": {
+          "hp": 31,
+          "atk": 31,
+          "def": 31,
+          "spa": 31,
+          "spd": 31,
+          "spe": 31
+        }
+      }
     },
     "Kingdra": {
       "usage": 0.0179,
@@ -2897,7 +3153,39 @@
             "spe": 31
           }
         }
-      ]
+      ],
+      "fun": {
+        "id": "kingdra-fun-dragon-dance",
+        "sourceName": "Dragon Dance",
+        "label": "Dragon Dance sweeper",
+        "description": "Boosts with Dragon Dance and hits hard on both sides with Hydro Pump and Hidden Power Flying.",
+        "weight": 0,
+        "moves": [
+          "Dragon Dance",
+          "Hydro Pump",
+          "Ice Beam",
+          "Hidden Power Flying"
+        ],
+        "item": "Leftovers",
+        "ability": "Swift Swim",
+        "nature": "Naive",
+        "evs": {
+          "hp": 4,
+          "atk": 252,
+          "def": 0,
+          "spa": 0,
+          "spd": 0,
+          "spe": 252
+        },
+        "ivs": {
+          "hp": 30,
+          "atk": 30,
+          "def": 30,
+          "spa": 30,
+          "spd": 30,
+          "spe": 31
+        }
+      }
     },
     "Houndoom": {
       "usage": 0.0176,
@@ -3490,7 +3778,39 @@
             "spe": 31
           }
         }
-      ]
+      ],
+      "fun": {
+        "id": "blaziken-fun-swords-dance-reversal",
+        "sourceName": "Swords Dance Reversal",
+        "label": "Reversal attacker",
+        "description": "Boosts with Swords Dance, Endures to 1 HP, then hits back with Reversal after its Salac Berry.",
+        "weight": 0,
+        "moves": [
+          "Swords Dance",
+          "Endure",
+          "Reversal",
+          "Fire Blast"
+        ],
+        "item": "Salac Berry",
+        "ability": "Blaze",
+        "nature": "Hasty",
+        "evs": {
+          "hp": 4,
+          "atk": 252,
+          "def": 0,
+          "spa": 0,
+          "spd": 0,
+          "spe": 252
+        },
+        "ivs": {
+          "hp": 31,
+          "atk": 31,
+          "def": 31,
+          "spa": 31,
+          "spd": 31,
+          "spe": 31
+        }
+      }
     },
     "Dusclops": {
       "usage": 0.0121,
@@ -3600,7 +3920,39 @@
             "spe": 31
           }
         }
-      ]
+      ],
+      "fun": {
+        "id": "marowak-fun-belly-drum",
+        "sourceName": "Belly Drum",
+        "label": "Belly Drum sweeper",
+        "description": "Doubles its huge Thick Club Attack again with Belly Drum, then swings for the knockout.",
+        "weight": 0,
+        "moves": [
+          "Belly Drum",
+          "Earthquake",
+          "Rock Slide",
+          "Double-Edge"
+        ],
+        "item": "Thick Club",
+        "ability": "Rock Head",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 252,
+          "atk": 252,
+          "def": 0,
+          "spa": 0,
+          "spd": 4,
+          "spe": 0
+        },
+        "ivs": {
+          "hp": 31,
+          "atk": 31,
+          "def": 31,
+          "spa": 31,
+          "spd": 31,
+          "spe": 31
+        }
+      }
     },
     "Donphan": {
       "usage": 0.0101,
@@ -4715,7 +5067,39 @@
             "spe": 31
           }
         }
-      ]
+      ],
+      "fun": {
+        "id": "misdreavus-fun-imprison",
+        "sourceName": "Imprison",
+        "label": "Imprison support",
+        "description": "Seals off any move it shares with the foe, so attackers relying on Thunderbolt or Hidden Power go quiet.",
+        "weight": 0,
+        "moves": [
+          "Hidden Power Ice",
+          "Thunderbolt",
+          "Thunder Wave",
+          "Imprison"
+        ],
+        "item": "Leftovers",
+        "ability": "Levitate",
+        "nature": "Modest",
+        "evs": {
+          "hp": 236,
+          "atk": 0,
+          "def": 68,
+          "spa": 124,
+          "spd": 80,
+          "spe": 0
+        },
+        "ivs": {
+          "hp": 31,
+          "atk": 30,
+          "def": 30,
+          "spa": 31,
+          "spd": 31,
+          "spe": 31
+        }
+      }
     },
     "Gardevoir": {
       "usage": 0.005,
@@ -5127,7 +5511,39 @@
             "spe": 31
           }
         }
-      ]
+      ],
+      "fun": {
+        "id": "lapras-fun-dragon-dance",
+        "sourceName": "Dragon Dance",
+        "label": "Dragon Dance sweeper",
+        "description": "Boosts its Attack and Speed with Dragon Dance, then sweeps with a bulky body behind it.",
+        "weight": 0,
+        "moves": [
+          "Dragon Dance",
+          "Return",
+          "Ice Beam",
+          "Rest"
+        ],
+        "item": "Leftovers",
+        "ability": "Water Absorb",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 252,
+          "atk": 252,
+          "def": 0,
+          "spa": 0,
+          "spd": 0,
+          "spe": 4
+        },
+        "ivs": {
+          "hp": 31,
+          "atk": 31,
+          "def": 31,
+          "spa": 31,
+          "spd": 31,
+          "spe": 31
+        }
+      }
     },
     "Rhydon": {
       "usage": 0.0023,
@@ -5269,7 +5685,39 @@
             "spe": 30
           }
         }
-      ]
+      ],
+      "fun": {
+        "id": "scizor-fun-agility-reversal",
+        "sourceName": "Agility Reversal",
+        "label": "Reversal attacker",
+        "description": "Speeds up with Agility, Endures to 1 HP, then sweeps with Reversal after its Liechi Berry.",
+        "weight": 0,
+        "moves": [
+          "Agility",
+          "Endure",
+          "Reversal",
+          "Hidden Power Ghost"
+        ],
+        "item": "Liechi Berry",
+        "ability": "Swarm",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 108,
+          "atk": 252,
+          "def": 0,
+          "spa": 0,
+          "spd": 0,
+          "spe": 148
+        },
+        "ivs": {
+          "hp": 31,
+          "atk": 31,
+          "def": 30,
+          "spa": 31,
+          "spd": 30,
+          "spe": 31
+        }
+      }
     },
     "Miltank": {
       "usage": 0.0022,
@@ -5695,7 +6143,39 @@
             "spe": 31
           }
         }
-      ]
+      ],
+      "fun": {
+        "id": "electrode-fun-screen-lead",
+        "sourceName": "Screen lead",
+        "label": "Screen lead",
+        "description": "Taunts the foe's lead, sets Light Screen for the team, then Explodes.",
+        "weight": 0,
+        "moves": [
+          "Taunt",
+          "Light Screen",
+          "Explosion",
+          "Thunderbolt"
+        ],
+        "item": "Leftovers",
+        "ability": "Static",
+        "nature": "Timid",
+        "evs": {
+          "hp": 4,
+          "atk": 0,
+          "def": 0,
+          "spa": 252,
+          "spd": 0,
+          "spe": 252
+        },
+        "ivs": {
+          "hp": 31,
+          "atk": 31,
+          "def": 31,
+          "spa": 31,
+          "spd": 31,
+          "spe": 31
+        }
+      }
     },
     "Exeggutor": {
       "usage": 0.0016,

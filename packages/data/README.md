@@ -57,6 +57,14 @@ How a curated set's options become one concrete set (`src/resolve.ts`):
 
 `pnpm --filter @daily-battle/data audit-sets --format <id>` writes `reports/set-audit-<format>.md`: attackers without two attacks, no STAB, slots resolved away from the analysis's choice, padding sets, labels naming missing moves, and EVs or natures at odds with the set, plus Random Battle roles no set covers. It changes nothing; decisions go into `set-curation.json` (`add`, `drop`, `swap`) and `role-overrides.json`. The Nov 2026 review's decisions are in `reports/set-proposals-<format>.md`.
 
+## Fun sets (Nov 2026)
+
+`<format>/fun-sets.json` holds at most one creative set per species (Bellyzard, Belly Drum Snorlax, Trick Room Dusknoir), many found through Random Battle roles no standard set covers. The build resolves and validates each like a standard set (as a team of one too, with the format's clauses) and stops on any problem, since they're written by hand. It writes it as the species' `fun` set: id `<species>-fun-<slug>`, weight 0, kept out of `sets`.
+
+- **Players only.** The team builder shows it after the standard sets, with no marker (`playerSets`). It offers at most three sets a week: see `offeredSets` in `@daily-battle/gen`. Opponents, the recommended team, and the pool checks read `sets` and never see it.
+- **The AI's guess** at a player's set gives it 5% (`playerSetPrior`, `FUN_SET_PRIOR`), so a revealed Belly Drum narrows to it instead of an unknown set.
+- **Species kept by hand.** `BUILD_RULES[format].include` keeps a species below the UU cut with its lower tier's sets: Gen 4 Charizard (NU), home to Gen 4 Bellyzard.
+
 ## Refreshing
 
 ```sh
