@@ -79,7 +79,7 @@
     "description": "Clears entry hazards with Rapid Spin while threatening foes with fast coverage moves."
   },
   "suicune-crocune-defensive-calm-mind-resttalk": {
-    "label": "Calm Mind sweeper (RestTalk)"
+    "label": "Calm Mind tank (RestTalk)"
   },
   "suicune-subcune": {
     "label": "Calm Mind sweeper (Substitute)"
@@ -103,5 +103,30 @@
   "yanmega-attacking-lead": {
     "label": "Speed Boost lead",
     "description": "Protects on the first turn to gain a Speed Boost, then attacks; Focus Sash lets it survive a hit."
+  },
+  "registeel-mono-attacker": {
+    "label": "Curse tank"
+  },
+  "spiritomb-curse": {
+    "label": "Ghost Curse staller"
+  },
+  "togekiss-defensive-nasty-plot": {
+    "label": "Paraflinch Nasty Plot"
+  },
+  "rotomfrost-utility": {
+    "label": "Substitute + Will-O-Wisp staller"
+  },
+  "uxie-choice-scarf-lead": {
+    "label": "Choice Scarf lead (Trick)"
+  },
+  "claydol-choice-scarf-lead": {
+    "label": "Choice Scarf lead (Trick)"
+  },
+  "moltres-subroost": {
+    "label": "SubRoost staller"
+  },
+  "kingdra-dragon-dance-resttalk": {
+    "label": "Dragon Dance RestTalk",
+    "description": "Boosts with Dragon Dance, then sleeps off damage with Rest and keeps attacking with Sleep Talk."
   }
 }

@@ -67,29 +67,60 @@ export function legalAbilities(species: string, gen: number): string[] {
     .map(([, name]) => name);
 }
 
+export interface PickOptions {
+  /** Moves a reference (Random Battles) uses on this species: each counts double. */
+  preferred?: ReadonlySet<string>;
+  /** Whether a move deals damage, for `minAttacks`. */
+  isAttack?: (move: string) => boolean;
+  /** An attacker's set needs this many attacks when some combination has them. */
+  minAttacks?: number;
+}
+
+/** Attacks that do little when locked in by a Choice item. */
+const CHOICE_USELESS = ['focuspunch', 'flail', 'reversal'];
+/** Status moves a Choice set still wants: passing the item on, or fainting for a teammate. */
+const CHOICE_STATUS = ['trick', 'switcheroo', 'healingwish', 'memento', 'lunardance'];
+
+/** How much the analysis's first-listed option, or a preferred move, counts over usage. */
+export const LISTED_FIRST_BONUS = 2;
+
 /**
- * Picks one option per move slot, with no repeats, maximizing the product of
- * usage shares (shares floored at 0.001 so unseen moves still count). Ties keep
- * the earlier listed combination. Returns null if no repeat-free choice exists.
+ * Picks one option per move slot, with no repeats, as a whole set: the
+ * product of usage shares (floored at 0.001 so unseen moves still count),
+ * doubled for each slot's first-listed option (the analysis's own pick) and
+ * for each preferred move, so usage has to clearly beat them. Combinations
+ * with `minAttacks` attacks win over those without. Ties keep the earlier
+ * listed combination. Returns null if no repeat-free choice exists.
  */
-export function pickMoves(slots: string[][], shares: Map<string, number>): string[] | null {
-  const logShare = (m: string) => Math.log(Math.max(shares.get(toID(m)) ?? 0, 0.001));
+export function pickMoves(
+  slots: string[][],
+  shares: Map<string, number>,
+  { preferred, isAttack, minAttacks = 0 }: PickOptions = {},
+): string[] | null {
+  const bonus = Math.log(LISTED_FIRST_BONUS);
+  const logShare = (m: string, first: boolean) =>
+    Math.log(Math.max(shares.get(toID(m)) ?? 0, 0.001)) +
+    (first ? bonus : 0) +
+    (preferred?.has(toID(m)) ? bonus : 0);
   let best: string[] | null = null;
-  let bestScore = -Infinity;
+  let bestKey: [number, number] = [-1, -Infinity];
   const walk = (i: number, chosen: string[], score: number) => {
     if (i === slots.length) {
-      if (score > bestScore) {
+      const attacks = isAttack ? chosen.filter(isAttack).length : 0;
+      const key: [number, number] = [attacks >= minAttacks ? 1 : 0, score];
+      if (key[0] > bestKey[0] || (key[0] === bestKey[0] && key[1] > bestKey[1])) {
         best = [...chosen];
-        bestScore = score;
+        bestKey = key;
       }
       return;
     }
-    for (const m of slots[i]!) {
-      if (chosen.some((c) => toID(c) === toID(m))) continue;
+    const options = slots[i]!;
+    options.forEach((m, n) => {
+      if (chosen.some((c) => toID(c) === toID(m))) return;
       chosen.push(m);
-      walk(i + 1, chosen, score + logShare(m));
+      walk(i + 1, chosen, score + logShare(m, n === 0 && options.length > 1));
       chosen.pop();
-    }
+    });
   };
   walk(0, [], 0);
   return best;
@@ -108,9 +139,31 @@ export function resolveSet(
   gen: number,
   /** Abilities never to pick, falling back to the species' others (see `BUILD_RULES` in build.ts). */
   avoidAbilities: readonly string[] = [],
+  /** Moves Random Battles use on the species (ids), preferred in a slashed slot. */
+  preferred?: ReadonlySet<string>,
 ): ResolvedSet | null {
   const dex = Dex.forGen(gen);
-  const moves = pickMoves(set.moves.map(asArray), usage.moves);
+  // An attacking spread (not a bulky one) gets at least two attacks where the slots allow.
+  const evs = fillStats(asArray(set.evs)[0], 0);
+  const bulky = evs.hp >= 200 && Math.max(evs.def, evs.spd) >= 160;
+  const attacker = !bulky && Math.max(evs.atk, evs.spa) >= 200;
+  // Locked into one move, a Choice set has no use for status moves (but Trick)
+  // or moves that need a hit first or low HP; skip them where a slot offers more.
+  const item = pick(asArray(set.item), usage.items) ?? '';
+  const slots = set.moves.map(asArray).map((options) => {
+    if (!item.startsWith('Choice')) return options;
+    const useful = options.filter((m) => {
+      const move = dex.moves.get(m);
+      if (CHOICE_USELESS.includes(move.id)) return false;
+      return move.category !== 'Status' || CHOICE_STATUS.includes(move.id);
+    });
+    return useful.length ? useful : options;
+  });
+  const moves = pickMoves(slots, usage.moves, {
+    preferred,
+    isAttack: (m) => dex.moves.get(m).category !== 'Status',
+    minAttacks: attacker ? 2 : 0,
+  });
   if (!moves) return null;
 
   const allowed = (abilities: string[]) => abilities.filter((a) => !avoidAbilities.includes(a));
@@ -130,13 +183,19 @@ export function resolveSet(
     if (dex.getHiddenPower(ivs).type !== type) Object.assign(ivs, dex.types.get(type).HPivs);
   }
 
+  // Natures are picked apart from the spread, so skip any that lowers a stat it invests in.
+  const natures = asArray(set.nature).filter((n) => {
+    const minus = dex.natures.get(n).minus;
+    return !minus || evs[minus] < 100;
+  });
+
   return {
     species,
     moves,
-    item: pick(asArray(set.item), usage.items) ?? '',
+    item,
     ability: ability ?? '',
-    nature: pick(asArray(set.nature), usage.natures) ?? 'Serious',
-    evs: fillStats(asArray(set.evs)[0], 0),
+    nature: pick(natures.length ? natures : asArray(set.nature), usage.natures) ?? 'Serious',
+    evs,
     ivs,
   };
 }

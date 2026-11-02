@@ -11,8 +11,8 @@
     "label": "Physical wall (Earthquake)"
   },
   "swampert-surf-defensive": {
-    "label": "Physical wall (Roar)",
-    "description": "Soaks up physical attacks, spreads Toxic, and Roars away setup sweepers."
+    "label": "Physical wall (Toxic)",
+    "description": "Soaks up physical attacks, spreads Toxic, and cures its own status with Refresh."
   },
   "swampert-standard-offensive": {
     "label": "Bulky attacker",
@@ -47,7 +47,7 @@
     "description": "Leads with Taunt to stop Spikes and setup, then attacks with Rock Slide, Earthquake, and Double-Edge."
   },
   "suicune-modest-resttalk": {
-    "label": "Calm Mind sweeper (RestTalk)"
+    "label": "Calm Mind tank (RestTalk)"
   },
   "celebi-leech-seed-3-attacks": {
     "label": "Leech Seed attacker",
@@ -61,7 +61,7 @@
     "label": "Calm Mind sweeper (offensive)"
   },
   "celebi-defensive-calm-mind": {
-    "label": "Calm Mind sweeper (bulky)"
+    "label": "Calm Mind tank"
   },
   "snorlax-utility-lax": {
     "label": "Bulky attacker",
@@ -90,19 +90,12 @@
     "label": "Perish trapper",
     "description": "Puts a foe to sleep with Lovely Kiss, traps it with Mean Look, and KOs it with Perish Song from behind a Substitute."
   },
-  "charizard-sun": {
-    "label": "Sun attacker",
-    "description": "Sets sun with Sunny Day to power up Fire Blast, with Hidden Power Grass and Dragon Claw for coverage."
-  },
   "medicham-reversal": {
     "label": "Reversal attacker",
     "description": "Behind a Substitute, Salac Berry and low HP power up Reversal and Focus Punch."
   },
   "cloyster-spiker": {
     "label": "Spikes setter (spinner)"
-  },
-  "cloyster-offensive-spikes": {
-    "label": "Spikes setter (offensive)"
   },
   "regirock-physical-attacker": {
     "label": "Bulky attacker",
@@ -143,10 +136,6 @@
     "label": "Mixed attacker (Salac Berry)",
     "description": "Mixes Fire Blast, Thunder Punch, and Hidden Power Ice with Sky Uppercut, with a Salac Berry for Speed."
   },
-  "blaziken-mixed-sweeper": {
-    "label": "Mixed attacker (Leftovers)",
-    "description": "Mixes Fire Blast with Focus Punch, Sky Uppercut, and Rock Slide to break through walls of either kind."
-  },
   "blaziken-reversal": {
     "label": "Reversal attacker",
     "description": "Behind a Substitute, Salac Berry and low HP power up Reversal, with Fire Blast and Hidden Power Ice for coverage."
@@ -158,10 +147,6 @@
   "alakazam-encore": {
     "label": "Encore attacker",
     "description": "Locks foes into their last move with Encore and attacks from behind a Substitute."
-  },
-  "alakazam-special-trick": {
-    "label": "Trick attacker (special)",
-    "description": "Attacks with Psychic and Fire Punch, then Tricks its Choice Band onto a wall to cripple it."
   },
   "alakazam-physical-trick": {
     "label": "Trick attacker (physical)",
@@ -178,15 +163,11 @@
     "label": "Perish trapper",
     "description": "Traps a foe with Mean Look and KOs it with Perish Song, Taunting healers and stalling with Protect."
   },
-  "misdreavus-imprison": {
-    "label": "Imprison support",
-    "description": "Locks out foes that share its moves with Imprison, and paralyzes with Thunder Wave."
-  },
   "gardevoir-special-sweeper": {
     "label": "Calm Mind sweeper (Will-O-Wisp)"
   },
   "gardevoir-mono-attacker": {
-    "label": "Calm Mind sweeper (Substitute)"
+    "label": "Substitute + Hypnosis"
   },
   "gardevoir-supporter": {
     "label": "Wish support",
@@ -195,10 +176,6 @@
   "lapras-offensive-utility": {
     "label": "Bulky attacker",
     "description": "Attacks with Hydro Pump, Ice Beam, and Thunderbolt from a bulky spread, and cures the team's status with Heal Bell."
-  },
-  "scizor-reversal": {
-    "label": "Reversal attacker",
-    "description": "Endures a hit, then uses Liechi Berry, Agility, and Swords Dance to power up a low-HP Reversal."
   },
   "scizor-swords-dance": {
     "label": "Swords Dance sweeper"
@@ -233,5 +210,18 @@
   "omastar-rain-dance-sweeper": {
     "label": "Rain sweeper",
     "description": "Sets rain with Rain Dance; Swift Swim doubles its Speed for rain-boosted Surf."
+  },
+  "miltank-curse": {
+    "label": "Curse tank"
+  },
+  "jynx-special-sweeper": {
+    "label": "Substitute + Lovely Kiss"
+  },
+  "vaporeon-substitute-wishpass": {
+    "label": "Wish passer"
+  },
+  "blissey-wish-support": {
+    "label": "Wish support",
+    "description": "Passes big Wishes to teammates and wears foes down with Toxic and Seismic Toss."
   }
 }

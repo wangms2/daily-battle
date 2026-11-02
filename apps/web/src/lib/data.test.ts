@@ -52,7 +52,10 @@ describe('possibleSets', () => {
     ]);
     expect(labels('Heatran', { moves: ['Stealth Rock'], item: '', ability: '' })).toEqual([
       'Stealth Rock setter',
+    ]);
+    expect(labels('Heatran', { moves: ['Dragon Pulse'], item: '', ability: '' })).toEqual([
       'Choice Scarf attacker',
+      'Fast attacker',
     ]);
     expect(labels('Heatran', { moves: ['Stealth Rock'], item: 'Leftovers', ability: '' })).toEqual([
       'Stealth Rock setter',

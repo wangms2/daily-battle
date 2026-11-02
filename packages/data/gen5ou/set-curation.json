@@ -65,19 +65,6 @@
         }
       }
     },
-    "Blissey": {
-      "Toxic Attacker": {
-        "moves": ["Soft-Boiled", "Toxic", "Flamethrower", "Ice Beam"],
-        "item": "Leftovers",
-        "ability": "Natural Cure",
-        "nature": "Calm",
-        "evs": {
-          "hp": 252,
-          "def": 4,
-          "spd": 252
-        }
-      }
-    },
     "Ninetales": {
       "Nasty Plot": {
         "moves": ["Nasty Plot", "Fire Blast", "Solar Beam", "Hidden Power Ice"],
@@ -451,22 +438,6 @@
         }
       }
     },
-    "Dusclops": {
-      "Trick Room": {
-        "moves": ["Trick Room", "Night Shade", "Will-O-Wisp", "Pain Split"],
-        "item": "Eviolite",
-        "ability": "Pressure",
-        "nature": "Relaxed",
-        "evs": {
-          "hp": 252,
-          "def": 252,
-          "spd": 4
-        },
-        "ivs": {
-          "spe": 0
-        }
-      }
-    },
     "Krookodile": {
       "Stealth Rock": {
         "moves": ["Stealth Rock", "Earthquake", "Knock Off", "Stone Edge"],
@@ -504,6 +475,17 @@
           "atk": 252,
           "spd": 4
         }
+      },
+      "Dragon Dance": {
+        "moves": ["Dragon Dance", "Crunch", "Stone Edge", "Earthquake"],
+        "item": "Lum Berry",
+        "ability": "Sand Stream",
+        "nature": "Jolly",
+        "evs": {
+          "hp": 4,
+          "atk": 252,
+          "spe": 252
+        }
       }
     },
     "Latios": {
@@ -518,11 +500,54 @@
           "spe": 252
         }
       }
+    },
+    "Starmie": {
+      "Bulky Spinner": {
+        "moves": ["Scald", "Recover", "Rapid Spin", "Psyshock"],
+        "item": "Leftovers",
+        "ability": "Natural Cure",
+        "nature": "Bold",
+        "evs": {
+          "hp": 252,
+          "def": 252,
+          "spe": 4
+        }
+      }
+    },
+    "Gliscor": {
+      "Toxic Stall": {
+        "moves": ["Toxic", "Protect", "Substitute", "Earthquake"],
+        "item": "Toxic Orb",
+        "ability": "Poison Heal",
+        "nature": "Impish",
+        "evs": {
+          "hp": 252,
+          "def": 184,
+          "spe": 72
+        }
+      }
+    },
+    "Conkeldurr": {
+      "Guts": {
+        "moves": ["Mach Punch", "Drain Punch", "Ice Punch", "Payback"],
+        "item": "Flame Orb",
+        "ability": "Guts",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 252,
+          "atk": 252,
+          "spd": 4
+        }
+      }
     }
   },
   "drop": {
     "Venusaur": ["Sun \"Sweeper\""],
-    "Latios": ["Colbur Berry"]
+    "Latios": ["Colbur Berry"],
+    "Jirachi": ["Lead"],
+    "Dragonite": ["Substitute + Dragon Dance"],
+    "Victini": ["All-out Attacker"],
+    "Togekiss": ["Specially Defensive"]
   },
   "swap": {
     "Breloom": {

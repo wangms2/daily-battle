@@ -11,7 +11,7 @@ import {
 } from './build';
 import { FORMATS, type FormatId } from './formats';
 import { setsFor } from './index';
-import type { ChaosStats, CuratedSets, RoleOverrides, SourcesMeta } from './types';
+import type { ChaosStats, CuratedSets, RandbatsFile, RoleOverrides, SourcesMeta } from './types';
 
 const readJson = <T>(rel: string) =>
   JSON.parse(readFileSync(new URL(rel, import.meta.url), 'utf8')) as T;
@@ -119,6 +119,7 @@ describe.each(FORMAT_IDS)('%s/sets.json', (format) => {
         sources: readJson<SourcesMeta>(`../sources/${format}-sources.json`),
         overrides: readJson<RoleOverrides>(`../${format}/role-overrides.json`),
         curation: readJson<SetCuration>(`../${format}/set-curation.json`),
+        randbats: readJson<RandbatsFile>(`../sources/${format}-randbats.json`),
       },
       { builtAt: sets.meta.builtAt },
     );
@@ -177,16 +178,6 @@ describe('gen6ou Megas', () => {
       for (const s of entry.sets) {
         if (dex.items.get(s.item).megaStone) expect(s.label, s.id).toMatch(/^Mega /);
       }
-    }
-  });
-
-  it('only leaves species with a Mega set at one set', () => {
-    const single = Object.entries(sets.species).filter(([, e]) => e.sets.length === 1);
-    for (const [name, entry] of single) {
-      expect(
-        entry.sets.some((s) => dex.items.get(s.item).megaStone),
-        name,
-      ).toBe(true);
     }
   });
 });

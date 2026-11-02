@@ -3,7 +3,7 @@
     "format": "gen3ou",
     "method": "curated-usage-weighted-v1",
     "simVersion": "0.10.11",
-    "builtAt": "2026-10-24T16:51:53.962Z",
+    "builtAt": "2026-11-02T19:29:08.533Z",
     "sources": {
       "sets": {
         "url": "https://raw.githubusercontent.com/pkmn/smogon/main/data/sets/gen3ou.json",
@@ -168,7 +168,7 @@
           "sourceName": "Standard Defensive",
           "label": "Physical wall (Earthquake)",
           "description": "Soaks up physical attacks while wearing the opponent down.",
-          "weight": 0.5278,
+          "weight": 0.5373,
           "moves": [
             "Earthquake",
             "Ice Beam",
@@ -200,7 +200,7 @@
           "sourceName": "Standard Offensive",
           "label": "Bulky attacker",
           "description": "Attacks with Hydro Pump, Ice Beam, and Earthquake from a bulky spread, and cures its status with Refresh.",
-          "weight": 0.2122,
+          "weight": 0.216,
           "moves": [
             "Hydro Pump",
             "Ice Beam",
@@ -230,14 +230,14 @@
         {
           "id": "swampert-surf-defensive",
           "sourceName": "Surf Defensive",
-          "label": "Physical wall (Roar)",
-          "description": "Soaks up physical attacks, spreads Toxic, and Roars away setup sweepers.",
-          "weight": 0.21,
+          "label": "Physical wall (Toxic)",
+          "description": "Soaks up physical attacks, spreads Toxic, and cures its own status with Refresh.",
+          "weight": 0.1967,
           "moves": [
             "Surf",
             "Toxic",
             "Protect",
-            "Roar"
+            "Refresh"
           ],
           "item": "Leftovers",
           "ability": "Torrent",
@@ -303,12 +303,12 @@
           "sourceName": "Standard",
           "label": "Spikes setter (specially defensive)",
           "description": "Sets Spikes to wear down every Pokémon the opponent switches in.",
-          "weight": 0.95,
+          "weight": 0.9,
           "moves": [
             "Spikes",
             "Roar",
             "Drill Peck",
-            "Toxic"
+            "Protect"
           ],
           "item": "Leftovers",
           "ability": "Keen Eye",
@@ -320,6 +320,38 @@
             "spa": 0,
             "spd": 252,
             "spe": 4
+          },
+          "ivs": {
+            "hp": 31,
+            "atk": 31,
+            "def": 31,
+            "spa": 31,
+            "spd": 31,
+            "spe": 31
+          }
+        },
+        {
+          "id": "skarmory-staller",
+          "sourceName": "Staller",
+          "label": "Spikes setter (physically defensive)",
+          "description": "Sets Spikes to wear down every Pokémon the opponent switches in.",
+          "weight": 0.05,
+          "moves": [
+            "Spikes",
+            "Toxic",
+            "Protect",
+            "Whirlwind"
+          ],
+          "item": "Leftovers",
+          "ability": "Keen Eye",
+          "nature": "Impish",
+          "evs": {
+            "hp": 252,
+            "atk": 0,
+            "def": 252,
+            "spa": 0,
+            "spd": 4,
+            "spe": 0
           },
           "ivs": {
             "hp": 31,
@@ -644,7 +676,7 @@
           "sourceName": "Utility",
           "label": "Special wall",
           "description": "Takes special hits all day, heals with Soft-Boiled, paralyzes with Thunder Wave, and chips away with Seismic Toss.",
-          "weight": 0.6188,
+          "weight": 0.5679,
           "moves": [
             "Soft-Boiled",
             "Ice Beam",
@@ -676,7 +708,7 @@
           "sourceName": "Calm Mind",
           "label": "Calm Mind sweeper",
           "description": "Boosts itself with Calm Mind, then tries to sweep through the opposing team.",
-          "weight": 0.3812,
+          "weight": 0.3499,
           "moves": [
             "Calm Mind",
             "Soft-Boiled",
@@ -702,6 +734,38 @@
             "spd": 31,
             "spe": 31
           }
+        },
+        {
+          "id": "blissey-wish-support",
+          "sourceName": "Wish Support",
+          "label": "Wish support",
+          "description": "Passes big Wishes to teammates and wears foes down with Toxic and Seismic Toss.",
+          "weight": 0.0822,
+          "moves": [
+            "Wish",
+            "Protect",
+            "Seismic Toss",
+            "Toxic"
+          ],
+          "item": "Leftovers",
+          "ability": "Natural Cure",
+          "nature": "Bold",
+          "evs": {
+            "hp": 4,
+            "atk": 0,
+            "def": 252,
+            "spa": 0,
+            "spd": 252,
+            "spe": 0
+          },
+          "ivs": {
+            "hp": 31,
+            "atk": 31,
+            "def": 31,
+            "spa": 31,
+            "spd": 31,
+            "spe": 31
+          }
         }
       ]
     },
@@ -715,7 +779,7 @@
           "sourceName": "Dragon Dance",
           "label": "Dragon Dance sweeper",
           "description": "Boosts itself with Dragon Dance, then tries to sweep through the opposing team.",
-          "weight": 0.7913,
+          "weight": 0.8984,
           "moves": [
             "Dragon Dance",
             "Hidden Power Flying",
@@ -743,43 +807,11 @@
           }
         },
         {
-          "id": "salamence-mixed",
-          "sourceName": "Mixed",
-          "label": "Fast attacker",
-          "description": "Hits fast and hard with wide move coverage.",
-          "weight": 0.1192,
-          "moves": [
-            "Rock Slide",
-            "Brick Break",
-            "Hidden Power Grass",
-            "Fire Blast"
-          ],
-          "item": "Leftovers",
-          "ability": "Intimidate",
-          "nature": "Rash",
-          "evs": {
-            "hp": 0,
-            "atk": 4,
-            "def": 0,
-            "spa": 252,
-            "spd": 0,
-            "spe": 252
-          },
-          "ivs": {
-            "hp": 31,
-            "atk": 30,
-            "def": 31,
-            "spa": 30,
-            "spd": 31,
-            "spe": 31
-          }
-        },
-        {
           "id": "salamence-choice-band",
           "sourceName": "Choice Band",
           "label": "Choice Band attacker",
           "description": "Hits extremely hard with physical moves, but is locked into one move until it switches out.",
-          "weight": 0.0895,
+          "weight": 0.1016,
           "moves": [
             "Hidden Power Flying",
             "Earthquake",
@@ -818,11 +850,11 @@
           "sourceName": "Standard Offensive",
           "label": "Fast attacker",
           "description": "Hits fast and hard with wide move coverage.",
-          "weight": 0.5118,
+          "weight": 0.5061,
           "moves": [
             "Thunderbolt",
             "Hidden Power Grass",
-            "Toxic",
+            "Thunder Wave",
             "Baton Pass"
           ],
           "item": "Leftovers",
@@ -850,7 +882,7 @@
           "sourceName": "Rest",
           "label": "Special wall",
           "description": "Soaks up special attacks and heals itself back up while wearing the opponent down.",
-          "weight": 0.4199,
+          "weight": 0.4248,
           "moves": [
             "Thunderbolt",
             "Rest",
@@ -882,7 +914,7 @@
           "sourceName": "Mixed",
           "label": "Mixed attacker",
           "description": "Mixes physical and special attacks to break through walls of either kind.",
-          "weight": 0.0683,
+          "weight": 0.0691,
           "moves": [
             "Thunderbolt",
             "Drill Peck",
@@ -992,7 +1024,7 @@
           "sourceName": "Offensive",
           "label": "Calm Mind sweeper (Offensive)",
           "description": "Boosts itself with Calm Mind, then tries to sweep through the opposing team.",
-          "weight": 0.2881,
+          "weight": 0.3992,
           "moves": [
             "Calm Mind",
             "Surf",
@@ -1020,43 +1052,11 @@
           }
         },
         {
-          "id": "suicune-defensive",
-          "sourceName": "Defensive",
-          "label": "Calm Mind sweeper (Defensive)",
-          "description": "Boosts itself with Calm Mind, then tries to sweep through the opposing team.",
-          "weight": 0.2783,
-          "moves": [
-            "Calm Mind",
-            "Surf",
-            "Rest",
-            "Roar"
-          ],
-          "item": "Leftovers",
-          "ability": "Pressure",
-          "nature": "Bold",
-          "evs": {
-            "hp": 240,
-            "atk": 0,
-            "def": 252,
-            "spa": 0,
-            "spd": 0,
-            "spe": 16
-          },
-          "ivs": {
-            "hp": 31,
-            "atk": 31,
-            "def": 31,
-            "spa": 31,
-            "spd": 31,
-            "spe": 31
-          }
-        },
-        {
           "id": "suicune-modest-resttalk",
           "sourceName": "Modest RestTalk",
-          "label": "Calm Mind sweeper (RestTalk)",
+          "label": "Calm Mind tank (RestTalk)",
           "description": "Boosts itself with Calm Mind, then tries to sweep through the opposing team.",
-          "weight": 0.251,
+          "weight": 0.3478,
           "moves": [
             "Calm Mind",
             "Surf",
@@ -1088,7 +1088,7 @@
           "sourceName": "Substitute",
           "label": "Calm Mind sweeper (Substitute)",
           "description": "Boosts itself with Calm Mind, then tries to sweep through the opposing team.",
-          "weight": 0.1826,
+          "weight": 0.253,
           "moves": [
             "Substitute",
             "Calm Mind",
@@ -1198,7 +1198,7 @@
           "sourceName": "Leech Seed + 3 Attacks",
           "label": "Leech Seed attacker",
           "description": "Saps HP with Leech Seed and attacks with Giga Drain, Psychic, and Hidden Power Fire.",
-          "weight": 0.3365,
+          "weight": 0.3404,
           "moves": [
             "Leech Seed",
             "Giga Drain",
@@ -1230,7 +1230,7 @@
           "sourceName": "Offensive",
           "label": "Calm Mind sweeper (offensive)",
           "description": "Boosts itself with Calm Mind, then tries to sweep through the opposing team.",
-          "weight": 0.2435,
+          "weight": 0.2463,
           "moves": [
             "Calm Mind",
             "Giga Drain",
@@ -1258,43 +1258,11 @@
           }
         },
         {
-          "id": "celebi-utility",
-          "sourceName": "Utility",
-          "label": "Leech Seed support",
-          "description": "Saps HP with Leech Seed, heals with Recover, and Baton Passes out to a teammate.",
-          "weight": 0.2109,
-          "moves": [
-            "Leech Seed",
-            "Recover",
-            "Psychic",
-            "Baton Pass"
-          ],
-          "item": "Leftovers",
-          "ability": "Natural Cure",
-          "nature": "Bold",
-          "evs": {
-            "hp": 252,
-            "atk": 0,
-            "def": 124,
-            "spa": 40,
-            "spd": 60,
-            "spe": 32
-          },
-          "ivs": {
-            "hp": 31,
-            "atk": 31,
-            "def": 31,
-            "spa": 31,
-            "spd": 31,
-            "spe": 31
-          }
-        },
-        {
           "id": "celebi-defensive-calm-mind",
           "sourceName": "Defensive Calm Mind",
-          "label": "Calm Mind sweeper (bulky)",
+          "label": "Calm Mind tank",
           "description": "Boosts itself with Calm Mind, then tries to sweep through the opposing team.",
-          "weight": 0.2091,
+          "weight": 0.2116,
           "moves": [
             "Calm Mind",
             "Leech Seed",
@@ -1317,6 +1285,38 @@
             "atk": 31,
             "def": 31,
             "spa": 31,
+            "spd": 31,
+            "spe": 31
+          }
+        },
+        {
+          "id": "celebi-utility",
+          "sourceName": "Utility",
+          "label": "Leech Seed support",
+          "description": "Saps HP with Leech Seed, heals with Recover, and Baton Passes out to a teammate.",
+          "weight": 0.2017,
+          "moves": [
+            "Leech Seed",
+            "Recover",
+            "Psychic",
+            "Hidden Power Grass"
+          ],
+          "item": "Leftovers",
+          "ability": "Natural Cure",
+          "nature": "Bold",
+          "evs": {
+            "hp": 252,
+            "atk": 0,
+            "def": 124,
+            "spa": 40,
+            "spd": 60,
+            "spe": 32
+          },
+          "ivs": {
+            "hp": 31,
+            "atk": 30,
+            "def": 31,
+            "spa": 30,
             "spd": 31,
             "spe": 31
           }
@@ -1434,9 +1434,9 @@
         {
           "id": "claydol-utility",
           "sourceName": "Utility",
-          "label": "Spinner (offensive)",
+          "label": "Spinner",
           "description": "Clears entry hazards from your side with Rapid Spin.",
-          "weight": 0.95,
+          "weight": 1,
           "moves": [
             "Rapid Spin",
             "Earthquake",
@@ -1462,38 +1462,6 @@
             "spd": 31,
             "spe": 31
           }
-        },
-        {
-          "id": "claydol-bulky-spinner",
-          "sourceName": "Bulky Spinner",
-          "label": "Spinner (physically defensive)",
-          "description": "Clears entry hazards from your side with Rapid Spin.",
-          "weight": 0.05,
-          "moves": [
-            "Rapid Spin",
-            "Earthquake",
-            "Ice Beam",
-            "Toxic"
-          ],
-          "item": "Leftovers",
-          "ability": "Levitate",
-          "nature": "Relaxed",
-          "evs": {
-            "hp": 252,
-            "atk": 4,
-            "def": 252,
-            "spa": 0,
-            "spd": 0,
-            "spe": 0
-          },
-          "ivs": {
-            "hp": 31,
-            "atk": 31,
-            "def": 31,
-            "spa": 31,
-            "spd": 31,
-            "spe": 31
-          }
         }
       ]
     },
@@ -1507,7 +1475,7 @@
           "sourceName": "Substitute + Calm Mind",
           "label": "Calm Mind sweeper (Substitute)",
           "description": "Boosts itself with Calm Mind, then tries to sweep through the opposing team.",
-          "weight": 0.3836,
+          "weight": 0.3892,
           "moves": [
             "Substitute",
             "Calm Mind",
@@ -1539,7 +1507,7 @@
           "sourceName": "Superachi (Offensive Calm Mind)",
           "label": "Calm Mind sweeper (offensive)",
           "description": "Boosts itself with Calm Mind, then tries to sweep through the opposing team.",
-          "weight": 0.3826,
+          "weight": 0.3883,
           "moves": [
             "Calm Mind",
             "Psychic",
@@ -1571,11 +1539,11 @@
           "sourceName": "Wish + Calm Mind",
           "label": "Calm Mind sweeper (Wish)",
           "description": "Boosts itself with Calm Mind, then tries to sweep through the opposing team.",
-          "weight": 0.1589,
+          "weight": 0.1516,
           "moves": [
             "Wish",
             "Calm Mind",
-            "Psychic",
+            "Ice Punch",
             "Fire Punch"
           ],
           "item": "Leftovers",
@@ -1603,12 +1571,12 @@
           "sourceName": "Defensive",
           "label": "Special wall",
           "description": "Soaks up special attacks and heals itself back up while wearing the opponent down.",
-          "weight": 0.0749,
+          "weight": 0.0709,
           "moves": [
             "Wish",
             "Protect",
             "Fire Punch",
-            "Toxic"
+            "Body Slam"
           ],
           "item": "Leftovers",
           "ability": "Serene Grace",
@@ -1711,9 +1679,9 @@
         {
           "id": "forretress-standard",
           "sourceName": "Standard",
-          "label": "Spikes setter (specially defensive)",
+          "label": "Spikes setter",
           "description": "Sets Spikes to wear down every Pokémon the opponent switches in, and clears your side with Rapid Spin.",
-          "weight": 0.95,
+          "weight": 1,
           "moves": [
             "Spikes",
             "Rapid Spin",
@@ -1739,38 +1707,6 @@
             "spd": 31,
             "spe": 31
           }
-        },
-        {
-          "id": "forretress-physically-defensive",
-          "sourceName": "Physically Defensive",
-          "label": "Spikes setter (physically defensive)",
-          "description": "Sets Spikes to wear down every Pokémon the opponent switches in, and clears your side with Rapid Spin.",
-          "weight": 0.05,
-          "moves": [
-            "Spikes",
-            "Rapid Spin",
-            "Toxic",
-            "Hidden Power Bug"
-          ],
-          "item": "Leftovers",
-          "ability": "Sturdy",
-          "nature": "Relaxed",
-          "evs": {
-            "hp": 252,
-            "atk": 0,
-            "def": 252,
-            "spa": 0,
-            "spd": 4,
-            "spe": 0
-          },
-          "ivs": {
-            "hp": 31,
-            "atk": 30,
-            "def": 30,
-            "spa": 31,
-            "spd": 30,
-            "spe": 31
-          }
         }
       ]
     },
@@ -1784,11 +1720,11 @@
           "sourceName": "Trapper",
           "label": "Steel trapper",
           "description": "Traps Steel types with Magnet Pull and takes them out with Thunderbolt and Hidden Power Fire.",
-          "weight": 0.8577,
+          "weight": 1,
           "moves": [
             "Thunderbolt",
             "Hidden Power Fire",
-            "Thunder Wave",
+            "Toxic",
             "Protect"
           ],
           "item": "Magnet",
@@ -1810,38 +1746,6 @@
             "spd": 31,
             "spe": 30
           }
-        },
-        {
-          "id": "magneton-substitute",
-          "sourceName": "Substitute",
-          "label": "Substitute attacker",
-          "description": "Uses Substitute to block status and scout its counters while it attacks.",
-          "weight": 0.1423,
-          "moves": [
-            "Substitute",
-            "Thunderbolt",
-            "Hidden Power Grass",
-            "Toxic"
-          ],
-          "item": "Leftovers",
-          "ability": "Magnet Pull",
-          "nature": "Modest",
-          "evs": {
-            "hp": 4,
-            "atk": 0,
-            "def": 0,
-            "spa": 252,
-            "spd": 0,
-            "spe": 252
-          },
-          "ivs": {
-            "hp": 31,
-            "atk": 30,
-            "def": 31,
-            "spa": 30,
-            "spd": 31,
-            "spe": 31
-          }
         }
       ]
     },
@@ -1855,7 +1759,7 @@
           "sourceName": "Mixed Wall",
           "label": "Special wall",
           "description": "Soaks up special attacks while wearing the opponent down.",
-          "weight": 0.9145,
+          "weight": 1,
           "moves": [
             "Thunder Wave",
             "Seismic Toss",
@@ -1881,38 +1785,6 @@
             "spd": 31,
             "spe": 31
           }
-        },
-        {
-          "id": "registeel-toxic-stall",
-          "sourceName": "Toxic Stall",
-          "label": "RestTalk",
-          "description": "Heals fully with Rest and keeps attacking while asleep with Sleep Talk.",
-          "weight": 0.0855,
-          "moves": [
-            "Toxic",
-            "Seismic Toss",
-            "Rest",
-            "Sleep Talk"
-          ],
-          "item": "Leftovers",
-          "ability": "Clear Body",
-          "nature": "Careful",
-          "evs": {
-            "hp": 252,
-            "atk": 0,
-            "def": 4,
-            "spa": 0,
-            "spd": 252,
-            "spe": 0
-          },
-          "ivs": {
-            "hp": 31,
-            "atk": 31,
-            "def": 31,
-            "spa": 31,
-            "spd": 31,
-            "spe": 31
-          }
         }
       ]
     },
@@ -1926,44 +1798,12 @@
           "sourceName": "Standard",
           "label": "Fast attacker",
           "description": "Hits fast and hard with wide move coverage.",
-          "weight": 0.6198,
+          "weight": 1,
           "moves": [
             "Thunderbolt",
-            "Hidden Power Grass",
+            "Hidden Power Ice",
             "Baton Pass",
-            "Thunder Wave"
-          ],
-          "item": "Leftovers",
-          "ability": "Volt Absorb",
-          "nature": "Timid",
-          "evs": {
-            "hp": 4,
-            "atk": 0,
-            "def": 0,
-            "spa": 252,
-            "spd": 0,
-            "spe": 252
-          },
-          "ivs": {
-            "hp": 31,
-            "atk": 30,
-            "def": 31,
-            "spa": 30,
-            "spd": 31,
-            "spe": 31
-          }
-        },
-        {
-          "id": "jolteon-substitute-pass",
-          "sourceName": "Substitute Pass",
-          "label": "Substitute attacker",
-          "description": "Uses Substitute to block status and scout its counters while it attacks.",
-          "weight": 0.3802,
-          "moves": [
-            "Substitute",
-            "Baton Pass",
-            "Thunderbolt",
-            "Hidden Power Ice"
+            "Roar"
           ],
           "item": "Leftovers",
           "ability": "Volt Absorb",
@@ -1997,7 +1837,7 @@
           "sourceName": "Defensive",
           "label": "Physical wall",
           "description": "Soaks up physical attacks while wearing the opponent down.",
-          "weight": 0.6929,
+          "weight": 0.7172,
           "moves": [
             "Protect",
             "Earthquake",
@@ -2027,14 +1867,14 @@
         {
           "id": "flygon-offensive",
           "sourceName": "Offensive",
-          "label": "Fast attacker",
-          "description": "Hits fast and hard with wide move coverage.",
-          "weight": 0.2075,
+          "label": "Substitute attacker",
+          "description": "Uses Substitute to block status and scout its counters while it attacks.",
+          "weight": 0.2125,
           "moves": [
             "Earthquake",
             "Rock Slide",
             "Hidden Power Bug",
-            "Fire Blast"
+            "Substitute"
           ],
           "item": "Leftovers",
           "ability": "Levitate",
@@ -2061,12 +1901,12 @@
           "sourceName": "Choice Band",
           "label": "Choice Band attacker",
           "description": "Hits extremely hard with physical moves, but is locked into one move until it switches out.",
-          "weight": 0.0996,
+          "weight": 0.0703,
           "moves": [
             "Earthquake",
             "Rock Slide",
             "Hidden Power Bug",
-            "Toxic"
+            "Fire Blast"
           ],
           "item": "Choice Band",
           "ability": "Levitate",
@@ -2203,7 +2043,7 @@
           "sourceName": "Standard",
           "label": "Swords Dance sweeper",
           "description": "Boosts itself with Swords Dance, then tries to sweep through the opposing team.",
-          "weight": 0.7269,
+          "weight": 0.7948,
           "moves": [
             "Megahorn",
             "Rock Slide",
@@ -2235,12 +2075,12 @@
           "sourceName": "Choice Band",
           "label": "Choice Band attacker",
           "description": "Hits extremely hard with physical moves, but is locked into one move until it switches out.",
-          "weight": 0.2731,
+          "weight": 0.2052,
           "moves": [
             "Megahorn",
             "Brick Break",
             "Rock Slide",
-            "Focus Punch"
+            "Hidden Power Ghost"
           ],
           "item": "Choice Band",
           "ability": "Guts",
@@ -2256,9 +2096,9 @@
           "ivs": {
             "hp": 31,
             "atk": 31,
-            "def": 31,
+            "def": 30,
             "spa": 31,
-            "spd": 31,
+            "spd": 30,
             "spe": 31
           }
         }
@@ -2274,7 +2114,7 @@
           "sourceName": "Mixed Attacker",
           "label": "SubPunch attacker",
           "description": "Hides behind a Substitute, then fires off a full-power Focus Punch.",
-          "weight": 0.8355,
+          "weight": 1,
           "moves": [
             "Fire Blast",
             "Hidden Power Grass",
@@ -2287,38 +2127,6 @@
           "evs": {
             "hp": 0,
             "atk": 4,
-            "def": 0,
-            "spa": 252,
-            "spd": 0,
-            "spe": 252
-          },
-          "ivs": {
-            "hp": 31,
-            "atk": 30,
-            "def": 31,
-            "spa": 30,
-            "spd": 31,
-            "spe": 31
-          }
-        },
-        {
-          "id": "charizard-sun",
-          "sourceName": "Sun",
-          "label": "Sun attacker",
-          "description": "Sets sun with Sunny Day to power up Fire Blast, with Hidden Power Grass and Dragon Claw for coverage.",
-          "weight": 0.1645,
-          "moves": [
-            "Sunny Day",
-            "Fire Blast",
-            "Hidden Power Grass",
-            "Dragon Claw"
-          ],
-          "item": "Leftovers",
-          "ability": "Blaze",
-          "nature": "Timid",
-          "evs": {
-            "hp": 4,
-            "atk": 0,
             "def": 0,
             "spa": 252,
             "spd": 0,
@@ -2345,7 +2153,7 @@
           "sourceName": "Standard",
           "label": "Fast attacker",
           "description": "Hits fast and hard with wide move coverage.",
-          "weight": 0.8406,
+          "weight": 1,
           "moves": [
             "Flamethrower",
             "Hidden Power Grass",
@@ -2371,38 +2179,6 @@
             "spd": 31,
             "spe": 31
           }
-        },
-        {
-          "id": "moltres-substitute-toxic",
-          "sourceName": "Substitute + Toxic",
-          "label": "Substitute attacker",
-          "description": "Uses Substitute to block status and scout its counters while it attacks.",
-          "weight": 0.1594,
-          "moves": [
-            "Substitute",
-            "Toxic",
-            "Fire Blast",
-            "Hidden Power Grass"
-          ],
-          "item": "Leftovers",
-          "ability": "Pressure",
-          "nature": "Modest",
-          "evs": {
-            "hp": 252,
-            "atk": 0,
-            "def": 0,
-            "spa": 252,
-            "spd": 0,
-            "spe": 4
-          },
-          "ivs": {
-            "hp": 31,
-            "atk": 30,
-            "def": 31,
-            "spa": 30,
-            "spd": 31,
-            "spe": 31
-          }
         }
       ]
     },
@@ -2416,12 +2192,12 @@
           "sourceName": "Standard",
           "label": "Dragon Dance sweeper (Standard)",
           "description": "Boosts itself with Dragon Dance, then tries to sweep through the opposing team.",
-          "weight": 0.5651,
+          "weight": 0.5567,
           "moves": [
             "Dragon Dance",
             "Hidden Power Flying",
             "Earthquake",
-            "Thunder Wave"
+            "Double-Edge"
           ],
           "item": "Leftovers",
           "ability": "Intimidate",
@@ -2448,7 +2224,7 @@
           "sourceName": "Rest",
           "label": "Dragon Dance sweeper (Rest)",
           "description": "Boosts itself with Dragon Dance, then tries to sweep through the opposing team.",
-          "weight": 0.4349,
+          "weight": 0.4433,
           "moves": [
             "Dragon Dance",
             "Hidden Power Flying",
@@ -2483,75 +2259,11 @@
       "setSource": "gen3ou",
       "sets": [
         {
-          "id": "medicham-all-out-attacker",
-          "sourceName": "All-Out Attacker",
-          "label": "Fast attacker",
-          "description": "Hits fast and hard with wide move coverage.",
-          "weight": 0.3299,
-          "moves": [
-            "Brick Break",
-            "Focus Punch",
-            "Rock Slide",
-            "Shadow Ball"
-          ],
-          "item": "Leftovers",
-          "ability": "Pure Power",
-          "nature": "Jolly",
-          "evs": {
-            "hp": 4,
-            "atk": 252,
-            "def": 0,
-            "spa": 0,
-            "spd": 0,
-            "spe": 252
-          },
-          "ivs": {
-            "hp": 31,
-            "atk": 31,
-            "def": 31,
-            "spa": 31,
-            "spd": 31,
-            "spe": 31
-          }
-        },
-        {
-          "id": "medicham-choice-band",
-          "sourceName": "Choice Band",
-          "label": "Choice Band attacker",
-          "description": "Hits extremely hard with physical moves, but is locked into one move until it switches out.",
-          "weight": 0.2909,
-          "moves": [
-            "Brick Break",
-            "Shadow Ball",
-            "Rock Slide",
-            "Focus Punch"
-          ],
-          "item": "Choice Band",
-          "ability": "Pure Power",
-          "nature": "Jolly",
-          "evs": {
-            "hp": 4,
-            "atk": 252,
-            "def": 0,
-            "spa": 0,
-            "spd": 0,
-            "spe": 252
-          },
-          "ivs": {
-            "hp": 31,
-            "atk": 31,
-            "def": 31,
-            "spa": 31,
-            "spd": 31,
-            "spe": 31
-          }
-        },
-        {
           "id": "medicham-reversal",
           "sourceName": "Reversal",
           "label": "Reversal attacker",
           "description": "Behind a Substitute, Salac Berry and low HP power up Reversal and Focus Punch.",
-          "weight": 0.2147,
+          "weight": 0.3797,
           "moves": [
             "Substitute",
             "Reversal",
@@ -2579,11 +2291,43 @@
           }
         },
         {
+          "id": "medicham-choice-band",
+          "sourceName": "Choice Band",
+          "label": "Choice Band attacker",
+          "description": "Hits extremely hard with physical moves, but is locked into one move until it switches out.",
+          "weight": 0.3295,
+          "moves": [
+            "Brick Break",
+            "Shadow Ball",
+            "Rock Slide",
+            "Fake Out"
+          ],
+          "item": "Choice Band",
+          "ability": "Pure Power",
+          "nature": "Jolly",
+          "evs": {
+            "hp": 4,
+            "atk": 252,
+            "def": 0,
+            "spa": 0,
+            "spd": 0,
+            "spe": 252
+          },
+          "ivs": {
+            "hp": 31,
+            "atk": 31,
+            "def": 31,
+            "spa": 31,
+            "spd": 31,
+            "spe": 31
+          }
+        },
+        {
           "id": "medicham-bulk-up",
           "sourceName": "Bulk Up",
           "label": "Bulk Up sweeper",
           "description": "Boosts itself with Bulk Up, then tries to sweep through the opposing team.",
-          "weight": 0.1645,
+          "weight": 0.2908,
           "moves": [
             "Bulk Up",
             "Brick Break",
@@ -2622,7 +2366,7 @@
           "sourceName": "Spiker",
           "label": "Spikes setter (spinner)",
           "description": "Sets Spikes to wear down every Pokémon the opponent switches in, and clears your side with Rapid Spin.",
-          "weight": 0.7688,
+          "weight": 1,
           "moves": [
             "Spikes",
             "Surf",
@@ -2648,38 +2392,6 @@
             "spd": 31,
             "spe": 31
           }
-        },
-        {
-          "id": "cloyster-offensive-spikes",
-          "sourceName": "Offensive Spikes",
-          "label": "Spikes setter (offensive)",
-          "description": "Sets Spikes to wear down every Pokémon the opponent switches in.",
-          "weight": 0.2312,
-          "moves": [
-            "Spikes",
-            "Ice Beam",
-            "Surf",
-            "Explosion"
-          ],
-          "item": "Leftovers",
-          "ability": "Shell Armor",
-          "nature": "Modest",
-          "evs": {
-            "hp": 4,
-            "atk": 0,
-            "def": 0,
-            "spa": 252,
-            "spd": 0,
-            "spe": 252
-          },
-          "ivs": {
-            "hp": 31,
-            "atk": 31,
-            "def": 31,
-            "spa": 31,
-            "spd": 31,
-            "spe": 31
-          }
         }
       ]
     },
@@ -2693,7 +2405,7 @@
           "sourceName": "Standard",
           "label": "Physical wall",
           "description": "Soaks up physical attacks and heals itself back up while wearing the opponent down.",
-          "weight": 0.95,
+          "weight": 1,
           "moves": [
             "Surf",
             "Recover",
@@ -2719,38 +2431,6 @@
             "spd": 31,
             "spe": 31
           }
-        },
-        {
-          "id": "milotic-specially-defensive",
-          "sourceName": "Specially Defensive",
-          "label": "Special wall",
-          "description": "Soaks up special attacks and heals itself back up while wearing the opponent down.",
-          "weight": 0.05,
-          "moves": [
-            "Surf",
-            "Ice Beam",
-            "Recover",
-            "Mirror Coat"
-          ],
-          "item": "Leftovers",
-          "ability": "Marvel Scale",
-          "nature": "Calm",
-          "evs": {
-            "hp": 252,
-            "atk": 0,
-            "def": 4,
-            "spa": 0,
-            "spd": 252,
-            "spe": 0
-          },
-          "ivs": {
-            "hp": 31,
-            "atk": 31,
-            "def": 31,
-            "spa": 31,
-            "spd": 31,
-            "spe": 31
-          }
         }
       ]
     },
@@ -2764,7 +2444,7 @@
           "sourceName": "Spore",
           "label": "Fast attacker",
           "description": "Hits fast and hard with wide move coverage.",
-          "weight": 0.7584,
+          "weight": 0.617,
           "moves": [
             "Spore",
             "Focus Punch",
@@ -2796,7 +2476,7 @@
           "sourceName": "Swords Dance",
           "label": "Swords Dance sweeper",
           "description": "Boosts itself with Swords Dance, then tries to sweep through the opposing team.",
-          "weight": 0.2416,
+          "weight": 0.1965,
           "moves": [
             "Spore",
             "Swords Dance",
@@ -2821,6 +2501,38 @@
             "spa": 31,
             "spd": 30,
             "spe": 31
+          }
+        },
+        {
+          "id": "breloom-subpunch-spore",
+          "sourceName": "SubPunch Spore",
+          "label": "SubPunch attacker",
+          "description": "Hides behind a Substitute, then fires off a full-power Focus Punch.",
+          "weight": 0.1865,
+          "moves": [
+            "Spore",
+            "Substitute",
+            "Focus Punch",
+            "Hidden Power Rock"
+          ],
+          "item": "Leftovers",
+          "ability": "Effect Spore",
+          "nature": "Adamant",
+          "evs": {
+            "hp": 4,
+            "atk": 252,
+            "def": 0,
+            "spa": 0,
+            "spd": 0,
+            "spe": 252
+          },
+          "ivs": {
+            "hp": 31,
+            "atk": 31,
+            "def": 30,
+            "spa": 31,
+            "spd": 30,
+            "spe": 30
           }
         }
       ]
@@ -2865,7 +2577,7 @@
         {
           "id": "vaporeon-substitute-wishpass",
           "sourceName": "Substitute + WishPass",
-          "label": "Substitute attacker",
+          "label": "Wish passer",
           "description": "Uses Substitute to block status and scout its counters while it attacks.",
           "weight": 0.351,
           "moves": [
@@ -3009,9 +2721,9 @@
           "sourceName": "Offensive",
           "label": "Bulky attacker",
           "description": "Hits with Focus Punch, Brick Break, and Rock Slide from huge HP, and removes items with Knock Off.",
-          "weight": 0.658,
+          "weight": 0.5956,
           "moves": [
-            "Focus Punch",
+            "Cross Chop",
             "Brick Break",
             "Knock Off",
             "Rock Slide"
@@ -3041,7 +2753,7 @@
           "sourceName": "Defensive Knock Off",
           "label": "Knock Off support",
           "description": "Removes the foe's item with Knock Off, heals with Rest, and hits back with Brick Break.",
-          "weight": 0.342,
+          "weight": 0.4044,
           "moves": [
             "Knock Off",
             "Brick Break",
@@ -3080,7 +2792,7 @@
           "sourceName": "Offensive",
           "label": "Mixed attacker",
           "description": "Mixes physical and special attacks to break through walls of either kind.",
-          "weight": 0.95,
+          "weight": 1,
           "moves": [
             "Ice Beam",
             "Thunderbolt",
@@ -3106,38 +2818,6 @@
             "spd": 31,
             "spe": 31
           }
-        },
-        {
-          "id": "regice-resttalk",
-          "sourceName": "RestTalk",
-          "label": "RestTalk",
-          "description": "Heals fully with Rest and keeps attacking while asleep with Sleep Talk.",
-          "weight": 0.05,
-          "moves": [
-            "Rest",
-            "Sleep Talk",
-            "Ice Beam",
-            "Thunderbolt"
-          ],
-          "item": "Leftovers",
-          "ability": "Clear Body",
-          "nature": "Calm",
-          "evs": {
-            "hp": 252,
-            "atk": 0,
-            "def": 4,
-            "spa": 0,
-            "spd": 252,
-            "spe": 0
-          },
-          "ivs": {
-            "hp": 31,
-            "atk": 31,
-            "def": 31,
-            "spa": 31,
-            "spd": 31,
-            "spe": 31
-          }
         }
       ]
     },
@@ -3149,9 +2829,9 @@
         {
           "id": "smeargle-standard-spikes-lead",
           "sourceName": "Standard Spikes Lead",
-          "label": "Spikes setter (Salac Berry)",
+          "label": "Spikes setter",
           "description": "Sets Spikes to wear down every Pokémon the opponent switches in.",
-          "weight": 0.7716,
+          "weight": 1,
           "moves": [
             "Spore",
             "Spikes",
@@ -3177,38 +2857,6 @@
             "spd": 31,
             "spe": 31
           }
-        },
-        {
-          "id": "smeargle-substitute-spikes",
-          "sourceName": "Substitute Spikes",
-          "label": "Spikes setter (Leftovers)",
-          "description": "Sets Spikes to wear down every Pokémon the opponent switches in.",
-          "weight": 0.2284,
-          "moves": [
-            "Substitute",
-            "Spore",
-            "Spikes",
-            "Baton Pass"
-          ],
-          "item": "Leftovers",
-          "ability": "Own Tempo",
-          "nature": "Jolly",
-          "evs": {
-            "hp": 252,
-            "atk": 0,
-            "def": 4,
-            "spa": 0,
-            "spd": 0,
-            "spe": 252
-          },
-          "ivs": {
-            "hp": 31,
-            "atk": 31,
-            "def": 31,
-            "spa": 31,
-            "spd": 31,
-            "spe": 31
-          }
         }
       ]
     },
@@ -3222,12 +2870,12 @@
           "sourceName": "Rain Dance Sweeper",
           "label": "Rain sweeper",
           "description": "Sets rain with Rain Dance; Swift Swim doubles its Speed for rain-boosted Surf and Hydro Pump.",
-          "weight": 0.95,
+          "weight": 1,
           "moves": [
             "Rain Dance",
             "Surf",
             "Ice Beam",
-            "Hydro Pump"
+            "Hidden Power Grass"
           ],
           "item": "Leftovers",
           "ability": "Swift Swim",
@@ -3242,41 +2890,9 @@
           },
           "ivs": {
             "hp": 31,
-            "atk": 31,
+            "atk": 30,
             "def": 31,
-            "spa": 31,
-            "spd": 31,
-            "spe": 31
-          }
-        },
-        {
-          "id": "kingdra-resttalk",
-          "sourceName": "RestTalk",
-          "label": "RestTalk",
-          "description": "Heals fully with Rest and keeps attacking while asleep with Sleep Talk.",
-          "weight": 0.05,
-          "moves": [
-            "Rest",
-            "Sleep Talk",
-            "Surf",
-            "Ice Beam"
-          ],
-          "item": "Leftovers",
-          "ability": "Swift Swim",
-          "nature": "Calm",
-          "evs": {
-            "hp": 252,
-            "atk": 0,
-            "def": 4,
-            "spa": 0,
-            "spd": 252,
-            "spe": 0
-          },
-          "ivs": {
-            "hp": 31,
-            "atk": 31,
-            "def": 31,
-            "spa": 31,
+            "spa": 30,
             "spd": 31,
             "spe": 31
           }
@@ -3536,7 +3152,7 @@
         {
           "id": "jynx-special-sweeper",
           "sourceName": "Special Sweeper",
-          "label": "Calm Mind sweeper",
+          "label": "Substitute + Lovely Kiss",
           "description": "Boosts itself with Calm Mind, then tries to sweep through the opposing team.",
           "weight": 0.7478,
           "moves": [
@@ -3712,7 +3328,7 @@
           "sourceName": "Standard",
           "label": "Physical wall",
           "description": "Soaks up physical attacks and heals itself back up while wearing the opponent down.",
-          "weight": 0.95,
+          "weight": 1,
           "moves": [
             "Recover",
             "Ice Beam",
@@ -3728,38 +3344,6 @@
             "def": 200,
             "spa": 0,
             "spd": 56,
-            "spe": 0
-          },
-          "ivs": {
-            "hp": 31,
-            "atk": 31,
-            "def": 31,
-            "spa": 31,
-            "spd": 31,
-            "spe": 31
-          }
-        },
-        {
-          "id": "porygon2-specially-defensive",
-          "sourceName": "Specially Defensive",
-          "label": "Special wall",
-          "description": "Soaks up special attacks and heals itself back up while wearing the opponent down.",
-          "weight": 0.05,
-          "moves": [
-            "Recover",
-            "Ice Beam",
-            "Toxic",
-            "Return"
-          ],
-          "item": "Leftovers",
-          "ability": "Trace",
-          "nature": "Careful",
-          "evs": {
-            "hp": 252,
-            "atk": 0,
-            "def": 4,
-            "spa": 0,
-            "spd": 252,
             "spe": 0
           },
           "ivs": {
@@ -3875,27 +3459,27 @@
           }
         },
         {
-          "id": "blaziken-mixed-sweeper",
-          "sourceName": "Mixed Sweeper",
-          "label": "Mixed attacker (Leftovers)",
-          "description": "Mixes Fire Blast with Focus Punch, Sky Uppercut, and Rock Slide to break through walls of either kind.",
+          "id": "blaziken-choice-band",
+          "sourceName": "Choice Band",
+          "label": "Choice Band attacker",
+          "description": "Hits extremely hard with physical moves, but is locked into one move until it switches out.",
           "weight": 0.05,
           "moves": [
-            "Focus Punch",
             "Sky Uppercut",
             "Rock Slide",
+            "Focus Punch",
             "Fire Blast"
           ],
-          "item": "Leftovers",
+          "item": "Choice Band",
           "ability": "Blaze",
-          "nature": "Adamant",
+          "nature": "Jolly",
           "evs": {
-            "hp": 80,
-            "atk": 232,
+            "hp": 4,
+            "atk": 252,
             "def": 0,
             "spa": 0,
             "spd": 0,
-            "spe": 196
+            "spe": 252
           },
           "ivs": {
             "hp": 31,
@@ -3918,7 +3502,7 @@
           "sourceName": "Staller",
           "label": "Special wall",
           "description": "Soaks up special attacks and heals itself back up while wearing the opponent down.",
-          "weight": 0.95,
+          "weight": 1,
           "moves": [
             "Shadow Ball",
             "Focus Punch",
@@ -3934,38 +3518,6 @@
             "def": 20,
             "spa": 0,
             "spd": 200,
-            "spe": 0
-          },
-          "ivs": {
-            "hp": 31,
-            "atk": 31,
-            "def": 31,
-            "spa": 31,
-            "spd": 31,
-            "spe": 31
-          }
-        },
-        {
-          "id": "dusclops-calm-mind",
-          "sourceName": "Calm Mind",
-          "label": "Calm Mind sweeper",
-          "description": "Boosts itself with Calm Mind, then tries to sweep through the opposing team.",
-          "weight": 0.05,
-          "moves": [
-            "Calm Mind",
-            "Ice Beam",
-            "Will-O-Wisp",
-            "Rest"
-          ],
-          "item": "Leftovers",
-          "ability": "Pressure",
-          "nature": "Bold",
-          "evs": {
-            "hp": 252,
-            "atk": 0,
-            "def": 200,
-            "spa": 56,
-            "spd": 0,
             "spe": 0
           },
           "ivs": {
@@ -4266,10 +3818,10 @@
           "sourceName": "Standard Wall",
           "label": "Special wall",
           "description": "Soaks up special attacks while wearing the opponent down.",
-          "weight": 0.8699,
+          "weight": 0.8583,
           "moves": [
             "Earthquake",
-            "Hidden Power Rock",
+            "Toxic",
             "Roar",
             "Explosion"
           ],
@@ -4287,10 +3839,10 @@
           "ivs": {
             "hp": 31,
             "atk": 31,
-            "def": 30,
+            "def": 31,
             "spa": 31,
-            "spd": 30,
-            "spe": 30
+            "spd": 31,
+            "spe": 31
           }
         },
         {
@@ -4298,7 +3850,7 @@
           "sourceName": "Choice Band",
           "label": "Choice Band attacker",
           "description": "Hits extremely hard with physical moves, but is locked into one move until it switches out.",
-          "weight": 0.1301,
+          "weight": 0.1417,
           "moves": [
             "Earthquake",
             "Iron Tail",
@@ -4337,7 +3889,7 @@
           "sourceName": "Calm Mind Sweeper",
           "label": "Calm Mind sweeper",
           "description": "Boosts itself with Calm Mind, then tries to sweep through the opposing team.",
-          "weight": 0.5899,
+          "weight": 0.6227,
           "moves": [
             "Calm Mind",
             "Psychic",
@@ -4369,7 +3921,7 @@
           "sourceName": "Encore",
           "label": "Encore attacker",
           "description": "Locks foes into their last move with Encore and attacks from behind a Substitute.",
-          "weight": 0.3101,
+          "weight": 0.3273,
           "moves": [
             "Psychic",
             "Fire Punch",
@@ -4377,38 +3929,6 @@
             "Encore"
           ],
           "item": "Leftovers",
-          "ability": "Synchronize",
-          "nature": "Timid",
-          "evs": {
-            "hp": 4,
-            "atk": 0,
-            "def": 0,
-            "spa": 252,
-            "spd": 0,
-            "spe": 252
-          },
-          "ivs": {
-            "hp": 31,
-            "atk": 31,
-            "def": 31,
-            "spa": 31,
-            "spd": 31,
-            "spe": 31
-          }
-        },
-        {
-          "id": "alakazam-special-trick",
-          "sourceName": "Special Trick",
-          "label": "Trick attacker (special)",
-          "description": "Attacks with Psychic and Fire Punch, then Tricks its Choice Band onto a wall to cripple it.",
-          "weight": 0.05,
-          "moves": [
-            "Psychic",
-            "Calm Mind",
-            "Fire Punch",
-            "Trick"
-          ],
-          "item": "Choice Band",
           "ability": "Synchronize",
           "nature": "Timid",
           "evs": {
@@ -4612,7 +4132,7 @@
             "Bulk Up",
             "Return",
             "Hidden Power Ghost",
-            "Focus Punch"
+            "Earthquake"
           ],
           "item": "Leftovers",
           "ability": "Guts",
@@ -4820,7 +4340,7 @@
           "sourceName": "Curse + Rest",
           "label": "Curse sweeper (physically defensive)",
           "description": "Boosts itself with Curse, then tries to sweep through the opposing team.",
-          "weight": 0.846,
+          "weight": 0.8711,
           "moves": [
             "Rest",
             "Curse",
@@ -4852,11 +4372,11 @@
           "sourceName": "Counter",
           "label": "Counter wall",
           "description": "Takes physical hits and returns them double with Counter, resetting setup with Haze.",
-          "weight": 0.104,
+          "weight": 0.0789,
           "moves": [
             "Counter",
             "Earthquake",
-            "Haze",
+            "Toxic",
             "Ice Beam"
           ],
           "item": "Leftovers",
@@ -4921,9 +4441,9 @@
         {
           "id": "armaldo-knock-off",
           "sourceName": "Knock Off",
-          "label": "Swords Dance sweeper",
+          "label": "Swords Dance sweeper (Knock Off)",
           "description": "Boosts itself with Swords Dance, then tries to sweep through the opposing team.",
-          "weight": 0.6015,
+          "weight": 0.6444,
           "moves": [
             "Hidden Power Bug",
             "Knock Off",
@@ -4953,14 +4473,14 @@
         {
           "id": "armaldo-rapid-spin",
           "sourceName": "Rapid Spin",
-          "label": "Spinner",
-          "description": "Clears entry hazards from your side with Rapid Spin.",
-          "weight": 0.3485,
+          "label": "Swords Dance sweeper (Rapid Spin)",
+          "description": "Boosts itself with Swords Dance, then tries to sweep through the opposing team.",
+          "weight": 0.3056,
           "moves": [
             "Hidden Power Bug",
             "Rapid Spin",
             "Rock Slide",
-            "Rest"
+            "Swords Dance"
           ],
           "item": "Leftovers",
           "ability": "Battle Armor",
@@ -5026,7 +4546,7 @@
           "sourceName": "Heal Bell",
           "label": "RestTalk",
           "description": "Heals fully with Rest and keeps attacking while asleep with Sleep Talk.",
-          "weight": 0.95,
+          "weight": 1,
           "moves": [
             "Ice Beam",
             "Rest",
@@ -5052,38 +4572,6 @@
             "spd": 31,
             "spe": 31
           }
-        },
-        {
-          "id": "articuno-substitute-toxic",
-          "sourceName": "Substitute + Toxic",
-          "label": "Substitute attacker",
-          "description": "Uses Substitute to block status and scout its counters while it attacks.",
-          "weight": 0.05,
-          "moves": [
-            "Substitute",
-            "Toxic",
-            "Ice Beam",
-            "Protect"
-          ],
-          "item": "Leftovers",
-          "ability": "Pressure",
-          "nature": "Bold",
-          "evs": {
-            "hp": 252,
-            "atk": 0,
-            "def": 252,
-            "spa": 0,
-            "spd": 0,
-            "spe": 4
-          },
-          "ivs": {
-            "hp": 31,
-            "atk": 31,
-            "def": 31,
-            "spa": 31,
-            "spd": 31,
-            "spe": 31
-          }
         }
       ]
     },
@@ -5097,7 +4585,7 @@
           "sourceName": "Choice Band",
           "label": "Choice Band attacker",
           "description": "Hits extremely hard with physical moves, but is locked into one move until it switches out.",
-          "weight": 0.95,
+          "weight": 1,
           "moves": [
             "Return",
             "Earthquake",
@@ -5105,38 +4593,6 @@
             "Focus Punch"
           ],
           "item": "Choice Band",
-          "ability": "Truant",
-          "nature": "Adamant",
-          "evs": {
-            "hp": 4,
-            "atk": 252,
-            "def": 0,
-            "spa": 0,
-            "spd": 0,
-            "spe": 252
-          },
-          "ivs": {
-            "hp": 31,
-            "atk": 31,
-            "def": 31,
-            "spa": 31,
-            "spd": 31,
-            "spe": 31
-          }
-        },
-        {
-          "id": "slaking-slack-off",
-          "sourceName": "Slack Off",
-          "label": "Fast attacker",
-          "description": "Hits fast and hard with wide move coverage.",
-          "weight": 0.05,
-          "moves": [
-            "Return",
-            "Earthquake",
-            "Shadow Ball",
-            "Slack Off"
-          ],
-          "item": "Leftovers",
           "ability": "Truant",
           "nature": "Adamant",
           "evs": {
@@ -5168,7 +4624,7 @@
           "sourceName": "Perish Trapper",
           "label": "Perish trapper",
           "description": "Traps a foe with Mean Look and KOs it with Perish Song, Taunting healers and stalling with Protect.",
-          "weight": 0.7225,
+          "weight": 0.7604,
           "moves": [
             "Mean Look",
             "Perish Song",
@@ -5200,7 +4656,7 @@
           "sourceName": "Defensive Utility",
           "label": "Special wall",
           "description": "Soaks up special attacks and heals itself back up while wearing the opponent down.",
-          "weight": 0.1434,
+          "weight": 0.151,
           "moves": [
             "Thunderbolt",
             "Hidden Power Ice",
@@ -5232,7 +4688,7 @@
           "sourceName": "Calm Mind",
           "label": "Calm Mind sweeper",
           "description": "Boosts itself with Calm Mind, then tries to sweep through the opposing team.",
-          "weight": 0.0841,
+          "weight": 0.0886,
           "moves": [
             "Calm Mind",
             "Hidden Power Ice",
@@ -5249,38 +4705,6 @@
             "spa": 0,
             "spd": 16,
             "spe": 64
-          },
-          "ivs": {
-            "hp": 31,
-            "atk": 30,
-            "def": 30,
-            "spa": 31,
-            "spd": 31,
-            "spe": 31
-          }
-        },
-        {
-          "id": "misdreavus-imprison",
-          "sourceName": "Imprison",
-          "label": "Imprison support",
-          "description": "Locks out foes that share its moves with Imprison, and paralyzes with Thunder Wave.",
-          "weight": 0.05,
-          "moves": [
-            "Hidden Power Ice",
-            "Thunderbolt",
-            "Thunder Wave",
-            "Imprison"
-          ],
-          "item": "Leftovers",
-          "ability": "Levitate",
-          "nature": "Modest",
-          "evs": {
-            "hp": 236,
-            "atk": 0,
-            "def": 68,
-            "spa": 124,
-            "spd": 80,
-            "spe": 0
           },
           "ivs": {
             "hp": 31,
@@ -5333,7 +4757,7 @@
         {
           "id": "gardevoir-mono-attacker",
           "sourceName": "Mono-Attacker",
-          "label": "Calm Mind sweeper (Substitute)",
+          "label": "Substitute + Hypnosis",
           "description": "Boosts itself with Calm Mind, then tries to sweep through the opposing team.",
           "weight": 0.3116,
           "moves": [
@@ -5541,7 +4965,7 @@
           "sourceName": "Physically Defensive",
           "label": "Physical wall",
           "description": "Soaks up physical attacks and heals itself back up while wearing the opponent down.",
-          "weight": 0.95,
+          "weight": 1,
           "moves": [
             "Recover",
             "Knock Off",
@@ -5557,38 +4981,6 @@
             "def": 252,
             "spa": 0,
             "spd": 4,
-            "spe": 0
-          },
-          "ivs": {
-            "hp": 31,
-            "atk": 31,
-            "def": 31,
-            "spa": 31,
-            "spd": 31,
-            "spe": 31
-          }
-        },
-        {
-          "id": "sableye-toxic-stall",
-          "sourceName": "Toxic Stall",
-          "label": "Special wall",
-          "description": "Soaks up special attacks and heals itself back up while wearing the opponent down.",
-          "weight": 0.05,
-          "moves": [
-            "Toxic",
-            "Recover",
-            "Seismic Toss",
-            "Protect"
-          ],
-          "item": "Leftovers",
-          "ability": "Keen Eye",
-          "nature": "Careful",
-          "evs": {
-            "hp": 252,
-            "atk": 0,
-            "def": 4,
-            "spa": 0,
-            "spd": 252,
             "spe": 0
           },
           "ivs": {
@@ -5784,7 +5176,7 @@
             "Megahorn",
             "Earthquake",
             "Rock Slide",
-            "Focus Punch"
+            "Double-Edge"
           ],
           "item": "Choice Band",
           "ability": "Rock Head",
@@ -5818,7 +5210,7 @@
           "sourceName": "Swords Dance",
           "label": "Swords Dance sweeper",
           "description": "Boosts itself with Swords Dance, then tries to sweep through the opposing team.",
-          "weight": 0.7698,
+          "weight": 0.95,
           "moves": [
             "Swords Dance",
             "Silver Wind",
@@ -5843,38 +5235,6 @@
             "spa": 31,
             "spd": 30,
             "spe": 30
-          }
-        },
-        {
-          "id": "scizor-reversal",
-          "sourceName": "Reversal",
-          "label": "Reversal attacker",
-          "description": "Endures a hit, then uses Liechi Berry, Agility, and Swords Dance to power up a low-HP Reversal.",
-          "weight": 0.1802,
-          "moves": [
-            "Agility",
-            "Endure",
-            "Reversal",
-            "Swords Dance"
-          ],
-          "item": "Liechi Berry",
-          "ability": "Swarm",
-          "nature": "Adamant",
-          "evs": {
-            "hp": 108,
-            "atk": 252,
-            "def": 0,
-            "spa": 0,
-            "spd": 0,
-            "spe": 148
-          },
-          "ivs": {
-            "hp": 31,
-            "atk": 31,
-            "def": 31,
-            "spa": 31,
-            "spd": 31,
-            "spe": 31
           }
         },
         {
@@ -5919,7 +5279,7 @@
         {
           "id": "miltank-curse",
           "sourceName": "Curse",
-          "label": "Curse sweeper",
+          "label": "Curse tank",
           "description": "Boosts itself with Curse, then tries to sweep through the opposing team.",
           "weight": 0.8722,
           "moves": [
@@ -6061,7 +5421,7 @@
             "Curse",
             "Earthquake",
             "Ice Beam",
-            "Surf"
+            "Rest"
           ],
           "item": "Leftovers",
           "ability": "Own Tempo",
@@ -6095,7 +5455,7 @@
           "sourceName": "Belly Drum",
           "label": "Belly Drum sweeper (Leftovers)",
           "description": "Boosts itself with Belly Drum, then tries to sweep through the opposing team.",
-          "weight": 0.6589,
+          "weight": 0.6936,
           "moves": [
             "Belly Drum",
             "Extreme Speed",
@@ -6127,7 +5487,7 @@
           "sourceName": "SubFlail",
           "label": "Belly Drum sweeper (Salac Berry)",
           "description": "Boosts itself with Belly Drum, then tries to sweep through the opposing team.",
-          "weight": 0.2911,
+          "weight": 0.3064,
           "moves": [
             "Substitute",
             "Belly Drum",
@@ -6151,38 +5511,6 @@
             "def": 31,
             "spa": 31,
             "spd": 31,
-            "spe": 31
-          }
-        },
-        {
-          "id": "linoone-choice-band",
-          "sourceName": "Choice Band",
-          "label": "Choice Band attacker",
-          "description": "Hits extremely hard with physical moves, but is locked into one move until it switches out.",
-          "weight": 0.05,
-          "moves": [
-            "Extreme Speed",
-            "Shadow Ball",
-            "Hidden Power Ground",
-            "Flail"
-          ],
-          "item": "Choice Band",
-          "ability": "Pickup",
-          "nature": "Adamant",
-          "evs": {
-            "hp": 4,
-            "atk": 252,
-            "def": 0,
-            "spa": 0,
-            "spd": 0,
-            "spe": 252
-          },
-          "ivs": {
-            "hp": 31,
-            "atk": 31,
-            "def": 31,
-            "spa": 30,
-            "spd": 30,
             "spe": 31
           }
         }
@@ -6269,7 +5597,7 @@
           "sourceName": "Standard",
           "label": "Spinner",
           "description": "Clears entry hazards from your side with Rapid Spin.",
-          "weight": 0.95,
+          "weight": 1,
           "moves": [
             "Surf",
             "Ice Beam",
@@ -6286,38 +5614,6 @@
             "spa": 68,
             "spd": 0,
             "spe": 40
-          },
-          "ivs": {
-            "hp": 31,
-            "atk": 31,
-            "def": 31,
-            "spa": 31,
-            "spd": 31,
-            "spe": 31
-          }
-        },
-        {
-          "id": "blastoise-resttalk",
-          "sourceName": "RestTalk",
-          "label": "RestTalk",
-          "description": "Heals fully with Rest and keeps attacking while asleep with Sleep Talk.",
-          "weight": 0.05,
-          "moves": [
-            "Rest",
-            "Sleep Talk",
-            "Surf",
-            "Roar"
-          ],
-          "item": "Leftovers",
-          "ability": "Torrent",
-          "nature": "Calm",
-          "evs": {
-            "hp": 252,
-            "atk": 0,
-            "def": 4,
-            "spa": 0,
-            "spd": 252,
-            "spe": 0
           },
           "ivs": {
             "hp": 31,
@@ -6624,7 +5920,7 @@
           "sourceName": "Calm Mind",
           "label": "Calm Mind sweeper",
           "description": "Boosts itself with Calm Mind, then tries to sweep through the opposing team.",
-          "weight": 0.95,
+          "weight": 1,
           "moves": [
             "Calm Mind",
             "Surf",
@@ -6650,38 +5946,6 @@
             "spd": 31,
             "spe": 31
           }
-        },
-        {
-          "id": "golduck-mixed-attacker",
-          "sourceName": "Mixed Attacker",
-          "label": "Mixed attacker",
-          "description": "Mixes physical and special attacks to break through walls of either kind.",
-          "weight": 0.05,
-          "moves": [
-            "Hydro Pump",
-            "Ice Beam",
-            "Cross Chop",
-            "Hidden Power Grass"
-          ],
-          "item": "Leftovers",
-          "ability": "Cloud Nine",
-          "nature": "Hasty",
-          "evs": {
-            "hp": 0,
-            "atk": 100,
-            "def": 0,
-            "spa": 156,
-            "spd": 0,
-            "spe": 252
-          },
-          "ivs": {
-            "hp": 31,
-            "atk": 30,
-            "def": 31,
-            "spa": 30,
-            "spd": 31,
-            "spe": 31
-          }
         }
       ]
     },
@@ -6695,7 +5959,7 @@
           "sourceName": "Choice Band",
           "label": "Choice Band attacker",
           "description": "Hits extremely hard with physical moves, but is locked into one move until it switches out.",
-          "weight": 0.95,
+          "weight": 1,
           "moves": [
             "Return",
             "Earthquake",
@@ -6703,38 +5967,6 @@
             "Double-Edge"
           ],
           "item": "Choice Band",
-          "ability": "Intimidate",
-          "nature": "Jolly",
-          "evs": {
-            "hp": 4,
-            "atk": 252,
-            "def": 0,
-            "spa": 0,
-            "spd": 0,
-            "spe": 252
-          },
-          "ivs": {
-            "hp": 31,
-            "atk": 31,
-            "def": 30,
-            "spa": 31,
-            "spd": 30,
-            "spe": 31
-          }
-        },
-        {
-          "id": "tauros-substitute",
-          "sourceName": "Substitute",
-          "label": "Substitute attacker",
-          "description": "Uses Substitute to block status and scout its counters while it attacks.",
-          "weight": 0.05,
-          "moves": [
-            "Substitute",
-            "Return",
-            "Earthquake",
-            "Hidden Power Ghost"
-          ],
-          "item": "Leftovers",
           "ability": "Intimidate",
           "nature": "Jolly",
           "evs": {
@@ -6766,7 +5998,7 @@
           "sourceName": "Spikes",
           "label": "Spikes setter (physically defensive)",
           "description": "Sets Spikes to wear down every Pokémon the opponent switches in.",
-          "weight": 0.3911,
+          "weight": 0.3946,
           "moves": [
             "Spikes",
             "Surf",
@@ -6798,10 +6030,10 @@
           "sourceName": "Rain Dance Sweeper",
           "label": "Rain sweeper",
           "description": "Sets rain with Rain Dance; Swift Swim doubles its Speed for rain-boosted Surf.",
-          "weight": 0.379,
+          "weight": 0.3734,
           "moves": [
             "Rain Dance",
-            "Surf",
+            "Hydro Pump",
             "Ice Beam",
             "Hidden Power Grass"
           ],
@@ -6830,7 +6062,7 @@
           "sourceName": "Offensive Spikes",
           "label": "Spikes setter (offensive)",
           "description": "Sets Spikes to wear down every Pokémon the opponent switches in.",
-          "weight": 0.2299,
+          "weight": 0.232,
           "moves": [
             "Spikes",
             "Surf",

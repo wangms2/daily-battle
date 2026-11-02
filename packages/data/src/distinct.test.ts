@@ -1,4 +1,3 @@
-import { Dex } from '@pkmn/sim';
 import { describe, expect, it } from 'vitest';
 import { jobOf, samePurpose } from './distinct';
 import { FORMATS } from './formats';
@@ -73,11 +72,10 @@ describe('distinct sets', () => {
     );
   });
 
-  it.each(Object.keys(FORMATS))('offers every %s species 2 to 4 sets (1 with a Mega)', (format) => {
+  // A species keeps only sets worth playing: one good set beats a padded second.
+  it.each(Object.keys(FORMATS))('offers every %s species 1 to 4 sets', (format) => {
     for (const [name, entry] of Object.entries(setsFor(format).species)) {
-      // A species with a Mega set keeps only its viable sets (Mega Lopunny alone).
-      const mega = entry.sets.some((s) => Dex.items.get(s.item).megaStone);
-      expect(entry.sets.length, name).toBeGreaterThanOrEqual(mega ? 1 : 2);
+      expect(entry.sets.length, name).toBeGreaterThanOrEqual(1);
       expect(entry.sets.length, name).toBeLessThanOrEqual(4);
     }
   });

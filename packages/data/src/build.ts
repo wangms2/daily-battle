@@ -9,6 +9,7 @@ import { assignRoles, megaForm } from './roles';
 import type {
   ChaosStats,
   CuratedSets,
+  RandbatsFile,
   RoleOverrides,
   SetEntry,
   SetsFile,
@@ -141,6 +142,8 @@ export interface BuildInput {
   overrides?: RoleOverrides;
   /** Hand curation: sets added for variety, and curated sets left out. */
   curation?: SetCuration;
+  /** Random Battle roles: their moves are preferred in a curated set's slashed slots. */
+  randbats?: RandbatsFile;
 }
 
 /**
@@ -223,6 +226,8 @@ export function buildSets(
 
   for (const { name, setSource } of picks) {
     const usage = usageShares(stats[name]!);
+    const randbatsRoles = input.randbats?.species[toID(name)]?.sets;
+    const preferred = randbatsRoles && new Set(randbatsRoles.flatMap((r) => r.movepool));
     const skip = new Set(input.curation?.drop?.[name] ?? []);
     // Every set we know for the species: its own tier's analysis first, then
     // the other tier's, then hand-added ones. Usage decides which make the cut.
@@ -251,7 +256,7 @@ export function buildSets(
             ),
           }
         : original;
-      const set = resolveSet(name, curatedSet, usage, format.gen, rules.avoidAbilities);
+      const set = resolveSet(name, curatedSet, usage, format.gen, rules.avoidAbilities, preferred);
       if (!set) {
         dropped.push({ species: name, set: setName, reason: 'not enough distinct moves' });
         continue;
@@ -260,10 +265,10 @@ export function buildSets(
         dropped.push({ species: name, set: setName, reason: 'Baton Passes stat boosts' });
         continue;
       }
-      const problems = validator.validateSet(
-        { name, gender: '', level: 100, ...structuredClone(set) },
-        {},
-      );
+      // Some clauses (Baton Pass Stat Trap) only run on whole teams, so check a team of one too.
+      const problems =
+        validator.validateSet({ name, gender: '', level: 100, ...structuredClone(set) }, {}) ??
+        validator.validateTeam([{ name, gender: '', level: 100, ...structuredClone(set) }]);
       if (problems) {
         dropped.push({ species: name, set: setName, reason: problems.join(' ') });
         continue;

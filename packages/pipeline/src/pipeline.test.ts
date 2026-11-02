@@ -1,7 +1,18 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { sets, setsFor } from '@daily-battle/data';
 import { megaCount } from '@daily-battle/data/species';
-import { addDays, findSet, parseSchedule, rngFor, teamSets, toPokemonSet } from '@daily-battle/gen';
+import {
+  addDays,
+  findSet,
+  GENERATOR_VERSION,
+  parseSchedule,
+  rngFor,
+  teamSets,
+  toPokemonSet,
+  type ScheduleFile,
+  type TeamSlot,
+} from '@daily-battle/gen';
+import type { SetsFile } from '@daily-battle/data';
 import { TeamValidator, type PokemonSet } from '@pkmn/sim';
 import { afterAll, describe, expect, it } from 'vitest';
 import { PIPELINE } from './config';
@@ -119,6 +130,25 @@ describe('sampling and simulation', () => {
   }, 120_000);
 });
 
+/**
+ * A schedule's teams as the app plays them. Weeks built before the current
+ * generator version may name sets a data update removed; the app plays those
+ * as the species' most-used set (apps/web findSet), and so does this check.
+ * Weeks built since must name only known sets.
+ */
+function asPlayed(data: SetsFile, schedule: ScheduleFile): TeamSlot[][] {
+  const current = schedule.generatorVersion >= GENERATOR_VERSION;
+  return [...schedule.days.map((d) => d.team), ...schedule.suggestedTeams.map((s) => s.team)].map(
+    (team) =>
+      team.map((slot) => {
+        const sets = data.species[slot.species]!.sets;
+        if (current || sets.some((s) => s.id === slot.setId)) return slot;
+        const top = sets.reduce((a, b) => (b.weight > a.weight ? b : a));
+        return { ...slot, setId: top.id };
+      }),
+  );
+}
+
 describe('published schedule files', () => {
   const dir = new URL('../../../apps/web/public/schedule/', import.meta.url);
   const files = readdirSync(dir).filter((f) => f.endsWith('.json'));
@@ -127,26 +157,28 @@ describe('published schedule files', () => {
     expect(files.length).toBeGreaterThan(0);
   });
 
-  it.each(files)('%s is well-formed, legal, and uses known sets', (file) => {
-    const schedule = parseSchedule(JSON.parse(readFileSync(new URL(file, dir), 'utf8')));
-    expect(`${schedule.week}.json`).toBe(file);
-    expect(schedule.days.map((d) => d.day)).toEqual(
-      Array.from({ length: 7 }, (_, i) => addDays(schedule.week, i)),
-    );
-    expect(new Set(schedule.pool.species).size).toBe(12);
-    const validator = TeamValidator.get('gen4ou');
-    for (const team of [
-      ...schedule.days.map((d) => d.team),
-      ...schedule.suggestedTeams.map((s) => s.team),
-    ]) {
-      expect(
-        validator.validateTeam(team.map((slot) => toPokemonSet(slot.species, findSet(sets, slot)))),
-      ).toBeNull();
-    }
-    for (const s of schedule.suggestedTeams) {
-      expect(s.team.every((slot) => schedule.pool.species.includes(slot.species))).toBe(true);
-    }
-  });
+  it.each(files)(
+    '%s is well-formed and legal, with known sets since its generator version',
+    (file) => {
+      const schedule = parseSchedule(JSON.parse(readFileSync(new URL(file, dir), 'utf8')));
+      expect(`${schedule.week}.json`).toBe(file);
+      expect(schedule.days.map((d) => d.day)).toEqual(
+        Array.from({ length: 7 }, (_, i) => addDays(schedule.week, i)),
+      );
+      expect(new Set(schedule.pool.species).size).toBe(12);
+      const validator = TeamValidator.get('gen4ou');
+      for (const team of asPlayed(sets, schedule)) {
+        expect(
+          validator.validateTeam(
+            team.map((slot) => toPokemonSet(slot.species, findSet(sets, slot))),
+          ),
+        ).toBeNull();
+      }
+      for (const s of schedule.suggestedTeams) {
+        expect(s.team.every((slot) => schedule.pool.species.includes(slot.species))).toBe(true);
+      }
+    },
+  );
 });
 
 describe('published Gen 6 schedule files', () => {
@@ -166,10 +198,7 @@ describe('published Gen 6 schedule files', () => {
     expect(
       schedule.pool.species.some((s) => data.species[s]!.sets.some((set) => isMega(s, set.id))),
     ).toBe(true);
-    for (const team of [
-      ...schedule.days.map((d) => d.team),
-      ...schedule.suggestedTeams.map((s) => s.team),
-    ]) {
+    for (const team of asPlayed(data, schedule)) {
       // The validator plus our one-Mega rule.
       expect(legalTeam(data, team)).toBe(true);
       expect(team.filter((slot) => isMega(slot.species, slot.setId)).length).toBeLessThanOrEqual(1);
@@ -185,24 +214,24 @@ describe('published Gen 3 schedule files', () => {
   // Until the first Gen 3 week is published there's nothing to check.
   if (!files.length) it.skip('no Gen 3 weeks published yet', () => {});
 
-  it.each(files)('%s is legal, uses known sets, and has a Spikes setter', (file) => {
-    const schedule = parseSchedule(JSON.parse(readFileSync(new URL(file, dir), 'utf8')));
-    expect(`${schedule.week}.json`).toBe(file);
-    expect(new Set(schedule.pool.species).size).toBe(12);
-    // No Stealth Rock in Gen 3: Spikes takes its place in every pool.
-    expect(
-      schedule.pool.species.some((s) =>
-        data.species[s]!.sets.some((set) => set.moves.includes('Spikes')),
-      ),
-    ).toBe(true);
-    for (const team of [
-      ...schedule.days.map((d) => d.team),
-      ...schedule.suggestedTeams.map((s) => s.team),
-    ]) {
-      expect(legalTeam(data, team)).toBe(true);
-    }
-    for (const s of schedule.suggestedTeams) {
-      expect(s.team.every((slot) => schedule.pool.species.includes(slot.species))).toBe(true);
-    }
-  });
+  it.each(files)(
+    '%s is legal, with known sets since its version, and has a Spikes setter',
+    (file) => {
+      const schedule = parseSchedule(JSON.parse(readFileSync(new URL(file, dir), 'utf8')));
+      expect(`${schedule.week}.json`).toBe(file);
+      expect(new Set(schedule.pool.species).size).toBe(12);
+      // No Stealth Rock in Gen 3: Spikes takes its place in every pool.
+      expect(
+        schedule.pool.species.some((s) =>
+          data.species[s]!.sets.some((set) => set.moves.includes('Spikes')),
+        ),
+      ).toBe(true);
+      for (const team of asPlayed(data, schedule)) {
+        expect(legalTeam(data, team)).toBe(true);
+      }
+      for (const s of schedule.suggestedTeams) {
+        expect(s.team.every((slot) => schedule.pool.species.includes(slot.species))).toBe(true);
+      }
+    },
+  );
 });

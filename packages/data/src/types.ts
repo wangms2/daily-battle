@@ -98,4 +98,11 @@ export interface ChaosStats {
 }
 
 /** Hand-reviewed label/description edits, keyed by set id. */
+/** `sources/<format>-randbats.json`: Showdown's Random Battle roles, by species id. */
+export interface RandbatsFile {
+  url: string;
+  fetchedAt: string;
+  species: Record<string, { sets?: { role: string; movepool: string[] }[] }>;
+}
+
 export type RoleOverrides = Record<string, { label?: string; description?: string }>;

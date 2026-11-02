@@ -19,6 +19,7 @@ export const SOURCES = {
   uuSets: root(`sources/${FORMAT.uu}-sets.json`),
   stats: root(`sources/${FORMAT.id}-stats.json`),
   meta: root(`sources/${FORMAT.id}-sources.json`),
+  randbats: root(`sources/${FORMAT.id}-randbats.json`),
 };
 export const OUTPUT = root(`${FORMAT.id}/sets.json`);
 export const OVERRIDES = root(`${FORMAT.id}/role-overrides.json`);

@@ -46,5 +46,40 @@
   "volcanion-bulky-offensive": {
     "label": "Bulky attacker",
     "description": "Hits hard with Steam Eruption and wide coverage while taking hits well."
+  },
+  "clefable-unaware-wall": {
+    "label": "Unaware wall (Wish)"
+  },
+  "talonflame-bulky-swords-dance": {
+    "label": "Bulky Swords Dance (Will-O-Wisp)"
+  },
+  "suicune-defensive-calm-mind": {
+    "label": "Calm Mind tank (Roar)"
+  },
+  "suicune-subcm": {
+    "label": "Calm Mind tank (Substitute)"
+  },
+  "suicune-substitute-protect": {
+    "label": "Calm Mind tank (Substitute + Protect)"
+  },
+  "togekiss-stallbreaker": {
+    "label": "Paraflinch Nasty Plot"
+  },
+  "aggron-curse": {
+    "label": "Mega Curse tank"
+  },
+  "cresselia-choice-scarf": {
+    "label": "Choice Scarf support (Trick + Lunar Dance)"
+  },
+  "gliscor-toxic-stall": {
+    "label": "Toxic staller",
+    "description": "Heals each turn from Poison Heal while Toxic, Protect, and Substitute wear foes down."
+  },
+  "clefable-calm-mind": {
+    "label": "Calm Mind sweeper"
+  },
+  "excadrill-sand-rush": {
+    "label": "Swords Dance sweeper (Sand Rush)",
+    "description": "Doubles its Speed in sand, boosts with Swords Dance, and can spin away hazards."
   }
 }

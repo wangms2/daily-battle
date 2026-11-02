@@ -2016,16 +2016,6 @@
       "contact": false,
       "desc": "User switches, passing stat changes and more."
     },
-    "Blaze Kick": {
-      "type": "Fire",
-      "category": "Physical",
-      "power": 85,
-      "accuracy": 90,
-      "pp": 10,
-      "priority": 0,
-      "contact": true,
-      "desc": "High critical hit ratio. 10% chance to burn."
-    },
     "Blizzard": {
       "type": "Ice",
       "category": "Special",
@@ -2126,16 +2116,6 @@
       "contact": true,
       "desc": "Lowers the user's Defense and Sp. Def by 1."
     },
-    "Counter": {
-      "type": "Fighting",
-      "category": "Physical",
-      "power": 0,
-      "accuracy": 100,
-      "pp": 20,
-      "priority": -5,
-      "contact": true,
-      "desc": "If hit by physical attack, returns double damage."
-    },
     "Cross Chop": {
       "type": "Fighting",
       "category": "Physical",
@@ -2215,16 +2195,6 @@
       "priority": 0,
       "contact": false,
       "desc": "Lowers the user's Sp. Atk by 2."
-    },
-    "Dragon Claw": {
-      "type": "Dragon",
-      "category": "Physical",
-      "power": 80,
-      "accuracy": 100,
-      "pp": 15,
-      "priority": 0,
-      "contact": true,
-      "desc": "No additional effect."
     },
     "Dragon Dance": {
       "type": "Dragon",
@@ -3046,16 +3016,6 @@
       "contact": false,
       "desc": "20% chance to lower the target's Sp. Def by 1."
     },
-    "Shadow Claw": {
-      "type": "Ghost",
-      "category": "Physical",
-      "power": 70,
-      "accuracy": 100,
-      "pp": 15,
-      "priority": 0,
-      "contact": true,
-      "desc": "High critical hit ratio."
-    },
     "Shadow Sneak": {
       "type": "Ghost",
       "category": "Physical",
@@ -3206,16 +3166,6 @@
       "contact": false,
       "desc": "Hits adjacent Pokemon. Power doubles on Dive."
     },
-    "Swift": {
-      "type": "Normal",
-      "category": "Special",
-      "power": 60,
-      "accuracy": true,
-      "pp": 20,
-      "priority": 0,
-      "contact": false,
-      "desc": "This move does not check accuracy. Hits foes."
-    },
     "Swords Dance": {
       "type": "Normal",
       "category": "Status",
@@ -3296,16 +3246,6 @@
       "contact": false,
       "desc": "10% chance to paralyze the target."
     },
-    "Torment": {
-      "type": "Dark",
-      "category": "Status",
-      "power": 0,
-      "accuracy": 100,
-      "pp": 15,
-      "priority": 0,
-      "contact": false,
-      "desc": "Target can't select the same move twice in a row."
-    },
     "Toxic": {
       "type": "Poison",
       "category": "Status",
@@ -3376,15 +3316,15 @@
       "contact": false,
       "desc": "Usually goes first."
     },
-    "Water Pulse": {
+    "Water Spout": {
       "type": "Water",
       "category": "Special",
-      "power": 60,
+      "power": 150,
       "accuracy": 100,
-      "pp": 20,
+      "pp": 5,
       "priority": 0,
       "contact": false,
-      "desc": "20% chance to confuse the target."
+      "desc": "Less power as user's HP decreases. Hits foe(s)."
     },
     "Waterfall": {
       "type": "Water",

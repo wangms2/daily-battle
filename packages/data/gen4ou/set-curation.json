@@ -7,22 +7,19 @@
     }
   },
   "drop": {
-    "Azelf": [
-      "Utility Rain Lead"
-    ],
-    "Scyther": [
-      "Baton Pass"
-    ]
+    "Azelf": ["Utility Rain Lead"],
+    "Scyther": ["Baton Pass"],
+    "Dragonite": ["Bulky Dragon Dance"],
+    "Aerodactyl": ["SubRoost"],
+    "Registeel": ["Rain Dance Support"],
+    "Moltres": ["Toxic Stall"],
+    "Ambipom": ["Offensive Baton Pass"],
+    "Steelix": ["Torment"]
   },
   "add": {
     "Roserade": {
       "Choice Specs": {
-        "moves": [
-          "Leaf Storm",
-          "Energy Ball",
-          "Sludge Bomb",
-          "Hidden Power Fire"
-        ],
+        "moves": ["Leaf Storm", "Energy Ball", "Sludge Bomb", "Hidden Power Fire"],
         "item": "Choice Specs",
         "ability": "Natural Cure",
         "nature": "Timid",
@@ -33,12 +30,7 @@
         }
       },
       "Toxic Spikes Lead": {
-        "moves": [
-          "Toxic Spikes",
-          "Leaf Storm",
-          "Sludge Bomb",
-          "Hidden Power Fire"
-        ],
+        "moves": ["Toxic Spikes", "Leaf Storm", "Sludge Bomb", "Hidden Power Fire"],
         "item": "Focus Sash",
         "ability": "Natural Cure",
         "nature": "Timid",
@@ -51,12 +43,7 @@
     },
     "Azelf": {
       "Nasty Plot": {
-        "moves": [
-          "Nasty Plot",
-          "Psychic",
-          "Fire Blast",
-          "Thunderbolt"
-        ],
+        "moves": ["Nasty Plot", "Psychic", "Fire Blast", "Thunderbolt"],
         "item": "Life Orb",
         "ability": "Levitate",
         "nature": "Timid",
@@ -67,12 +54,7 @@
         }
       },
       "Choice Specs": {
-        "moves": [
-          "Psychic",
-          "Fire Blast",
-          "Thunderbolt",
-          "U-turn"
-        ],
+        "moves": ["Psychic", "Fire Blast", "Thunderbolt", "U-turn"],
         "item": "Choice Specs",
         "ability": "Levitate",
         "nature": "Timid",
@@ -85,12 +67,7 @@
     },
     "Blissey": {
       "Wish Support": {
-        "moves": [
-          "Wish",
-          "Protect",
-          "Seismic Toss",
-          "Toxic"
-        ],
+        "moves": ["Wish", "Protect", "Seismic Toss", "Toxic"],
         "item": "Leftovers",
         "ability": "Natural Cure",
         "nature": "Bold",
@@ -99,32 +76,11 @@
           "def": 252,
           "spd": 4
         }
-      },
-      "Calm Mind": {
-        "moves": [
-          "Calm Mind",
-          "Soft-Boiled",
-          "Flamethrower",
-          "Ice Beam"
-        ],
-        "item": "Leftovers",
-        "ability": "Natural Cure",
-        "nature": "Bold",
-        "evs": {
-          "hp": 252,
-          "def": 252,
-          "spa": 4
-        }
       }
     },
     "Weavile": {
       "Swords Dance": {
-        "moves": [
-          "Swords Dance",
-          "Night Slash",
-          "Ice Punch",
-          "Ice Shard"
-        ],
+        "moves": ["Swords Dance", "Night Slash", "Ice Punch", "Ice Shard"],
         "item": "Life Orb",
         "ability": "Pressure",
         "nature": "Jolly",
@@ -135,12 +91,7 @@
         }
       },
       "Choice Band": {
-        "moves": [
-          "Night Slash",
-          "Ice Punch",
-          "Ice Shard",
-          "Pursuit"
-        ],
+        "moves": ["Night Slash", "Ice Punch", "Ice Shard", "Pursuit"],
         "item": "Choice Band",
         "ability": "Pressure",
         "nature": "Jolly",
@@ -152,29 +103,8 @@
       }
     },
     "Tentacruel": {
-      "Swords Dance": {
-        "moves": [
-          "Swords Dance",
-          "Waterfall",
-          "Poison Jab",
-          "Knock Off"
-        ],
-        "item": "Life Orb",
-        "ability": "Clear Body",
-        "nature": "Jolly",
-        "evs": {
-          "atk": 252,
-          "spd": 4,
-          "spe": 252
-        }
-      },
       "Offensive Rapid Spin": {
-        "moves": [
-          "Rapid Spin",
-          "Hydro Pump",
-          "Ice Beam",
-          "Sludge Bomb"
-        ],
+        "moves": ["Rapid Spin", "Hydro Pump", "Ice Beam", "Sludge Bomb"],
         "item": "Life Orb",
         "ability": "Clear Body",
         "nature": "Timid",
@@ -187,12 +117,7 @@
     },
     "Snorlax": {
       "Choice Band": {
-        "moves": [
-          "Return",
-          "Earthquake",
-          "Pursuit",
-          "Self-Destruct"
-        ],
+        "moves": ["Return", "Earthquake", "Pursuit", "Self-Destruct"],
         "item": "Choice Band",
         "ability": "Thick Fat",
         "nature": "Adamant",
@@ -201,49 +126,12 @@
           "atk": 252,
           "spd": 4
         }
-      },
-      "RestTalk": {
-        "moves": [
-          "Body Slam",
-          "Curse",
-          "Rest",
-          "Sleep Talk"
-        ],
-        "item": "Leftovers",
-        "ability": "Thick Fat",
-        "nature": "Careful",
-        "evs": {
-          "hp": 252,
-          "def": 4,
-          "spd": 252
-        }
       }
     },
     "Jolteon": {
       "Substitute + Baton Pass": {
-        "moves": [
-          "Substitute",
-          "Baton Pass",
-          "Thunderbolt",
-          "Hidden Power Ice"
-        ],
+        "moves": ["Substitute", "Baton Pass", "Thunderbolt", "Hidden Power Ice"],
         "item": "Leftovers",
-        "ability": "Volt Absorb",
-        "nature": "Timid",
-        "evs": {
-          "hp": 4,
-          "spa": 252,
-          "spe": 252
-        }
-      },
-      "Choice Scarf": {
-        "moves": [
-          "Thunderbolt",
-          "Shadow Ball",
-          "Hidden Power Ice",
-          "Baton Pass"
-        ],
-        "item": "Choice Scarf",
         "ability": "Volt Absorb",
         "nature": "Timid",
         "evs": {
@@ -255,12 +143,7 @@
     },
     "Porygon-Z": {
       "Choice Specs": {
-        "moves": [
-          "Tri Attack",
-          "Dark Pulse",
-          "Thunderbolt",
-          "Ice Beam"
-        ],
+        "moves": ["Tri Attack", "Dark Pulse", "Thunderbolt", "Ice Beam"],
         "item": "Choice Specs",
         "ability": "Adaptability",
         "nature": "Modest",
@@ -271,12 +154,7 @@
         }
       },
       "Choice Scarf": {
-        "moves": [
-          "Tri Attack",
-          "Dark Pulse",
-          "Hidden Power Fighting",
-          "Trick"
-        ],
+        "moves": ["Tri Attack", "Dark Pulse", "Hidden Power Fighting", "Trick"],
         "item": "Choice Scarf",
         "ability": "Adaptability",
         "nature": "Timid",
@@ -289,12 +167,7 @@
     },
     "Raikou": {
       "Choice Specs": {
-        "moves": [
-          "Thunderbolt",
-          "Shadow Ball",
-          "Hidden Power Ice",
-          "Signal Beam"
-        ],
+        "moves": ["Thunderbolt", "Shadow Ball", "Hidden Power Ice", "Signal Beam"],
         "item": "Choice Specs",
         "ability": "Pressure",
         "nature": "Timid",
@@ -303,32 +176,11 @@
           "spd": 4,
           "spe": 252
         }
-      },
-      "Dual Screens": {
-        "moves": [
-          "Reflect",
-          "Light Screen",
-          "Thunderbolt",
-          "Roar"
-        ],
-        "item": "Light Clay",
-        "ability": "Pressure",
-        "nature": "Timid",
-        "evs": {
-          "hp": 252,
-          "spd": 4,
-          "spe": 252
-        }
       }
     },
     "Gallade": {
       "Swords Dance": {
-        "moves": [
-          "Swords Dance",
-          "Close Combat",
-          "Night Slash",
-          "Shadow Sneak"
-        ],
+        "moves": ["Swords Dance", "Close Combat", "Night Slash", "Shadow Sneak"],
         "item": "Life Orb",
         "ability": "Steadfast",
         "nature": "Jolly",
@@ -339,12 +191,7 @@
         }
       },
       "Choice Scarf": {
-        "moves": [
-          "Close Combat",
-          "Psycho Cut",
-          "Stone Edge",
-          "Trick"
-        ],
+        "moves": ["Close Combat", "Psycho Cut", "Stone Edge", "Trick"],
         "item": "Choice Scarf",
         "ability": "Steadfast",
         "nature": "Jolly",
@@ -357,12 +204,7 @@
     },
     "Electivire": {
       "Choice Band": {
-        "moves": [
-          "Thunder Punch",
-          "Cross Chop",
-          "Ice Punch",
-          "Earthquake"
-        ],
+        "moves": ["Thunder Punch", "Cross Chop", "Ice Punch", "Earthquake"],
         "item": "Choice Band",
         "ability": "Motor Drive",
         "nature": "Jolly",
@@ -375,12 +217,7 @@
     },
     "Vaporeon": {
       "Wish Support": {
-        "moves": [
-          "Wish",
-          "Protect",
-          "Surf",
-          "Roar"
-        ],
+        "moves": ["Wish", "Protect", "Surf", "Roar"],
         "item": "Leftovers",
         "ability": "Water Absorb",
         "nature": "Bold",
@@ -391,35 +228,9 @@
         }
       }
     },
-    "Dusknoir": {
-      "Trick Room": {
-        "moves": [
-          "Trick Room",
-          "Shadow Sneak",
-          "Earthquake",
-          "Ice Punch"
-        ],
-        "item": "Life Orb",
-        "ability": "Pressure",
-        "nature": "Brave",
-        "evs": {
-          "hp": 252,
-          "atk": 252,
-          "def": 4
-        },
-        "ivs": {
-          "spe": 0
-        }
-      }
-    },
     "Shaymin": {
       "Choice Specs": {
-        "moves": [
-          "Seed Flare",
-          "Earth Power",
-          "Air Slash",
-          "Hidden Power Fire"
-        ],
+        "moves": ["Seed Flare", "Earth Power", "Air Slash", "Hidden Power Fire"],
         "item": "Choice Specs",
         "ability": "Natural Cure",
         "nature": "Timid",
@@ -430,12 +241,7 @@
         }
       },
       "SubSeed": {
-        "moves": [
-          "Substitute",
-          "Leech Seed",
-          "Seed Flare",
-          "Earth Power"
-        ],
+        "moves": ["Substitute", "Leech Seed", "Seed Flare", "Earth Power"],
         "item": "Leftovers",
         "ability": "Natural Cure",
         "nature": "Timid",
@@ -448,12 +254,7 @@
     },
     "Honchkrow": {
       "Nasty Plot": {
-        "moves": [
-          "Nasty Plot",
-          "Dark Pulse",
-          "Heat Wave",
-          "Hidden Power Fighting"
-        ],
+        "moves": ["Nasty Plot", "Dark Pulse", "Heat Wave", "Hidden Power Fighting"],
         "item": "Life Orb",
         "ability": "Super Luck",
         "nature": "Modest",
@@ -466,12 +267,7 @@
     },
     "Crobat": {
       "Choice Band": {
-        "moves": [
-          "Brave Bird",
-          "Cross Poison",
-          "U-turn",
-          "Zen Headbutt"
-        ],
+        "moves": ["Brave Bird", "Cross Poison", "U-turn", "Zen Headbutt"],
         "item": "Choice Band",
         "ability": "Inner Focus",
         "nature": "Jolly",
@@ -480,20 +276,30 @@
           "def": 4,
           "spe": 252
         }
-      },
-      "Nasty Plot": {
-        "moves": [
-          "Nasty Plot",
-          "Air Slash",
-          "Heat Wave",
-          "Roost"
-        ],
-        "item": "Life Orb",
-        "ability": "Inner Focus",
+      }
+    },
+    "Togekiss": {
+      "Choice Scarf": {
+        "moves": ["Air Slash", "Aura Sphere", "Fire Blast", "Trick"],
+        "item": "Choice Scarf",
+        "ability": "Serene Grace",
         "nature": "Timid",
         "evs": {
-          "def": 4,
+          "hp": 4,
           "spa": 252,
+          "spe": 252
+        }
+      }
+    },
+    "Kingdra": {
+      "Dragon Dance RestTalk": {
+        "moves": ["Dragon Dance", "Outrage", "Rest", "Sleep Talk"],
+        "item": "Leftovers",
+        "ability": "Swift Swim",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 4,
+          "atk": 252,
           "spe": 252
         }
       }

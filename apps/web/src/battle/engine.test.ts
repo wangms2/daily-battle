@@ -62,7 +62,11 @@ describe('BattleEngine', () => {
     const engine = new BattleEngine(start(1));
     engine.begin();
     const pkg = engine.choose('move 1');
-    expect(pkg.frames.some((f) => f.event?.kind === 'turn')).toBe(true);
+    // The turn ends, unless a faster foe knocks out your lead first and you must switch.
+    const fainted = pkg.frames.some((f) => f.event?.kind === 'faint' && f.event.who === 'you');
+    expect(fainted ? pkg.controls?.kind : pkg.frames.some((f) => f.event?.kind === 'turn')).toBe(
+      fainted ? 'switch' : true,
+    );
     // The opponent acts too: it attacks or switches.
     expect(
       pkg.frames.some(
@@ -110,10 +114,12 @@ describe('BattleEngine', () => {
 
   it('resumes to exactly the state reached live (DESIGN.md §7)', () => {
     const s = start(20);
-    const live = play(s, 30);
+    const live = play(s, 15);
     const resumed = new BattleEngine({ ...s, choices: live.choices }).begin();
     expect(resumed.resumed).toBe(true);
     const last = live.packages.at(-1)!;
+    // Mid-battle: a finished battle is never resumed (and has no request to order the team by).
+    expect(last.end).toBeNull();
     expect(resumed.frames.at(-1)!.view).toEqual(last.frames.at(-1)!.view);
     expect(resumed.controls).toEqual(last.controls);
     expect(resumed.team).toEqual(last.team);
@@ -504,7 +510,7 @@ describe('BattleEngine on Gen 5 OU (Team Preview)', () => {
 
   it('resumes to exactly the state reached live', () => {
     const s = start5(20);
-    const live = play(s, 30);
+    const live = play(s, 25);
     const resumed = new BattleEngine({ ...s, choices: live.choices }).begin();
     const last = live.packages.at(-1)!;
     expect(resumed.frames.at(-1)!.view).toEqual(last.frames.at(-1)!.view);

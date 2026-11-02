@@ -2,12 +2,7 @@
   "add": {
     "Weavile": {
       "Swords Dance": {
-        "moves": [
-          "Swords Dance",
-          "Knock Off",
-          "Icicle Crash",
-          "Ice Shard"
-        ],
+        "moves": ["Swords Dance", "Knock Off", "Icicle Crash", "Ice Shard"],
         "item": "Life Orb",
         "ability": "Pressure",
         "nature": "Jolly",
@@ -20,12 +15,7 @@
     },
     "Ferrothorn": {
       "Stealth Rock": {
-        "moves": [
-          "Stealth Rock",
-          "Leech Seed",
-          "Gyro Ball",
-          "Knock Off"
-        ],
+        "moves": ["Stealth Rock", "Leech Seed", "Gyro Ball", "Knock Off"],
         "item": "Leftovers",
         "ability": "Iron Barbs",
         "nature": "Relaxed",
@@ -41,12 +31,7 @@
     },
     "Tornadus-Therian": {
       "Life Orb": {
-        "moves": [
-          "Hurricane",
-          "Heat Wave",
-          "Knock Off",
-          "U-turn"
-        ],
+        "moves": ["Hurricane", "Heat Wave", "Knock Off", "U-turn"],
         "item": "Life Orb",
         "ability": "Regenerator",
         "nature": "Timid",
@@ -59,12 +44,7 @@
     },
     "Skarmory": {
       "Defog": {
-        "moves": [
-          "Defog",
-          "Roost",
-          "Whirlwind",
-          "Brave Bird"
-        ],
+        "moves": ["Defog", "Roost", "Whirlwind", "Brave Bird"],
         "item": "Rocky Helmet",
         "ability": "Sturdy",
         "nature": "Impish",
@@ -77,12 +57,7 @@
     },
     "Magnezone": {
       "Choice Specs": {
-        "moves": [
-          "Thunderbolt",
-          "Flash Cannon",
-          "Hidden Power Fire",
-          "Volt Switch"
-        ],
+        "moves": ["Thunderbolt", "Flash Cannon", "Hidden Power Fire", "Volt Switch"],
         "item": "Choice Specs",
         "ability": "Magnet Pull",
         "nature": "Modest",
@@ -95,12 +70,7 @@
     },
     "Amoonguss": {
       "Specially Defensive": {
-        "moves": [
-          "Spore",
-          "Giga Drain",
-          "Sludge Bomb",
-          "Hidden Power Fire"
-        ],
+        "moves": ["Spore", "Giga Drain", "Sludge Bomb", "Hidden Power Fire"],
         "item": "Black Sludge",
         "ability": "Regenerator",
         "nature": "Calm",
@@ -113,12 +83,7 @@
     },
     "Azelf": {
       "Expert Belt": {
-        "moves": [
-          "Psychic",
-          "Fire Blast",
-          "Thunderbolt",
-          "U-turn"
-        ],
+        "moves": ["Psychic", "Fire Blast", "Thunderbolt", "U-turn"],
         "item": "Expert Belt",
         "ability": "Levitate",
         "nature": "Timid",
@@ -131,12 +96,7 @@
     },
     "Chansey": {
       "Wish": {
-        "moves": [
-          "Wish",
-          "Protect",
-          "Seismic Toss",
-          "Toxic"
-        ],
+        "moves": ["Wish", "Protect", "Seismic Toss", "Toxic"],
         "item": "Eviolite",
         "ability": "Natural Cure",
         "nature": "Bold",
@@ -147,32 +107,9 @@
         }
       }
     },
-    "Shuckle": {
-      "Red Card": {
-        "moves": [
-          "Sticky Web",
-          "Stealth Rock",
-          "Final Gambit",
-          "Infestation"
-        ],
-        "item": "Red Card",
-        "ability": "Sturdy",
-        "nature": "Calm",
-        "evs": {
-          "hp": 248,
-          "def": 8,
-          "spd": 252
-        }
-      }
-    },
     "Quagsire": {
       "Curse": {
-        "moves": [
-          "Curse",
-          "Waterfall",
-          "Earthquake",
-          "Recover"
-        ],
+        "moves": ["Curse", "Waterfall", "Earthquake", "Recover"],
         "item": "Leftovers",
         "ability": "Unaware",
         "nature": "Impish",
@@ -185,12 +122,7 @@
     },
     "Politoed": {
       "Choice Scarf": {
-        "moves": [
-          "Hydro Pump",
-          "Ice Beam",
-          "Focus Blast",
-          "Hidden Power Grass"
-        ],
+        "moves": ["Hydro Pump", "Ice Beam", "Focus Blast", "Hidden Power Grass"],
         "item": "Choice Scarf",
         "ability": "Drizzle",
         "nature": "Timid",
@@ -203,12 +135,7 @@
     },
     "Blissey": {
       "Wish": {
-        "moves": [
-          "Wish",
-          "Protect",
-          "Seismic Toss",
-          "Toxic"
-        ],
+        "moves": ["Wish", "Protect", "Seismic Toss", "Toxic"],
         "item": "Leftovers",
         "ability": "Natural Cure",
         "nature": "Calm",
@@ -221,12 +148,7 @@
     },
     "Nidoking": {
       "Stealth Rock": {
-        "moves": [
-          "Stealth Rock",
-          "Earth Power",
-          "Sludge Wave",
-          "Ice Beam"
-        ],
+        "moves": ["Stealth Rock", "Earth Power", "Sludge Wave", "Ice Beam"],
         "item": "Focus Sash",
         "ability": "Sheer Force",
         "nature": "Timid",
@@ -239,12 +161,7 @@
     },
     "Mandibuzz": {
       "Physically Defensive": {
-        "moves": [
-          "Foul Play",
-          "Roost",
-          "Defog",
-          "Toxic"
-        ],
+        "moves": ["Foul Play", "Roost", "Defog", "Toxic"],
         "item": "Rocky Helmet",
         "ability": "Overcoat",
         "nature": "Bold",
@@ -257,12 +174,7 @@
     },
     "Feraligatr": {
       "Choice Band": {
-        "moves": [
-          "Waterfall",
-          "Crunch",
-          "Ice Punch",
-          "Aqua Jet"
-        ],
+        "moves": ["Waterfall", "Crunch", "Ice Punch", "Aqua Jet"],
         "item": "Choice Band",
         "ability": "Sheer Force",
         "nature": "Adamant",
@@ -275,12 +187,7 @@
     },
     "Hawlucha": {
       "Choice Band": {
-        "moves": [
-          "High Jump Kick",
-          "Stone Edge",
-          "Poison Jab",
-          "U-turn"
-        ],
+        "moves": ["High Jump Kick", "Stone Edge", "Poison Jab", "U-turn"],
         "item": "Choice Band",
         "ability": "Mold Breaker",
         "nature": "Jolly",
@@ -289,6 +196,49 @@
           "def": 4,
           "spe": 252
         }
+      }
+    },
+    "Gliscor": {
+      "Toxic Stall": {
+        "moves": ["Toxic", "Protect", "Substitute", "Earthquake"],
+        "item": "Toxic Orb",
+        "ability": "Poison Heal",
+        "nature": "Impish",
+        "evs": {
+          "hp": 252,
+          "def": 184,
+          "spe": 72
+        }
+      }
+    },
+    "Togekiss": {
+      "Choice Scarf": {
+        "moves": ["Air Slash", "Aura Sphere", "Dazzling Gleam", "Trick"],
+        "item": "Choice Scarf",
+        "ability": "Serene Grace",
+        "nature": "Timid",
+        "evs": {
+          "hp": 4,
+          "spa": 252,
+          "spe": 252
+        }
+      }
+    }
+  },
+  "drop": {
+    "Cloyster": ["The Janitor (Shell Smash)"],
+    "Talonflame": ["Specially Defensive"],
+    "Togekiss": ["Defensive"]
+  },
+  "swap": {
+    "Excadrill": {
+      "Sand Rush": {
+        "Rock Slide": "Swords Dance"
+      }
+    },
+    "Clefable": {
+      "Calm Mind": {
+        "Thunder Wave": "Flamethrower"
       }
     }
   }

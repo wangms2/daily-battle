@@ -1,6 +1,6 @@
 # @daily-battle/data
 
-Set snapshots for Gen 3 OU, Gen 4 OU, Gen 5 OU, and Gen 6 OU: 2–4 usage-weighted sets per species, each with a player-facing role label and one-line description. The generators (M3) and the AI's set priors (M4) read them.
+Set snapshots for Gen 3 OU, Gen 4 OU, Gen 5 OU, and Gen 6 OU: 1–4 usage-weighted sets per species (one good set beats a padded second), each with a player-facing role label and one-line description. The generators (M3) and the AI's set priors (M4) read them.
 
 ```ts
 import { sets, setsFor } from '@daily-battle/data';
@@ -44,6 +44,18 @@ setsFor('gen5ou').species['Politoed'].sets; // any format in src/formats.ts
 5. **Roles:** the ordered rules in `src/roles.ts` give a label and description from item, moves, and EVs (Choice items, Stealth Rock leads, setup sweepers, hazard setters, spinners, walls, and so on).
    - When two sets of one species share a label, a suffix tells them apart: the item, otherwise the EV spread, otherwise the source set name.
    - `gen4ou/role-overrides.json` holds hand-reviewed edits keyed by set id and is applied last.
+
+## Set quality (Nov 2026)
+
+How a curated set's options become one concrete set (`src/resolve.ts`):
+
+- **Whole sets, not slots.** Move slots are picked together, scored by usage shares. A slot's first-listed option (the analysis's own pick) counts double, and so does any move Showdown's Random Battle sets use on the species (`sources/<format>-randbats.json`, from `fetch-randbats`), so usage has to clearly beat them. That's how Gen 3 Jolteon gets Hidden Power Ice.
+- **Attackers attack.** A set with an attacking spread gets at least two attacks when its slots allow.
+- **Choice sets.** A Choice set skips status moves (but Trick, Switcheroo, Healing Wish, Memento, Lunar Dance) and Focus Punch, Flail, and Reversal, where a slot offers something else.
+- **Natures fit the spread.** A listed nature that lowers a stat the set invests in (100+ EVs) is skipped.
+- **Team rules.** Each set is also validated as a team of one, so team-wide clauses (Baton Pass Stat Trap) drop it at build time.
+
+`pnpm --filter @daily-battle/data audit-sets --format <id>` writes `reports/set-audit-<format>.md`: attackers without two attacks, no STAB, slots resolved away from the analysis's choice, padding sets, labels naming missing moves, and EVs or natures at odds with the set, plus Random Battle roles no set covers. It changes nothing; decisions go into `set-curation.json` (`add`, `drop`, `swap`) and `role-overrides.json`. The Nov 2026 review's decisions are in `reports/set-proposals-<format>.md`.
 
 ## Refreshing
 

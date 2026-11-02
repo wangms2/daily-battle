@@ -71,10 +71,6 @@
     "label": "Special wall",
     "description": "Absorbs special attacks, heals with Soft-Boiled, and sets Stealth Rock."
   },
-  "blissey-toxic-attacker": {
-    "label": "Toxic staller",
-    "description": "Absorbs special attacks and wears foes down with Toxic, Flamethrower, and Ice Beam."
-  },
   "politoed-defensive": {
     "label": "Rain setter",
     "description": "Brings rain with Drizzle that lasts until another weather replaces it, and walls physical attackers with Scald, Protect, and Encore."
@@ -127,5 +123,29 @@
   "umbreon-wish-support": {
     "label": "Wish support",
     "description": "Passes Wish heals to teammates, cures status with Heal Bell, and punishes physical attackers with Foul Play."
+  },
+  "suicune-crocune": {
+    "label": "Calm Mind tank (RestTalk)"
+  },
+  "togekiss-physically-defensive": {
+    "label": "Paraflinch Nasty Plot"
+  },
+  "dusclops-curse": {
+    "label": "Ghost Curse staller"
+  },
+  "registeel-curse": {
+    "label": "Curse tank"
+  },
+  "starmie-bulky-spinner": {
+    "label": "Spinner (bulky)",
+    "description": "Clears entry hazards with Rapid Spin, burns with Scald, and heals with Recover."
+  },
+  "gliscor-toxic-stall": {
+    "label": "Toxic staller",
+    "description": "Heals each turn from Poison Heal while Toxic, Protect, and Substitute wear foes down."
+  },
+  "conkeldurr-guts": {
+    "label": "Guts attacker",
+    "description": "Its Flame Orb burns it to power up Guts, then it hits hard with Mach Punch and Drain Punch."
   }
 }

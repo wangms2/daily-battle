@@ -22,11 +22,11 @@ describe('usageShares', () => {
 
 describe('pickMoves', () => {
   it('picks the best combination, not the greedy one', () => {
-    // Greedy would take Shadow Ball in slot 2, leaving Will-O-Wisp for slot 3.
+    // Greedy would take Shadow Ball in slot 1, leaving Will-O-Wisp for slot 2.
     const slots = [
       ['Pain Split'],
-      ['Shadow Ball', 'Hydro Pump'],
-      ['Will-O-Wisp', 'Shadow Ball'],
+      ['Hydro Pump', 'Shadow Ball'],
+      ['Shadow Ball', 'Will-O-Wisp'],
       ['Thunderbolt'],
     ];
     expect(pickMoves(slots, usage.moves)).toEqual([
@@ -34,6 +34,31 @@ describe('pickMoves', () => {
       'Hydro Pump',
       'Shadow Ball',
       'Thunderbolt',
+    ]);
+  });
+
+  it("prefers a slot's first-listed option unless usage clearly beats it", () => {
+    // Will-O-Wisp (0.3, doubled) beats Hydro Pump (0.5); Thunderbolt (0.9) beats Pain Split (0.2, doubled).
+    expect(pickMoves([['Will-O-Wisp', 'Hydro Pump']], usage.moves)).toEqual(['Will-O-Wisp']);
+    expect(pickMoves([['Pain Split', 'Thunderbolt']], usage.moves)).toEqual(['Thunderbolt']);
+  });
+
+  it('prefers the moves a reference uses', () => {
+    // Will-O-Wisp is listed first (0.3, doubled) over Hydro Pump (0.5) until Hydro Pump is preferred too.
+    const slots = [['Will-O-Wisp', 'Hydro Pump']];
+    expect(pickMoves(slots, usage.moves)).toEqual(['Will-O-Wisp']);
+    expect(pickMoves(slots, usage.moves, { preferred: new Set(['hydropump']) })).toEqual([
+      'Hydro Pump',
+    ]);
+  });
+
+  it('gives an attacker its attacks when the slots allow', () => {
+    const isAttack = (m: string) => m !== 'Will-O-Wisp' && m !== 'Pain Split';
+    const slots = [['Thunderbolt'], ['Will-O-Wisp', 'Hydro Pump']];
+    expect(pickMoves(slots, usage.moves)).toEqual(['Thunderbolt', 'Will-O-Wisp']);
+    expect(pickMoves(slots, usage.moves, { isAttack, minAttacks: 2 })).toEqual([
+      'Thunderbolt',
+      'Hydro Pump',
     ]);
   });
 
@@ -58,6 +83,41 @@ describe('resolveSet', () => {
     expect(set).toMatchObject({ item: 'Leftovers', nature: 'Timid', ability: 'Levitate' });
     expect(set?.evs).toEqual({ hp: 252, atk: 0, def: 0, spa: 4, spd: 0, spe: 252 });
     expect(set?.ivs.spe).toBe(31);
+  });
+
+  it('gives a Choice set no status moves but Trick, and no Focus Punch', () => {
+    const set = resolveSet(
+      'Rotom-Wash',
+      {
+        moves: [
+          ['Will-O-Wisp', 'Thunderbolt'],
+          ['Focus Punch', 'Shadow Ball'],
+          'Trick',
+          'Hydro Pump',
+        ],
+        item: 'Choice Scarf',
+        evs: { spa: 252, spe: 252 },
+      },
+      usage,
+      4,
+    );
+    expect(set?.moves).toEqual(['Thunderbolt', 'Shadow Ball', 'Trick', 'Hydro Pump']);
+  });
+
+  it('skips a listed nature that lowers a stat the set invests in', () => {
+    const set = resolveSet(
+      'Rotom-Wash',
+      { moves: ['Thunderbolt'], nature: ['Jolly', 'Timid'], evs: { spa: 252, spe: 252 } },
+      {
+        ...usage,
+        natures: new Map([
+          ['jolly', 0.9],
+          ['timid', 0.1],
+        ]),
+      },
+      4,
+    );
+    expect(set?.nature).toBe('Timid');
   });
 
   it('sets Hidden Power IVs', () => {

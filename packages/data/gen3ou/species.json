@@ -1587,16 +1587,6 @@
       "contact": true,
       "desc": "Has 1/3 recoil."
     },
-    "Dragon Claw": {
-      "type": "Dragon",
-      "category": "Special",
-      "power": 80,
-      "accuracy": 100,
-      "pp": 15,
-      "priority": 0,
-      "contact": true,
-      "desc": "No additional effect."
-    },
     "Dragon Dance": {
       "type": "Dragon",
       "category": "Status",
@@ -1676,6 +1666,16 @@
       "priority": 1,
       "contact": true,
       "desc": "Usually goes first."
+    },
+    "Fake Out": {
+      "type": "Normal",
+      "category": "Physical",
+      "power": 40,
+      "accuracy": 100,
+      "pp": 10,
+      "priority": 1,
+      "contact": false,
+      "desc": "Hits first. First turn out only. 100% flinch chance."
     },
     "Fake Tears": {
       "type": "Dark",
@@ -1887,16 +1887,6 @@
       "contact": true,
       "desc": "10% chance to freeze the target."
     },
-    "Imprison": {
-      "type": "Psychic",
-      "category": "Status",
-      "power": 0,
-      "accuracy": true,
-      "pp": 10,
-      "priority": 0,
-      "contact": false,
-      "desc": "No foe can use any move known by the user."
-    },
     "Iron Tail": {
       "type": "Steel",
       "category": "Physical",
@@ -1996,16 +1986,6 @@
       "priority": 0,
       "contact": false,
       "desc": "Heals the user by 50% of its max HP."
-    },
-    "Mirror Coat": {
-      "type": "Psychic",
-      "category": "Special",
-      "power": 0,
-      "accuracy": 100,
-      "pp": 20,
-      "priority": -5,
-      "contact": false,
-      "desc": "If hit by special attack, returns double damage."
     },
     "Overheat": {
       "type": "Fire",
@@ -2237,16 +2217,6 @@
       "contact": true,
       "desc": "Can hit Pokemon using Bounce or Fly."
     },
-    "Slack Off": {
-      "type": "Normal",
-      "category": "Status",
-      "power": 0,
-      "accuracy": true,
-      "pp": 10,
-      "priority": 0,
-      "contact": false,
-      "desc": "Heals the user by 50% of its max HP."
-    },
     "Sleep Powder": {
       "type": "Grass",
       "category": "Status",
@@ -2457,6 +2427,16 @@
       "contact": false,
       "desc": "User switches its held item with the target's."
     },
+    "Whirlwind": {
+      "type": "Normal",
+      "category": "Status",
+      "power": 0,
+      "accuracy": 100,
+      "pp": 20,
+      "priority": -6,
+      "contact": false,
+      "desc": "Forces the target to switch to a random ally."
+    },
     "Will-O-Wisp": {
       "type": "Fire",
       "category": "Status",
@@ -2481,7 +2461,6 @@
   "items": {
     "Choice Band": "Holder's Attack is 1.5x, but it can only select the first move it executes.",
     "Leftovers": "At the end of every turn, holder restores 1/16 of its max HP.",
-    "Liechi Berry": "Raises holder's Attack by 1 stage when at 1/4 max HP or less. Single use.",
     "Magnet": "Holder's Electric-type attacks have 1.1x power.",
     "Petaya Berry": "Raises holder's Sp. Atk by 1 stage when at 1/4 max HP or less. Single use.",
     "Salac Berry": "Raises holder's Speed by 1 stage when at 1/4 max HP or less. Single use.",

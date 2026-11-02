@@ -2573,6 +2573,16 @@
       "contact": true,
       "desc": "Nearly always goes first."
     },
+    "Facade": {
+      "type": "Normal",
+      "category": "Physical",
+      "power": 70,
+      "accuracy": 100,
+      "pp": 20,
+      "priority": 0,
+      "contact": true,
+      "desc": "Power doubles if user is burn/poison/paralyzed."
+    },
     "Fake Out": {
       "type": "Normal",
       "category": "Physical",
@@ -2853,16 +2863,6 @@
       "contact": false,
       "desc": "10% chance to freeze the target."
     },
-    "Ice Fang": {
-      "type": "Ice",
-      "category": "Physical",
-      "power": 65,
-      "accuracy": 95,
-      "pp": 15,
-      "priority": 0,
-      "contact": true,
-      "desc": "10% chance to freeze. 10% chance to flinch."
-    },
     "Ice Punch": {
       "type": "Ice",
       "category": "Physical",
@@ -2892,16 +2892,6 @@
       "priority": 0,
       "contact": false,
       "desc": "30% chance to make the target flinch."
-    },
-    "Icy Wind": {
-      "type": "Ice",
-      "category": "Special",
-      "power": 55,
-      "accuracy": 95,
-      "pp": 15,
-      "priority": 0,
-      "contact": false,
-      "desc": "100% chance to lower the foe(s) Speed by 1."
     },
     "Imprison": {
       "type": "Psychic",
@@ -3142,6 +3132,16 @@
       "priority": 0,
       "contact": false,
       "desc": "Shares HP of user and target equally."
+    },
+    "Payback": {
+      "type": "Dark",
+      "category": "Physical",
+      "power": 50,
+      "accuracy": 100,
+      "pp": 10,
+      "priority": 0,
+      "contact": true,
+      "desc": "Power doubles if the user moves after the target."
     },
     "Power Whip": {
       "type": "Grass",
@@ -3797,7 +3797,6 @@
   "items": {
     "Air Balloon": "Holder is immune to Ground-type attacks. Pops when holder is hit.",
     "Black Sludge": "Each turn, if holder is a Poison type, restores 1/16 max HP; loses 1/8 if not.",
-    "Charcoal": "Holder's Fire-type attacks have 1.2x power.",
     "Choice Band": "Holder's Attack is 1.5x, but it can only select the first move it executes.",
     "Choice Scarf": "Holder's Speed is 1.5x, but it can only select the first move it executes.",
     "Choice Specs": "Holder's Sp. Atk is 1.5x, but it can only select the first move it executes.",

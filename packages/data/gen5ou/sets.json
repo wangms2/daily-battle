@@ -3,7 +3,7 @@
     "format": "gen5ou",
     "method": "curated-usage-weighted-v1",
     "simVersion": "0.10.11",
-    "builtAt": "2026-10-23T13:58:33.422Z",
+    "builtAt": "2026-11-02T19:29:14.110Z",
     "sources": {
       "sets": {
         "url": "https://data.pkmn.cc/sets/gen5ou.json",
@@ -134,7 +134,7 @@
             "Calm Mind",
             "Draco Meteor",
             "Surf",
-            "Hidden Power Fire"
+            "Recover"
           ],
           "item": "Draco Plate",
           "ability": "Levitate",
@@ -149,11 +149,11 @@
           },
           "ivs": {
             "hp": 31,
-            "atk": 30,
+            "atk": 31,
             "def": 31,
-            "spa": 30,
+            "spa": 31,
             "spd": 31,
-            "spe": 30
+            "spe": 31
           }
         }
       ]
@@ -168,7 +168,7 @@
           "sourceName": "Bulky Pursuit Trapper",
           "label": "Pursuit trapper",
           "description": "Traps and removes fleeing Psychic- and Ghost-types with Pursuit, while its bulk soaks special hits.",
-          "weight": 0.9,
+          "weight": 0.85,
           "moves": [
             "Crunch",
             "Pursuit",
@@ -258,6 +258,38 @@
             "spd": 31,
             "spe": 31
           }
+        },
+        {
+          "id": "tyranitar-dragon-dance",
+          "sourceName": "Dragon Dance",
+          "label": "Dragon Dance sweeper",
+          "description": "Boosts itself with Dragon Dance, then tries to sweep through the opposing team.",
+          "weight": 0.05,
+          "moves": [
+            "Dragon Dance",
+            "Crunch",
+            "Stone Edge",
+            "Earthquake"
+          ],
+          "item": "Lum Berry",
+          "ability": "Sand Stream",
+          "nature": "Jolly",
+          "evs": {
+            "hp": 4,
+            "atk": 252,
+            "def": 0,
+            "spa": 0,
+            "spd": 0,
+            "spe": 252
+          },
+          "ivs": {
+            "hp": 31,
+            "atk": 31,
+            "def": 31,
+            "spa": 31,
+            "spd": 31,
+            "spe": 31
+          }
         }
       ]
     },
@@ -269,9 +301,9 @@
         {
           "id": "starmie-rapid-spin",
           "sourceName": "Rapid Spin",
-          "label": "Spinner",
+          "label": "Spinner (Air Balloon)",
           "description": "Clears entry hazards from your side with Rapid Spin.",
-          "weight": 0.95,
+          "weight": 0.9,
           "moves": [
             "Rapid Spin",
             "Hydro Pump",
@@ -320,6 +352,38 @@
             "spa": 252,
             "spd": 4,
             "spe": 252
+          },
+          "ivs": {
+            "hp": 31,
+            "atk": 31,
+            "def": 31,
+            "spa": 31,
+            "spd": 31,
+            "spe": 31
+          }
+        },
+        {
+          "id": "starmie-bulky-spinner",
+          "sourceName": "Bulky Spinner",
+          "label": "Spinner (bulky)",
+          "description": "Clears entry hazards with Rapid Spin, burns with Scald, and heals with Recover.",
+          "weight": 0.05,
+          "moves": [
+            "Scald",
+            "Recover",
+            "Rapid Spin",
+            "Psyshock"
+          ],
+          "item": "Leftovers",
+          "ability": "Natural Cure",
+          "nature": "Bold",
+          "evs": {
+            "hp": 252,
+            "atk": 0,
+            "def": 252,
+            "spa": 0,
+            "spd": 0,
+            "spe": 4
           },
           "ivs": {
             "hp": 31,
@@ -413,7 +477,7 @@
           "sourceName": "Stealth Rock Lead",
           "label": "Stealth Rock lead",
           "description": "Leads off, survives a hit with Focus Sash, and sets Stealth Rock before the opponent's lead can stop it.",
-          "weight": 0.3923,
+          "weight": 0.453,
           "moves": [
             "Stealth Rock",
             "Outrage",
@@ -445,11 +509,11 @@
           "sourceName": "Choice Scarf",
           "label": "Choice Scarf attacker",
           "description": "Outspeeds most threats and hits hard, but is locked into one move until it switches out.",
-          "weight": 0.3867,
+          "weight": 0.3247,
           "moves": [
             "Outrage",
             "Earthquake",
-            "Stealth Rock",
+            "Stone Edge",
             "Dual Chop"
           ],
           "item": "Choice Scarf",
@@ -477,12 +541,12 @@
           "sourceName": "Swords Dance",
           "label": "Swords Dance sweeper",
           "description": "Boosts itself with Swords Dance, then tries to sweep through the opposing team.",
-          "weight": 0.171,
+          "weight": 0.1723,
           "moves": [
             "Swords Dance",
             "Earthquake",
             "Outrage",
-            "Dual Chop"
+            "Dragon Claw"
           ],
           "item": "Yache Berry",
           "ability": "Rough Skin",
@@ -548,7 +612,7 @@
           "sourceName": "Choice Scarf",
           "label": "Choice Scarf attacker",
           "description": "Outspeeds most threats and hits hard, but is locked into one move until it switches out.",
-          "weight": 0.5912,
+          "weight": 0.6662,
           "moves": [
             "Iron Head",
             "U-turn",
@@ -578,13 +642,13 @@
         {
           "id": "jirachi-utility",
           "sourceName": "Utility",
-          "label": "Stealth Rock setter",
-          "description": "Sets Stealth Rock to wear down every Pokémon the opponent switches in.",
-          "weight": 0.3088,
+          "label": "Special wall",
+          "description": "Soaks up special attacks and heals itself back up while wearing the opponent down.",
+          "weight": 0.2338,
           "moves": [
-            "Stealth Rock",
+            "Wish",
             "Iron Head",
-            "Thunder",
+            "Body Slam",
             "U-turn"
           ],
           "item": "Leftovers",
@@ -617,7 +681,7 @@
             "Substitute",
             "Iron Head",
             "Thunder",
-            "Icy Wind"
+            "Hidden Power Ice"
           ],
           "item": "Leftovers",
           "ability": "Serene Grace",
@@ -632,8 +696,8 @@
           },
           "ivs": {
             "hp": 31,
-            "atk": 31,
-            "def": 31,
+            "atk": 30,
+            "def": 30,
             "spa": 31,
             "spd": 31,
             "spe": 31
@@ -683,12 +747,12 @@
           "sourceName": "Choice Scarf",
           "label": "Choice Scarf attacker",
           "description": "Outspeeds most threats and hits hard, but is locked into one move until it switches out.",
-          "weight": 0.4998,
+          "weight": 0.476,
           "moves": [
             "Earthquake",
             "U-turn",
             "Hidden Power Ice",
-            "Stealth Rock"
+            "Stone Edge"
           ],
           "item": "Choice Scarf",
           "ability": "Intimidate",
@@ -715,7 +779,7 @@
           "sourceName": "Defensive",
           "label": "Stealth Rock setter",
           "description": "Sets Stealth Rock to wear down every Pokémon the opponent switches in.",
-          "weight": 0.4002,
+          "weight": 0.424,
           "moves": [
             "Stealth Rock",
             "Earthquake",
@@ -919,9 +983,9 @@
         {
           "id": "dragonite-3-attacks-dragon-dance",
           "sourceName": "3 Attacks Dragon Dance",
-          "label": "Dragon Dance sweeper (Lum Berry)",
+          "label": "Dragon Dance sweeper",
           "description": "Boosts itself with Dragon Dance, then tries to sweep through the opposing team.",
-          "weight": 0.8288,
+          "weight": 0.8853,
           "moves": [
             "Dragon Dance",
             "Outrage",
@@ -953,12 +1017,12 @@
           "sourceName": "Choice Band",
           "label": "Choice Band attacker",
           "description": "Hits extremely hard with physical moves, but is locked into one move until it switches out.",
-          "weight": 0.1212,
+          "weight": 0.1147,
           "moves": [
             "Outrage",
             "Extreme Speed",
             "Fire Punch",
-            "Earthquake"
+            "Superpower"
           ],
           "item": "Choice Band",
           "ability": "Multiscale",
@@ -970,38 +1034,6 @@
             "spa": 0,
             "spd": 4,
             "spe": 252
-          },
-          "ivs": {
-            "hp": 31,
-            "atk": 31,
-            "def": 31,
-            "spa": 31,
-            "spd": 31,
-            "spe": 31
-          }
-        },
-        {
-          "id": "dragonite-substitute-dragon-dance",
-          "sourceName": "Substitute + Dragon Dance",
-          "label": "Dragon Dance sweeper (Leftovers)",
-          "description": "Boosts itself with Dragon Dance, then tries to sweep through the opposing team.",
-          "weight": 0.05,
-          "moves": [
-            "Substitute",
-            "Dragon Dance",
-            "Dragon Claw",
-            "Roost"
-          ],
-          "item": "Leftovers",
-          "ability": "Multiscale",
-          "nature": "Jolly",
-          "evs": {
-            "hp": 252,
-            "atk": 0,
-            "def": 72,
-            "spa": 0,
-            "spd": 60,
-            "spe": 124
           },
           "ivs": {
             "hp": 31,
@@ -1024,7 +1056,7 @@
           "sourceName": "Defensive",
           "label": "Rain setter",
           "description": "Brings rain with Drizzle that lasts until another weather replaces it, and walls physical attackers with Scald, Protect, and Encore.",
-          "weight": 0.7835,
+          "weight": 0.7924,
           "moves": [
             "Scald",
             "Protect",
@@ -1056,7 +1088,7 @@
           "sourceName": "Choice Scarf",
           "label": "Choice Scarf attacker",
           "description": "Outspeeds most threats and hits hard, but is locked into one move until it switches out.",
-          "weight": 0.146,
+          "weight": 0.1476,
           "moves": [
             "Hydro Pump",
             "Scald",
@@ -1088,11 +1120,11 @@
           "sourceName": "Choice Specs",
           "label": "Choice Specs attacker",
           "description": "Hits extremely hard with special moves, but is locked into one move until it switches out.",
-          "weight": 0.0705,
+          "weight": 0.06,
           "moves": [
             "Scald",
             "Ice Beam",
-            "Hydro Pump",
+            "Focus Blast",
             "Hidden Power Grass"
           ],
           "item": "Choice Specs",
@@ -1681,7 +1713,7 @@
           "sourceName": "Bulk Up",
           "label": "Bulk Up sweeper",
           "description": "Boosts itself with Bulk Up, then tries to sweep through the opposing team.",
-          "weight": 0.9195,
+          "weight": 0.8218,
           "moves": [
             "Bulk Up",
             "Mach Punch",
@@ -1709,11 +1741,43 @@
           }
         },
         {
+          "id": "conkeldurr-guts",
+          "sourceName": "Guts",
+          "label": "Guts attacker",
+          "description": "Its Flame Orb burns it to power up Guts, then it hits hard with Mach Punch and Drain Punch.",
+          "weight": 0.1063,
+          "moves": [
+            "Mach Punch",
+            "Drain Punch",
+            "Ice Punch",
+            "Payback"
+          ],
+          "item": "Flame Orb",
+          "ability": "Guts",
+          "nature": "Adamant",
+          "evs": {
+            "hp": 252,
+            "atk": 252,
+            "def": 0,
+            "spa": 0,
+            "spd": 4,
+            "spe": 0
+          },
+          "ivs": {
+            "hp": 31,
+            "atk": 31,
+            "def": 31,
+            "spa": 31,
+            "spd": 31,
+            "spe": 31
+          }
+        },
+        {
           "id": "conkeldurr-four-attacks",
           "sourceName": "Four Attacks",
           "label": "Life Orb attacker",
           "description": "Gives up a little HP with each attack for a big boost in power.",
-          "weight": 0.0805,
+          "weight": 0.0719,
           "moves": [
             "Drain Punch",
             "Ice Punch",
@@ -2306,12 +2370,12 @@
           "sourceName": "Swords Dance",
           "label": "Swords Dance sweeper",
           "description": "Boosts itself with Swords Dance, then tries to sweep through the opposing team.",
-          "weight": 0.5341,
+          "weight": 0.4358,
           "moves": [
             "Swords Dance",
             "Protect",
             "Earthquake",
-            "Ice Fang"
+            "Facade"
           ],
           "item": "Toxic Orb",
           "ability": "Poison Heal",
@@ -2338,7 +2402,7 @@
           "sourceName": "Stealth Rock",
           "label": "Stealth Rock setter",
           "description": "Sets Stealth Rock to wear down every Pokémon the opponent switches in.",
-          "weight": 0.4659,
+          "weight": 0.4317,
           "moves": [
             "Stealth Rock",
             "Earthquake",
@@ -2363,6 +2427,38 @@
             "spa": 31,
             "spd": 31,
             "spe": 0
+          }
+        },
+        {
+          "id": "gliscor-toxic-stall",
+          "sourceName": "Toxic Stall",
+          "label": "Toxic staller",
+          "description": "Heals each turn from Poison Heal while Toxic, Protect, and Substitute wear foes down.",
+          "weight": 0.1325,
+          "moves": [
+            "Toxic",
+            "Protect",
+            "Substitute",
+            "Earthquake"
+          ],
+          "item": "Toxic Orb",
+          "ability": "Poison Heal",
+          "nature": "Impish",
+          "evs": {
+            "hp": 252,
+            "atk": 0,
+            "def": 184,
+            "spa": 0,
+            "spd": 0,
+            "spe": 72
+          },
+          "ivs": {
+            "hp": 31,
+            "atk": 31,
+            "def": 31,
+            "spa": 31,
+            "spd": 31,
+            "spe": 31
           }
         }
       ]
@@ -2931,7 +3027,7 @@
           "sourceName": "Special Wall",
           "label": "Special wall",
           "description": "Absorbs special attacks, heals with Soft-Boiled, and sets Stealth Rock.",
-          "weight": 0.95,
+          "weight": 1,
           "moves": [
             "Soft-Boiled",
             "Seismic Toss",
@@ -2947,38 +3043,6 @@
             "def": 252,
             "spa": 0,
             "spd": 8,
-            "spe": 0
-          },
-          "ivs": {
-            "hp": 31,
-            "atk": 31,
-            "def": 31,
-            "spa": 31,
-            "spd": 31,
-            "spe": 31
-          }
-        },
-        {
-          "id": "blissey-toxic-attacker",
-          "sourceName": "Toxic Attacker",
-          "label": "Toxic staller",
-          "description": "Absorbs special attacks and wears foes down with Toxic, Flamethrower, and Ice Beam.",
-          "weight": 0.05,
-          "moves": [
-            "Soft-Boiled",
-            "Toxic",
-            "Flamethrower",
-            "Ice Beam"
-          ],
-          "item": "Leftovers",
-          "ability": "Natural Cure",
-          "nature": "Calm",
-          "evs": {
-            "hp": 252,
-            "atk": 0,
-            "def": 4,
-            "spa": 0,
-            "spd": 252,
             "spe": 0
           },
           "ivs": {
@@ -3178,7 +3242,7 @@
           "description": "Soaks up special attacks and heals itself back up while wearing the opponent down.",
           "weight": 0.05,
           "moves": [
-            "Toxic",
+            "Thunder Wave",
             "Roost",
             "U-turn",
             "Night Shade"
@@ -3389,7 +3453,7 @@
           "sourceName": "Bulky Pivot",
           "label": "Baton Pass support",
           "description": "Makes a Substitute and passes it to a teammate with Baton Pass, healing with Recover.",
-          "weight": 0.602,
+          "weight": 0.607,
           "moves": [
             "Psychic",
             "Recover",
@@ -3421,10 +3485,10 @@
           "sourceName": "Nasty Plot",
           "label": "Nasty Plot sweeper",
           "description": "Boosts itself with Nasty Plot, then tries to sweep through the opposing team.",
-          "weight": 0.398,
+          "weight": 0.393,
           "moves": [
             "Nasty Plot",
-            "Giga Drain",
+            "Leaf Storm",
             "Hidden Power Fire",
             "Recover"
           ],
@@ -3705,7 +3769,7 @@
           "sourceName": "Choice Band",
           "label": "Choice Band attacker",
           "description": "Hits extremely hard with physical moves, but is locked into one move until it switches out.",
-          "weight": 0.7676,
+          "weight": 0.808,
           "moves": [
             "V-create",
             "Bolt Strike",
@@ -3737,7 +3801,7 @@
           "sourceName": "Choice Scarf",
           "label": "Choice Scarf attacker",
           "description": "Outspeeds most threats and hits hard, but is locked into one move until it switches out.",
-          "weight": 0.1824,
+          "weight": 0.192,
           "moves": [
             "V-create",
             "Bolt Strike",
@@ -3752,38 +3816,6 @@
             "atk": 252,
             "def": 0,
             "spa": 0,
-            "spd": 4,
-            "spe": 252
-          },
-          "ivs": {
-            "hp": 31,
-            "atk": 31,
-            "def": 31,
-            "spa": 31,
-            "spd": 31,
-            "spe": 31
-          }
-        },
-        {
-          "id": "victini-all-out-attacker",
-          "sourceName": "All-out Attacker",
-          "label": "Fast attacker",
-          "description": "Hits fast and hard with wide move coverage.",
-          "weight": 0.05,
-          "moves": [
-            "V-create",
-            "Grass Knot",
-            "U-turn",
-            "Focus Blast"
-          ],
-          "item": "Charcoal",
-          "ability": "Victory Star",
-          "nature": "Timid",
-          "evs": {
-            "hp": 0,
-            "atk": 0,
-            "def": 0,
-            "spa": 252,
             "spd": 4,
             "spe": 252
           },
@@ -3941,12 +3973,12 @@
         {
           "id": "chansey-support",
           "sourceName": "Support",
-          "label": "Stealth Rock setter",
-          "description": "Sets Stealth Rock to wear down every Pokémon the opponent switches in.",
-          "weight": 0.5517,
+          "label": "Physical wall",
+          "description": "Soaks up physical attacks and heals itself back up while wearing the opponent down.",
+          "weight": 0.5422,
           "moves": [
             "Soft-Boiled",
-            "Stealth Rock",
+            "Aromatherapy",
             "Toxic",
             "Seismic Toss"
           ],
@@ -3975,7 +4007,7 @@
           "sourceName": "Cleric",
           "label": "Cleric",
           "description": "Cures the team with Aromatherapy, paralyzes with Thunder Wave, and takes special hits with Eviolite.",
-          "weight": 0.4483,
+          "weight": 0.4578,
           "moves": [
             "Seismic Toss",
             "Soft-Boiled",
@@ -4468,7 +4500,7 @@
           "weight": 0.05,
           "moves": [
             "Scald",
-            "Psychic",
+            "Psyshock",
             "Fire Blast",
             "Trick"
           ],
@@ -5452,7 +5484,7 @@
           "sourceName": "Rain Dance",
           "label": "Rain Dance attacker",
           "description": "Sets its own rain with Rain Dance to power up its Water attacks, with Draco Meteor for coverage.",
-          "weight": 0.647,
+          "weight": 0.6086,
           "moves": [
             "Rain Dance",
             "Hydro Pump",
@@ -5484,7 +5516,7 @@
           "sourceName": "Choice Specs",
           "label": "Choice Specs attacker",
           "description": "Hits extremely hard with special moves, but is locked into one move until it switches out.",
-          "weight": 0.303,
+          "weight": 0.2914,
           "moves": [
             "Draco Meteor",
             "Hydro Pump",
@@ -5514,16 +5546,48 @@
         {
           "id": "kingdra-offensive-dragon-dance",
           "sourceName": "Offensive Dragon Dance",
-          "label": "Dragon Dance sweeper",
+          "label": "Dragon Dance sweeper (Life Orb)",
           "description": "Boosts itself with Dragon Dance, then tries to sweep through the opposing team.",
           "weight": 0.05,
           "moves": [
             "Dragon Dance",
             "Outrage",
             "Waterfall",
-            "Draco Meteor"
+            "Rain Dance"
           ],
           "item": "Life Orb",
+          "ability": "Sniper",
+          "nature": "Adamant",
+          "evs": {
+            "hp": 0,
+            "atk": 252,
+            "def": 0,
+            "spa": 0,
+            "spd": 4,
+            "spe": 252
+          },
+          "ivs": {
+            "hp": 31,
+            "atk": 31,
+            "def": 31,
+            "spa": 31,
+            "spd": 31,
+            "spe": 31
+          }
+        },
+        {
+          "id": "kingdra-substitute-dragon-dance",
+          "sourceName": "Substitute + Dragon Dance",
+          "label": "Dragon Dance sweeper (Leftovers)",
+          "description": "Boosts itself with Dragon Dance, then tries to sweep through the opposing team.",
+          "weight": 0.05,
+          "moves": [
+            "Substitute",
+            "Dragon Dance",
+            "Outrage",
+            "Waterfall"
+          ],
+          "item": "Leftovers",
           "ability": "Sniper",
           "nature": "Adamant",
           "evs": {
@@ -5630,8 +5694,8 @@
           "moves": [
             "Slack Off",
             "Scald",
-            "Dragon Tail",
-            "Thunder Wave"
+            "Thunder Wave",
+            "Fire Blast"
           ],
           "item": "Leftovers",
           "ability": "Regenerator",
@@ -6352,7 +6416,7 @@
         {
           "id": "suicune-crocune",
           "sourceName": "CroCune",
-          "label": "Calm Mind sweeper (physically defensive)",
+          "label": "Calm Mind tank (RestTalk)",
           "description": "Boosts itself with Calm Mind, then tries to sweep through the opposing team.",
           "weight": 0.235,
           "moves": [
@@ -6425,7 +6489,7 @@
           "sourceName": "Dual Screens",
           "label": "Dual screens lead",
           "description": "Taunts the foe's lead, sets Stealth Rock, and puts up Reflect and Light Screen for the team.",
-          "weight": 0.8071,
+          "weight": 0.8282,
           "moves": [
             "Reflect",
             "Light Screen",
@@ -6457,10 +6521,10 @@
           "sourceName": "All-Out Attacker",
           "label": "Stealth Rock attacker",
           "description": "Sets Stealth Rock, then hits hard with Life Orb-boosted attacks.",
-          "weight": 0.0929,
+          "weight": 0.0718,
           "moves": [
             "Psychic",
-            "Flamethrower",
+            "Fire Blast",
             "Shadow Ball",
             "Stealth Rock"
           ],
@@ -6493,8 +6557,8 @@
           "moves": [
             "Nasty Plot",
             "Psychic",
-            "Flamethrower",
-            "Grass Knot"
+            "Fire Blast",
+            "Thunderbolt"
           ],
           "item": "Life Orb",
           "ability": "Levitate",
@@ -6560,7 +6624,7 @@
           "sourceName": "Special Attacker",
           "label": "Stealth Rock setter",
           "description": "Sets Stealth Rock to wear down every Pokémon the opponent switches in.",
-          "weight": 0.6452,
+          "weight": 0.6884,
           "moves": [
             "Earth Power",
             "Fire Blast",
@@ -6592,12 +6656,12 @@
           "sourceName": "Choice Scarf",
           "label": "Choice Scarf attacker",
           "description": "Outspeeds most threats and hits hard, but is locked into one move until it switches out.",
-          "weight": 0.3548,
+          "weight": 0.3116,
           "moves": [
             "Earth Power",
             "Sludge Wave",
             "Ice Beam",
-            "Thunderbolt"
+            "Fire Blast"
           ],
           "item": "Choice Scarf",
           "ability": "Sheer Force",
@@ -6773,7 +6837,7 @@
           "sourceName": "Air Balloon Attacker",
           "label": "Fast attacker",
           "description": "Hits fast and hard with wide move coverage.",
-          "weight": 0.8054,
+          "weight": 0.8077,
           "moves": [
             "Sucker Punch",
             "Night Slash",
@@ -6805,12 +6869,12 @@
           "sourceName": "Swords Dance",
           "label": "Swords Dance sweeper",
           "description": "Boosts itself with Swords Dance, then tries to sweep through the opposing team.",
-          "weight": 0.1946,
+          "weight": 0.1923,
           "moves": [
             "Swords Dance",
             "Sucker Punch",
             "Substitute",
-            "Iron Head"
+            "Low Kick"
           ],
           "item": "Leftovers",
           "ability": "Defiant",
@@ -6977,13 +7041,13 @@
         {
           "id": "togekiss-physically-defensive",
           "sourceName": "Physically Defensive",
-          "label": "Nasty Plot sweeper (physically defensive)",
+          "label": "Paraflinch Nasty Plot",
           "description": "Boosts itself with Nasty Plot, then tries to sweep through the opposing team.",
-          "weight": 0.5811,
+          "weight": 1,
           "moves": [
             "Air Slash",
             "Roost",
-            "Thunder Wave",
+            "Heal Bell",
             "Nasty Plot"
           ],
           "item": "Leftovers",
@@ -6995,38 +7059,6 @@
             "def": 216,
             "spa": 0,
             "spd": 0,
-            "spe": 44
-          },
-          "ivs": {
-            "hp": 31,
-            "atk": 31,
-            "def": 31,
-            "spa": 31,
-            "spd": 31,
-            "spe": 31
-          }
-        },
-        {
-          "id": "togekiss-specially-defensive",
-          "sourceName": "Specially Defensive",
-          "label": "Nasty Plot sweeper (specially defensive)",
-          "description": "Boosts itself with Nasty Plot, then tries to sweep through the opposing team.",
-          "weight": 0.4189,
-          "moves": [
-            "Air Slash",
-            "Roost",
-            "Thunder Wave",
-            "Nasty Plot"
-          ],
-          "item": "Leftovers",
-          "ability": "Serene Grace",
-          "nature": "Calm",
-          "evs": {
-            "hp": 248,
-            "atk": 0,
-            "def": 0,
-            "spa": 0,
-            "spd": 216,
             "spe": 44
           },
           "ivs": {
@@ -7192,7 +7224,7 @@
           "sourceName": "SubPetaya",
           "label": "Agility sweeper",
           "description": "Boosts itself with Agility, then tries to sweep through the opposing team.",
-          "weight": 0.5177,
+          "weight": 0.5225,
           "moves": [
             "Agility",
             "Substitute",
@@ -7220,43 +7252,11 @@
           }
         },
         {
-          "id": "empoleon-specially-defensive",
-          "sourceName": "Specially Defensive",
-          "label": "Stealth Rock setter (specially defensive)",
-          "description": "Sets Stealth Rock to wear down every Pokémon the opponent switches in.",
-          "weight": 0.2186,
-          "moves": [
-            "Stealth Rock",
-            "Scald",
-            "Ice Beam",
-            "Toxic"
-          ],
-          "item": "Leftovers",
-          "ability": "Torrent",
-          "nature": "Calm",
-          "evs": {
-            "hp": 252,
-            "atk": 0,
-            "def": 0,
-            "spa": 4,
-            "spd": 252,
-            "spe": 0
-          },
-          "ivs": {
-            "hp": 31,
-            "atk": 31,
-            "def": 31,
-            "spa": 31,
-            "spd": 31,
-            "spe": 31
-          }
-        },
-        {
           "id": "empoleon-offensive-stealth-rock",
           "sourceName": "Offensive Stealth Rock",
           "label": "Stealth Rock setter (offensive)",
           "description": "Sets Stealth Rock to wear down every Pokémon the opponent switches in.",
-          "weight": 0.2137,
+          "weight": 0.2157,
           "moves": [
             "Stealth Rock",
             "Hydro Pump",
@@ -7284,6 +7284,38 @@
           }
         },
         {
+          "id": "empoleon-specially-defensive",
+          "sourceName": "Specially Defensive",
+          "label": "Stealth Rock setter (specially defensive)",
+          "description": "Sets Stealth Rock to wear down every Pokémon the opponent switches in.",
+          "weight": 0.2118,
+          "moves": [
+            "Stealth Rock",
+            "Scald",
+            "Ice Beam",
+            "Roar"
+          ],
+          "item": "Leftovers",
+          "ability": "Torrent",
+          "nature": "Calm",
+          "evs": {
+            "hp": 252,
+            "atk": 0,
+            "def": 0,
+            "spa": 4,
+            "spd": 252,
+            "spe": 0
+          },
+          "ivs": {
+            "hp": 31,
+            "atk": 31,
+            "def": 31,
+            "spa": 31,
+            "spd": 31,
+            "spe": 31
+          }
+        },
+        {
           "id": "empoleon-choice-specs",
           "sourceName": "Choice Specs",
           "label": "Choice Specs attacker",
@@ -7293,7 +7325,7 @@
             "Hydro Pump",
             "Ice Beam",
             "Grass Knot",
-            "Surf"
+            "Scald"
           ],
           "item": "Choice Specs",
           "ability": "Torrent",
@@ -7327,11 +7359,11 @@
           "sourceName": "Defensive Duck",
           "label": "Physical wall",
           "description": "Soaks up physical attacks and heals itself back up while wearing the opponent down.",
-          "weight": 0.6257,
+          "weight": 0.5667,
           "moves": [
             "Ice Beam",
             "Thunderbolt",
-            "Thunder Wave",
+            "Toxic",
             "Recover"
           ],
           "item": "Eviolite",
@@ -7355,43 +7387,11 @@
           }
         },
         {
-          "id": "porygon2-trick-room",
-          "sourceName": "Trick Room",
-          "label": "Trick Room setter",
-          "description": "Sets up Trick Room so that slower Pokémon move first for five turns.",
-          "weight": 0.1956,
-          "moves": [
-            "Trick Room",
-            "Thunderbolt",
-            "Tri Attack",
-            "Recover"
-          ],
-          "item": "Eviolite",
-          "ability": "Trace",
-          "nature": "Quiet",
-          "evs": {
-            "hp": 252,
-            "atk": 0,
-            "def": 0,
-            "spa": 252,
-            "spd": 4,
-            "spe": 0
-          },
-          "ivs": {
-            "hp": 31,
-            "atk": 31,
-            "def": 31,
-            "spa": 31,
-            "spd": 31,
-            "spe": 0
-          }
-        },
-        {
           "id": "porygon2-duck-tank",
           "sourceName": "Duck Tank",
           "label": "Eviolite tank",
           "description": "Holds Eviolite to take hits far better than its stats suggest.",
-          "weight": 0.1787,
+          "weight": 0.2176,
           "moves": [
             "Tri Attack",
             "Ice Beam",
@@ -7416,6 +7416,38 @@
             "spa": 31,
             "spd": 31,
             "spe": 31
+          }
+        },
+        {
+          "id": "porygon2-trick-room",
+          "sourceName": "Trick Room",
+          "label": "Trick Room setter",
+          "description": "Sets up Trick Room so that slower Pokémon move first for five turns.",
+          "weight": 0.2157,
+          "moves": [
+            "Trick Room",
+            "Thunderbolt",
+            "Ice Beam",
+            "Recover"
+          ],
+          "item": "Eviolite",
+          "ability": "Trace",
+          "nature": "Quiet",
+          "evs": {
+            "hp": 252,
+            "atk": 0,
+            "def": 0,
+            "spa": 252,
+            "spd": 4,
+            "spe": 0
+          },
+          "ivs": {
+            "hp": 31,
+            "atk": 31,
+            "def": 31,
+            "spa": 31,
+            "spd": 31,
+            "spe": 0
           }
         }
       ]
@@ -7884,16 +7916,16 @@
       "setSource": "gen5uu",
       "sets": [
         {
-          "id": "machamp-bulk-up",
-          "sourceName": "Bulk Up",
-          "label": "Bulk Up sweeper",
-          "description": "Boosts itself with Bulk Up, then tries to sweep through the opposing team.",
-          "weight": 0.5065,
+          "id": "machamp-subchamp",
+          "sourceName": "SubChamp",
+          "label": "Substitute attacker",
+          "description": "Uses Substitute to block status and scout its counters while it attacks.",
+          "weight": 0.5036,
           "moves": [
-            "Bulk Up",
+            "Substitute",
             "Dynamic Punch",
             "Stone Edge",
-            "Ice Punch"
+            "Thunder Punch"
           ],
           "item": "Leftovers",
           "ability": "No Guard",
@@ -7916,13 +7948,13 @@
           }
         },
         {
-          "id": "machamp-subchamp",
-          "sourceName": "SubChamp",
-          "label": "Substitute attacker",
-          "description": "Uses Substitute to block status and scout its counters while it attacks.",
-          "weight": 0.4935,
+          "id": "machamp-bulk-up",
+          "sourceName": "Bulk Up",
+          "label": "Bulk Up sweeper",
+          "description": "Boosts itself with Bulk Up, then tries to sweep through the opposing team.",
+          "weight": 0.4964,
           "moves": [
-            "Substitute",
+            "Bulk Up",
             "Dynamic Punch",
             "Stone Edge",
             "Thunder Punch"
@@ -8275,7 +8307,7 @@
           "sourceName": "Physical Attacker",
           "label": "Life Orb attacker (physical)",
           "description": "Gives up a little HP with each attack for a big boost in power.",
-          "weight": 0.9367,
+          "weight": 0.9433,
           "moves": [
             "Protect",
             "Waterfall",
@@ -8307,10 +8339,10 @@
           "sourceName": "Special Attacker",
           "label": "Life Orb attacker (special)",
           "description": "Gives up a little HP with each attack for a big boost in power.",
-          "weight": 0.0633,
+          "weight": 0.0567,
           "moves": [
             "Protect",
-            "Surf",
+            "Hydro Pump",
             "Dark Pulse",
             "Ice Beam"
           ],
@@ -8660,9 +8692,9 @@
         {
           "id": "dusclops-curse",
           "sourceName": "Curse",
-          "label": "Curse sweeper",
+          "label": "Ghost Curse staller",
           "description": "Boosts itself with Curse, then tries to sweep through the opposing team.",
-          "weight": 0.744,
+          "weight": 1,
           "moves": [
             "Curse",
             "Night Shade",
@@ -8688,38 +8720,6 @@
             "spd": 31,
             "spe": 31
           }
-        },
-        {
-          "id": "dusclops-trick-room",
-          "sourceName": "Trick Room",
-          "label": "Trick Room setter",
-          "description": "Sets up Trick Room so that slower Pokémon move first for five turns.",
-          "weight": 0.256,
-          "moves": [
-            "Trick Room",
-            "Night Shade",
-            "Will-O-Wisp",
-            "Pain Split"
-          ],
-          "item": "Eviolite",
-          "ability": "Pressure",
-          "nature": "Relaxed",
-          "evs": {
-            "hp": 252,
-            "atk": 0,
-            "def": 252,
-            "spa": 0,
-            "spd": 4,
-            "spe": 0
-          },
-          "ivs": {
-            "hp": 31,
-            "atk": 31,
-            "def": 31,
-            "spa": 31,
-            "spd": 31,
-            "spe": 0
-          }
         }
       ]
     },
@@ -8733,7 +8733,7 @@
           "sourceName": "Offensive Tank",
           "label": "Stealth Rock setter (offensive)",
           "description": "Sets Stealth Rock to wear down every Pokémon the opponent switches in.",
-          "weight": 0.7954,
+          "weight": 0.8184,
           "moves": [
             "Earthquake",
             "Waterfall",
@@ -8765,10 +8765,10 @@
           "sourceName": "Defensive Tank",
           "label": "Stealth Rock setter (physically defensive)",
           "description": "Sets Stealth Rock to wear down every Pokémon the opponent switches in.",
-          "weight": 0.1207,
+          "weight": 0.0974,
           "moves": [
             "Stealth Rock",
-            "Waterfall",
+            "Scald",
             "Earthquake",
             "Toxic"
           ],
@@ -8797,12 +8797,12 @@
           "sourceName": "Choice Band",
           "label": "Choice Band attacker",
           "description": "Hits extremely hard with physical moves, but is locked into one move until it switches out.",
-          "weight": 0.0839,
+          "weight": 0.0842,
           "moves": [
             "Earthquake",
             "Waterfall",
             "Ice Punch",
-            "Stone Edge"
+            "Superpower"
           ],
           "item": "Choice Band",
           "ability": "Torrent",
@@ -9278,7 +9278,7 @@
         {
           "id": "registeel-curse",
           "sourceName": "Curse",
-          "label": "Curse sweeper",
+          "label": "Curse tank",
           "description": "Boosts itself with Curse, then tries to sweep through the opposing team.",
           "weight": 0.0961,
           "moves": [
@@ -9388,7 +9388,7 @@
             "Psychic",
             "Focus Blast",
             "Shadow Ball",
-            "Trick"
+            "U-turn"
           ],
           "item": "Choice Specs",
           "ability": "Serene Grace",

@@ -13,7 +13,9 @@
     "refresh": "tsx scripts/refresh.ts",
     "build-sets": "tsx scripts/build-sets.ts",
     "typecheck": "tsc --noEmit",
-    "build-species": "tsx scripts/build-species.ts"
+    "build-species": "tsx scripts/build-species.ts",
+    "fetch-randbats": "tsx scripts/fetch-randbats.ts",
+    "audit-sets": "tsx scripts/audit-sets.ts"
   },
   "dependencies": {
     "@pkmn/sim": "catalog:"
