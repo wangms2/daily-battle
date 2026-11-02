@@ -5,9 +5,10 @@
 // `--a`/`--b` are `<iterations>x<worlds>`; `--b` defaults to Hard's own budget.
 // Pass (the plan): >= 60% pooled, with each gen's 95% interval above 50%.
 import { fork } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { appendFileSync, mkdirSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { FORMATS, setsFor } from '@daily-battle/data';
+import { FORMATS, setsFor, type SetsFile } from '@daily-battle/data';
 import {
   addDays,
   findSet,
@@ -19,8 +20,11 @@ import {
 } from '@daily-battle/gen';
 import { engineBuilt, loadEngine } from '@daily-battle/engine-wasm/node';
 import type { Engine } from '@daily-battle/engine-wasm';
-import { deriveSeed, runBattle, type Policy } from '@daily-battle/sim-bridge';
-import { HARD_DEFAULTS, HardPolicy, NetPolicy, type KnownSets } from '../src/index';
+import { deriveSeed, runBattle, type Policy, type SideView } from '@daily-battle/sim-bridge';
+import { HARD_DEFAULTS, HardPolicy, NetPolicy, type KnownSets, type NetRecord } from '../src/index';
+import { toChoice } from '../src/hard/choices';
+import { translate, type WorldFoe } from '../src/hard/translate';
+import { extractState } from '../src/state';
 import { MatrixPolicy } from '../src/advanced/matrix';
 import { EndgamePolicy } from '../src/advanced/endgame';
 import { HalvingPolicy } from '../src/advanced/halving';
@@ -70,7 +74,65 @@ const A_NET = (() => {
     ...(priorWeight !== undefined ? { priorWeight } : {}),
   };
 })();
-/** `--a-variety 0.9`: a side's near-tie band (HardPolicyOptions.variety). */
+/**
+ * `--a-record <dir>[,p][,iterations]` (with `--a-net`): writes a share `p`
+ * (default 0.4) of the network's decisions to `<dir>/<shard>.jsonl`, each with
+ * its network inputs and every legal choice graded by an oracle: poke-engine
+ * held to that choice for `iterations` (default 100000) on the true state (the
+ * foe's real team). scripts/search-eval.ts scores search settings on them.
+ */
+const A_RECORD = (() => {
+  const s = arg('a-record');
+  if (!s) return undefined;
+  const [dir, p, it] = s.split(',');
+  mkdirSync(dir!, { recursive: true });
+  return { dir: dir!, p: p ? Number(p) : 0.4, iterations: it ? Number(it) : 100_000 };
+})();
+const SHARD = (() => {
+  const c = process.argv.indexOf('--child');
+  return c > 0 ? Number(process.argv[c + 1]) : 0;
+})();
+
+/** Each legal choice's value (side one's win share) on the true state, by `searchFixed`. */
+function oracle(
+  engine: Engine,
+  view: SideView,
+  sets: SetsFile,
+  truth: KnownSets,
+  legal: readonly string[],
+  seed: number,
+): Record<string, number> | undefined {
+  const state = extractState(view, sets);
+  const seen = view.battle[view.side === 'p1' ? 'p2' : 'p1'].team;
+  const foes: WorldFoe[] = [];
+  for (const [i, f] of state.foe.entries()) {
+    const set = truth[f.species];
+    if (!set) return undefined;
+    foes.push({ species: f.species, set, seen: seen[i] });
+  }
+  const seenSpecies = new Set(state.foe.map((f) => f.species));
+  const unseen = Math.max(0, Math.min(6, state.foeTotal) - seen.length);
+  for (const species of Object.keys(truth)
+    .filter((s) => !seenSpecies.has(s))
+    .slice(0, unseen))
+    foes.push({ species, set: truth[species]! });
+  const st = translate(
+    view,
+    foes,
+    sets,
+    state.own.map((m) => m.set),
+  );
+  const request = view.request as Parameters<typeof toChoice>[1];
+  const out: Record<string, number> = {};
+  engine.options(st).s1.forEach((key, k) => {
+    const c = toChoice(key, request);
+    if (!c || !legal.includes(c) || c in out) return;
+    const r = engine.searchFixed(st, A_RECORD!.iterations, seed + k, k);
+    const v = r.s1.reduce((a, o) => a + o.v, 0);
+    if (v) out[c] = r.s1.reduce((a, o) => a + o.s, 0) / v;
+  });
+  return Object.keys(out).length >= 2 ? out : undefined;
+}
 const varietyOf = (s: string | undefined) => (s ? { variety: Number(s) } : {});
 /**
  * `--a-matrix 8,20000,5,3000,0.1`: the challenger is the coach's game-theoretic
@@ -163,14 +225,14 @@ function poolTeam(format: string, i: number, week: string) {
 }
 
 const engines = new Map<string, Engine>();
-function engineFor(format: string, side: 'a' | 'b'): Engine {
+function engineFor(format: string, side: 'a' | 'b' | 'o'): Engine {
   const gen = FORMATS[format as keyof typeof FORMATS].gen;
   if (!engineBuilt(gen)) throw new Error(`no engine for ${format}: run build:wasm first`);
   const key = `${gen}:${side}`;
   let e = engines.get(key);
   if (!e) {
     engines.set(key, (e = loadEngine(gen)));
-    const boost = side === 'a' ? A_BOOST : B_BOOST;
+    const boost = side === 'a' ? A_BOOST : side === 'b' ? B_BOOST : undefined;
     if (boost) e.setBoostEval(boost.scale, boost.linear, boost.foe);
   }
   return e;
@@ -227,10 +289,60 @@ function playTask({ format, i, swap }: Task): Outcome {
         ...A_ENDGAME,
       })
     : undefined;
+  const rec: { last?: NetRecord } = {};
   const netA = A_NET
-    ? new NetPolicy({ engine: engineFor(format, 'a'), data: sets, pool, ...A_NET })
+    ? new NetPolicy({
+        engine: engineFor(format, 'a'),
+        data: sets,
+        pool,
+        ...A_NET,
+        ...(A_RECORD ? { record: (r: NetRecord) => (rec.last = r) } : {}),
+      })
     : undefined;
-  const a = timed(netA ?? endgameA ?? matrixA ?? hardA, ta);
+
+  const truth: KnownSets = swap
+    ? knownMine
+    : Object.fromEntries(slots.map((s) => [s.species, findSet(sets, s)]));
+  const recordRng = rngFor(`gate:record:${format}:${i}:${swap}`);
+  const recorded: Policy | undefined =
+    netA && A_RECORD
+      ? {
+          choose(view, rng) {
+            rec.last = undefined;
+            const played = netA.choose(view, rng);
+            // Set by the policy during choose (TS can't see that).
+            const pending = rec.last as NetRecord | undefined;
+            if (!pending || recordRng() >= A_RECORD.p) return played;
+            try {
+              const grades = oracle(
+                engineFor(format, 'o'),
+                view,
+                sets,
+                truth,
+                pending.legal,
+                Math.floor(recordRng() * 2 ** 31),
+              );
+              if (grades)
+                appendFileSync(
+                  join(A_RECORD.dir, `${SHARD}.jsonl`),
+                  JSON.stringify({
+                    format,
+                    i,
+                    swap,
+                    turn: view.battle.turn,
+                    played,
+                    oracle: grades,
+                    ...pending,
+                  }) + '\n',
+                );
+            } catch {
+              // An engine panic on the true state: skip the position.
+            }
+            return played;
+          },
+        }
+      : undefined;
+  const a = timed(recorded ?? netA ?? endgameA ?? matrixA ?? hardA, ta);
   const b = timed(new HardPolicy({ engine: engineFor(format, 'b'), data: sets, pool, ...B }), tb);
   // Same battle seed both ways round, so each matchup's luck is mirrored.
   const result = runBattle({

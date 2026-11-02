@@ -30,7 +30,13 @@ export {
   type WorldSearch,
 } from './hard/policy';
 export { toChoice } from './hard/choices';
-export { NetPolicy, type NetPolicyOptions, type NetStats } from './master/policy';
+export {
+  NetPolicy,
+  pickSearched,
+  type NetPolicyOptions,
+  type NetRecord,
+  type NetStats,
+} from './master/policy';
 export { AI_VERSION, EASY_VERSION, HARD_VERSION } from './version';
 export {
   aiFor,
