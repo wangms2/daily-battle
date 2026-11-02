@@ -70,6 +70,7 @@ interface Exports {
   features_meta(ptr: number, len: number): void;
   net_load(ptr: number, len: number): void;
   net_forward(ptr: number, len: number): void;
+  net_search(ptr: number, len: number): void;
   observe(ptr: number, len: number): void;
 }
 
@@ -140,7 +141,8 @@ export class Engine {
       | 'damage'
       | 'features'
       | 'features_meta'
-      | 'observe',
+      | 'observe'
+      | 'net_search',
     input: string,
     ...args: number[]
   ): string {
@@ -304,44 +306,34 @@ export class Engine {
     known: readonly NetKnown[],
     events: readonly NetEvent[],
   ): { floats: Float32Array; ids: Uint16Array } {
-    const b = (x: boolean) => (x ? 1 : 0);
-    const lines = [state, String(turn)];
-    for (let i = 0; i < 6; i++) {
-      const k = known[i] ?? UNSEEN;
-      const r = Math.round;
-      lines.push(
-        [
-          b(k.seen),
-          b(k.item),
-          b(k.ability),
-          ...k.moves.map(b),
-          ...k.base.map(r),
-          r(k.speed[0]),
-          r(k.speed[1]),
-        ].join(' '),
-      );
-    }
-    for (const e of events) {
-      lines.push(
-        [
-          e.kind,
-          b(e.mine),
-          e.turn,
-          e.species,
-          e.move,
-          b(e.mega),
-          e.hpOwn.toFixed(4),
-          e.hpFoe.toFixed(4),
-        ].join(' '),
-      );
-    }
-    this.#call('observe', lines.join('\n'));
+    this.#call('observe', viewLines(state, turn, known, events).join('\n'));
     const e = this.#exports;
     const bytes = new Uint8Array(e.memory.buffer, e.out_ptr(), e.out_len()).slice();
     return {
       floats: new Float32Array(bytes.buffer, 0, NET_OBS.floats),
       ids: new Uint16Array(bytes.buffer, NET_OBS.floats * 4, NET_OBS.ids),
     };
+  }
+
+  /**
+   * The light search (rust/src/search.rs) with the loaded network: per world,
+   * our searched choices' scores (win chances) next to the root's prior, value
+   * and foe prediction. The worlds share the network's batches.
+   */
+  netSearch(params: NetSearchParams, worlds: readonly NetWorld[]): NetSearchResult[] {
+    const p = { ...DEFAULT_NET_SEARCH, ...params };
+    const lines = [
+      [p.ownK, p.ownMass, p.foeK, p.foeMass, p.branches, p.branchMass, p.robust].join(' '),
+    ];
+    for (const w of worlds) {
+      lines.push(['legal', ...w.legal.map((x) => (x ? 1 : 0))].join(' '));
+      lines.push(...viewLines(w.state, w.turn, w.known, w.events), '=');
+    }
+    const out = this.#call('net_search', lines.join('\n'));
+    return (JSON.parse(out) as NetSearchResult[]).map((r) => ({
+      ...r,
+      score: r.score.map((s) => (s === null ? NaN : s)),
+    }));
   }
 
   /**
@@ -382,6 +374,95 @@ export class Engine {
       };
     });
   }
+}
+
+/** A world as `observe` reads it, as text lines. */
+function viewLines(
+  state: string,
+  turn: number,
+  known: readonly NetKnown[],
+  events: readonly NetEvent[],
+): string[] {
+  const b = (x: boolean) => (x ? 1 : 0);
+  const lines = [state, String(turn)];
+  for (let i = 0; i < 6; i++) {
+    const k = known[i] ?? UNSEEN;
+    const r = Math.round;
+    lines.push(
+      [
+        b(k.seen),
+        b(k.item),
+        b(k.ability),
+        ...k.moves.map(b),
+        ...k.base.map(r),
+        r(k.speed[0]),
+        r(k.speed[1]),
+      ].join(' '),
+    );
+  }
+  for (const e of events) {
+    lines.push(
+      [
+        e.kind,
+        b(e.mine),
+        e.turn,
+        e.species,
+        e.move,
+        b(e.mega),
+        e.hpOwn.toFixed(4),
+        e.hpFoe.toFixed(4),
+      ].join(' '),
+    );
+  }
+  return lines;
+}
+
+/** Light-search settings (search.rs `Params`). */
+export interface NetSearchParams {
+  /** Our choices searched: the likeliest until `ownMass` of the prior, at most `ownK`. */
+  ownK?: number;
+  ownMass?: number;
+  /** The foe's: the likeliest by the network's prediction until `foeMass`, at most `foeK`. */
+  foeK?: number;
+  foeMass?: number;
+  /** Chance outcomes per pair of choices: the likeliest until `branchMass`, at most `branches`. */
+  branches?: number;
+  branchMass?: number;
+  /** Weight of a choice's worst case over the foe's choices, vs the predicted mean. */
+  robust?: number;
+}
+
+export const DEFAULT_NET_SEARCH: Required<NetSearchParams> = {
+  ownK: 4,
+  ownMass: 0.95,
+  foeK: 3,
+  foeMass: 0.9,
+  branches: 6,
+  branchMass: 0.98,
+  robust: 0.25,
+};
+
+/** One sampled world to search, from side one's view. */
+export interface NetWorld {
+  state: string;
+  turn: number;
+  known: readonly NetKnown[];
+  events: readonly NetEvent[];
+  /** Our action slots the game allows. */
+  legal: readonly boolean[];
+}
+
+export interface NetSearchResult {
+  /** The network's move probabilities at the root, per slot (0 where not allowed). */
+  prior: number[];
+  /** Its win chance for us at the root. */
+  value: number;
+  /** The foe's predicted choice, per slot. */
+  foe: number[];
+  /** Each searched choice's win chance (NaN: not searched). */
+  score: number[];
+  /** Positions the network judged. */
+  positions: number;
 }
 
 /** Observation v2 sizes (features.rs OBS_FLOATS, OBS_IDS; 14 action slots). */

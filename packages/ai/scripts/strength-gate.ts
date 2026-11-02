@@ -44,14 +44,31 @@ const boostOf = (s: string | undefined) => {
 };
 const A_BOOST = boostOf(arg('a-boost'));
 /**
- * `--a-net <file.dbnet>[,worlds]`: the challenger is the Master network alone
- * (NetPolicy, no search) over `worlds` sampled worlds (default 4).
+ * `--a-net <file.dbnet>[,worlds][,search][,key=value...]`: the challenger is
+ * the Master network over `worlds` sampled worlds (default 4), alone or with
+ * the light search (`search`, or any search setting: ownK, ownMass, foeK,
+ * foeMass, branches, branchMass, robust; `beta` weights log(prior)).
  */
 const A_NET = (() => {
   const s = arg('a-net');
   if (!s) return undefined;
-  const [path, worlds] = s.split(',');
-  return { net: new Uint8Array(readFileSync(path!)), worlds: worlds ? Number(worlds) : 4 };
+  const [path, worlds, ...rest] = s.split(',');
+  const search: Record<string, number> = {};
+  let on = false;
+  let priorWeight: number | undefined;
+  for (const r of rest) {
+    const [k, v] = r.split('=');
+    if (k === 'search') on = true;
+    else if (k === 'beta') priorWeight = Number(v);
+    else if (k && v !== undefined) [search[k], on] = [Number(v), true];
+    else throw new Error(`--a-net: unknown setting ${r}`);
+  }
+  return {
+    net: new Uint8Array(readFileSync(path!)),
+    worlds: worlds ? Number(worlds) : 4,
+    ...(on ? { search } : {}),
+    ...(priorWeight !== undefined ? { priorWeight } : {}),
+  };
 })();
 /** `--a-variety 0.9`: a side's near-tie band (HardPolicyOptions.variety). */
 const varietyOf = (s: string | undefined) => (s ? { variety: Number(s) } : {});
@@ -119,6 +136,8 @@ interface Outcome extends Task {
   decB: number;
   /** The challenger's searched decisions, and those where a near-tie was drawn. */
   searchedA: number;
+  /** Positions the network judged in the light search. */
+  positionsA: number;
   variedA: number;
   /** Decisions the endgame solver took, its total and longest time. */
   solvedA: number;
@@ -234,6 +253,7 @@ function playTask({ format, i, swap }: Task): Outcome {
     msB: tb.ms,
     decB: tb.n,
     searchedA: netA?.stats.net ?? hardA.stats.searched,
+    positionsA: netA?.stats.positions ?? 0,
     variedA: hardA.stats.varied,
     solvedA: endgameA?.stats.solved ?? 0,
     solveMsA: endgameA?.stats.ms ?? 0,
@@ -371,7 +391,10 @@ if (A_NET)
           1,
           outcomes.reduce((a, o) => a + o.decA, 0),
         ),
-    )} of all decisions (the rest: forced or fallback)`,
+    )} of all decisions (the rest: forced or fallback)` +
+      (A_NET.search
+        ? `, judging ${(outcomes.reduce((a, o) => a + o.positionsA, 0) / Math.max(1, searched)).toFixed(0)} positions each`
+        : ''),
   );
 if (A_ENDGAME)
   console.log(

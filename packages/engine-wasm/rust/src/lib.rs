@@ -18,6 +18,7 @@ use std::str::FromStr;
 
 pub mod features;
 pub mod net;
+pub mod search;
 
 static mut OUT: Vec<u8> = Vec::new();
 
@@ -399,24 +400,22 @@ pub extern "C" fn features_meta(ptr: *mut u8, len: usize) {
 
 static mut NET: Option<net::Net> = None;
 
-/// Observation v2 (features::observe) for side one of a world state, as the
-/// network sees it. Input lines: the state; the turn; six foe-slot lines
-/// `seen item ability m0 m1 m2 m3 hp atk def spa spd spe speedLo speedHi`
-/// (flags 0/1, base stats, Speed bounds); then one event per line, oldest
-/// first: `kind mine turn species move mega hpOwn hpFoe` (embedding ids).
-/// Output: OBS_FLOATS f32 then OBS_IDS u16, little-endian.
-#[no_mangle]
-pub extern "C" fn observe(ptr: *mut u8, len: usize) {
-    install_panic_hook();
-    let text = input(ptr, len);
-    let mut lines = text.lines();
-    let state = State::deserialize(lines.next().expect("observe: no state"));
-    let turn: u32 = lines.next().and_then(|l| l.trim().parse().ok()).expect("observe: no turn");
+/// A world as `observe` reads it (see there), up to a line `=` or the end.
+fn parse_view<'a>(
+    lines: &mut impl Iterator<Item = &'a str>,
+    who: &str,
+) -> (State, u32, [features::Known; 6], Vec<features::Event>) {
+    let state = State::deserialize(lines.next().unwrap_or_else(|| panic!("{who}: no state")));
+    let turn: u32 = lines.next().and_then(|l| l.trim().parse().ok()).unwrap_or_else(|| panic!("{who}: no turn"));
     let mut known = [features::Known::default(); 6];
     for k in known.iter_mut() {
-        let v: Vec<u32> =
-            lines.next().expect("observe: missing foe line").split_whitespace().map(|x| x.parse().unwrap()).collect();
-        assert!(v.len() == 15, "observe: foe line needs 15 numbers");
+        let v: Vec<u32> = lines
+            .next()
+            .unwrap_or_else(|| panic!("{who}: missing foe line"))
+            .split_whitespace()
+            .map(|x| x.parse().unwrap())
+            .collect();
+        assert!(v.len() == 15, "{who}: foe line needs 15 numbers");
         *k = features::Known {
             seen: v[0] != 0,
             item: v[1] != 0,
@@ -427,10 +426,11 @@ pub extern "C" fn observe(ptr: *mut u8, len: usize) {
         };
     }
     let history: Vec<features::Event> = lines
+        .take_while(|l| l.trim() != "=")
         .filter(|l| !l.trim().is_empty())
         .map(|l| {
             let v: Vec<&str> = l.split_whitespace().collect();
-            assert!(v.len() == 8, "observe: event needs 8 fields");
+            assert!(v.len() == 8, "{who}: event needs 8 fields");
             features::Event {
                 kind: v[0].parse().unwrap(),
                 by_side_one: v[1] == "1",
@@ -443,6 +443,73 @@ pub extern "C" fn observe(ptr: *mut u8, len: usize) {
             }
         })
         .collect();
+    (state, turn, known, history)
+}
+
+/// The light search (search.rs) over the loaded network. Input lines: the
+/// parameters `ownK ownMass foeK foeMass branches branchMass robust`; then per
+/// world, `legal` with 14 flags (our slots the game allows), and the world as
+/// `observe` reads it, ended by a line `=`. Output: JSON, per world
+/// `{"prior":[14],"value":v,"foe":[14],"score":[14, null where not searched],"positions":n}`.
+#[no_mangle]
+pub extern "C" fn net_search(ptr: *mut u8, len: usize) {
+    install_panic_hook();
+    let text = input(ptr, len);
+    let net = unsafe { (*std::ptr::addr_of!(NET)).as_ref() }.expect("no network loaded");
+    let mut lines = text.lines();
+    let v: Vec<f32> =
+        lines.next().expect("net_search: no parameters").split_whitespace().map(|x| x.parse().unwrap()).collect();
+    assert!(v.len() == 7, "net_search: 7 parameters");
+    let p = search::Params {
+        own_k: v[0] as usize,
+        own_mass: v[1],
+        foe_k: v[2] as usize,
+        foe_mass: v[3],
+        branches: v[4] as usize,
+        branch_mass: v[5],
+        robust: v[6],
+    };
+    let mut worlds = Vec::new();
+    while let Some(l) = lines.by_ref().find(|l| !l.trim().is_empty()) {
+        let flags: Vec<&str> = l.split_whitespace().collect();
+        assert!(flags.len() == 1 + net::ACTIONS && flags[0] == "legal", "net_search: expected a legal line");
+        let mut legal = [false; net::ACTIONS];
+        for (i, f) in flags[1..].iter().enumerate() {
+            legal[i] = *f == "1";
+        }
+        let (state, turn, known, history) = parse_view(&mut lines, "net_search");
+        worlds.push(search::World { state, known, history, turn, legal });
+    }
+    let nums = |xs: &[f32]| {
+        xs.iter().map(|x| if x.is_finite() { format!("{x}") } else { "null".into() }).collect::<Vec<_>>().join(",")
+    };
+    let out: Vec<String> = search::search(net, worlds, &p)
+        .iter()
+        .map(|r| {
+            format!(
+                "{{\"prior\":[{}],\"value\":{},\"foe\":[{}],\"score\":[{}],\"positions\":{}}}",
+                nums(&r.prior),
+                r.value,
+                nums(&r.foe),
+                nums(&r.score),
+                r.positions
+            )
+        })
+        .collect();
+    set_out(format!("[{}]", out.join(",")));
+}
+
+/// Observation v2 (features::observe) for side one of a world state, as the
+/// network sees it. Input lines: the state; the turn; six foe-slot lines
+/// `seen item ability m0 m1 m2 m3 hp atk def spa spd spe speedLo speedHi`
+/// (flags 0/1, base stats, Speed bounds); then one event per line, oldest
+/// first: `kind mine turn species move mega hpOwn hpFoe` (embedding ids).
+/// Output: OBS_FLOATS f32 then OBS_IDS u16, little-endian.
+#[no_mangle]
+pub extern "C" fn observe(ptr: *mut u8, len: usize) {
+    install_panic_hook();
+    let text = input(ptr, len);
+    let (state, turn, known, history) = parse_view(&mut text.lines(), "observe");
     let f = features::observe(&state, true, &known, &history, turn);
     let mut out = Vec::with_capacity(f.floats.len() * 4 + f.ids.len() * 2);
     for v in &f.floats {
@@ -481,15 +548,25 @@ pub extern "C" fn net_forward(ptr: *mut u8, len: usize) {
     let row = net::OBS_FLOATS * 4 + net::OBS_IDS * 2 + net::ACTIONS;
     assert!(len % row == 0, "net_forward: {len} bytes isn't a whole number of rows");
     let mut out = Vec::with_capacity(len / row * (2 * net::ACTIONS + 1) * 4);
-    for r in bytes.chunks_exact(row) {
-        let (f, rest) = r.split_at(net::OBS_FLOATS * 4);
-        let (i, m) = rest.split_at(net::OBS_IDS * 2);
-        let floats: Vec<f32> = f.chunks_exact(4).map(|c| f32::from_le_bytes(c.try_into().unwrap())).collect();
-        let ids: Vec<u16> = i.chunks_exact(2).map(|c| u16::from_le_bytes([c[0], c[1]])).collect();
-        let mask: Vec<bool> = m.iter().map(|&b| b != 0).collect();
-        let o = n.forward(&floats, &ids, &mask);
-        for v in o.policy.iter().chain(std::iter::once(&o.value)).chain(o.foe_action.iter()) {
-            out.extend_from_slice(&v.to_le_bytes());
+    let parsed: Vec<(Vec<f32>, Vec<u16>, Vec<bool>)> = bytes
+        .chunks_exact(row)
+        .map(|r| {
+            let (f, rest) = r.split_at(net::OBS_FLOATS * 4);
+            let (i, m) = rest.split_at(net::OBS_IDS * 2);
+            (
+                f.chunks_exact(4).map(|c| f32::from_le_bytes(c.try_into().unwrap())).collect(),
+                i.chunks_exact(2).map(|c| u16::from_le_bytes([c[0], c[1]])).collect(),
+                m.iter().map(|&b| b != 0).collect(),
+            )
+        })
+        .collect();
+    let rows: Vec<net::Row> =
+        parsed.iter().map(|(floats, ids, mask)| net::Row { floats, ids, mask }).collect();
+    for chunk in rows.chunks(net::BATCH) {
+        for o in n.forward_batch(chunk) {
+            for v in o.policy.iter().chain(std::iter::once(&o.value)).chain(o.foe_action.iter()) {
+                out.extend_from_slice(&v.to_le_bytes());
+            }
         }
     }
     unsafe {

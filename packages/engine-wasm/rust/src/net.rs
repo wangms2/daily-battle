@@ -1,8 +1,9 @@
 //! The Master network's forward pass (plan-rl R8): model v2 from
 //! tools/net/model.py, loaded from a .dbnet file (tools/net/export.py).
 //!
-//! Plain f32 loops, one position at a time. Must match model.py exactly: a
-//! parity test runs the export's fixture through it (engine-wasm net.test.ts).
+//! f32, batched: each layer is one matrix product over every token of every
+//! position (4 × 4 tiles, WASM SIMD when built with simd128). Must match
+//! model.py: a parity test runs the export's fixture through it (net.test.ts).
 
 use std::collections::HashMap;
 
@@ -21,6 +22,9 @@ pub const MATCH_F: usize = 20;
 /// Where a matchup token's foe slot one-hot starts.
 const MATCH_FOE_SLOT: usize = 12;
 pub const ACTIONS: usize = 14;
+/// Positions per `forward_batch` call from the ABI: big enough to share weight
+/// reads, small enough to keep the activations modest (~5 MB).
+pub const BATCH: usize = 32;
 pub const OBS_FLOATS: usize = TOKENS * MON_F + FIELD_F + HIST * HIST_F + MATCH * MATCH_F;
 pub const OBS_IDS: usize = TOKENS * MON_IDS + HIST * HIST_IDS;
 const _: () = assert!(OBS_FLOATS == crate::features::OBS_FLOATS && OBS_IDS == crate::features::OBS_IDS);
@@ -31,16 +35,68 @@ const TYPES: usize = 6;
 /// The main sequence: field 1, own 6, foe 6, own active's moves 4, history 16.
 const SEQ: usize = 1 + 6 + 6 + 4 + HIST;
 
-fn token_type(t: usize) -> usize {
-    match t {
-        0 => 0,
-        1..=6 => 1,
-        7..=12 => 2,
-        13..=16 => 3,
-        17..=32 => 4,
-        _ => 5,
+/// Each token type's range of the sequence (its FFN), in type order.
+const TYPE_RANGES: [(usize, usize); TYPES] = [(0, 1), (1, 7), (7, 13), (13, 17), (17, SEQ), (SEQ, SEQ + MATCH)];
+
+/// Four f32 lanes: WASM SIMD when built with simd128, plain arrays otherwise
+/// (which native targets vectorize on their own). Lanes sum the same way in both.
+#[cfg(all(target_arch = "wasm32", target_feature = "simd128"))]
+mod lanes {
+    use core::arch::wasm32::*;
+    #[derive(Clone, Copy)]
+    pub struct F4(v128);
+    impl F4 {
+        #[inline(always)]
+        pub fn zero() -> F4 {
+            F4(f32x4_splat(0.0))
+        }
+        /// Safety: `p..p + 4` is in bounds.
+        #[inline(always)]
+        pub unsafe fn load(p: *const f32) -> F4 {
+            F4(v128_load(p as *const v128))
+        }
+        #[inline(always)]
+        pub fn madd(self, a: F4, b: F4) -> F4 {
+            F4(f32x4_add(self.0, f32x4_mul(a.0, b.0)))
+        }
+        #[inline(always)]
+        pub fn sum(self) -> f32 {
+            (f32x4_extract_lane::<0>(self.0) + f32x4_extract_lane::<1>(self.0))
+                + (f32x4_extract_lane::<2>(self.0) + f32x4_extract_lane::<3>(self.0))
+        }
     }
 }
+
+#[cfg(not(all(target_arch = "wasm32", target_feature = "simd128")))]
+mod lanes {
+    #[derive(Clone, Copy)]
+    pub struct F4([f32; 4]);
+    impl F4 {
+        #[inline(always)]
+        pub fn zero() -> F4 {
+            F4([0.0; 4])
+        }
+        /// Safety: `p..p + 4` is in bounds.
+        #[inline(always)]
+        pub unsafe fn load(p: *const f32) -> F4 {
+            F4([*p, *p.add(1), *p.add(2), *p.add(3)])
+        }
+        #[inline(always)]
+        pub fn madd(self, a: F4, b: F4) -> F4 {
+            let mut o = self.0;
+            for l in 0..4 {
+                o[l] += a.0[l] * b.0[l];
+            }
+            F4(o)
+        }
+        #[inline(always)]
+        pub fn sum(self) -> f32 {
+            (self.0[0] + self.0[1]) + (self.0[2] + self.0[3])
+        }
+    }
+}
+
+use lanes::F4;
 
 struct Linear {
     w: Vec<f32>,
@@ -49,24 +105,69 @@ struct Linear {
     out: usize,
 }
 
+/// Bytes of input rows per cache block in `gemm`: the block stays in L1 (32 KB
+/// and up, phones included) while every weight row passes over it.
+const BLOCK_BYTES: usize = 16 * 1024;
+
 impl Linear {
-    fn apply(&self, x: &[f32], y: &mut [f32]) {
-        debug_assert_eq!(x.len(), self.inp);
-        for o in 0..self.out {
-            let row = &self.w[o * self.inp..(o + 1) * self.inp];
-            let mut s = 0f32;
-            for (a, b) in row.iter().zip(x) {
-                s += a * b;
+    /// `y` (n × out) = `x` (n × inp) · Wᵀ + b, in 4 × 4 tiles of rows × outputs.
+    fn gemm(&self, x: &[f32], y: &mut [f32]) {
+        let (inp, out) = (self.inp, self.out);
+        let n = x.len() / inp;
+        assert!(x.len() == n * inp && y.len() == n * out);
+        let k4 = inp & !3;
+        let (xp, wp) = (x.as_ptr(), self.w.as_ptr());
+        let block = (BLOCK_BYTES / (inp * 4)).max(4) & !3;
+        for b0 in (0..n).step_by(block) {
+            let b1 = (b0 + block).min(n);
+            for o0 in (0..out).step_by(4) {
+                let outs = (out - o0).min(4);
+                let wr: [usize; 4] = std::array::from_fn(|j| (o0 + j.min(outs - 1)) * inp);
+                for r0 in (b0..b1).step_by(4) {
+                    let rows = (b1 - r0).min(4);
+                    let xr: [usize; 4] = std::array::from_fn(|i| (r0 + i.min(rows - 1)) * inp);
+                    let mut acc = [[F4::zero(); 4]; 4];
+                    let mut k = 0;
+                    while k < k4 {
+                        // Safety: k + 4 <= inp, and every xr/wr is a row start.
+                        unsafe {
+                            let xv: [F4; 4] = std::array::from_fn(|i| F4::load(xp.add(xr[i] + k)));
+                            for j in 0..4 {
+                                let wv = F4::load(wp.add(wr[j] + k));
+                                for i in 0..4 {
+                                    acc[i][j] = acc[i][j].madd(xv[i], wv);
+                                }
+                            }
+                        }
+                        k += 4;
+                    }
+                    for i in 0..rows {
+                        for j in 0..outs {
+                            let mut s = acc[i][j].sum();
+                            for kk in k4..inp {
+                                s += x[xr[i] + kk] * self.w[wr[j] + kk];
+                            }
+                            y[(r0 + i) * out + o0 + j] = s + self.b.as_ref().map_or(0.0, |b| b[o0 + j]);
+                        }
+                    }
+                }
             }
-            y[o] = s + self.b.as_ref().map_or(0.0, |b| b[o]);
         }
     }
 
     fn call(&self, x: &[f32]) -> Vec<f32> {
-        let mut y = vec![0f32; self.out];
-        self.apply(x, &mut y);
+        let mut y = vec![0f32; x.len() / self.inp * self.out];
+        self.gemm(x, &mut y);
         y
     }
+}
+
+/// One observation (features.rs v3) for `Net::forward_batch`.
+#[derive(Clone, Copy)]
+pub struct Row<'a> {
+    pub floats: &'a [f32],
+    pub ids: &'a [u16],
+    pub mask: &'a [bool],
 }
 
 struct Block {
@@ -187,24 +288,45 @@ fn rms_norm(x: &mut [f32], w: &[f32]) {
     }
 }
 
+/// e^x in f32 without a libm call (WASM has no exp instruction): 2^n · e^r with
+/// |r| ≤ ln2/2 and a degree-7 Taylor polynomial, relative error ~1e-7.
+#[inline(always)]
+fn exp(x: f32) -> f32 {
+    let x = x.clamp(-87.0, 88.0);
+    let n = (x * std::f32::consts::LOG2_E).round();
+    let r = x - n * 0.693_145_75 - n * 1.428_606_8e-6;
+    let p = 1.0
+        + r * (1.0
+            + r * (0.5 + r * (1.0 / 6.0 + r * (1.0 / 24.0 + r * (1.0 / 120.0 + r * (1.0 / 720.0 + r / 5040.0))))));
+    p * f32::from_bits(((n as i32 + 127) as u32) << 23)
+}
+
 /// erf (Abramowitz & Stegun 7.1.26, absolute error under 1.5e-7), for exact GELU.
 fn erf(x: f32) -> f32 {
-    let x = x as f64;
-    let s = x.signum();
     let a = x.abs();
     let t = 1.0 / (1.0 + 0.327_591_1 * a);
     let y = 1.0
-        - (((((1.061_405_429 * t - 1.453_152_027) * t) + 1.421_413_741) * t - 0.284_496_736) * t
-            + 0.254_829_592)
+        - (((((1.061_405_4 * t - 1.453_152) * t) + 1.421_413_8) * t - 0.284_496_74) * t + 0.254_829_6)
             * t
-            * (-a * a).exp();
-    (s * y) as f32
+            * exp(-a * a);
+    y.copysign(x)
 }
 
 fn gelu(x: &mut [f32]) {
     for v in x {
         *v = 0.5 * *v * (1.0 + erf(*v * std::f32::consts::FRAC_1_SQRT_2));
     }
+}
+
+/// An observation's float parts: Pokémon, field, history, matchups.
+fn parts(f: &[f32]) -> (&[f32], &[f32], &[f32], &[f32]) {
+    let mut at = TOKENS * MON_F;
+    let mons = &f[..at];
+    let field = &f[at..at + FIELD_F];
+    at += FIELD_F;
+    let hist = &f[at..at + HIST * HIST_F];
+    at += HIST * HIST_F;
+    (mons, field, hist, &f[at..at + MATCH * MATCH_F])
 }
 
 /// Index of the first maximum (torch.argmax).
@@ -309,21 +431,51 @@ impl Net {
 
     /// `floats` OBS_FLOATS, `ids` OBS_IDS, `mask` ACTIONS (features.rs observation v3).
     pub fn forward(&self, floats: &[f32], ids: &[u16], mask: &[bool]) -> Output {
-        let d = self.d;
-        let mons = &floats[..TOKENS * MON_F];
-        let mut at = TOKENS * MON_F;
-        let field = &floats[at..at + FIELD_F];
-        at += FIELD_F;
-        let hist_f = &floats[at..at + HIST * HIST_F];
-        at += HIST * HIST_F;
-        let match_f = &floats[at..at + MATCH * MATCH_F];
-        let mon = |k: usize| &mons[k * MON_F..(k + 1) * MON_F];
-        let mon_ids = |k: usize| &ids[k * MON_IDS..(k + 1) * MON_IDS];
-        let hist_ids = &ids[TOKENS * MON_IDS..];
+        self.forward_batch(&[Row { floats, ids, mask }]).pop().unwrap()
+    }
 
-        let mon_in = |k: usize| {
-            let (m, id) = (mon(k), mon_ids(k));
-            let mut v = Vec::with_capacity(self.enc_own.inp);
+    /// Many observations at once: each layer runs over all their tokens together,
+    /// so its weights are read once per batch rather than once per token.
+    pub fn forward_batch(&self, rows: &[Row]) -> Vec<Output> {
+        let n = rows.len();
+        if n == 0 {
+            return Vec::new();
+        }
+        let d = self.d;
+        let total = SEQ + MATCH;
+        for r in rows {
+            assert!(r.floats.len() == OBS_FLOATS && r.ids.len() == OBS_IDS && r.mask.len() == ACTIONS);
+        }
+        let mut x = vec![0f32; n * total * d];
+        // Puts the encoder outputs `enc` (k per row), plus `add`, at tokens `t0..t0 + k`.
+        fn place<'w>(
+            x: &mut [f32],
+            enc: &[f32],
+            (n, total, d): (usize, usize, usize),
+            k: usize,
+            t0: usize,
+            add: impl Fn(usize, usize) -> Option<&'w [f32]>,
+        ) {
+            for r in 0..n {
+                for j in 0..k {
+                    let dst = &mut x[(r * total + t0 + j) * d..][..d];
+                    dst.copy_from_slice(&enc[(r * k + j) * d..][..d]);
+                    if let Some(a) = add(r, j) {
+                        for (o, v) in dst.iter_mut().zip(a) {
+                            *o += v;
+                        }
+                    }
+                }
+            }
+        }
+        let dims = (n, total, d);
+
+        let field: Vec<f32> = rows.iter().flat_map(|r| parts(r.floats).1.iter().copied()).collect();
+        place(&mut x, &self.enc_field.call(&field), dims, 1, 0, |_, _| None);
+
+        let mon_in = |r: &Row<'_>, k: usize, v: &mut Vec<f32>| {
+            let m = &parts(r.floats).0[k * MON_F..(k + 1) * MON_F];
+            let id = &r.ids[k * MON_IDS..(k + 1) * MON_IDS];
             v.extend_from_slice(&m[..MON_BASE]);
             v.extend_from_slice(self.row(&self.species, id[0]));
             v.extend_from_slice(self.row(&self.items, id[1]));
@@ -332,59 +484,65 @@ impl Net {
                 v.extend_from_slice(&m[MON_BASE + j * MOVE_F..MON_BASE + (j + 1) * MOVE_F]);
                 v.extend_from_slice(self.row(&self.moves, id[3 + j]));
             }
-            v
         };
-        let total = SEQ + MATCH;
-        let mut x = vec![0f32; total * d];
-        let tok = |x: &mut [f32], t: usize, v: &[f32], add: Option<&[f32]>| {
-            let dst = &mut x[t * d..(t + 1) * d];
-            dst.copy_from_slice(v);
-            if let Some(a) = add {
-                for (o, b) in dst.iter_mut().zip(a) {
-                    *o += b;
+        for (foe, enc) in [(false, &self.enc_own), (true, &self.enc_foe)] {
+            let mut v = Vec::with_capacity(n * 6 * enc.inp);
+            for r in rows {
+                for k in 0..6 {
+                    mon_in(r, k + 6 * foe as usize, &mut v);
                 }
             }
-        };
-        tok(&mut x, 0, &self.enc_field.call(field), None);
-        for k in 0..6 {
-            tok(&mut x, 1 + k, &self.enc_own.call(&mon_in(k)), Some(&self.slot[k * d..(k + 1) * d]));
-            tok(&mut x, 7 + k, &self.enc_foe.call(&mon_in(6 + k)), Some(&self.slot[(6 + k) * d..(7 + k) * d]));
+            let s = 6 * foe as usize;
+            place(&mut x, &enc.call(&v), dims, 6, 1 + s, |_, j| Some(&self.slot[(s + j) * d..(s + j + 1) * d]));
         }
-        let own_active = argmax((0..6).map(|k| mon(k)[1]));
-        let (am, aid) = (mon(own_active), mon_ids(own_active));
-        for j in 0..4 {
-            let mut v = Vec::with_capacity(self.enc_move.inp);
-            v.extend_from_slice(&am[MON_BASE + j * MOVE_F..MON_BASE + (j + 1) * MOVE_F]);
-            v.extend_from_slice(self.row(&self.moves, aid[3 + j]));
-            v.extend_from_slice(&am[..MON_BASE]);
-            tok(&mut x, 13 + j, &self.enc_move.call(&v), Some(&self.move_pos[j * d..(j + 1) * d]));
-        }
-        for k in 0..HIST {
-            let mut v = Vec::with_capacity(self.enc_hist.inp);
-            v.extend_from_slice(&hist_f[k * HIST_F..(k + 1) * HIST_F]);
-            v.extend_from_slice(self.row(&self.species, hist_ids[k * 2]));
-            v.extend_from_slice(self.row(&self.moves, hist_ids[k * 2 + 1]));
-            tok(&mut x, 17 + k, &self.enc_hist.call(&v), Some(&self.hist_pos[k * d..(k + 1) * d]));
-        }
-        for k in 0..MATCH {
-            let mf = &match_f[k * MATCH_F..(k + 1) * MATCH_F];
-            let mut v = self.enc_match.call(mf);
-            let own = k / MATCH_FOES;
-            for (o, s) in v.iter_mut().zip(&self.slot[own * d..(own + 1) * d]) {
-                *o += s;
+
+        let mut v = Vec::with_capacity(n * 4 * self.enc_move.inp);
+        for r in rows {
+            let mons = parts(r.floats).0;
+            let a = argmax((0..6).map(|k| mons[k * MON_F + 1]));
+            let (am, aid) = (&mons[a * MON_F..(a + 1) * MON_F], &r.ids[a * MON_IDS..(a + 1) * MON_IDS]);
+            for j in 0..4 {
+                v.extend_from_slice(&am[MON_BASE + j * MOVE_F..MON_BASE + (j + 1) * MOVE_F]);
+                v.extend_from_slice(self.row(&self.moves, aid[3 + j]));
+                v.extend_from_slice(&am[..MON_BASE]);
             }
-            for j in 0..6 {
-                let w = mf[MATCH_FOE_SLOT + j];
-                if w != 0.0 {
-                    for (o, s) in v.iter_mut().zip(&self.slot[(6 + j) * d..(7 + j) * d]) {
-                        *o += w * s;
+        }
+        place(&mut x, &self.enc_move.call(&v), dims, 4, 13, |_, j| Some(&self.move_pos[j * d..(j + 1) * d]));
+
+        let mut v = Vec::with_capacity(n * HIST * self.enc_hist.inp);
+        for r in rows {
+            let (hist_f, hist_ids) = (parts(r.floats).2, &r.ids[TOKENS * MON_IDS..]);
+            for k in 0..HIST {
+                v.extend_from_slice(&hist_f[k * HIST_F..(k + 1) * HIST_F]);
+                v.extend_from_slice(self.row(&self.species, hist_ids[k * 2]));
+                v.extend_from_slice(self.row(&self.moves, hist_ids[k * 2 + 1]));
+            }
+        }
+        place(&mut x, &self.enc_hist.call(&v), dims, HIST, 17, |_, k| Some(&self.hist_pos[k * d..(k + 1) * d]));
+
+        let mf: Vec<f32> = rows.iter().flat_map(|r| parts(r.floats).3.iter().copied()).collect();
+        let enc = self.enc_match.call(&mf);
+        for r in 0..n {
+            for k in 0..MATCH {
+                let m = &mf[(r * MATCH + k) * MATCH_F..][..MATCH_F];
+                let dst = &mut x[(r * total + SEQ + k) * d..][..d];
+                dst.copy_from_slice(&enc[(r * MATCH + k) * d..][..d]);
+                let own = k / MATCH_FOES;
+                for (o, s) in dst.iter_mut().zip(&self.slot[own * d..(own + 1) * d]) {
+                    *o += s;
+                }
+                for j in 0..6 {
+                    let w = m[MATCH_FOE_SLOT + j];
+                    if w != 0.0 {
+                        for (o, s) in dst.iter_mut().zip(&self.slot[(6 + j) * d..(7 + j) * d]) {
+                            *o += w * s;
+                        }
                     }
                 }
             }
-            tok(&mut x, SEQ + k, &v, None);
         }
-        for t in 0..total {
-            rms_norm(&mut x[t * d..(t + 1) * d], &self.in_norm);
+        for t in x.chunks_exact_mut(d) {
+            rms_norm(t, &self.in_norm);
         }
 
         let inject_at = self.blocks.len() / 2;
@@ -393,96 +551,124 @@ impl Net {
             if i == inject_at {
                 len = total;
             }
-            self.block(blk, &mut x[..len * d], len);
+            self.block(blk, &mut x, n, total, len);
         }
-        let out = |t: usize| {
-            let mut v = x[t * d..(t + 1) * d].to_vec();
-            rms_norm(&mut v, &self.out_norm);
-            v
-        };
 
-        let mut policy = [0f32; ACTIONS];
-        for j in 0..4 {
-            let pm = self.pol_move.call(&out(13 + j));
-            policy[j] = pm[0];
-            policy[4 + j] = pm[1];
-        }
-        let own_t: Vec<Vec<f32>> = (0..6).map(|k| out(1 + k)).collect();
-        for k in 0..6 {
-            policy[8 + k] = self.pol_switch.call(&own_t[k])[0];
-        }
-        for (p, &m) in policy.iter_mut().zip(mask) {
-            if !m {
-                *p = -1e9;
-            }
-        }
-        let mut h = self.value1.call(&out(0));
-        gelu(&mut h);
-        let value = self.value2.call(&h)[0];
-        let foe_active = argmax((6..12).map(|k| mon(k)[1]));
-        let mut foe_action = [0f32; ACTIONS];
-        foe_action[..8].copy_from_slice(&self.foe_move.call(&out(7 + foe_active)));
-        for k in 0..6 {
-            foe_action[8 + k] = self.foe_switch.call(&out(7 + k))[0];
-        }
-        Output { policy, value, foe_action }
+        rows.iter()
+            .enumerate()
+            .map(|(r, row)| {
+                let out = |t: usize| {
+                    let mut v = x[(r * total + t) * d..][..d].to_vec();
+                    rms_norm(&mut v, &self.out_norm);
+                    v
+                };
+                let mut policy = [0f32; ACTIONS];
+                let moves: Vec<f32> = (0..4).flat_map(|j| out(13 + j)).collect();
+                let pm = self.pol_move.call(&moves);
+                for j in 0..4 {
+                    policy[j] = pm[2 * j];
+                    policy[4 + j] = pm[2 * j + 1];
+                }
+                let own: Vec<f32> = (0..6).flat_map(|k| out(1 + k)).collect();
+                policy[8..].copy_from_slice(&self.pol_switch.call(&own));
+                for (p, &m) in policy.iter_mut().zip(row.mask) {
+                    if !m {
+                        *p = -1e9;
+                    }
+                }
+                let mut h = self.value1.call(&out(0));
+                gelu(&mut h);
+                let value = self.value2.call(&h)[0];
+                let mons = parts(row.floats).0;
+                let foe_active = argmax((6..12).map(|k| mons[k * MON_F + 1]));
+                let mut foe_action = [0f32; ACTIONS];
+                foe_action[..8].copy_from_slice(&self.foe_move.call(&out(7 + foe_active)));
+                let foes: Vec<f32> = (0..6).flat_map(|k| out(7 + k)).collect();
+                foe_action[8..].copy_from_slice(&self.foe_switch.call(&foes));
+                Output { policy, value, foe_action }
+            })
+            .collect()
     }
 
-    fn block(&self, b: &Block, x: &mut [f32], t: usize) {
+    /// One transformer block over the first `len` of each row's `total` tokens.
+    fn block(&self, b: &Block, x: &mut [f32], n: usize, total: usize, len: usize) {
         let d = self.d;
         let dh = d / self.heads;
-        let mut qkv = vec![0f32; t * 3 * d];
-        let mut h = vec![0f32; d];
-        for i in 0..t {
-            h.copy_from_slice(&x[i * d..(i + 1) * d]);
-            rms_norm(&mut h, &b.n1);
-            b.qkv.apply(&h, &mut qkv[i * 3 * d..(i + 1) * 3 * d]);
+        let m = n * len;
+        let tok = |r: usize, t: usize| (r * total + t) * d;
+        let mut h = vec![0f32; m * d];
+        for r in 0..n {
+            for t in 0..len {
+                let dst = &mut h[(r * len + t) * d..][..d];
+                dst.copy_from_slice(&x[tok(r, t)..][..d]);
+                rms_norm(dst, &b.n1);
+            }
         }
+        let mut qkv = vec![0f32; m * 3 * d];
+        b.qkv.gemm(&h, &mut qkv);
         let scale = 1.0 / (dh as f32).sqrt();
-        let mut att = vec![0f32; t * d];
-        let mut p = vec![0f32; t];
-        for hd in 0..self.heads {
-            let off = hd * dh;
-            for i in 0..t {
-                let q = &qkv[i * 3 * d + off..i * 3 * d + off + dh];
-                let mut mx = f32::NEG_INFINITY;
-                for j in 0..t {
-                    let k = &qkv[j * 3 * d + d + off..j * 3 * d + d + off + dh];
-                    let s = q.iter().zip(k).map(|(a, b)| a * b).sum::<f32>() * scale;
-                    p[j] = s;
-                    mx = mx.max(s);
-                }
-                let mut sum = 0f32;
-                for v in p.iter_mut() {
-                    *v = (*v - mx).exp();
-                    sum += *v;
-                }
-                let o = &mut att[i * d + off..i * d + off + dh];
-                for j in 0..t {
-                    let w = p[j] / sum;
-                    let v = &qkv[j * 3 * d + 2 * d + off..j * 3 * d + 2 * d + off + dh];
-                    for (a, b) in o.iter_mut().zip(v) {
-                        *a += w * b;
+        let mut att = vec![0f32; m * d];
+        let mut p = vec![0f32; len];
+        for r in 0..n {
+            let q0 = r * len;
+            for hd in 0..self.heads {
+                let off = hd * dh;
+                for i in 0..len {
+                    let q = &qkv[(q0 + i) * 3 * d + off..][..dh];
+                    let mut mx = f32::NEG_INFINITY;
+                    for j in 0..len {
+                        let k = &qkv[(q0 + j) * 3 * d + d + off..][..dh];
+                        let s = q.iter().zip(k).map(|(a, b)| a * b).sum::<f32>() * scale;
+                        p[j] = s;
+                        mx = mx.max(s);
+                    }
+                    let mut sum = 0f32;
+                    for v in p.iter_mut() {
+                        *v = exp(*v - mx);
+                        sum += *v;
+                    }
+                    let o = &mut att[(q0 + i) * d + off..][..dh];
+                    for j in 0..len {
+                        let w = p[j] / sum;
+                        let v = &qkv[(q0 + j) * 3 * d + 2 * d + off..][..dh];
+                        for (a, b) in o.iter_mut().zip(v) {
+                            *a += w * b;
+                        }
                     }
                 }
             }
         }
-        let mut y = vec![0f32; d];
-        let mut u = vec![0f32; b.up[0].out];
-        for i in 0..t {
-            b.proj.apply(&att[i * d..(i + 1) * d], &mut y);
-            let xi = &mut x[i * d..(i + 1) * d];
-            for (a, v) in xi.iter_mut().zip(&y) {
-                *a += v;
+        b.proj.gemm(&att, &mut h);
+        for r in 0..n {
+            for t in 0..len {
+                for (a, v) in x[tok(r, t)..][..d].iter_mut().zip(&h[(r * len + t) * d..][..d]) {
+                    *a += v;
+                }
             }
-            h.copy_from_slice(xi);
-            rms_norm(&mut h, &b.n2);
-            let ty = token_type(i);
-            b.up[ty].apply(&h, &mut u);
+        }
+        for (ty, &(a, z)) in TYPE_RANGES.iter().enumerate() {
+            let z = z.min(len);
+            if a >= z {
+                continue;
+            }
+            let cnt = z - a;
+            let mut hh = vec![0f32; n * cnt * d];
+            for r in 0..n {
+                for t in a..z {
+                    let dst = &mut hh[(r * cnt + t - a) * d..][..d];
+                    dst.copy_from_slice(&x[tok(r, t)..][..d]);
+                    rms_norm(dst, &b.n2);
+                }
+            }
+            let mut u = b.up[ty].call(&hh);
             gelu(&mut u);
-            b.down[ty].apply(&u, &mut y);
-            for (a, v) in xi.iter_mut().zip(&y) {
-                *a += v;
+            b.down[ty].gemm(&u, &mut hh);
+            for r in 0..n {
+                for t in a..z {
+                    for (o, v) in x[tok(r, t)..][..d].iter_mut().zip(&hh[(r * cnt + t - a) * d..][..d]) {
+                        *o += v;
+                    }
+                }
             }
         }
     }

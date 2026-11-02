@@ -4,7 +4,14 @@
 // with the move probabilities averaged across worlds. Team Preview and
 // anything the engine can't model fall back to the strongest utility AI.
 import { sets as defaultSets, type SetsFile } from '@daily-battle/data';
-import { NET_OBS, type Engine, type NetEvent, type NetKnown } from '@daily-battle/engine-wasm';
+import {
+  NET_OBS,
+  type Engine,
+  type NetEvent,
+  type NetKnown,
+  type NetSearchParams,
+  type NetWorld,
+} from '@daily-battle/engine-wasm';
 import { legalChoices, type Policy, type Rng, type SideView } from '@daily-battle/sim-bridge';
 import { genFor, moveInfo, type Gen } from '../calc';
 import { toChoice } from '../hard/choices';
@@ -28,8 +35,12 @@ export interface NetPolicyOptions {
   pool?: readonly string[];
   /** Worlds sampled per decision. */
   worlds?: number;
-  /** Draw from the averaged policy instead of taking its best. */
+  /** Draw from the averaged policy instead of taking its best (without search only). */
   sample?: boolean;
+  /** Light search (engine `netSearch`) on top of the network; off when absent. */
+  search?: NetSearchParams;
+  /** With search, weight of log(prior) next to the searched win chances. */
+  priorWeight?: number;
 }
 
 export interface NetStats {
@@ -38,6 +49,8 @@ export interface NetStats {
   net: number;
   /** The network's own win chance, summed over its decisions. */
   value: number;
+  /** Positions the search had the network judge, summed. */
+  positions: number;
   errors: string[];
 }
 
@@ -73,7 +86,7 @@ export function permuteOwn(state: string, perm: readonly number[]): string {
 const sigmoid = (x: number) => 1 / (1 + Math.exp(-x));
 
 export class NetPolicy implements Policy {
-  readonly stats: NetStats = { decisions: 0, net: 0, value: 0, errors: [] };
+  readonly stats: NetStats = { decisions: 0, net: 0, value: 0, positions: 0, errors: [] };
   private readonly engine: Engine;
   private readonly data: SetsFile;
   private readonly gen: Gen;
@@ -198,6 +211,7 @@ export class NetPolicy implements Policy {
     const legalSet = new Set(legal);
 
     const rows = [];
+    const searchWorlds: NetWorld[] = [];
     const slots: (string | undefined)[][] = [];
     const weights: number[] = [];
     for (const world of worlds) {
@@ -225,12 +239,15 @@ export class NetPolicy implements Policy {
       if (!choice.some(Boolean)) continue;
       const known = foes.map((f) => this.known(f, tracker));
       const events = tracker.events.slice(-16).map((e) => this.event(e, request, foes));
-      const obs = this.engine.observe(st, turn, known, events);
-      rows.push({ ...obs, mask: choice.map(Boolean) });
+      if (this.options.search)
+        searchWorlds.push({ state: st, turn, known, events, legal: choice.map(Boolean) });
+      else
+        rows.push({ ...this.engine.observe(st, turn, known, events), mask: choice.map(Boolean) });
       slots.push(choice);
       weights.push(world.weight);
     }
-    if (!rows.length) return undefined;
+    if (!slots.length) return undefined;
+    if (this.options.search) return this.searched(legal, slots, weights, searchWorlds);
 
     const outs = this.engine.netForward(rows);
     const prob = new Map<string, number>();
@@ -260,6 +277,51 @@ export class NetPolicy implements Policy {
     for (const c of legal) {
       const p = prob.get(c);
       if (p !== undefined && p > bestP) [best, bestP] = [c, p];
+    }
+    return best;
+  }
+
+  /**
+   * Picks by the light search: each choice's win chance averaged over the
+   * worlds by weight, plus `priorWeight` × log of the network's averaged
+   * prior. Where a world didn't search a choice it counts as that world's
+   * worst searched one, so an unexamined choice can't win by omission.
+   */
+  private searched(
+    legal: string[],
+    slots: (string | undefined)[][],
+    weights: number[],
+    worlds: NetWorld[],
+  ): string | undefined {
+    const results = this.engine.netSearch(this.options.search!, worlds);
+    const total = weights.reduce((a, b) => a + b, 0) || 1;
+    const score = new Map<string, number>();
+    const prior = new Map<string, number>();
+    const searched = new Set<string>();
+    results.forEach((r, k) => {
+      const w = weights[k]! / total;
+      this.stats.value += w * r.value;
+      this.stats.positions += r.positions;
+      const finite = r.score.filter(Number.isFinite);
+      const floor = finite.length ? Math.min(...finite) : r.value;
+      const seen = new Set<string>();
+      slots[k]!.forEach((c, i) => {
+        if (!c || seen.has(c)) return;
+        seen.add(c);
+        const s = r.score[i]!;
+        if (Number.isFinite(s)) searched.add(c);
+        score.set(c, (score.get(c) ?? 0) + w * (Number.isFinite(s) ? s : floor));
+        prior.set(c, (prior.get(c) ?? 0) + w * r.prior[i]!);
+      });
+    });
+    const beta = this.options.priorWeight ?? 0.02;
+    let best: string | undefined;
+    let bestS = -Infinity;
+    for (const c of legal) {
+      const s = score.get(c);
+      if (s === undefined || (searched.size && !searched.has(c))) continue;
+      const v = s + beta * Math.log(Math.max(prior.get(c) ?? 0, 1e-6));
+      if (v > bestS) [best, bestS] = [c, v];
     }
     return best;
   }
