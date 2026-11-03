@@ -53,6 +53,19 @@ pub struct World {
     pub turn: u32,
     /// Our slots the game allows now (the engine may offer choices Showdown doesn't).
     pub legal: [bool; ACTIONS],
+    /// Our slots searched whatever the prior says (the coach's: the player's pick).
+    pub must: [bool; ACTIONS],
+}
+
+/// One of the foe's searched replies at the root, for judging a choice against it.
+#[derive(Clone, Debug)]
+pub struct Reply {
+    /// The foe's slot (None: it has no real choice).
+    pub slot: Option<usize>,
+    /// Its predicted chance, renormalized over the searched replies.
+    pub p: f32,
+    /// Each of our searched choices' win chance against it (NaN: not searched).
+    pub q: [f32; ACTIONS],
 }
 
 #[derive(Clone, Debug)]
@@ -67,6 +80,8 @@ pub struct WorldResult {
     pub score: [f32; ACTIONS],
     /// Positions the network judged for this world.
     pub positions: usize,
+    /// The foe's searched replies and our choices' win chances against each.
+    pub replies: Vec<Reply>,
 }
 
 pub fn slot_of(c: &MoveChoice) -> Option<usize> {
@@ -256,6 +271,7 @@ fn expand(
     pos: &mut Pos,
     out: &Output,
     legal: Option<&[bool; ACTIONS]>,
+    must: Option<&[bool; ACTIONS]>,
     p: &Params,
     own_k: usize,
     foe_k: usize,
@@ -268,7 +284,14 @@ fn expand(
     let on2: Vec<usize> = o2.iter().filter_map(slot_of).collect();
     let prior = softmax(&out.policy, |s| on1.contains(&s));
     let foe_p = softmax(&out.foe_action, |s| on2.contains(&s));
-    let own = pick(&o1, &prior, own_k, p.own_mass);
+    let mut own = pick(&o1, &prior, own_k, p.own_mass);
+    if let Some(must) = must {
+        for c in &o1 {
+            if slot_of(c).is_some_and(|s| must[s]) && !own.iter().any(|(o, _)| o == c) {
+                own.push((*c, 0.0));
+            }
+        }
+    }
     let foe = pick(&o2, &foe_p, foe_k, p.foe_mass);
     let mut pairs = Vec::with_capacity(own.len() * foe.len());
     for (c1, _) in &own {
@@ -293,12 +316,12 @@ fn expand(
     Node { own, foe, pairs }
 }
 
-/// Each of our candidates' scores at `node`, given the judged positions' values.
-fn scores(node: &Node, value: &dyn Fn(usize) -> f32, robust: f32) -> Vec<f32> {
+/// Each of our candidates' win chance against each of the foe's (own × foe).
+fn pair_values(node: &Node, value: &dyn Fn(usize) -> f32) -> Vec<Vec<f32>> {
     let nf = node.foe.len();
     (0..node.own.len())
         .map(|a| {
-            let q: Vec<f32> = (0..nf)
+            (0..nf)
                 .map(|b| {
                     node.pairs[a * nf + b]
                         .iter()
@@ -308,7 +331,16 @@ fn scores(node: &Node, value: &dyn Fn(usize) -> f32, robust: f32) -> Vec<f32> {
                         })
                         .sum()
                 })
-                .collect();
+                .collect()
+        })
+        .collect()
+}
+
+/// Each of our candidates' scores at `node`, given the judged positions' values.
+fn scores(node: &Node, value: &dyn Fn(usize) -> f32, robust: f32) -> Vec<f32> {
+    pair_values(node, value)
+        .into_iter()
+        .map(|q| {
             let mean: f32 = q.iter().zip(&node.foe).map(|(v, f)| v * f.1).sum();
             let worst = q.iter().copied().fold(f32::INFINITY, f32::min);
             (1.0 - robust) * mean + robust * worst
@@ -344,7 +376,10 @@ pub fn search(net: &Net, worlds: Vec<World>, p: &Params) -> Vec<WorldResult> {
     let nodes: Vec<Node> = roots
         .iter_mut()
         .enumerate()
-        .map(|(i, r)| expand(r, &root_out[i], Some(&worlds[i].legal), p, p.own_k, p.foe_k, &mut first))
+        .map(|(i, r)| {
+            let w = &worlds[i];
+            expand(r, &root_out[i], Some(&w.legal), Some(&w.must), p, p.own_k, p.foe_k, &mut first)
+        })
         .collect();
     let first_out = judge(net, &first, |i| if first[i].forced() { mask_of(&first[i].state) } else { [true; ACTIONS] });
 
@@ -352,7 +387,7 @@ pub fn search(net: &Net, worlds: Vec<World>, p: &Params) -> Vec<WorldResult> {
     let mut second = Vec::new();
     let mut sub: Vec<Option<Node>> = Vec::with_capacity(first.len());
     for (i, pos) in first.iter_mut().enumerate() {
-        sub.push(pos.forced().then(|| expand(pos, &first_out[i], None, p, 3, 3, &mut second)));
+        sub.push(pos.forced().then(|| expand(pos, &first_out[i], None, None, p, 3, 3, &mut second)));
     }
     let second_out = judge(net, &second, |_| [true; ACTIONS]);
     let v2 = |i: usize| sigmoid(second_out[i].value);
@@ -390,12 +425,28 @@ pub fn search(net: &Net, worlds: Vec<World>, p: &Params) -> Vec<WorldResult> {
                     score[slot] = s;
                 }
             }
+            let q = pair_values(node, &|i| v1[i]);
+            let replies = node
+                .foe
+                .iter()
+                .enumerate()
+                .map(|(b, (c, prob))| {
+                    let mut per = [f32::NAN; ACTIONS];
+                    for (a, (own, _)) in node.own.iter().enumerate() {
+                        if let Some(slot) = slot_of(own) {
+                            per[slot] = q[a][b];
+                        }
+                    }
+                    Reply { slot: slot_of(c), p: *prob, q: per }
+                })
+                .collect();
             WorldResult {
                 prior: softmax(&out.policy, |s| on1.contains(&s)),
                 value: sigmoid(out.value),
                 foe: softmax(&out.foe_action, |s| on2.contains(&s)),
                 score,
                 positions: counts[w],
+                replies,
             }
         })
         .collect()

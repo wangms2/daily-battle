@@ -16,7 +16,8 @@ export type ChoiceOutcome = 'ok' | 'blocked' | 'illegal';
 export class LiveBattle {
   private readonly session: BattleSession;
 
-  constructor(match: Match) {
+  /** `watch` sees each of its side's replayed decisions, for an AI that remembers (`Policy.watch`). */
+  constructor(match: Match, watch?: { side: Side; watch: (view: SideView) => void }) {
     // The teams are stored lead first.
     this.session = new BattleSession({
       format: match.format,
@@ -39,6 +40,10 @@ export class LiveBattle {
         if (this.session.ended || !this.session.request(side)) continue;
         const choice = match.choices[side][next[side]];
         if (choice === undefined) continue;
+        if (watch?.side === side) {
+          const view = this.session.view(side);
+          if (view) watch.watch(view);
+        }
         this.session.choose(side, choice);
         next[side]++;
         acted = true;

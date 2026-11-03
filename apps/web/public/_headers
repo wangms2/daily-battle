@@ -32,3 +32,7 @@
 # Schedules are published weekly; always check for a fresh copy.
 /schedule/*
   Cache-Control: no-cache
+
+# Master's network: a new network gets a new name (MASTER_NET).
+/net/*
+  Cache-Control: public, max-age=31536000, immutable

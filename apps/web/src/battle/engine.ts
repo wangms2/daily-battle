@@ -3,6 +3,7 @@
 import {
   aiFor,
   HardPolicy,
+  searches,
   UtilityPolicy,
   type DecisionJob,
   type WorldClaim,
@@ -47,6 +48,20 @@ import { SidePresenter } from './presenter';
 
 export { cleanText, effectiveness, moveDesc } from './presenter';
 
+/**
+ * A decision made in one go, as a job: the first `step` (the worker's spare
+ * time, while you choose) makes it, so it's usually ready before your choice.
+ */
+function wholeJob(ai: Policy, view: SideView, rng: Rng): DecisionJob {
+  let choice: string | undefined;
+  const make = () => (choice ??= ai.choose(view, rng));
+  return {
+    step: () => (make(), false),
+    claim: () => undefined,
+    result: make,
+  };
+}
+
 /** Shown when the move you picked turns out to be blocked (by Imprison, say). */
 const BLOCKED = 'That move can’t be used right now. Choose another.';
 
@@ -56,11 +71,12 @@ export class BattleEngine {
   private readonly aiRng: Rng;
   private readonly presenter: SidePresenter;
   private readonly sets: PokemonSet[];
-  private readonly hard: boolean;
-  /** Hard: every AI choice so far; those past `reported` are new since the last package. */
+  /** Hard and Master: the AI's choices are saved, and replayed on resume. */
+  private readonly saves: boolean;
+  /** Hard and Master: every AI choice so far; those past `reported` are new since the last package. */
   private readonly aiLog: string[] = [];
   private reported: number;
-  /** Hard: saved AI choices still to replay (cleared if one stops fitting). */
+  /** Hard and Master: saved AI choices still to replay (cleared if one stops fitting). */
   private replay: string[];
   private readonly coach?: Coach;
   /** The request the coach last spoke on, so it isn't asked twice about one turn. */
@@ -126,14 +142,16 @@ export class BattleEngine {
       ...(start.pool ? { pool: start.pool } : {}),
       ...(budget ? { hard: budget } : {}),
       ...(start.aiVersion ? { aiVersion: start.aiVersion } : {}),
+      ...(start.hardVersion ? { hardVersion: start.hardVersion } : {}),
     });
     this.ai = ai;
     this.aiRng = makeRng(tutorial ? deriveSeed(start.battleSeed, 2) : (start.aiSeed as PRNGSeed));
-    this.hard = difficulty === 'hard';
-    this.replay = this.hard ? [...(start.aiChoices ?? [])] : [];
+    this.saves = searches(difficulty);
+    this.replay = this.saves ? [...(start.aiChoices ?? [])] : [];
     this.reported = this.replay.length;
     this.presenter = new SidePresenter('p1', this.sets, format);
-    if (start.coach) {
+    // No coach against Master: the coach plays with Master's brain.
+    if (start.coach && difficulty !== 'master') {
       // A lesson's foe is fixed content, so the coach knows its sets; a daily
       // foe's are hidden, as for the AI.
       const lessonFoe = tutorial ? (start.opponentTeam as Mon[]) : undefined;
@@ -315,8 +333,8 @@ export class BattleEngine {
       {
         ...start,
         choices: this.made.slice(0, decision),
-        // Hard's choices as made, so the replay needs no search.
-        ...(this.hard ? { aiChoices: [...this.aiLog] } : {}),
+        // Hard and Master's choices as made, so the replay needs no search.
+        ...(this.saves ? { aiChoices: [...this.aiLog] } : {}),
       },
       this.engine,
       this.budget,
@@ -332,7 +350,7 @@ export class BattleEngine {
     return new ReviewJob(
       this.start,
       [...this.made],
-      this.hard ? [...this.aiLog] : [],
+      this.saves ? [...this.aiLog] : [],
       judge,
       this.engine,
     );
@@ -355,7 +373,7 @@ export class BattleEngine {
     return this.package(false);
   }
 
-  /** Hard: searches a slice (one world) of the opponent's decision; true while there's more. */
+  /** Hard and Master: works a slice (a world, or Master's whole decision) of the opponent's decision; true while there's more. */
   ponder(): boolean {
     return !!this.thinking?.step();
   }
@@ -381,7 +399,7 @@ export class BattleEngine {
     this.session.choose('p2', choice);
   }
 
-  /** The opponent answers every request it has; on Hard, one made while you choose waits for `ponder`. */
+  /** The opponent answers every request it has; on Hard and Master, one made while you choose waits for `ponder`. */
   private advanceAi() {
     this.pending = undefined;
     for (
@@ -389,30 +407,27 @@ export class BattleEngine {
       view && !this.session.ended;
       view = this.session.view('p2')
     ) {
-      if (!this.hard) {
+      if (!this.saves) {
         const choice = this.ai.choose(view, this.aiRng);
         if (this.coach && view.request.requestType === 'move') this.pending = { view, choice };
         this.session.choose('p2', choice);
         continue;
       }
-      // Hard: a saved choice skips the search (a resume would otherwise redo every
-      // one). Each decision gets its own rng, so skipping one doesn't shift the rest.
+      // Hard and Master: a saved choice skips the search (a resume would otherwise redo
+      // every one), though Master still sees the decision. Each decision gets its own
+      // rng, so skipping one doesn't shift the rest.
       const saved = this.replay.shift();
       let choice: string;
-      if (saved !== undefined && legalChoices(view.request).includes(saved)) choice = saved;
-      else {
+      if (saved !== undefined && legalChoices(view.request).includes(saved)) {
+        choice = saved;
+        this.ai.watch?.(view);
+      } else {
         // Searched from here on; the saved tail (if any) is replaced from this point.
         if (saved !== undefined) this.reported = Math.min(this.reported, this.aiLog.length);
         this.replay = [];
         const rng = makeRng(deriveSeed(this.start.aiSeed, this.aiLog.length));
         const job =
-          this.ai instanceof HardPolicy
-            ? this.ai.think(view, rng)
-            : {
-                step: () => false,
-                claim: () => undefined,
-                result: () => this.ai.choose(view, rng),
-              };
+          this.ai instanceof HardPolicy ? this.ai.think(view, rng) : wholeJob(this.ai, view, rng);
         // While you choose, the search runs in the worker's spare time (`ponder`).
         if (this.youChoose()) {
           this.thinking = job;

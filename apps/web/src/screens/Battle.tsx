@@ -294,8 +294,9 @@ export function Battle({
     !start.tutorial &&
     !staged &&
     (start.format ?? DEFAULT_FORMAT) === 'gen3ou' &&
-    // Not against Hard: its warnings aren't checked there yet (step 5).
+    // Not against Hard: its warnings aren't checked there yet (step 5). Nor Master, the coach's own brain.
     start.difficulty !== 'hard' &&
+    start.difficulty !== 'master' &&
     !!backend.review;
   const [reviewProgress, setReviewProgress] = useState<{ done: number; total: number } | null>(
     null,

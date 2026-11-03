@@ -1,12 +1,16 @@
 // The engine on the main thread, for tests (no worker). Hard and the coach's
 // judge need `hardEngine` to supply poke-engine for the format (tests load it
-// from disk); without it, a coached battle gives no warnings.
+// from disk), Master `masterEngine` (with its network loaded); without them,
+// a coached battle gives no warnings.
 import type { Engine } from '@daily-battle/engine-wasm';
 import type { CoachNote } from '@daily-battle/tutorial';
 import type { BattleBackend } from './backend';
 import { BattleEngine, presentTurn } from './engine';
 
-export function inlineBackend(hardEngine?: (format: string) => Engine): BattleBackend {
+export function inlineBackend(
+  hardEngine?: (format: string) => Engine,
+  masterEngine?: (format: string) => Engine,
+): BattleBackend {
   let engine: BattleEngine | null = null;
   const need = () => {
     if (!engine) throw new Error('No battle in progress');
@@ -27,7 +31,12 @@ export function inlineBackend(hardEngine?: (format: string) => Engine): BattleBa
   return {
     start: async (start) => {
       const format = start.format ?? 'gen4ou';
-      const hard = start.difficulty === 'hard' ? hardEngine?.(format) : undefined;
+      const hard =
+        start.difficulty === 'hard'
+          ? hardEngine?.(format)
+          : start.difficulty === 'master'
+            ? masterEngine?.(format)
+            : undefined;
       const judge = start.coach ? hardEngine?.(format) : undefined;
       engine = new BattleEngine(start, hard, undefined, judge);
       return later(engine.begin());

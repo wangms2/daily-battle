@@ -43,6 +43,22 @@ function playOut(m: Match, seed: number): { m: Match; battle: LiveBattle } {
 }
 
 describe('LiveBattle', () => {
+  it('shows a watcher each of its side’s replayed decisions, before the choice', () => {
+    const { m } = playOut(match(5), 5);
+    const seen: { request: unknown; logLength: number }[] = [];
+    new LiveBattle(m, {
+      side: 'p2',
+      watch: (view) => seen.push({ request: view.request, logLength: view.log.length }),
+    });
+    expect(seen).toHaveLength(m.choices.p2.length);
+    // Each view still asks for the decision (the choice isn't made yet).
+    for (const [k, s] of seen.entries()) {
+      expect(legalChoices(s.request as never)).toContain(m.choices.p2[k]);
+    }
+    expect(seen.map((s) => s.logLength)).toEqual(
+      [...seen.map((s) => s.logLength)].sort((a, b) => a - b),
+    );
+  });
   it('plays to an end and rebuilds exactly from its choices', () => {
     for (let i = 0; i < 3; i++) {
       const { m, battle } = playOut(match(i), i);

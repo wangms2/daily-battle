@@ -6,7 +6,7 @@ import type { WorldClaim } from '@daily-battle/ai';
 import { Engine, type WasmModule } from '@daily-battle/engine-wasm';
 import { genOf } from '@daily-battle/data/formats';
 import type { FromWorker, ToWorker } from './frames';
-import { loadHardEngine, loadHardModule } from './hardEngine';
+import { loadHardEngine, loadHardModule, loadMasterEngine, loadNet } from './hardEngine';
 import type { FromHelper, ToHelper } from './search.worker';
 
 let engine: BattleEngine | null = null;
@@ -141,6 +141,7 @@ self.onmessage = async (event: MessageEvent<ToWorker>) => {
   try {
     if (msg.type === 'warm') {
       void loadHardEngine(msg.format).catch(() => {});
+      if (msg.net) void loadNet().catch(() => {});
     } else if (msg.type === 'visibility') {
       hidden = msg.hidden;
       if (!hidden) waiting.splice(0).forEach((resume) => resume());
@@ -155,6 +156,8 @@ self.onmessage = async (event: MessageEvent<ToWorker>) => {
         hard = new Engine(module);
         hardModule = { gen: genOf(format), module };
         startHelpers();
+      } else if (start.difficulty === 'master') {
+        hard = await loadMasterEngine(format);
       }
       // Without the engine the coach still gives fact tips, but no warnings.
       const judge = start.coach ? await loadHardEngine(format).catch(() => undefined) : undefined;

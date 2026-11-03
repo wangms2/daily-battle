@@ -31,19 +31,21 @@ export {
 } from './hard/policy';
 export { toChoice } from './hard/choices';
 export {
+  MASTER_DEFAULTS,
   NetPolicy,
   pickSearched,
   type NetPolicyOptions,
   type NetRecord,
   type NetStats,
 } from './master/policy';
-export { AI_VERSION, EASY_VERSION, HARD_VERSION } from './version';
+export { AI_VERSION, EASY_VERSION, HARD_VERSION, MASTER_VERSION } from './version';
 export {
   aiFor,
   aiVersion,
   DIFFICULTIES,
   difficultyTag,
   isDifficulty,
+  searches,
   type AiForOptions,
   type Difficulty,
 } from './difficulty';

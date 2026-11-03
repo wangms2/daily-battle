@@ -243,6 +243,8 @@ export interface EngineStart {
   difficulty?: Difficulty;
   /** The AI version the attempt was saved under, if older than the current one (Easy and Normal). */
   aiVersion?: number;
+  /** Hard: the Hard version the attempt was saved under, if older (it keeps its search budget). */
+  hardVersion?: number;
   /** The week's pool species: Hard's prior for your unseen Pokémon, and the coach's for the foe's. */
   pool?: string[];
   /** Hard: the AI's saved choices, replayed on resume instead of searched again. */
@@ -285,7 +287,7 @@ export type ToWorker =
   /** Unanswered hints (DESIGN.md §7): the page is hidden or not (background work pauses). */
   | { type: 'visibility'; hidden: boolean }
   /** Fetch and compile the Hard engine for the format now, ahead of a start. */
-  | { type: 'warm'; format: string };
+  | { type: 'warm'; format: string; net?: boolean };
 
 export type FromWorker =
   | { type: 'package'; pkg: TurnPackage }

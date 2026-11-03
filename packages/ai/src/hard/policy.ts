@@ -9,6 +9,7 @@ import type { KnownSets } from '../belief';
 import { STRONG } from '../presets';
 import { UtilityPolicy } from '../policy';
 import { extractState } from '../state';
+import { HARD_ITERATIONS, HARD_VERSION } from '../version';
 import { toChoice } from './choices';
 import { translate, type WorldFoe } from './translate';
 import { sampleWorlds } from './worlds';
@@ -49,8 +50,13 @@ export interface DecisionRecord {
   pickKey?: string;
 }
 
-// 200k beat 40k 57% head to head (120 games, Gen 4); 150k keeps a mid-range phone under ~2 s.
-export const HARD_DEFAULTS = { iterations: 150_000, worlds: 8, variety: 0.9 } as const;
+// 200k beat 40k 57% head to head (120 games, Gen 4). Hard 3 drops to 100k: the Master
+// network (net + search) is the strongest CPU now, and 100k is faster on phones.
+export const HARD_DEFAULTS = {
+  iterations: HARD_ITERATIONS[HARD_VERSION]!,
+  worlds: 8,
+  variety: 0.9,
+} as const;
 
 export interface HardStats {
   decisions: number;

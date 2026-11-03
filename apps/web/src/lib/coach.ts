@@ -10,9 +10,9 @@ import { summarizeDay, type Bucket } from './results';
 /** Games with lessons for the coach's tips to link to. */
 const COACHED_GAMES: FormatId[] = ['gen3ou'];
 
-/** The coach is offered in Gen 3, below Hard (whose Advanced coach isn't built yet). */
+/** The coach is offered in Gen 3, at Easy and Normal (the coach *is* Master's brain, so never there). */
 export const coachAvailable = (format: FormatId, difficulty: Difficulty) =>
-  COACHED_GAMES.includes(format) && difficulty !== 'hard';
+  COACHED_GAMES.includes(format) && difficulty !== 'hard' && difficulty !== 'master';
 
 /** Whether today's battle is coached: an unfinished battle's, or else the setting. */
 export function coachOn(

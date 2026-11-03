@@ -21,6 +21,7 @@ describe('daily coach', () => {
   it('is offered in Gen 3 below Hard', () => {
     expect(coachAvailable('gen3ou', 'easy')).toBe(true);
     expect(coachAvailable('gen3ou', 'hard')).toBe(false);
+    expect(coachAvailable('gen3ou', 'master')).toBe(false);
     expect(coachAvailable('gen4ou', 'normal')).toBe(false);
   });
 

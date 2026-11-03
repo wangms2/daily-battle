@@ -108,6 +108,7 @@ export async function summary(db: Db, now: number, today?: string | null) {
             COALESCE(SUM(difficulty = 'easy'), 0) AS easy,
             COALESCE(SUM(difficulty = 'normal'), 0) AS normal,
             COALESCE(SUM(difficulty = 'hard'), 0) AS hard,
+            COALESCE(SUM(difficulty = 'master'), 0) AS master,
             COALESCE(SUM(coach), 0) AS coach,
             COALESCE(SUM(lessons > 0), 0) AS learners
        FROM account_games GROUP BY format ORDER BY format`,

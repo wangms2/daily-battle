@@ -25,6 +25,7 @@ const ROW_LABEL: Record<Bucket, string> = {
   easy: 'Easy',
   normal: 'Normal',
   hard: 'Hard',
+  master: 'Master',
   coached: 'Coached',
 };
 

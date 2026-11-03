@@ -61,7 +61,7 @@ export interface Match {
   /** The AI's style (DESIGN.md §8.5), from its generated team. */
   aiStyle?: 'offense' | 'balance' | 'stall';
   /** The AI's difficulty when it isn't Normal (the room's Rival setting at the round's start). */
-  aiDifficulty?: 'easy' | 'hard';
+  aiDifficulty?: 'easy' | 'hard' | 'master';
   format: FormatId;
   /** The battle's PRNG seed. Never sent to players. */
   seed: string;

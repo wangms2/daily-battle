@@ -27,7 +27,8 @@ const arg = (name: string) => {
 };
 const FORMAT = 'gen3ou';
 const BATTLES = Number(arg('battles') ?? 30);
-const VS = (arg('vs') ?? 'easy') as Difficulty;
+// The coach never plays against Master (it is Master's brain).
+const VS = (arg('vs') ?? 'easy') as Exclude<Difficulty, 'master'>;
 const PLAYER = arg('player') ?? 'easy';
 const MARGINS = [0.05, 0.1, 0.15, 0.2];
 const START = '2026-01-05';

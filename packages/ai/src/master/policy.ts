@@ -67,6 +67,16 @@ export interface NetStats {
 
 const loaded = new WeakMap<Engine, Uint8Array>();
 
+/**
+ * Master's settings (DESIGN.md §6): 4 worlds and a light search, picking by
+ * win chance with a little of the prior. Gated at 57.6% against Hard at 150k.
+ */
+export const MASTER_DEFAULTS = {
+  worlds: 4,
+  search: { robust: 0 },
+  priorWeight: 0.02,
+} as const satisfies Pick<NetPolicyOptions, 'worlds' | 'search' | 'priorWeight'>;
+
 /** Engine slot of a root option (env `slot_of`): moves 0–3, Mega moves 4–7, switches 8–13. */
 function slotOf(key: string): number | undefined {
   const [kind, index] = key.split(':');
@@ -159,7 +169,16 @@ export class NetPolicy implements Policy {
     }
   }
 
-  choose(view: SideView, rng: Rng): string {
+  /**
+   * Sees a decision without making it: a replayed choice on resume. The
+   * network's inputs (Speed evidence, team order) come from every decision, so
+   * a resumed battle must show it each one it skipped, in order.
+   */
+  watch(view: SideView): void {
+    this.observe(view);
+  }
+
+  private observe(view: SideView): Tracker {
     const tracker = this.tracker(view);
     tracker.sync(view.log);
     const request = view.request;
@@ -170,6 +189,12 @@ export class NetPolicy implements Policy {
         if (start) tracker.start(start);
       }
     }
+    return tracker;
+  }
+
+  choose(view: SideView, rng: Rng): string {
+    const tracker = this.observe(view);
+    const request = view.request;
     const legal = legalChoices(request);
     if (legal.length <= 1) return legal[0] ?? 'default';
     this.stats.decisions++;

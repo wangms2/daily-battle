@@ -5,7 +5,7 @@
 // Hard needs the format's WASM (`pnpm --filter @daily-battle/engine-wasm build:wasm`).
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { DIFFICULTIES, type Difficulty } from '@daily-battle/ai/version';
+import { DIFFICULTIES, searches, type Difficulty } from '@daily-battle/ai/version';
 import { DEFAULT_FORMAT, genOf, setsFor } from '@daily-battle/data';
 import { engineBuilt } from '@daily-battle/engine-wasm/node';
 import { mondayOf, parseSchedule, rngFor, teamSets } from '@daily-battle/gen';
@@ -24,8 +24,8 @@ const hardIterations =
 const workers = arg('workers') === undefined ? undefined : Number(arg('workers'));
 const wanted = (arg('difficulties') ?? DIFFICULTIES.join(',')).split(',') as Difficulty[];
 const difficulties = wanted.filter((d) => {
-  if (d !== 'hard' || engineBuilt(genOf(format))) return true;
-  console.error(`Skipping Hard: no ${format} engine built.`);
+  if (!searches(d) || engineBuilt(genOf(format))) return true;
+  console.error(`Skipping ${d}: no ${format} engine built.`);
   return false;
 });
 

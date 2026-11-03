@@ -41,8 +41,7 @@ import {
 import { bucketOf, coachAvailable, coachOn, coachWarning } from './lib/coach';
 import { preloadSchedule, useSchedule } from './lib/schedule';
 import type { ScheduleFile } from '@daily-battle/gen/schedule';
-import { hardAvailable } from './battle/hardEngine';
-import { currentDifficulty } from './lib/difficulty';
+import { currentDifficulty, unavailableDifficulties } from './lib/difficulty';
 import { ENGINE_VERSION, randomSeed } from './lib/seed';
 import {
   DIFFICULTY_NAME,
@@ -739,7 +738,7 @@ export function App() {
         {...(coachAvailable(format, difficulty) && {
           coach: { on: coached, warning: coachCost, onChange: setCoach },
         })}
-        hardAvailable={hardAvailable(format)}
+        unavailable={unavailableDifficulties(format)}
         result={{ summary, streak: stats.streak, share: thisGameShare, countdown }}
       />
     );

@@ -22,6 +22,8 @@ export interface SideView {
 export interface Policy {
   /** Returns a choice string such as `move 2`, `switch 4`, or `default`. */
   choose(view: SideView, rng: Rng): string;
+  /** Sees a decision whose choice was made without it (a resume's replay); for policies that remember. */
+  watch?(view: SideView): void;
 }
 
 export interface PlayerInput {

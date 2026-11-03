@@ -298,14 +298,21 @@ const RIGHT = CARD_W - 96;
 const MID = 78;
 
 /** The lid with "Pokémon Daily · {header}" on it, the dark seam, and the ball. */
-/** Which ball sits on the seam: a Poké Ball for Normal, Ultra for Hard, Premier for Easy. */
-export type BallKind = 'poke' | 'ultra' | 'premier';
+/** Which ball sits on the seam: a Poké Ball for Normal, Ultra for Hard, Premier for Easy, Master for Master. */
+export type BallKind = 'poke' | 'ultra' | 'premier' | 'master';
 
 export const ballFor = (level: string | undefined): BallKind =>
-  level === 'Hard' ? 'ultra' : level === 'Easy' ? 'premier' : 'poke';
+  level === 'Master'
+    ? 'master'
+    : level === 'Hard'
+      ? 'ultra'
+      : level === 'Easy'
+        ? 'premier'
+        : 'poke';
 
 const ULTRA = { top: '#26252b', band: '#f2c230' };
 const PREMIER_RED = '#d1434b';
+const MASTER = { top: '#7a3ea6', spot: '#e05a9c', letter: '#f4f3f1' };
 
 /** A ball at (cx, cy) of radius r, with a ring of width r/4 (the card's style). */
 function drawBall(
@@ -330,6 +337,27 @@ function drawBall(
     ctx.fillStyle = ULTRA.band;
     ctx.fillRect(cx - r, cy - r * 0.62, r * 0.5, r * 0.42);
     ctx.fillRect(cx + r * 0.5, cy - r * 0.62, r * 0.5, r * 0.42);
+  }
+  if (kind === 'master') {
+    // The Master Ball: a purple top, two pink spots and an M.
+    ctx.fillStyle = MASTER.top;
+    ctx.fillRect(cx - r, cy - r, r * 2, r);
+    ctx.fillStyle = MASTER.spot;
+    for (const side of [-1, 1]) {
+      ctx.beginPath();
+      ctx.arc(cx + side * r * 0.64, cy - r * 0.44, r * 0.22, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.beginPath();
+    ctx.moveTo(cx - r * 0.26, cy - r * 0.26);
+    ctx.lineTo(cx - r * 0.26, cy - r * 0.66);
+    ctx.lineTo(cx, cy - r * 0.42);
+    ctx.lineTo(cx + r * 0.26, cy - r * 0.66);
+    ctx.lineTo(cx + r * 0.26, cy - r * 0.26);
+    ctx.strokeStyle = MASTER.letter;
+    ctx.lineWidth = r * 0.14;
+    ctx.lineJoin = 'round';
+    ctx.stroke();
   }
   if (kind !== 'poke') {
     // Its middle line.

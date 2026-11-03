@@ -55,7 +55,8 @@ const arg = (name: string) => {
   return i > 0 ? process.argv[i + 1] : undefined;
 };
 const FORMAT = 'gen3ou';
-const VS = (arg('vs') ?? 'easy') as Difficulty;
+// The coach never plays against Master (it is Master's brain).
+const VS = (arg('vs') ?? 'easy') as Exclude<Difficulty, 'master'>;
 const BATTLES = Number(arg('battles') ?? 200);
 /** The first battle index: a fresh range checks results on battles not used for tuning. */
 const FIRST = Number(arg('first') ?? 0);

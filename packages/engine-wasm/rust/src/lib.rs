@@ -448,9 +448,10 @@ fn parse_view<'a>(
 
 /// The light search (search.rs) over the loaded network. Input lines: the
 /// parameters `ownK ownMass foeK foeMass branches branchMass robust`; then per
-/// world, `legal` with 14 flags (our slots the game allows), and the world as
-/// `observe` reads it, ended by a line `=`. Output: JSON, per world
-/// `{"prior":[14],"value":v,"foe":[14],"score":[14, null where not searched],"positions":n}`.
+/// world, `legal` with 14 flags (our slots the game allows: 1, or 2 to search
+/// it whatever the prior), and the world as `observe` reads it, ended by a
+/// line `=`. Output: JSON, per world `{"prior":[14],"value":v,"foe":[14],
+/// "score":[14, null where not searched],"positions":n,"replies":[{"slot":s,"p":p,"q":[14]}]}`.
 #[no_mangle]
 pub extern "C" fn net_search(ptr: *mut u8, len: usize) {
     install_panic_hook();
@@ -474,11 +475,13 @@ pub extern "C" fn net_search(ptr: *mut u8, len: usize) {
         let flags: Vec<&str> = l.split_whitespace().collect();
         assert!(flags.len() == 1 + net::ACTIONS && flags[0] == "legal", "net_search: expected a legal line");
         let mut legal = [false; net::ACTIONS];
+        let mut must = [false; net::ACTIONS];
         for (i, f) in flags[1..].iter().enumerate() {
-            legal[i] = *f == "1";
+            legal[i] = *f != "0";
+            must[i] = *f == "2";
         }
         let (state, turn, known, history) = parse_view(&mut lines, "net_search");
-        worlds.push(search::World { state, known, history, turn, legal });
+        worlds.push(search::World { state, known, history, turn, legal, must });
     }
     let nums = |xs: &[f32]| {
         xs.iter().map(|x| if x.is_finite() { format!("{x}") } else { "null".into() }).collect::<Vec<_>>().join(",")
@@ -486,13 +489,26 @@ pub extern "C" fn net_search(ptr: *mut u8, len: usize) {
     let out: Vec<String> = search::search(net, worlds, &p)
         .iter()
         .map(|r| {
+            let replies: Vec<String> = r
+                .replies
+                .iter()
+                .map(|x| {
+                    format!(
+                        "{{\"slot\":{},\"p\":{},\"q\":[{}]}}",
+                        x.slot.map_or("null".into(), |s| s.to_string()),
+                        x.p,
+                        nums(&x.q)
+                    )
+                })
+                .collect();
             format!(
-                "{{\"prior\":[{}],\"value\":{},\"foe\":[{}],\"score\":[{}],\"positions\":{}}}",
+                "{{\"prior\":[{}],\"value\":{},\"foe\":[{}],\"score\":[{}],\"positions\":{},\"replies\":[{}]}}",
                 nums(&r.prior),
                 r.value,
                 nums(&r.foe),
                 nums(&r.score),
-                r.positions
+                r.positions,
+                replies.join(",")
             )
         })
         .collect();

@@ -9,5 +9,6 @@ export const WASM_VERSION = 2;
 
 export const hasEngine = (gen: number): boolean => (ENGINE_GENS as readonly number[]).includes(gen);
 
-/** File name of a generation's module in `dist/`. */
-export const engineFile = (gen: number): string => `gen${gen}.wasm`;
+/** File name of a generation's module in `dist/`: the WASM SIMD build or the plain one. */
+export const engineFile = (gen: number, simd = false): string =>
+  `gen${gen}${simd ? '-simd' : ''}.wasm`;

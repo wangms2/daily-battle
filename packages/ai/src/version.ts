@@ -18,25 +18,42 @@ export const RESUMABLE_AI: readonly number[] = [1];
 
 /**
  * The same for Easy's preset and Hard's search (translation, worlds, budget); Normal ignores them.
- * Hard 2: near-ties are drawn (`variety`).
+ * Hard 2: near-ties are drawn (`variety`). Hard 3: 100k iterations a decision (was 150k).
+ * Master: its network and search settings (master/policy.ts `MASTER_DEFAULTS`).
  */
 export const EASY_VERSION = 1;
-export const HARD_VERSION = 2;
+export const HARD_VERSION = 3;
+export const MASTER_VERSION = 1;
 
-export const DIFFICULTIES = ['easy', 'normal', 'hard'] as const;
+/** Hard's search budget (iterations a decision) by version: older saved battles resume with theirs. */
+export const HARD_ITERATIONS: Readonly<Record<number, number>> = { 2: 150_000, 3: 100_000 };
+
+/** Master's network: served at `/net/{MASTER_NET}.dbnet` (apps/web/public), never changed in place. */
+export const MASTER_NET = 'master-15447166';
+export const MASTER_NET_PATH = `/net/${MASTER_NET}.dbnet`;
+
+/** Older Hard versions that can still play, so their saved battles resume. */
+export const RESUMABLE_HARD: readonly number[] = [2];
+
+export const DIFFICULTIES = ['easy', 'normal', 'hard', 'master'] as const;
 export type Difficulty = (typeof DIFFICULTIES)[number];
 
 export const isDifficulty = (x: unknown): x is Difficulty =>
   typeof x === 'string' && (DIFFICULTIES as readonly string[]).includes(x);
 
+/** Difficulties that run poke-engine (and save their choices, as a resume would otherwise redo every search). */
+export const searches = (d: Difficulty | undefined): d is 'hard' | 'master' =>
+  d === 'hard' || d === 'master';
+
 /** What a difficulty adds to the AI version: nothing for Normal, so its saves keep resuming. */
 export function difficultyTag(difficulty: Difficulty): string {
   if (difficulty === 'easy') return ` easy ${EASY_VERSION}`;
   if (difficulty === 'hard') return ` hard ${HARD_VERSION} e${WASM_VERSION}`;
+  if (difficulty === 'master') return ` master ${MASTER_VERSION} e${WASM_VERSION}`;
   return '';
 }
 
-/** The AI part of an attempt's engine string: `ai 2`, `ai 2 easy 1`, `ai 2 hard 2 e2`. */
+/** The AI part of an attempt's engine string: `ai 2`, `ai 2 easy 1`, `ai 2 hard 2 e2`, `ai 2 master 1 e3`. */
 export const aiVersion = (difficulty: Difficulty): string =>
   `ai ${AI_VERSION}${difficultyTag(difficulty)}`;
 
@@ -46,11 +63,23 @@ export function aiVersionOf(engine: string): number {
   return m ? Number(m[1]) : 1;
 }
 
+/** The Hard version in a saved engine string (`… ai 2 hard 2 e2` → 2); undefined if it isn't Hard. */
+export function hardVersionOf(engine: string): number | undefined {
+  const m = / hard (\d+)/.exec(engine);
+  return m ? Number(m[1]) : undefined;
+}
+
 /**
  * Whether a battle saved with `saved` can resume under `current` (both full
- * engine strings): the same, or the same but for an AI version still playable.
+ * engine strings): the same, or the same but for an AI or Hard version still playable.
  */
 export function canResume(saved: string, current: string): boolean {
   if (saved === current) return true;
-  return RESUMABLE_AI.some((v) => saved === current.replace(/ ai \d+/, ` ai ${v}`));
+  const ais = [AI_VERSION, ...RESUMABLE_AI];
+  const hards = [HARD_VERSION, ...RESUMABLE_HARD];
+  return ais.some((a) =>
+    hards.some(
+      (h) => saved === current.replace(/ ai \d+/, ` ai ${a}`).replace(/ hard \d+/, ` hard ${h}`),
+    ),
+  );
 }
