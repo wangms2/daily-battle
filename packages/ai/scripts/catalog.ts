@@ -1,12 +1,13 @@
 // The self-play env's team catalog (tools/net/env): every set in each
 // format's pool as a fresh engine Pokémon, plus varied copies of the pool
-// (vary.ts) so the network doesn't memorize today's sets. One TSV per gen:
+// (vary.ts) so the network doesn't memorize today's sets. Today's pool also has
+// each species' fun set, at the share Hard expects (playerSetPrior). One TSV per gen:
 //   species  set  weight  varied  engine-pokemon
 // Rerun whenever the pools change:
 //   npx tsx scripts/catalog.ts [--out ../../tools/net/data/catalog] [--varied 3] [--seed catalog1]
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
-import { FORMATS, setsFor, type SetsFile } from '@daily-battle/data';
+import { FORMATS, playerSetPrior, setsFor, type SetsFile } from '@daily-battle/data';
 import { rngFor } from '@daily-battle/gen';
 import { loadEngine } from '@daily-battle/engine-wasm/node';
 import { genFor } from '../src/calc';
@@ -29,7 +30,8 @@ for (const [format, info] of Object.entries(FORMATS)) {
   const lines: string[] = [];
   const add = (sets: SetsFile, varied: number) => {
     for (const [species, entry] of Object.entries(sets.species)) {
-      entry.sets.forEach((set, i) => {
+      // Today's pool includes the fun set, at the share Hard expects a player to bring it.
+      (varied ? entry.sets : playerSetPrior(entry)).forEach((set, i) => {
         const mon = engineMonFromSet(species, set, format);
         lines.push([species, i, set.weight, varied, mon].join('\t'));
       });
