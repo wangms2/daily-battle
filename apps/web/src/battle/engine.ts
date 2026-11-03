@@ -30,11 +30,13 @@ import {
   Judge,
   LESSON_TIE,
   knownSets,
+  NetJudge,
   setStartHp,
   soundPick,
   startPosition,
   teamOf,
   withLessonSets,
+  type CoachJudge,
   type CoachNote,
   type FoeRead,
   type Mon,
@@ -82,11 +84,12 @@ export class BattleEngine {
   /** The request the coach last spoke on, so it isn't asked twice about one turn. */
   private coached?: unknown;
   /**
-   * The coach's judge (DESIGN.md §22): the search, from your view, decides which
+   * The coach's judge (DESIGN.md §22): Master's network search (or, without a
+   * network, and in lessons, the Hard search), from your view, decides which
    * warnings and action tips show. Without it (no engine), the coach gives only
    * fact tips: no warnings, no action tips, no review.
    */
-  private readonly judge?: Judge;
+  private readonly judge?: CoachJudge;
   /** This decision's warnings shown so far, by choice. */
   private readonly shown = new Map<string, CoachNote>();
   /** A tip waits for the judge's top choice. */
@@ -163,7 +166,10 @@ export class BattleEngine {
         tutorial ? 'easy' : difficulty,
         tutorial?.taught ?? Infinity,
       );
-      if (coachEngine)
+      // Lessons keep the search judge their content is checked with (lesson-check.ts).
+      if (coachEngine?.netLoaded && !lessonFoe)
+        this.judge = new NetJudge(coachEngine, data, start.pool ? { pool: start.pool } : {});
+      else if (coachEngine)
         this.judge = new Judge(coachEngine, data, {
           ...(start.pool ? { pool: start.pool } : {}),
           // Lessons leave near-ties out of the judge's agreement (daily battles don't, yet).
@@ -190,6 +196,8 @@ export class BattleEngine {
       // The coach sees each replayed turn too (with the judge's saved verdict),
       // so its review and one-time tips survive a resume.
       this.coachSees(choice, this.start.coachLog?.[this.decisions] ?? undefined);
+      const view = this.judge?.watch && this.session.view('p1');
+      if (view) this.judge!.watch!(view);
       this.made.push(choice);
       this.settleAi();
       this.session.choose('p1', choice);

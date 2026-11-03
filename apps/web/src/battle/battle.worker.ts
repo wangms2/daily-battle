@@ -6,7 +6,14 @@ import type { WorldClaim } from '@daily-battle/ai';
 import { Engine, type WasmModule } from '@daily-battle/engine-wasm';
 import { genOf } from '@daily-battle/data/formats';
 import type { FromWorker, ToWorker } from './frames';
-import { loadHardEngine, loadHardModule, loadMasterEngine, loadNet } from './hardEngine';
+import {
+  loadCoachEngine,
+  loadHardEngine,
+  loadHardModule,
+  loadMasterEngine,
+  loadNet,
+  masterAvailable,
+} from './hardEngine';
 import type { FromHelper, ToHelper } from './search.worker';
 
 let engine: BattleEngine | null = null;
@@ -141,7 +148,7 @@ self.onmessage = async (event: MessageEvent<ToWorker>) => {
   try {
     if (msg.type === 'warm') {
       void loadHardEngine(msg.format).catch(() => {});
-      if (msg.net) void loadNet().catch(() => {});
+      if (msg.net && masterAvailable(msg.format)) void loadNet().catch(() => {});
     } else if (msg.type === 'visibility') {
       hidden = msg.hidden;
       if (!hidden) waiting.splice(0).forEach((resume) => resume());
@@ -160,7 +167,7 @@ self.onmessage = async (event: MessageEvent<ToWorker>) => {
         hard = await loadMasterEngine(format);
       }
       // Without the engine the coach still gives fact tips, but no warnings.
-      const judge = start.coach ? await loadHardEngine(format).catch(() => undefined) : undefined;
+      const judge = start.coach ? await loadCoachEngine(format, !start.tutorial) : undefined;
       engine = new BattleEngine(start, hard, undefined, judge);
       post({ type: 'package', pkg: engine.begin() });
     } else if (msg.type === 'turn') {
@@ -175,7 +182,9 @@ self.onmessage = async (event: MessageEvent<ToWorker>) => {
       post({ type: 'package', pkg: engine.choose(msg.choice) });
     } else if (msg.type === 'review') {
       // Judged a slice at a time, so other messages (a replayed turn) get in between.
-      const job = engine.reviewJob(await loadHardEngine(engine.start.format ?? 'gen4ou'));
+      const judge = await loadCoachEngine(engine.start.format ?? 'gen4ou', true);
+      if (!judge) throw new Error('No engine for the review');
+      const job = engine.reviewJob(judge);
       const review = await new Promise<Review>((resolve) => {
         const slice = () => {
           if (hidden) return waiting.push(slice);

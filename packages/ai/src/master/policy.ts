@@ -14,6 +14,7 @@ import {
   type NetWorld,
 } from '@daily-battle/engine-wasm';
 import { legalChoices, type Policy, type Rng, type SideView } from '@daily-battle/sim-bridge';
+import type { KnownSets } from '../belief';
 import { genFor, moveInfo, type Gen } from '../calc';
 import { toChoice } from '../hard/choices';
 import { engineId, engineMove } from '../hard/names';
@@ -44,6 +45,8 @@ export interface NetPolicyOptions {
   priorWeight?: number;
   /** Called with each decision's network inputs (for offline evaluation). */
   record?: (r: NetRecord) => void;
+  /** The foe's real sets, by species: lesson content only, never in play. */
+  knownSets?: KnownSets;
 }
 
 /** One decision's network inputs: per sampled world, the slot→choice map and the world. */
@@ -52,6 +55,11 @@ export interface NetRecord {
   slots: (string | undefined)[][];
   weights: number[];
   worlds: NetWorld[];
+}
+
+/** A decision's network inputs, with each world's foes in the order its state has them. */
+export interface NetPrepared extends NetRecord {
+  foes: WorldFoe[][];
 }
 
 export interface NetStats {
@@ -266,6 +274,20 @@ export class NetPolicy implements Policy {
     };
   }
 
+  /**
+   * A decision's network inputs without deciding (the coach's judge): the
+   * view is seen as `choose` sees it. Undefined when there's no choice to make
+   * or the engine can't model it.
+   */
+  prepare(view: SideView, rng: Rng): NetPrepared | undefined {
+    const tracker = this.observe(view);
+    const request = view.request;
+    if (request.requestType !== 'move' && request.requestType !== 'switch') return undefined;
+    const legal = legalChoices(request);
+    if (legal.length < 2) return undefined;
+    return this.build(view, request, tracker, legal, rng);
+  }
+
   private decide(
     view: SideView,
     request: Request,
@@ -273,55 +295,9 @@ export class NetPolicy implements Policy {
     legal: string[],
     rng: Rng,
   ): string | undefined {
-    const data = this.data;
-    const state = extractState(view, data);
-    const worlds = sampleWorlds(view, state, data, rng, {
-      count: this.options.worlds ?? 4,
-      ...(this.options.pool ? { pool: this.options.pool } : {}),
-    });
-    const ownSets = state.own.map((m) => m.set);
-    const reqMons = request.side.pokemon;
-    const order = (tracker.ownOrder ?? []).map((id) => reqMons.findIndex((p) => p.ident === id));
-    const perm =
-      order.length === reqMons.length && !order.includes(-1) ? order : reqMons.map((_, i) => i);
-    while (perm.length < 6) perm.push(perm.length);
-    const turn =
-      request.requestType === 'move' ? Math.max(0, view.battle.turn - 1) : view.battle.turn;
-    const legalSet = new Set(legal);
-
-    const worldsIn: NetWorld[] = [];
-    const slots: (string | undefined)[][] = [];
-    const weights: number[] = [];
-    for (const world of worlds) {
-      // Foes in order of appearance, as the env's are in team order with the lead first.
-      const rank = (f: WorldFoe) => {
-        const i = tracker.foeAppeared.indexOf(speciesKey(f.species));
-        return i < 0 ? Infinity : i;
-      };
-      const foes = world.foes
-        .map((f, i) => ({ f, i }))
-        .sort((a, b) => rank(a.f) - rank(b.f) || a.i - b.i)
-        .map((x) => x.f);
-      const st = permuteOwn(translate(view, foes, data, ownSets), perm);
-      const choice: (string | undefined)[] = Array(NET_OBS.actions).fill(undefined);
-      for (const key of this.engine.options(st).s1) {
-        const slot = slotOf(key);
-        if (slot === undefined) continue;
-        const c = key.startsWith('switch:')
-          ? perm[slot - 8]! < reqMons.length
-            ? `switch ${perm[slot - 8]! + 1}`
-            : undefined
-          : toChoice(key, request);
-        if (c && legalSet.has(c)) choice[slot] = c;
-      }
-      if (!choice.some(Boolean)) continue;
-      const known = foes.map((f) => this.known(f, tracker));
-      const events = tracker.events.slice(-16).map((e) => this.event(e, request, foes));
-      worldsIn.push({ state: st, turn, known, events, legal: choice.map(Boolean) });
-      slots.push(choice);
-      weights.push(world.weight);
-    }
-    if (!slots.length) return undefined;
+    const prepared = this.build(view, request, tracker, legal, rng);
+    if (!prepared) return undefined;
+    const { slots, weights, worlds: worldsIn } = prepared;
     this.options.record?.({ legal, slots, weights, worlds: worldsIn });
     if (this.options.search) return this.searched(legal, slots, weights, worldsIn);
 
@@ -360,6 +336,69 @@ export class NetPolicy implements Policy {
       if (p !== undefined && p > bestP) [best, bestP] = [c, p];
     }
     return best;
+  }
+
+  /** Samples the worlds and turns each into the network's inputs (the env's slots and order). */
+  private build(
+    view: SideView,
+    request: Request,
+    tracker: Tracker,
+    legal: string[],
+    rng: Rng,
+  ): NetPrepared | undefined {
+    const data = this.data;
+    const state = extractState(view, data);
+    const worlds = sampleWorlds(view, state, data, rng, {
+      count: this.options.worlds ?? 4,
+      ...(this.options.pool ? { pool: this.options.pool } : {}),
+      ...(this.options.knownSets ? { known: this.options.knownSets } : {}),
+    });
+    const ownSets = state.own.map((m) => m.set);
+    const reqMons = request.side.pokemon;
+    const order = (tracker.ownOrder ?? []).map((id) => reqMons.findIndex((p) => p.ident === id));
+    const perm =
+      order.length === reqMons.length && !order.includes(-1) ? order : reqMons.map((_, i) => i);
+    while (perm.length < 6) perm.push(perm.length);
+    const turn =
+      request.requestType === 'move' ? Math.max(0, view.battle.turn - 1) : view.battle.turn;
+    const legalSet = new Set(legal);
+
+    const worldsIn: NetWorld[] = [];
+    const slots: (string | undefined)[][] = [];
+    const weights: number[] = [];
+    const foeLists: WorldFoe[][] = [];
+    for (const world of worlds) {
+      // Foes in order of appearance, as the env's are in team order with the lead first.
+      const rank = (f: WorldFoe) => {
+        const i = tracker.foeAppeared.indexOf(speciesKey(f.species));
+        return i < 0 ? Infinity : i;
+      };
+      const foes = world.foes
+        .map((f, i) => ({ f, i }))
+        .sort((a, b) => rank(a.f) - rank(b.f) || a.i - b.i)
+        .map((x) => x.f);
+      const st = permuteOwn(translate(view, foes, data, ownSets), perm);
+      const choice: (string | undefined)[] = Array(NET_OBS.actions).fill(undefined);
+      for (const key of this.engine.options(st).s1) {
+        const slot = slotOf(key);
+        if (slot === undefined) continue;
+        const c = key.startsWith('switch:')
+          ? perm[slot - 8]! < reqMons.length
+            ? `switch ${perm[slot - 8]! + 1}`
+            : undefined
+          : toChoice(key, request);
+        if (c && legalSet.has(c)) choice[slot] = c;
+      }
+      if (!choice.some(Boolean)) continue;
+      const known = foes.map((f) => this.known(f, tracker));
+      const events = tracker.events.slice(-16).map((e) => this.event(e, request, foes));
+      worldsIn.push({ state: st, turn, known, events, legal: choice.map(Boolean) });
+      slots.push(choice);
+      weights.push(world.weight);
+      foeLists.push(foes);
+    }
+    if (!slots.length) return undefined;
+    return { legal, slots, weights, worlds: worldsIn, foes: foeLists };
   }
 
   /** Picks by the light search (`pickSearched`); a world the engine panics on is dropped. */

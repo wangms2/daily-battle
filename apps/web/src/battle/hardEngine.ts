@@ -91,3 +91,19 @@ export function loadHardModule(format: string): Promise<WasmModule> {
 export async function loadHardEngine(format: string): Promise<Engine> {
   return new Engine(await loadHardModule(format));
 }
+
+/**
+ * The coach's judge's engine (DESIGN.md §22): Master's, with the network, where
+ * it runs (lessons excepted); otherwise the Hard search's. Undefined if neither
+ * loads (the coach then gives fact tips only).
+ */
+export async function loadCoachEngine(format: string, net: boolean): Promise<Engine | undefined> {
+  if (net && masterAvailable(format)) {
+    try {
+      return await loadMasterEngine(format);
+    } catch {
+      // The Hard search judges instead.
+    }
+  }
+  return loadHardEngine(format).catch(() => undefined);
+}

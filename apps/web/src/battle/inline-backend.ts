@@ -1,7 +1,8 @@
-// The engine on the main thread, for tests (no worker). Hard and the coach's
-// judge need `hardEngine` to supply poke-engine for the format (tests load it
-// from disk), Master `masterEngine` (with its network loaded); without them,
-// a coached battle gives no warnings.
+// The engine on the main thread, for tests (no worker). Hard needs `hardEngine`
+// to supply poke-engine for the format (tests load it from disk), Master
+// `masterEngine` (with its network loaded). The coach's judge uses Master's
+// engine when given (not in lessons), else Hard's; without either, a coached
+// battle gives no warnings.
 import type { Engine } from '@daily-battle/engine-wasm';
 import type { CoachNote } from '@daily-battle/tutorial';
 import type { BattleBackend } from './backend';
@@ -37,7 +38,9 @@ export function inlineBackend(
           : start.difficulty === 'master'
             ? masterEngine?.(format)
             : undefined;
-      const judge = start.coach ? hardEngine?.(format) : undefined;
+      const judge = !start.coach
+        ? undefined
+        : (!start.tutorial && masterEngine?.(format)) || hardEngine?.(format);
       engine = new BattleEngine(start, hard, undefined, judge);
       return later(engine.begin());
     },
@@ -46,10 +49,10 @@ export function inlineBackend(
     coachCheck: async (choice, waitMs) => need().coachCheck(choice, waitMs),
     replay: async (decision) => need().replayTurn(decision),
     // Reviews need the judge's engine.
-    ...(hardEngine && {
+    ...((masterEngine ?? hardEngine) && {
       review: async (onProgress: (done: number, total: number) => void) => {
         const e = need();
-        const job = e.reviewJob(hardEngine(e.start.format ?? 'gen4ou'));
+        const job = e.reviewJob((masterEngine ?? hardEngine)!(e.start.format ?? 'gen4ou'));
         for (;;) {
           const review = job.step(1000);
           onProgress(job.done, job.total);

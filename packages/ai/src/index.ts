@@ -35,6 +35,7 @@ export {
   NetPolicy,
   pickSearched,
   type NetPolicyOptions,
+  type NetPrepared,
   type NetRecord,
   type NetStats,
 } from './master/policy';

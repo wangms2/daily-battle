@@ -212,14 +212,15 @@ export function DailyBrief({
   useEffect(() => {
     preloadSprites(opponent.team.map((s) => s.species));
   }, [opponent]);
-  // Load the battle engine while the player looks at the opponent, and Hard's
-  // search engine (the coach's judge uses it too) when it'll be needed.
+  // Load the battle engine while the player looks at the opponent, and the
+  // search engine (and Master's network, which the coach's judge uses too)
+  // when they'll be needed.
   useEffect(() => {
     if (typeof Worker !== 'undefined') warmBattleWorker();
   }, []);
   const playable = !unavailable.includes(difficulty);
   const needsSearch = (searches(difficulty) && playable) || !!coach?.on;
-  const needsNet = difficulty === 'master' && playable;
+  const needsNet = (difficulty === 'master' && playable) || !!coach?.on;
   useEffect(() => {
     if (needsSearch) warmHardEngine(activeFormat(), needsNet);
   }, [needsSearch, needsNet]);

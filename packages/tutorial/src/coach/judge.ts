@@ -111,6 +111,19 @@ export interface Verdict {
   topValue: number;
 }
 
+/** What the coach needs of a judge: the search judge (`Judge`) or the network's (`NetJudge`). */
+export interface CoachJudge {
+  begin(view: SideView, key: string, first?: readonly string[]): void;
+  readonly best: string | undefined;
+  readonly busy: boolean;
+  step(): boolean;
+  verdict(choice: string): Verdict | undefined;
+  settle(choice: string, ms: number, now?: () => number): Verdict | undefined;
+  against(read: FoeRead, choices?: readonly string[]): Record<string, ReadValue> | undefined;
+  /** Sees a decision it won't judge (a replayed one), for judges that remember the battle. */
+  watch?(view: SideView): void;
+}
+
 type Task = { world: number; fixed?: string };
 
 /**
@@ -204,7 +217,7 @@ function values(result: SearchResult, request: SideView['request']): Record<stri
   return out;
 }
 
-export class Judge {
+export class Judge implements CoachJudge {
   private readonly options: JudgeOptions;
   private request?: SideView['request'];
   private legal = new Set<string>();

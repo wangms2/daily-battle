@@ -346,6 +346,12 @@ export class Engine {
    * Loads the Master network (a .dbnet file from tools/net/export.py) into this
    * engine; it's reloaded automatically if the instance restarts after a panic.
    */
+  /** Whether a network is loaded (
+etLoad). */
+  get netLoaded(): boolean {
+    return !!this.#net;
+  }
+
   netLoad(bytes: Uint8Array): { params: number } {
     this.#callBytes('net_load', bytes);
     this.#net = bytes;

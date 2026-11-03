@@ -256,7 +256,19 @@ describe('lesson battles', () => {
   }, 60_000);
 });
 
-describe.skipIf(!engineBuilt(3))('the coach’s judge', () => {
+const MASTER_FILE = join(fileURLToPath(import.meta.url), '../../../public', MASTER_NET_PATH);
+
+/** The coach's judge's engine: the Hard search's, or Master's (with its network). */
+function judgeEngine(net: boolean) {
+  const engine = loadEngine(3);
+  if (net) engine.netLoad(new Uint8Array(readFileSync(MASTER_FILE)));
+  return engine;
+}
+
+describe.skipIf(!engineBuilt(3)).each([
+  ['search', false],
+  ['network', true],
+] as const)('the coach’s judge (%s)', (_name, net) => {
   it('warns only when the judge agrees, and never without the engine', () => {
     const rng = makeRng(deriveSeed('engine:judge', 0));
     const data = setsFor('gen3ou');
@@ -267,7 +279,7 @@ describe.skipIf(!engineBuilt(3))('the coach’s judge', () => {
       difficulty: 'easy',
       coach: 'simple',
     });
-    const judged = new BattleEngine(s, undefined, undefined, loadEngine(3));
+    const judged = new BattleEngine(s, undefined, undefined, judgeEngine(net));
     const blind = new BattleEngine(s);
     let pkg = judged.begin();
     blind.begin();
@@ -301,7 +313,7 @@ describe.skipIf(!engineBuilt(3))('the coach’s judge', () => {
       difficulty: 'easy',
       coach: 'simple',
     });
-    const engine = new BattleEngine(s, undefined, undefined, loadEngine(3));
+    const engine = new BattleEngine(s, undefined, undefined, judgeEngine(net));
     const packages = [engine.begin()];
     const choices: string[] = [];
     const memos: (CoachMemo | null)[] = [];
@@ -338,7 +350,7 @@ describe.skipIf(!engineBuilt(3))('the coach’s judge', () => {
         { ...s, choices: choices.slice(0, k), ...(log && { coachLog: log }) },
         undefined,
         undefined,
-        loadEngine(3),
+        judgeEngine(net),
       );
       e.begin();
       return e.coachCheck(choices[k]!, Infinity);
@@ -346,6 +358,23 @@ describe.skipIf(!engineBuilt(3))('the coach’s judge', () => {
     expect(at()?.text).toBe(memos[k]!.ignored);
     expect(at(memos)).toBeNull();
   }, 120_000);
+
+  it('judges a decision after a resume just as it did live', () => {
+    const { s, choices, memos } = coached(12);
+    // The judge resumes knowing only the replayed decisions, and must still see the battle as it did.
+    for (let k = 1; k < choices.length; k++) {
+      if (!memos[k]?.verdict) continue;
+      const e = new BattleEngine(
+        { ...s, choices: choices.slice(0, k), coachLog: memos.slice(0, k) },
+        undefined,
+        undefined,
+        judgeEngine(net),
+      );
+      e.begin();
+      e.coachCheck(choices[k]!, Infinity);
+      expect(e.choose(choices[k]!).coachMemo?.verdict).toEqual(memos[k]!.verdict);
+    }
+  }, 240_000);
 
   it('replays a past decision: the battle as it was, then the turn as played', () => {
     const { engine, packages, choices } = coached(6);
@@ -366,7 +395,7 @@ describe.skipIf(!engineBuilt(3))('the coach’s judge', () => {
     const uncoached = new BattleEngine(plain);
     uncoached.begin();
     for (const c of choices) uncoached.choose(c);
-    const job = uncoached.reviewJob(loadEngine(3));
+    const job = uncoached.reviewJob(judgeEngine(net));
     let review;
     while (!(review = job.step(50)));
     expect(job.done).toBe(choices.length);
@@ -629,8 +658,6 @@ describe.skipIf(!engineBuilt(3))('the guided replay', () => {
     expect(pkg.end?.winner).toBe('you');
   }, 120_000);
 });
-
-const MASTER_FILE = join(fileURLToPath(import.meta.url), '../../../public', MASTER_NET_PATH);
 
 describe.skipIf(!engineBuilt(4))('BattleEngine on Master', () => {
   const s = start(82, { difficulty: 'master' });
