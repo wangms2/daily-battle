@@ -1,3 +1,4 @@
+import { coresFor } from '@daily-battle/data';
 import type { ScheduleFile } from '@daily-battle/gen/schedule';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
@@ -57,6 +58,10 @@ describe('TeamBuilder cores', () => {
     fireEvent.click(screen.getByRole('button', { name: /^Add Swampert \+ Skarmory/ }));
     expect(chosen()).toEqual(['Remove Swampert from team', 'Remove Skarmory from team']);
     expect(screen.getByRole('status')).toHaveTextContent('Swampert + Skarmory added');
+    // With why the core works.
+    expect(screen.getByRole('status')).toHaveTextContent(
+      coresFor('gen4ou').find((x) => x.id === 'swampert-skarmory')!.why,
+    );
     fireEvent.click(screen.getByRole('button', { name: 'Undo' }));
     expect(screen.queryAllByRole('button', { pressed: true })).toHaveLength(0);
   });
@@ -86,7 +91,16 @@ describe('TeamBuilder cores', () => {
       .closest('.card')!;
     expect(magnezone).toHaveClass('is-partner');
     expect(metagross).toHaveClass('is-partner');
-    expect(within(magnezone as HTMLElement).getByText('Pairs with Dragonite')).toBeInTheDocument();
+    // The gold link says why they pair.
+    fireEvent.click(
+      within(magnezone as HTMLElement).getByRole('button', {
+        name: 'Why Magnezone pairs with Dragonite',
+      }),
+    );
+    expect(screen.getByRole('dialog', { name: 'Why Magnezone fits' })).toHaveTextContent(
+      coresFor('gen4ou').find((c) => c.id === 'dragonite-magnezone')!.why,
+    );
+    fireEvent.keyDown(document.activeElement!, { key: 'Escape' });
     // Not Swampert, which pairs with no one on the team.
     expect(
       screen.getByRole('button', { name: 'Add Swampert to team' }).closest('.card'),

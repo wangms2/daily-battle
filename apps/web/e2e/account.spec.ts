@@ -45,7 +45,7 @@ function player(name: string) {
       sound: false,
       musicVolume: 0.35,
       effectsVolume: 0.4,
-      shownExplainers: ['welcome', 'gen5-news', 'gen6-news', 'gen3-news', 'tour'],
+      shownExplainers: ['welcome', 'cores', 'gen5-news', 'gen6-news', 'gen3-news', 'tour'],
     },
   };
 }

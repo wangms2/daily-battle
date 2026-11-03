@@ -13,7 +13,7 @@ import type { Settings } from '../state/schema';
 import { useAccount } from '../state/context';
 import { Sheet } from '../ui/Sheet';
 import { Button, Switch, TypeBadge } from '../ui/bits';
-import { CheckIcon, ChevronIcon, CloseIcon } from '../ui/icons';
+import { CheckIcon, ChevronIcon, CloseIcon, LinkIcon } from '../ui/icons';
 
 export function WelcomeSheet({
   open,
@@ -95,6 +95,46 @@ export function WelcomeSheet({
           </p>
         </>
       )}
+    </Sheet>
+  );
+}
+
+/** A one-time note for players who were here before cores (shown once, then marked). */
+export function CoresNewSheet({ open, onDone }: { open: boolean; onDone: () => void }) {
+  return (
+    <Sheet open={open} onOpenChange={(o) => !o && onDone()} title="New: cores">
+      <p className="text-[15px] leading-snug">
+        <strong>Cores</strong> are pairs of Pokémon that work well together.
+      </p>
+      <div className="mt-3 flex items-center justify-center gap-2 rounded-card bg-gold-soft px-3 py-2.5">
+        <span className="flex">
+          {['Swampert', 'Skarmory'].map((s) => (
+            <img key={s} src={getSprite(s, 'icon')} alt="" className="-mr-2.5 size-10 last:mr-0" />
+          ))}
+        </span>
+        <span className="text-[15px] font-semibold">Swampert + Skarmory</span>
+      </div>
+      <ul className="mt-3 space-y-2">
+        <li className="flex gap-3">
+          <span className="grid size-6 shrink-0 place-items-center rounded-full bg-gold text-on-gold">
+            <LinkIcon width={13} height={13} />
+          </span>
+          <span className="text-[14px] leading-snug">
+            <strong>Partners light up.</strong>
+          </span>
+        </li>
+        <li className="flex gap-3">
+          <span className="grid size-6 shrink-0 place-items-center rounded-full bg-accent-soft text-[12px] font-bold text-soft-ink">
+            +
+          </span>
+          <span className="text-[14px] leading-snug">
+            <strong>Add a pair in one tap.</strong>
+          </span>
+        </li>
+      </ul>
+      <Button className="mt-4 w-full" onClick={onDone}>
+        Got it
+      </Button>
     </Sheet>
   );
 }

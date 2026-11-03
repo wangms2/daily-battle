@@ -29,6 +29,7 @@ import { ConfirmDialog, TeamCheckSheet } from '../sheets/misc';
 import { InfoSheet } from '../sheets/InfoSheet';
 import { SetPicker } from '../sheets/SetPicker';
 import { Button, SectionLabel } from '../ui/bits';
+import { Sheet } from '../ui/Sheet';
 import { CheckIcon, ChevronIcon, CloseIcon, DiceIcon } from '../ui/icons';
 import { PokemonRow, PokemonTile } from '../ui/PokemonTile';
 import { DetailsPanel } from '../ui/DetailsPanel';
@@ -98,7 +99,11 @@ export function TeamBuilder({
     undo?: Slot[];
     reroll?: boolean;
     wrap?: boolean;
+    /** A second, quieter line under the message (why a core works). */
+    detail?: string;
   } | null>(null);
+  // The Pokémon whose gold link was tapped: why it pairs with the team.
+  const [pairFor, setPairFor] = useState<string | null>(null);
   // Wide: the Pokémon in the details panel, and the set previewed for it.
   const [viewing, setViewing] = useState<string | null>(null);
   const [preview, setPreview] = useState<string | undefined>();
@@ -207,7 +212,7 @@ export function TeamBuilder({
     } else if (!plan.add.length) {
       setSnack({ message: `${core.name} is already on your team`, wrap: true });
     } else {
-      setSnack({ message: `${core.name} added`, undo: team, wrap: true });
+      setSnack({ message: `${core.name} added`, detail: core.why, undo: team });
       setTeam([...team, ...plan.add]);
     }
   };
@@ -224,7 +229,7 @@ export function TeamBuilder({
 
   // The undo message takes the button's place, so it never covers controls.
   const recommendRow = (
-    <div className="flex shrink-0 flex-col gap-1">
+    <div className="flex shrink-0 flex-col gap-1.5">
       <div className="flex h-6 items-center gap-2">
         <h2 className="display shrink-0 text-[12px] tracking-wider text-muted uppercase">
           {showTab === 'cores' ? 'Cores this week' : 'Recommended team'}
@@ -257,17 +262,25 @@ export function TeamBuilder({
           role="status"
           // Tap to dismiss; a rule message wraps to two lines instead of being cut off.
           onClick={snack.undo ? undefined : () => setSnack(null)}
-          className="flex h-10 items-center gap-2 rounded-chip bg-accent-soft px-4"
+          className={clsx(
+            'flex items-center gap-2 rounded-chip bg-accent-soft px-4',
+            snack.detail ? 'min-h-10 py-1.5' : 'h-10',
+          )}
         >
           {snack.undo && <CheckIcon width={16} height={16} className="text-soft-ink" />}
           <span
             className={
-              snack.undo && !snack.wrap
+              snack.undo && !snack.wrap && !snack.detail
                 ? 'min-w-0 flex-1 truncate text-[14px] font-semibold'
                 : 'min-w-0 flex-1 text-[13px] leading-4 font-semibold'
             }
           >
             {snack.message}
+            {snack.detail && (
+              <span className="block text-[12px] leading-4 font-normal text-muted">
+                {snack.detail}
+              </span>
+            )}
           </span>
           {snack.reroll && (
             <button
@@ -443,6 +456,7 @@ export function TeamBuilder({
             onEdit={i >= 0 ? () => setPickerFor(species) : undefined}
             editLabel={i >= 0 ? `${species}, ${findSet(team[i]!)?.label}. Change set` : undefined}
             partner={partnerOf(species)}
+            onPartner={() => setPairFor(species)}
             label={
               i >= 0
                 ? `Remove ${species} from team`
@@ -546,7 +560,7 @@ export function TeamBuilder({
           </aside>
         </main>
       ) : (
-        <main className="flex min-h-0 flex-1 flex-col gap-2 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3">
+        <main className="flex min-h-0 flex-1 flex-col gap-3 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-4">
           {noticeBar}
           {recommendRow}
           {poolGrid}
@@ -579,6 +593,23 @@ export function TeamBuilder({
             : undefined
         }
       />
+      <Sheet
+        open={!!pairFor}
+        onOpenChange={(o) => !o && setPairFor(null)}
+        title={pairFor ? `Why ${pairFor} fits` : ''}
+      >
+        <ul className="space-y-3">
+          {(pairFor ? (pairs.get(pairFor) ?? []) : []).map(({ core, withTeam }) => (
+            <li key={core.id}>
+              <p className="text-[15px] font-semibold">
+                With {joinNames(withTeam)}
+                <span className="font-normal text-muted"> · {core.name}</span>
+              </p>
+              <p className="text-[14px] leading-snug">{core.why}</p>
+            </li>
+          ))}
+        </ul>
+      </Sheet>
       <SetPicker
         key={picker ? `${picker.species}-${picker.adding}` : ''}
         species={picker?.species ?? null}

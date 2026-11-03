@@ -46,7 +46,7 @@
     "name": "Salamence + Magneton",
     "kind": "offensive",
     "members": ["Salamence", "Magneton"],
-    "why": "Magneton traps Skarmory and resists the Ice, Rock, and Dragon moves Salamence fears."
+    "why": "Magneton traps Skarmory and Forretress, the walls that stop Salamence."
   },
   {
     "id": "jirachi-salamence-tyranitar",

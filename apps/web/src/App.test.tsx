@@ -40,7 +40,7 @@ function memoryBackend(seed?: State, broken = false): globalThis.Storage {
 /** State after the welcome sheet, optionally with hints off and a team locked. */
 function seeded({ hints = true, team }: { hints?: boolean; team?: { week: string } } = {}): State {
   const state = initialState();
-  state.settings.shownExplainers = ['welcome'];
+  state.settings.shownExplainers = ['welcome', 'cores'];
   state.settings.beginnerHints = hints;
   state.settings.format = 'gen4ou';
   state.settings.name = 'Ash';
@@ -84,6 +84,18 @@ describe('first run', () => {
     renderApp();
     await user.click(await screen.findByRole('button', { name: 'Let’s play' }));
     expect(await screen.findByRole('button', { name: /Pick 6 more/ })).toBeDisabled();
+    // A new player never gets the cores note.
+    expect(screen.queryByRole('dialog', { name: 'New: cores' })).toBeNull();
+  });
+
+  it('tells a returning player about cores once', async () => {
+    const user = userEvent.setup();
+    const state = seeded();
+    state.settings.shownExplainers = ['welcome'];
+    renderApp(state);
+    const note = await screen.findByRole('dialog', { name: 'New: cores' });
+    await user.click(within(note).getByRole('button', { name: 'Got it' }));
+    expect(screen.queryByRole('dialog', { name: 'New: cores' })).toBeNull();
   });
 
   it('links to the disclaimer and credits from the welcome sheet', async () => {

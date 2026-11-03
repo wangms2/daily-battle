@@ -27,6 +27,7 @@ export function PokemonTile({
   editLabel,
   hoverCard,
   partner,
+  onPartner,
 }: {
   species: string;
   onTap?: () => void;
@@ -51,6 +52,8 @@ export function PokemonTile({
   hoverCard?: ReactNode;
   /** "Skarmory": a Pokémon on your team that this one pairs with (a core). It's ringed. */
   partner?: string;
+  /** Tapping the gold link says why they pair. */
+  onPartner?: () => void;
 }) {
   const { types } = speciesInfo(species);
   const [hovered, setHovered] = useState(false);
@@ -100,7 +103,9 @@ export function PokemonTile({
       </button>
       {footer}
       {badge && <span className="pointer-events-none absolute top-1 left-1">{badge}</span>}
-      {partner && !selected && !badge && <PairBadge partner={partner} />}
+      {partner && !selected && !badge && (
+        <PairBadge partner={partner} species={species} onTap={onPartner} />
+      )}
       {hoverCard && hovered && (
         <div
           role="tooltip"
@@ -134,16 +139,37 @@ export function PokemonTile({
   );
 }
 
-/** The small link in a ringed tile's corner: it pairs with a teammate (the name is for readers). */
-function PairBadge({ partner }: { partner: string }) {
-  return (
-    <span
-      title={`Pairs with ${partner}`}
-      className="pointer-events-none absolute top-1 left-1 grid size-5 place-items-center rounded-full bg-gold text-on-gold"
-    >
+/** The small gold link in a ringed tile's corner: it pairs with a teammate. Tap for why. */
+function PairBadge({
+  partner,
+  species,
+  onTap,
+}: {
+  partner: string;
+  species: string;
+  onTap?: () => void;
+}) {
+  const badge = (
+    <span className="grid size-5 place-items-center rounded-full bg-gold text-on-gold">
       <LinkIcon width={12} height={12} />
-      <span className="sr-only">Pairs with {partner}</span>
     </span>
+  );
+  if (!onTap)
+    return (
+      <span title={`Pairs with ${partner}`} className="pointer-events-none absolute top-1 left-1">
+        {badge}
+        <span className="sr-only">Pairs with {partner}</span>
+      </span>
+    );
+  return (
+    <button
+      type="button"
+      onClick={onTap}
+      aria-label={`Why ${species} pairs with ${partner}`}
+      className="absolute top-0 left-0 grid size-8 place-items-center rounded-full active:scale-[0.94]"
+    >
+      {badge}
+    </button>
   );
 }
 

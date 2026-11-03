@@ -21,7 +21,7 @@ import { savedName, saveName } from './versus/saved';
 import { Home } from './screens/Home';
 import { TeamBuilder } from './screens/TeamBuilder';
 import { AboutSheet } from './sheets/About';
-import { ConfirmDialog, SettingsSheet, WelcomeSheet } from './sheets/misc';
+import { ConfirmDialog, CoresNewSheet, SettingsSheet, WelcomeSheet } from './sheets/misc';
 import { TrainerCard } from './sheets/TrainerCard';
 import { TrainerProvider } from './ui/Profile';
 import { configureAudio, menuSounds } from './lib/audio';
@@ -355,10 +355,14 @@ export function App() {
   const setCoach = (on: boolean) => setSetting('coach', { ...settings.coach, [format]: on });
   const setDifficulty = (d: Difficulty) =>
     setSetting('difficulty', { ...settings.difficulty, [format]: d });
+  // New players learn about cores in the builder, so the one-time note is for returning ones.
+  const markWelcomed = () => {
+    dispatchAny({ type: 'markExplainer', id: 'welcome' });
+    dispatchAny({ type: 'markExplainer', id: 'cores' });
+  };
   // The welcome sheet and How to play point beginners to the Gen 3 lessons (DESIGN.md §22).
   const startTutorial = () => {
-    if (!settings.shownExplainers.includes('welcome'))
-      dispatchAny({ type: 'markExplainer', id: 'welcome' });
+    if (!settings.shownExplainers.includes('welcome')) markWelcomed();
     setHowToPlayOpen(false);
     const next = nextLesson(LESSONS[LEARN_FORMAT]!, settings.tutorial?.[LEARN_FORMAT]);
     go(next ? `learn/${next.id}` : 'learn');
@@ -791,9 +795,17 @@ export function App() {
         open={playing && !settings.shownExplainers.includes('welcome')}
         hints={settings.beginnerHints}
         onHints={(v) => setSetting('beginnerHints', v)}
-        onDone={() => dispatchAny({ type: 'markExplainer', id: 'welcome' })}
+        onDone={markWelcomed}
         onAbout={() => setAboutOpen(true)}
         onTutorial={startTutorial}
+      />
+      <CoresNewSheet
+        open={
+          playing &&
+          settings.shownExplainers.includes('welcome') &&
+          !settings.shownExplainers.includes('cores')
+        }
+        onDone={() => dispatchAny({ type: 'markExplainer', id: 'cores' })}
       />
       <ConfirmDialog
         open={coachOffer}

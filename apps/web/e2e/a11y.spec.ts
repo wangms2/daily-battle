@@ -31,7 +31,7 @@ async function seed(page: Page, { team = true, welcome = false } = {}) {
             animations: true,
             shownExplainers: welcome
               ? []
-              : ['welcome', 'gen5-news', 'gen6-news', 'gen3-news', 'tour'],
+              : ['welcome', 'cores', 'gen5-news', 'gen6-news', 'gen3-news', 'tour'],
           },
         }),
       );

@@ -85,6 +85,7 @@ async function quick(page: Page) {
           animations: false,
           shownExplainers: [
             'welcome',
+            'cores',
             'gen5-news',
             'gen6-news',
             'gen3-news',
