@@ -280,13 +280,28 @@ interface SideInput {
   gen: number;
 }
 
+/**
+ * Where a Pokémon's last move sits among its serialized moves, or -1. The battle
+ * log says "Hidden Power" with no type; the engine's move is typed ("HIDDENPOWERBUG70").
+ */
+export function lastMoveIndex(lastMove: string | undefined, activeMoves: string[], gen: number) {
+  if (!lastMove) return -1;
+  const id = engineMove(lastMove, gen);
+  const exact = activeMoves.indexOf(id);
+  if (exact >= 0 || id !== 'HIDDENPOWER') return exact;
+  return activeMoves.findIndex((m) => m.startsWith('HIDDENPOWER'));
+}
+
 function serializeSide(s: SideInput): string {
   const mons = [...s.mons];
   while (mons.length < 6) mons.push(EMPTY_MON);
   const a = s.active;
-  const volatiles = Object.keys(a?.volatiles ?? {}).filter((v) => VOLATILES.has(v));
+  const last = lastMoveIndex(a?.lastMove, s.activeMoves, s.gen);
+  // The engine panics on Encore without a last move to repeat, so it's left out then.
+  const volatiles = Object.keys(a?.volatiles ?? {}).filter(
+    (v) => VOLATILES.has(v) && (v !== 'encore' || last >= 0),
+  );
   const boosts = BOOSTS.map((b) => a?.boosts[b] ?? 0);
-  const last = a?.lastMove ? s.activeMoves.indexOf(engineMove(a.lastMove, s.gen)) : -1;
   return [
     ...mons.slice(0, 6),
     s.activeIndex,

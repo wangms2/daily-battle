@@ -5,6 +5,7 @@ import { deriveSeed, makeRng, randomTeam, runBattle, type Policy } from '@daily-
 import { describe, expect, it } from 'vitest';
 import { strongBot } from '../bots';
 import { engineId, engineMove } from './names';
+import { lastMoveIndex } from './translate';
 import { HardPolicy } from './policy';
 
 const FORMATS = ['gen3ou', 'gen4ou', 'gen5ou', 'gen6ou'].filter((f) => engineBuilt(Number(f[3])));
@@ -15,6 +16,25 @@ describe('engineMove', () => {
     expect(engineMove('Return 102', 3)).toBe('RETURN');
     expect(engineMove('hiddenpowerrock70', 3)).toBe('HIDDENPOWERROCK70');
     expect(engineMove('Hidden Power Ice', 6)).toBe('HIDDENPOWERICE60');
+  });
+});
+
+describe('lastMoveIndex', () => {
+  // The log says "Hidden Power"; the engine's move is typed. Without a match, an Encored
+  // Pokémon has no last move and the engine panics (seen on Gen 3 Tyranitar, HP Bug).
+  const moves = ['ROCKSLIDE', 'EARTHQUAKE', 'HIDDENPOWERBUG70', 'FOCUSPUNCH'];
+
+  it('finds a move by name, and Hidden Power by its typed move', () => {
+    expect(lastMoveIndex('earthquake', moves, 3)).toBe(1);
+    expect(lastMoveIndex('hiddenpower', moves, 3)).toBe(2);
+    expect(lastMoveIndex('Hidden Power', moves, 3)).toBe(2);
+    expect(lastMoveIndex('hiddenpowerbug70', moves, 3)).toBe(2);
+  });
+
+  it('is -1 for no move, or one the Pokémon doesn’t have', () => {
+    expect(lastMoveIndex(undefined, moves, 3)).toBe(-1);
+    expect(lastMoveIndex('surf', moves, 3)).toBe(-1);
+    expect(lastMoveIndex('hiddenpower', ['SURF', 'ICEBEAM'], 3)).toBe(-1);
   });
 });
 
