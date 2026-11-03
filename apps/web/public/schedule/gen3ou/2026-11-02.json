@@ -1,51 +1,55 @@
 {
   "version": 1,
-  "generatorVersion": 4,
-  "dataBuiltAt": "2026-10-24T16:51:53.962Z",
+  "generatorVersion": 6,
+  "dataBuiltAt": "2026-11-02T19:56:19.638Z",
   "week": "2026-11-02",
   "pool": {
     "species": [
-      "Blissey",
-      "Magneton",
+      "Metagross",
+      "Dragonite",
       "Skarmory",
-      "Tyranitar",
-      "Claydol",
-      "Regice",
-      "Jolteon",
-      "Charizard",
-      "Flygon",
-      "Sceptile",
-      "Hariyama",
-      "Dragonite"
+      "Blissey",
+      "Gyarados",
+      "Cloyster",
+      "Swampert",
+      "Heracross",
+      "Raikou",
+      "Slowbro",
+      "Jynx",
+      "Alakazam"
     ],
-    "candidate": 0
+    "candidate": 0,
+    "cores": [
+      "metagross-dragonite",
+      "skarmory-blissey"
+    ]
   },
   "suggestedTeams": [
     {
       "team": [
         {
-          "species": "Skarmory",
-          "setId": "skarmory-standard"
+          "species": "Cloyster",
+          "setId": "cloyster-spiker"
         },
         {
-          "species": "Jolteon",
-          "setId": "jolteon-standard"
+          "species": "Metagross",
+          "setId": "metagross-choice-band"
+        },
+        {
+          "species": "Gyarados",
+          "setId": "gyarados-standard"
         },
         {
           "species": "Blissey",
           "setId": "blissey-calm-mind"
         },
         {
-          "species": "Claydol",
-          "setId": "claydol-utility"
+          "species": "Swampert",
+          "setId": "swampert-standard-defensive"
         },
         {
-          "species": "Tyranitar",
-          "setId": "tyranitar-bulky-dragon-dance"
-        },
-        {
-          "species": "Flygon",
-          "setId": "flygon-offensive"
+          "species": "Raikou",
+          "setId": "raikou-calm-mind-sweeper"
         }
       ]
     }
@@ -53,147 +57,108 @@
   "days": [
     {
       "day": "2026-11-02",
-      "style": "offense",
+      "style": "balance",
       "team": [
         {
-          "species": "Starmie",
-          "setId": "starmie-defensive"
+          "species": "Lapras",
+          "setId": "lapras-offensive-utility"
         },
         {
-          "species": "Magneton",
-          "setId": "magneton-trapper"
+          "species": "Porygon2",
+          "setId": "porygon2-standard"
+        },
+        {
+          "species": "Heracross",
+          "setId": "heracross-standard"
+        },
+        {
+          "species": "Jolteon",
+          "setId": "jolteon-standard"
+        },
+        {
+          "species": "Breloom",
+          "setId": "breloom-swords-dance"
+        },
+        {
+          "species": "Zapdos",
+          "setId": "zapdos-rest"
+        }
+      ],
+      "candidate": 10
+    },
+    {
+      "day": "2026-11-03",
+      "style": "stall",
+      "team": [
+        {
+          "species": "Porygon2",
+          "setId": "porygon2-standard"
+        },
+        {
+          "species": "Forretress",
+          "setId": "forretress-standard"
+        },
+        {
+          "species": "Donphan",
+          "setId": "donphan-tank"
         },
         {
           "species": "Salamence",
           "setId": "salamence-dragon-dance"
         },
         {
-          "species": "Celebi",
-          "setId": "celebi-utility"
-        },
-        {
-          "species": "Gyarados",
-          "setId": "gyarados-standard"
-        },
-        {
-          "species": "Tyranitar",
-          "setId": "tyranitar-bulky-physical-attacker"
-        }
-      ],
-      "candidate": 1
-    },
-    {
-      "day": "2026-11-03",
-      "style": "balance",
-      "team": [
-        {
-          "species": "Cloyster",
-          "setId": "cloyster-spiker"
-        },
-        {
           "species": "Aerodactyl",
-          "setId": "aerodactyl-taunt-lead"
+          "setId": "aerodactyl-choice-band"
         },
         {
-          "species": "Flygon",
-          "setId": "flygon-defensive"
-        },
-        {
-          "species": "Ursaring",
-          "setId": "ursaring-swords-dance"
-        },
-        {
-          "species": "Quagsire",
-          "setId": "quagsire-curse"
-        },
-        {
-          "species": "Blastoise",
-          "setId": "blastoise-standard"
+          "species": "Entei",
+          "setId": "entei-sunnybeam"
         }
       ],
-      "candidate": 0
+      "candidate": 5
     },
     {
       "day": "2026-11-04",
       "style": "balance",
       "team": [
         {
-          "species": "Metagross",
-          "setId": "metagross-agility"
+          "species": "Jirachi",
+          "setId": "jirachi-substitute-calm-mind"
+        },
+        {
+          "species": "Regice",
+          "setId": "regice-offensive"
+        },
+        {
+          "species": "Regirock",
+          "setId": "regirock-physical-attacker"
+        },
+        {
+          "species": "Claydol",
+          "setId": "claydol-utility"
         },
         {
           "species": "Salamence",
           "setId": "salamence-dragon-dance"
         },
         {
-          "species": "Tyranitar",
-          "setId": "tyranitar-bulky-dragon-dance"
-        },
-        {
-          "species": "Zapdos",
-          "setId": "zapdos-rest"
-        },
-        {
-          "species": "Sceptile",
-          "setId": "sceptile-subseed"
-        },
-        {
-          "species": "Raikou",
-          "setId": "raikou-calm-mind-sweeper"
+          "species": "Forretress",
+          "setId": "forretress-standard"
         }
       ],
-      "candidate": 4
+      "candidate": 5
     },
     {
       "day": "2026-11-05",
       "style": "balance",
       "team": [
         {
-          "species": "Vaporeon",
-          "setId": "vaporeon-wall"
+          "species": "Exeggutor",
+          "setId": "exeggutor-sunnybeam"
         },
         {
-          "species": "Forretress",
-          "setId": "forretress-standard"
-        },
-        {
-          "species": "Blissey",
-          "setId": "blissey-utility"
-        },
-        {
-          "species": "Zapdos",
-          "setId": "zapdos-standard-offensive"
-        },
-        {
-          "species": "Moltres",
-          "setId": "moltres-standard"
-        },
-        {
-          "species": "Houndoom",
-          "setId": "houndoom-pursuit"
-        }
-      ],
-      "candidate": 9
-    },
-    {
-      "day": "2026-11-06",
-      "style": "balance",
-      "team": [
-        {
-          "species": "Salamence",
-          "setId": "salamence-dragon-dance"
-        },
-        {
-          "species": "Metagross",
-          "setId": "metagross-agility"
-        },
-        {
-          "species": "Moltres",
-          "setId": "moltres-standard"
-        },
-        {
-          "species": "Forretress",
-          "setId": "forretress-standard"
+          "species": "Gyarados",
+          "setId": "gyarados-rest"
         },
         {
           "species": "Dugtrio",
@@ -202,71 +167,110 @@
         {
           "species": "Claydol",
           "setId": "claydol-utility"
-        }
-      ],
-      "candidate": 0
-    },
-    {
-      "day": "2026-11-07",
-      "style": "balance",
-      "team": [
-        {
-          "species": "Starmie",
-          "setId": "starmie-defensive"
-        },
-        {
-          "species": "Tyranitar",
-          "setId": "tyranitar-bulky-physical-attacker"
         },
         {
           "species": "Metagross",
           "setId": "metagross-bulky-attacker"
         },
         {
-          "species": "Dusclops",
-          "setId": "dusclops-staller"
-        },
-        {
-          "species": "Forretress",
-          "setId": "forretress-standard"
-        },
-        {
-          "species": "Celebi",
-          "setId": "celebi-leech-seed-3-attacks"
+          "species": "Swampert",
+          "setId": "swampert-standard-defensive"
         }
       ],
-      "candidate": 2
+      "candidate": 0
     },
     {
-      "day": "2026-11-08",
+      "day": "2026-11-06",
       "style": "offense",
       "team": [
         {
-          "species": "Armaldo",
-          "setId": "armaldo-rapid-spin"
+          "species": "Claydol",
+          "setId": "claydol-utility"
+        },
+        {
+          "species": "Raikou",
+          "setId": "raikou-calm-mind-sweeper"
+        },
+        {
+          "species": "Suicune",
+          "setId": "suicune-offensive"
+        },
+        {
+          "species": "Medicham",
+          "setId": "medicham-bulk-up"
+        },
+        {
+          "species": "Cloyster",
+          "setId": "cloyster-spiker"
+        },
+        {
+          "species": "Hariyama",
+          "setId": "hariyama-offensive"
+        }
+      ],
+      "candidate": 8
+    },
+    {
+      "day": "2026-11-07",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Charizard",
+          "setId": "charizard-mixed-attacker"
+        },
+        {
+          "species": "Donphan",
+          "setId": "donphan-tank"
+        },
+        {
+          "species": "Metagross",
+          "setId": "metagross-agility"
+        },
+        {
+          "species": "Swampert",
+          "setId": "swampert-standard-defensive"
         },
         {
           "species": "Salamence",
           "setId": "salamence-dragon-dance"
         },
         {
-          "species": "Gengar",
-          "setId": "gengar-defensive"
-        },
-        {
-          "species": "Zapdos",
-          "setId": "zapdos-mixed"
-        },
-        {
-          "species": "Snorlax",
-          "setId": "snorlax-utility-lax"
-        },
-        {
-          "species": "Raikou",
-          "setId": "raikou-calm-mind-sweeper"
+          "species": "Gyarados",
+          "setId": "gyarados-standard"
         }
       ],
-      "candidate": 5
+      "candidate": 8
+    },
+    {
+      "day": "2026-11-08",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Zapdos",
+          "setId": "zapdos-rest"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-bulky-dragon-dance"
+        },
+        {
+          "species": "Celebi",
+          "setId": "celebi-defensive-calm-mind"
+        },
+        {
+          "species": "Cloyster",
+          "setId": "cloyster-spiker"
+        },
+        {
+          "species": "Forretress",
+          "setId": "forretress-standard"
+        },
+        {
+          "species": "Blissey",
+          "setId": "blissey-calm-mind"
+        }
+      ],
+      "candidate": 2
     }
   ]
 }

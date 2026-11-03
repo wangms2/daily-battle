@@ -1,13 +1,13 @@
 {
   "week": "2026-11-23",
-  "generatorVersion": 4,
-  "builtAt": "2026-10-24T14:13:48.138Z",
-  "seconds": 822,
+  "generatorVersion": 6,
+  "builtAt": "2026-11-03T04:34:51.251Z",
+  "seconds": 586,
   "pool": {
     "stats": {
       "teams": 60,
-      "viableShare": 0.6833333333333333,
-      "bestWinRate": 0.575,
+      "viableShare": 0.6,
+      "bestWinRate": 0.8,
       "medianWinRate": 0.4375
     },
     "problems": [],
@@ -15,31 +15,31 @@
       {
         "team": [
           {
-            "species": "Gliscor",
-            "setId": "gliscor-swords-dance-wallbreaker"
-          },
-          {
-            "species": "Charizard",
-            "setId": "charizard-dragon-dance"
-          },
-          {
-            "species": "Magnezone",
-            "setId": "magnezone-choice-scarf"
-          },
-          {
             "species": "Keldeo",
             "setId": "keldeo-choice-specs"
           },
           {
-            "species": "Mamoswine",
-            "setId": "mamoswine-life-orb-attacker"
+            "species": "Gastrodon",
+            "setId": "gastrodon-curse"
           },
           {
-            "species": "Diggersby",
-            "setId": "diggersby-choice-band"
+            "species": "Scizor",
+            "setId": "scizor-choice-band"
+          },
+          {
+            "species": "Landorus-Therian",
+            "setId": "landorustherian-defensive"
+          },
+          {
+            "species": "Weavile",
+            "setId": "weavile-choice-band"
+          },
+          {
+            "species": "Pinsir",
+            "setId": "pinsir-swords-dance"
           }
         ],
-        "winRate": 0.671875,
+        "winRate": 0.7135416666666666,
         "battles": 192,
         "rules": "all"
       }
@@ -48,23 +48,842 @@
     "accepted": "pass",
     "rejected": [],
     "species": [
-      "Charizard",
       "Keldeo",
-      "Mew",
-      "Lopunny",
+      "Scizor",
+      "Talonflame",
+      "Gastrodon",
       "Weavile",
-      "Azelf",
-      "Magnezone",
-      "Gliscor",
-      "Heatran",
-      "Diggersby",
-      "Mamoswine",
-      "Kingdra"
+      "Pinsir",
+      "Gengar",
+      "Lopunny",
+      "Landorus-Therian",
+      "Hippowdon",
+      "Shuckle",
+      "Porygon-Z"
     ]
   },
   "days": [
     {
-      "candidate": 1,
+      "candidate": 0,
+      "accepted": "pass",
+      "check": {
+        "metrics": {
+          "turnCapRate": 0,
+          "hardCounters": [],
+          "uninformed": {
+            "wins": 201,
+            "losses": 199,
+            "ties": 0,
+            "n": 400,
+            "rate": 0.5025,
+            "ci": [
+              0.4535006125038281,
+              0.5514993874961718
+            ]
+          },
+          "luck": {
+            "playerCrits": 0.96,
+            "opponentCrits": 0.7925,
+            "playerMisses": 0.2575,
+            "opponentMisses": 0.2075
+          },
+          "informed": {
+            "wins": 196,
+            "losses": 204,
+            "ties": 0,
+            "n": 400,
+            "rate": 0.49,
+            "ci": [
+              0.44100980098019604,
+              0.5389901990198039
+            ]
+          },
+          "naive": {
+            "wins": 53,
+            "losses": 147,
+            "ties": 0,
+            "n": 200,
+            "rate": 0.265,
+            "ci": [
+              0.20383433806456439,
+              0.32616566193543567
+            ]
+          },
+          "strong": {
+            "wins": 100,
+            "losses": 100,
+            "ties": 0,
+            "n": 200,
+            "rate": 0.5,
+            "ci": [
+              0.4307035354437183,
+              0.5692964645562817
+            ]
+          }
+        },
+        "problems": [],
+        "distance": 0
+      },
+      "rejected": [],
+      "day": "2026-11-23",
+      "style": "balance"
+    },
+    {
+      "candidate": 7,
+      "accepted": "pass",
+      "check": {
+        "metrics": {
+          "turnCapRate": 0,
+          "hardCounters": [],
+          "uninformed": {
+            "wins": 198,
+            "losses": 202,
+            "ties": 0,
+            "n": 400,
+            "rate": 0.495,
+            "ci": [
+              0.44600245006125305,
+              0.5439975499387469
+            ]
+          },
+          "luck": {
+            "playerCrits": 0.865,
+            "opponentCrits": 0.8075,
+            "playerMisses": 0.31,
+            "opponentMisses": 0.3675
+          },
+          "informed": {
+            "wins": 216,
+            "losses": 184,
+            "ties": 0,
+            "n": 400,
+            "rate": 0.54,
+            "ci": [
+              0.49115705168604173,
+              0.5888429483139583
+            ]
+          },
+          "naive": {
+            "wins": 80,
+            "losses": 120,
+            "ties": 0,
+            "n": 200,
+            "rate": 0.4,
+            "ci": [
+              0.33210360834330005,
+              0.4678963916567
+            ]
+          },
+          "strong": {
+            "wins": 108,
+            "losses": 92,
+            "ties": 0,
+            "n": 200,
+            "rate": 0.54,
+            "ci": [
+              0.4709256400681121,
+              0.609074359931888
+            ]
+          }
+        },
+        "problems": [],
+        "distance": 0
+      },
+      "rejected": [
+        {
+          "candidate": 0,
+          "check": {
+            "metrics": {
+              "turnCapRate": 0,
+              "hardCounters": [],
+              "uninformed": {
+                "wins": 255,
+                "losses": 145,
+                "ties": 0,
+                "n": 400,
+                "rate": 0.6375,
+                "ci": [
+                  0.5903892329185779,
+                  0.684610767081422
+                ]
+              },
+              "luck": {
+                "playerCrits": 0.925,
+                "opponentCrits": 0.55,
+                "playerMisses": 0.3575,
+                "opponentMisses": 0.5825
+              }
+            },
+            "problems": [
+              "too easy on a first try: 63.7% (want 45.0%–55.0%)"
+            ],
+            "distance": 0.08749999999999991
+          }
+        },
+        {
+          "candidate": 1,
+          "check": {
+            "metrics": {
+              "turnCapRate": 0,
+              "hardCounters": [],
+              "uninformed": {
+                "wins": 166,
+                "losses": 234,
+                "ties": 0,
+                "n": 400,
+                "rate": 0.415,
+                "ci": [
+                  0.3667132409453689,
+                  0.46328675905463107
+                ]
+              },
+              "luck": {
+                "playerCrits": 1.2175,
+                "opponentCrits": 0.905,
+                "playerMisses": 0.2325,
+                "opponentMisses": 0.8475
+              }
+            },
+            "problems": [
+              "too hard on a first try: 41.5% (want 45.0%–55.0%)"
+            ],
+            "distance": 0.03500000000000003
+          }
+        },
+        {
+          "candidate": 2,
+          "check": {
+            "metrics": {
+              "turnCapRate": 0,
+              "hardCounters": [],
+              "uninformed": {
+                "wins": 124,
+                "losses": 276,
+                "ties": 0,
+                "n": 400,
+                "rate": 0.31,
+                "ci": [
+                  0.26467566216699906,
+                  0.35532433783300094
+                ]
+              },
+              "luck": {
+                "playerCrits": 1.1575,
+                "opponentCrits": 0.8025,
+                "playerMisses": 0.2,
+                "opponentMisses": 0.0525
+              }
+            },
+            "problems": [
+              "too hard on a first try: 31.0% (want 45.0%–55.0%)"
+            ],
+            "distance": 0.14
+          }
+        },
+        {
+          "candidate": 3,
+          "check": {
+            "metrics": {
+              "turnCapRate": 0,
+              "hardCounters": [],
+              "uninformed": {
+                "wins": 166,
+                "losses": 234,
+                "ties": 0,
+                "n": 400,
+                "rate": 0.415,
+                "ci": [
+                  0.3667132409453689,
+                  0.46328675905463107
+                ]
+              },
+              "luck": {
+                "playerCrits": 0.845,
+                "opponentCrits": 0.825,
+                "playerMisses": 0.32,
+                "opponentMisses": 0.3225
+              }
+            },
+            "problems": [
+              "too hard on a first try: 41.5% (want 45.0%–55.0%)"
+            ],
+            "distance": 0.03500000000000003
+          }
+        },
+        {
+          "candidate": 4,
+          "check": {
+            "metrics": {
+              "turnCapRate": 0,
+              "hardCounters": [],
+              "uninformed": {
+                "wins": 174,
+                "losses": 226,
+                "ties": 0,
+                "n": 400,
+                "rate": 0.435,
+                "ci": [
+                  0.38641581430135935,
+                  0.48358418569864065
+                ]
+              },
+              "luck": {
+                "playerCrits": 0.8275,
+                "opponentCrits": 0.7775,
+                "playerMisses": 0.415,
+                "opponentMisses": 0.6525
+              }
+            },
+            "problems": [
+              "too hard on a first try: 43.5% (want 45.0%–55.0%)"
+            ],
+            "distance": 0.015000000000000013
+          }
+        },
+        {
+          "candidate": 5,
+          "check": {
+            "metrics": {
+              "turnCapRate": 0,
+              "hardCounters": [],
+              "uninformed": {
+                "wins": 69,
+                "losses": 31,
+                "ties": 0,
+                "n": 100,
+                "rate": 0.69,
+                "ci": [
+                  0.5993513243339981,
+                  0.7806486756660018
+                ]
+              },
+              "luck": {
+                "playerCrits": 1.04,
+                "opponentCrits": 0.94,
+                "playerMisses": 0.39,
+                "opponentMisses": 0.77
+              }
+            },
+            "problems": [
+              "too easy on a first try: 69.0% (want 45.0%–55.0%)"
+            ],
+            "distance": 0.1399999999999999
+          }
+        },
+        {
+          "candidate": 6,
+          "check": {
+            "metrics": {
+              "turnCapRate": 0,
+              "hardCounters": [],
+              "uninformed": {
+                "wins": 152,
+                "losses": 248,
+                "ties": 0,
+                "n": 400,
+                "rate": 0.38,
+                "ci": [
+                  0.33243212848991455,
+                  0.42756787151008546
+                ]
+              },
+              "luck": {
+                "playerCrits": 0.66,
+                "opponentCrits": 0.78,
+                "playerMisses": 0.2625,
+                "opponentMisses": 0.4975
+              }
+            },
+            "problems": [
+              "too hard on a first try: 38.0% (want 45.0%–55.0%)"
+            ],
+            "distance": 0.07
+          }
+        }
+      ],
+      "day": "2026-11-24",
+      "style": "balance"
+    },
+    {
+      "candidate": 13,
+      "accepted": "pass",
+      "check": {
+        "metrics": {
+          "turnCapRate": 0,
+          "hardCounters": [],
+          "uninformed": {
+            "wins": 188,
+            "losses": 212,
+            "ties": 0,
+            "n": 400,
+            "rate": 0.47,
+            "ci": [
+              0.42108827952320627,
+              0.5189117204767937
+            ]
+          },
+          "luck": {
+            "playerCrits": 0.8675,
+            "opponentCrits": 0.8575,
+            "playerMisses": 0.26,
+            "opponentMisses": 0.3525
+          },
+          "informed": {
+            "wins": 189,
+            "losses": 211,
+            "ties": 0,
+            "n": 400,
+            "rate": 0.4725,
+            "ci": [
+              0.4235741686325107,
+              0.5214258313674893
+            ]
+          },
+          "naive": {
+            "wins": 66,
+            "losses": 134,
+            "ties": 0,
+            "n": 200,
+            "rate": 0.33,
+            "ci": [
+              0.2648318421312985,
+              0.3951681578687015
+            ]
+          },
+          "strong": {
+            "wins": 96,
+            "losses": 104,
+            "ties": 0,
+            "n": 200,
+            "rate": 0.48,
+            "ci": [
+              0.41075899480798966,
+              0.5492410051920102
+            ]
+          }
+        },
+        "problems": [],
+        "distance": 0
+      },
+      "rejected": [
+        {
+          "candidate": 0,
+          "check": {
+            "metrics": {
+              "turnCapRate": 0,
+              "hardCounters": [],
+              "uninformed": {
+                "wins": 23,
+                "losses": 77,
+                "ties": 0,
+                "n": 100,
+                "rate": 0.23,
+                "ci": [
+                  0.14751682838299685,
+                  0.3124831716170032
+                ]
+              },
+              "luck": {
+                "playerCrits": 0.94,
+                "opponentCrits": 0.84,
+                "playerMisses": 0.39,
+                "opponentMisses": 1.76
+              }
+            },
+            "problems": [
+              "too hard on a first try: 23.0% (want 45.0%–55.0%)"
+            ],
+            "distance": 0.22
+          }
+        },
+        {
+          "candidate": 1,
+          "check": {
+            "metrics": {
+              "turnCapRate": 0,
+              "hardCounters": [],
+              "uninformed": {
+                "wins": 148,
+                "losses": 252,
+                "ties": 0,
+                "n": 400,
+                "rate": 0.37,
+                "ci": [
+                  0.3226851777980726,
+                  0.4173148222019274
+                ]
+              },
+              "luck": {
+                "playerCrits": 0.8875,
+                "opponentCrits": 0.685,
+                "playerMisses": 0.32,
+                "opponentMisses": 0.945
+              }
+            },
+            "problems": [
+              "too hard on a first try: 37.0% (want 45.0%–55.0%)"
+            ],
+            "distance": 0.08000000000000002
+          }
+        },
+        {
+          "candidate": 2,
+          "check": {
+            "metrics": {
+              "turnCapRate": 0,
+              "hardCounters": [],
+              "uninformed": {
+                "wins": 168,
+                "losses": 232,
+                "ties": 0,
+                "n": 400,
+                "rate": 0.42,
+                "ci": [
+                  0.37163126629732796,
+                  0.468368733702672
+                ]
+              },
+              "luck": {
+                "playerCrits": 0.7175,
+                "opponentCrits": 0.755,
+                "playerMisses": 0.285,
+                "opponentMisses": 0.59
+              }
+            },
+            "problems": [
+              "too hard on a first try: 42.0% (want 45.0%–55.0%)"
+            ],
+            "distance": 0.030000000000000027
+          }
+        },
+        {
+          "candidate": 3,
+          "check": {
+            "metrics": {
+              "turnCapRate": 0,
+              "hardCounters": [],
+              "uninformed": {
+                "wins": 155,
+                "losses": 245,
+                "ties": 0,
+                "n": 400,
+                "rate": 0.3875,
+                "ci": [
+                  0.33975642058873257,
+                  0.43524357941126746
+                ]
+              },
+              "luck": {
+                "playerCrits": 1.12,
+                "opponentCrits": 0.975,
+                "playerMisses": 0.4025,
+                "opponentMisses": 0.695
+              }
+            },
+            "problems": [
+              "too hard on a first try: 38.8% (want 45.0%–55.0%)"
+            ],
+            "distance": 0.0625
+          }
+        },
+        {
+          "candidate": 4,
+          "check": {
+            "metrics": {
+              "turnCapRate": 0,
+              "hardCounters": [],
+              "uninformed": {
+                "wins": 209,
+                "losses": 191,
+                "ties": 0,
+                "n": 400,
+                "rate": 0.5225,
+                "ci": [
+                  0.4735496376417906,
+                  0.5714503623582093
+                ]
+              },
+              "luck": {
+                "playerCrits": 0.8475,
+                "opponentCrits": 0.735,
+                "playerMisses": 0.275,
+                "opponentMisses": 0.1725
+              },
+              "informed": {
+                "wins": 238,
+                "losses": 162,
+                "ties": 0,
+                "n": 400,
+                "rate": 0.595,
+                "ci": [
+                  0.5468925795744565,
+                  0.6431074204255435
+                ]
+              }
+            },
+            "problems": [
+              "too easy on retries: 59.5% (want 35.0%–55.0%)"
+            ],
+            "distance": 0.04499999999999993
+          }
+        },
+        {
+          "candidate": 5,
+          "check": {
+            "metrics": {
+              "turnCapRate": 0,
+              "hardCounters": [],
+              "uninformed": {
+                "wins": 163,
+                "losses": 237,
+                "ties": 0,
+                "n": 400,
+                "rate": 0.4075,
+                "ci": [
+                  0.3593458124873859,
+                  0.45565418751261405
+                ]
+              },
+              "luck": {
+                "playerCrits": 0.86,
+                "opponentCrits": 0.69,
+                "playerMisses": 0.3475,
+                "opponentMisses": 0.535
+              }
+            },
+            "problems": [
+              "too hard on a first try: 40.8% (want 45.0%–55.0%)"
+            ],
+            "distance": 0.04250000000000004
+          }
+        },
+        {
+          "candidate": 6,
+          "check": {
+            "metrics": {
+              "turnCapRate": 0,
+              "hardCounters": [],
+              "uninformed": {
+                "wins": 250,
+                "losses": 150,
+                "ties": 0,
+                "n": 400,
+                "rate": 0.625,
+                "ci": [
+                  0.5775559540089591,
+                  0.6724440459910409
+                ]
+              },
+              "luck": {
+                "playerCrits": 0.595,
+                "opponentCrits": 0.575,
+                "playerMisses": 0.3,
+                "opponentMisses": 0.38
+              }
+            },
+            "problems": [
+              "too easy on a first try: 62.5% (want 45.0%–55.0%)"
+            ],
+            "distance": 0.07499999999999996
+          }
+        },
+        {
+          "candidate": 7,
+          "check": {
+            "metrics": {
+              "turnCapRate": 0,
+              "hardCounters": [],
+              "uninformed": {
+                "wins": 238,
+                "losses": 162,
+                "ties": 0,
+                "n": 400,
+                "rate": 0.595,
+                "ci": [
+                  0.5468925795744565,
+                  0.6431074204255435
+                ]
+              },
+              "luck": {
+                "playerCrits": 0.93,
+                "opponentCrits": 0.5775,
+                "playerMisses": 0.4925,
+                "opponentMisses": 0.23
+              }
+            },
+            "problems": [
+              "too easy on a first try: 59.5% (want 45.0%–55.0%)"
+            ],
+            "distance": 0.04499999999999993
+          }
+        },
+        {
+          "candidate": 8,
+          "check": {
+            "metrics": {
+              "turnCapRate": 0,
+              "hardCounters": [],
+              "uninformed": {
+                "wins": 220,
+                "losses": 180,
+                "ties": 0,
+                "n": 400,
+                "rate": 0.55,
+                "ci": [
+                  0.5012456155817757,
+                  0.5987543844182244
+                ]
+              },
+              "luck": {
+                "playerCrits": 0.785,
+                "opponentCrits": 0.7025,
+                "playerMisses": 0.3025,
+                "opponentMisses": 0.615
+              },
+              "informed": {
+                "wins": 250,
+                "losses": 150,
+                "ties": 0,
+                "n": 400,
+                "rate": 0.625,
+                "ci": [
+                  0.5775559540089591,
+                  0.6724440459910409
+                ]
+              }
+            },
+            "problems": [
+              "too easy on retries: 62.5% (want 35.0%–55.0%)"
+            ],
+            "distance": 0.07499999999999996
+          }
+        },
+        {
+          "candidate": 9,
+          "check": {
+            "metrics": {
+              "turnCapRate": 0,
+              "hardCounters": [],
+              "uninformed": {
+                "wins": 248,
+                "losses": 152,
+                "ties": 0,
+                "n": 400,
+                "rate": 0.62,
+                "ci": [
+                  0.5724321284899145,
+                  0.6675678715100855
+                ]
+              },
+              "luck": {
+                "playerCrits": 1.0725,
+                "opponentCrits": 0.7775,
+                "playerMisses": 0.4125,
+                "opponentMisses": 0.8025
+              }
+            },
+            "problems": [
+              "too easy on a first try: 62.0% (want 45.0%–55.0%)"
+            ],
+            "distance": 0.06999999999999995
+          }
+        },
+        {
+          "candidate": 10,
+          "check": {
+            "metrics": {
+              "turnCapRate": 0,
+              "hardCounters": [],
+              "uninformed": {
+                "wins": 254,
+                "losses": 146,
+                "ties": 0,
+                "n": 400,
+                "rate": 0.635,
+                "ci": [
+                  0.5878198442139071,
+                  0.6821801557860929
+                ]
+              },
+              "luck": {
+                "playerCrits": 0.6575,
+                "opponentCrits": 0.5675,
+                "playerMisses": 0.215,
+                "opponentMisses": 0.375
+              }
+            },
+            "problems": [
+              "too easy on a first try: 63.5% (want 45.0%–55.0%)"
+            ],
+            "distance": 0.08499999999999996
+          }
+        },
+        {
+          "candidate": 11,
+          "check": {
+            "metrics": {
+              "turnCapRate": 0,
+              "hardCounters": [],
+              "uninformed": {
+                "wins": 225,
+                "losses": 175,
+                "ties": 0,
+                "n": 400,
+                "rate": 0.5625,
+                "ci": [
+                  0.5138843196591881,
+                  0.6111156803408119
+                ]
+              },
+              "luck": {
+                "playerCrits": 1.0675,
+                "opponentCrits": 0.9325,
+                "playerMisses": 0.315,
+                "opponentMisses": 0.2475
+              }
+            },
+            "problems": [
+              "too easy on a first try: 56.3% (want 45.0%–55.0%)"
+            ],
+            "distance": 0.012499999999999956
+          }
+        },
+        {
+          "candidate": 12,
+          "check": {
+            "metrics": {
+              "turnCapRate": 0,
+              "hardCounters": [],
+              "uninformed": {
+                "wins": 25,
+                "losses": 75,
+                "ties": 0,
+                "n": 100,
+                "rate": 0.25,
+                "ci": [
+                  0.16512951042912502,
+                  0.33487048957087495
+                ]
+              },
+              "luck": {
+                "playerCrits": 0.84,
+                "opponentCrits": 1.1,
+                "playerMisses": 0.21,
+                "opponentMisses": 0.49
+              }
+            },
+            "problems": [
+              "too hard on a first try: 25.0% (want 45.0%–55.0%)"
+            ],
+            "distance": 0.2
+          }
+        }
+      ],
+      "day": "2026-11-25",
+      "style": "balance"
+    },
+    {
+      "candidate": 0,
       "accepted": "pass",
       "check": {
         "metrics": {
@@ -82,138 +901,107 @@
             ]
           },
           "luck": {
-            "playerCrits": 0.605,
-            "opponentCrits": 0.61,
-            "playerMisses": 0.305,
-            "opponentMisses": 0.3675
+            "playerCrits": 0.65,
+            "opponentCrits": 0.785,
+            "playerMisses": 0.23,
+            "opponentMisses": 0.4875
           },
           "informed": {
-            "wins": 180,
-            "losses": 220,
+            "wins": 191,
+            "losses": 209,
             "ties": 0,
             "n": 400,
-            "rate": 0.45,
+            "rate": 0.4775,
             "ci": [
-              0.4012456155817756,
-              0.4987543844182244
+              0.4285496376417906,
+              0.5264503623582093
             ]
           },
           "naive": {
-            "wins": 44,
-            "losses": 156,
+            "wins": 49,
+            "losses": 151,
             "ties": 0,
             "n": 200,
-            "rate": 0.22,
+            "rate": 0.245,
             "ci": [
-              0.1625883914177629,
-              0.2774116085822371
+              0.1853929551143491,
+              0.3046070448856509
             ]
           },
           "strong": {
-            "wins": 102,
-            "losses": 98,
+            "wins": 103,
+            "losses": 97,
             "ties": 0,
             "n": 200,
-            "rate": 0.51,
+            "rate": 0.515,
             "ci": [
-              0.44071739612283617,
-              0.5792826038771639
+              0.4457347258721948,
+              0.5842652741278052
             ]
           }
         },
         "problems": [],
         "distance": 0
       },
-      "rejected": [
-        {
-          "candidate": 0,
-          "check": {
-            "metrics": {
-              "turnCapRate": 0,
-              "hardCounters": [],
-              "uninformed": {
-                "wins": 167,
-                "losses": 233,
-                "ties": 0,
-                "n": 400,
-                "rate": 0.4175,
-                "ci": [
-                  0.3691716152245908,
-                  0.46582838477540917
-                ]
-              },
-              "luck": {
-                "playerCrits": 0.67,
-                "opponentCrits": 0.6275,
-                "playerMisses": 0.325,
-                "opponentMisses": 0.45
-              }
-            },
-            "problems": [
-              "too hard on a first try: 41.8% (want 45.0%–55.0%)"
-            ],
-            "distance": 0.03250000000000003
-          }
-        }
-      ],
-      "day": "2026-11-23",
-      "style": "balance"
+      "rejected": [],
+      "day": "2026-11-26",
+      "style": "offense"
     },
     {
-      "candidate": 4,
+      "candidate": 1,
       "accepted": "pass",
       "check": {
         "metrics": {
           "turnCapRate": 0,
           "hardCounters": [],
           "uninformed": {
-            "wins": 214,
-            "losses": 186,
+            "wins": 204,
+            "losses": 196,
             "ties": 0,
             "n": 400,
-            "rate": 0.535,
+            "rate": 0.51,
             "ci": [
-              0.48612019742265733,
-              0.5838798025773427
+              0.46100980098019606,
+              0.558990199019804
             ]
           },
           "luck": {
-            "playerCrits": 0.5675,
-            "opponentCrits": 0.6375,
-            "playerMisses": 0.4275,
-            "opponentMisses": 1.1275
+            "playerCrits": 0.8975,
+            "opponentCrits": 0.88,
+            "playerMisses": 0.455,
+            "opponentMisses": 0.4525
           },
           "informed": {
-            "wins": 194,
-            "losses": 206,
+            "wins": 187,
+            "losses": 213,
             "ties": 0,
             "n": 400,
-            "rate": 0.485,
+            "rate": 0.4675,
             "ci": [
-              0.4360220549634838,
-              0.5339779450365162
+              0.41860362206666024,
+              0.5163963779333398
             ]
           },
           "naive": {
-            "wins": 76,
-            "losses": 124,
+            "wins": 61,
+            "losses": 139,
             "ties": 0,
             "n": 200,
-            "rate": 0.38,
+            "rate": 0.305,
             "ci": [
-              0.3127288709772164,
-              0.4472711290227836
+              0.24119078593181076,
+              0.36880921406818923
             ]
           },
           "strong": {
-            "wins": 99,
-            "losses": 101,
+            "wins": 114,
+            "losses": 86,
             "ties": 0,
             "n": 200,
-            "rate": 0.495,
+            "rate": 0.57,
             "ci": [
-              0.42570700035357106,
-              0.564292999646429
+              0.5013860014282799,
+              0.63861399857172
             ]
           }
         },
@@ -228,27 +1016,92 @@
               "turnCapRate": 0,
               "hardCounters": [],
               "uninformed": {
-                "wins": 162,
-                "losses": 238,
+                "wins": 178,
+                "losses": 222,
                 "ties": 0,
                 "n": 400,
-                "rate": 0.405,
+                "rate": 0.445,
                 "ci": [
-                  0.3568925795744565,
-                  0.45310742042554353
+                  0.3962973522280359,
+                  0.4937026477719641
                 ]
               },
               "luck": {
-                "playerCrits": 0.9925,
-                "opponentCrits": 0.94,
-                "playerMisses": 0.66,
-                "opponentMisses": 0.3375
+                "playerCrits": 0.8375,
+                "opponentCrits": 0.6775,
+                "playerMisses": 0.2725,
+                "opponentMisses": 0.11
               }
             },
             "problems": [
-              "too hard on a first try: 40.5% (want 45.0%–55.0%)"
+              "too hard on a first try: 44.5% (want 45.0%–55.0%)"
             ],
-            "distance": 0.044999999999999984
+            "distance": 0.0050000000000000044
+          }
+        }
+      ],
+      "day": "2026-11-27",
+      "style": "balance"
+    },
+    {
+      "candidate": 18,
+      "check": {
+        "metrics": {
+          "turnCapRate": 0,
+          "hardCounters": [],
+          "uninformed": {
+            "wins": 175,
+            "losses": 225,
+            "ties": 0,
+            "n": 400,
+            "rate": 0.4375,
+            "ci": [
+              0.3888843196591881,
+              0.4861156803408119
+            ]
+          },
+          "luck": {
+            "playerCrits": 0.985,
+            "opponentCrits": 0.92,
+            "playerMisses": 0.3475,
+            "opponentMisses": 0.1775
+          }
+        },
+        "problems": [
+          "too hard on a first try: 43.8% (want 45.0%–55.0%)"
+        ],
+        "distance": 0.012500000000000011
+      },
+      "accepted": "closest",
+      "rejected": [
+        {
+          "candidate": 0,
+          "check": {
+            "metrics": {
+              "turnCapRate": 0,
+              "hardCounters": [],
+              "uninformed": {
+                "wins": 80,
+                "losses": 20,
+                "ties": 0,
+                "n": 100,
+                "rate": 0.8,
+                "ci": [
+                  0.7216,
+                  0.8784000000000001
+                ]
+              },
+              "luck": {
+                "playerCrits": 0.88,
+                "opponentCrits": 0.91,
+                "playerMisses": 0.38,
+                "opponentMisses": 0.13
+              }
+            },
+            "problems": [
+              "too easy on a first try: 80.0% (want 45.0%–55.0%)"
+            ],
+            "distance": 0.25
           }
         },
         {
@@ -258,31 +1111,113 @@
               "turnCapRate": 0,
               "hardCounters": [],
               "uninformed": {
-                "wins": 32,
-                "losses": 68,
+                "wins": 68,
+                "losses": 32,
                 "ties": 0,
                 "n": 100,
-                "rate": 0.32,
+                "rate": 0.68,
                 "ci": [
-                  0.22857067428882571,
-                  0.4114293257111743
+                  0.5885706742888257,
+                  0.7714293257111744
                 ]
               },
               "luck": {
-                "playerCrits": 0.8,
-                "opponentCrits": 0.74,
-                "playerMisses": 0.33,
-                "opponentMisses": 0.27
+                "playerCrits": 0.86,
+                "opponentCrits": 0.53,
+                "playerMisses": 0.28,
+                "opponentMisses": 0.28
               }
             },
             "problems": [
-              "too hard on a first try: 32.0% (want 45.0%–55.0%)"
+              "too easy on a first try: 68.0% (want 45.0%–55.0%)"
             ],
             "distance": 0.13
           }
         },
         {
           "candidate": 2,
+          "check": {
+            "metrics": {
+              "turnCapRate": 0,
+              "hardCounters": [],
+              "uninformed": {
+                "wins": 204,
+                "losses": 196,
+                "ties": 0,
+                "n": 400,
+                "rate": 0.51,
+                "ci": [
+                  0.46100980098019606,
+                  0.558990199019804
+                ]
+              },
+              "luck": {
+                "playerCrits": 1.2175,
+                "opponentCrits": 0.8325,
+                "playerMisses": 0.56,
+                "opponentMisses": 0.14
+              },
+              "informed": {
+                "wins": 243,
+                "losses": 157,
+                "ties": 0,
+                "n": 400,
+                "rate": 0.6075,
+                "ci": [
+                  0.5596459116166654,
+                  0.6553540883833346
+                ]
+              }
+            },
+            "problems": [
+              "too easy on retries: 60.8% (want 35.0%–55.0%)"
+            ],
+            "distance": 0.057499999999999996
+          }
+        },
+        {
+          "candidate": 3,
+          "check": {
+            "metrics": {
+              "turnCapRate": 0,
+              "hardCounters": [],
+              "uninformed": {
+                "wins": 219,
+                "losses": 181,
+                "ties": 0,
+                "n": 400,
+                "rate": 0.5475,
+                "ci": [
+                  0.4987216136490761,
+                  0.5962783863509239
+                ]
+              },
+              "luck": {
+                "playerCrits": 0.9625,
+                "opponentCrits": 0.7275,
+                "playerMisses": 0.41,
+                "opponentMisses": 0.6725
+              },
+              "informed": {
+                "wins": 256,
+                "losses": 144,
+                "ties": 0,
+                "n": 400,
+                "rate": 0.64,
+                "ci": [
+                  0.59296,
+                  0.68704
+                ]
+              }
+            },
+            "problems": [
+              "too easy on retries: 64.0% (want 35.0%–55.0%)"
+            ],
+            "distance": 0.08999999999999997
+          }
+        },
+        {
+          "candidate": 4,
           "check": {
             "metrics": {
               "turnCapRate": 0,
@@ -299,10 +1234,10 @@
                 ]
               },
               "luck": {
-                "playerCrits": 0.7825,
-                "opponentCrits": 0.73,
-                "playerMisses": 0.4475,
-                "opponentMisses": 0.475
+                "playerCrits": 0.85,
+                "opponentCrits": 0.6625,
+                "playerMisses": 0.265,
+                "opponentMisses": 0.51
               }
             },
             "problems": [
@@ -312,27 +1247,180 @@
           }
         },
         {
-          "candidate": 3,
+          "candidate": 5,
           "check": {
             "metrics": {
               "turnCapRate": 0,
               "hardCounters": [],
               "uninformed": {
-                "wins": 28,
-                "losses": 72,
+                "wins": 144,
+                "losses": 256,
                 "ties": 0,
-                "n": 100,
-                "rate": 0.28,
+                "n": 400,
+                "rate": 0.36,
                 "ci": [
-                  0.19199621826307692,
-                  0.36800378173692316
+                  0.31296,
+                  0.40703999999999996
                 ]
               },
               "luck": {
-                "playerCrits": 0.92,
-                "opponentCrits": 0.92,
-                "playerMisses": 0.5,
+                "playerCrits": 1.205,
+                "opponentCrits": 1.1525,
+                "playerMisses": 0.3275,
+                "opponentMisses": 0.39
+              }
+            },
+            "problems": [
+              "too hard on a first try: 36.0% (want 45.0%–55.0%)"
+            ],
+            "distance": 0.09000000000000002
+          }
+        },
+        {
+          "candidate": 6,
+          "check": {
+            "metrics": {
+              "turnCapRate": 0,
+              "hardCounters": [],
+              "uninformed": {
+                "wins": 159,
+                "losses": 241,
+                "ties": 0,
+                "n": 400,
+                "rate": 0.3975,
+                "ci": [
+                  0.34954066331776473,
+                  0.4454593366822353
+                ]
+              },
+              "luck": {
+                "playerCrits": 0.6175,
+                "opponentCrits": 0.6725,
+                "playerMisses": 0.1275,
+                "opponentMisses": 0.185
+              }
+            },
+            "problems": [
+              "too hard on a first try: 39.8% (want 45.0%–55.0%)"
+            ],
+            "distance": 0.05249999999999999
+          }
+        },
+        {
+          "candidate": 7,
+          "check": {
+            "metrics": {
+              "turnCapRate": 0,
+              "hardCounters": [],
+              "uninformed": {
+                "wins": 153,
+                "losses": 247,
+                "ties": 0,
+                "n": 400,
+                "rate": 0.3825,
+                "ci": [
+                  0.3348722268523921,
+                  0.4301277731476079
+                ]
+              },
+              "luck": {
+                "playerCrits": 0.75,
+                "opponentCrits": 0.74,
+                "playerMisses": 0.18,
+                "opponentMisses": 0.2325
+              }
+            },
+            "problems": [
+              "too hard on a first try: 38.3% (want 45.0%–55.0%)"
+            ],
+            "distance": 0.0675
+          }
+        },
+        {
+          "candidate": 8,
+          "check": {
+            "metrics": {
+              "turnCapRate": 0,
+              "hardCounters": [],
+              "uninformed": {
+                "wins": 219,
+                "losses": 181,
+                "ties": 0,
+                "n": 400,
+                "rate": 0.5475,
+                "ci": [
+                  0.4987216136490761,
+                  0.5962783863509239
+                ]
+              },
+              "luck": {
+                "playerCrits": 1.0425,
+                "opponentCrits": 0.7775,
+                "playerMisses": 0.4375,
                 "opponentMisses": 0.68
+              },
+              "informed": {
+                "wins": 208,
+                "losses": 192,
+                "ties": 0,
+                "n": 400,
+                "rate": 0.52,
+                "ci": [
+                  0.4710392156925566,
+                  0.5689607843074435
+                ]
+              },
+              "naive": {
+                "wins": 108,
+                "losses": 92,
+                "ties": 0,
+                "n": 200,
+                "rate": 0.54,
+                "ci": [
+                  0.4709256400681121,
+                  0.609074359931888
+                ]
+              },
+              "strong": {
+                "wins": 122,
+                "losses": 78,
+                "ties": 0,
+                "n": 200,
+                "rate": 0.61,
+                "ci": [
+                  0.5424013077049563,
+                  0.6775986922950437
+                ]
+              }
+            },
+            "problems": [
+              "skill barely matters: strong 61.0% vs naive 54.0%"
+            ],
+            "distance": 0.030000000000000054
+          }
+        },
+        {
+          "candidate": 9,
+          "check": {
+            "metrics": {
+              "turnCapRate": 0,
+              "hardCounters": [],
+              "uninformed": {
+                "wins": 112,
+                "losses": 288,
+                "ties": 0,
+                "n": 400,
+                "rate": 0.28,
+                "ci": [
+                  0.23599810913153846,
+                  0.3240018908684616
+                ]
+              },
+              "luck": {
+                "playerCrits": 0.675,
+                "opponentCrits": 0.805,
+                "playerMisses": 0.1375,
+                "opponentMisses": 0.37
               }
             },
             "problems": [
@@ -340,78 +1428,313 @@
             ],
             "distance": 0.16999999999999998
           }
+        },
+        {
+          "candidate": 10,
+          "check": {
+            "metrics": {
+              "turnCapRate": 0,
+              "hardCounters": [],
+              "uninformed": {
+                "wins": 31,
+                "losses": 69,
+                "ties": 0,
+                "n": 100,
+                "rate": 0.31,
+                "ci": [
+                  0.21935132433399812,
+                  0.4006486756660019
+                ]
+              },
+              "luck": {
+                "playerCrits": 0.83,
+                "opponentCrits": 0.79,
+                "playerMisses": 0.31,
+                "opponentMisses": 1.28
+              }
+            },
+            "problems": [
+              "too hard on a first try: 31.0% (want 45.0%–55.0%)"
+            ],
+            "distance": 0.14
+          }
+        },
+        {
+          "candidate": 11,
+          "check": {
+            "metrics": {
+              "turnCapRate": 0,
+              "hardCounters": [],
+              "uninformed": {
+                "wins": 32,
+                "losses": 68,
+                "ties": 0,
+                "n": 100,
+                "rate": 0.32,
+                "ci": [
+                  0.22857067428882571,
+                  0.4114293257111743
+                ]
+              },
+              "luck": {
+                "playerCrits": 0.79,
+                "opponentCrits": 0.67,
+                "playerMisses": 0.39,
+                "opponentMisses": 0.42
+              }
+            },
+            "problems": [
+              "too hard on a first try: 32.0% (want 45.0%–55.0%)"
+            ],
+            "distance": 0.13
+          }
+        },
+        {
+          "candidate": 12,
+          "check": {
+            "metrics": {
+              "turnCapRate": 0,
+              "hardCounters": [],
+              "uninformed": {
+                "wins": 148,
+                "losses": 252,
+                "ties": 0,
+                "n": 400,
+                "rate": 0.37,
+                "ci": [
+                  0.3226851777980726,
+                  0.4173148222019274
+                ]
+              },
+              "luck": {
+                "playerCrits": 0.6975,
+                "opponentCrits": 0.82,
+                "playerMisses": 0.2025,
+                "opponentMisses": 0.3425
+              }
+            },
+            "problems": [
+              "too hard on a first try: 37.0% (want 45.0%–55.0%)"
+            ],
+            "distance": 0.08000000000000002
+          }
+        },
+        {
+          "candidate": 13,
+          "check": {
+            "metrics": {
+              "turnCapRate": 0,
+              "hardCounters": [],
+              "uninformed": {
+                "wins": 244,
+                "losses": 156,
+                "ties": 0,
+                "n": 400,
+                "rate": 0.61,
+                "ci": [
+                  0.5622005062788318,
+                  0.6577994937211682
+                ]
+              },
+              "luck": {
+                "playerCrits": 1.1225,
+                "opponentCrits": 0.6225,
+                "playerMisses": 0.3325,
+                "opponentMisses": 0.2
+              }
+            },
+            "problems": [
+              "too easy on a first try: 61.0% (want 45.0%–55.0%)"
+            ],
+            "distance": 0.05999999999999994
+          }
+        },
+        {
+          "candidate": 14,
+          "check": {
+            "metrics": {
+              "turnCapRate": 0,
+              "hardCounters": [],
+              "uninformed": {
+                "wins": 139,
+                "losses": 261,
+                "ties": 0,
+                "n": 400,
+                "rate": 0.3475,
+                "ci": [
+                  0.30083473481271106,
+                  0.3941652651872889
+                ]
+              },
+              "luck": {
+                "playerCrits": 1.015,
+                "opponentCrits": 1.1,
+                "playerMisses": 0.2075,
+                "opponentMisses": 0.4825
+              }
+            },
+            "problems": [
+              "too hard on a first try: 34.8% (want 45.0%–55.0%)"
+            ],
+            "distance": 0.10250000000000004
+          }
+        },
+        {
+          "candidate": 15,
+          "check": {
+            "metrics": {
+              "turnCapRate": 0,
+              "hardCounters": [],
+              "uninformed": {
+                "wins": 159,
+                "losses": 241,
+                "ties": 0,
+                "n": 400,
+                "rate": 0.3975,
+                "ci": [
+                  0.34954066331776473,
+                  0.4454593366822353
+                ]
+              },
+              "luck": {
+                "playerCrits": 1.0125,
+                "opponentCrits": 0.7975,
+                "playerMisses": 0.1675,
+                "opponentMisses": 0.675
+              }
+            },
+            "problems": [
+              "too hard on a first try: 39.8% (want 45.0%–55.0%)"
+            ],
+            "distance": 0.05249999999999999
+          }
+        },
+        {
+          "candidate": 16,
+          "check": {
+            "metrics": {
+              "turnCapRate": 0,
+              "hardCounters": [],
+              "uninformed": {
+                "wins": 30,
+                "losses": 70,
+                "ties": 0,
+                "n": 100,
+                "rate": 0.3,
+                "ci": [
+                  0.2101815163788655,
+                  0.38981848362113447
+                ]
+              },
+              "luck": {
+                "playerCrits": 0.81,
+                "opponentCrits": 0.94,
+                "playerMisses": 0.23,
+                "opponentMisses": 0.79
+              }
+            },
+            "problems": [
+              "too hard on a first try: 30.0% (want 45.0%–55.0%)"
+            ],
+            "distance": 0.15000000000000002
+          }
+        },
+        {
+          "candidate": 17,
+          "check": {
+            "metrics": {
+              "turnCapRate": 0,
+              "hardCounters": [],
+              "uninformed": {
+                "wins": 236,
+                "losses": 164,
+                "ties": 0,
+                "n": 400,
+                "rate": 0.59,
+                "ci": [
+                  0.5418003361007568,
+                  0.6381996638992431
+                ]
+              },
+              "luck": {
+                "playerCrits": 1.045,
+                "opponentCrits": 0.73,
+                "playerMisses": 0.475,
+                "opponentMisses": 0.1075
+              }
+            },
+            "problems": [
+              "too easy on a first try: 59.0% (want 45.0%–55.0%)"
+            ],
+            "distance": 0.039999999999999925
+          }
+        },
+        {
+          "candidate": 18,
+          "check": {
+            "metrics": {
+              "turnCapRate": 0,
+              "hardCounters": [],
+              "uninformed": {
+                "wins": 175,
+                "losses": 225,
+                "ties": 0,
+                "n": 400,
+                "rate": 0.4375,
+                "ci": [
+                  0.3888843196591881,
+                  0.4861156803408119
+                ]
+              },
+              "luck": {
+                "playerCrits": 0.985,
+                "opponentCrits": 0.92,
+                "playerMisses": 0.3475,
+                "opponentMisses": 0.1775
+              }
+            },
+            "problems": [
+              "too hard on a first try: 43.8% (want 45.0%–55.0%)"
+            ],
+            "distance": 0.012500000000000011
+          }
+        },
+        {
+          "candidate": 19,
+          "check": {
+            "metrics": {
+              "turnCapRate": 0,
+              "hardCounters": [],
+              "uninformed": {
+                "wins": 256,
+                "losses": 144,
+                "ties": 0,
+                "n": 400,
+                "rate": 0.64,
+                "ci": [
+                  0.59296,
+                  0.68704
+                ]
+              },
+              "luck": {
+                "playerCrits": 1.155,
+                "opponentCrits": 0.715,
+                "playerMisses": 0.57,
+                "opponentMisses": 0.2075
+              }
+            },
+            "problems": [
+              "too easy on a first try: 64.0% (want 45.0%–55.0%)"
+            ],
+            "distance": 0.08999999999999997
+          }
         }
       ],
-      "day": "2026-11-24",
+      "day": "2026-11-28",
       "style": "balance"
     },
     {
       "candidate": 0,
-      "accepted": "pass",
-      "check": {
-        "metrics": {
-          "turnCapRate": 0,
-          "hardCounters": [],
-          "uninformed": {
-            "wins": 194,
-            "losses": 206,
-            "ties": 0,
-            "n": 400,
-            "rate": 0.485,
-            "ci": [
-              0.4360220549634838,
-              0.5339779450365162
-            ]
-          },
-          "luck": {
-            "playerCrits": 0.84,
-            "opponentCrits": 0.6275,
-            "playerMisses": 0.52,
-            "opponentMisses": 0.9575
-          },
-          "informed": {
-            "wins": 185,
-            "losses": 215,
-            "ties": 0,
-            "n": 400,
-            "rate": 0.4625,
-            "ci": [
-              0.41363800684581115,
-              0.5113619931541888
-            ]
-          },
-          "naive": {
-            "wins": 79,
-            "losses": 121,
-            "ties": 0,
-            "n": 200,
-            "rate": 0.395,
-            "ci": [
-              0.3272487505650265,
-              0.46275124943497353
-            ]
-          },
-          "strong": {
-            "wins": 117,
-            "losses": 83,
-            "ties": 0,
-            "n": 200,
-            "rate": 0.585,
-            "ci": [
-              0.5167122104618987,
-              0.6532877895381012
-            ]
-          }
-        },
-        "problems": [],
-        "distance": 0
-      },
-      "rejected": [],
-      "day": "2026-11-25",
-      "style": "balance"
-    },
-    {
-      "candidate": 5,
       "accepted": "pass",
       "check": {
         "metrics": {
@@ -429,471 +1752,42 @@
             ]
           },
           "luck": {
-            "playerCrits": 0.72,
-            "opponentCrits": 0.7125,
-            "playerMisses": 0.3775,
-            "opponentMisses": 0.04
+            "playerCrits": 0.98,
+            "opponentCrits": 0.9375,
+            "playerMisses": 0.2475,
+            "opponentMisses": 1.2825
           },
           "informed": {
-            "wins": 197,
-            "losses": 203,
+            "wins": 192,
+            "losses": 208,
             "ties": 0,
             "n": 400,
-            "rate": 0.4925,
+            "rate": 0.48,
             "ci": [
-              0.443505512810113,
-              0.541494487189887
+              0.43103921569255654,
+              0.5289607843074434
             ]
           },
           "naive": {
-            "wins": 48,
-            "losses": 152,
+            "wins": 33,
+            "losses": 167,
             "ties": 0,
             "n": 200,
-            "rate": 0.24,
+            "rate": 0.165,
             "ci": [
-              0.1808092980274773,
-              0.2991907019725227
+              0.11355700047625528,
+              0.21644299952374474
             ]
           },
           "strong": {
-            "wins": 109,
-            "losses": 91,
+            "wins": 103,
+            "losses": 97,
             "ties": 0,
             "n": 200,
-            "rate": 0.545,
+            "rate": 0.515,
             "ci": [
-              0.47598475675620644,
-              0.6140152432437936
-            ]
-          }
-        },
-        "problems": [],
-        "distance": 0
-      },
-      "rejected": [
-        {
-          "candidate": 0,
-          "check": {
-            "metrics": {
-              "turnCapRate": 0,
-              "hardCounters": [],
-              "uninformed": {
-                "wins": 222,
-                "losses": 178,
-                "ties": 0,
-                "n": 400,
-                "rate": 0.555,
-                "ci": [
-                  0.506297352228036,
-                  0.6037026477719641
-                ]
-              },
-              "luck": {
-                "playerCrits": 1.215,
-                "opponentCrits": 0.8525,
-                "playerMisses": 0.5775,
-                "opponentMisses": 0.2525
-              }
-            },
-            "problems": [
-              "too easy on a first try: 55.5% (want 45.0%–55.0%)"
-            ],
-            "distance": 0.0050000000000000044
-          }
-        },
-        {
-          "candidate": 1,
-          "check": {
-            "metrics": {
-              "turnCapRate": 0,
-              "hardCounters": [],
-              "uninformed": {
-                "wins": 108,
-                "losses": 292,
-                "ties": 0,
-                "n": 400,
-                "rate": 0.27,
-                "ci": [
-                  0.22649197315437072,
-                  0.31350802684562934
-                ]
-              },
-              "luck": {
-                "playerCrits": 0.6725,
-                "opponentCrits": 0.63,
-                "playerMisses": 0.295,
-                "opponentMisses": 0.6
-              }
-            },
-            "problems": [
-              "too hard on a first try: 27.0% (want 45.0%–55.0%)"
-            ],
-            "distance": 0.18
-          }
-        },
-        {
-          "candidate": 2,
-          "check": {
-            "metrics": {
-              "turnCapRate": 0,
-              "hardCounters": [],
-              "uninformed": {
-                "wins": 130,
-                "losses": 270,
-                "ties": 0,
-                "n": 400,
-                "rate": 0.325,
-                "ci": [
-                  0.27909926471177177,
-                  0.37090073528822826
-                ]
-              },
-              "luck": {
-                "playerCrits": 0.885,
-                "opponentCrits": 0.9225,
-                "playerMisses": 0.6275,
-                "opponentMisses": 0.0525
-              }
-            },
-            "problems": [
-              "too hard on a first try: 32.5% (want 45.0%–55.0%)"
-            ],
-            "distance": 0.125
-          }
-        },
-        {
-          "candidate": 3,
-          "check": {
-            "metrics": {
-              "turnCapRate": 0,
-              "hardCounters": [],
-              "uninformed": {
-                "wins": 32,
-                "losses": 68,
-                "ties": 0,
-                "n": 100,
-                "rate": 0.32,
-                "ci": [
-                  0.22857067428882571,
-                  0.4114293257111743
-                ]
-              },
-              "luck": {
-                "playerCrits": 0.6,
-                "opponentCrits": 0.76,
-                "playerMisses": 0.26,
-                "opponentMisses": 0.21
-              }
-            },
-            "problems": [
-              "too hard on a first try: 32.0% (want 45.0%–55.0%)"
-            ],
-            "distance": 0.13
-          }
-        },
-        {
-          "candidate": 4,
-          "check": {
-            "metrics": {
-              "turnCapRate": 0,
-              "hardCounters": [],
-              "uninformed": {
-                "wins": 151,
-                "losses": 249,
-                "ties": 0,
-                "n": 400,
-                "rate": 0.3775,
-                "ci": [
-                  0.3299933691470338,
-                  0.4250066308529662
-                ]
-              },
-              "luck": {
-                "playerCrits": 0.6175,
-                "opponentCrits": 0.7525,
-                "playerMisses": 0.35,
-                "opponentMisses": 0.605
-              }
-            },
-            "problems": [
-              "too hard on a first try: 37.8% (want 45.0%–55.0%)"
-            ],
-            "distance": 0.07250000000000001
-          }
-        }
-      ],
-      "day": "2026-11-26",
-      "style": "balance"
-    },
-    {
-      "candidate": 0,
-      "accepted": "pass",
-      "check": {
-        "metrics": {
-          "turnCapRate": 0,
-          "hardCounters": [],
-          "uninformed": {
-            "wins": 183,
-            "losses": 217,
-            "ties": 0,
-            "n": 400,
-            "rate": 0.4575,
-            "ci": [
-              0.4086773333890907,
-              0.5063226666109093
-            ]
-          },
-          "luck": {
-            "playerCrits": 1.0775,
-            "opponentCrits": 0.9675,
-            "playerMisses": 0.5025,
-            "opponentMisses": 0.3075
-          },
-          "informed": {
-            "wins": 187,
-            "losses": 213,
-            "ties": 0,
-            "n": 400,
-            "rate": 0.4675,
-            "ci": [
-              0.41860362206666024,
-              0.5163963779333398
-            ]
-          },
-          "naive": {
-            "wins": 38,
-            "losses": 162,
-            "ties": 0,
-            "n": 200,
-            "rate": 0.19,
-            "ci": [
-              0.13562986849381364,
-              0.24437013150618636
-            ]
-          },
-          "strong": {
-            "wins": 112,
-            "losses": 88,
-            "ties": 0,
-            "n": 200,
-            "rate": 0.56,
-            "ci": [
-              0.4912042792028458,
-              0.6287957207971543
-            ]
-          }
-        },
-        "problems": [],
-        "distance": 0
-      },
-      "rejected": [],
-      "day": "2026-11-27",
-      "style": "balance"
-    },
-    {
-      "candidate": 2,
-      "accepted": "pass",
-      "check": {
-        "metrics": {
-          "turnCapRate": 0,
-          "hardCounters": [],
-          "uninformed": {
-            "wins": 191,
-            "losses": 209,
-            "ties": 0,
-            "n": 400,
-            "rate": 0.4775,
-            "ci": [
-              0.4285496376417906,
-              0.5264503623582093
-            ]
-          },
-          "luck": {
-            "playerCrits": 0.685,
-            "opponentCrits": 0.645,
-            "playerMisses": 0.45,
-            "opponentMisses": 0.51
-          },
-          "informed": {
-            "wins": 213,
-            "losses": 187,
-            "ties": 0,
-            "n": 400,
-            "rate": 0.5325,
-            "ci": [
-              0.4836036220666602,
-              0.5813963779333398
-            ]
-          },
-          "naive": {
-            "wins": 63,
-            "losses": 137,
-            "ties": 0,
-            "n": 200,
-            "rate": 0.315,
-            "ci": [
-              0.2506213839850529,
-              0.3793786160149471
-            ]
-          },
-          "strong": {
-            "wins": 134,
-            "losses": 66,
-            "ties": 0,
-            "n": 200,
-            "rate": 0.67,
-            "ci": [
-              0.6048318421312986,
-              0.7351681578687015
-            ]
-          }
-        },
-        "problems": [],
-        "distance": 0
-      },
-      "rejected": [
-        {
-          "candidate": 0,
-          "check": {
-            "metrics": {
-              "turnCapRate": 0,
-              "hardCounters": [],
-              "uninformed": {
-                "wins": 205,
-                "losses": 195,
-                "ties": 0,
-                "n": 400,
-                "rate": 0.5125,
-                "ci": [
-                  0.46351531489332604,
-                  0.5614846851066738
-                ]
-              },
-              "luck": {
-                "playerCrits": 0.655,
-                "opponentCrits": 0.685,
-                "playerMisses": 0.435,
-                "opponentMisses": 0.7975
-              },
-              "informed": {
-                "wins": 230,
-                "losses": 170,
-                "ties": 0,
-                "n": 400,
-                "rate": 0.575,
-                "ci": [
-                  0.5265543861634513,
-                  0.6234456138365486
-                ]
-              }
-            },
-            "problems": [
-              "too easy on retries: 57.5% (want 35.0%–55.0%)"
-            ],
-            "distance": 0.02499999999999991
-          }
-        },
-        {
-          "candidate": 1,
-          "check": {
-            "metrics": {
-              "turnCapRate": 0,
-              "hardCounters": [],
-              "uninformed": {
-                "wins": 205,
-                "losses": 195,
-                "ties": 0,
-                "n": 400,
-                "rate": 0.5125,
-                "ci": [
-                  0.46351531489332604,
-                  0.5614846851066738
-                ]
-              },
-              "luck": {
-                "playerCrits": 0.5775,
-                "opponentCrits": 0.625,
-                "playerMisses": 0.31,
-                "opponentMisses": 0.2475
-              },
-              "informed": {
-                "wins": 242,
-                "losses": 158,
-                "ties": 0,
-                "n": 400,
-                "rate": 0.605,
-                "ci": [
-                  0.557092632090669,
-                  0.652907367909331
-                ]
-              }
-            },
-            "problems": [
-              "too easy on retries: 60.5% (want 35.0%–55.0%)"
-            ],
-            "distance": 0.05499999999999994
-          }
-        }
-      ],
-      "day": "2026-11-28",
-      "style": "balance"
-    },
-    {
-      "candidate": 0,
-      "accepted": "pass",
-      "check": {
-        "metrics": {
-          "turnCapRate": 0,
-          "hardCounters": [],
-          "uninformed": {
-            "wins": 203,
-            "losses": 197,
-            "ties": 0,
-            "n": 400,
-            "rate": 0.5075,
-            "ci": [
-              0.458505512810113,
-              0.5564944871898869
-            ]
-          },
-          "luck": {
-            "playerCrits": 0.7975,
-            "opponentCrits": 0.585,
-            "playerMisses": 0.56,
-            "opponentMisses": 0.13
-          },
-          "informed": {
-            "wins": 215,
-            "losses": 185,
-            "ties": 0,
-            "n": 400,
-            "rate": 0.5375,
-            "ci": [
-              0.4886380068458111,
-              0.5863619931541888
-            ]
-          },
-          "naive": {
-            "wins": 74,
-            "losses": 126,
-            "ties": 0,
-            "n": 200,
-            "rate": 0.37,
-            "ci": [
-              0.3030867367407627,
-              0.4369132632592373
-            ]
-          },
-          "strong": {
-            "wins": 113,
-            "losses": 87,
-            "ties": 0,
-            "n": 200,
-            "rate": 0.565,
-            "ci": [
-              0.49629158566812936,
-              0.6337084143318705
+              0.4457347258721948,
+              0.5842652741278052
             ]
           }
         },
@@ -902,7 +1796,7 @@
       },
       "rejected": [],
       "day": "2026-11-29",
-      "style": "stall"
+      "style": "balance"
     }
   ]
 }

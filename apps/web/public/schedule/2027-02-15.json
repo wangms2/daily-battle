@@ -1,51 +1,55 @@
 {
   "version": 1,
-  "generatorVersion": 4,
-  "dataBuiltAt": "2026-10-22T13:34:45.150Z",
+  "generatorVersion": 6,
+  "dataBuiltAt": "2026-11-02T20:05:16.370Z",
   "week": "2027-02-15",
   "pool": {
     "species": [
-      "Hippowdon",
-      "Azelf",
-      "Aerodactyl",
       "Gyarados",
-      "Bronzong",
-      "Snorlax",
-      "Heatran",
-      "Empoleon",
-      "Blaziken",
-      "Omastar",
-      "Gallade",
-      "Magneton"
+      "Jolteon",
+      "Swampert",
+      "Skarmory",
+      "Lucario",
+      "Tentacruel",
+      "Starmie",
+      "Gliscor",
+      "Zapdos",
+      "Honchkrow",
+      "Heracross",
+      "Drapion"
     ],
-    "candidate": 0
+    "candidate": 0,
+    "cores": [
+      "gyarados-jolteon",
+      "swampert-skarmory"
+    ]
   },
   "suggestedTeams": [
     {
       "team": [
         {
-          "species": "Hippowdon",
-          "setId": "hippowdon-specially-defensive"
-        },
-        {
-          "species": "Snorlax",
-          "setId": "snorlax-utility"
-        },
-        {
-          "species": "Gallade",
-          "setId": "gallade-swords-dance"
-        },
-        {
-          "species": "Magneton",
-          "setId": "magneton-choice-scarf"
-        },
-        {
           "species": "Gyarados",
           "setId": "gyarados-offensive-dragon-dance"
         },
         {
-          "species": "Bronzong",
-          "setId": "bronzong-offensive-trick-room"
+          "species": "Honchkrow",
+          "setId": "honchkrow-life-orb"
+        },
+        {
+          "species": "Swampert",
+          "setId": "swampert-physically-offensive-stealth-rock"
+        },
+        {
+          "species": "Zapdos",
+          "setId": "zapdos-physically-defensive"
+        },
+        {
+          "species": "Starmie",
+          "setId": "starmie-offensive-rapid-spin"
+        },
+        {
+          "species": "Jolteon",
+          "setId": "jolteon-choice-specs"
         }
       ]
     }
@@ -53,220 +57,220 @@
   "days": [
     {
       "day": "2027-02-15",
-      "style": "balance",
+      "style": "offense",
       "team": [
         {
-          "species": "Aerodactyl",
-          "setId": "aerodactyl-lead"
+          "species": "Raikou",
+          "setId": "raikou-calm-mind-protect"
         },
         {
-          "species": "Metagross",
-          "setId": "metagross-agility"
+          "species": "Latias",
+          "setId": "latias-choice-specs"
         },
         {
-          "species": "Blaziken",
-          "setId": "blaziken-swords-dance"
-        },
-        {
-          "species": "Snorlax",
-          "setId": "snorlax-utility"
-        },
-        {
-          "species": "Scizor",
-          "setId": "scizor-offensive-swords-dance"
-        },
-        {
-          "species": "Blissey",
-          "setId": "blissey-standard"
-        }
-      ],
-      "candidate": 4
-    },
-    {
-      "day": "2027-02-16",
-      "style": "balance",
-      "team": [
-        {
-          "species": "Zapdos",
-          "setId": "zapdos-subroost"
-        },
-        {
-          "species": "Snorlax",
-          "setId": "snorlax-utility"
-        },
-        {
-          "species": "Staraptor",
-          "setId": "staraptor-choice-band"
-        },
-        {
-          "species": "Rotom-Heat",
-          "setId": "rotomheat-utility"
-        },
-        {
-          "species": "Skarmory",
-          "setId": "skarmory-physically-defensive"
-        },
-        {
-          "species": "Hippowdon",
-          "setId": "hippowdon-specially-defensive"
-        }
-      ],
-      "candidate": 0
-    },
-    {
-      "day": "2027-02-17",
-      "style": "balance",
-      "team": [
-        {
-          "species": "Tentacruel",
-          "setId": "tentacruel-defensive-rapid-spin"
-        },
-        {
-          "species": "Feraligatr",
-          "setId": "feraligatr-swords-dance"
-        },
-        {
-          "species": "Suicune",
-          "setId": "suicune-supercune-offensive-calm-mind"
-        },
-        {
-          "species": "Aerodactyl",
-          "setId": "aerodactyl-lead"
-        },
-        {
-          "species": "Blissey",
-          "setId": "blissey-wish-support"
-        },
-        {
-          "species": "Tyranitar",
-          "setId": "tyranitar-dragon-dance"
-        }
-      ],
-      "candidate": 6
-    },
-    {
-      "day": "2027-02-18",
-      "style": "balance",
-      "team": [
-        {
-          "species": "Dragonite",
-          "setId": "dragonite-offensive-dragon-dance"
+          "species": "Gengar",
+          "setId": "gengar-utility"
         },
         {
           "species": "Scizor",
           "setId": "scizor-choice-scarf"
         },
         {
-          "species": "Bronzong",
-          "setId": "bronzong-offensive-trick-room"
+          "species": "Empoleon",
+          "setId": "empoleon-lead"
         },
         {
-          "species": "Zapdos",
-          "setId": "zapdos-physically-defensive"
+          "species": "Rotom-Frost",
+          "setId": "rotomfrost-utility"
+        }
+      ],
+      "candidate": 0
+    },
+    {
+      "day": "2027-02-16",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Heatran",
+          "setId": "heatran-utility"
         },
         {
-          "species": "Magneton",
-          "setId": "magneton-choice-scarf"
+          "species": "Jolteon",
+          "setId": "jolteon-choice-specs"
         },
         {
-          "species": "Metagross",
-          "setId": "metagross-agility"
+          "species": "Latias",
+          "setId": "latias-calm-mind-2-attacks"
+        },
+        {
+          "species": "Scizor",
+          "setId": "scizor-choice-band"
+        },
+        {
+          "species": "Claydol",
+          "setId": "claydol-support"
+        },
+        {
+          "species": "Nidoking",
+          "setId": "nidoking-mixed-attacker"
+        }
+      ],
+      "candidate": 10
+    },
+    {
+      "day": "2027-02-17",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Infernape",
+          "setId": "infernape-physical-attacker"
+        },
+        {
+          "species": "Nidoqueen",
+          "setId": "nidoqueen-physically-defensive-toxic-spikes"
+        },
+        {
+          "species": "Aerodactyl",
+          "setId": "aerodactyl-lead"
+        },
+        {
+          "species": "Rotom-Wash",
+          "setId": "rotomwash-utility"
+        },
+        {
+          "species": "Abomasnow",
+          "setId": "abomasnow-leech-seed"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-all-purpose"
         }
       ],
       "candidate": 2
     },
     {
-      "day": "2027-02-19",
+      "day": "2027-02-18",
       "style": "balance",
       "team": [
         {
-          "species": "Registeel",
-          "setId": "registeel-tank"
+          "species": "Hippowdon",
+          "setId": "hippowdon-specially-defensive"
         },
         {
-          "species": "Suicune",
-          "setId": "suicune-subcune"
-        },
-        {
-          "species": "Heatran",
-          "setId": "heatran-utility"
+          "species": "Dragonite",
+          "setId": "dragonite-offensive-dragon-dance"
         },
         {
           "species": "Tyranitar",
           "setId": "tyranitar-all-purpose"
         },
         {
-          "species": "Blastoise",
-          "setId": "blastoise-utility"
+          "species": "Flygon",
+          "setId": "flygon-choice-band"
         },
         {
-          "species": "Latias",
-          "setId": "latias-choice-scarf"
+          "species": "Swampert",
+          "setId": "swampert-physically-offensive-stealth-rock"
+        },
+        {
+          "species": "Scizor",
+          "setId": "scizor-bulky-swords-dance"
         }
       ],
-      "candidate": 10
+      "candidate": 1
+    },
+    {
+      "day": "2027-02-19",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Rotom-Heat",
+          "setId": "rotomheat-choice-scarf"
+        },
+        {
+          "species": "Qwilfish",
+          "setId": "qwilfish-swords-dance"
+        },
+        {
+          "species": "Raikou",
+          "setId": "raikou-calm-mind-protect"
+        },
+        {
+          "species": "Dragonite",
+          "setId": "dragonite-choice-band"
+        },
+        {
+          "species": "Tentacruel",
+          "setId": "tentacruel-defensive-rapid-spin"
+        },
+        {
+          "species": "Blastoise",
+          "setId": "blastoise-utility"
+        }
+      ],
+      "candidate": 14
     },
     {
       "day": "2027-02-20",
-      "style": "balance",
+      "style": "offense",
       "team": [
+        {
+          "species": "Gengar",
+          "setId": "gengar-substitute"
+        },
+        {
+          "species": "Magnezone",
+          "setId": "magnezone-choice-scarf"
+        },
         {
           "species": "Starmie",
-          "setId": "starmie-offensive-rapid-spin"
-        },
-        {
-          "species": "Hippowdon",
-          "setId": "hippowdon-specially-defensive"
-        },
-        {
-          "species": "Bronzong",
-          "setId": "bronzong-offensive-trick-room"
-        },
-        {
-          "species": "Heatran",
-          "setId": "heatran-utility"
-        },
-        {
-          "species": "Heracross",
-          "setId": "heracross-choice-scarf"
-        },
-        {
-          "species": "Togekiss",
-          "setId": "togekiss-defensive-nasty-plot"
-        }
-      ],
-      "candidate": 4
-    },
-    {
-      "day": "2027-02-21",
-      "style": "balance",
-      "team": [
-        {
-          "species": "Donphan",
-          "setId": "donphan-rapid-spin"
-        },
-        {
-          "species": "Cresselia",
-          "setId": "cresselia-calm-mind"
+          "setId": "starmie-defensive-rapid-spin"
         },
         {
           "species": "Gyarados",
           "setId": "gyarados-offensive-dragon-dance"
         },
         {
-          "species": "Clefable",
-          "setId": "clefable-support"
+          "species": "Magneton",
+          "setId": "magneton-choice-scarf"
         },
         {
-          "species": "Uxie",
-          "setId": "uxie-choice-scarf-lead"
-        },
-        {
-          "species": "Crobat",
-          "setId": "crobat-stallbreaker"
+          "species": "Azumarill",
+          "setId": "azumarill-choice-band"
         }
       ],
-      "candidate": 6
+      "candidate": 9
+    },
+    {
+      "day": "2027-02-21",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Venusaur",
+          "setId": "venusaur-physically-defensive"
+        },
+        {
+          "species": "Rotom-Wash",
+          "setId": "rotomwash-choice-scarf"
+        },
+        {
+          "species": "Heatran",
+          "setId": "heatran-trapper"
+        },
+        {
+          "species": "Swampert",
+          "setId": "swampert-physically-offensive-stealth-rock"
+        },
+        {
+          "species": "Latias",
+          "setId": "latias-life-orb"
+        },
+        {
+          "species": "Empoleon",
+          "setId": "empoleon-lead"
+        }
+      ],
+      "candidate": 1
     }
   ]
 }

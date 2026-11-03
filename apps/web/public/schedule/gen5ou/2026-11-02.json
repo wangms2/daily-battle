@@ -1,51 +1,55 @@
 {
   "version": 1,
-  "generatorVersion": 4,
-  "dataBuiltAt": "2026-10-23T13:58:33.422Z",
+  "generatorVersion": 6,
+  "dataBuiltAt": "2026-11-02T19:56:22.560Z",
   "week": "2026-11-02",
   "pool": {
     "species": [
-      "Jellicent",
-      "Blissey",
-      "Gliscor",
       "Scizor",
+      "Tentacruel",
       "Garchomp",
-      "Heatran",
-      "Terrakion",
-      "Excadrill",
-      "Slowking",
-      "Krookodile",
-      "Swampert",
-      "Bronzong"
+      "Alakazam",
+      "Ferrothorn",
+      "Salamence",
+      "Celebi",
+      "Blissey",
+      "Kingdra",
+      "Nidoking",
+      "Abomasnow",
+      "Azelf"
     ],
-    "candidate": 0
+    "candidate": 0,
+    "cores": [
+      "scizor-tentacruel",
+      "garchomp-alakazam-ferrothorn"
+    ]
   },
   "suggestedTeams": [
     {
       "team": [
         {
-          "species": "Garchomp",
-          "setId": "garchomp-choice-scarf"
+          "species": "Alakazam",
+          "setId": "alakazam-attacker"
+        },
+        {
+          "species": "Kingdra",
+          "setId": "kingdra-choice-specs"
+        },
+        {
+          "species": "Tentacruel",
+          "setId": "tentacruel-utility"
+        },
+        {
+          "species": "Salamence",
+          "setId": "salamence-dragon-dance"
         },
         {
           "species": "Blissey",
           "setId": "blissey-special-wall"
         },
         {
-          "species": "Excadrill",
-          "setId": "excadrill-choice-scarf"
-        },
-        {
           "species": "Scizor",
           "setId": "scizor-choice-band"
-        },
-        {
-          "species": "Jellicent",
-          "setId": "jellicent-specially-defensive"
-        },
-        {
-          "species": "Heatran",
-          "setId": "heatran-offensive"
         }
       ]
     }
@@ -56,217 +60,217 @@
       "style": "balance",
       "team": [
         {
-          "species": "Espeon",
-          "setId": "espeon-screens-setter"
+          "species": "Ambipom",
+          "setId": "ambipom-all-out-attacker"
+        },
+        {
+          "species": "Victini",
+          "setId": "victini-choice-band"
+        },
+        {
+          "species": "Magnezone",
+          "setId": "magnezone-sunny-day"
+        },
+        {
+          "species": "Tentacruel",
+          "setId": "tentacruel-utility"
         },
         {
           "species": "Gliscor",
-          "setId": "gliscor-swords-dance"
+          "setId": "gliscor-stealth-rock"
         },
         {
-          "species": "Metagross",
-          "setId": "metagross-shuca-berry-attacker"
-        },
-        {
-          "species": "Thundurus-Therian",
-          "setId": "thundurustherian-offensive"
-        },
-        {
-          "species": "Landorus-Therian",
-          "setId": "landorustherian-choice-scarf"
-        },
-        {
-          "species": "Tornadus",
-          "setId": "tornadus-offensive"
+          "species": "Hydreigon",
+          "setId": "hydreigon-choice-scarf"
         }
       ],
-      "candidate": 9
+      "candidate": 4
     },
     {
       "day": "2026-11-03",
-      "style": "offense",
+      "style": "balance",
       "team": [
         {
-          "species": "Alakazam",
-          "setId": "alakazam-life-orb"
-        },
-        {
-          "species": "Scizor",
-          "setId": "scizor-offensive-swords-dance"
-        },
-        {
-          "species": "Latios",
-          "setId": "latios-choice-scarf"
+          "species": "Celebi",
+          "setId": "celebi-bulky-pivot"
         },
         {
           "species": "Excadrill",
           "setId": "excadrill-offensive"
         },
         {
-          "species": "Thundurus-Therian",
-          "setId": "thundurustherian-offensive"
+          "species": "Abomasnow",
+          "setId": "abomasnow-mixed"
+        },
+        {
+          "species": "Amoonguss",
+          "setId": "amoonguss-defensive-pivot"
         },
         {
           "species": "Landorus-Therian",
-          "setId": "landorustherian-choice-scarf"
+          "setId": "landorustherian-defensive"
+        },
+        {
+          "species": "Dragonite",
+          "setId": "dragonite-3-attacks-dragon-dance"
         }
       ],
-      "candidate": 1
+      "candidate": 10
     },
     {
       "day": "2026-11-04",
       "style": "balance",
       "team": [
         {
-          "species": "Bronzong",
-          "setId": "bronzong-tank"
-        },
-        {
-          "species": "Haxorus",
-          "setId": "haxorus-dragon-dance"
-        },
-        {
-          "species": "Tornadus",
-          "setId": "tornadus-substitute-protect"
-        },
-        {
           "species": "Starmie",
           "setId": "starmie-rapid-spin"
         },
         {
-          "species": "Mew",
-          "setId": "mew-swords-dance"
+          "species": "Suicune",
+          "setId": "suicune-crocune"
         },
         {
-          "species": "Terrakion",
-          "setId": "terrakion-stealth-rock"
+          "species": "Tornadus",
+          "setId": "tornadus-offensive"
+        },
+        {
+          "species": "Hippowdon",
+          "setId": "hippowdon-mixed-wall"
+        },
+        {
+          "species": "Latias",
+          "setId": "latias-choice-scarf"
+        },
+        {
+          "species": "Landorus-Therian",
+          "setId": "landorustherian-defensive"
         }
       ],
-      "candidate": 0
+      "candidate": 1
     },
     {
       "day": "2026-11-05",
-      "style": "balance",
-      "team": [
-        {
-          "species": "Salamence",
-          "setId": "salamence-choice-scarf"
-        },
-        {
-          "species": "Flygon",
-          "setId": "flygon-choice-scarf"
-        },
-        {
-          "species": "Ferrothorn",
-          "setId": "ferrothorn-standard"
-        },
-        {
-          "species": "Tyranitar",
-          "setId": "tyranitar-bulky-pursuit-trapper"
-        },
-        {
-          "species": "Volcarona",
-          "setId": "volcarona-lum-berry-quiver-dance"
-        },
-        {
-          "species": "Excadrill",
-          "setId": "excadrill-choice-scarf"
-        }
-      ],
-      "candidate": 2
-    },
-    {
-      "day": "2026-11-06",
       "style": "stall",
       "team": [
         {
-          "species": "Suicune",
-          "setId": "suicune-offensive"
+          "species": "Darmanitan",
+          "setId": "darmanitan-choice-scarf"
+        },
+        {
+          "species": "Porygon2",
+          "setId": "porygon2-defensive-duck"
+        },
+        {
+          "species": "Togekiss",
+          "setId": "togekiss-physically-defensive"
+        },
+        {
+          "species": "Venusaur",
+          "setId": "venusaur-leech-seed"
+        },
+        {
+          "species": "Kyurem-Black",
+          "setId": "kyuremblack-choice-band"
+        },
+        {
+          "species": "Gastrodon",
+          "setId": "gastrodon-physically-defensive"
+        }
+      ],
+      "candidate": 1
+    },
+    {
+      "day": "2026-11-06",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Latios",
+          "setId": "latios-choice-scarf"
+        },
+        {
+          "species": "Seismitoad",
+          "setId": "seismitoad-utility"
         },
         {
           "species": "Scizor",
           "setId": "scizor-choice-band"
         },
         {
-          "species": "Alakazam",
-          "setId": "alakazam-attacker"
+          "species": "Flygon",
+          "setId": "flygon-choice-scarf"
         },
         {
-          "species": "Claydol",
-          "setId": "claydol-support"
+          "species": "Haxorus",
+          "setId": "haxorus-choice-band"
         },
         {
-          "species": "Seismitoad",
-          "setId": "seismitoad-bulky-attacker"
-        },
-        {
-          "species": "Blissey",
-          "setId": "blissey-special-wall"
+          "species": "Forretress",
+          "setId": "forretress-entry-hazard-control"
         }
       ],
-      "candidate": 10
+      "candidate": 7
     },
     {
       "day": "2026-11-07",
-      "style": "balance",
+      "style": "stall",
       "team": [
         {
-          "species": "Cresselia",
-          "setId": "cresselia-defensive"
+          "species": "Azelf",
+          "setId": "azelf-choice-band"
         },
         {
-          "species": "Suicune",
-          "setId": "suicune-offensive"
-        },
-        {
-          "species": "Sableye",
-          "setId": "sableye-prankster"
-        },
-        {
-          "species": "Porygon-Z",
-          "setId": "porygonz-nasty-plot"
+          "species": "Volcarona",
+          "setId": "volcarona-lum-berry-quiver-dance"
         },
         {
           "species": "Starmie",
           "setId": "starmie-rapid-spin"
         },
         {
-          "species": "Latios",
-          "setId": "latios-choice-scarf"
+          "species": "Hippowdon",
+          "setId": "hippowdon-mixed-wall"
+        },
+        {
+          "species": "Forretress",
+          "setId": "forretress-custap-lead"
+        },
+        {
+          "species": "Conkeldurr",
+          "setId": "conkeldurr-bulk-up"
         }
       ],
-      "candidate": 2
+      "candidate": 0
     },
     {
       "day": "2026-11-08",
       "style": "balance",
       "team": [
         {
-          "species": "Scizor",
-          "setId": "scizor-offensive-swords-dance"
+          "species": "Jellicent",
+          "setId": "jellicent-standard"
         },
         {
-          "species": "Skarmory",
-          "setId": "skarmory-defensive"
-        },
-        {
-          "species": "Magnezone",
-          "setId": "magnezone-choice-scarf"
-        },
-        {
-          "species": "Blastoise",
-          "setId": "blastoise-specially-defensive"
-        },
-        {
-          "species": "Chandelure",
-          "setId": "chandelure-spinblocker"
+          "species": "Excadrill",
+          "setId": "excadrill-swords-dance"
         },
         {
           "species": "Breloom",
           "setId": "breloom-technician"
+        },
+        {
+          "species": "Politoed",
+          "setId": "politoed-defensive"
+        },
+        {
+          "species": "Cofagrigus",
+          "setId": "cofagrigus-offensive-trick-room"
+        },
+        {
+          "species": "Froslass",
+          "setId": "froslass-suicide-lead"
         }
       ],
-      "candidate": 2
+      "candidate": 17
     }
   ]
 }

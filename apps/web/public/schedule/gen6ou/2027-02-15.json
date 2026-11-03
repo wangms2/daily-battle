@@ -1,51 +1,55 @@
 {
   "version": 1,
-  "generatorVersion": 4,
-  "dataBuiltAt": "2026-10-24T02:55:39.964Z",
+  "generatorVersion": 6,
+  "dataBuiltAt": "2026-11-02T19:56:23.978Z",
   "week": "2027-02-15",
   "pool": {
     "species": [
-      "Keldeo",
-      "Bisharp",
-      "Diancie",
-      "Latios",
-      "Gliscor",
+      "Latias",
+      "Terrakion",
+      "Rotom-Wash",
+      "Tornadus-Therian",
+      "Landorus-Therian",
+      "Venusaur",
+      "Medicham",
+      "Heatran",
       "Skarmory",
-      "Lopunny",
-      "Clefable",
-      "Garchomp",
-      "Azumarill",
-      "Cofagrigus",
-      "Crawdaunt"
+      "Volcarona",
+      "Gastrodon",
+      "Mamoswine"
     ],
-    "candidate": 0
+    "candidate": 0,
+    "cores": [
+      "latias-terrakion",
+      "rotom-wash-tornadus-therian"
+    ]
   },
   "suggestedTeams": [
     {
       "team": [
         {
-          "species": "Latios",
-          "setId": "latios-life-orb-attacker"
+          "species": "Volcarona",
+          "setId": "volcarona-bulkarona"
         },
         {
-          "species": "Keldeo",
-          "setId": "keldeo-choice-specs"
+          "species": "Venusaur",
+          "setId": "venusaur-offensive"
         },
         {
-          "species": "Azumarill",
-          "setId": "azumarill-choice-band"
+          "species": "Skarmory",
+          "setId": "skarmory-defog"
         },
         {
-          "species": "Gliscor",
-          "setId": "gliscor-swords-dance-wallbreaker"
+          "species": "Terrakion",
+          "setId": "terrakion-choice-band"
         },
         {
-          "species": "Diancie",
-          "setId": "diancie-offensive"
+          "species": "Mamoswine",
+          "setId": "mamoswine-sash-lead"
         },
         {
-          "species": "Cofagrigus",
-          "setId": "cofagrigus-toxic-spikes-support"
+          "species": "Rotom-Wash",
+          "setId": "rotomwash-physically-defensive-pivot"
         }
       ]
     }
@@ -53,23 +57,197 @@
   "days": [
     {
       "day": "2027-02-15",
-      "style": "balance",
+      "style": "stall",
       "team": [
         {
-          "species": "Scolipede",
-          "setId": "scolipede-bulky-sweeper"
-        },
-        {
-          "species": "Excadrill",
-          "setId": "excadrill-specially-defensive"
-        },
-        {
-          "species": "Seismitoad",
-          "setId": "seismitoad-defensive"
+          "species": "Scizor",
+          "setId": "scizor-choice-band"
         },
         {
           "species": "Tornadus-Therian",
           "setId": "tornadustherian-assault-vest-pivot"
+        },
+        {
+          "species": "Gastrodon",
+          "setId": "gastrodon-specially-defensive"
+        },
+        {
+          "species": "Jellicent",
+          "setId": "jellicent-utility"
+        },
+        {
+          "species": "Zapdos",
+          "setId": "zapdos-specially-defensive"
+        },
+        {
+          "species": "Landorus-Therian",
+          "setId": "landorustherian-suicide-lead"
+        }
+      ],
+      "candidate": 2
+    },
+    {
+      "day": "2027-02-16",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Heatran",
+          "setId": "heatran-fast-utility"
+        },
+        {
+          "species": "Thundurus",
+          "setId": "thundurus-nasty-plot"
+        },
+        {
+          "species": "Hippowdon",
+          "setId": "hippowdon-physically-defensive"
+        },
+        {
+          "species": "Sylveon",
+          "setId": "sylveon-cleric"
+        },
+        {
+          "species": "Gliscor",
+          "setId": "gliscor-swords-dance-wallbreaker"
+        },
+        {
+          "species": "Cloyster",
+          "setId": "cloyster-shell-smash"
+        }
+      ],
+      "candidate": 19
+    },
+    {
+      "day": "2027-02-17",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Dragonite",
+          "setId": "dragonite-dragon-dance-three-attacks"
+        },
+        {
+          "species": "Volcarona",
+          "setId": "volcarona-offensive-quiver-dance"
+        },
+        {
+          "species": "Keldeo",
+          "setId": "keldeo-substitute-calm-mind"
+        },
+        {
+          "species": "Excadrill",
+          "setId": "excadrill-sand-rush"
+        },
+        {
+          "species": "Politoed",
+          "setId": "politoed-support"
+        },
+        {
+          "species": "Ferrothorn",
+          "setId": "ferrothorn-utility"
+        }
+      ],
+      "candidate": 1
+    },
+    {
+      "day": "2027-02-18",
+      "style": "offense",
+      "team": [
+        {
+          "species": "Chansey",
+          "setId": "chansey-de-blob"
+        },
+        {
+          "species": "Excadrill",
+          "setId": "excadrill-choice-scarf"
+        },
+        {
+          "species": "Alakazam",
+          "setId": "alakazam-colorful-attacker"
+        },
+        {
+          "species": "Raikou",
+          "setId": "raikou-calm-mind"
+        },
+        {
+          "species": "Weavile",
+          "setId": "weavile-choice-band"
+        },
+        {
+          "species": "Rotom-Wash",
+          "setId": "rotomwash-fast-utility"
+        }
+      ],
+      "candidate": 9
+    },
+    {
+      "day": "2027-02-19",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Volcanion",
+          "setId": "volcanion-assault-vest"
+        },
+        {
+          "species": "Magnezone",
+          "setId": "magnezone-choice-scarf"
+        },
+        {
+          "species": "Clefable",
+          "setId": "clefable-calm-mind"
+        },
+        {
+          "species": "Medicham",
+          "setId": "medicham-all-out-attacker"
+        },
+        {
+          "species": "Gliscor",
+          "setId": "gliscor-swords-dance-wallbreaker"
+        },
+        {
+          "species": "Landorus-Therian",
+          "setId": "landorustherian-choice-scarf"
+        }
+      ],
+      "candidate": 0
+    },
+    {
+      "day": "2027-02-20",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Excadrill",
+          "setId": "excadrill-sand-rush"
+        },
+        {
+          "species": "Terrakion",
+          "setId": "terrakion-choice-scarf"
+        },
+        {
+          "species": "Ferrothorn",
+          "setId": "ferrothorn-utility"
+        },
+        {
+          "species": "Landorus-Therian",
+          "setId": "landorustherian-choice-scarf"
+        },
+        {
+          "species": "Dragonite",
+          "setId": "dragonite-bulky-roost-dragon-dance"
+        },
+        {
+          "species": "Manaphy",
+          "setId": "manaphy-tail-glow-3-attacks"
+        }
+      ],
+      "candidate": 2
+    },
+    {
+      "day": "2027-02-21",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Magnezone",
+          "setId": "magnezone-choice-scarf"
         },
         {
           "species": "Latias",
@@ -78,195 +256,21 @@
         {
           "species": "Raikou",
           "setId": "raikou-calm-mind"
+        },
+        {
+          "species": "Azelf",
+          "setId": "azelf-lead"
+        },
+        {
+          "species": "Chansey",
+          "setId": "chansey-de-blob"
+        },
+        {
+          "species": "Volcarona",
+          "setId": "volcarona-offensive-quiver-dance"
         }
       ],
-      "candidate": 1
-    },
-    {
-      "day": "2027-02-16",
-      "style": "balance",
-      "team": [
-        {
-          "species": "Gliscor",
-          "setId": "gliscor-stallbreaker"
-        },
-        {
-          "species": "Thundurus-Therian",
-          "setId": "thundurustherian-nasty-plot"
-        },
-        {
-          "species": "Venusaur",
-          "setId": "venusaur-offensive"
-        },
-        {
-          "species": "Weavile",
-          "setId": "weavile-choice-band"
-        },
-        {
-          "species": "Cresselia",
-          "setId": "cresselia-defensive"
-        },
-        {
-          "species": "Hippowdon",
-          "setId": "hippowdon-special-wall"
-        }
-      ],
-      "candidate": 3
-    },
-    {
-      "day": "2027-02-17",
-      "style": "balance",
-      "team": [
-        {
-          "species": "Lucario",
-          "setId": "lucario-swords-dance"
-        },
-        {
-          "species": "Bisharp",
-          "setId": "bisharp-swords-dance"
-        },
-        {
-          "species": "Excadrill",
-          "setId": "excadrill-sand-rush"
-        },
-        {
-          "species": "Keldeo",
-          "setId": "keldeo-substitute-calm-mind"
-        },
-        {
-          "species": "Amoonguss",
-          "setId": "amoonguss-pivot"
-        },
-        {
-          "species": "Heatran",
-          "setId": "heatran-specially-defensive"
-        }
-      ],
-      "candidate": 5
-    },
-    {
-      "day": "2027-02-18",
-      "style": "balance",
-      "team": [
-        {
-          "species": "Serperior",
-          "setId": "serperior-dual-screens"
-        },
-        {
-          "species": "Weavile",
-          "setId": "weavile-choice-band"
-        },
-        {
-          "species": "Krookodile",
-          "setId": "krookodile-choice-scarf"
-        },
-        {
-          "species": "Gliscor",
-          "setId": "gliscor-swords-dance-wallbreaker"
-        },
-        {
-          "species": "Excadrill",
-          "setId": "excadrill-fast-utility"
-        },
-        {
-          "species": "Garchomp",
-          "setId": "garchomp-substitute-swords-dance"
-        }
-      ],
-      "candidate": 2
-    },
-    {
-      "day": "2027-02-19",
-      "style": "balance",
-      "team": [
-        {
-          "species": "Donphan",
-          "setId": "donphan-defensive-spinner"
-        },
-        {
-          "species": "Volcanion",
-          "setId": "volcanion-assault-vest"
-        },
-        {
-          "species": "Bisharp",
-          "setId": "bisharp-swords-dance"
-        },
-        {
-          "species": "Clefable",
-          "setId": "clefable-calm-mind"
-        },
-        {
-          "species": "Scizor",
-          "setId": "scizor-choice-band"
-        },
-        {
-          "species": "Latios",
-          "setId": "latios-calm-mind"
-        }
-      ],
-      "candidate": 16
-    },
-    {
-      "day": "2027-02-20",
-      "style": "stall",
-      "team": [
-        {
-          "species": "Latios",
-          "setId": "latios-calm-mind"
-        },
-        {
-          "species": "Quagsire",
-          "setId": "quagsire-unaware-wall"
-        },
-        {
-          "species": "Cofagrigus",
-          "setId": "cofagrigus-toxic-spikes-support"
-        },
-        {
-          "species": "Magnezone",
-          "setId": "magnezone-choice-scarf"
-        },
-        {
-          "species": "Zapdos",
-          "setId": "zapdos-physically-defensive"
-        },
-        {
-          "species": "Alakazam",
-          "setId": "alakazam-utility-attacker"
-        }
-      ],
-      "candidate": 3
-    },
-    {
-      "day": "2027-02-21",
-      "style": "balance",
-      "team": [
-        {
-          "species": "Toxicroak",
-          "setId": "toxicroak-swords-dance"
-        },
-        {
-          "species": "Garchomp",
-          "setId": "garchomp-tank-chomp"
-        },
-        {
-          "species": "Gengar",
-          "setId": "gengar-hex"
-        },
-        {
-          "species": "Scizor",
-          "setId": "scizor-choice-band"
-        },
-        {
-          "species": "Weavile",
-          "setId": "weavile-choice-band"
-        },
-        {
-          "species": "Politoed",
-          "setId": "politoed-support"
-        }
-      ],
-      "candidate": 4
+      "candidate": 9
     }
   ]
 }
