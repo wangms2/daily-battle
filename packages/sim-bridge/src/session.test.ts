@@ -57,7 +57,7 @@ describe('BattleSession', () => {
   });
 
   it('plays the same after a reseed with the same seed, and differently with another', () => {
-    const input = { seed: deriveSeed('session', 5), ...teams(5) };
+    const input = { seed: deriveSeed('session', 8), ...teams(8) };
     const play = (seed: string) => {
       const s = new BattleSession(input);
       s.reseed(seed as never);
@@ -74,7 +74,7 @@ describe('BattleSession', () => {
   });
 
   it('sets HP silently, and both sides see it', () => {
-    const s = new BattleSession({ seed: deriveSeed('session', 6), ...teams(6) });
+    const s = new BattleSession({ seed: deriveSeed('session', 8), ...teams(8) });
     s.drain('p1');
     s.setHp('p1', 0, 0.3);
     s.setHp('p2', 0, 0.55);

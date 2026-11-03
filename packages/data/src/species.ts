@@ -60,6 +60,9 @@ export interface SpeciesFile {
   typeChart: Record<string, Record<string, number>>;
 }
 
+/** Moves the Learn course teaches that no set uses, so the web can still describe them. */
+const COURSE_MOVES: Record<string, string[]> = { gen3ou: ['Dragon Claw'] };
+
 export function buildSpecies(sets: SetsFile): SpeciesFile {
   const dex = Dex.forGen(genOf(sets.meta.format));
   const species: SpeciesFile['species'] = {};
@@ -95,7 +98,10 @@ export function buildSpecies(sets: SetsFile): SpeciesFile {
   }
   const moves: SpeciesFile['moves'] = {};
   for (const name of [
-    ...new Set(Object.values(sets.species).flatMap((e) => playerSets(e).flatMap((s) => s.moves))),
+    ...new Set([
+      ...Object.values(sets.species).flatMap((e) => playerSets(e).flatMap((s) => s.moves)),
+      ...(COURSE_MOVES[sets.meta.format] ?? []),
+    ]),
   ].sort()) {
     const m = dex.moves.get(name);
     if (!m.exists) throw new Error(`Unknown move in sets: ${name}`);

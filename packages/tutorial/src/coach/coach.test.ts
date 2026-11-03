@@ -182,6 +182,7 @@ describe('Simple coach warnings', () => {
       {
         p1: [{ species: 'Blissey', moves: ['Seismic Toss', 'Soft-Boiled', 'Toxic', 'Ice Beam'] }],
         p2: [MENCE],
+        hp: { p2: [40] },
       },
       'move 1',
       'move 4',
@@ -362,7 +363,6 @@ describe('Simple coach in real battles', () => {
         p1: [SWAMPERT, { species: 'Heracross', setId: 'heracross-standard' }],
         p2: [{ species: 'Salamence', setId }],
       });
-    expect(turn('salamence-mixed')).toEqual(turn('salamence-dragon-dance'));
     expect(turn('salamence-choice-band')).toEqual(turn('salamence-dragon-dance'));
   });
 

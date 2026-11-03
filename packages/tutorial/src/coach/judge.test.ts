@@ -100,7 +100,7 @@ describe.skipIf(!engineBuilt(3))('Judge', () => {
       while (judge.step());
       return ['move 1', 'move 2', 'move 3', 'move 4'].map((c) => judge.verdict(c));
     };
-    expect(verdicts('salamence-mixed')).toEqual(verdicts('salamence-dragon-dance'));
+    expect(verdicts('salamence-choice-band')).toEqual(verdicts('salamence-dragon-dance'));
   });
 });
 
