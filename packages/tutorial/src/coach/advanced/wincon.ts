@@ -1,6 +1,9 @@
 // The advanced coach's win conditions (plan: concept 1), from counterfactual
 // searches (facts/counterfactual.ts): the battle with one of the foe's seen
 // Pokémon gone is near-won for us, and it hinges on one of ours.
+// NOT USED IN THE GAME (owner, Nov 4): on the risk1 holdout the oracle confirmed the
+// "near-won without it" claim for only ~27% of "take out" tips (~2/3 even as a softer
+// "it's in your way"); "keep" and "plan" were weaker. Kept for the offline scan.
 //   "Take out Swampert: once it's down, Salamence should be able to win this."
 //   "Keep Salamence healthy: once Swampert is down, it should be able to win this."
 import type { NetWorld } from '@daily-battle/engine-wasm';

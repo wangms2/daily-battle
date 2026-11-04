@@ -260,8 +260,17 @@ const child = process.argv.indexOf('--child');
 if (child > 0) {
   const [shard, jobs] = process.argv.slice(child + 1).map(Number);
   const all = load();
-  for (let k = shard!; k < all.length; k += jobs!)
-    process.send!(scan(engineFor(all[k]!.format), all[k]!, k));
+  for (let k = shard!; k < all.length; k += jobs!) {
+    let f: Found;
+    try {
+      f = scan(engineFor(all[k]!.format), all[k]!, k);
+    } catch (e) {
+      // A rare engine failure (e.g. the oracle's stack overflow) skips the position.
+      console.error(`  position ${k} skipped: ${String(e).slice(0, 120)}`);
+      f = { k, tips: [] };
+    }
+    process.send!(f);
+  }
   process.exit(0);
 }
 

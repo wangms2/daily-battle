@@ -29,12 +29,17 @@ const damaging = (c: string) => c === 'move 1';
 
 describe('preserve / sacrifice tips', () => {
   it('keeps a Pokémon we need, and lets one go that we don’t', () => {
-    expect(preserveTip([world(0.3, 0.5)], legal, 'switch 2', () => 0.2, damaging)).toMatchObject({
+    const on = { preserve: true };
+    expect(
+      preserveTip([world(0.3, 0.5)], legal, 'switch 2', () => 0.2, damaging, on),
+    ).toMatchObject({
       kind: 'preserve',
       mon: 'gengar',
       contrast: 'move 1',
       danger: 1,
     });
+    // Off by default (owner: sacrifice only).
+    expect(preserveTip([world(0.3, 0.5)], legal, 'switch 2', () => 0.2, damaging)).toBeUndefined();
     expect(preserveTip([world(0.5, 0.4)], legal, 'move 1', () => 0.48, damaging)).toMatchObject({
       kind: 'sacrifice',
       contrast: 'switch 2',
@@ -42,7 +47,9 @@ describe('preserve / sacrifice tips', () => {
   });
 
   it('stays quiet when the cost doesn’t match the advice', () => {
-    expect(preserveTip([world(0.3, 0.5)], legal, 'switch 2', () => 0.45, damaging)).toBeUndefined();
+    expect(
+      preserveTip([world(0.3, 0.5)], legal, 'switch 2', () => 0.45, damaging, { preserve: true }),
+    ).toBeUndefined();
     expect(preserveTip([world(0.5, 0.4)], legal, 'move 1', () => 0.2, damaging)).toBeUndefined();
   });
 

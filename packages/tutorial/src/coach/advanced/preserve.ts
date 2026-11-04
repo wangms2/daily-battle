@@ -12,6 +12,11 @@ import { bestScore } from './wincon';
 export interface PreserveOptions {
   /** Our active faints this turn with at least this chance if it attacks. */
   danger: number;
+  /**
+   * Offer preserve tips at all. Off: on the risk1 holdout the oracle contradicted ~22%
+   * at every gate tried (owner, Nov 4: sacrifice only).
+   */
+  preserve: boolean;
   /** Preserve: losing it costs at least this. */
   need: number;
   /** Sacrifice: losing it costs at most this. */
@@ -25,6 +30,7 @@ export interface PreserveOptions {
 
 export const PRESERVE_DEFAULTS: PreserveOptions = {
   danger: 0.5,
+  preserve: false,
   need: 0.15,
   spare: 0.05,
   keepLead: 0.15,
@@ -78,7 +84,7 @@ export function preserveTip(
   const swap = by(legal.filter((c) => c.startsWith('switch ') && Number.isFinite(values[c])));
   if (!attack || !swap) return undefined;
   const kind = top === swap ? 'preserve' : damaging(top) ? 'sacrifice' : undefined;
-  if (!kind) return undefined;
+  if (!kind || (kind === 'preserve' && !o.preserve)) return undefined;
   const contrast = kind === 'preserve' ? attack : swap;
   if (!(values[top]! - values[contrast]! >= (kind === 'preserve' ? o.keepLead : o.lead)))
     return undefined;
