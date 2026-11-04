@@ -46,6 +46,7 @@ describe.skipIf(!engineBuilt(4))('net search for the coach', () => {
     search.mockRestore();
 
     let held = 0;
+    let hurt = 0;
     for (const [params, worlds] of calls) {
       for (const [w, result] of engine.netSearch(params, worlds).entries()) {
         // With robust 0, a score is its win chance against each reply, by the reply's chance.
@@ -54,6 +55,20 @@ describe.skipIf(!engineBuilt(4))('net search for the coach', () => {
         for (const slot of searched) {
           const mean = result.replies.reduce((t, r) => t + r.p * r.q[slot]!, 0);
           expect(mean).toBeCloseTo(result.score[slot]!, 4);
+        }
+        // Asked for, the outcomes break each (choice, reply) value down by chance,
+        // and the search doesn't change.
+        const [split] = engine.netSearch({ ...params, outcomes: true }, [worlds[w]!]);
+        expect(split!.score).toEqual(result.score);
+        expect(result.outcomes).toEqual([]);
+        for (const reply of result.replies) {
+          for (const slot of searched) {
+            const pair = split!.outcomes.filter((o) => o.own === slot && o.foe === reply.slot);
+            expect(pair.length).toBeGreaterThan(0);
+            expect(pair.reduce((t, o) => t + o.p, 0)).toBeCloseTo(1, 4);
+            expect(pair.reduce((t, o) => t + o.p * o.value, 0)).toBeCloseTo(reply.q[slot]!, 4);
+            for (const o of pair) if (o.foeHp > 0 || o.ownHp > 0) hurt++;
+          }
         }
         // A legal choice the prior left out is searched when held, and the
         // others' scores don't move.
@@ -67,6 +82,7 @@ describe.skipIf(!engineBuilt(4))('net search for the coach', () => {
       }
     }
     expect(held).toBeGreaterThan(0);
+    expect(hurt).toBeGreaterThan(0);
   }, 120_000);
 });
 

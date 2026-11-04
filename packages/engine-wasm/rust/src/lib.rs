@@ -447,11 +447,13 @@ fn parse_view<'a>(
 }
 
 /// The light search (search.rs) over the loaded network. Input lines: the
-/// parameters `ownK ownMass foeK foeMass branches branchMass robust`; then per
+/// parameters `ownK ownMass foeK foeMass branches branchMass robust [outcomes]`; then per
 /// world, `legal` with 14 flags (our slots the game allows: 1, or 2 to search
 /// it whatever the prior), and the world as `observe` reads it, ended by a
 /// line `=`. Output: JSON, per world `{"prior":[14],"value":v,"foe":[14],
-/// "score":[14, null where not searched],"positions":n,"replies":[{"slot":s,"p":p,"q":[14]}]}`.
+/// "score":[14, null where not searched],"positions":n,"replies":[{"slot":s,"p":p,"q":[14]}],
+/// "outcomes":[{"own":s,"foe":s,"p":p,"value":v,"ownHp":h,"foeHp":h,"ownKo":n,"foeKo":n}]}`
+/// (outcomes only when the flag is 1).
 #[no_mangle]
 pub extern "C" fn net_search(ptr: *mut u8, len: usize) {
     install_panic_hook();
@@ -460,7 +462,7 @@ pub extern "C" fn net_search(ptr: *mut u8, len: usize) {
     let mut lines = text.lines();
     let v: Vec<f32> =
         lines.next().expect("net_search: no parameters").split_whitespace().map(|x| x.parse().unwrap()).collect();
-    assert!(v.len() == 7, "net_search: 7 parameters");
+    assert!(v.len() == 7 || v.len() == 8, "net_search: 7 or 8 parameters");
     let p = search::Params {
         own_k: v[0] as usize,
         own_mass: v[1],
@@ -469,6 +471,7 @@ pub extern "C" fn net_search(ptr: *mut u8, len: usize) {
         branches: v[4] as usize,
         branch_mass: v[5],
         robust: v[6],
+        outcomes: v.get(7).is_some_and(|&x| x != 0.0),
     };
     let mut worlds = Vec::new();
     while let Some(l) = lines.by_ref().find(|l| !l.trim().is_empty()) {
@@ -501,14 +504,33 @@ pub extern "C" fn net_search(ptr: *mut u8, len: usize) {
                     )
                 })
                 .collect();
+            let slot = |s: Option<usize>| s.map_or("null".into(), |s| s.to_string());
+            let outcomes: Vec<String> = r
+                .outcomes
+                .iter()
+                .map(|o| {
+                    format!(
+                        "{{\"own\":{},\"foe\":{},\"p\":{},\"value\":{},\"ownHp\":{},\"foeHp\":{},\"ownKo\":{},\"foeKo\":{}}}",
+                        slot(o.own),
+                        slot(o.foe),
+                        o.p,
+                        o.value,
+                        o.change.own_hp,
+                        o.change.foe_hp,
+                        o.change.own_ko,
+                        o.change.foe_ko
+                    )
+                })
+                .collect();
             format!(
-                "{{\"prior\":[{}],\"value\":{},\"foe\":[{}],\"score\":[{}],\"positions\":{},\"replies\":[{}]}}",
+                "{{\"prior\":[{}],\"value\":{},\"foe\":[{}],\"score\":[{}],\"positions\":{},\"replies\":[{}],\"outcomes\":[{}]}}",
                 nums(&r.prior),
                 r.value,
                 nums(&r.foe),
                 nums(&r.score),
                 r.positions,
-                replies.join(",")
+                replies.join(","),
+                outcomes.join(",")
             )
         })
         .collect();

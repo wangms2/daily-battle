@@ -323,7 +323,16 @@ export class Engine {
   netSearch(params: NetSearchParams, worlds: readonly NetWorld[]): NetSearchResult[] {
     const p = { ...DEFAULT_NET_SEARCH, ...params };
     const lines = [
-      [p.ownK, p.ownMass, p.foeK, p.foeMass, p.branches, p.branchMass, p.robust].join(' '),
+      [
+        p.ownK,
+        p.ownMass,
+        p.foeK,
+        p.foeMass,
+        p.branches,
+        p.branchMass,
+        p.robust,
+        p.outcomes ? 1 : 0,
+      ].join(' '),
     ];
     for (const w of worlds) {
       lines.push(['legal', ...w.legal.map((x, i) => (x ? (w.must?.[i] ? 2 : 1) : 0))].join(' '));
@@ -442,6 +451,8 @@ export interface NetSearchParams {
   branchMass?: number;
   /** Weight of a choice's worst case over the foe's choices, vs the predicted mean. */
   robust?: number;
+  /** Report each root pair's chance outcomes (NetSearchResult.outcomes), for the coach's risk facts. */
+  outcomes?: boolean;
 }
 
 export const DEFAULT_NET_SEARCH: Required<NetSearchParams> = {
@@ -452,6 +463,7 @@ export const DEFAULT_NET_SEARCH: Required<NetSearchParams> = {
   branches: 6,
   branchMass: 0.98,
   robust: 0.25,
+  outcomes: false,
 };
 
 /** One sampled world to search, from side one's view. */
@@ -489,6 +501,24 @@ export interface NetSearchResult {
   positions: number;
   /** The foe's searched replies, with our choices' win chances against each. */
   replies: NetReply[];
+  /** With outcomes: every searched (our choice, foe reply) pair's chance outcomes; else empty. */
+  outcomes: NetOutcome[];
+}
+
+/** One chance outcome (a hit or miss, a crit, a damage roll…) of a pair of choices at the root. */
+export interface NetOutcome {
+  /** Our slot and the foe's (null: no real choice). */
+  own: number | null;
+  foe: number | null;
+  /** Its chance, given the two choices (the pair's searched outcomes sum to 1). */
+  p: number;
+  /** Our win chance after it. */
+  value: number;
+  /** HP lost over each whole team, in full HP bars, and Pokémon fainted. */
+  ownHp: number;
+  foeHp: number;
+  ownKo: number;
+  foeKo: number;
 }
 
 /** Observation v2 sizes (features.rs OBS_FLOATS, OBS_IDS; 14 action slots). */

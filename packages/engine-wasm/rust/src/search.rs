@@ -37,11 +37,13 @@ pub struct Params {
     pub branch_mass: f32,
     /// Weight of a choice's worst case over the foe's choices (vs the predicted mean).
     pub robust: f32,
+    /// Report each root outcome (`WorldResult::outcomes`), for the coach's risk facts.
+    pub outcomes: bool,
 }
 
 impl Default for Params {
     fn default() -> Params {
-        Params { own_k: 4, own_mass: 0.95, foe_k: 3, foe_mass: 0.9, branches: 6, branch_mass: 0.98, robust: 0.25 }
+        Params { own_k: 4, own_mass: 0.95, foe_k: 3, foe_mass: 0.9, branches: 6, branch_mass: 0.98, robust: 0.25, outcomes: false }
     }
 }
 
@@ -82,6 +84,51 @@ pub struct WorldResult {
     pub positions: usize,
     /// The foe's searched replies and our choices' win chances against each.
     pub replies: Vec<Reply>,
+    /// With `Params::outcomes`: every searched pair's chance outcomes at the root.
+    pub outcomes: Vec<Outcome>,
+}
+
+/// What a turn's chance outcome did, as HP and faints on each side.
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub struct Change {
+    /// HP lost over the whole team, in Pokémon (1.0: one full HP bar).
+    pub own_hp: f32,
+    pub foe_hp: f32,
+    /// Pokémon that fainted.
+    pub own_ko: u8,
+    pub foe_ko: u8,
+}
+
+/// One chance outcome of one of our searched choices against one foe reply.
+#[derive(Clone, Debug)]
+pub struct Outcome {
+    pub own: Option<usize>,
+    pub foe: Option<usize>,
+    /// Its chance, given the two choices.
+    pub p: f32,
+    /// Our win chance after it.
+    pub value: f32,
+    pub change: Change,
+}
+
+/// The turn's HP and faints, from `a` to `b`.
+fn change(a: &State, b: &State) -> Change {
+    let side = |x: &poke_engine::state::Side, y: &poke_engine::state::Side| {
+        let mut hp = 0.0;
+        let mut ko = 0;
+        for (p, q) in x.pokemon.pkmn.iter().zip(y.pokemon.pkmn.iter()) {
+            if p.maxhp > 0 {
+                hp += (p.hp - q.hp) as f32 / p.maxhp as f32;
+            }
+            if p.hp > 0 && q.hp <= 0 {
+                ko += 1;
+            }
+        }
+        (hp, ko)
+    };
+    let (own_hp, own_ko) = side(&a.side_one, &b.side_one);
+    let (foe_hp, foe_ko) = side(&a.side_two, &b.side_two);
+    Change { own_hp, foe_hp, own_ko, foe_ko }
 }
 
 pub fn slot_of(c: &MoveChoice) -> Option<usize> {
@@ -251,6 +298,8 @@ struct Node {
     foe: Vec<(MoveChoice, f32)>,
     /// Per (own, foe) pair: (probability, leaf) outcomes.
     pairs: Vec<Vec<(f32, Leaf)>>,
+    /// With `record`: each outcome's change, parallel to `pairs`.
+    changes: Vec<Vec<Change>>,
 }
 
 enum Leaf {
@@ -275,6 +324,7 @@ fn expand(
     p: &Params,
     own_k: usize,
     foe_k: usize,
+    record: bool,
     batch: &mut Vec<Pos>,
 ) -> Node {
     let (o1, o2) = pos.state.root_get_all_options();
@@ -294,11 +344,16 @@ fn expand(
     }
     let foe = pick(&o2, &foe_p, foe_k, p.foe_mass);
     let mut pairs = Vec::with_capacity(own.len() * foe.len());
+    let mut changes = Vec::new();
     for (c1, _) in &own {
         for (c2, _) in &foe {
             let mut leaves = Vec::new();
+            let mut ch = Vec::new();
             for (w, ins) in outcomes(pos, c1, c2, p) {
                 let next = pos.after([c1, c2], &ins);
+                if record {
+                    ch.push(change(&pos.state, &next.state));
+                }
                 leaves.push((
                     w,
                     match over(&next.state) {
@@ -311,9 +366,10 @@ fn expand(
                 ));
             }
             pairs.push(leaves);
+            changes.push(ch);
         }
     }
-    Node { own, foe, pairs }
+    Node { own, foe, pairs, changes: if record { changes } else { Vec::new() } }
 }
 
 /// Each of our candidates' win chance against each of the foe's (own × foe).
@@ -378,7 +434,7 @@ pub fn search(net: &Net, worlds: Vec<World>, p: &Params) -> Vec<WorldResult> {
         .enumerate()
         .map(|(i, r)| {
             let w = &worlds[i];
-            expand(r, &root_out[i], Some(&w.legal), Some(&w.must), p, p.own_k, p.foe_k, &mut first)
+            expand(r, &root_out[i], Some(&w.legal), Some(&w.must), p, p.own_k, p.foe_k, p.outcomes, &mut first)
         })
         .collect();
     let first_out = judge(net, &first, |i| if first[i].forced() { mask_of(&first[i].state) } else { [true; ACTIONS] });
@@ -387,7 +443,7 @@ pub fn search(net: &Net, worlds: Vec<World>, p: &Params) -> Vec<WorldResult> {
     let mut second = Vec::new();
     let mut sub: Vec<Option<Node>> = Vec::with_capacity(first.len());
     for (i, pos) in first.iter_mut().enumerate() {
-        sub.push(pos.forced().then(|| expand(pos, &first_out[i], None, None, p, 3, 3, &mut second)));
+        sub.push(pos.forced().then(|| expand(pos, &first_out[i], None, None, p, 3, 3, false, &mut second)));
     }
     let second_out = judge(net, &second, |_| [true; ACTIONS]);
     let v2 = |i: usize| sigmoid(second_out[i].value);
@@ -440,6 +496,26 @@ pub fn search(net: &Net, worlds: Vec<World>, p: &Params) -> Vec<WorldResult> {
                     Reply { slot: slot_of(c), p: *prob, q: per }
                 })
                 .collect();
+            let nf = node.foe.len();
+            let v1 = &v1;
+            let outcomes = node
+                .changes
+                .iter()
+                .enumerate()
+                .flat_map(|(k, ch)| {
+                    let (a, b) = (k / nf, k % nf);
+                    node.pairs[k].iter().zip(ch).map(move |((pr, leaf), c)| Outcome {
+                        own: slot_of(&node.own[a].0),
+                        foe: slot_of(&node.foe[b].0),
+                        p: *pr,
+                        value: match leaf {
+                            Leaf::Over(v) => *v,
+                            Leaf::Judged(i) => v1[*i],
+                        },
+                        change: *c,
+                    })
+                })
+                .collect();
             WorldResult {
                 prior: softmax(&out.policy, |s| on1.contains(&s)),
                 value: sigmoid(out.value),
@@ -447,6 +523,7 @@ pub fn search(net: &Net, worlds: Vec<World>, p: &Params) -> Vec<WorldResult> {
                 score,
                 positions: counts[w],
                 replies,
+                outcomes,
             }
         })
         .collect()
