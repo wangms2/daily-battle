@@ -1,4 +1,4 @@
-import type { SVGProps } from 'react';
+import { useId, type SVGProps } from 'react';
 
 const base = (props: SVGProps<SVGSVGElement>) => ({
   width: 20,
@@ -92,6 +92,8 @@ export const BallIcon = ({
   kind,
   ...p
 }: SVGProps<SVGSVGElement> & { kind: 'poke' | 'great' | 'ultra' | 'master' }) => {
+  // Unique per icon: a repeated id can leave the clip unapplied in some browsers.
+  const clip = `ball-${useId().replace(/\W/g, '')}`;
   const ring = '#2b2d36';
   const top = {
     ultra: '#26252b',
@@ -101,10 +103,10 @@ export const BallIcon = ({
   }[kind];
   return (
     <svg width={14} height={14} viewBox="0 0 20 20" aria-hidden {...p}>
-      <clipPath id={`ball-${kind}`}>
+      <clipPath id={clip}>
         <circle cx="10" cy="10" r="9" />
       </clipPath>
-      <g clipPath={`url(#ball-${kind})`}>
+      <g clipPath={`url(#${clip})`}>
         <rect width="20" height="20" fill="#f4f3f1" />
         <rect width="20" height="10" fill={top} />
         {kind === 'great' && (
