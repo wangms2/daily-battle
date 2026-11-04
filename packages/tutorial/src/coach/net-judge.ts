@@ -31,6 +31,7 @@ import {
   type ReadValue,
   type Verdict,
 } from './judge';
+import type { BranchWorld } from './facts/branches';
 
 export interface NetJudgeOptions extends Pick<
   JudgeOptions,
@@ -44,11 +45,12 @@ export interface NetJudgeOptions extends Pick<
 /**
  * Set by coach-eval --judge both (vs Normal and Hard): the network's gaps run about
  * half the search's, and at 0.07 its warnings gained as much or more, with no clearly
- * wrong ones.
+ * wrong ones. Its searches also report their chance outcomes (the same search; for the
+ * advanced coach's branch odds).
  */
 export const NET_JUDGE_DEFAULTS: NetJudgeOptions = {
   worlds: MASTER_DEFAULTS.worlds,
-  search: MASTER_DEFAULTS.search,
+  search: { ...MASTER_DEFAULTS.search, outcomes: true },
   margin: 0.07,
   agree: 0.9,
 };
@@ -210,6 +212,18 @@ export class NetJudge implements CoachJudge {
         )
       : undefined;
     if (!this.top) this.failed = true;
+  }
+
+  /** The searched worlds, for the advanced coach's facts; undefined until every world is searched. */
+  searched(): BranchWorld[] | undefined {
+    if (this.failed || !this.top) return undefined;
+    const p = this.prepared!;
+    return this.kept().map((k) => ({
+      result: this.results[k]!,
+      weight: p.weights[k]!,
+      slots: p.slots[k]!,
+      world: p.worlds[k]!,
+    }));
   }
 
   /** Worlds whose search ran. */

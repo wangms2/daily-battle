@@ -1,7 +1,7 @@
 // Branch odds for the advanced coach's risk tips: how a choice's chance
 // outcomes (a miss, a crit, a damage roll; engine netSearch `outcomes`) spread
 // its win chance, against the foe's likely replies, over the sampled worlds.
-import type { NetOutcome, NetSearchResult } from '@daily-battle/engine-wasm';
+import type { NetOutcome, NetSearchResult, NetWorld } from '@daily-battle/engine-wasm';
 
 /** One searched world: its search (with outcomes), weight and our choices' slots. */
 export interface BranchWorld {
@@ -9,6 +9,8 @@ export interface BranchWorld {
   weight: number;
   /** Our choice at each slot (undefined: none there). */
   slots: readonly (string | undefined)[];
+  /** The world searched (for counterfactuals). */
+  world?: NetWorld;
 }
 
 /** What happened in a bad branch, next to the pair's likeliest outcome. */
