@@ -2,11 +2,12 @@
 // (--out JSONL) as one HTML page for the owner to grade (sound / clear /
 // useful), each with the board (the judge's first sampled world), the tip's
 // text, its facts and numbers, and the oracle's grades.
-//   pnpm exec tsx scripts/advanced-gallery.ts --tips a.jsonl[,b.jsonl] --out gallery.html [--max 50]
+//   pnpm exec tsx scripts/advanced-gallery.ts --tips a.jsonl[,b.jsonl] --out gallery.html [--max 50] [--concept risk|slow]
 import { readFileSync, writeFileSync } from 'node:fs';
 import { FORMATS } from '@daily-battle/data';
 import { Dex } from '@pkmn/sim';
 import { riskText, type RiskTip } from '../src/coach/advanced/risk';
+import { HAZARD_MOVES, PACING_MOVES, slowText, type SlowTip } from '../src/coach/advanced/slow';
 
 const arg = (name: string) => {
   const i = process.argv.indexOf(`--${name}`);
@@ -16,6 +17,7 @@ const TIPS = arg('tips');
 const OUT = arg('out');
 if (!TIPS || !OUT) throw new Error('usage: --tips <a.jsonl[,b.jsonl]> --out <gallery.html>');
 const MAX = Number(arg('max') ?? 50);
+const CONCEPT = arg('concept') ?? 'risk';
 
 interface Row {
   format: string;
@@ -26,15 +28,24 @@ interface Row {
   legal: string[];
   oracle?: Record<string, number>;
   oracleLead?: number;
-  tip: { concept: string; kind: string } & RiskTip;
+  tip: ({ concept: 'risk'; kind: 'miss' } & RiskTip) | ({ concept: 'slow' } & SlowTip);
   state: string;
+}
+
+/** Slow tips: only the moves the detector still uses. */
+function keep(r: Row) {
+  const s = r.state.split('/')[0]!.split('=');
+  const m = /^move (\d)/.exec((r.tip as SlowTip).choice);
+  const id = m ? s[Number(s[6])]!.split(',')[21 + Number(m[1])]!.split(';')[0]!.toLowerCase() : '';
+  return HAZARD_MOVES.has(id) || PACING_MOVES.has(id);
 }
 
 const rows: Row[] = TIPS.split(',').flatMap((f) =>
   readFileSync(f, 'utf8')
     .split('\n')
     .filter((l) => l.trim())
-    .map((l) => JSON.parse(l) as Row),
+    .map((l) => JSON.parse(l) as Row)
+    .filter((r) => r.tip.concept === CONCEPT && (r.tip.concept !== 'slow' || keep(r))),
 );
 // Spread over formats: round-robin by format, in file order.
 const byFormat = new Map<string, Row[]>();
@@ -50,7 +61,7 @@ const pct = (x: number) => `${Math.round(100 * x)}%`;
 interface Mon {
   species: string;
   hp: number;
-  moves: { name: string; acc: number | true }[];
+  moves: { id: string; name: string; acc: number | true }[];
 }
 function side(s: string, dex: typeof Dex): { active: number; mons: Mon[] } {
   const f = s.split('=');
@@ -61,7 +72,7 @@ function side(s: string, dex: typeof Dex): { active: number; mons: Mon[] } {
       hp: Number(p[6]) / Number(p[7]),
       moves: p.slice(22, 26).map((x) => {
         const mv = dex.moves.get(x.split(';')[0]!);
-        return { name: mv.name || x, acc: mv.accuracy };
+        return { id: mv.id, name: mv.name || x, acc: mv.accuracy };
       }),
     };
   });
@@ -84,9 +95,35 @@ const cards = picked.map((r, n) => {
   ];
   const me = mine.mons[mine.active]!;
   const them = foe.mons[foe.active]!;
-  const safe = moveOf(me, r.tip.safe)!;
-  const risky = moveOf(me, r.tip.risky)!;
-  const text = riskText(safe.name, risky.name, risky.acc === true ? 100 : risky.acc, n);
+  let text: string;
+  let facts: string;
+  if (r.tip.concept === 'risk') {
+    const safe = moveOf(me, r.tip.safe)!;
+    const risky = moveOf(me, r.tip.risky)!;
+    text = riskText(safe.name, risky.name, risky.acc === true ? 100 : risky.acc, n);
+    facts = `${esc(risky.name)} is ${risky.acc === true ? '—' : `${risky.acc}%`} accurate; a costly miss
+    in ${pct(r.tip.bad)} of its outcomes. Win chance (network): ${esc(safe.name)} ${r.tip.values.safe.toFixed(2)},
+    ${esc(risky.name)} ${r.tip.values.risky.toFixed(2)}.`;
+  } else {
+    const t = r.tip;
+    const move = moveOf(me, t.choice)!;
+    const contrast = label(mine, me, t.contrast);
+    const targets = t.targets?.map((x) => ({
+      name: dex.species.get(x.species).name,
+      frac: x.frac,
+    }));
+    text = slowText(
+      move.id,
+      { move: move.name, contrast, foe: them.species, ...(targets ? { targets } : {}) },
+      n,
+    );
+    facts = `${t.kind}: ${esc(move.name)} ${t.values.choice.toFixed(2)} vs ${esc(contrast)} ${t.values.contrast.toFixed(2)}
+    (network win chance; ahead by 0.05+ in ${pct(t.worlds)} of worlds)${
+      targets
+        ? `. Hits: ${targets.map((x) => `${esc(x.name)}${x.frac ? ` ${x.frac.toFixed(3)}` : ''}`).join(', ')}`
+        : ''
+    }.`;
+  }
   const team = (s: ReturnType<typeof side>) =>
     s.mons
       .map(
@@ -107,9 +144,7 @@ const cards = picked.map((r, n) => {
   <p><b>${esc(me.species)}</b> vs <b>${esc(them.species)}</b>. Moves: ${me.moves
     .map((m) => `${esc(m.name)} (${m.acc === true ? '—' : `${m.acc}%`})`)
     .join(', ')}</p>
-  <p><b>Facts:</b> ${esc(risky.name)} is ${risky.acc === true ? '—' : `${risky.acc}%`} accurate; a costly miss
-    in ${pct(r.tip.bad)} of its outcomes. Win chance (network): ${esc(safe.name)} ${r.tip.values.safe.toFixed(2)},
-    ${esc(risky.name)} ${r.tip.values.risky.toFixed(2)}.</p>
+  <p><b>Facts:</b> ${facts}</p>
   <p><b>Oracle</b> (100k on the true state): ${oracle}${r.oracleLead !== undefined ? ` — advice ahead by ${r.oracleLead.toFixed(2)}` : ''}</p>
   <p class="grade">${['sound', 'clear', 'useful']
     .map((g) => `<label><input type="checkbox" data-n="${n + 1}" data-g="${g}"> ${g}</label>`)
@@ -119,11 +154,11 @@ const cards = picked.map((r, n) => {
 
 writeFileSync(
   OUT,
-  `<!doctype html><meta charset="utf-8"><title>Advanced coach gallery: risk</title>
+  `<!doctype html><meta charset="utf-8"><title>Advanced coach gallery: ${CONCEPT}</title>
 <style>body{font:15px system-ui;max-width:900px;margin:2em auto;padding:0 1em}section{border:1px solid #ccc;border-radius:8px;padding:.5em 1em;margin:1em 0}
 h2{font-size:1em;color:#555}.tip{font-size:1.15em;background:#eef6ff;padding:.5em;border-radius:6px}.act{font-weight:bold}.ko{color:#aaa;text-decoration:line-through}
 .note{width:50%}button{font-size:1em;padding:.4em 1em}</style>
-<h1>Advanced coach: risk tips (${picked.length} of ${rows.length})</h1>
+<h1>Advanced coach: ${CONCEPT} tips (${picked.length} of ${rows.length})</h1>
 <p>Grade each tip: <b>sound</b> (the advice is right), <b>clear</b> (the words make sense), <b>useful</b> (worth saying). Then press Copy and paste the result back.</p>
 ${cards.join('\n')}
 <button onclick="navigator.clipboard.writeText(JSON.stringify([...document.querySelectorAll('section')].map((s,i)=>({n:i+1,...Object.fromEntries([...s.querySelectorAll('input[type=checkbox]')].map(c=>[c.dataset.g,c.checked])),note:s.querySelector('.note').value}))));this.textContent='Copied'">Copy grades</button>`,

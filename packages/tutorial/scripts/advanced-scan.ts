@@ -16,6 +16,7 @@ import type { Engine, NetSearchResult } from '@daily-battle/engine-wasm';
 import { loadEngine } from '@daily-battle/engine-wasm/node';
 import { Dex } from '@pkmn/sim';
 import { riskTip, type RiskOptions, type RiskTip } from '../src/coach/advanced/risk';
+import { slowTip, type SlowOptions, type SlowTip } from '../src/coach/advanced/slow';
 import type { BranchWorld } from '../src/coach/facts/branches';
 import { NET_JUDGE_DEFAULTS } from '../src/coach/net-judge';
 
@@ -30,7 +31,7 @@ interface Position extends NetRecord {
   keys?: Record<string, number>;
   seed?: number;
 }
-type Tip = { concept: 'risk'; kind: 'miss' } & RiskTip;
+type Tip = ({ concept: 'risk'; kind: 'miss' } & RiskTip) | ({ concept: 'slow' } & SlowTip);
 interface Found {
   k: number;
   top?: string;
@@ -52,12 +53,16 @@ const OUT = arg('out');
 const ORACLE = Number(arg('oracle') ?? 100_000);
 /** `--worlds N`: worlds per decision (default: the light check's). */
 const WORLDS = Number(arg('worlds') ?? NET_JUDGE_DEFAULTS.worlds);
-const RISK = Object.fromEntries(
-  (arg('risk') ?? '')
-    .split(',')
-    .filter(Boolean)
-    .map((kv) => [kv.split('=')[0]!, Number(kv.split('=')[1])]),
-) as Partial<RiskOptions>;
+/** --risk drop=0.2,worlds=0.75: a detector's options. */
+const opts = (name: string) =>
+  Object.fromEntries(
+    (arg(name) ?? '')
+      .split(',')
+      .filter(Boolean)
+      .map((kv) => [kv.split('=')[0]!, Number(kv.split('=')[1])]),
+  );
+const RISK = opts('risk') as Partial<RiskOptions>;
+const SLOW = opts('slow') as Partial<SlowOptions>;
 const keyOf = (p: { format: string; i: number; swap: boolean; turn: number }) =>
   `${p.format}:${p.i}:${p.swap}:${p.turn}`;
 /** `--only a.jsonl[,b.jsonl]`: just the positions of earlier tips (e.g. to re-check them with more worlds). */
@@ -98,16 +103,15 @@ function engineFor(format: string): Engine {
   return e;
 }
 
-/** Our active's move choices' accuracy, from the true state (poke-engine move ids). */
-function accuracyOf(p: Position) {
+/** Our active's moves by choice, from the state (poke-engine move ids), in the dex. */
+function movesOf(p: Position) {
   const side = p.worlds[0]!.state.split('/')[0]!.split('=');
   const mon = side[Number(side[6])]!.split(',');
   const dex = Dex.forGen(FORMATS[p.format as keyof typeof FORMATS].gen);
   return (choice: string) => {
     const m = /^move (\d)/.exec(choice);
     const id = m ? mon[21 + Number(m[1])]?.split(';')[0] : undefined;
-    const acc = id ? dex.moves.get(id).accuracy : undefined;
-    return acc === true ? 100 : acc;
+    return id ? dex.moves.get(id) : undefined;
   };
 }
 
@@ -129,10 +133,26 @@ function scan(engine: Engine, p: Position, k: number): Found {
     result,
     weight: weights[i]!,
     slots: slots[i]!,
+    world: p.worlds[i]!,
   }));
   const tips: Tip[] = [];
-  const r = riskTip(worlds, p.legal, top, accuracyOf(p), RISK);
+  const move = movesOf(p);
+  const accuracy = (c: string) => {
+    const a = move(c)?.accuracy;
+    return a === true ? 100 : a;
+  };
+  const r = riskTip(worlds, p.legal, top, accuracy, RISK);
   if (r) tips.push({ concept: 'risk', kind: 'miss', ...r });
+  const s = slowTip(
+    worlds,
+    p.legal,
+    top,
+    (c) => move(c)?.id,
+    (c) => !!move(c) && move(c)!.category !== 'Status',
+    FORMATS[p.format as keyof typeof FORMATS].gen,
+    SLOW,
+  );
+  if (s) tips.push({ concept: 'slow', ...s });
   // Recorded without grades (strength-gate --a-record dir,p,0): grade only tips' positions.
   let oracle = p.oracle;
   if (tips.length && !oracle && p.truth && p.keys) {
@@ -187,8 +207,9 @@ found.sort((a, b) => a.k - b.k);
 const pct = (x: number) => (100 * x).toFixed(1);
 /** The oracle's view of a tip: the advised choice's lead over the one it's contrasted with. */
 function grade(t: Tip, o: Record<string, number>): number | undefined {
-  if (!(t.safe in o) || !(t.risky in o)) return undefined;
-  return o[t.safe]! - o[t.risky]!;
+  const [a, b] = t.concept === 'risk' ? [t.safe, t.risky] : [t.choice, t.contrast];
+  if (!(a in o) || !(b in o)) return undefined;
+  return o[a]! - o[b]!;
 }
 const groups = new Map<string, { n: number; graded: number; agree: number; contra: number }>();
 const lines: string[] = [];
@@ -217,6 +238,7 @@ for (const f of found) {
         tip: t,
         oracleLead: d,
         state: p.worlds[0]?.state,
+        known: p.worlds[0]?.known,
       }),
     );
   }
