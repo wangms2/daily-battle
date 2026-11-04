@@ -32,7 +32,7 @@ export interface BattleBackend {
    */
   onCoachTip?(onTip: (note: CoachNote) => void): () => void;
   /**
-   * After a battle played without the coach (Gen 3): the coach's review of it,
+   * After a battle played without the coach: the coach's review of it,
    * judged on request; `onProgress` follows the choices judged.
    */
   review?(onProgress: (done: number, total: number) => void): Promise<Review>;

@@ -68,7 +68,20 @@ const SURE_KO = 0.85;
 /** Sure enough to say who moves first. */
 const SURE_FIRST = 0.95;
 
-const SETUP = new Set(['dragondance', 'calmmind', 'swordsdance', 'bulkup', 'curse', 'agility']);
+const SETUP = new Set([
+  'dragondance',
+  'calmmind',
+  'swordsdance',
+  'bulkup',
+  'curse',
+  'agility',
+  'nastyplot',
+  'rockpolish',
+  'quiverdance',
+  'shellsmash',
+  'coil',
+  'shiftgear',
+]);
 /** Moves that knock out the user too: never the move to recommend. */
 const SELF_KO = new Set(['explosion', 'selfdestruct', 'memento', 'healingwish', 'lunardance']);
 
@@ -455,7 +468,7 @@ export class Coach {
 
 /** The lesson for a move that does nothing: types, status, or hazards. */
 function noEffectLesson(f: Facts, choice: string): LessonKey {
-  const m = f.moves.find((x) => x.choice === choice);
+  const m = f.moves.find((x) => x.choice === choice.replace(/ mega$/, ''));
   if (m?.noEffect?.kind === 'hazardMax') return 'hazard';
   return m?.category === 'Status' && m.noEffect?.kind !== 'type' ? 'status' : 'noEffect';
 }

@@ -35,6 +35,8 @@ test('the game runs under the production CSP', async ({ page }) => {
             beginnerHints: true,
             battleSpeed: 'instant',
             animations: true,
+            // The brief's "Want a coach?" offer, already answered.
+            coachOffered: { gen3ou: true, gen4ou: true, gen5ou: true, gen6ou: true },
             shownExplainers: ['welcome', 'cores', 'gen5-news', 'gen6-news', 'gen3-news', 'tour'],
           },
         }),

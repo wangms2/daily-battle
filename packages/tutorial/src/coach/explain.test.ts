@@ -204,3 +204,55 @@ describe('Warning explanations', () => {
     expect(e?.text ?? '').not.toContain('Salamence takes Salamence');
   });
 });
+
+describe('Warning explanations in later games', () => {
+  /** From Gen 5 on, Team Preview comes first: each side leads with its first Pokémon. */
+  const at = (format: string, pos: Omit<Position, 'seed'>) => {
+    const lead = { p1: `team ${pos.p1.map((_, i) => i + 1).join('')}`, p2: 'team 1' };
+    const rounds = [lead, ...(pos.rounds ?? [])];
+    const view = startPosition(format, { ...pos, rounds, seed: 'explain' }).view('p1')!;
+    return { view, f: turnFacts(view, setsFor(format)) };
+  };
+  const verdict = (choice: string, top: string): Verdict => ({
+    choice,
+    top,
+    worse: true,
+    gap: 0.2,
+    agree: 1,
+    value: 0.3,
+    topValue: 0.5,
+  });
+
+  it('counts Stealth Rock on the way in, and Rapid Spin clears it', () => {
+    const { view, f } = at('gen5ou', {
+      p1: [
+        { species: 'Starmie', moves: ['Rapid Spin', 'Surf'] },
+        { species: 'Volcarona', moves: ['Quiver Dance', 'Fiery Dance'] },
+      ],
+      p2: [{ species: 'Skarmory', moves: ['Stealth Rock', 'Whirlwind'] }],
+      rounds: [{ p1: 'move Surf', p2: 'move Stealth Rock' }],
+    });
+    expect(f.switches.find((s) => s.species === 'Volcarona')?.entry).toBe(0.5);
+    expect(explainWarning(view, f, verdict('move 1', 'move 2'))?.reason).not.toBe('noSpikes');
+  });
+
+  it('knows Mold Breaker hits through Levitate', () => {
+    const rotom = { species: 'Rotom-Wash', setId: 'rotomwash-defensive' };
+    const eq = (p1: { species: string; setId: string }) =>
+      at('gen5ou', { p1: [p1], p2: [rotom] }).f.moves.find((m) => m.name === 'Earthquake');
+    expect(eq({ species: 'Excadrill', setId: 'excadrill-offensive' })?.noEffect?.kind).toBe(
+      'ability',
+    );
+    expect(eq({ species: 'Haxorus', setId: 'haxorus-choice-band' })?.noEffect).toBeUndefined();
+  });
+
+  it('explains a Mega Evolving pick as its move', () => {
+    const { view, f } = at('gen6ou', {
+      p1: [{ species: 'Charizard', setId: 'charizard-bulky-will-o-wisp' }],
+      p2: [{ species: 'Skarmory', setId: 'skarmory-physically-defensive' }],
+    });
+    const e = explainWarning(view, f, verdict('move 4 mega', 'move 2 mega'));
+    expect(e?.reason).toBe('noEffect');
+    expect(e!.text).toMatch(/^Skarmory is immune to Ground moves, so Earthquake will do nothing\./);
+  });
+});

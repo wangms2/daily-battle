@@ -864,7 +864,7 @@ describe('coach', () => {
     );
   });
 
-  it('reviews a Gen 3 battle played without the coach, on request', async () => {
+  it('reviews a battle played without the coach, on request', async () => {
     const { backend } = fakeBackend([WON]);
     let finish: (r: Review) => void = () => {};
     backend.review = vi.fn(
@@ -874,7 +874,7 @@ describe('coach', () => {
           finish = resolve;
         }),
     );
-    renderBattle(backend, { start: { ...START, format: 'gen3ou' } });
+    renderBattle(backend, { start: { ...START, difficulty: 'hard' } });
     await userEvent.click(await thunderbolt());
     await userEvent.click(await screen.findByRole('button', { name: 'Review this battle' }));
     expect(await screen.findByRole('status')).toHaveTextContent(
@@ -886,19 +886,10 @@ describe('coach', () => {
     );
   });
 
-  it('offers no review on Hard, where the coach’s warnings aren’t checked yet', async () => {
+  it('offers no review against Master, the coach’s own brain', async () => {
     const { backend } = fakeBackend([WON]);
     backend.review = vi.fn();
-    renderBattle(backend, { start: { ...START, format: 'gen3ou', difficulty: 'hard' } });
-    await userEvent.click(await thunderbolt());
-    await screen.findByRole('dialog', { name: 'Battle over' });
-    expect(screen.queryByRole('button', { name: 'Review this battle' })).not.toBeInTheDocument();
-  });
-
-  it('offers no review outside Gen 3', async () => {
-    const { backend } = fakeBackend([WON]);
-    backend.review = vi.fn();
-    renderBattle(backend);
+    renderBattle(backend, { start: { ...START, difficulty: 'master' } });
     await userEvent.click(await thunderbolt());
     await screen.findByRole('dialog', { name: 'Battle over' });
     expect(screen.queryByRole('button', { name: 'Review this battle' })).not.toBeInTheDocument();

@@ -18,16 +18,17 @@ const day = (...attempts: Attempt[]): DayState => ({ swapUsed: false, attempts }
 const settings = (coach: boolean) => ({ coach: { gen3ou: coach } }) as unknown as Settings;
 
 describe('daily coach', () => {
-  it('is offered in Gen 3 below Hard', () => {
+  it('is offered in every game, except against Master', () => {
     expect(coachAvailable('gen3ou', 'easy')).toBe(true);
-    expect(coachAvailable('gen3ou', 'hard')).toBe(false);
+    expect(coachAvailable('gen3ou', 'hard')).toBe(true);
     expect(coachAvailable('gen3ou', 'master')).toBe(false);
-    expect(coachAvailable('gen4ou', 'normal')).toBe(false);
+    expect(coachAvailable('gen4ou', 'normal')).toBe(true);
+    expect(coachAvailable('gen6ou', 'master')).toBe(false);
   });
 
   it('follows the setting, except for a battle already under way', () => {
     expect(coachOn(settings(true), 'gen3ou', undefined, 'normal')).toBe(true);
-    expect(coachOn(settings(true), 'gen3ou', undefined, 'hard')).toBe(false);
+    expect(coachOn(settings(true), 'gen3ou', undefined, 'master')).toBe(false);
     const playing = day(attempt({ result: 'inProgress' }));
     expect(coachOn(settings(true), 'gen3ou', playing, 'normal')).toBe(false);
     const coached = day(attempt({ result: 'inProgress', coached: true }));

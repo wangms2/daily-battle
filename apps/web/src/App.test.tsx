@@ -44,6 +44,8 @@ function seeded({ hints = true, team }: { hints?: boolean; team?: { week: string
   state.settings.beginnerHints = hints;
   state.settings.format = 'gen4ou';
   state.settings.name = 'Ash';
+  // The coach's one-time offer is tested on its own.
+  state.settings.coachOffered = { gen3ou: true, gen4ou: true, gen5ou: true, gen6ou: true };
   if (team) {
     state.games.gen4ou.weeks[team.week] = {
       team: schedule.suggestedTeams[0]!.team,
@@ -544,6 +546,7 @@ describe('results and streak', () => {
     );
     const state = seeded();
     state.settings.format = 'gen3ou';
+    state.settings.coachOffered = {};
     state.games.gen3ou.weeks[WEEK] = {
       team: gen3.suggestedTeams[0]!.team,
       poolId: `${WEEK}:g${gen3.generatorVersion}:c${gen3.pool.candidate}`,
@@ -575,10 +578,10 @@ describe('results and streak', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
-  it('has no coach outside Gen 3', async () => {
+  it('offers the coach in every game', async () => {
     renderApp(seeded({ team: { week: WEEK } }));
     await screen.findByRole('radiogroup', { name: 'Difficulty' });
-    expect(screen.queryByRole('button', { name: /^Coach/ })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Coach off' })).toBeInTheDocument();
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 });

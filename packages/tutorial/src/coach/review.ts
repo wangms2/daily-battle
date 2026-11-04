@@ -73,8 +73,14 @@ export function decision(
   const hits: Record<string, { damage: number; ko: number }> = {};
   const taken: Record<string, number> = {};
   for (const m of facts.moves) {
+    const hit = { damage: m.noEffect ? 0 : m.damage, ko: m.noEffect ? 0 : m.ko };
     labels[m.choice] = m.name;
-    hits[m.choice] = { damage: m.noEffect ? 0 : m.damage, ko: m.noEffect ? 0 : m.ko };
+    hits[m.choice] = hit;
+    // Mega Evolving with the move (Gen 6): the same hit, judged as the move.
+    if (facts.state.canMega) {
+      labels[`${m.choice} mega`] = `Mega Evolution and ${m.name}`;
+      hits[`${m.choice} mega`] = hit;
+    }
   }
   for (const s of facts.switches) {
     labels[s.choice] = s.species;
@@ -106,7 +112,8 @@ const named = (d: Decision, choice: string) => {
 
 /** What made the player's choice (the judge's top) good, or undefined if the facts don't show it. */
 function praise(d: Decision): string | undefined {
-  const c = d.labels[d.choice] ?? d.choice;
+  const moveOf = (choice: string) => choice.replace(/ mega$/, '');
+  const c = d.labels[moveOf(d.choice)] ?? d.labels[d.choice] ?? d.choice;
   if (d.choice.startsWith('switch')) {
     const cost = d.taken[d.choice] ?? 1;
     return d.threat >= 0.3 && cost <= d.threat / 2
@@ -118,7 +125,7 @@ function praise(d: Decision): string | undefined {
   if (hit.ko >= 0.5 && SELF_KO.has(c))
     return `Good choice: ${c} could knock out ${d.foe}, though it knocks out ${d.me} too.`;
   if (hit.ko >= 0.5) return `Good choice: ${c} could knock out ${d.foe}.`;
-  const others = Object.entries(d.hits).filter(([choice]) => choice !== d.choice);
+  const others = Object.entries(d.hits).filter(([choice]) => moveOf(choice) !== moveOf(d.choice));
   const next = Math.max(0, ...others.map(([, h]) => h.damage));
   return hit.damage >= 0.3 && hit.damage >= next + 0.15
     ? `Good choice: ${c} was your strongest attack against ${d.foe}.`

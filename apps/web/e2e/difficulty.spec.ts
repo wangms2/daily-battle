@@ -50,6 +50,8 @@ test('a Hard battle loads its engine under the CSP, and resumes after a reload',
         beginnerHints: true,
         battleSpeed: 'instant',
         animations: false,
+        // The brief's "Want a coach?" offer, already answered.
+        coachOffered: { gen3ou: true, gen4ou: true, gen5ou: true, gen6ou: true },
         shownExplainers: ['welcome', 'cores', 'tour'],
         format: 'gen3ou',
         difficulty: { gen3ou: 'hard' },
