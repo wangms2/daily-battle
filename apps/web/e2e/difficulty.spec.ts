@@ -79,7 +79,8 @@ test('a Hard battle loads its engine under the CSP, and resumes after a reload',
       .getByRole('banner')
       .getByText('Turn 3')
       .or(page.getByRole('button', { name: /^Switch to/ }).first())
-      .or(page.getByRole('dialog', { name: 'Battle over' })),
+      .or(page.getByRole('dialog', { name: 'Battle over' }))
+      .first(),
   ).toBeVisible({ timeout: 30_000 });
   expect(problems).toEqual([]);
 });
