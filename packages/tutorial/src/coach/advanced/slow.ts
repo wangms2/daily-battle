@@ -186,7 +186,7 @@ export function slowText(id: string, n: SlowNames, variant: number): string {
       return `${lead}: every time they switch in, ${list([
         `${top!.name} would lose ${fraction(top!.frac!)} of its HP`,
         ...rest.map((x) => `${x.name} ${fraction(x.frac!)}`),
-        ...(more ? [`${more} more you’ve seen take less`] : []),
+        ...(more ? [`${more} more you’ve seen`] : []),
       ])}.`;
     }
     if (id === 'spikes')
