@@ -13,6 +13,7 @@ export function DifficultyPicker({
   onChange,
   unavailable = [],
   disabled,
+  compact,
 }: {
   value: Difficulty;
   onChange: (d: Difficulty) => void;
@@ -20,6 +21,8 @@ export function DifficultyPicker({
   unavailable?: readonly Difficulty[];
   /** While a battle is unfinished, its difficulty stays. */
   disabled?: boolean;
+  /** Narrow screens: only the picked level shows its name; the rest show their ball. */
+  compact?: boolean;
 }) {
   return (
     <div className="seg flex p-0.5" role="radiogroup" aria-label="Difficulty">
@@ -36,14 +39,17 @@ export function DifficultyPicker({
             title={(cant && UNAVAILABLE_HINT[d]) || DIFFICULTY_HINT[d]}
             onClick={() => !off && onChange(d)}
             className={clsx(
-              'min-h-7 rounded-lg px-2.5 text-[12px] font-semibold',
+              'min-h-7 rounded-lg text-[12px] font-semibold',
+              compact && value !== d ? 'px-2' : 'px-2.5',
               value === d ? 'bg-surface text-ink shadow-card' : 'text-muted',
               off && value !== d && 'opacity-40',
             )}
           >
             <span className="flex items-center gap-1">
               <BallIcon kind={BALL[d]} />
-              {DIFFICULTY_NAME[d]}
+              <span className={clsx(compact && value !== d && 'sr-only')}>
+                {DIFFICULTY_NAME[d]}
+              </span>
             </span>
           </button>
         );
