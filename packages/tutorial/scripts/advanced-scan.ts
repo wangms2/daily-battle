@@ -5,7 +5,7 @@
 // backs it (agrees: the advice is ahead; contradicts: another choice is ahead
 // by more than 0.05). Writes every tip, with its position, to --out (JSONL).
 //   pnpm exec tsx scripts/advanced-scan.ts --set <dir> --net <file.dbnet> [--jobs 8] [--limit N] [--out tips.jsonl]
-//     [--risk drop=0.2,worlds=0.75]
+//     [--risk drop=0.2,worlds=0.75] [--worlds 8] [--only tips.jsonl] [--oracle 100000]
 import { fork } from 'node:child_process';
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -24,13 +24,18 @@ interface Position extends NetRecord {
   i: number;
   swap: boolean;
   turn: number;
-  oracle: Record<string, number>;
+  oracle?: Record<string, number>;
+  /** Recorded without grades: the true state, each choice's option index, and the oracle's seed. */
+  truth?: string;
+  keys?: Record<string, number>;
+  seed?: number;
 }
 type Tip = { concept: 'risk'; kind: 'miss' } & RiskTip;
 interface Found {
   k: number;
   top?: string;
   tips: Tip[];
+  oracle?: Record<string, number>;
 }
 
 const arg = (name: string) => {
@@ -43,13 +48,28 @@ if (!SET || !NET) throw new Error('usage: --set <dir> --net <file.dbnet>');
 const JOBS = Number(arg('jobs') ?? 8);
 const LIMIT = Number(arg('limit') ?? Infinity);
 const OUT = arg('out');
-const WORLDS = NET_JUDGE_DEFAULTS.worlds;
+/** Oracle iterations for positions recorded without grades (the gate's default). */
+const ORACLE = Number(arg('oracle') ?? 100_000);
+/** `--worlds N`: worlds per decision (default: the light check's). */
+const WORLDS = Number(arg('worlds') ?? NET_JUDGE_DEFAULTS.worlds);
 const RISK = Object.fromEntries(
   (arg('risk') ?? '')
     .split(',')
     .filter(Boolean)
     .map((kv) => [kv.split('=')[0]!, Number(kv.split('=')[1])]),
 ) as Partial<RiskOptions>;
+const keyOf = (p: { format: string; i: number; swap: boolean; turn: number }) =>
+  `${p.format}:${p.i}:${p.swap}:${p.turn}`;
+/** `--only a.jsonl[,b.jsonl]`: just the positions of earlier tips (e.g. to re-check them with more worlds). */
+const ONLY = arg('only')
+  ? new Set(
+      arg('only')!
+        .split(',')
+        .flatMap((f) => readFileSync(f, 'utf8').split('\n'))
+        .filter((l) => l.trim())
+        .map((l) => keyOf(JSON.parse(l) as Position)),
+    )
+  : undefined;
 
 function load(): Position[] {
   const out: Position[] = [];
@@ -63,7 +83,7 @@ function load(): Position[] {
       `${b.format}:${b.i}:${b.swap}:${b.turn}`,
     ),
   );
-  return out.slice(0, LIMIT);
+  return out.slice(0, LIMIT).filter((p) => !ONLY || ONLY.has(keyOf(p)));
 }
 
 const engines = new Map<number, Engine>();
@@ -113,7 +133,17 @@ function scan(engine: Engine, p: Position, k: number): Found {
   const tips: Tip[] = [];
   const r = riskTip(worlds, p.legal, top, accuracyOf(p), RISK);
   if (r) tips.push({ concept: 'risk', kind: 'miss', ...r });
-  return { k, top, tips };
+  // Recorded without grades (strength-gate --a-record dir,p,0): grade only tips' positions.
+  let oracle = p.oracle;
+  if (tips.length && !oracle && p.truth && p.keys) {
+    oracle = {};
+    for (const [c, key] of Object.entries(p.keys)) {
+      const s = engine.searchFixed(p.truth, ORACLE, p.seed! + key, key);
+      const v = s.s1.reduce((a, o) => a + o.v, 0);
+      if (v) oracle[c] = s.s1.reduce((a, o) => a + o.s, 0) / v;
+    }
+  }
+  return { k, top, tips, oracle };
 }
 
 const child = process.argv.indexOf('--child');
@@ -167,7 +197,7 @@ for (const f of found) {
   for (const t of f.tips) {
     const key = `${t.concept}/${t.kind}`;
     const g = groups.get(key) ?? { n: 0, graded: 0, agree: 0, contra: 0 };
-    const d = grade(t, p.oracle);
+    const d = f.oracle ? grade(t, f.oracle) : undefined;
     g.n++;
     if (d !== undefined) {
       g.graded++;
@@ -183,7 +213,7 @@ for (const f of found) {
         turn: p.turn,
         top: f.top,
         legal: p.legal,
-        oracle: p.oracle,
+        oracle: f.oracle,
         tip: t,
         oracleLead: d,
         state: p.worlds[0]?.state,

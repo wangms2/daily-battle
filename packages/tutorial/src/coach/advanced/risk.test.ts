@@ -1,7 +1,7 @@
 import type { NetOutcome } from '@daily-battle/engine-wasm';
 import { describe, expect, it } from 'vitest';
 import type { BranchWorld } from '../facts/branches';
-import { riskTip } from './risk';
+import { riskText, riskTip } from './risk';
 
 const o = (own: number, p: number, value: number, foeHp = 0.5): NetOutcome => ({
   own,
@@ -53,5 +53,17 @@ describe('risk tips', () => {
   it('needs the safe choice clearly ahead, in most worlds', () => {
     expect(riskTip([world(0.95)], legal, 'move 1', acc)).toBeUndefined();
     expect(riskTip([world(), world(0.95)], legal, 'move 1', acc)).toBeUndefined();
+  });
+
+  it('words a tip only from its facts', () => {
+    for (let v = 0; v < 6; v++) {
+      const text = riskText('Surf', 'Hydro Pump', 80, v);
+      // Only the two move names and the accuracy (or its miss rate) appear.
+      const rest = text.replace('Surf', '').replace('Hydro Pump', '');
+      expect(rest).not.toMatch(/[A-Z][a-z]+ [A-Z]/);
+      expect(rest.match(/\d+/g)!.every((n) => n === '80' || n === '20')).toBe(true);
+      expect(text).toContain('Surf');
+      expect(text).toContain('Hydro Pump');
+    }
   });
 });

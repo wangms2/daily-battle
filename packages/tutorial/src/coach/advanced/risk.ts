@@ -95,3 +95,18 @@ export function riskTip(
   }
   return best;
 }
+
+/** Risk tip wordings: `safe`/`risky` are move names, `acc` the risky move's accuracy (dex, percent). */
+const RISK_TEXTS = [
+  (safe: string, risky: string, acc: number) =>
+    `${risky} is only ${acc}% accurate, and a miss here costs you a lot. ${safe} is the safer play.`,
+  (safe: string, risky: string, acc: number) =>
+    `${safe} is the safer play: ${risky} misses ${100 - acc}% of the time, and a miss here would hurt.`,
+  (safe: string, risky: string, acc: number) =>
+    `Careful with ${risky}: at ${acc}% accuracy, a miss here is costly. Stick with ${safe}.`,
+];
+
+/** A risk tip's text; `variant` picks the wording (any integer, e.g. a hash of the decision key). */
+export function riskText(safe: string, risky: string, acc: number, variant: number): string {
+  return RISK_TEXTS[Math.abs(Math.trunc(variant)) % RISK_TEXTS.length]!(safe, risky, acc);
+}

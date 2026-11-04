@@ -79,7 +79,8 @@ const A_NET = (() => {
  * (default 0.4) of the network's decisions to `<dir>/<shard>.jsonl`, each with
  * its network inputs and every legal choice graded by an oracle: poke-engine
  * held to that choice for `iterations` (default 100000) on the true state (the
- * foe's real team). scripts/search-eval.ts scores search settings on them.
+ * foe's real team). Iterations 0 records the true state and option indices
+ * instead, for grading later. scripts/search-eval.ts scores search settings on them.
  */
 const A_RECORD = (() => {
   const s = arg('a-record');
@@ -101,7 +102,10 @@ function oracle(
   truth: KnownSets,
   legal: readonly string[],
   seed: number,
-): Record<string, number> | undefined {
+):
+  | { oracle: Record<string, number> }
+  | { truth: string; keys: Record<string, number>; seed: number }
+  | undefined {
   const state = extractState(view, sets);
   const seen = view.battle[view.side === 'p1' ? 'p2' : 'p1'].team;
   const foes: WorldFoe[] = [];
@@ -123,15 +127,34 @@ function oracle(
     state.own.map((m) => m.set),
   );
   const request = view.request as Parameters<typeof toChoice>[1];
-  const out: Record<string, number> = {};
+  const keys: Record<string, number> = {};
   engine.options(st).s1.forEach((key, k) => {
     const c = toChoice(key, request);
-    if (!c || !legal.includes(c) || c in out) return;
-    const r = engine.searchFixed(st, A_RECORD!.iterations, seed + k, k);
+    if (c && legal.includes(c) && !(c in keys)) keys[c] = k;
+  });
+  if (Object.keys(keys).length < 2) return undefined;
+  // Iterations 0: no grades now; the true state and each choice's option
+  // index, for grading later (oracleGrades in scripts that need it).
+  if (!A_RECORD!.iterations) return { truth: st, keys, seed };
+  const out = oracleGrades(engine, st, keys, A_RECORD!.iterations, seed);
+  return Object.keys(out).length >= 2 ? { oracle: out } : undefined;
+}
+
+/** Each choice's value (side one's win share): poke-engine held to its option index on `state`. */
+function oracleGrades(
+  engine: Engine,
+  state: string,
+  keys: Record<string, number>,
+  iterations: number,
+  seed: number,
+) {
+  const out: Record<string, number> = {};
+  for (const [c, k] of Object.entries(keys)) {
+    const r = engine.searchFixed(state, iterations, seed + k, k);
     const v = r.s1.reduce((a, o) => a + o.v, 0);
     if (v) out[c] = r.s1.reduce((a, o) => a + o.s, 0) / v;
-  });
-  return Object.keys(out).length >= 2 ? out : undefined;
+  }
+  return out;
 }
 const varietyOf = (s: string | undefined) => (s ? { variety: Number(s) } : {});
 /**
@@ -331,7 +354,7 @@ function playTask({ format, i, swap }: Task): Outcome {
                     swap,
                     turn: view.battle.turn,
                     played,
-                    oracle: grades,
+                    ...grades,
                     ...pending,
                   }) + '\n',
                 );
