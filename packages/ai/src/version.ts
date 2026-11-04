@@ -59,7 +59,7 @@ export function difficultyTag(difficulty: Difficulty): string {
   return '';
 }
 
-/** The AI part of an attempt's engine string: `ai 2`, `ai 2 easy 1`, `ai 2 hard 2 e2`, `ai 2 master 1 e3`. */
+/** The AI part of an attempt's engine string: `ai 2`, `ai 2 easy 1`, `ai 2 hard 3 e2`, `ai 2 master 1 e2`. */
 export const aiVersion = (difficulty: Difficulty): string =>
   `ai ${AI_VERSION}${difficultyTag(difficulty)}`;
 

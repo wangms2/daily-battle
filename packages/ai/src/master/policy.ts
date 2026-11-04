@@ -76,7 +76,7 @@ export interface NetStats {
 const loaded = new WeakMap<Engine, Uint8Array>();
 
 /**
- * Master's settings (DESIGN.md §6): 4 worlds and a light search, picking by
+ * Master's settings (DESIGN.md §4.6): 4 worlds and a light search, picking by
  * win chance with a little of the prior. Gated at 57.6% against Hard at 150k.
  */
 export const MASTER_DEFAULTS = {
