@@ -93,8 +93,9 @@ export async function loadHardEngine(format: string): Promise<Engine> {
 }
 
 /**
- * The coach's judge's engine (DESIGN.md §22): Master's, with the network, where
- * it runs (lessons excepted); otherwise the Hard search's. Undefined if neither
+ * The coach's judge's engine (DESIGN.md §22): Master's, with the network, when
+ * 
+et (Normal and Hard, not lessons) and it runs here; otherwise the Hard search's. Undefined if neither
  * loads (the coach then gives fact tips only).
  */
 export async function loadCoachEngine(format: string, net: boolean): Promise<Engine | undefined> {

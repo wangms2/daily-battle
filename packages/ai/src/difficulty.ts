@@ -12,6 +12,7 @@ import { AI_VERSION, HARD_ITERATIONS, type Difficulty } from './version';
 
 export {
   aiVersion,
+  coachNetJudge,
   DIFFICULTIES,
   difficultyTag,
   isDifficulty,

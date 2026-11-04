@@ -34,11 +34,15 @@ export interface NetJudgeOptions extends Pick<
   search: NetSearchParams;
 }
 
-/** Provisional until the offline check (coach-eval --judge net). */
+/**
+ * Set by coach-eval --judge both (vs Normal and Hard): the network's gaps run about
+ * half the search's, and at 0.07 its warnings gained as much or more, with no clearly
+ * wrong ones.
+ */
 export const NET_JUDGE_DEFAULTS: NetJudgeOptions = {
   worlds: MASTER_DEFAULTS.worlds,
   search: MASTER_DEFAULTS.search,
-  margin: 0.1,
+  margin: 0.07,
   agree: 0.9,
 };
 

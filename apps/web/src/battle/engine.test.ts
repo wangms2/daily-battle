@@ -6,6 +6,7 @@ import { setsFor } from '@daily-battle/data';
 import { engineBuilt, loadEngine } from '@daily-battle/engine-wasm/node';
 import { Dex } from '@pkmn/sim';
 import { deriveSeed, makeRng, randomTeam } from '@daily-battle/sim-bridge';
+import { Judge, NetJudge } from '@daily-battle/tutorial';
 import { gen3Lessons } from '@daily-battle/tutorial/lessons';
 import { describe, expect, it, vi } from 'vitest';
 import { lessonStart } from '../tutorial/lesson';
@@ -258,7 +259,7 @@ describe('lesson battles', () => {
 
 const MASTER_FILE = join(fileURLToPath(import.meta.url), '../../../public', MASTER_NET_PATH);
 
-/** The coach's judge's engine: the Hard search's, or Master's (with its network). */
+/** The coach's judge's engine: the Hard search's, or Master's (with its network, used against Normal and Hard). */
 function judgeEngine(net: boolean) {
   const engine = loadEngine(3);
   if (net) engine.netLoad(new Uint8Array(readFileSync(MASTER_FILE)));
@@ -276,7 +277,7 @@ describe.skipIf(!engineBuilt(3)).each([
       format: 'gen3ou',
       playerTeam: randomTeam(rng, data),
       opponentTeam: randomTeam(rng, data),
-      difficulty: 'easy',
+      difficulty: net ? 'normal' : 'easy',
       coach: 'simple',
     });
     const judged = new BattleEngine(s, undefined, undefined, judgeEngine(net));
@@ -302,7 +303,7 @@ describe.skipIf(!engineBuilt(3)).each([
     // Random picks blunder often enough for the judge to back a few warnings.
     expect(warned).toBeGreaterThan(0);
   }, 120_000);
-  /** A coached Gen 3 battle against Easy, judged; `n` choices in, warnings checked on every pick. */
+  /** A coached Gen 3 battle against Easy (Normal for the network's judge), judged; `n` choices in, warnings checked on every pick. */
   function coached(n: number) {
     const rng = makeRng(deriveSeed('engine:judge', 1));
     const data = setsFor('gen3ou');
@@ -310,7 +311,7 @@ describe.skipIf(!engineBuilt(3)).each([
       format: 'gen3ou',
       playerTeam: randomTeam(rng, data),
       opponentTeam: randomTeam(rng, data),
-      difficulty: 'easy',
+      difficulty: net ? 'normal' : 'easy',
       coach: 'simple',
     });
     const engine = new BattleEngine(s, undefined, undefined, judgeEngine(net));
@@ -403,6 +404,30 @@ describe.skipIf(!engineBuilt(3)).each([
     // here: every warning was overridden).
     expect(review).toEqual(engine.coachReview());
   }, 120_000);
+});
+
+describe.skipIf(!engineBuilt(3))('which judge coaches', () => {
+  it('is the network against Normal and Hard, the search against Easy and in lessons', () => {
+    const judgeOf = (s: EngineStart) =>
+      (
+        new BattleEngine(s, loadEngine(3), undefined, judgeEngine(true)) as unknown as {
+          judge: unknown;
+        }
+      ).judge;
+    const daily = (difficulty: EngineStart['difficulty']) =>
+      judgeOf(start(0, { format: 'gen3ou', difficulty, coach: 'simple' }));
+    expect(daily('easy')).toBeInstanceOf(Judge);
+    expect(daily('normal')).toBeInstanceOf(NetJudge);
+    expect(daily('hard')).toBeInstanceOf(NetJudge);
+    // Lessons play Easy; even against Normal they'd keep the search their content is checked with.
+    const lesson = gen3Lessons.find((l) => l.id === 'gen3-switching-course')!;
+    const s = lessonStart(
+      lesson.steps.find((x) => x.kind === 'battle')!,
+      lesson.format,
+      lesson.number,
+    );
+    expect(judgeOf({ ...s, difficulty: 'normal' })).toBeInstanceOf(Judge);
+  });
 });
 
 describe('lesson turns', () => {

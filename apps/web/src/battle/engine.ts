@@ -2,6 +2,7 @@
 // opponent AI, and a presenter that turns the player's side into frames.
 import {
   aiFor,
+  coachNetJudge,
   HardPolicy,
   searches,
   UtilityPolicy,
@@ -167,7 +168,7 @@ export class BattleEngine {
         tutorial?.taught ?? Infinity,
       );
       // Lessons keep the search judge their content is checked with (lesson-check.ts).
-      if (coachEngine?.netLoaded && !lessonFoe)
+      if (coachEngine?.netLoaded && !lessonFoe && coachNetJudge(difficulty))
         this.judge = new NetJudge(coachEngine, data, start.pool ? { pool: start.pool } : {});
       else if (coachEngine)
         this.judge = new Judge(coachEngine, data, {

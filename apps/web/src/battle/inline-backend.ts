@@ -3,6 +3,7 @@
 // `masterEngine` (with its network loaded). The coach's judge uses Master's
 // engine when given (not in lessons), else Hard's; without either, a coached
 // battle gives no warnings.
+import { coachNetJudge } from '@daily-battle/ai/version';
 import type { Engine } from '@daily-battle/engine-wasm';
 import type { CoachNote } from '@daily-battle/tutorial';
 import type { BattleBackend } from './backend';
@@ -40,7 +41,8 @@ export function inlineBackend(
             : undefined;
       const judge = !start.coach
         ? undefined
-        : (!start.tutorial && masterEngine?.(format)) || hardEngine?.(format);
+        : (!start.tutorial && coachNetJudge(start.difficulty) && masterEngine?.(format)) ||
+          hardEngine?.(format);
       engine = new BattleEngine(start, hard, undefined, judge);
       return later(engine.begin());
     },
@@ -52,7 +54,9 @@ export function inlineBackend(
     ...((masterEngine ?? hardEngine) && {
       review: async (onProgress: (done: number, total: number) => void) => {
         const e = need();
-        const job = e.reviewJob((masterEngine ?? hardEngine)!(e.start.format ?? 'gen4ou'));
+        const format = e.start.format ?? 'gen4ou';
+        const net = coachNetJudge(e.start.difficulty) && masterEngine;
+        const job = e.reviewJob((net || hardEngine || masterEngine)!(format));
         for (;;) {
           const review = job.step(1000);
           onProgress(job.done, job.total);

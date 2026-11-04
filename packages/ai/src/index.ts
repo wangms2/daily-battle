@@ -43,6 +43,7 @@ export { AI_VERSION, EASY_VERSION, HARD_VERSION, MASTER_VERSION } from './versio
 export {
   aiFor,
   aiVersion,
+  coachNetJudge,
   DIFFICULTIES,
   difficultyTag,
   isDifficulty,

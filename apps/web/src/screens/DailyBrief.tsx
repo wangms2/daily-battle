@@ -1,6 +1,6 @@
 // Daily brief (DESIGN.md §4.3): today's opponent (species only), your team,
 // the lead, and today's single change, all on one screen.
-import { searches, type Difficulty } from '@daily-battle/ai/version';
+import { coachNetJudge, searches, type Difficulty } from '@daily-battle/ai/version';
 import type { ScheduleFile } from '@daily-battle/gen/schedule';
 import clsx from 'clsx';
 import { useEffect, useState, type ReactNode } from 'react';
@@ -220,7 +220,8 @@ export function DailyBrief({
   }, []);
   const playable = !unavailable.includes(difficulty);
   const needsSearch = (searches(difficulty) && playable) || !!coach?.on;
-  const needsNet = (difficulty === 'master' && playable) || !!coach?.on;
+  const needsNet =
+    (difficulty === 'master' && playable) || (!!coach?.on && coachNetJudge(difficulty));
   useEffect(() => {
     if (needsSearch) warmHardEngine(activeFormat(), needsNet);
   }, [needsSearch, needsNet]);

@@ -1,5 +1,6 @@
 /// <reference lib="webworker" />
 // Runs the simulator and the opponent AI off the main thread (DESIGN.md §7).
+import { coachNetJudge } from '@daily-battle/ai/version';
 import { BattleEngine, presentTurn } from './engine';
 import type { Review } from '@daily-battle/tutorial';
 import type { WorldClaim } from '@daily-battle/ai';
@@ -167,7 +168,9 @@ self.onmessage = async (event: MessageEvent<ToWorker>) => {
         hard = await loadMasterEngine(format);
       }
       // Without the engine the coach still gives fact tips, but no warnings.
-      const judge = start.coach ? await loadCoachEngine(format, !start.tutorial) : undefined;
+      const judge = start.coach
+        ? await loadCoachEngine(format, !start.tutorial && coachNetJudge(start.difficulty))
+        : undefined;
       engine = new BattleEngine(start, hard, undefined, judge);
       post({ type: 'package', pkg: engine.begin() });
     } else if (msg.type === 'turn') {
@@ -182,7 +185,10 @@ self.onmessage = async (event: MessageEvent<ToWorker>) => {
       post({ type: 'package', pkg: engine.choose(msg.choice) });
     } else if (msg.type === 'review') {
       // Judged a slice at a time, so other messages (a replayed turn) get in between.
-      const judge = await loadCoachEngine(engine.start.format ?? 'gen4ou', true);
+      const judge = await loadCoachEngine(
+        engine.start.format ?? 'gen4ou',
+        coachNetJudge(engine.start.difficulty),
+      );
       if (!judge) throw new Error('No engine for the review');
       const job = engine.reviewJob(judge);
       const review = await new Promise<Review>((resolve) => {
