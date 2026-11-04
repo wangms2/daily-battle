@@ -1,6 +1,6 @@
 // Time per decision in a real browser (BENCH=1 only; not part of the suite):
 // Master's choice (the worker's `choose` round trip) and the coach's check
-// before a pick (`check`), at full speed and with the CPU throttled like a phone.
+// before a pick (`check`), and how late a waiting tip comes after its turn (`tip`), at full speed and with the CPU throttled like a phone.
 //   BENCH=1 pnpm exec playwright test e2e/bench.spec.ts --project=desktop-1280x800
 // With BENCH_SPEED=normal (or another battle speed), it plays with animations on.
 import { test, type Page } from '@playwright/test';
@@ -14,17 +14,21 @@ const TEAM = schedule.suggestedTeams[0]!.team;
 test.skip(!process.env.BENCH, 'benchmark: BENCH=1');
 test.setTimeout(15 * 60_000);
 
-/** Wraps the page's Worker to time `choose` and `check` round trips. */
+/** Wraps the page's Worker to time `choose` and `check` round trips, and tips after their package. */
 function timeWorker() {
   const w = window as unknown as { __times: Record<string, number[]> };
-  w.__times = { choose: [], check: [] };
+  w.__times = { choose: [], check: [], tip: [] };
   const Base = window.Worker;
   window.Worker = class extends Base {
     private sent: { type: string; t: number } | undefined;
+    /** When the last package came: a tip's delay after it. */
+    private packaged = 0;
     constructor(url: string | URL, opts?: WorkerOptions) {
       super(url, opts);
       this.addEventListener('message', (e: MessageEvent) => {
         const type = (e.data as { type?: string })?.type;
+        if (type === 'package') this.packaged = performance.now();
+        if (type === 'tip') w.__times.tip!.push(performance.now() - this.packaged);
         const s = this.sent;
         if (!s) return;
         if (
@@ -135,6 +139,6 @@ for (const throttle of [1, 4])
         () => (window as unknown as { __times: Record<string, number[]> }).__times,
       );
       console.log(
-        `BENCH ${difficulty}${coach ? '+coach' : ''} ${throttle}x choose ${stats(times.choose!)} | check ${stats(times.check!)}`,
+        `BENCH ${difficulty}${coach ? '+coach' : ''} ${throttle}x choose ${stats(times.choose!)} | check ${stats(times.check!)} | tip ${stats(times.tip!)}`,
       );
     });
