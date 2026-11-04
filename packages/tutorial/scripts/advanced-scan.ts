@@ -154,12 +154,13 @@ function claimOf(t: WinconTip): { claim?: Claim } {
     const v = s.s1.reduce((a, o) => a + o.v, 0);
     return v ? s.s1.reduce((a, o) => a + o.s, 0) / v : NaN;
   };
-  const slot = (side: 0 | 1, id: string) =>
-    p
-      .truth!.split('/')
-      [side]!.split('=')
+  const slot = (side: 0 | 1, id: string) => {
+    const half = p.truth!.split('/')[side]!;
+    return half
+      .split('=')
       .slice(0, 6)
       .findIndex((m) => m.split(',')[0]!.toLowerCase() === id);
+  };
   const y = slot(1, t.blocker);
   if (y < 0) return {};
   const gone = faint(p.truth, 1, y);

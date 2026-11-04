@@ -44,12 +44,13 @@ export interface WinconTip {
 }
 
 const HP = 6;
-const mons = (state: string, side: 0 | 1) =>
-  state
-    .split('/')
-    [side]!.split('=')
+const mons = (state: string, side: 0 | 1) => {
+  const half = state.split('/')[side]!;
+  return half
+    .split('=')
     .slice(0, 7)
     .map((f) => f.split(','));
+};
 
 /** Our win chance in a searched world: its best searched choice. */
 export const bestScore = (r: { score: number[]; value: number }) => {

@@ -20,7 +20,7 @@ import {
   type NetPrepared,
 } from '@daily-battle/ai';
 import type { SetsFile } from '@daily-battle/data';
-import type { Engine, NetSearchParams, NetSearchResult } from '@daily-battle/engine-wasm';
+import type { Engine, NetSearchParams, NetSearchResult, NetWorld } from '@daily-battle/engine-wasm';
 import { deriveSeed, legalChoices, makeRng, type SideView } from '@daily-battle/sim-bridge';
 import {
   agreement,
@@ -32,6 +32,7 @@ import {
   type Verdict,
 } from './judge';
 import type { BranchWorld } from './facts/branches';
+import { bestScore } from './advanced/wincon';
 
 export interface NetJudgeOptions extends Pick<
   JudgeOptions,
@@ -224,6 +225,21 @@ export class NetJudge implements CoachJudge {
       slots: p.slots[k]!,
       world: p.worlds[k]!,
     }));
+  }
+
+  /**
+   * A counterfactual world's win chance for us (the advanced coach's sacrifice
+   * check): its best choice's score, every choice searched. NaN if the engine fails.
+   */
+  value(world: NetWorld): number {
+    try {
+      const [r] = this.engine.netSearch(this.options.search, [
+        { ...world, legal: world.legal.map(() => true) },
+      ]);
+      return bestScore(r!);
+    } catch {
+      return NaN;
+    }
   }
 
   /** Worlds whose search ran. */

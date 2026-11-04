@@ -1,7 +1,7 @@
 // What the battle worker sends the UI: plain data describing only what the
 // player's side can see. No simulator types cross this boundary.
 import type { Difficulty } from '@daily-battle/ai/version';
-import type { CoachNote, Heeded, Review, Verdict } from '@daily-battle/tutorial';
+import type { AdvancedReview, CoachNote, Heeded, Review, Verdict } from '@daily-battle/tutorial';
 import type { Position } from '@daily-battle/tutorial/lessons';
 
 export type Who = 'you' | 'foe';
@@ -196,6 +196,11 @@ export interface CoachMemo {
   ignored?: string;
   /** A warning you listened to (you picked again): your first pick and the warning. */
   heeded?: Heeded;
+  /**
+   * The advanced coach on the decision (Normal and Hard): its review texts, and
+   * the one-time key of the tip it showed, so a resume doesn't show it again.
+   */
+  advanced?: { review?: AdvancedReview; key?: string };
 }
 
 /** A past decision replayed (the coach's review): frozen at the decision, then the turn as played. */

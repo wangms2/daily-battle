@@ -70,6 +70,9 @@ function wholeJob(ai: Policy, view: SideView, rng: Rng): DecisionJob {
 /** Shown when the move you picked turns out to be blocked (by Imprison, say). */
 const BLOCKED = 'That move can’t be used right now. Choose another.';
 
+/** An advanced tip not ready this long after its turn's package is skipped (about 2 s on a phone, by the plan). */
+export const ADVANCED_MS = 2000;
+
 export class BattleEngine {
   private readonly session: BattleSession;
   private readonly ai: Policy;
@@ -97,6 +100,13 @@ export class BattleEngine {
   private readonly shown = new Map<string, CoachNote>();
   /** A tip waits for the judge's top choice. */
   private tipPending = false;
+  /**
+   * The advanced coach (Normal and Hard daily battles, with the network judge):
+   * it waits for the judge's searched worlds on this decision.
+   */
+  private advancedPending = false;
+  /** When this decision's package was made: an advanced tip later than `ADVANCED_MS` doesn't show. */
+  private packagedAt = 0;
   /** Your choices so far (resumed ones too): the index of the next one's memo. */
   private decisions = 0;
   /** The coach's memo on the choice just made, for the next package. */
@@ -254,20 +264,33 @@ export class BattleEngine {
     if (!view) return;
     if (this.coached !== view.request) this.coach!.turn(view);
     if (index < this.start.choices.length) {
-      this.coach!.record(view, choice, null, saved?.verdict, saved?.heeded);
+      if (saved?.advanced?.key) this.coach!.shownBefore(view, saved.advanced.key);
+      this.coach!.record(
+        view,
+        choice,
+        null,
+        saved?.verdict,
+        saved?.heeded,
+        saved?.advanced?.review,
+      );
       return;
     }
+    // Picked before the advanced coach ran: it still finds this decision's tips for the review.
+    if (this.advancedPending) this.runAdvanced(view, false);
     const verdict = this.readVerdict(this.judge?.verdict(choice));
     const shown = this.shown.get(choice);
     // A warning you listened to: the last one shown on another pick.
     const other = [...this.shown].filter(([c]) => c !== choice).at(-1);
     const heeded = other && { choice: other[0], note: other[1] };
     this.coach!.record(view, choice, shown ?? null, verdict, heeded);
-    if (verdict || shown || heeded)
+    const advanced = this.coach!.advancedMemo(view);
+    const hasAdvanced = !!(advanced.review || advanced.key);
+    if (verdict || shown || heeded || hasAdvanced)
       this.memo = {
         ...(verdict ? { verdict } : {}),
         ...(shown ? { ignored: shown.text } : {}),
         ...(heeded ? { heeded } : {}),
+        ...(hasAdvanced ? { advanced } : {}),
       };
   }
 
@@ -322,7 +345,11 @@ export class BattleEngine {
     const end = performance.now() + ms;
     let more: boolean;
     do more = judge.step();
-    while (more && performance.now() < end && !(this.tipPending && this.tipReady()));
+    while (
+      more &&
+      performance.now() < end &&
+      !((this.tipPending || this.advancedPending) && this.tipReady())
+    );
     return more;
   }
 
@@ -354,12 +381,52 @@ export class BattleEngine {
   coachTip(): CoachNote | undefined {
     const top = this.judge?.best;
     const view = this.session.view('p1');
-    if (!this.tipPending || !top || !view || !this.coach || !this.tipReady()) return undefined;
+    if (!(this.tipPending || this.advancedPending) || !top || !view || !this.coach)
+      return undefined;
+    if (!this.tipReady()) return undefined;
+    if (this.start.tutorial?.guide) {
+      this.tipPending = false;
+      return guideNote(view, top);
+    }
+    // An advanced tip outranks a basic one waiting (DESIGN.md §22), if it's in time.
+    const advanced = this.advancedPending
+      ? this.runAdvanced(view, performance.now() - this.packagedAt <= ADVANCED_MS)
+      : undefined;
+    if (advanced) {
+      this.tipPending = false;
+      return advanced;
+    }
+    if (!this.tipPending) return undefined;
     this.tipPending = false;
-    if (this.start.tutorial?.guide) return guideNote(view, top);
+    return this.coach.confirm(view, top, this.sound());
+  }
+
+  /** A check of a choice against what the opponent is really doing (judge.ts `soundPick`), when known (Normal). */
+  private sound(): ((choice: string) => boolean) | undefined {
     const read = this.foeRead();
     const values = read && this.judge!.against(read);
-    return this.coach.confirm(view, top, values ? (c) => soundPick(c, values) : undefined);
+    return values ? (c) => soundPick(c, values) : undefined;
+  }
+
+  /** The advanced coach on this decision, once the judge has searched it; `show` false: for the review only. */
+  private runAdvanced(view: SideView, show: boolean): CoachNote | undefined {
+    const judge = this.judge as NetJudge;
+    const worlds = judge.searched();
+    const top = judge.best;
+    if (!worlds || !top) return undefined;
+    this.advancedPending = false;
+    const sound = this.sound();
+    return this.coach!.advanced(
+      view,
+      {
+        worlds,
+        legal: legalChoices(view.request),
+        top,
+        value: (w) => judge.value(w),
+        ...(sound ? { sound } : {}),
+      },
+      show,
+    );
   }
 
   /**
@@ -514,6 +581,7 @@ export class BattleEngine {
       this.memo = undefined;
       const view = this.session.view('p1');
       this.tipPending = false;
+      this.advancedPending = false;
       if (view && pkg.controls) {
         const turn = this.coach.turn(view);
         pkg.coach = turn.tip ? { tip: turn.tip } : {};
@@ -526,6 +594,11 @@ export class BattleEngine {
           guideKey(String(this.start.battleSeed), this.session.choices('p1').length),
         );
         this.tipPending = !!turn.pending && !!this.judge;
+        this.advancedPending =
+          this.judge instanceof NetJudge &&
+          !this.start.tutorial &&
+          view.request.requestType === 'move';
+        this.packagedAt = performance.now();
         if (this.start.tutorial?.guide) {
           // The guide's tip replaces the coach's: the judge's top move, or the
           // teammate to send in when one of yours has fainted.

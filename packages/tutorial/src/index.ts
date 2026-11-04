@@ -49,3 +49,5 @@ export {
   type Review,
   type ReviewTurn,
 } from './coach/review';
+export type { AdvancedReview } from './coach/advanced/review';
+export { advancedTips, type AdvancedFind, type AdvancedRule } from './coach/advanced/coach';
