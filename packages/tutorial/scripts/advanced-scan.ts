@@ -12,13 +12,25 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { MASTER_DEFAULTS, pickSearched, type NetRecord } from '@daily-battle/ai';
 import { FORMATS } from '@daily-battle/data';
-import type { Engine, NetSearchResult } from '@daily-battle/engine-wasm';
+import type { Engine, NetSearchResult, NetWorld } from '@daily-battle/engine-wasm';
 import { loadEngine } from '@daily-battle/engine-wasm/node';
 import { Dex } from '@pkmn/sim';
+import {
+  preserveTip,
+  type PreserveOptions,
+  type PreserveTip,
+} from '../src/coach/advanced/preserve';
 import { readTip, type ReadOptions, type ReadTip } from '../src/coach/advanced/reads';
-import { riskTip, type RiskOptions, type RiskTip } from '../src/coach/advanced/risk';
+import {
+  bestScore,
+  winconTip,
+  type WinconOptions,
+  type WinconTip,
+} from '../src/coach/advanced/wincon';
+import { choiceValues, riskTip, type RiskOptions, type RiskTip } from '../src/coach/advanced/risk';
 import { slowTip, type SlowOptions, type SlowTip } from '../src/coach/advanced/slow';
 import type { BranchWorld } from '../src/coach/facts/branches';
+import { faint } from '../src/coach/facts/counterfactual';
 import { NET_JUDGE_DEFAULTS } from '../src/coach/net-judge';
 
 interface Position extends NetRecord {
@@ -35,7 +47,15 @@ interface Position extends NetRecord {
 type Tip =
   | ({ concept: 'risk'; kind: 'miss' } & RiskTip)
   | ({ concept: 'slow' } & SlowTip)
-  | ({ concept: 'reads' } & ReadTip);
+  | ({ concept: 'reads' } & ReadTip)
+  | ({ concept: 'wincon'; contrast: string; claim?: Claim } & WinconTip)
+  | ({ concept: 'preserve' } & PreserveTip);
+/** The oracle's win chances on the true state: now, with the blocker gone, and with our key gone too. */
+interface Claim {
+  now: number;
+  without: number;
+  withoutKey?: number;
+}
 interface Found {
   k: number;
   top?: string;
@@ -68,6 +88,10 @@ const opts = (name: string) =>
 const RISK = opts('risk') as Partial<RiskOptions>;
 const SLOW = opts('slow') as Partial<SlowOptions>;
 const READS = opts('reads') as Partial<ReadOptions>;
+const WINCON = opts('wincon') as Partial<WinconOptions>;
+const PRESERVE = opts('preserve') as Partial<PreserveOptions>;
+const CONCEPTS = arg('concepts')?.split(',');
+const on = (c: string) => !CONCEPTS || CONCEPTS.includes(c);
 const keyOf = (p: { format: string; i: number; swap: boolean; turn: number }) =>
   `${p.format}:${p.i}:${p.swap}:${p.turn}`;
 /** `--only a.jsonl[,b.jsonl]`: just the positions of earlier tips (e.g. to re-check them with more worlds). */
@@ -120,7 +144,41 @@ function movesOf(p: Position) {
   };
 }
 
+/** Win-condition claims, checked by the oracle on the true state (sets recorded with truth only). */
+function claimOf(t: WinconTip): { claim?: Claim } {
+  const p = current!;
+  if (!p.truth) return {};
+  const engine = engineFor(p.format);
+  const val = (state: string) => {
+    const s = engine.search(state, ORACLE, p.seed ?? 1);
+    const v = s.s1.reduce((a, o) => a + o.v, 0);
+    return v ? s.s1.reduce((a, o) => a + o.s, 0) / v : NaN;
+  };
+  const slot = (side: 0 | 1, id: string) =>
+    p
+      .truth!.split('/')
+      [side]!.split('=')
+      .slice(0, 6)
+      .findIndex((m) => m.split(',')[0]!.toLowerCase() === id);
+  const y = slot(1, t.blocker);
+  if (y < 0) return {};
+  const gone = faint(p.truth, 1, y);
+  if (!gone) return {};
+  const without = gone.over ? 1 : val(gone.state);
+  const x = t.key ? slot(0, t.key) : -1;
+  const both = x >= 0 ? faint(gone.state, 0, x) : undefined;
+  return {
+    claim: {
+      now: val(p.truth),
+      without,
+      ...(both ? { withoutKey: both.over ? 0 : val(both.state) } : {}),
+    },
+  };
+}
+let current: Position | undefined;
+
 function scan(engine: Engine, p: Position, k: number): Found {
+  current = p;
   const n = Math.min(WORLDS, p.worlds.length);
   const slots = p.slots.slice(0, n).map((s) => s.map((c) => c ?? undefined));
   const results: NetSearchResult[] = [];
@@ -146,20 +204,45 @@ function scan(engine: Engine, p: Position, k: number): Found {
     const a = move(c)?.accuracy;
     return a === true ? 100 : a;
   };
-  const r = riskTip(worlds, p.legal, top, accuracy, RISK);
+  const r = on('risk') ? riskTip(worlds, p.legal, top, accuracy, RISK) : undefined;
   if (r) tips.push({ concept: 'risk', kind: 'miss', ...r });
-  const s = slowTip(
-    worlds,
-    p.legal,
-    top,
-    (c) => move(c)?.id,
-    (c) => !!move(c) && move(c)!.category !== 'Status',
-    FORMATS[p.format as keyof typeof FORMATS].gen,
-    SLOW,
-  );
+  const s = !on('slow')
+    ? undefined
+    : slowTip(
+        worlds,
+        p.legal,
+        top,
+        (c) => move(c)?.id,
+        (c) => !!move(c) && move(c)!.category !== 'Status',
+        FORMATS[p.format as keyof typeof FORMATS].gen,
+        SLOW,
+      );
   if (s) tips.push({ concept: 'slow', ...s });
-  const rd = readTip(worlds, p.legal, top, READS);
+  const rd = on('reads') ? readTip(worlds, p.legal, top, READS) : undefined;
   if (rd) tips.push({ concept: 'reads', ...rd });
+  const value = (w: NetWorld) => {
+    try {
+      const [r] = engine.netSearch(NET_JUDGE_DEFAULTS.search, [
+        { ...w, legal: w.legal.map(() => true) },
+      ]);
+      return bestScore(r!);
+    } catch {
+      return NaN;
+    }
+  };
+  const damaging = (c: string) => !!move(c) && move(c)!.category !== 'Status';
+  const wc = on('wincon') ? winconTip(worlds, top, value, damaging, WINCON) : undefined;
+  if (wc) {
+    const v = choiceValues(worlds, p.legal);
+    const contrast = p.legal
+      .filter((c) => c !== top)
+      .sort((a, b) => (v[b] ?? -1) - (v[a] ?? -1))[0];
+    if (contrast) tips.push({ concept: 'wincon', contrast, ...wc, ...claimOf(wc) });
+  }
+  const pr = on('preserve')
+    ? preserveTip(worlds, p.legal, top, value, damaging, PRESERVE)
+    : undefined;
+  if (pr) tips.push({ concept: 'preserve', ...pr });
   // Recorded without grades (strength-gate --a-record dir,p,0): grade only tips' positions.
   let oracle = p.oracle;
   if (tips.length && !oracle && p.truth && p.keys) {

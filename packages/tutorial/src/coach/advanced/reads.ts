@@ -144,7 +144,7 @@ export function readText(
   variant: number,
 ): string {
   const cap = (t: string) =>
-    t.replace(/(^|[.:] )([a-z])/g, (_, a: string, b: string) => a + b.toUpperCase());
+    t.replace(/(^|\. )([a-z])/g, (_, a: string, b: string) => a + b.toUpperCase());
   return cap(readWords(tip, n, variant));
 }
 

@@ -476,6 +476,27 @@ describe('buildReview', () => {
     expect(missed.good).toEqual([]);
   });
 
+  it('explains a turn with the advanced tip, when the player made the play it weighed', () => {
+    const f = facts(POS);
+    const advanced = {
+      choice: 'move 4',
+      against: 'move 3',
+      followed: 'Good call.',
+      missed: 'Ice Beam was safer.',
+    };
+    const key = (choice: string) =>
+      buildReview([
+        decision(0, f, choice, worse(choice, 'move 4'), undefined, undefined, advanced)!,
+      ]).key;
+    expect(key('move 3')[0]?.text).toBe('Ice Beam was safer.');
+    // Another play: the tip's trade-off isn't the one the player made.
+    expect(key('move 2')).toEqual([]);
+    const fine = { ...worse('move 4', 'move 4', 0), worse: false };
+    expect(
+      buildReview([decision(0, f, 'move 4', fine, undefined, undefined, advanced)!]).good[0]?.text,
+    ).toBe('Good call.');
+  });
+
   it('says what Explosion costs when it praises it', () => {
     const f = facts({
       p1: [{ species: 'Metagross', moves: ['Explosion', 'Meteor Mash'] }],

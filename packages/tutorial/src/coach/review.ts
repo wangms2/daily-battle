@@ -1,8 +1,11 @@
 // Post-battle review (DESIGN.md §22): the judge's verdict on each player
 // decision, turned into a few key turns. A key turn is one the judge found
 // clearly worse and the coach can explain (the same text a warning would have
-// shown), so the review never contradicts what the coach said in battle.
+// shown), so the review never contradicts what the coach said in battle. On
+// Normal and Hard, an advanced tip for the turn (advanced/review.ts) explains
+// it first.
 import type { Facts } from '@daily-battle/ai';
+import type { AdvancedReview } from './advanced/review';
 import type { Verdict } from './judge';
 import type { CoachNote } from './simple';
 
@@ -26,6 +29,8 @@ export interface Decision {
   warning?: CoachNote;
   /** A warning the player listened to: their first pick, and what the coach said about it. */
   heeded?: Heeded;
+  /** The advanced tip for the turn (shown or not), in the past tense. */
+  advanced?: AdvancedReview;
 }
 
 /** A warning the player listened to (they picked again). */
@@ -67,6 +72,7 @@ export function decision(
   verdict: Verdict | undefined,
   warning?: CoachNote,
   heeded?: Heeded,
+  advanced?: AdvancedReview,
 ): Decision | undefined {
   if (!verdict || facts.forced || !facts.foe || !facts.me) return undefined;
   const labels: Record<string, string> = {};
@@ -99,6 +105,7 @@ export function decision(
     verdict,
     ...(warning ? { warning } : {}),
     ...(heeded ? { heeded } : {}),
+    ...(advanced ? { advanced } : {}),
   };
 }
 
@@ -163,18 +170,24 @@ export function buildReview(decisions: Decision[], max = 3): Review {
       });
       continue;
     }
+    const adv = d.advanced?.choice === v.top ? d.advanced : undefined;
     if (v.top === d.choice) {
-      const text = praise(d);
-      if (text && !good.some((g) => g.text === text)) good.push({ ...base, text, gap: 0 });
+      const text = adv?.followed ?? praise(d);
+      if (text && !good.some((g) => g.text === text))
+        good.push({ ...base, text, gap: adv ? 0.5 : 0 });
       continue;
     }
-    if (!v.worse || !d.warning) continue;
+    if (!v.worse) continue;
+    // An advanced tip explains the turn when the player made the play it was weighed against.
+    const missed = adv && (!adv.against || adv.against === d.choice) ? adv.missed : undefined;
+    if (!missed && !d.warning) continue;
     key.push({
       ...base,
       top: v.top,
       better: named(d, v.top),
-      text: d.warning.text,
-      ...(d.warning.lesson ? { lesson: d.warning.lesson } : {}),
+      ...(missed
+        ? { text: missed }
+        : { text: d.warning!.text, ...(d.warning!.lesson ? { lesson: d.warning!.lesson } : {}) }),
       gap: v.gap,
     });
   }

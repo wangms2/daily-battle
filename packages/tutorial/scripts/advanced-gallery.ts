@@ -2,10 +2,13 @@
 // (--out JSONL) as one HTML page for the owner to grade (sound / clear /
 // useful), each with the board (the judge's first sampled world), the tip's
 // text, its facts and numbers, and the oracle's grades.
-//   pnpm exec tsx scripts/advanced-gallery.ts --tips a.jsonl[,b.jsonl] --out gallery.html [--max 50] [--concept risk|slow|reads]
-import { readFileSync, writeFileSync } from 'node:fs';
+//   pnpm exec tsx scripts/advanced-gallery.ts --tips a.jsonl[,b.jsonl] --out gallery.html [--max 50] [--concept risk|slow|reads|wincon|preserve]
+import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { FORMATS } from '@daily-battle/data';
 import { Dex } from '@pkmn/sim';
+import { preserveText, type PreserveTip } from '../src/coach/advanced/preserve';
+import { winconText, type WinconTip } from '../src/coach/advanced/wincon';
 import { readText, type ReadTip } from '../src/coach/advanced/reads';
 import { riskText, type RiskTip } from '../src/coach/advanced/risk';
 import { HAZARD_MOVES, PACING_MOVES, slowText, type SlowTip } from '../src/coach/advanced/slow';
@@ -19,6 +22,21 @@ const OUT = arg('out');
 if (!TIPS || !OUT) throw new Error('usage: --tips <a.jsonl[,b.jsonl]> --out <gallery.html>');
 const MAX = Number(arg('max') ?? 50);
 const CONCEPT = arg('concept') ?? 'risk';
+/** `--set dir[,dir]`: the search sets the tips came from, for each position's action slots (switch names). */
+const SLOTS = new Map<string, (string | null)[]>();
+for (const dir of arg('set')?.split(',') ?? [])
+  for (const f of readdirSync(dir).filter((f) => f.endsWith('.jsonl')))
+    for (const line of readFileSync(join(dir, f), 'utf8').split('\n'))
+      if (line.trim()) {
+        const p = JSON.parse(line) as {
+          format: string;
+          i: number;
+          swap: boolean;
+          turn: number;
+          slots: (string | null)[][];
+        };
+        SLOTS.set(`${p.format}:${p.i}:${p.swap}:${p.turn}`, p.slots[0]!);
+      }
 
 interface Row {
   format: string;
@@ -32,7 +50,12 @@ interface Row {
   tip:
     | ({ concept: 'risk'; kind: 'miss' } & RiskTip)
     | ({ concept: 'slow' } & SlowTip)
-    | ({ concept: 'reads' } & ReadTip);
+    | ({ concept: 'reads' } & ReadTip)
+    | ({
+        concept: 'wincon';
+        claim?: { now: number; without: number; withoutKey?: number };
+      } & WinconTip)
+    | ({ concept: 'preserve' } & PreserveTip);
   state: string;
 }
 
@@ -86,12 +109,17 @@ const moveOf = (mon: Mon, choice: string) => {
   const m = /^move (\d)/.exec(choice);
   return m ? mon.moves[Number(m[1]) - 1] : undefined;
 };
+let slots: (string | null)[] | undefined;
 const label = (own: { mons: Mon[] }, active: Mon, c: string) => {
-  const s = /^switch (\d)/.exec(c);
-  return s ? `switch to ${own.mons[Number(s[1]) - 1]?.species}` : (moveOf(active, c)?.name ?? c);
+  if (!c.startsWith('switch ')) return moveOf(active, c)?.name ?? c;
+  const at = slots?.indexOf(c) ?? -1;
+  if (at >= 8) return `switch to ${own.mons[at - 8]?.species}`;
+  if (SLOTS.size) return c;
+  return `switch to ${own.mons[Number(c.slice(7)) - 1]?.species}`;
 };
 
 const cards = picked.map((r, n) => {
+  slots = SLOTS.get(`${r.format}:${r.i}:${r.swap}:${r.turn}`);
   const dex = Dex.forGen(FORMATS[r.format as keyof typeof FORMATS].gen);
   const [mine, foe] = r.state.split('/').map((s) => side(s, dex)) as [
     ReturnType<typeof side>,
@@ -108,6 +136,30 @@ const cards = picked.map((r, n) => {
     facts = `${esc(risky.name)} is ${risky.acc === true ? '—' : `${risky.acc}%`} accurate; a costly miss
     in ${pct(r.tip.bad)} of its outcomes. Win chance (network): ${esc(safe.name)} ${r.tip.values.safe.toFixed(2)},
     ${esc(risky.name)} ${r.tip.values.risky.toFixed(2)}.`;
+  } else if (r.tip.concept === 'wincon') {
+    const t = r.tip;
+    const n = {
+      blocker: dex.species.get(t.blocker).name || t.blocker,
+      ...(t.key ? { key: dex.species.get(t.key).name || t.key } : {}),
+    };
+    text = winconText(t.kind, n, r.turn);
+    const c = t.claim;
+    facts = `${t.kind}; play ${esc(label(mine, me, t.choice))}. Win chance (network) now ${t.values.now.toFixed(2)},
+    without ${esc(n.blocker)} ${t.values.without.toFixed(2)}${
+      t.values.withoutKey !== undefined
+        ? `, without ${esc(n.key!)} too ${t.values.withoutKey.toFixed(2)}`
+        : ''
+    }.${c ? ` Oracle on the true state: now ${c.now.toFixed(2)}, without ${c.without.toFixed(2)}${c.withoutKey !== undefined ? `, without key too ${c.withoutKey.toFixed(2)}` : ''}.` : ''}`;
+  } else if (r.tip.concept === 'preserve') {
+    const t = r.tip;
+    const n = {
+      mon: dex.species.get(t.mon).name || t.mon,
+      choice: label(mine, me, t.choice).replace(/^switch to/, 'switching to'),
+      contrast: label(mine, me, t.contrast).replace(/^switch to/, 'switching to'),
+    };
+    text = preserveText(t.kind, n, r.turn);
+    facts = `${t.kind}; faints if it attacks: ${pct(t.danger)}. Win chance (network) now ${t.values.now.toFixed(2)},
+    with ${esc(n.mon)} already gone ${t.values.without.toFixed(2)}.`;
   } else if (r.tip.concept === 'reads') {
     const t = r.tip;
     const n = {
