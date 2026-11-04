@@ -2,10 +2,11 @@
 // (--out JSONL) as one HTML page for the owner to grade (sound / clear /
 // useful), each with the board (the judge's first sampled world), the tip's
 // text, its facts and numbers, and the oracle's grades.
-//   pnpm exec tsx scripts/advanced-gallery.ts --tips a.jsonl[,b.jsonl] --out gallery.html [--max 50] [--concept risk|slow]
+//   pnpm exec tsx scripts/advanced-gallery.ts --tips a.jsonl[,b.jsonl] --out gallery.html [--max 50] [--concept risk|slow|reads]
 import { readFileSync, writeFileSync } from 'node:fs';
 import { FORMATS } from '@daily-battle/data';
 import { Dex } from '@pkmn/sim';
+import { readText, type ReadTip } from '../src/coach/advanced/reads';
 import { riskText, type RiskTip } from '../src/coach/advanced/risk';
 import { HAZARD_MOVES, PACING_MOVES, slowText, type SlowTip } from '../src/coach/advanced/slow';
 
@@ -28,7 +29,10 @@ interface Row {
   legal: string[];
   oracle?: Record<string, number>;
   oracleLead?: number;
-  tip: ({ concept: 'risk'; kind: 'miss' } & RiskTip) | ({ concept: 'slow' } & SlowTip);
+  tip:
+    | ({ concept: 'risk'; kind: 'miss' } & RiskTip)
+    | ({ concept: 'slow' } & SlowTip)
+    | ({ concept: 'reads' } & ReadTip);
   state: string;
 }
 
@@ -104,6 +108,18 @@ const cards = picked.map((r, n) => {
     facts = `${esc(risky.name)} is ${risky.acc === true ? '—' : `${risky.acc}%`} accurate; a costly miss
     in ${pct(r.tip.bad)} of its outcomes. Win chance (network): ${esc(safe.name)} ${r.tip.values.safe.toFixed(2)},
     ${esc(risky.name)} ${r.tip.values.risky.toFixed(2)}.`;
+  } else if (r.tip.concept === 'reads') {
+    const t = r.tip;
+    const n = {
+      choice: label(mine, me, t.choice).replace(/^switch to/, 'switching to'),
+      contrast: label(mine, me, t.contrast).replace(/^switch to/, 'switching to'),
+      foe: dex.species.get(t.foe).name || t.foe,
+      target: dex.species.get(t.target).name || t.target,
+    };
+    text = readText(t, n, r.turn + n.choice.length);
+    facts = `${t.kind}; foe stays ${pct(t.pStay)}, switches to ${esc(n.target)} ${pct(t.pTarget)}.
+    Win chance (network) vs stay / vs switch: ${esc(n.choice)} ${t.vsStay.choice.toFixed(2)} / ${t.vsSwitch.choice.toFixed(2)},
+    ${esc(n.contrast)} ${t.vsStay.contrast.toFixed(2)} / ${t.vsSwitch.contrast.toFixed(2)}.`;
   } else {
     const t = r.tip;
     const move = moveOf(me, t.choice)!;

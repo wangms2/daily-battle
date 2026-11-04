@@ -15,6 +15,7 @@ import { FORMATS } from '@daily-battle/data';
 import type { Engine, NetSearchResult } from '@daily-battle/engine-wasm';
 import { loadEngine } from '@daily-battle/engine-wasm/node';
 import { Dex } from '@pkmn/sim';
+import { readTip, type ReadOptions, type ReadTip } from '../src/coach/advanced/reads';
 import { riskTip, type RiskOptions, type RiskTip } from '../src/coach/advanced/risk';
 import { slowTip, type SlowOptions, type SlowTip } from '../src/coach/advanced/slow';
 import type { BranchWorld } from '../src/coach/facts/branches';
@@ -31,7 +32,10 @@ interface Position extends NetRecord {
   keys?: Record<string, number>;
   seed?: number;
 }
-type Tip = ({ concept: 'risk'; kind: 'miss' } & RiskTip) | ({ concept: 'slow' } & SlowTip);
+type Tip =
+  | ({ concept: 'risk'; kind: 'miss' } & RiskTip)
+  | ({ concept: 'slow' } & SlowTip)
+  | ({ concept: 'reads' } & ReadTip);
 interface Found {
   k: number;
   top?: string;
@@ -63,6 +67,7 @@ const opts = (name: string) =>
   );
 const RISK = opts('risk') as Partial<RiskOptions>;
 const SLOW = opts('slow') as Partial<SlowOptions>;
+const READS = opts('reads') as Partial<ReadOptions>;
 const keyOf = (p: { format: string; i: number; swap: boolean; turn: number }) =>
   `${p.format}:${p.i}:${p.swap}:${p.turn}`;
 /** `--only a.jsonl[,b.jsonl]`: just the positions of earlier tips (e.g. to re-check them with more worlds). */
@@ -153,6 +158,8 @@ function scan(engine: Engine, p: Position, k: number): Found {
     SLOW,
   );
   if (s) tips.push({ concept: 'slow', ...s });
+  const rd = readTip(worlds, p.legal, top, READS);
+  if (rd) tips.push({ concept: 'reads', ...rd });
   // Recorded without grades (strength-gate --a-record dir,p,0): grade only tips' positions.
   let oracle = p.oracle;
   if (tips.length && !oracle && p.truth && p.keys) {
