@@ -1,3 +1,4 @@
+import { coachNetJudge } from '@daily-battle/ai/version';
 import { describe, expect, it } from 'vitest';
 import type { Attempt, DayState, Settings } from '../state/schema';
 import { coachAvailable, coachOn, coachWarning } from './coach';
@@ -24,6 +25,13 @@ describe('daily coach', () => {
     expect(coachAvailable('gen3ou', 'master')).toBe(false);
     expect(coachAvailable('gen4ou', 'normal')).toBe(true);
     expect(coachAvailable('gen6ou', 'master')).toBe(false);
+  });
+
+  it('judges with the network against Normal and Hard, Normal being no difficulty in a battle', () => {
+    expect(coachNetJudge(undefined)).toBe(true);
+    expect(coachNetJudge('normal')).toBe(true);
+    expect(coachNetJudge('hard')).toBe(true);
+    expect(coachNetJudge('easy')).toBe(false);
   });
 
   it('follows the setting, except for a battle already under way', () => {

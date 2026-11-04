@@ -48,8 +48,10 @@ export const searches = (d: Difficulty | undefined): d is 'hard' | 'master' =>
 /**
  * Whether the coach's judge is Master's network (DESIGN.md §22): against Normal
  * and Hard. Against Easy the search judge's warnings measured better (coach-eval).
+ * No difficulty is Normal, as in a battle's start.
  */
-export const coachNetJudge = (d: Difficulty | undefined): boolean => d === 'normal' || d === 'hard';
+export const coachNetJudge = (d: Difficulty | undefined): boolean =>
+  d === undefined || d === 'normal' || d === 'hard';
 
 /** What a difficulty adds to the AI version: nothing for Normal, so its saves keep resuming. */
 export function difficultyTag(difficulty: Difficulty): string {

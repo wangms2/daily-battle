@@ -4,9 +4,11 @@ import {
   aiFor,
   coachNetJudge,
   HardPolicy,
+  NetPolicy,
   searches,
   UtilityPolicy,
   type DecisionJob,
+  type NetClaim,
   type WorldClaim,
 } from '@daily-battle/ai';
 import { DEFAULT_FORMAT, setsFor } from '@daily-battle/data';
@@ -208,6 +210,20 @@ export class BattleEngine {
   }
 
   choose(choice: string): TurnPackage {
+    const blocked = this.submit(choice);
+    if (blocked) return blocked;
+    this.advanceAi();
+    return this.package(false);
+  }
+
+  /**
+   * `choose` in steps, for the worker: makes your choice (a package only if
+   * it was blocked), then `proceed` until it gives the package. In between, an
+   * opponent decision you'd only wait on (a switch after a faint) is left
+   * `thinking`, so the worker can search it with its helpers. The same
+   * decisions as `choose`.
+   */
+  submit(choice: string): TurnPackage | undefined {
     this.settleAi();
     this.coachSees(choice);
     this.made.push(choice);
@@ -217,8 +233,13 @@ export class BattleEngine {
       this.coach?.forget();
       return this.package(false, BLOCKED);
     }
-    this.advanceAi();
-    return this.package(false);
+    return undefined;
+  }
+
+  /** After `submit`: the package, or undefined while an opponent decision is being searched (`ponder`). */
+  proceed(): TurnPackage | undefined {
+    this.settleAi();
+    return this.advanceAi(true) ? undefined : this.package(false);
   }
 
   /**
@@ -294,13 +315,25 @@ export class BattleEngine {
       : verdict;
   }
 
-  /** Works on the judge for up to `ms`; true while there's more to do. */
+  /** Works on the judge for up to `ms`; true while there's more to do here (not counting worlds handed out). */
   coachWork(ms: number): boolean {
     const judge = this.judge;
     if (!judge?.busy) return false;
     const end = performance.now() + ms;
-    while (judge.step() && performance.now() < end && !(this.tipPending && this.tipReady()));
-    return judge.busy;
+    let more: boolean;
+    do more = judge.step();
+    while (more && performance.now() < end && !(this.tipPending && this.tipReady()));
+    return more;
+  }
+
+  /** The verdict on `choice` is ready, or can't be. */
+  coachReady(choice: string): boolean {
+    return !this.judge?.busy || !!this.judge.verdict(choice);
+  }
+
+  /** A world of the coach's judge for another worker to search, if one's left (the network judge). */
+  claimJudge(): NetClaim | undefined {
+    return this.judge?.claim?.();
   }
 
   /**
@@ -387,8 +420,13 @@ export class BattleEngine {
     return !!this.thinking?.step();
   }
 
-  /** Hard: a world of the opponent's decision for another worker to search, if one's left. */
-  claimWorld(): WorldClaim | undefined {
+  /** Hard and Master: the opponent's decision is still being searched. */
+  thinkingLeft(): boolean {
+    return !!this.thinking;
+  }
+
+  /** Hard and Master: a world of the opponent's decision for another worker to search, if one's left. */
+  claimWorld(): WorldClaim | NetClaim | undefined {
     return this.thinking?.claim();
   }
 
@@ -408,8 +446,12 @@ export class BattleEngine {
     this.session.choose('p2', choice);
   }
 
-  /** The opponent answers every request it has; on Hard and Master, one made while you choose waits for `ponder`. */
-  private advanceAi() {
+  /**
+   * The opponent answers every request it has; on Hard and Master, one made
+   * while you choose waits for `ponder`. With `defer`, so does one you'd wait
+   * on, and this returns true: `settleAi` and advance again once it's searched.
+   */
+  private advanceAi(defer = false): boolean {
     this.pending = undefined;
     for (
       let view = this.session.view('p2');
@@ -436,17 +478,20 @@ export class BattleEngine {
         this.replay = [];
         const rng = makeRng(deriveSeed(this.start.aiSeed, this.aiLog.length));
         const job =
-          this.ai instanceof HardPolicy ? this.ai.think(view, rng) : wholeJob(this.ai, view, rng);
+          this.ai instanceof HardPolicy || this.ai instanceof NetPolicy
+            ? this.ai.think(view, rng)
+            : wholeJob(this.ai, view, rng);
         // While you choose, the search runs in the worker's spare time (`ponder`).
-        if (this.youChoose()) {
+        if (this.youChoose() || defer) {
           this.thinking = job;
-          return;
+          return !this.youChoose();
         }
         choice = job.result();
       }
       this.aiLog.push(choice);
       this.session.choose('p2', choice);
     }
+    return false;
   }
 
   private package(resumed: boolean, note?: string): TurnPackage {

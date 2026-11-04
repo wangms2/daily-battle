@@ -17,6 +17,7 @@ import { legalChoices, type Policy, type Rng, type SideView } from '@daily-battl
 import type { KnownSets } from '../belief';
 import { genFor, moveInfo, type Gen } from '../calc';
 import { toChoice } from '../hard/choices';
+import { settled, type DecisionJob, type NetClaim } from '../hard/policy';
 import { engineId, engineMove } from '../hard/names';
 import { translate, type WorldFoe } from '../hard/translate';
 import { sampleWorlds } from '../hard/worlds';
@@ -201,24 +202,108 @@ export class NetPolicy implements Policy {
   }
 
   choose(view: SideView, rng: Rng): string {
+    return this.think(view, rng).result();
+  }
+
+  /**
+   * The decision as a job, a world at a time (as Hard's, `DecisionJob`): the
+   * worlds are sampled now, and each world's search is independent, so some
+   * can be handed to other workers (`claim`). Run to the end it gives exactly
+   * what `choose` does. `rng` should be this decision's own.
+   */
+  think(view: SideView, rng: Rng): DecisionJob<NetClaim> {
     const tracker = this.observe(view);
     const request = view.request;
     const legal = legalChoices(request);
-    if (legal.length <= 1) return legal[0] ?? 'default';
+    if (legal.length <= 1) return settled(legal[0] ?? 'default');
     this.stats.decisions++;
     if (request.requestType === 'team' || request.requestType === 'wait')
+      return settled(this.fallback.choose(view, rng));
+    const fallback = (message: string) => {
+      this.note(message);
       return this.fallback.choose(view, rng);
+    };
+    const noOption = `no legal network option (legal: ${legal.join(', ')})`;
+    const params = this.options.search;
+    let prepared: NetPrepared | undefined;
     try {
-      const pick = this.decide(view, request, tracker, legal, rng);
-      if (pick) {
-        this.stats.net++;
-        return pick;
+      if (!params) {
+        const pick = this.unsearched(request, tracker, legal, view, rng);
+        if (pick) this.stats.net++;
+        return settled(pick ?? fallback(noOption));
       }
-      this.note(`no legal network option (legal: ${legal.join(', ')})`);
+      prepared = this.build(view, request, tracker, legal, rng);
     } catch (err) {
-      this.note(String((err as Error)?.message ?? err));
+      return settled(fallback(String((err as Error)?.message ?? err)));
     }
-    return this.fallback.choose(view, rng);
+    if (!prepared) return settled(fallback(noOption));
+    const { slots, weights, worlds } = prepared;
+    this.options.record?.({ legal, slots, weights, worlds });
+
+    // By world index: a result, or null for a world the engine panicked on (dropped).
+    const results: (NetSearchResult | null | undefined)[] = [];
+    const claimed = new Set<number>();
+    let failure: unknown;
+    let pick: string | undefined;
+    const finish = () => {
+      const keep = worlds.flatMap((_, k) => (results[k] ? [k] : []));
+      if (!keep.length) {
+        pick = fallback(String((failure as Error)?.message ?? failure));
+        return;
+      }
+      const kept = keep.map((k) => results[k]!);
+      const keptWeights = keep.map((k) => weights[k]!);
+      const total = keptWeights.reduce((a, b) => a + b, 0) || 1;
+      kept.forEach((r, j) => {
+        this.stats.value += (keptWeights[j]! / total) * r.value;
+        this.stats.positions += r.positions;
+      });
+      const best = pickSearched(
+        legal,
+        keep.map((k) => slots[k]!),
+        keptWeights,
+        kept,
+        this.options.priorWeight,
+      );
+      if (best) this.stats.net++;
+      pick = best ?? fallback(noOption);
+    };
+    // Searches a world here; with `all`, ones handed out too (never given back).
+    const search = (all: boolean): boolean => {
+      if (pick !== undefined) return false;
+      const k = worlds.findIndex((_, k) => results[k] === undefined && (all || !claimed.has(k)));
+      if (k >= 0) {
+        try {
+          results[k] = this.engine.netSearch(params, [worlds[k]!])[0]!;
+        } catch (err) {
+          this.note(String((err as Error)?.message ?? err));
+          failure ??= err;
+          results[k] = null;
+        }
+      }
+      if (worlds.some((_, k) => results[k] === undefined)) return k >= 0;
+      finish();
+      return false;
+    };
+    return {
+      step: () => search(false),
+      claim: () => {
+        if (pick !== undefined) return undefined;
+        const k = worlds.findIndex((_, k) => results[k] === undefined && !claimed.has(k));
+        if (k < 0) return undefined;
+        claimed.add(k);
+        return {
+          net: { params, world: worlds[k]! },
+          give: (result) => {
+            if (pick === undefined && results[k] === undefined) results[k] = result;
+          },
+        };
+      },
+      result: () => {
+        while (search(true));
+        return pick!;
+      },
+    };
   }
 
   private tracker(view: SideView): Tracker {
@@ -288,18 +373,18 @@ export class NetPolicy implements Policy {
     return this.build(view, request, tracker, legal, rng);
   }
 
-  private decide(
-    view: SideView,
+  /** The network's pick without search: its move probabilities averaged over the worlds. */
+  private unsearched(
     request: Request,
     tracker: Tracker,
     legal: string[],
+    view: SideView,
     rng: Rng,
   ): string | undefined {
     const prepared = this.build(view, request, tracker, legal, rng);
     if (!prepared) return undefined;
     const { slots, weights, worlds: worldsIn } = prepared;
     this.options.record?.({ legal, slots, weights, worlds: worldsIn });
-    if (this.options.search) return this.searched(legal, slots, weights, worldsIn);
 
     const outs = this.engine.netForward(
       worldsIn.map((w) => ({
@@ -399,40 +484,6 @@ export class NetPolicy implements Policy {
     }
     if (!slots.length) return undefined;
     return { legal, slots, weights, worlds: worldsIn, foes: foeLists };
-  }
-
-  /** Picks by the light search (`pickSearched`); a world the engine panics on is dropped. */
-  private searched(
-    legal: string[],
-    slots: (string | undefined)[][],
-    weights: number[],
-    worlds: NetWorld[],
-  ): string | undefined {
-    const params = this.options.search!;
-    let keep = worlds.map((_, k) => k);
-    let results: NetSearchResult[];
-    try {
-      results = this.engine.netSearch(params, worlds);
-    } catch (err) {
-      this.note(String((err as Error)?.message ?? err));
-      [keep, results] = [[], []];
-      worlds.forEach((w, k) => {
-        try {
-          results.push(this.engine.netSearch(params, [w])[0]!);
-          keep.push(k);
-        } catch {
-          // Dropped.
-        }
-      });
-      if (!keep.length) throw err;
-    }
-    const kept = { slots: keep.map((k) => slots[k]!), weights: keep.map((k) => weights[k]!) };
-    const total = kept.weights.reduce((a, b) => a + b, 0) || 1;
-    results.forEach((r, k) => {
-      this.stats.value += (kept.weights[k]! / total) * r.value;
-      this.stats.positions += r.positions;
-    });
-    return pickSearched(legal, kept.slots, kept.weights, results, this.options.priorWeight);
   }
 
   /** What we know of a foe in a world, as features.rs `Known`. */

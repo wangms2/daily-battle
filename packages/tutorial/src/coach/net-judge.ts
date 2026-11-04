@@ -10,8 +10,15 @@
 // (`against`: the foe read on Easy and Normal).
 //
 // The work is one search per world, so the battle worker can run it a slice
-// at a time while the player chooses.
-import { MASTER_DEFAULTS, NetPolicy, pickSearched, type NetPrepared } from '@daily-battle/ai';
+// at a time while the player chooses, and hand worlds to its helpers (claim):
+// a world's search is the same wherever it runs.
+import {
+  MASTER_DEFAULTS,
+  NetPolicy,
+  pickSearched,
+  type NetClaim,
+  type NetPrepared,
+} from '@daily-battle/ai';
 import type { SetsFile } from '@daily-battle/data';
 import type { Engine, NetSearchParams, NetSearchResult } from '@daily-battle/engine-wasm';
 import { deriveSeed, legalChoices, makeRng, type SideView } from '@daily-battle/sim-bridge';
@@ -53,11 +60,14 @@ export class NetJudge implements CoachJudge {
   private readonly policy: NetPolicy;
   private legal = new Set<string>();
   private prepared?: NetPrepared;
-  /** Each world's search (null: the engine failed on it). */
-  private results: (NetSearchResult | null)[] = [];
+  /** Each world's search (null: the engine failed on it; undefined: not yet). */
+  private results: (NetSearchResult | null | undefined)[] = [];
   /** Each world's foe reply keys, by the foe's slot. */
   private replyKeys: (string | undefined)[][] = [];
+  /** Worlds not yet searched here or handed out. */
   private queue: number[] = [];
+  /** Worlds handed out (claim) and not yet given back. */
+  private out = new Set<number>();
   private top?: string;
   private failed = false;
 
@@ -94,6 +104,7 @@ export class NetJudge implements CoachJudge {
     this.results = [];
     this.replyKeys = [];
     this.queue = [];
+    this.out = new Set();
     this.top = undefined;
     this.failed = false;
     if (view.request.requestType !== 'move' || this.legal.size < 2) {
@@ -129,26 +140,61 @@ export class NetJudge implements CoachJudge {
     return this.failed ? undefined : this.top;
   }
 
-  /** Whether there's work left for this decision. */
+  /** Whether there's work left for this decision (including worlds handed out). */
   get busy(): boolean {
-    return !this.failed && this.queue.length > 0;
+    return !this.failed && this.queue.length + this.out.size > 0;
   }
 
-  /** Searches one world. Returns false when there's nothing left to do. */
-  step(): boolean {
-    const k = this.queue.shift();
+  /**
+   * Searches one world here; with ll, one handed out if none is left (its
+   * answer, if it ever comes, is then ignored). Returns false when there's no
+   * such world left.
+   */
+  step(all = false): boolean {
     const p = this.prepared;
-    if (k === undefined || this.failed || !p) return false;
-    const world = p.worlds[k]!;
-    try {
-      this.results[k] = this.engine.netSearch(this.options.search, [
-        { ...world, must: world.legal },
-      ])[0]!;
-    } catch {
-      this.results[k] = null;
+    if (this.failed || !p) return false;
+    let k = this.queue.shift();
+    if (k === undefined && all) {
+      k = this.out.values().next().value;
+      if (k !== undefined) this.out.delete(k);
     }
-    if (!this.queue.length) this.finish();
-    return this.queue.length > 0;
+    if (k === undefined) return false;
+    this.store(k, this.search(k));
+    return this.queue.length > 0 || (all && this.out.size > 0);
+  }
+
+  /** A world for another worker to search (the same search step does), if one's left. */
+  claim(): NetClaim | undefined {
+    const p = this.prepared;
+    const k = this.failed || !p ? undefined : this.queue.shift();
+    if (k === undefined) return undefined;
+    this.out.add(k);
+    return {
+      net: { params: this.options.search, world: this.world(k) },
+      give: (result) => {
+        // Only an answer still waited on: not one for an earlier decision.
+        if (this.prepared !== p || !this.out.delete(k)) return;
+        this.store(k, result);
+      },
+    };
+  }
+
+  private world(k: number) {
+    const world = this.prepared!.worlds[k]!;
+    return { ...world, must: world.legal };
+  }
+
+  private search(k: number): NetSearchResult | null {
+    try {
+      return this.engine.netSearch(this.options.search, [this.world(k)])[0]!;
+    } catch {
+      return null;
+    }
+  }
+
+  private store(k: number, result: NetSearchResult | null) {
+    this.results[k] = result;
+    if (!this.queue.length && !this.out.size) this.finish();
   }
 
   private finish() {
@@ -288,9 +334,9 @@ export class NetJudge implements CoachJudge {
     const end = now() + ms;
     for (;;) {
       const v = this.verdict(choice);
-      if (v || this.failed || !this.queue.length) return v;
+      if (v || !this.busy) return v;
       if (now() >= end) return undefined;
-      this.step();
+      this.step(true);
     }
   }
 }

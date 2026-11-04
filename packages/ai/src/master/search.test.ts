@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { setsFor } from '@daily-battle/data';
 import type { NetSearchParams, NetWorld } from '@daily-battle/engine-wasm';
 import { engineBuilt, loadEngine } from '@daily-battle/engine-wasm/node';
-import { deriveSeed, makeRng, randomTeam, runBattle } from '@daily-battle/sim-bridge';
+import { deriveSeed, makeRng, randomTeam, runBattle, type Policy } from '@daily-battle/sim-bridge';
 import { describe, expect, it, vi } from 'vitest';
 import { strongBot } from '../bots';
 import { MASTER_NET_PATH } from '../version';
@@ -67,5 +67,43 @@ describe.skipIf(!engineBuilt(4))('net search for the coach', () => {
       }
     }
     expect(held).toBeGreaterThan(0);
+  }, 120_000);
+});
+
+describe.skipIf(!engineBuilt(4))('Master a world at a time', () => {
+  it('plays the same battle when worlds are searched elsewhere, out of order', () => {
+    const data = setsFor('gen4ou');
+    const net = new Uint8Array(readFileSync(NET));
+    const play = (split: boolean) => {
+      const master = new NetPolicy({ engine: loadEngine(4), net, data, ...MASTER_DEFAULTS });
+      const helper = loadEngine(4);
+      helper.netLoad(net);
+      // As the web's helper workers do: two worlds given back out of order, one never.
+      const policy: Policy = split
+        ? {
+            choose: (view, rng) => {
+              const job = master.think(view, rng);
+              const claims = [job.claim(), job.claim(), job.claim()];
+              job.step();
+              for (const claim of [claims[2], claims[0]])
+                if (claim) claim.give(helper.netSearch(claim.net.params, [claim.net.world])[0]!);
+              return job.result();
+            },
+          }
+        : master;
+      const rng = makeRng(deriveSeed('net-job-test:teams', 0));
+      return runBattle({
+        format: 'gen4ou',
+        seed: deriveSeed('net-job-test:battle', 0),
+        maxTurns: 15,
+        p1: {
+          team: randomTeam(rng, data),
+          policy: strongBot({ data }),
+          seed: deriveSeed('net-job-test:p1', 0),
+        },
+        p2: { team: randomTeam(rng, data), policy, seed: deriveSeed('net-job-test:p2', 0) },
+      }).spectatorLog.filter((l) => !l.startsWith('|t:|'));
+    };
+    expect(play(true)).toEqual(play(false));
   }, 120_000);
 });

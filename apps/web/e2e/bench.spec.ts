@@ -2,6 +2,7 @@
 // Master's choice (the worker's `choose` round trip) and the coach's check
 // before a pick (`check`), at full speed and with the CPU throttled like a phone.
 //   BENCH=1 pnpm exec playwright test e2e/bench.spec.ts --project=desktop-1280x800
+// With BENCH_SPEED=normal (or another battle speed), it plays with animations on.
 import { test, type Page } from '@playwright/test';
 import schedule from '../public/schedule/2026-10-19.json' with { type: 'json' };
 
@@ -55,8 +56,9 @@ async function open(page: Page, difficulty: string, coach: boolean) {
     days: {},
     settings: {
       beginnerHints: false,
-      battleSpeed: 'instant',
-      animations: false,
+      // BENCH_SPEED=normal: as played, so the search overlaps the turn's animations.
+      battleSpeed: process.env.BENCH_SPEED ?? 'instant',
+      animations: !!process.env.BENCH_SPEED,
       coachOffered: { gen3ou: true, gen4ou: true, gen5ou: true, gen6ou: true },
       coach: { gen4ou: coach },
       difficulty: { gen4ou: difficulty },

@@ -22,6 +22,7 @@ export {
   searchWorlds,
   type DecisionJob,
   type DecisionRecord,
+  type NetClaim,
   type WorldClaim,
   type HardPolicyOptions,
   type HardStats,

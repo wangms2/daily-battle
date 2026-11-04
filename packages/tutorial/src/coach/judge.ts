@@ -27,6 +27,7 @@ import {
   searchWorld,
   toChoice,
   type KnownSets,
+  type NetClaim,
   type PreparedWorld,
 } from '@daily-battle/ai';
 import type { SetsFile } from '@daily-battle/data';
@@ -122,6 +123,8 @@ export interface CoachJudge {
   against(read: FoeRead, choices?: readonly string[]): Record<string, ReadValue> | undefined;
   /** Sees a decision it won't judge (a replayed one), for judges that remember the battle. */
   watch?(view: SideView): void;
+  /** A world for another worker to search (the network judge): `step` skips it while it's out, `settle` doesn't. */
+  claim?(): NetClaim | undefined;
 }
 
 type Task = { world: number; fixed?: string };

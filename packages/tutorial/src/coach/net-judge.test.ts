@@ -111,6 +111,30 @@ describe.skipIf(!engineBuilt(3))('NetJudge', () => {
     const ddOnly = j.against({ likely: { [dd]: 1 } })!;
     expect(ddOnly['move 1']!.expected).toBeCloseTo(read['move 1']!.actual!);
   });
+
+  it('gives the same verdicts with worlds searched elsewhere, given back in any order', () => {
+    const choices = ['move 1', 'move 2', 'move 3', 'move 4', 'switch 2'];
+    const here = judge(zapdos('zapdos-standard-offensive'));
+    while (here.step());
+    const j = judge(zapdos('zapdos-standard-offensive'));
+    const helper = netEngine();
+    const claims = [];
+    for (let c = j.claim(); c; c = j.claim()) claims.push(c);
+    expect(claims.length).toBeGreaterThan(1);
+    // Everything's out: nothing to search here, but not ready either.
+    expect(j.step()).toBe(false);
+    expect(j.busy).toBe(true);
+    expect(j.verdict('move 1')).toBeUndefined();
+    // One never comes back: settle searches it here.
+    const [lost, ...rest] = claims;
+    for (const c of rest.reverse()) c.give(helper.netSearch(c.net.params, [c.net.world])[0]!);
+    expect(j.busy).toBe(true);
+    expect(j.settle('move 1', Infinity)).toEqual(here.verdict('move 1'));
+    expect(choices.map((c) => j.verdict(c))).toEqual(choices.map((c) => here.verdict(c)));
+    // A late answer, for a world searched here since, changes nothing.
+    lost!.give(helper.netSearch(rest[0]!.net.params, [rest[0]!.net.world])[0]!);
+    expect(choices.map((c) => j.verdict(c))).toEqual(choices.map((c) => here.verdict(c)));
+  });
 });
 
 describe('NetJudge without a working engine', () => {
