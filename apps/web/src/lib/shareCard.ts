@@ -298,20 +298,14 @@ const RIGHT = CARD_W - 96;
 const MID = 78;
 
 /** The lid with "Pokémon Daily · {header}" on it, the dark seam, and the ball. */
-/** Which ball sits on the seam: a Poké Ball for Normal, Ultra for Hard, Premier for Easy, Master for Master. */
-export type BallKind = 'poke' | 'ultra' | 'premier' | 'master';
+/** Which ball sits on the seam: the card's plain ball for Normal, Poké for Easy, Ultra for Hard, Master for Master. */
+export type BallKind = 'plain' | 'poke' | 'ultra' | 'master';
 
 export const ballFor = (level: string | undefined): BallKind =>
-  level === 'Master'
-    ? 'master'
-    : level === 'Hard'
-      ? 'ultra'
-      : level === 'Easy'
-        ? 'premier'
-        : 'poke';
+  level === 'Master' ? 'master' : level === 'Hard' ? 'ultra' : level === 'Easy' ? 'poke' : 'plain';
 
 const ULTRA = { top: '#26252b', band: '#f2c230' };
-const PREMIER_RED = '#d1434b';
+const POKE_RED = '#d1434b';
 const MASTER = { top: '#7a3ea6', spot: '#e05a9c', letter: '#f4f3f1' };
 
 /** A ball at (cx, cy) of radius r, with a ring of width r/4 (the card's style). */
@@ -323,13 +317,17 @@ function drawBall(
   kind: BallKind,
   button: string,
 ) {
-  const ring = kind === 'premier' ? PREMIER_RED : C.seam;
+  const ring = C.seam;
   ctx.save();
   ctx.beginPath();
   ctx.arc(cx, cy, r, 0, Math.PI * 2);
   ctx.clip();
   ctx.fillStyle = C.stone;
   ctx.fillRect(cx - r, cy - r, r * 2, r * 2);
+  if (kind === 'poke') {
+    ctx.fillStyle = POKE_RED;
+    ctx.fillRect(cx - r, cy - r, r * 2, r);
+  }
   if (kind === 'ultra') {
     // The Ultra Ball: a black top with its two gold bands.
     ctx.fillStyle = ULTRA.top;
@@ -359,7 +357,7 @@ function drawBall(
     ctx.lineJoin = 'round';
     ctx.stroke();
   }
-  if (kind !== 'poke') {
+  if (kind !== 'plain') {
     // Its middle line.
     ctx.fillStyle = ring;
     ctx.fillRect(cx - r, cy - r * 0.09, r * 2, r * 0.18);
@@ -372,7 +370,7 @@ function drawBall(
   ctx.stroke();
   ctx.beginPath();
   ctx.arc(cx, cy, r * 0.3, 0, Math.PI * 2);
-  ctx.fillStyle = kind === 'poke' ? button : C.stone;
+  ctx.fillStyle = kind === 'plain' ? button : C.stone;
   ctx.fill();
   ctx.lineWidth = r * 0.13;
   ctx.stroke();
@@ -382,7 +380,7 @@ function drawLid(
   ctx: CanvasRenderingContext2D,
   colors: typeof CLAY,
   header: string,
-  ball: BallKind = 'poke',
+  ball: BallKind = 'plain',
 ) {
   const lid = ctx.createLinearGradient(0, 0, CARD_W, 150);
   lid.addColorStop(0, colors.lid);

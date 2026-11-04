@@ -87,16 +87,16 @@ export const DiceIcon = (p: SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
-/** A tiny ball for a difficulty: Premier (Easy), Poké (Normal), Ultra (Hard), Master (Master). */
+/** A tiny ball for a difficulty: Poké (Easy), Great (Normal), Ultra (Hard), Master (Master). */
 export const BallIcon = ({
   kind,
   ...p
-}: SVGProps<SVGSVGElement> & { kind: 'poke' | 'ultra' | 'premier' | 'master' }) => {
-  const ring = kind === 'premier' ? '#d1434b' : '#2b2d36';
+}: SVGProps<SVGSVGElement> & { kind: 'poke' | 'great' | 'ultra' | 'master' }) => {
+  const ring = '#2b2d36';
   const top = {
     ultra: '#26252b',
     poke: '#d1434b',
-    premier: '#f4f3f1',
+    great: '#3a72d6',
     master: '#7a3ea6',
   }[kind];
   return (
@@ -107,6 +107,12 @@ export const BallIcon = ({
       <g clipPath={`url(#ball-${kind})`}>
         <rect width="20" height="20" fill="#f4f3f1" />
         <rect width="20" height="10" fill={top} />
+        {kind === 'great' && (
+          <>
+            <path d="M1 4.2l4.6-2.4 1 3.4L1.6 7.4z" fill="#e0453f" />
+            <path d="M19 4.2l-4.6-2.4-1 3.4 5 2.2z" fill="#e0453f" />
+          </>
+        )}
         {kind === 'ultra' && (
           <>
             <rect x="1" y="3.5" width="4.5" height="3.5" fill="#f2c230" />

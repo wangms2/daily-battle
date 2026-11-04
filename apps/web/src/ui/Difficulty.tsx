@@ -6,7 +6,7 @@ import clsx from 'clsx';
 import { DIFFICULTY_HINT, UNAVAILABLE_HINT } from '../lib/difficulty';
 import { DIFFICULTY_NAME } from '../lib/share';
 
-const BALL = { easy: 'premier', normal: 'poke', hard: 'ultra', master: 'master' } as const;
+const BALL = { easy: 'poke', normal: 'great', hard: 'ultra', master: 'master' } as const;
 
 export function DifficultyPicker({
   value,
