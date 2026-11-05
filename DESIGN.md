@@ -667,7 +667,7 @@ A room where friends play live battles against each other, Super Auto Pets style
 
 ### 18.2 Live play
 
-- **Turn timer.** Like Showdown's: a time bank plus a cap per turn, and each answer adds time back to the bank (Fast 10 s, Standard 20 s, Relaxed 30 s). Running out loses the battle; if both players run out at once, it's a tie.
+- **Turn timer.** Showdown's (`RoomBattleTimer`): a bank for the whole battle plus a one-off grace, a cap on any one turn, and time added at each new turn, never filling the bank past its start (so the grace wears off). A request in the middle of a turn (a switch after a faint) adds up to 5 s. Your clock runs only while you have a choice to make. Standard is Showdown's ladder timer (2:30 + 1:00 grace, +10 s a turn), Relaxed its challenge timer (5:00 + 1:00, +10 s), Fast 1:00 + 0:30, +5 s, at most 30 s a turn. Running out loses the battle; if both players run out at once, it's a tie.
 - **Disconnects.** A player's clock keeps running while they're away, so an abandoned battle ends when their time does (at most one turn's cap). A reconnect, or a reload, resumes the battle where it was.
 - **Length.** A live 6v6 takes 10–20 minutes, so a room of four with 2 lives runs several rounds. The timer, the lives default, and handicap teams keep it in bounds.
 
