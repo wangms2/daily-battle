@@ -3,11 +3,9 @@
 // `hero` is the band at the game picker's height, its title large and left, and
 // the Poké Ball on the seam (With friends, opened from the landing like Play).
 import clsx from 'clsx';
-import { createContext, useContext, type ReactNode } from 'react';
+import { useContext, type ReactNode } from 'react';
 import { ChevronIcon, GearIcon } from '../ui/icons';
-
-/** Opens the app's Settings (sound, music, …): every versus screen's header has the gear. */
-export const VersusSettingsContext = createContext<(() => void) | null>(null);
+import { VersusSettingsContext } from './settingsContext';
 
 function SettingsButton() {
   const onSettings = useContext(VersusSettingsContext);
