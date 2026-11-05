@@ -98,7 +98,12 @@ export default function LiveBattle({
         onExit={onBack}
         topBarRight={
           <>
-            <Countdown ms={match.timeLeftMs} at={match.receivedAt} />
+            <Countdown
+              ms={match.timeLeftMs}
+              at={match.receivedAt}
+              // Waiting on the foe, your clock stops: it stays up, paused at your bank.
+              {...(!match.result && { paused: match.bankMs })}
+            />
             {right}
           </>
         }
