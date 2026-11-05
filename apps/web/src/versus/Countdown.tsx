@@ -52,9 +52,9 @@ export function Countdown({
         !running
           ? 'border-line bg-surface-2 text-muted'
           : left <= 10_000
-            ? 'animate-pulse border-bad bg-bad text-white'
+            ? 'timer-flash border-bad bg-bad text-surface'
             : left <= 30_000
-              ? 'border-gold bg-gold-soft text-on-gold'
+              ? 'border-gold bg-gold text-on-gold'
               : 'border-line bg-surface text-ink',
         className,
       )}

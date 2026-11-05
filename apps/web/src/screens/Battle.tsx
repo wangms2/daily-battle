@@ -191,7 +191,7 @@ export function Battle({
   onRunItBack,
   onChangeTeam,
   topBarRight,
-  logTimer,
+  fieldTimer,
   background,
   result,
   live,
@@ -228,8 +228,8 @@ export function Battle({
   /** After a loss: back to the brief with the team open for changes. */
   onChangeTeam?: () => void;
   topBarRight?: ReactNode;
-  /** A clock (versus) by the battle log, where the eye already is. */
-  logTimer?: ReactNode;
+  /** A clock (versus), on the field's top left where it can't be missed. */
+  fieldTimer?: ReactNode;
   /** Learn mode: a lesson's callout for the turn about to be chosen. */
   prompt?: (turn: number) => string | undefined;
 }) {
@@ -672,10 +672,7 @@ export function Battle({
       onClick={() => playing && skip()}
       className="card relative flex min-h-0 flex-1 basis-0 flex-col p-4"
     >
-      <div className="mb-2 flex items-center justify-between gap-2">
-        <p className="display text-[12px] tracking-wider text-muted uppercase">Battle log</p>
-        {logTimer}
-      </div>
+      <p className="display mb-2 text-[12px] tracking-wider text-muted uppercase">Battle log</p>
       {log.length ? (
         // A computer's log: a touch larger than the rest, it's read a lot.
         <LogList lines={log} className="min-h-0 flex-1 !text-[15px] leading-[1.5]" />
@@ -689,15 +686,13 @@ export function Battle({
   // field that takes the spare height (see battle/ui/BattleLog.tsx).
   const gen = formatInfo(format).gen;
   const textbox = (
-    <div data-spot="log" data-taps className="flex min-h-[3.25rem] flex-1 basis-0 gap-1.5">
+    <div data-spot="log" data-taps className="flex min-h-[3.25rem] flex-1 basis-0 flex-col">
       <BattleLog
         log={log}
         follow={follow}
         onClick={() => playing && skip()}
-        className="min-h-[3.25rem] min-w-0 flex-1"
+        className="min-h-[3.25rem] flex-1 basis-0"
       />
-      {/* Beside the text, not over it (its top corner has the scroll cue). */}
-      {logTimer && <div className="shrink-0">{logTimer}</div>}
     </div>
   );
 
@@ -853,6 +848,7 @@ export function Battle({
         }}
         busy={playing}
         popover={popover}
+        corner={fieldTimer}
       />
       {explainerNote}
     </div>

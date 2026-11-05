@@ -97,7 +97,7 @@ export default function LiveBattle({
         onEnd={() => {}}
         onExit={onBack}
         topBarRight={right}
-        logTimer={
+        fieldTimer={
           <Countdown
             ms={match.timeLeftMs}
             at={match.receivedAt}
