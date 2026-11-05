@@ -1,6 +1,6 @@
 // A live battle against a friend, on the daily game's battle screen. Loaded
 // on demand: it brings the presenter (and with it the simulator's data).
-import { useEffect, useState, type ReactNode } from 'react';
+import { useLayoutEffect, useState, type ReactNode } from 'react';
 import { BattleBackendContext } from '../battle/backend';
 import type { EngineStart, TurnPackage } from '../battle/frames';
 import { setActiveFormat } from '../lib/data';
@@ -70,7 +70,9 @@ export default function LiveBattle({
   setActiveFormat(match.format);
   // One backend and one opening for the battle's life on screen.
   const [backend] = useState(() => remoteBackend(match, feed, { choose, forfeit }));
-  useEffect(() => backend.attach(), [backend]);
+  // Before the battle screen's own effects start it: what's already in the feed (back from
+  // the room, say) is queued, so the screen opens on where the battle stands now.
+  useLayoutEffect(() => backend.attach(), [backend]);
   const [factory] = useState(() => () => backend);
   const [start] = useState<EngineStart>(() => ({
     format: match.format,

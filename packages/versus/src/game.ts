@@ -125,6 +125,13 @@ export function pairByLives(players: readonly Player[], random: () => number): P
   return pairs;
 }
 
+/**
+ * A battle's id: unique within the room across games (rounds start again at 1
+ * each game, and clients keep each battle's log by its id).
+ */
+export const matchId = (state: RoomState, round: number, i: number) =>
+  `${(state.game?.startedAt ?? 0).toString(36)}-${round}-${i}`;
+
 /** Starts a round with its battles, already paired and dealt. */
 export const startRound = (state: RoomState, matches: Match[]): RoomState => ({
   ...state,

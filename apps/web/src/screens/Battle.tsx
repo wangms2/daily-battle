@@ -569,6 +569,8 @@ export function Battle({
     pending.current = null;
     backend.forfeit().then(
       (pkg) => {
+        // No end yet: just news, so the battle goes on until it comes.
+        if (!pkg.end) return play(pkg);
         for (const f of pkg.frames) applyFrame(f, false);
         if (!ended.current) {
           ended.current = true;
@@ -576,8 +578,8 @@ export function Battle({
           setEnd(pkg.end);
           onEndRef.current({
             result: 'forfeit',
-            remaining: pkg.end?.youLeft ?? 0,
-            ...(pkg.end?.youFainted && { fainted: pkg.end.youFainted }),
+            remaining: pkg.end.youLeft,
+            ...(pkg.end.youFainted && { fainted: pkg.end.youFainted }),
           });
         }
         setControls(null);

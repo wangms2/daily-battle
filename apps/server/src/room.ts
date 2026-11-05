@@ -27,6 +27,7 @@ import {
   fillTeams,
   joinRoom,
   matchOf,
+  matchId,
   matchView,
   newMatch,
   nextDeadline,
@@ -42,10 +43,10 @@ import {
   putMatch,
   roomView,
   roundDone,
+  runClocks,
   sideOf,
   SIDES,
   startBuild,
-  startClock,
   startRound,
   stopClock,
   submitTeam,
@@ -101,7 +102,7 @@ export class Room extends DurableObject<Env> {
   /** How many of each side's lines its player has been sent, by match id. */
   private readonly sent = new Map<string, Record<Side, number>>();
   /** The AI's policy in each battle against it, by match id. */
-  private readonly policies = new Map<string, Policy>();
+  private readonly policies = new Map<string, Promise<Policy>>();
   /** How many of each battle's public lines watchers have been sent, by match id. */
   private readonly watched = new Map<string, number>();
   /** When each person last reacted, to keep reactions to one a second. */
@@ -193,14 +194,14 @@ export class Room extends DurableObject<Env> {
         return this.react(ws, me, msg.match, msg.emoji, now);
     }
 
-    // Leaving, or being removed, mid-game loses your battle first.
-    if (msg.type === 'leave') await this.forfeitFor(me, now);
-    if (msg.type === 'kick' && room.hostId === me && msg.player !== me) {
-      await this.forfeitFor(msg.player, now);
-    }
+    // Leaving, or being removed, mid-game loses your battle. You're out first, so
+    // a round your battle ends places you with everyone else out in it.
     const result = applyCommand(this.room!, me, msg);
     if (!result.ok) return this.send(ws, { type: 'error', code: result.error });
-    let next = afterDeparture(result.state, now, random);
+    this.room = result.state;
+    if (msg.type === 'leave') await this.forfeitFor(me, now);
+    if (msg.type === 'kick') await this.forfeitFor(msg.player, now);
+    let next = afterDeparture(this.room, now, random);
     // A new game or pool: the pool follows the settings.
     if (msg.type === 'settings' && ('format' in msg.settings || 'pool' in msg.settings)) {
       next = await this.withPool(ws, next);
@@ -218,6 +219,8 @@ export class Room extends DurableObject<Env> {
       }
     }
     await this.save(next);
+    // The last one still building left: everyone else is ready to play.
+    if (buildDone(next, now)) return this.beginGame(now);
     this.broadcast();
   }
 
@@ -258,12 +261,15 @@ export class Room extends DurableObject<Env> {
           continue;
         }
         if (m.stage !== 'battle') continue;
-        const late = SIDES.find((s) => {
+        const late = SIDES.filter((s) => {
           const deadline = clockDeadline(m.clocks[s], this.perTurnMs());
           return deadline !== null && now >= deadline;
         });
-        if (late) {
-          this.battle(m).forfeit(late);
+        if (late.length) {
+          // Both out of time at once is a tie: both lose a life.
+          const battle = this.battle(m);
+          if (late.length === 2) battle.tie();
+          else battle.forfeit(late[0]!);
           await this.endMatch(m, 'timeout', now);
         }
       }
@@ -307,12 +313,14 @@ export class Room extends DurableObject<Env> {
     this.send(ws, { type: 'welcome', you: who.id, token: who.token, room: this.view() });
     this.send(ws, { type: 'team', team: who.team ?? null });
     this.broadcast(ws);
-    // Back in the middle of a round: your battle, and its whole log so far.
+    // Back in the middle of a round: your battle (or none), and its whole log so
+    // far, finished or not, so a battle that's over still shows how it ended.
     const match = matchOf(next, who.id);
+    if (!match) this.send(ws, { type: 'match', match: null });
     if (match) {
       const side = sideOf(match, who.id)!;
       this.send(ws, { type: 'match', match: matchView(match, side, Date.now(), this.perTurnMs()) });
-      if (match.stage === 'battle') {
+      if (match.battleAt !== undefined) {
         this.send(ws, {
           type: 'side',
           match: match.id,
@@ -423,7 +431,7 @@ export class Room extends DurableObject<Env> {
       const ai =
         p2 === AI_ID ? aiTeam(format, `room:${room.code}:${round}:${i}`, a.teamSize) : null;
       return newMatch({
-        id: `${round}-${i}`,
+        id: matchId(room, round, i),
         players: { p1, p2 },
         names: { p1: a.name, p2: ai ? AI_NAME : player(p2).name },
         ai: ai ? 'p2' : null,
@@ -458,8 +466,8 @@ export class Room extends DurableObject<Env> {
     }
     const next = updatePrep(match, side, update, poolOf(room, me));
     if (!next) return this.send(ws, { type: 'error', code: 'notYourTurn' });
-    if (prepDone(next, now)) return this.beginBattle(next, now);
     await this.save(putMatch(room, next));
+    if (prepDone(next, now)) return this.beginBattle(next, now);
     this.sendMatch(next, now);
   }
 
@@ -468,6 +476,13 @@ export class Room extends DurableObject<Env> {
    * battle starts lead first, and both players get its opening.
    */
   private async beginBattle(match: Match, now: number) {
+    // The Rival's engine may load from the site first, and other messages can
+    // arrive meanwhile: go on from the room as it is then, once.
+    const policy = match.ai ? await this.policyFor(match) : null;
+    const current =
+      this.room?.phase === 'playing' && this.room.matches.find((x) => x.id === match.id);
+    if (!current || current.stage !== 'prep') return;
+    match = current;
     let room = this.room!;
     const slots = { p1: battleSlots(match, 'p1'), p2: battleSlots(match, 'p2') };
     for (const side of SIDES) {
@@ -494,8 +509,8 @@ export class Room extends DurableObject<Env> {
     const battle = new LiveBattle(m);
     this.battles.set(m.id, battle);
     this.sent.set(m.id, { p1: 0, p2: 0 });
-    m = await this.runAi(m, battle);
-    m = withFainted(this.runClocks(m, battle, now), battle);
+    m = this.runAi(m, battle, policy);
+    m = withFainted(this.clocksAfter(m, battle, now), battle);
     await this.save(putMatch(room, m));
     this.broadcast();
     this.sendMatch(m, now);
@@ -504,6 +519,13 @@ export class Room extends DurableObject<Env> {
   }
 
   private async choose(ws: WebSocket, me: string, choice: string, now: number) {
+    const before = matchOf(this.room!, me);
+    if (!before || before.stage !== 'battle') {
+      return this.send(ws, { type: 'error', code: 'notYourTurn' });
+    }
+    // The AI is ready before the battle is rebuilt, so one that remembers sees it replayed.
+    const policy = before.ai ? await this.policyFor(before) : null;
+    // Its engine may have loaded from the site meanwhile: the battle as it is now.
     const match = matchOf(this.room!, me);
     const side = match && sideOf(match, me);
     if (!match || !side || match.stage !== 'battle') {
@@ -517,9 +539,9 @@ export class Room extends DurableObject<Env> {
       return this.sendSide(match, side, outcome === 'blocked');
     }
     let m = record(match, side, choice);
-    m = await this.runAi(m, battle);
+    m = this.runAi(m, battle, policy);
     if (battle.ended) return this.endMatch(m, battle.winner ? 'win' : 'tie', now);
-    m = withFainted(this.runClocks(m, battle, now), battle);
+    m = withFainted(this.clocksAfter(m, battle, now, side), battle);
     await this.save(putMatch(this.room!, m));
     for (const s of SIDES) this.sendSide(m, s);
     this.sendWatch(m);
@@ -529,10 +551,9 @@ export class Room extends DurableObject<Env> {
   }
 
   /** The AI answers everything the battle asks of it; its choices are recorded like a player's. */
-  private async runAi(match: Match, battle: LiveBattle): Promise<Match> {
+  private runAi(match: Match, battle: LiveBattle, policy: Policy | null): Match {
     const side = match.ai;
-    if (!side) return match;
-    const policy = await this.policyFor(match);
+    if (!side || !policy) return match;
     let m = match;
     for (let view = battle.view(side); view && !battle.ended; view = battle.view(side)) {
       const rng = makeRng(deriveSeed(m.seed, m.choices[side].length) as PRNGSeed);
@@ -542,10 +563,22 @@ export class Room extends DurableObject<Env> {
     return m;
   }
 
-  /** The Rival's AI for a battle, at the difficulty it started with (Hard needs its engine). */
-  private async policyFor(match: Match): Promise<Policy> {
+  /** The Rival's AI for a battle, made once even if asked for again while it loads. */
+  private policyFor(match: Match): Promise<Policy> {
     let policy = this.policies.get(match.id);
-    if (policy) return policy;
+    if (!policy) {
+      policy = this.makePolicy(match);
+      this.policies.set(match.id, policy);
+      policy.catch(() => this.policies.delete(match.id));
+    }
+    return policy;
+  }
+
+  /**
+   * The Rival's AI for a battle, at the difficulty it started with (Hard needs
+   * its engine; without it, it plays as Normal).
+   */
+  private async makePolicy(match: Match): Promise<Policy> {
     const style = match.aiStyle ?? 'balance';
     const data = setsFor(match.format);
     let engine: Engine | null = null;
@@ -555,13 +588,12 @@ export class Room extends DurableObject<Env> {
     const difficulty = match.aiDifficulty === 'hard' && !engine ? 'normal' : match.aiDifficulty;
     // Hard guesses its foe's unseen Pokémon from the 12 they built from.
     const foe = match.players[match.ai === 'p1' ? 'p2' : 'p1'];
-    policy = aiFor({
+    const policy = aiFor({
       difficulty: difficulty ?? 'normal',
       style,
       data,
       ...(engine && { engine, pool: this.room ? poolOf(this.room, foe) : [] }),
     });
-    this.policies.set(match.id, policy);
     return policy;
   }
 
@@ -598,16 +630,16 @@ export class Room extends DurableObject<Env> {
     this.broadcast();
   }
 
-  /** Each player's clock runs while they have a choice to make (the AI's never does). */
-  private runClocks(match: Match, battle: LiveBattle, now: number): Match {
-    const clocks = { ...match.clocks };
-    for (const s of SIDES) {
-      clocks[s] =
-        s !== match.ai && battle.waitingOn(s)
-          ? startClock(clocks[s], now)
-          : stopClock(clocks[s], now);
-    }
-    return { ...match, clocks };
+  /**
+   * Each player's clock runs while they have a choice to make (the AI's never
+   * does). The side that just `answered` gets its per-turn time, and if the
+   * battle already asks it again (the turn ran), its clock starts afresh.
+   */
+  private clocksAfter(match: Match, battle: LiveBattle, now: number, answered?: Side): Match {
+    const waiting = { p1: battle.waitingOn('p1'), p2: battle.waitingOn('p2') };
+    if (match.ai) waiting[match.ai] = false;
+    const addMs = TIMERS[this.room!.settings.timer].addPerTurn * 1000;
+    return { ...match, clocks: runClocks(match.clocks, waiting, now, addMs, answered) };
   }
 
   /** The match's battle, rebuilt from its record if the room slept since. */
@@ -615,6 +647,12 @@ export class Room extends DurableObject<Env> {
     let battle = this.battles.get(match.id);
     if (!battle) {
       battle = new LiveBattle(match);
+      // A battle that ended early (forfeit, time) ends the same way again.
+      if (match.stage === 'over' && match.result && !battle.ended) {
+        const { winner } = match.result;
+        if (winner) battle.forfeit(otherSide(winner));
+        else battle.tie();
+      }
       this.battles.set(match.id, battle);
       // Everything up to the last recorded choice was sent before the room slept.
       this.sent.set(match.id, { p1: battle.logLength('p1'), p2: battle.logLength('p2') });
@@ -694,7 +732,7 @@ export class Room extends DurableObject<Env> {
   /** Every battle this round, from the start, to one watcher who just arrived. */
   private watchAll(ws: WebSocket) {
     for (const m of this.room!.matches) {
-      if (m.stage === 'prep') continue;
+      if (m.battleAt === undefined) continue;
       const battle = this.battle(m);
       this.send(ws, { type: 'watch', match: m.id, from: 0, ...battle.spectate(0), resync: true });
     }

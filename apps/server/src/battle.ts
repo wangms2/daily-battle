@@ -82,6 +82,11 @@ export class LiveBattle {
     this.session.forfeit(side);
   }
 
+  /** Ends the battle as a tie: nobody wins. */
+  tie(): void {
+    this.session.tie();
+  }
+
   /** How many of the side's Pokémon have fainted, from the public log. */
   fainted(side: Side): number {
     return this.session.spectatorLog.filter((l) => l.startsWith(`|faint|${side}a:`)).length;

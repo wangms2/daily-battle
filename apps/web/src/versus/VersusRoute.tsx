@@ -8,6 +8,7 @@ import type { Settings } from '../state/schema';
 import { Button } from '../ui/bits';
 import { BreakScreen, GameOverScreen } from './Break';
 import { BuildScreen, RoundScreen } from './GameScreens';
+import { ErrorBoundary } from './ErrorBoundary';
 import { Lobby } from './Lobby';
 import { Friends } from '../ui/Friends';
 import { Page } from './Page';
@@ -76,7 +77,7 @@ export function VersusRoute({
   );
   if (!code) {
     return (
-      <>
+      <ErrorBoundary key="home">
         <VersusMusic />
         <VersusHome
           onExit={onExit}
@@ -87,11 +88,11 @@ export function VersusRoute({
           }}
         />
         {sheet}
-      </>
+      </ErrorBoundary>
     );
   }
   return (
-    <>
+    <ErrorBoundary key={code}>
       <RoomScreen
         key={code}
         code={code}
@@ -101,7 +102,7 @@ export function VersusRoute({
         onExit={() => go('versus')}
       />
       {sheet}
-    </>
+    </ErrorBoundary>
   );
 }
 
@@ -250,8 +251,17 @@ function RoomScreen({
   }, [building, notePlay]);
   const [name, setName] = useState(savedName);
   const clean = cleanName(name);
-  // The room's lobby, opened from your battle (it carries on meanwhile).
-  const [inRoomFor, setInRoomFor] = useState<string | null>(null);
+  // The room's lobby, opened from your battle (it carries on meanwhile): which battle,
+  // at which stage, in which game.
+  const [inRoom, setInRoom] = useState<{ id: string; stage: string; game: number } | null>(null);
+  // Left during the swap, the battle itself starting brings you back to it.
+  const inRoomFor =
+    match &&
+    inRoom?.id === match.id &&
+    inRoom.game === room.game &&
+    !(inRoom.stage === 'prep' && match.stage !== 'prep')
+      ? match.id
+      : null;
 
   if (status.kind === 'joined') {
     const { room: view, you, at } = status;
@@ -277,7 +287,7 @@ function RoomScreen({
       menu = false;
       const toRoom = () => {
         if (match.stage === 'over') room.dismissMatch();
-        else setInRoomFor(match.id);
+        else setInRoom({ id: match.id, stage: match.stage, game: room.game });
       };
       screen =
         match.stage === 'prep' ? (
@@ -337,7 +347,14 @@ function RoomScreen({
       screen = (
         <RoundScreen
           {...common}
-          onToBattle={match && match.stage !== 'over' ? () => setInRoomFor(null) : undefined}
+          note={
+            match?.stage === 'prep'
+              ? 'Your battle’s getting ready. Its clock runs while you’re here.'
+              : match?.stage === 'battle'
+                ? 'Your battle’s still on. Its clock runs while you’re here.'
+                : undefined
+          }
+          onToBattle={match && match.stage !== 'over' ? () => setInRoom(null) : undefined}
         />
       );
     } else if (view.phase === 'intermission') {

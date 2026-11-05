@@ -10,6 +10,7 @@ import {
   nextDeadline,
   PREP_MS,
   prepDone,
+  runClocks,
   startClock,
   stopClock,
   updatePrep,
@@ -111,6 +112,34 @@ describe('clocks', () => {
     // Less in the bank than a turn's cap: the bank is the limit.
     c = startClock({ bankMs: 10_000, since: null }, 0);
     expect(clockDeadline(c, 60_000)).toBe(10_000);
+  });
+
+  it('gives back the per-turn time only to a running clock', () => {
+    expect(stopClock({ bankMs: 100_000, since: 0 }, 30_000, 20_000)).toEqual({
+      bankMs: 90_000,
+      since: null,
+    });
+    expect(stopClock({ bankMs: 100_000, since: null }, 30_000, 20_000).bankMs).toBe(100_000);
+  });
+
+  it('restarts the clock of the side that answered last, when the turn runs', () => {
+    const clocks = { p1: { bankMs: 100_000, since: 0 }, p2: { bankMs: 100_000, since: null } };
+    // p1 answered after p2 and the next turn asks both again: p1's clock starts afresh.
+    const both = runClocks(clocks, { p1: true, p2: true }, 30_000, 20_000, 'p1');
+    expect(both.p1).toEqual({ bankMs: 90_000, since: 30_000 });
+    expect(both.p2).toEqual({ bankMs: 100_000, since: 30_000 });
+    // p2 answered first: p1 still has to, and keeps its turn's start.
+    const first = runClocks(
+      { p1: { bankMs: 100_000, since: 0 }, p2: { bankMs: 100_000, since: 0 } },
+      { p1: true, p2: false },
+      10_000,
+      20_000,
+      'p2',
+    );
+    expect(first).toEqual({
+      p1: { bankMs: 100_000, since: 0 },
+      p2: { bankMs: 110_000, since: null },
+    });
   });
 
   it('finds the next deadline in a match', () => {
