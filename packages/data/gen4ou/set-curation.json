@@ -4,6 +4,13 @@
       "Choice Scarf": {
         "Thunder Wave": "Flash Cannon"
       }
+    },
+    "Jirachi": {
+      "Utility": {
+        "Protect": "Wish",
+        "Stealth Rock": "Wish",
+        "Substitute": "Wish"
+      }
     }
   },
   "drop": {
