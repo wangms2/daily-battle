@@ -13,6 +13,11 @@
       }
     }
   },
+  "nature": {
+    "Jirachi": {
+      "Wish + Protect": "Impish"
+    }
+  },
   "drop": {
     "Azelf": ["Utility Rain Lead"],
     "Scyther": ["Baton Pass"],

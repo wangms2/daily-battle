@@ -163,6 +163,11 @@ describe('curation', () => {
     expect(scarf.moves).not.toContain('Thunder Wave');
   });
 
+  it('gives Gen 4 Jirachi Wish on its Wish support set, and Impish on Wish + Protect', () => {
+    expect(find('gen4ou', 'Jirachi', 'Utility').moves).toContain('Wish');
+    expect(find('gen4ou', 'Jirachi', 'Wish + Protect').nature).toBe('Impish');
+  });
+
   it('keeps setup moves off Gen 5 Choice sets (Breloom, Crobat)', () => {
     expect(find('gen5ou', 'Breloom', 'Technician').moves).not.toContain('Swords Dance');
     expect(find('gen5ou', 'Crobat', 'Choice Band').moves).not.toContain('Roost');
