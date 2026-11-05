@@ -39,14 +39,29 @@ export interface Prep {
 }
 
 /**
- * A chess clock, like Showdown's timer: a bank for the whole battle, and a cap
- * on any one turn. It runs while its side has a choice to make.
+ * A chess clock, like Showdown's timer: a bank for the whole battle, topped up
+ * each turn, and a cap on any one turn. It runs while its side has a choice to make.
  */
 export interface Clock {
   bankMs: number;
   /** When it started running, or null while stopped. */
   since: number | null;
+  /** The battle turn of the last top-up; null (or missing) before the first request. */
+  turn?: number | null;
 }
+
+/** A room's timer, in milliseconds (see `TIMERS`). */
+export interface TimerRules {
+  /** The bank at the start, and the most a new turn's top-up fills it to. */
+  startingMs: number;
+  /** Added to the bank at each new turn. */
+  addPerTurnMs: number;
+  /** The longest any one turn can take. */
+  maxPerTurnMs: number;
+}
+
+/** Showdown adds at most this for a request in the middle of a turn (a switch after a faint, U-turn). */
+export const MID_TURN_ADD_MS = 5000;
 
 export type MatchEnd = 'win' | 'tie' | 'forfeit' | 'timeout';
 
@@ -189,27 +204,48 @@ export const turnLimit = (clock: Clock, perTurnMs: number) => Math.min(clock.ban
 export const startClock = (clock: Clock, now: number): Clock =>
   clock.since === null ? { ...clock, since: now } : clock;
 
-/** Stops a running clock; `addMs` goes back into its bank (Showdown's per-turn time, for answering). */
-export const stopClock = (clock: Clock, now: number, addMs = 0): Clock =>
+export const stopClock = (clock: Clock, now: number): Clock =>
   clock.since === null
     ? clock
-    : { bankMs: Math.max(0, clock.bankMs - (now - clock.since)) + addMs, since: null };
+    : { ...clock, bankMs: Math.max(0, clock.bankMs - (now - clock.since)), since: null };
 
 /**
- * Both clocks after a battle moves on: each runs while its side is `waiting`.
- * The side that just `answered` gets `addMs` back, and if the battle already
- * asks it again (the turn ran), its clock starts afresh for the new turn.
+ * Showdown's top-up as a side is asked to choose (`RoomBattleTimer.updateTurn`):
+ * the first request adds nothing; a new turn adds `addPerTurn`, never filling
+ * the bank past its start; another request in the same turn adds up to 5 seconds.
+ */
+export function topUp(clock: Clock, turn: number, rules: TimerRules): Clock {
+  const last = clock.turn ?? null;
+  if (last === null) return { ...clock, turn };
+  if (turn > last) {
+    return {
+      ...clock,
+      bankMs: Math.min(clock.bankMs + rules.addPerTurnMs, rules.startingMs),
+      turn,
+    };
+  }
+  return { ...clock, bankMs: clock.bankMs + Math.min(rules.addPerTurnMs, MID_TURN_ADD_MS) };
+}
+
+/**
+ * Both clocks after a battle moves on: each runs while its side is `waiting`,
+ * topped up as its request comes in. The side that just `answered` is stopped
+ * first, so if the battle already asks it again (the turn ran), its clock
+ * starts afresh for the new request.
  */
 export function runClocks(
   clocks: Record<Side, Clock>,
   waiting: Record<Side, boolean>,
   now: number,
-  addMs: number,
+  turn: number,
+  rules: TimerRules,
   answered?: Side,
 ): Record<Side, Clock> {
   const tick = (side: Side) => {
-    const clock = side === answered ? stopClock(clocks[side], now, addMs) : clocks[side];
-    return waiting[side] ? startClock(clock, now) : stopClock(clock, now);
+    const clock = side === answered ? stopClock(clocks[side], now) : clocks[side];
+    if (!waiting[side]) return stopClock(clock, now);
+    if (clock.since !== null) return clock;
+    return startClock(topUp(clock, turn, rules), now);
   };
   return { p1: tick('p1'), p2: tick('p2') };
 }

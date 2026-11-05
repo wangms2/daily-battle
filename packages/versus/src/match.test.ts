@@ -13,6 +13,7 @@ import {
   runClocks,
   startClock,
   stopClock,
+  topUp,
   updatePrep,
   withChange,
   type Match,
@@ -114,31 +115,43 @@ describe('clocks', () => {
     expect(clockDeadline(c, 60_000)).toBe(10_000);
   });
 
-  it('gives back the per-turn time only to a running clock', () => {
-    expect(stopClock({ bankMs: 100_000, since: 0 }, 30_000, 20_000)).toEqual({
-      bankMs: 90_000,
-      since: null,
-    });
-    expect(stopClock({ bankMs: 100_000, since: null }, 30_000, 20_000).bankMs).toBe(100_000);
+  it('tops up like Showdown: nothing at first, +add a new turn up to the start, +5s mid-turn', () => {
+    const rules = { startingMs: 150_000, addPerTurnMs: 10_000, maxPerTurnMs: 150_000 };
+    // The first request: the bank (with its grace) as it is.
+    let c = topUp({ bankMs: 210_000, since: null }, 1, rules);
+    expect(c).toEqual({ bankMs: 210_000, since: null, turn: 1 });
+    // A new turn never fills past the start, so the grace wears off.
+    c = topUp(c, 2, rules);
+    expect(c.bankMs).toBe(150_000);
+    c = topUp({ ...c, bankMs: 100_000 }, 3, rules);
+    expect(c).toEqual({ bankMs: 110_000, since: null, turn: 3 });
+    // A switch after a faint, in the same turn: at most 5 seconds, uncapped.
+    c = topUp(c, 3, rules);
+    expect(c).toEqual({ bankMs: 115_000, since: null, turn: 3 });
   });
 
   it('restarts the clock of the side that answered last, when the turn runs', () => {
-    const clocks = { p1: { bankMs: 100_000, since: 0 }, p2: { bankMs: 100_000, since: null } };
-    // p1 answered after p2 and the next turn asks both again: p1's clock starts afresh.
-    const both = runClocks(clocks, { p1: true, p2: true }, 30_000, 20_000, 'p1');
-    expect(both.p1).toEqual({ bankMs: 90_000, since: 30_000 });
-    expect(both.p2).toEqual({ bankMs: 100_000, since: 30_000 });
+    const rules = { startingMs: 150_000, addPerTurnMs: 10_000, maxPerTurnMs: 150_000 };
+    const clocks = {
+      p1: { bankMs: 100_000, since: 0, turn: 1 },
+      p2: { bankMs: 100_000, since: null, turn: 1 },
+    };
+    // p1 answered after p2 and turn 2 asks both again: p1's clock starts afresh, both topped up.
+    const both = runClocks(clocks, { p1: true, p2: true }, 30_000, 2, rules, 'p1');
+    expect(both.p1).toEqual({ bankMs: 80_000, since: 30_000, turn: 2 });
+    expect(both.p2).toEqual({ bankMs: 110_000, since: 30_000, turn: 2 });
     // p2 answered first: p1 still has to, and keeps its turn's start.
     const first = runClocks(
-      { p1: { bankMs: 100_000, since: 0 }, p2: { bankMs: 100_000, since: 0 } },
+      { p1: { bankMs: 100_000, since: 0, turn: 1 }, p2: { bankMs: 100_000, since: 0, turn: 1 } },
       { p1: true, p2: false },
       10_000,
-      20_000,
+      1,
+      rules,
       'p2',
     );
     expect(first).toEqual({
-      p1: { bankMs: 100_000, since: 0 },
-      p2: { bankMs: 110_000, since: null },
+      p1: { bankMs: 100_000, since: 0, turn: 1 },
+      p2: { bankMs: 90_000, since: null, turn: 1 },
     });
   });
 

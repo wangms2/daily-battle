@@ -47,10 +47,12 @@ import {
   sideOf,
   SIDES,
   startBuild,
+  startingBankMs,
   startRound,
   stopClock,
   submitTeam,
   TIMERS,
+  timerRules,
   updatePrep,
   upgradeRoom,
   withChange,
@@ -440,7 +442,7 @@ export class Room extends DurableObject<Env> {
         format,
         seed: randomSeed(),
         slots: { p1: a.team!, p2: ai ? ai.slots : player(p2).team! },
-        bankMs: TIMERS[timer].bank * 1000,
+        bankMs: startingBankMs(timer),
         now,
       });
     });
@@ -632,14 +634,16 @@ export class Room extends DurableObject<Env> {
 
   /**
    * Each player's clock runs while they have a choice to make (the AI's never
-   * does). The side that just `answered` gets its per-turn time, and if the
-   * battle already asks it again (the turn ran), its clock starts afresh.
+   * does), topped up as Showdown's is when a new request comes in (`topUp`).
    */
   private clocksAfter(match: Match, battle: LiveBattle, now: number, answered?: Side): Match {
     const waiting = { p1: battle.waitingOn('p1'), p2: battle.waitingOn('p2') };
     if (match.ai) waiting[match.ai] = false;
-    const addMs = TIMERS[this.room!.settings.timer].addPerTurn * 1000;
-    return { ...match, clocks: runClocks(match.clocks, waiting, now, addMs, answered) };
+    const rules = timerRules(this.room!.settings.timer);
+    return {
+      ...match,
+      clocks: runClocks(match.clocks, waiting, now, battle.turns(), rules, answered),
+    };
   }
 
   /** The match's battle, rebuilt from its record if the room slept since. */

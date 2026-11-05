@@ -8,6 +8,7 @@ import {
   LIVES_MIN,
   TEAM_SIZES,
   TIMERS,
+  timerHint,
   type RoomCommand,
   type RoomSettings,
   type RoomView,
@@ -93,7 +94,7 @@ const LIVES_OPTIONS: Option<number>[] = Array.from(
 const TIMER_OPTIONS: Option<TimerId>[] = (Object.keys(TIMERS) as TimerId[]).map((id) => ({
   value: id,
   label: TIMERS[id].name,
-  hint: `${TIMERS[id].perTurn}s a turn, +${TIMERS[id].addPerTurn}s each turn`,
+  hint: timerHint(id),
 }));
 const POOL_OPTIONS: Option<RoomSettings['pool']>[] = [
   { value: 'random', label: 'A random 12 each', hint: 'Fewer mirror matches' },
@@ -163,7 +164,7 @@ export function Lobby({
   const rules = [
     `${formatInfo(room.settings.format).name} OU`,
     `${lives} ${lives === 1 ? 'life' : 'lives'}`,
-    `${TIMERS[room.settings.timer].perTurn}s a turn, +${TIMERS[room.settings.timer].addPerTurn}s`,
+    `${TIMERS[room.settings.timer].name} timer`,
     own ? 'A random 12 each' : 'This week’s 12',
     `Rival ${DIFFICULTY_NAME[rival]}`,
   ];

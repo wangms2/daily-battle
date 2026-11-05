@@ -16,15 +16,37 @@ export const TEAM_SIZES = [6, 5, 4, 3] as const;
 export type TeamSize = (typeof TEAM_SIZES)[number];
 
 /**
- * Turn timers, like Showdown's: a bank for the whole battle, a cap on any one
- * turn, and time added back to the bank each time you answer (seconds).
+ * Turn timers, as Showdown's (`server/room-battle.ts`): a bank for the whole
+ * battle (`starting`, plus a one-off `grace` that wears off), topped up by
+ * `addPerTurn` each new turn but never past `starting`, and a cap on any one
+ * turn (seconds). Standard is Showdown's ladder timer, Relaxed its challenge
+ * timer, Fast a quicker one.
  */
 export const TIMERS = {
-  fast: { name: 'Fast', bank: 120, perTurn: 30, addPerTurn: 10 },
-  standard: { name: 'Standard', bank: 240, perTurn: 60, addPerTurn: 20 },
-  relaxed: { name: 'Relaxed', bank: 480, perTurn: 120, addPerTurn: 30 },
+  fast: { name: 'Fast', starting: 60, grace: 30, addPerTurn: 5, perTurn: 30 },
+  standard: { name: 'Standard', starting: 150, grace: 60, addPerTurn: 10, perTurn: 150 },
+  relaxed: { name: 'Relaxed', starting: 300, grace: 60, addPerTurn: 10, perTurn: 300 },
 } as const;
 export type TimerId = keyof typeof TIMERS;
+
+/** A clock's bank at the start of a battle (ms). */
+export const startingBankMs = (id: TimerId) => (TIMERS[id].starting + TIMERS[id].grace) * 1000;
+
+/** A timer's rules in milliseconds, for the clocks. */
+export const timerRules = (id: TimerId) => ({
+  startingMs: TIMERS[id].starting * 1000,
+  addPerTurnMs: TIMERS[id].addPerTurn * 1000,
+  maxPerTurnMs: TIMERS[id].perTurn * 1000,
+});
+
+/** A timer in a few words, e.g. "3:30 to start, +10s a turn" (with the turn cap when it's lower). */
+export function timerHint(id: TimerId): string {
+  const t = TIMERS[id];
+  const total = t.starting + t.grace;
+  const clock = `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`;
+  const cap = t.perTurn < t.starting ? `, ${t.perTurn}s max` : '';
+  return `${clock} to start, +${t.addPerTurn}s a turn${cap}`;
+}
 
 export interface RoomSettings {
   format: FormatId;
