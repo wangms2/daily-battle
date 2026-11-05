@@ -528,7 +528,7 @@ export function validSettings(input: unknown): Partial<RoomSettings> | null {
       out.pool = value;
     } else if (key === 'week' && typeof value === 'string' && WEEK.test(value)) {
       out.week = value;
-    } else if (key === 'rivalDifficulty' && isDifficulty(value)) {
+    } else if (key === 'rivalDifficulty' && isDifficulty(value) && value !== 'master') {
       out.rivalDifficulty = value;
     } else {
       return null;

@@ -421,7 +421,12 @@ export class Room extends DurableObject<Env> {
   /** Starts a round from its pairings: each pair's match, in the swap. */
   private async beginRound(pairs: Pairing[], now: number) {
     const room = this.room!;
-    const { format, timer, rivalDifficulty = 'normal' } = room.settings;
+    const { format, timer } = room.settings;
+    // Master is retired as a choice: a room set to it before then plays Hard.
+    const rivalDifficulty =
+      room.settings.rivalDifficulty === 'master'
+        ? 'hard'
+        : (room.settings.rivalDifficulty ?? 'normal');
     const round = room.round + 1;
     const player = (id: string) => room.players.find((p) => p.id === id)!;
     this.battles.clear();

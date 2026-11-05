@@ -29,7 +29,9 @@ export function unavailableDifficulties(format: FormatId): Difficulty[] {
 
 /** The difficulty picked for a game (Hard and Master only where they can play). */
 export function pickedDifficulty(settings: Settings, format: FormatId): Difficulty {
-  const d = settings.difficulty?.[format] ?? 'normal';
+  const saved = settings.difficulty?.[format] ?? 'normal';
+  // Master is retired as a choice: a player who had it picked plays Hard.
+  const d = saved === 'master' ? 'hard' : saved;
   return unavailableDifficulties(format).includes(d) ? 'normal' : d;
 }
 

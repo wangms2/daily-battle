@@ -46,6 +46,7 @@ export {
   aiVersion,
   coachNetJudge,
   DIFFICULTIES,
+  PICKABLE_DIFFICULTIES,
   difficultyTag,
   isDifficulty,
   searches,

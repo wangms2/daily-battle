@@ -38,6 +38,14 @@ export const RESUMABLE_HARD: readonly number[] = [2];
 export const DIFFICULTIES = ['easy', 'normal', 'hard', 'master'] as const;
 export type Difficulty = (typeof DIFFICULTIES)[number];
 
+/**
+ * The difficulties a player can pick (daily games and versus rivals). Master is
+ * retired as a choice (it played little better than Hard); it stays a
+ * Difficulty so saved Master battles resume and old results read, and its
+ * network still judges for the coach.
+ */
+export const PICKABLE_DIFFICULTIES = ['easy', 'normal', 'hard'] as const;
+
 export const isDifficulty = (x: unknown): x is Difficulty =>
   typeof x === 'string' && (DIFFICULTIES as readonly string[]).includes(x);
 

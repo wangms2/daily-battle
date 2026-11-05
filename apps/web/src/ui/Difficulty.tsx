@@ -1,7 +1,7 @@
 // The CPU difficulty: a picker on the daily brief, and a badge wherever a game
 // isn't at Normal (Normal shows nothing, so it looks as it always has).
 import { BallIcon } from './icons';
-import { DIFFICULTIES, type Difficulty } from '@daily-battle/ai/version';
+import { PICKABLE_DIFFICULTIES, type Difficulty } from '@daily-battle/ai/version';
 import clsx from 'clsx';
 import { DIFFICULTY_HINT, UNAVAILABLE_HINT } from '../lib/difficulty';
 import { DIFFICULTY_NAME } from '../lib/share';
@@ -26,7 +26,8 @@ export function DifficultyPicker({
 }) {
   return (
     <div className="seg flex p-0.5" role="radiogroup" aria-label="Difficulty">
-      {DIFFICULTIES.map((d) => {
+      {/* A Master battle saved before Master was retired still shows its level. */}
+      {(value === 'master' ? [...PICKABLE_DIFFICULTIES, value] : PICKABLE_DIFFICULTIES).map((d) => {
         const cant = unavailable.includes(d);
         const off = disabled || cant;
         return (

@@ -1,6 +1,6 @@
 // A room before it starts: who's in, the invite, and the host's settings.
 // Everyone sees the same settings; only the host can change them.
-import { DIFFICULTIES, searches, type Difficulty } from '@daily-battle/ai/version';
+import { PICKABLE_DIFFICULTIES, searches, type Difficulty } from '@daily-battle/ai/version';
 import { FORMATS, formatInfo, genOf, type FormatId } from '@daily-battle/data/formats';
 import { hasEngine } from '@daily-battle/engine-wasm/version';
 import {
@@ -93,7 +93,7 @@ const POOL_OPTIONS: Option<RoomSettings['pool']>[] = [
   { value: 'random', label: 'A random 12 each' },
   { value: 'weekly', label: 'This week’s 12' },
 ];
-const RIVAL_OPTIONS: Option<Difficulty>[] = DIFFICULTIES.map((d) => ({
+const RIVAL_OPTIONS: Option<Difficulty>[] = PICKABLE_DIFFICULTIES.map((d) => ({
   value: d,
   label: DIFFICULTY_NAME[d],
 }));
@@ -136,7 +136,11 @@ export function Lobby({
   const link = `${window.location.origin}/#versus/${room.code}`;
   const set = (settings: Partial<RoomSettings>) => command({ type: 'settings', settings });
   const nextHost = room.players.find((p) => p.id !== you);
-  const rival = room.settings.rivalDifficulty ?? 'normal';
+  // A room set to Master before it was retired plays Hard.
+  const rival =
+    room.settings.rivalDifficulty === 'master'
+      ? 'hard'
+      : (room.settings.rivalDifficulty ?? 'normal');
 
   const invite = async () => {
     try {
