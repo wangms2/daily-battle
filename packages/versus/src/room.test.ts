@@ -106,24 +106,25 @@ describe('commands', () => {
     });
   });
 
-  it('lets the host set a full team of 3, keeping each handicap', () => {
+  it('lets the host start everyone at 3, and anyone change theirs from 1 to 6', () => {
     const room = ok(
       applyCommand(roomWith('Ash', 'Misty'), 'id0', { type: 'teamSize', player: 'id1', size: 4 }),
     );
     const three = ok(applyCommand(room, 'id0', { type: 'settings', settings: { teamSize: 3 } }));
-    expect(three.players.map((p) => p.teamSize)).toEqual([3, 1]);
-    // Handicaps go down from 3, and never above it.
-    expect(applyCommand(three, 'id1', { type: 'teamSize', player: 'id1', size: 2 }).ok).toBe(true);
-    expect(applyCommand(three, 'id1', { type: 'teamSize', player: 'id1', size: 4 })).toEqual({
-      ok: false,
-      error: 'badMessage',
-    });
-    // A newcomer brings the full 3; back to 6, the gaps stay.
+    expect(three.players.map((p) => p.teamSize)).toEqual([3, 3]);
+    // Any size from 1 to 6, in either mode.
+    for (const size of [1, 6] as const) {
+      const r = ok(applyCommand(three, 'id1', { type: 'teamSize', player: 'id1', size }));
+      expect(r.players[1]!.teamSize).toBe(size);
+    }
+    // A newcomer starts at the room's size; other settings leave sizes alone.
     expect(ok(joinRoom(three, { id: 'x', name: 'Brock', token: 't' })).players[2]!.teamSize).toBe(
       3,
     );
-    const six = ok(applyCommand(three, 'id0', { type: 'settings', settings: { teamSize: 6 } }));
-    expect(six.players.map((p) => p.teamSize)).toEqual([6, 4]);
+    expect(
+      ok(applyCommand(room, 'id0', { type: 'settings', settings: { lives: 3 } })).players[1]!
+        .teamSize,
+    ).toBe(4);
   });
 
   it('passes the host on when the host leaves', () => {

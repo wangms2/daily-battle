@@ -15,27 +15,16 @@ export const LIVES_MAX = 5;
 export const TEAM_SIZES = [6, 5, 4, 3, 2, 1] as const;
 export type TeamSize = (typeof TEAM_SIZES)[number];
 
-/** The room's full team, which the host picks: six, or three for quicker battles. */
+/** The room's starting team size, which the host picks: six, or three for quicker battles. */
 export const FULL_TEAMS = [6, 3] as const;
 export type FullTeam = (typeof FULL_TEAMS)[number];
 
-/** A room's full team (missing is six). */
+/** A room's starting team size (missing is six). Each player can then bring 1 to 6. */
 export const fullTeam = (settings: Pick<RoomSettings, 'teamSize'>): FullTeam =>
   settings.teamSize ?? 6;
 
-/** The sizes a player can bring: the full team, down by up to three as a handicap. */
-export function teamSizeRange(settings: Pick<RoomSettings, 'teamSize'>): {
-  min: TeamSize;
-  max: TeamSize;
-} {
-  const max = fullTeam(settings);
-  return { min: max === 6 ? 3 : 1, max };
-}
-
-const clampSize = (size: number, settings: Pick<RoomSettings, 'teamSize'>): TeamSize => {
-  const { min, max } = teamSizeRange(settings);
-  return Math.min(max, Math.max(min, size)) as TeamSize;
-};
+/** The sizes a player can bring, whatever the room's starting size. */
+export const teamSizeRange = (): { min: TeamSize; max: TeamSize } => ({ min: 1, max: 6 });
 
 /**
  * Turn timers, as Showdown's (`server/room-battle.ts`): a bank for the whole
@@ -71,7 +60,7 @@ export interface RoomSettings {
   week?: string;
   /** How hard the Rival plays (the AI that battles an odd player out). Missing is Normal. */
   rivalDifficulty?: Difficulty;
-  /** Everyone's full team: 6, or 3. Missing is 6. Handicaps go down from it. */
+  /** Everyone's starting team size: 6, or 3. Missing is 6. Each player can change theirs. */
   teamSize?: FullTeam;
 }
 
@@ -459,18 +448,17 @@ export function applyCommand(state: RoomState, by: string, command: RoomCommand)
   switch (command.type) {
     case 'settings': {
       const settings = { ...state.settings, ...command.settings };
-      // A new full team keeps each handicap: someone two down stays two down.
-      const shift = fullTeam(settings) - fullTeam(state.settings);
+      // A new starting size puts everyone there; they can change it again.
+      const reset = command.settings.teamSize !== undefined;
       const players = state.players.map((p) => ({
         ...p,
         lives: settings.lives,
-        teamSize: clampSize(p.teamSize + shift, settings),
+        ...(reset && { teamSize: fullTeam(settings) }),
       }));
       return { ok: true, state: { ...state, settings, players } };
     }
     case 'teamSize': {
       if (!state.players.some((p) => p.id === command.player)) return fail('badMessage');
-      if (clampSize(command.size, state.settings) !== command.size) return fail('badMessage');
       const players = state.players.map((p) =>
         p.id === command.player ? { ...p, teamSize: command.size } : p,
       );
