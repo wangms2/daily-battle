@@ -103,7 +103,7 @@
   },
   "hariyama-offensive": {
     "label": "Bulky attacker",
-    "description": "Hits with Focus Punch, Brick Break, and Rock Slide from huge HP, and removes items with Knock Off."
+    "description": "Hits with Cross Chop, Brick Break, and Rock Slide from huge HP, and removes items with Knock Off."
   },
   "hariyama-defensive-knock-off": {
     "label": "Knock Off support",
@@ -111,7 +111,7 @@
   },
   "kingdra-rain-dance-sweeper": {
     "label": "Rain sweeper",
-    "description": "Sets rain with Rain Dance; Swift Swim doubles its Speed for rain-boosted Surf and Hydro Pump."
+    "description": "Sets rain with Rain Dance; Swift Swim doubles its Speed for rain-boosted Surf, Ice Beam, and Hidden Power Grass."
   },
   "houndoom-pursuit": {
     "label": "Pursuit trapper",
@@ -205,11 +205,11 @@
   },
   "quagsire-counter": {
     "label": "Counter wall",
-    "description": "Takes physical hits and returns them double with Counter, resetting setup with Haze."
+    "description": "Takes physical hits and returns them double with Counter, and wears foes down with Toxic."
   },
   "omastar-rain-dance-sweeper": {
     "label": "Rain sweeper",
-    "description": "Sets rain with Rain Dance; Swift Swim doubles its Speed for rain-boosted Surf."
+    "description": "Sets rain with Rain Dance; Swift Swim doubles its Speed for rain-boosted Hydro Pump."
   },
   "miltank-curse": {
     "label": "Curse tank"

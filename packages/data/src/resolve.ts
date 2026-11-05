@@ -183,10 +183,17 @@ export function resolveSet(
     if (dex.getHiddenPower(ivs).type !== type) Object.assign(ivs, dex.types.get(type).HPivs);
   }
 
-  // Natures are picked apart from the spread, so skip any that lowers a stat it invests in.
+  // Natures are picked apart from the spread, so skip any that lowers a stat it
+  // invests in, or raises the defense it doesn't when it invests in the other
+  // (Careful on a 224 Def spread).
   const natures = asArray(set.nature).filter((n) => {
-    const minus = dex.natures.get(n).minus;
-    return !minus || evs[minus] < 100;
+    const { plus, minus } = dex.natures.get(n);
+    if (minus && evs[minus] >= 100) return false;
+    if (plus === 'def' || plus === 'spd') {
+      const other = plus === 'def' ? 'spd' : 'def';
+      if (evs[plus] < 100 && evs[other] >= 100) return false;
+    }
+    return true;
   });
 
   return {

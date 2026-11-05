@@ -3,7 +3,7 @@
     "format": "gen4ou",
     "method": "curated-usage-weighted-v1",
     "simVersion": "0.10.11",
-    "builtAt": "2026-11-05T01:02:05.134Z",
+    "builtAt": "2026-11-05T01:13:22.750Z",
     "sources": {
       "sets": {
         "url": "https://data.pkmn.cc/sets/gen4ou.json",
@@ -1525,7 +1525,7 @@
           "sourceName": "Physically Defensive",
           "label": "Spikes setter (physically defensive)",
           "description": "Sets Spikes to wear down every Pokémon the opponent switches in.",
-          "weight": 0.475,
+          "weight": 0.7804,
           "moves": [
             "Spikes",
             "Roost",
@@ -1557,7 +1557,7 @@
           "sourceName": "Specially Defensive",
           "label": "Spikes setter (specially defensive)",
           "description": "Sets Spikes to wear down every Pokémon the opponent switches in.",
-          "weight": 0.475,
+          "weight": 0.1594,
           "moves": [
             "Spikes",
             "Roost",
@@ -1566,7 +1566,7 @@
           ],
           "item": "Leftovers",
           "ability": "Keen Eye",
-          "nature": "Impish",
+          "nature": "Careful",
           "evs": {
             "hp": 252,
             "atk": 0,
@@ -1589,7 +1589,7 @@
           "sourceName": "Offensive Spiker",
           "label": "Stealth Rock lead",
           "description": "Leads off, survives a hit with Focus Sash, and sets Stealth Rock before the opponent's lead can stop it.",
-          "weight": 0.05,
+          "weight": 0.0602,
           "moves": [
             "Spikes",
             "Stealth Rock",
@@ -8080,7 +8080,7 @@
           ],
           "item": "Leftovers",
           "ability": "Shell Armor",
-          "nature": "Bold",
+          "nature": "Careful",
           "evs": {
             "hp": 252,
             "atk": 0,
@@ -8760,7 +8760,7 @@
           "sourceName": "Standard Wall",
           "label": "Stealth Rock setter (Leftovers)",
           "description": "Sets Stealth Rock to wear down every Pokémon the opponent switches in.",
-          "weight": 0.6672,
+          "weight": 0.573,
           "moves": [
             "Stealth Rock",
             "Earthquake",
@@ -8769,7 +8769,7 @@
           ],
           "item": "Leftovers",
           "ability": "Sturdy",
-          "nature": "Relaxed",
+          "nature": "Sassy",
           "evs": {
             "hp": 252,
             "atk": 4,
@@ -8792,7 +8792,7 @@
           "sourceName": "Curse",
           "label": "Curse sweeper",
           "description": "Boosts itself with Curse, then tries to sweep through the opposing team.",
-          "weight": 0.2828,
+          "weight": 0.377,
           "moves": [
             "Curse",
             "Earthquake",
@@ -8891,43 +8891,11 @@
       "setSource": "gen4ou",
       "sets": [
         {
-          "id": "mesprit-utility-counter",
-          "sourceName": "Utility Counter",
-          "label": "Stealth Rock setter (Utility Counter)",
-          "description": "Sets Stealth Rock to wear down every Pokémon the opponent switches in.",
-          "weight": 0.5302,
-          "moves": [
-            "Thunderbolt",
-            "Ice Beam",
-            "Psychic",
-            "Stealth Rock"
-          ],
-          "item": "Leftovers",
-          "ability": "Levitate",
-          "nature": "Bold",
-          "evs": {
-            "hp": 252,
-            "atk": 0,
-            "def": 180,
-            "spa": 0,
-            "spd": 76,
-            "spe": 0
-          },
-          "ivs": {
-            "hp": 31,
-            "atk": 31,
-            "def": 31,
-            "spa": 31,
-            "spd": 31,
-            "spe": 31
-          }
-        },
-        {
           "id": "mesprit-physically-defensive",
           "sourceName": "Physically Defensive",
-          "label": "Stealth Rock setter (Physically Defensive)",
+          "label": "Stealth Rock setter (physically defensive)",
           "description": "Sets Stealth Rock to wear down every Pokémon the opponent switches in.",
-          "weight": 0.2066,
+          "weight": 0.4178,
           "moves": [
             "Stealth Rock",
             "Psychic",
@@ -8957,9 +8925,9 @@
         {
           "id": "mesprit-lead",
           "sourceName": "Lead",
-          "label": "Stealth Rock setter (Lead)",
+          "label": "Stealth Rock setter (offensive)",
           "description": "Sets Stealth Rock to wear down every Pokémon the opponent switches in.",
-          "weight": 0.2012,
+          "weight": 0.4069,
           "moves": [
             "Stealth Rock",
             "Psychic",
@@ -8991,7 +8959,7 @@
           "sourceName": "Choice Scarf",
           "label": "Choice Scarf attacker",
           "description": "Outspeeds most threats and hits hard, but is locked into one move until it switches out.",
-          "weight": 0.062,
+          "weight": 0.1253,
           "moves": [
             "Psychic",
             "Ice Beam",
@@ -9016,6 +8984,38 @@
             "spa": 31,
             "spd": 31,
             "spe": 31
+          }
+        },
+        {
+          "id": "mesprit-trick-room",
+          "sourceName": "Trick Room",
+          "label": "Trick Room setter",
+          "description": "Sets up Trick Room so that slower Pokémon move first for five turns.",
+          "weight": 0.05,
+          "moves": [
+            "Trick Room",
+            "Thunderbolt",
+            "Ice Beam",
+            "Psychic"
+          ],
+          "item": "Leftovers",
+          "ability": "Levitate",
+          "nature": "Relaxed",
+          "evs": {
+            "hp": 252,
+            "atk": 0,
+            "def": 180,
+            "spa": 0,
+            "spd": 76,
+            "spe": 0
+          },
+          "ivs": {
+            "hp": 31,
+            "atk": 31,
+            "def": 29,
+            "spa": 31,
+            "spd": 31,
+            "spe": 0
           }
         }
       ]
@@ -10561,7 +10561,7 @@
           "sourceName": "Physically Defensive",
           "label": "Physical wall",
           "description": "Soaks up physical attacks while wearing the opponent down.",
-          "weight": 0.911,
+          "weight": 0.95,
           "moves": [
             "Flamethrower",
             "Thunderbolt",
@@ -10593,7 +10593,7 @@
           "sourceName": "Specially Defensive",
           "label": "RestTalk",
           "description": "Heals fully with Rest and keeps attacking while asleep with Sleep Talk.",
-          "weight": 0.089,
+          "weight": 0.05,
           "moves": [
             "Rest",
             "Sleep Talk",
@@ -10602,7 +10602,7 @@
           ],
           "item": "Leftovers",
           "ability": "Levitate",
-          "nature": "Bold",
+          "nature": "Calm",
           "evs": {
             "hp": 252,
             "atk": 0,

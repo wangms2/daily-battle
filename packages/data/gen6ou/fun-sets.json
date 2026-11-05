@@ -30,7 +30,7 @@
   "Lopunny": {
     "name": "Choice Scarf Healing Wish",
     "label": "Choice Scarf support",
-    "description": "Outspeeds and hits, Tricks its Scarf onto a wall, or faints with Healing Wish to fully heal a teammate.",
+    "description": "Outspeeds and hits, swaps its Scarf onto a wall with Switcheroo, or faints with Healing Wish to fully heal a teammate.",
     "moves": ["Return", "High Jump Kick", "Switcheroo", "Healing Wish"],
     "item": "Choice Scarf",
     "ability": "Limber",

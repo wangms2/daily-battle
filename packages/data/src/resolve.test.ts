@@ -120,6 +120,27 @@ describe('resolveSet', () => {
     expect(set?.nature).toBe('Timid');
   });
 
+  it('skips a listed nature that raises the defense the set leaves bare', () => {
+    // Gen 4 Skarmory: 252 SpD, but Impish (+Def) is more used than Careful (+SpD).
+    const set = resolveSet(
+      'Skarmory',
+      {
+        moves: ['Spikes'],
+        nature: ['Careful', 'Impish'],
+        evs: { hp: 252, def: 4, spd: 252 },
+      },
+      {
+        ...usage,
+        natures: new Map([
+          ['impish', 0.9],
+          ['careful', 0.1],
+        ]),
+      },
+      4,
+    );
+    expect(set?.nature).toBe('Careful');
+  });
+
   it('sets Hidden Power IVs', () => {
     const set = resolveSet(
       'Starmie',

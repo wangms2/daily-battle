@@ -3,7 +3,7 @@
     "format": "gen3ou",
     "method": "curated-usage-weighted-v1",
     "simVersion": "0.10.11",
-    "builtAt": "2026-11-02T19:56:19.638Z",
+    "builtAt": "2026-11-05T01:13:21.551Z",
     "sources": {
       "sets": {
         "url": "https://raw.githubusercontent.com/pkmn/smogon/main/data/sets/gen3ou.json",
@@ -2944,7 +2944,7 @@
           "id": "hariyama-offensive",
           "sourceName": "Offensive",
           "label": "Bulky attacker",
-          "description": "Hits with Focus Punch, Brick Break, and Rock Slide from huge HP, and removes items with Knock Off.",
+          "description": "Hits with Cross Chop, Brick Break, and Rock Slide from huge HP, and removes items with Knock Off.",
           "weight": 0.5956,
           "moves": [
             "Cross Chop",
@@ -3125,7 +3125,7 @@
           "id": "kingdra-rain-dance-sweeper",
           "sourceName": "Rain Dance Sweeper",
           "label": "Rain sweeper",
-          "description": "Sets rain with Rain Dance; Swift Swim doubles its Speed for rain-boosted Surf and Hydro Pump.",
+          "description": "Sets rain with Rain Dance; Swift Swim doubles its Speed for rain-boosted Surf, Ice Beam, and Hidden Power Grass.",
           "weight": 1,
           "moves": [
             "Rain Dance",
@@ -4166,43 +4166,11 @@
       "setSource": "gen3ou",
       "sets": [
         {
-          "id": "steelix-standard-wall",
-          "sourceName": "Standard Wall",
-          "label": "Special wall",
-          "description": "Soaks up special attacks while wearing the opponent down.",
-          "weight": 0.8583,
-          "moves": [
-            "Earthquake",
-            "Toxic",
-            "Roar",
-            "Explosion"
-          ],
-          "item": "Leftovers",
-          "ability": "Sturdy",
-          "nature": "Impish",
-          "evs": {
-            "hp": 252,
-            "atk": 36,
-            "def": 0,
-            "spa": 0,
-            "spd": 220,
-            "spe": 0
-          },
-          "ivs": {
-            "hp": 31,
-            "atk": 31,
-            "def": 31,
-            "spa": 31,
-            "spd": 31,
-            "spe": 31
-          }
-        },
-        {
           "id": "steelix-choice-band",
           "sourceName": "Choice Band",
           "label": "Choice Band attacker",
           "description": "Hits extremely hard with physical moves, but is locked into one move until it switches out.",
-          "weight": 0.1417,
+          "weight": 0.8249,
           "moves": [
             "Earthquake",
             "Iron Tail",
@@ -4227,6 +4195,38 @@
             "spa": 31,
             "spd": 30,
             "spe": 30
+          }
+        },
+        {
+          "id": "steelix-standard-wall",
+          "sourceName": "Standard Wall",
+          "label": "Special wall",
+          "description": "Soaks up special attacks while wearing the opponent down.",
+          "weight": 0.1751,
+          "moves": [
+            "Earthquake",
+            "Toxic",
+            "Roar",
+            "Explosion"
+          ],
+          "item": "Leftovers",
+          "ability": "Sturdy",
+          "nature": "Careful",
+          "evs": {
+            "hp": 252,
+            "atk": 36,
+            "def": 0,
+            "spa": 0,
+            "spd": 220,
+            "spe": 0
+          },
+          "ivs": {
+            "hp": 31,
+            "atk": 31,
+            "def": 31,
+            "spa": 31,
+            "spd": 31,
+            "spe": 31
           }
         }
       ]
@@ -4723,7 +4723,7 @@
           "id": "quagsire-counter",
           "sourceName": "Counter",
           "label": "Counter wall",
-          "description": "Takes physical hits and returns them double with Counter, resetting setup with Haze.",
+          "description": "Takes physical hits and returns them double with Counter, and wears foes down with Toxic.",
           "weight": 0.0789,
           "moves": [
             "Counter",
@@ -6509,7 +6509,7 @@
           "id": "omastar-rain-dance-sweeper",
           "sourceName": "Rain Dance Sweeper",
           "label": "Rain sweeper",
-          "description": "Sets rain with Rain Dance; Swift Swim doubles its Speed for rain-boosted Surf.",
+          "description": "Sets rain with Rain Dance; Swift Swim doubles its Speed for rain-boosted Hydro Pump.",
           "weight": 0.3734,
           "moves": [
             "Rain Dance",

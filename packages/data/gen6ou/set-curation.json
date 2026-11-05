@@ -1,4 +1,9 @@
 {
+  "nature": {
+    "Aggron": {
+      "Tank": "Careful"
+    }
+  },
   "add": {
     "Weavile": {
       "Swords Dance": {
