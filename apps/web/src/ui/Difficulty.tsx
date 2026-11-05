@@ -13,7 +13,6 @@ export function DifficultyPicker({
   onChange,
   unavailable = [],
   disabled,
-  compact,
 }: {
   value: Difficulty;
   onChange: (d: Difficulty) => void;
@@ -21,8 +20,6 @@ export function DifficultyPicker({
   unavailable?: readonly Difficulty[];
   /** While a battle is unfinished, its difficulty stays. */
   disabled?: boolean;
-  /** Narrow screens: only the picked level shows its name; the rest show their ball. */
-  compact?: boolean;
 }) {
   return (
     <div className="seg flex p-0.5" role="radiogroup" aria-label="Difficulty">
@@ -41,16 +38,14 @@ export function DifficultyPicker({
             onClick={() => !off && onChange(d)}
             className={clsx(
               'min-h-7 rounded-lg text-[12px] font-semibold',
-              compact && value !== d ? 'px-2' : 'px-2.5',
+              'px-2.5',
               value === d ? 'bg-surface text-ink shadow-card' : 'text-muted',
               off && value !== d && 'opacity-40',
             )}
           >
             <span className="flex items-center gap-1">
               <BallIcon kind={BALL[d]} />
-              <span className={clsx(compact && value !== d && 'sr-only')}>
-                {DIFFICULTY_NAME[d]}
-              </span>
+              <span>{DIFFICULTY_NAME[d]}</span>
             </span>
           </button>
         );
@@ -101,7 +96,7 @@ export function CoachToggle({
       type="button"
       aria-pressed={on}
       disabled={disabled}
-      title="Tips, blunder warnings, and a review after. Coached results count apart."
+      title="Tips, blunder warnings, and a review after. Coached wins count toward your streak."
       onClick={() => onChange(!on)}
       className={clsx(
         'chip chunky-chip min-h-8 shrink-0 px-2.5 text-[13px] font-semibold',

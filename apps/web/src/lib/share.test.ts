@@ -76,21 +76,21 @@ describe('share text', () => {
     expect(header('normal')).toBe('Pokémon Daily · Gen 4 OU · Oct 21');
   });
 
-  it('says Coached, with the difficulty the deciding try was played on', () => {
-    const header = (attempts: Attempt[]) =>
+  it('says Coached when the coach helped with a try that counted', () => {
+    const header = (attempts: Attempt[], difficulty: 'normal' | 'easy' = 'normal') =>
       shareText({
         day: DAY,
-        summary: summarizeDay({ swapUsed: false, attempts }, true, 'coached'),
+        summary: summarizeDay({ swapUsed: false, attempts }, true, difficulty),
         streak: 1,
         game: 'Gen 3 OU',
-        difficulty: 'normal',
-        coached: true,
+        difficulty,
       }).split('\n')[0];
     const easy = { ...a('win', 4), coached: true as const, difficulty: 'easy' as const };
-    expect(header([easy])).toBe('Pokémon Daily · Gen 3 OU · Easy · Coached · Oct 21');
+    expect(header([easy], 'easy')).toBe('Pokémon Daily · Gen 3 OU · Easy · Coached · Oct 21');
     expect(header([{ ...a('loss', 0), coached: true }])).toBe(
       'Pokémon Daily · Gen 3 OU · Coached · Oct 21',
     );
+    expect(header([a('win', 4)])).toBe('Pokémon Daily · Gen 3 OU · Oct 21');
   });
 
   it('is compact: the header, the deciding try’s squares, then the streak; no team', () => {

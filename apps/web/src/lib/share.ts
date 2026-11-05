@@ -19,8 +19,6 @@ export interface ShareArgs {
   format?: FormatId;
   /** The CPU difficulty; only Easy and Hard show. */
   difficulty?: Difficulty;
-  /** The coached tries (any difficulty): the header says so, with the deciding try's difficulty. */
-  coached?: boolean;
   /** This game's days won ever, at this difficulty: on the first try, and on any try. */
   stars?: Stars;
   /** The player's name, on the image card's lid. */
@@ -96,7 +94,6 @@ export function shareModel({
   game,
   format,
   difficulty,
-  coached,
   stars,
   trainer,
 }: ShareArgs): ShareModel {
@@ -122,13 +119,12 @@ export function shareModel({
     swapped: s.species === swappedIn,
   }));
 
-  // Coached tries can span difficulties: name the one the result came from.
-  const level = coached ? (winning ?? counted.at(-1))?.difficulty : difficulty;
   return {
     ...(game && { game }),
     ...(format && { format }),
-    ...(level && level !== 'normal' && { level: DIFFICULTY_NAME[level] }),
-    ...(coached && { coached: true as const }),
+    ...(difficulty && difficulty !== 'normal' && { level: DIFFICULTY_NAME[difficulty] }),
+    // The coach helped with a try that counted: marked by the ball.
+    ...(summary.helped && { coached: true as const }),
     date,
     status,
     headline,

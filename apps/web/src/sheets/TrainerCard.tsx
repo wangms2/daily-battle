@@ -26,7 +26,6 @@ const ROW_LABEL: Record<Bucket, string> = {
   normal: 'Normal',
   hard: 'Hard',
   master: 'Master',
-  coached: 'Coached',
 };
 
 function Total({ value, label }: { value: ReactNode; label: string }) {
