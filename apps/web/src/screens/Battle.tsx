@@ -1267,6 +1267,8 @@ export function Battle({
         animations={settings.animations}
         onHints={(v) => onSetting('beginnerHints', v)}
         onAnimations={(v) => onSetting('animations', v)}
+        sound={settings.sound}
+        onSound={(v) => onSetting('sound', v)}
         onLog={() => {
           setMenuOpen(false);
           setLogOpen(true);

@@ -11,7 +11,7 @@ import { BuildScreen, RoundScreen } from './GameScreens';
 import { ErrorBoundary } from './ErrorBoundary';
 import { Lobby } from './Lobby';
 import { Friends } from '../ui/Friends';
-import { Page } from './Page';
+import { Page, VersusSettingsContext } from './Page';
 import { HowToLink, VersusHowTo } from './HowTo';
 import { PrepScreen } from './PrepScreen';
 import { RoomDrawer } from './RoomDrawer';
@@ -53,12 +53,15 @@ export function VersusRoute({
   route,
   go,
   onExit,
+  onSettings,
   battle,
 }: {
   route: string;
   go: (route: string) => void;
   /** Back to the daily game. */
   onExit: () => void;
+  /** Opens the app's Settings, from every versus screen's header. */
+  onSettings: () => void;
   battle: BattleSettings;
 }) {
   const code = roomCodeOf(route);
@@ -78,30 +81,34 @@ export function VersusRoute({
   if (!code) {
     return (
       <ErrorBoundary key="home">
-        <VersusMusic />
-        <VersusHome
-          onExit={onExit}
-          onHowTo={() => setHowTo(true)}
-          onRoom={(c, name) => {
-            setJoinAs(name ? { code: c, name } : null);
-            go(`versus/${c}`);
-          }}
-        />
-        {sheet}
+        <VersusSettingsContext.Provider value={onSettings}>
+          <VersusMusic />
+          <VersusHome
+            onExit={onExit}
+            onHowTo={() => setHowTo(true)}
+            onRoom={(c, name) => {
+              setJoinAs(name ? { code: c, name } : null);
+              go(`versus/${c}`);
+            }}
+          />
+          {sheet}
+        </VersusSettingsContext.Provider>
       </ErrorBoundary>
     );
   }
   return (
     <ErrorBoundary key={code}>
-      <RoomScreen
-        key={code}
-        code={code}
-        autoJoinAs={joinAs?.code === code ? joinAs.name : undefined}
-        battle={battle}
-        onHowTo={() => setHowTo(true)}
-        onExit={() => go('versus')}
-      />
-      {sheet}
+      <VersusSettingsContext.Provider value={onSettings}>
+        <RoomScreen
+          key={code}
+          code={code}
+          autoJoinAs={joinAs?.code === code ? joinAs.name : undefined}
+          battle={battle}
+          onHowTo={() => setHowTo(true)}
+          onExit={() => go('versus')}
+        />
+        {sheet}
+      </VersusSettingsContext.Provider>
     </ErrorBoundary>
   );
 }

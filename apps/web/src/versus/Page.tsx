@@ -3,8 +3,26 @@
 // `hero` is the band at the game picker's height, its title large and left, and
 // the Poké Ball on the seam (With friends, opened from the landing like Play).
 import clsx from 'clsx';
-import type { ReactNode } from 'react';
-import { ChevronIcon } from '../ui/icons';
+import { createContext, useContext, type ReactNode } from 'react';
+import { ChevronIcon, GearIcon } from '../ui/icons';
+
+/** Opens the app's Settings (sound, music, …): every versus screen's header has the gear. */
+export const VersusSettingsContext = createContext<(() => void) | null>(null);
+
+function SettingsButton() {
+  const onSettings = useContext(VersusSettingsContext);
+  if (!onSettings) return null;
+  return (
+    <button
+      type="button"
+      onClick={onSettings}
+      className="grid size-10 shrink-0 place-items-center rounded-full text-white/85 hover:bg-white/10"
+      aria-label="Settings"
+    >
+      <GearIcon />
+    </button>
+  );
+}
 
 export function Page({
   title,
@@ -40,7 +58,10 @@ export function Page({
               <ChevronIcon className="size-[18px] rotate-180" aria-hidden />
               {back}
             </button>
-            {right}
+            <div className="flex items-center gap-1">
+              {right}
+              <SettingsButton />
+            </div>
           </div>
           <div className="absolute inset-x-0 top-12 z-10">
             <h1 className="home-serif mx-auto w-full max-w-[520px] px-5 text-[26px] leading-[1.1] wide:max-w-[880px] wide:px-4">
@@ -79,7 +100,10 @@ export function Page({
         </button>
         <h1 className="home-serif min-w-0 flex-1 truncate text-center text-[17px]">{title}</h1>
         {/* Balances the back button so the title stays centered. */}
-        <span className="relative z-10 flex min-w-16 justify-end">{right}</span>
+        <span className="relative z-10 flex min-w-16 items-center justify-end gap-1">
+          {right}
+          <SettingsButton />
+        </span>
       </header>
       <div className="home-seam is-thin" />
       <main className="min-h-0 flex-1 overflow-y-auto px-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
