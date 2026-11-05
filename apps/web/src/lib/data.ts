@@ -306,9 +306,12 @@ export interface Matchups {
   immune: string[];
 }
 
-/** Defensive type matchups, with the immunity abilities a species' sets use. */
-export function matchups(species: string): Matchups {
-  const abilities = new Set(setsOf(species).map((s) => s.ability));
+/**
+ * Defensive type matchups, with the immunity abilities a species' sets use, or
+ * only `ability` when it's known (your own Pokémon).
+ */
+export function matchups(species: string, ability?: string): Matchups {
+  const abilities = new Set(ability ? [ability] : setsOf(species).map((s) => s.ability));
   const abilityImmune: Record<string, string> = {
     Levitate: 'Ground',
     'Flash Fire': 'Fire',
