@@ -40,11 +40,17 @@ export function remoteBackend(
   /** A start, choice, or forfeit waiting for the room's answer. */
   let answer: ((pkg: TurnPackage) => void) | null = null;
   let listener: ((pkg: TurnPackage) => void) | null = null;
+  /** Giving up, waiting for the battle's end (other news goes on as usual meanwhile). */
+  let forfeited: ((pkg: TurnPackage) => void) | null = null;
   let started = false;
   const queued: TurnPackage[] = [];
 
   const deliver = (pkg: TurnPackage) => {
-    if (answer) {
+    if (forfeited && pkg.end) {
+      const f = forfeited;
+      forfeited = null;
+      f(pkg);
+    } else if (answer) {
       const a = answer;
       answer = null;
       a(pkg);
@@ -96,7 +102,7 @@ export function remoteBackend(
     },
     forfeit: () => {
       send.forfeit();
-      return next();
+      return new Promise<TurnPackage>((resolve) => (forfeited = resolve));
     },
     subscribe: (onPackage) => {
       listener = onPackage;

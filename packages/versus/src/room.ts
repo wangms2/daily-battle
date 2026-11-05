@@ -15,11 +15,14 @@ export const LIVES_MAX = 5;
 export const TEAM_SIZES = [6, 5, 4, 3] as const;
 export type TeamSize = (typeof TEAM_SIZES)[number];
 
-/** Turn timers, like Showdown's: a bank for the whole battle and a cap on any one turn. */
+/**
+ * Turn timers, like Showdown's: a bank for the whole battle, a cap on any one
+ * turn, and time added back to the bank each time you answer (seconds).
+ */
 export const TIMERS = {
-  fast: { name: 'Fast', bank: 120, perTurn: 30 },
-  standard: { name: 'Standard', bank: 240, perTurn: 60 },
-  relaxed: { name: 'Relaxed', bank: 480, perTurn: 120 },
+  fast: { name: 'Fast', bank: 120, perTurn: 30, addPerTurn: 10 },
+  standard: { name: 'Standard', bank: 240, perTurn: 60, addPerTurn: 20 },
+  relaxed: { name: 'Relaxed', bank: 480, perTurn: 120, addPerTurn: 30 },
 } as const;
 export type TimerId = keyof typeof TIMERS;
 
@@ -320,7 +323,8 @@ export function joinRoom(
 ): Result {
   const name = cleanName(input.name);
   if (!name) return fail('badName');
-  const taken = [...state.players, ...state.spectators];
+  // Someone who left mid-game keeps their place in the standings but not their name.
+  const taken = [...state.players.filter((p) => !p.left), ...state.spectators];
   if (taken.some((p) => p.name.toLowerCase() === name.toLowerCase())) return fail('nameTaken');
   if (state.phase !== 'lobby') {
     if (state.spectators.length >= MAX_SPECTATORS) return fail('full');
@@ -377,19 +381,21 @@ export const alive = (state: RoomState): Player[] =>
 /**
  * Takes a player out of the room. In the lobby they're gone; mid-game they
  * stay in the standings, with no lives left (the room server forfeits their
- * battle first). The host passes to the next player still here.
+ * battle first). The host passes to the next player still here, or to a
+ * spectator if no player is.
  */
 export function removePlayer(state: RoomState, id: string): RoomState {
-  if (state.spectators.some((s) => s.id === id)) {
-    return { ...state, spectators: state.spectators.filter((s) => s.id !== id) };
-  }
   const players =
     state.phase === 'lobby'
       ? state.players.filter((p) => p.id !== id)
       : state.players.map((p) => (p.id === id ? { ...p, left: true, lives: 0 } : p));
-  const here = players.filter((p) => p.id !== id && !p.left);
-  const hostId = state.hostId === id ? (here[0]?.id ?? null) : state.hostId;
-  return { ...state, players, hostId };
+  const spectators = state.spectators.filter((s) => s.id !== id);
+  const isSpectator = spectators.length !== state.spectators.length;
+  const hostId =
+    state.hostId === id
+      ? (players.find((p) => p.id !== id && !p.left)?.id ?? spectators[0]?.id ?? null)
+      : state.hostId;
+  return isSpectator ? { ...state, spectators, hostId } : { ...state, players, hostId };
 }
 
 /** What a joined player can ask the room to do. Joining itself is separate (`joinRoom`). */

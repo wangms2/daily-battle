@@ -189,10 +189,30 @@ export const turnLimit = (clock: Clock, perTurnMs: number) => Math.min(clock.ban
 export const startClock = (clock: Clock, now: number): Clock =>
   clock.since === null ? { ...clock, since: now } : clock;
 
-export const stopClock = (clock: Clock, now: number): Clock =>
+/** Stops a running clock; `addMs` goes back into its bank (Showdown's per-turn time, for answering). */
+export const stopClock = (clock: Clock, now: number, addMs = 0): Clock =>
   clock.since === null
     ? clock
-    : { bankMs: Math.max(0, clock.bankMs - (now - clock.since)), since: null };
+    : { bankMs: Math.max(0, clock.bankMs - (now - clock.since)) + addMs, since: null };
+
+/**
+ * Both clocks after a battle moves on: each runs while its side is `waiting`.
+ * The side that just `answered` gets `addMs` back, and if the battle already
+ * asks it again (the turn ran), its clock starts afresh for the new turn.
+ */
+export function runClocks(
+  clocks: Record<Side, Clock>,
+  waiting: Record<Side, boolean>,
+  now: number,
+  addMs: number,
+  answered?: Side,
+): Record<Side, Clock> {
+  const tick = (side: Side) => {
+    const clock = side === answered ? stopClock(clocks[side], now, addMs) : clocks[side];
+    return waiting[side] ? startClock(clock, now) : stopClock(clock, now);
+  };
+  return { p1: tick('p1'), p2: tick('p2') };
+}
 
 /** When a running clock runs out; null while stopped. */
 export const clockDeadline = (clock: Clock, perTurnMs: number): number | null =>

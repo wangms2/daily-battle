@@ -6,8 +6,10 @@ import {
   cannotStartGame,
   endRound,
   fillTeams,
+  matchId,
   pairByLives,
   playAgain,
+  roundDone,
   startBuild,
   startRound,
   submitTeam,
@@ -21,6 +23,7 @@ import {
   dealPools,
   joinRoom,
   poolOf,
+  putMatch,
   type Player,
   type Result,
   type RoomState,
@@ -237,6 +240,34 @@ describe('rounds', () => {
     expect(s.players[0]!.place).toBe(1);
   });
 
+  it('places a leaver who ends the round with the others out that round', () => {
+    // Brock lost to the AI; then Ash leaves mid-battle, the round's last.
+    let s = playing(['Ash', 'Misty', 'Brock'], 1);
+    const battling = { ...result('id0', 'id1', null), stage: 'battle' as const, result: undefined };
+    s = { ...s, matches: [battling, result('id2', AI_ID, 'p2')] };
+    // As the room server does: leave, then forfeit the battle, then end the round.
+    s = ok(applyCommand(s, 'id0', { type: 'leave' }));
+    s = putMatch(s, { ...battling, stage: 'over', result: { winner: 'p2', reason: 'forfeit' } });
+    expect(roundDone(s)).toBe(true);
+    s = afterDeparture(endRound(s, 0, seq()), 0, seq());
+    expect(s.phase).toBe('over');
+    expect(s.players.map((p) => [p.name, p.place])).toEqual([
+      ['Ash', 2],
+      ['Misty', 1],
+      ['Brock', 2],
+    ]);
+    expect([...s.lastRound!.out].sort()).toEqual(['id0', 'id2']);
+  });
+
+  it('gives battles new ids each game, as rounds count from 1 again', () => {
+    const s = playing(['Ash', 'Misty']);
+    const first = { ...s, game: { id: 'g1', startedAt: 1000 } };
+    const second = { ...s, game: { id: 'g2', startedAt: 2000 } };
+    expect(matchId(first, 1, 0)).not.toBe(matchId(second, 1, 0));
+    expect(matchId(first, 1, 0)).not.toBe(matchId(first, 2, 0));
+    expect(matchId(first, 1, 0)).not.toBe(matchId(first, 1, 1));
+  });
+
   it('plays again with the same players, minus those who left', () => {
     let s = playing(['Ash', 'Misty', 'Brock'], 1);
     s = ok(applyCommand(s, 'id2', { type: 'leave' }));
@@ -288,5 +319,16 @@ describe('spectators', () => {
     expect(s.players.map((p) => p.name)).toEqual(['Ash', 'Misty', 'Elm']);
     expect(s.spectators).toEqual([]);
     expect(s.players[2]!.lives).toBe(2);
+  });
+
+  it('frees a leaver’s name mid-game, and passes the host to a spectator last', () => {
+    let s = ok(applyCommand(started(), 'id1', { type: 'leave' }));
+    s = ok(joinRoom(s, { id: 'm2', name: 'Misty', token: 'tm2' }));
+    expect(s.spectators.map((x) => x.name)).toEqual(['Misty']);
+    s = { ...s, phase: 'over' };
+    s = ok(applyCommand(s, 'id0', { type: 'leave' }));
+    expect(s.hostId).toBe('m2');
+    s = ok(playAgain(s, 'm2'));
+    expect(s.players.map((p) => p.name)).toEqual(['Misty']);
   });
 });

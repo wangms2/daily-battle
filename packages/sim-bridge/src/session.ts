@@ -184,6 +184,13 @@ export class BattleSession {
     this.battle.sendUpdates();
   }
 
+  /** Ends the battle with nobody winning (both sides out of time at once). */
+  tie(): void {
+    if (this.ended) return;
+    this.battle.forceWin(null);
+    this.battle.sendUpdates();
+  }
+
   /** The side's protocol lines since the last drain. */
   drain(side: SideID): string[] {
     const s = this.sides[side];

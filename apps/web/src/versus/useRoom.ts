@@ -45,6 +45,17 @@ const ENDS: Partial<Record<number, EndReason>> = {
   [CLOSE.left]: 'left',
 };
 
+/** A connection that's heard nothing for this long may have died silently (a phone asleep). */
+export const STALE_MS = 45_000;
+/** A connection still opening after this long is given up and tried again. */
+const OPENING_MS = 15_000;
+/** How often the connection is checked. */
+const CHECK_MS = 20_000;
+
+/** Whether a game starts afresh at this phase: its battles (and their ids) are new. */
+const isNewGame = (phase: RoomView['phase'], last: RoomView['phase'] | null) =>
+  (phase === 'lobby' || phase === 'build') && phase !== last;
+
 const socketUrl = (code: string) =>
   `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}/api/rooms/${code}/socket`;
 
@@ -86,9 +97,17 @@ export function useRoom(code: string, autoJoinAs?: string) {
   }, []);
   /** Spectators' reactions, to the battles you play or watch. */
   const [reactions] = useState(() => new Feed<ReactionEvent>());
+  /** Counts games in this room, so screens can drop what they kept from the last one. */
+  const [game, setGame] = useState(0);
+  /** The room's phase as last heard, to tell when a new game starts. */
+  const lastPhase = useRef<RoomView['phase'] | null>(null);
+  /** Giving up while disconnected: sent once you're back. */
+  const forfeitLater = useRef(false);
 
   const send = useCallback((msg: ClientMessage) => {
-    if (socket.current?.readyState === WebSocket.OPEN) socket.current.send(JSON.stringify(msg));
+    if (socket.current?.readyState !== WebSocket.OPEN) return false;
+    socket.current.send(JSON.stringify(msg));
+    return true;
   }, []);
 
   useEffect(() => {
@@ -98,13 +117,33 @@ export function useRoom(code: string, autoJoinAs?: string) {
     let reactionCount = 0;
     /** A rejoin was refused (you were removed meanwhile): reconnect and join afresh. */
     let rejoinRefused = false;
+    /** When the socket last opened or heard from the room. */
+    let heardAt = Date.now();
+    /** The room's done with you (kicked, left, another tab): no more reconnecting. */
+    let stopped = false;
+
+    /** A new game: battles from the last one (whose ids may repeat) are gone. */
+    const phaseIs = (phase: RoomView['phase']) => {
+      if (isNewGame(phase, lastPhase.current)) {
+        feeds.current.clear();
+        watchFeeds.current.clear();
+        lastStage.current = null;
+        forfeitLater.current = false;
+        setMatch(null);
+        setGame((n) => n + 1);
+      }
+      lastPhase.current = phase;
+    };
 
     const connect = () => {
+      retry = undefined;
       const ws = new WebSocket(socketUrl(code));
       socket.current = ws;
+      heardAt = Date.now();
       const sendHere = (msg: ClientMessage) => ws.send(JSON.stringify(msg));
       let joined = false;
       ws.onopen = () => {
+        heardAt = Date.now();
         failures = 0;
         const token = tokenFor(code);
         if (token) sendHere({ type: 'rejoin', token });
@@ -112,12 +151,26 @@ export function useRoom(code: string, autoJoinAs?: string) {
         else setStatus({ kind: 'name' });
       };
       ws.onmessage = (e) => {
+        heardAt = Date.now();
         const msg = parseServerMessage(e.data);
         if (!msg) return;
         if (msg.type === 'welcome') {
           joined = true;
           saveToken(code, msg.token);
           joinAs.current = undefined;
+          phaseIs(msg.room.phase);
+          // Back after a drop: a battle the room no longer has in play is stale (the
+          // room sends the current one next). A finished one stays up to be seen.
+          const live = new Set(
+            msg.room.phase === 'playing'
+              ? msg.room.matches.filter((m) => m.stage !== 'over').map((m) => m.id)
+              : [],
+          );
+          setMatch((m) => (m && m.stage !== 'over' && !live.has(m.id) ? null : m));
+          if (forfeitLater.current) {
+            forfeitLater.current = false;
+            sendHere({ type: 'forfeit' });
+          }
           setStatus({
             kind: 'joined',
             you: msg.you,
@@ -127,6 +180,7 @@ export function useRoom(code: string, autoJoinAs?: string) {
           });
         } else if (msg.type === 'room') {
           const at = Date.now();
+          phaseIs(msg.room.phase);
           setStatus((s) =>
             s.kind === 'joined' ? { ...s, room: msg.room, at, connected: true } : s,
           );
@@ -176,6 +230,7 @@ export function useRoom(code: string, autoJoinAs?: string) {
         if (disposed || socket.current !== ws) return;
         const end = ENDS[e.code];
         if (end) {
+          stopped = true;
           setStatus({ kind: 'ended', reason: end });
           return;
         }
@@ -185,6 +240,8 @@ export function useRoom(code: string, autoJoinAs?: string) {
             rejoinRefused = false;
             setStatus({ kind: 'connecting' });
             connect();
+          } else {
+            stopped = true;
           }
           return;
         }
@@ -196,10 +253,54 @@ export function useRoom(code: string, autoJoinAs?: string) {
       };
     };
 
+    /** Drops this connection (without it counting as a drop) and opens another now. */
+    const reconnectNow = () => {
+      const old = socket.current;
+      window.clearTimeout(retry);
+      retry = undefined;
+      failures = 0;
+      if (old) {
+        old.onopen = old.onmessage = old.onclose = null;
+        old.close(1000);
+      }
+      setStatus((s) => (s.kind === 'joined' ? { ...s, connected: false } : s));
+      connect();
+    };
+    /** A connection that's stuck opening, or silent too long, is replaced. */
+    const check = (stale: number, eager: boolean) => {
+      const ws = socket.current;
+      if (disposed || stopped || !ws) return;
+      // Waiting to try again after a drop: now, if there's reason to think it'll work.
+      if (retry !== undefined) {
+        if (eager) reconnectNow();
+        return;
+      }
+      const quiet = Date.now() - heardAt;
+      if (
+        (ws.readyState === WebSocket.CONNECTING && quiet > OPENING_MS) ||
+        (ws.readyState === WebSocket.OPEN && quiet > stale)
+      ) {
+        reconnectNow();
+      }
+    };
+    // Coming back to the tab (a phone waking) or back online: check straight away,
+    // as a socket can die silently meanwhile. Rooms can be quiet for long stretches,
+    // so the regular check only replaces a connection that's stuck opening.
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') check(STALE_MS, true);
+    };
+    const onOnline = () => check(STALE_MS, true);
+    const interval = window.setInterval(() => check(Infinity, false), CHECK_MS);
+    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('online', onOnline);
+
     connect();
     return () => {
       disposed = true;
       window.clearTimeout(retry);
+      window.clearInterval(interval);
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('online', onOnline);
       socket.current?.close(1000);
       socket.current = null;
     };
@@ -221,6 +322,8 @@ export function useRoom(code: string, autoJoinAs?: string) {
     },
     command: (command: RoomCommand) => send(command),
     match,
+    /** Counts games in this room: it changes when a new one starts. */
+    game,
     feedFor,
     watchFeedFor,
     /** Changes when a watched battle gets news, so screens can re-read the feeds. */
@@ -238,7 +341,12 @@ export function useRoom(code: string, autoJoinAs?: string) {
     ready: () => send({ type: 'ready' }),
     lead: (species: string) => send({ type: 'lead', species }),
     choose: (choice: string) => send({ type: 'choose', choice }),
-    forfeit: () => send({ type: 'forfeit' }),
+    forfeit: () => {
+      if (send({ type: 'forfeit' })) return;
+      // Sent once you're back, rather than lost.
+      forfeitLater.current = true;
+      setNotice('Reconnecting… you’ll give up once you’re back.');
+    },
     leave: () => {
       send({ type: 'leave' });
       forgetToken(code);

@@ -116,6 +116,15 @@ describe('LiveBattle', () => {
     expect(battle.update('p2', 0).ended).toBe(true);
   });
 
+  it('ends as a tie when both run out of time', () => {
+    const battle = new LiveBattle(match(4));
+    battle.tie();
+    expect(battle.ended).toBe(true);
+    expect(battle.winner).toBeNull();
+    expect(battle.update('p1', 0).ended).toBe(true);
+    expect(battle.spectate(0).ended).toBe(true);
+  });
+
   it('shows spectators only the public log, and counts faints for the drawer', () => {
     const start = match(5);
     const fresh = new LiveBattle({ ...start, choices: { p1: [], p2: [] } });
