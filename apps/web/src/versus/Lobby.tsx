@@ -341,7 +341,7 @@ export function Lobby({
               )
             }
           >
-            {own ? 'Your 12' : 'This week’s 12'}
+            {own ? 'Random' : 'Weekly'}
           </SectionLabel>
           <ul className="grid grid-cols-12 gap-0.5" aria-label="Your pool">
             {/* All 12 appear together: a redraw keeps the old pool up until every
