@@ -155,12 +155,15 @@ export interface BuildInput {
  * `<format>/set-curation.json`. `add` sets are written like curated ones and
  * compete on equal terms; `drop` names curated sets (by species and set name)
  * that don't earn a place, such as a near-copy of a better set; `swap`
- * replaces moves one for one in a named set (species → set → old → new).
+ * replaces moves one for one in a named set (species → set → old → new);
+ * `nature` fixes a named set's nature where usage picks one at odds with
+ * its spread (species → set → nature).
  */
 export interface SetCuration {
   add?: CuratedSets;
   drop?: Record<string, string[]>;
   swap?: Record<string, Record<string, Record<string, string>>>;
+  nature?: Record<string, Record<string, string>>;
 }
 
 export interface BuildReport {
@@ -260,14 +263,16 @@ export function buildSets(
         continue;
       }
       const swap = input.curation?.swap?.[name]?.[setName];
-      const curatedSet = swap
-        ? {
-            ...original,
-            moves: original.moves.map((slot) =>
-              Array.isArray(slot) ? slot.map((m) => swap[m] ?? m) : (swap[slot] ?? slot),
-            ),
-          }
-        : original;
+      const fixedNature = input.curation?.nature?.[name]?.[setName];
+      const curatedSet = {
+        ...original,
+        ...(swap && {
+          moves: original.moves.map((slot) =>
+            Array.isArray(slot) ? slot.map((m) => swap[m] ?? m) : (swap[slot] ?? slot),
+          ),
+        }),
+        ...(fixedNature && { nature: fixedNature }),
+      };
       const set = resolveSet(name, curatedSet, usage, format.gen, rules.avoidAbilities, preferred);
       if (!set) {
         dropped.push({ species: name, set: setName, reason: 'not enough distinct moves' });

@@ -3,7 +3,7 @@
     "format": "gen4ou",
     "method": "curated-usage-weighted-v1",
     "simVersion": "0.10.11",
-    "builtAt": "2026-11-02T20:05:16.370Z",
+    "builtAt": "2026-11-05T01:02:05.134Z",
     "sources": {
       "sets": {
         "url": "https://data.pkmn.cc/sets/gen4ou.json",
@@ -303,12 +303,12 @@
           "sourceName": "Utility",
           "label": "Wish support",
           "description": "Passes big Wish heals to teammates and spreads paralysis with Body Slam.",
-          "weight": 0.3687,
+          "weight": 0.4061,
           "moves": [
             "Iron Head",
             "Body Slam",
             "Fire Punch",
-            "Protect"
+            "Wish"
           ],
           "item": "Leftovers",
           "ability": "Serene Grace",
@@ -335,7 +335,7 @@
           "sourceName": "Offensive",
           "label": "Fast attacker",
           "description": "Hits fast and hard with wide move coverage.",
-          "weight": 0.3688,
+          "weight": 0.4041,
           "moves": [
             "Iron Head",
             "Body Slam",
@@ -363,43 +363,11 @@
           }
         },
         {
-          "id": "jirachi-wish-protect",
-          "sourceName": "Wish + Protect",
-          "label": "Wish + Protect",
-          "description": "Heals itself and teammates with Wish, scouts with Protect, and pivots out with U-turn.",
-          "weight": 0.161,
-          "moves": [
-            "Wish",
-            "Protect",
-            "Iron Head",
-            "Body Slam"
-          ],
-          "item": "Leftovers",
-          "ability": "Serene Grace",
-          "nature": "Careful",
-          "evs": {
-            "hp": 252,
-            "atk": 0,
-            "def": 224,
-            "spa": 0,
-            "spd": 0,
-            "spe": 32
-          },
-          "ivs": {
-            "hp": 31,
-            "atk": 31,
-            "def": 31,
-            "spa": 31,
-            "spd": 31,
-            "spe": 31
-          }
-        },
-        {
           "id": "jirachi-choice-scarf",
           "sourceName": "Choice Scarf",
           "label": "Choice Scarf attacker",
           "description": "Outspeeds most threats and hits hard, but is locked into one move until it switches out.",
-          "weight": 0.1015,
+          "weight": 0.1112,
           "moves": [
             "Iron Head",
             "Fire Punch",
@@ -416,6 +384,38 @@
             "spa": 0,
             "spd": 0,
             "spe": 252
+          },
+          "ivs": {
+            "hp": 31,
+            "atk": 31,
+            "def": 31,
+            "spa": 31,
+            "spd": 31,
+            "spe": 31
+          }
+        },
+        {
+          "id": "jirachi-wish-protect",
+          "sourceName": "Wish + Protect",
+          "label": "Wish + Protect",
+          "description": "Heals itself and teammates with Wish, scouts with Protect, and spreads paralysis with Body Slam.",
+          "weight": 0.0786,
+          "moves": [
+            "Wish",
+            "Protect",
+            "Iron Head",
+            "Body Slam"
+          ],
+          "item": "Leftovers",
+          "ability": "Serene Grace",
+          "nature": "Impish",
+          "evs": {
+            "hp": 252,
+            "atk": 0,
+            "def": 224,
+            "spa": 0,
+            "spd": 0,
+            "spe": 32
           },
           "ivs": {
             "hp": 31,
