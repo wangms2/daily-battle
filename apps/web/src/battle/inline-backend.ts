@@ -1,12 +1,18 @@
-// The engine on the main thread, for tests (no worker). Hard and the coach's
-// judge need `hardEngine` to supply poke-engine for the format (tests load it
-// from disk); without it, a coached battle gives no warnings.
+// The engine on the main thread, for tests (no worker). Hard needs `hardEngine`
+// to supply poke-engine for the format (tests load it from disk), Master
+// `masterEngine` (with its network loaded). The coach's judge uses Master's
+// engine when given (not in lessons), else Hard's; without either, a coached
+// battle gives no warnings.
+import { coachNetJudge } from '@daily-battle/ai/version';
 import type { Engine } from '@daily-battle/engine-wasm';
 import type { CoachNote } from '@daily-battle/tutorial';
 import type { BattleBackend } from './backend';
 import { BattleEngine, presentTurn } from './engine';
 
-export function inlineBackend(hardEngine?: (format: string) => Engine): BattleBackend {
+export function inlineBackend(
+  hardEngine?: (format: string) => Engine,
+  masterEngine?: (format: string) => Engine,
+): BattleBackend {
   let engine: BattleEngine | null = null;
   const need = () => {
     if (!engine) throw new Error('No battle in progress');
@@ -27,8 +33,16 @@ export function inlineBackend(hardEngine?: (format: string) => Engine): BattleBa
   return {
     start: async (start) => {
       const format = start.format ?? 'gen4ou';
-      const hard = start.difficulty === 'hard' ? hardEngine?.(format) : undefined;
-      const judge = start.coach ? hardEngine?.(format) : undefined;
+      const hard =
+        start.difficulty === 'hard'
+          ? hardEngine?.(format)
+          : start.difficulty === 'master'
+            ? masterEngine?.(format)
+            : undefined;
+      const judge = !start.coach
+        ? undefined
+        : (!start.tutorial && coachNetJudge(start.difficulty) && masterEngine?.(format)) ||
+          hardEngine?.(format);
       engine = new BattleEngine(start, hard, undefined, judge);
       return later(engine.begin());
     },
@@ -37,10 +51,12 @@ export function inlineBackend(hardEngine?: (format: string) => Engine): BattleBa
     coachCheck: async (choice, waitMs) => need().coachCheck(choice, waitMs),
     replay: async (decision) => need().replayTurn(decision),
     // Reviews need the judge's engine.
-    ...(hardEngine && {
+    ...((masterEngine ?? hardEngine) && {
       review: async (onProgress: (done: number, total: number) => void) => {
         const e = need();
-        const job = e.reviewJob(hardEngine(e.start.format ?? 'gen4ou'));
+        const format = e.start.format ?? 'gen4ou';
+        const net = coachNetJudge(e.start.difficulty) && masterEngine;
+        const job = e.reviewJob((net || hardEngine || masterEngine)!(format));
         for (;;) {
           const review = job.step(1000);
           onProgress(job.done, job.total);

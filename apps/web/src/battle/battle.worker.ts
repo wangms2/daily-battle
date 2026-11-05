@@ -1,12 +1,20 @@
 /// <reference lib="webworker" />
 // Runs the simulator and the opponent AI off the main thread (DESIGN.md §7).
+import { coachNetJudge } from '@daily-battle/ai/version';
 import { BattleEngine, presentTurn } from './engine';
 import type { Review } from '@daily-battle/tutorial';
-import type { WorldClaim } from '@daily-battle/ai';
+import type { NetClaim, WorldClaim } from '@daily-battle/ai';
 import { Engine, type WasmModule } from '@daily-battle/engine-wasm';
 import { genOf } from '@daily-battle/data/formats';
 import type { FromWorker, ToWorker } from './frames';
-import { loadHardEngine, loadHardModule } from './hardEngine';
+import {
+  loadCoachEngine,
+  loadHardEngine,
+  loadHardModule,
+  loadMasterEngine,
+  loadNet,
+  masterAvailable,
+} from './hardEngine';
 import type { FromHelper, ToHelper } from './search.worker';
 
 let engine: BattleEngine | null = null;
@@ -14,7 +22,7 @@ let engine: BattleEngine | null = null;
 const post = (msg: FromWorker) => (self as DedicatedWorkerGlobalScope).postMessage(msg);
 
 /**
- * Helpers that search some of Hard's worlds on other cores, so a decision is
+ * Helpers that search some of Hard's or Master's worlds on other cores, so a decision is
  * ready sooner when you tap straight through. One core is left for the page
  * and one for this worker; a helper that fails is dropped, and its world is
  * searched here. The worlds and their seeds are the same, so is the choice.
@@ -23,11 +31,13 @@ const HELPERS = Math.min(3, Math.max(0, (self.navigator?.hardwareConcurrency || 
 interface Helper {
   worker: Worker;
   loaded: Set<number>;
-  claim?: WorldClaim;
+  /** Gens whose engine has Master's network. */
+  netLoaded: Set<number>;
+  claim?: WorldClaim | NetClaim;
 }
 let helpers: Helper[] = [];
-/** Hard's module for this battle, for the helpers. */
-let hardModule: { gen: number; module: WasmModule } | undefined;
+/** Hard's or Master's module for this battle, for the helpers (and Master's network). */
+let hardModule: { gen: number; module: WasmModule; net?: Uint8Array } | undefined;
 /** Waiting for a helper to answer. */
 const answered: (() => void)[] = [];
 
@@ -38,11 +48,13 @@ function startHelpers() {
       const helper: Helper = {
         worker: new Worker(new URL('./search.worker.ts', import.meta.url), { type: 'module' }),
         loaded: new Set(),
+        netLoaded: new Set(),
       };
       helper.worker.onmessage = (e: MessageEvent<FromHelper>) => {
         const claim = helper.claim;
         helper.claim = undefined;
-        if ('result' in e.data) claim?.give(e.data.result);
+        if ('result' in e.data) (claim as WorldClaim | undefined)?.give(e.data.result);
+        else if ('netResult' in e.data) (claim as NetClaim | undefined)?.give(e.data.netResult);
         else dropHelper(helper);
         helperDone();
       };
@@ -67,13 +79,16 @@ function helperDone() {
   work();
 }
 
-/** Hands the opponent's unsearched worlds to idle helpers. */
+/**
+ * Hands unsearched worlds to idle helpers: the coach's judge's first (you may
+ * be waiting on its check), then the opponent's.
+ */
 function feedHelpers() {
   if (hidden || !engine || !hardModule) return;
-  const { gen, module } = hardModule;
+  const { gen, module, net } = hardModule;
   for (const helper of helpers) {
     if (helper.claim) continue;
-    const claim = engine.claimWorld();
+    const claim = engine.claimJudge() ?? engine.claimWorld();
     if (!claim) return;
     const send = (msg: ToHelper) => helper.worker.postMessage(msg);
     if (!helper.loaded.has(gen)) {
@@ -81,12 +96,53 @@ function feedHelpers() {
       helper.loaded.add(gen);
     }
     helper.claim = claim;
+    if ('net' in claim) {
+      // Without the network the helper's search fails, and the world is searched here.
+      if (net && !helper.netLoaded.has(gen)) {
+        send({ type: 'net', gen, net });
+        helper.netLoaded.add(gen);
+      }
+      send({ type: 'netSearch', gen, ...claim.net });
+      continue;
+    }
     const { state, iterations, seed } = claim.world;
     send({ type: 'search', gen, state, iterations, seed });
   }
 }
 
-/** Hard: finishes the opponent's decision, with the helpers, before your choice goes in. */
+/** The next helper answer, or `ms` passing. */
+function nextAnswer(ms: number) {
+  return new Promise<void>((resolve) => {
+    const timer = setTimeout(resolve, ms);
+    answered.push(() => {
+      clearTimeout(timer);
+      resolve();
+    });
+  });
+}
+
+/**
+ * The coach's check on `choice`, given up to `waitMs`: the judge's worlds are
+ * searched here and by the helpers. One a helper still has when time's up is
+ * searched here.
+ */
+async function coachCheck(choice: string, waitMs: number) {
+  const end = performance.now() + waitMs;
+  while (engine && !engine.coachReady(choice)) {
+    feedHelpers();
+    const left = end - performance.now();
+    if (left <= 0) break;
+    if (engine.coachWork(Math.min(SLICE_MS, left))) {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      continue;
+    }
+    if (!helpers.some((h) => h.claim)) break;
+    await nextAnswer(left);
+  }
+  return engine!.coachCheck(choice, Math.max(0, end - performance.now()));
+}
+
+/** Hard and Master: finishes the opponent's decision, with the helpers, before your choice goes in. */
 async function thinkThrough() {
   for (;;) {
     feedHelpers();
@@ -128,7 +184,9 @@ function work() {
     const tip = engine?.coachTip();
     if (tip) post({ type: 'tip', note: tip });
     feedHelpers();
-    const thinking = engine?.ponder();
+    // The judge goes first here, as the coach's check waits on it; the helpers
+    // keep searching the opponent's decision meanwhile.
+    const thinking = more ? engine?.thinkingLeft() : engine?.ponder();
     if (more || thinking) work();
   }, 0);
 }
@@ -141,6 +199,7 @@ self.onmessage = async (event: MessageEvent<ToWorker>) => {
   try {
     if (msg.type === 'warm') {
       void loadHardEngine(msg.format).catch(() => {});
+      if (msg.net && masterAvailable(msg.format)) void loadNet().catch(() => {});
     } else if (msg.type === 'visibility') {
       hidden = msg.hidden;
       if (!hidden) waiting.splice(0).forEach((resume) => resume());
@@ -155,10 +214,23 @@ self.onmessage = async (event: MessageEvent<ToWorker>) => {
         hard = new Engine(module);
         hardModule = { gen: genOf(format), module };
         startHelpers();
+      } else if (start.difficulty === 'master') {
+        const [module, net] = await Promise.all([loadHardModule(format), loadNet()]);
+        hard = await loadMasterEngine(format);
+        hardModule = { gen: genOf(format), module, net };
+        startHelpers();
       }
       // Without the engine the coach still gives fact tips, but no warnings.
-      const judge = start.coach ? await loadHardEngine(format).catch(() => undefined) : undefined;
+      const judge = start.coach
+        ? await loadCoachEngine(format, !start.tutorial && coachNetJudge(start.difficulty))
+        : undefined;
       engine = new BattleEngine(start, hard, undefined, judge);
+      if (judge?.netLoaded) {
+        // The network judge's worlds go to the helpers too.
+        const [module, net] = await Promise.all([loadHardModule(format), loadNet()]);
+        hardModule = { gen: genOf(format), module, net };
+        startHelpers();
+      }
       post({ type: 'package', pkg: engine.begin() });
     } else if (msg.type === 'turn') {
       post({
@@ -169,10 +241,18 @@ self.onmessage = async (event: MessageEvent<ToWorker>) => {
       throw new Error('No battle in progress');
     } else if (msg.type === 'choose') {
       await thinkThrough();
-      post({ type: 'package', pkg: engine.choose(msg.choice) });
+      let pkg = engine.submit(msg.choice);
+      // The opponent's decisions you'd wait on are searched with the helpers too.
+      while (!pkg && !(pkg = engine.proceed())) await thinkThrough();
+      post({ type: 'package', pkg });
     } else if (msg.type === 'review') {
       // Judged a slice at a time, so other messages (a replayed turn) get in between.
-      const job = engine.reviewJob(await loadHardEngine(engine.start.format ?? 'gen4ou'));
+      const judge = await loadCoachEngine(
+        engine.start.format ?? 'gen4ou',
+        coachNetJudge(engine.start.difficulty),
+      );
+      if (!judge) throw new Error('No engine for the review');
+      const job = engine.reviewJob(judge);
       const review = await new Promise<Review>((resolve) => {
         const slice = () => {
           if (hidden) return waiting.push(slice);
@@ -187,7 +267,7 @@ self.onmessage = async (event: MessageEvent<ToWorker>) => {
     } else if (msg.type === 'replay') {
       post({ type: 'replay', replay: engine.replayTurn(msg.decision) });
     } else if (msg.type === 'check') {
-      post({ type: 'check', note: engine.coachCheck(msg.choice, msg.waitMs) });
+      post({ type: 'check', note: await coachCheck(msg.choice, msg.waitMs) });
     } else {
       post({ type: 'package', pkg: engine.forfeit() });
     }

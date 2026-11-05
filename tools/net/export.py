@@ -9,12 +9,14 @@ checkpoint defaults to the newest snapshot of the pilot run. Runs on the CPU onl
 .dbnet layout (little-endian):
     b"DBNET\\0\\0\\0", u32 format version, u32 n, n u32 config values
     (d, layers, heads, ffn, emb), u32 tensor count, then per tensor:
-    u16 name length, name (UTF-8), u8 ndim, ndim u32 dims, u8 dtype (1 = f16), data.
+    u16 name length, name (UTF-8), u8 ndim, ndim u32 dims, u8 dtype, data.
+    dtype 1 = f16; dtype 2 = int8 per row (first dim): rows f16 scales, then the
+    i8 values (value = i8 × scale). --int8 uses dtype 2 for tensors of 2+ dims.
 
 Fixture (.fix) layout: u32 rows, then per row OBS_FLOATS f32, OBS_IDS u16,
 ACTIONS u8 mask, then policy logits (ACTIONS f32), value logit (f32), foe-action
-logits (ACTIONS f32). The outputs use the f16-rounded weights, so the WASM must
-match them to float precision.
+logits (ACTIONS f32). The outputs use the stored (rounded) weights, so the WASM
+must match them to float precision.
 """
 import argparse
 import os
@@ -31,6 +33,23 @@ HERE = Path(__file__).parent
 MAGIC = b"DBNET\0\0\0"
 FORMAT = 1
 F16 = 1
+I8 = 2
+
+
+def quantize(t: torch.Tensor):
+    """Symmetric int8 per row: (f16 scales, i8 values), scales already f16-rounded."""
+    rows = t.detach().float().reshape(t.shape[0], -1)
+    scale = (rows.abs().amax(1) / 127).clamp_min(1e-8).to(torch.float16).float()
+    q = torch.round(rows / scale[:, None]).clamp(-127, 127).to(torch.int8)
+    return scale, q
+
+
+def stored(t: torch.Tensor, int8: bool) -> torch.Tensor:
+    """The weights as the engine will see them."""
+    if int8 and t.dim() >= 2:
+        scale, q = quantize(t)
+        return (q.float() * scale[:, None]).reshape(t.shape)
+    return t.to(torch.float16).float()
 
 
 def latest_snapshot(run: Path) -> Path:
@@ -40,7 +59,7 @@ def latest_snapshot(run: Path) -> Path:
     return snaps[-1]
 
 
-def write_weights(net: Net, path: Path) -> int:
+def write_weights(net: Net, path: Path, int8: bool = False) -> int:
     c = net.c
     sd = net.state_dict()
     with open(path, "wb") as f:
@@ -52,8 +71,14 @@ def write_weights(net: Net, path: Path) -> int:
             b = name.encode()
             f.write(struct.pack("<H", len(b)) + b)
             f.write(struct.pack(f"<B{t.dim()}I", t.dim(), *t.shape))
-            f.write(struct.pack("<B", F16))
-            f.write(t.detach().cpu().to(torch.float16).numpy().astype("<f2").tobytes())
+            if int8 and t.dim() >= 2:
+                scale, q = quantize(t.cpu())
+                f.write(struct.pack("<B", I8))
+                f.write(scale.to(torch.float16).numpy().astype("<f2").tobytes())
+                f.write(q.numpy().tobytes())
+            else:
+                f.write(struct.pack("<B", F16))
+                f.write(t.detach().cpu().to(torch.float16).numpy().astype("<f2").tobytes())
     return path.stat().st_size
 
 
@@ -83,6 +108,7 @@ def main():
     p.add_argument("--out", default=str(HERE / "data" / "export" / "net"))
     p.add_argument("--rows", type=int, default=64, help="fixture rows per gen")
     p.add_argument("--seed", type=int, default=7)
+    p.add_argument("--int8", action="store_true", help="int8 weights per row (about half the size)")
     a = p.parse_args()
     torch.set_num_threads(4)
     sys.path.insert(0, str(HERE))
@@ -95,7 +121,7 @@ def main():
     net.eval()
     out = Path(a.out)
     out.parent.mkdir(parents=True, exist_ok=True)
-    size = write_weights(net, out.with_suffix(".dbnet"))
+    size = write_weights(net, out.with_suffix(".dbnet"), a.int8)
     print(f"{ck_path.name}: {size / 2**20:.1f} MiB -> {out.with_suffix('.dbnet')}")
 
     rows = sample_rows(a.rows, a.seed)
@@ -106,12 +132,13 @@ def main():
         full = net(f, i, m)
         for t in net.state_dict().values():
             if t.is_floating_point():
-                t.copy_(t.to(torch.float16).float())
+                t.copy_(stored(t, a.int8))
         half = net(f, i, m)
     legal = m.float()
     agree = (full["policy"].argmax(1) == half["policy"].argmax(1)).float().mean().item()
     dv = (torch.sigmoid(full["value"]) - torch.sigmoid(half["value"])).abs().max().item()
-    print(f"fixture {len(rows)} rows; f16 vs f32 weights: policy argmax agree {agree:.1%}, max |dP(win)| {dv:.4f}")
+    kind = "int8" if a.int8 else "f16"
+    print(f"fixture {len(rows)} rows; {kind} vs f32 weights: policy argmax agree {agree:.1%}, max |dP(win)| {dv:.4f}")
     assert legal.sum(1).min() > 0
 
     with open(out.with_suffix(".fix"), "wb") as fh:

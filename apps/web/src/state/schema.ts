@@ -24,15 +24,15 @@ export interface Attempt {
   choices: string[];
   /** Simulator and AI versions; a mismatch on resume records a forfeit (§15). */
   engine: string;
-  /** Easy or Hard; absent for Normal (and for every attempt saved before difficulties). */
-  difficulty?: 'easy' | 'hard';
+  /** Easy, Hard or Master; absent for Normal (and for every attempt saved before difficulties). */
+  difficulty?: 'easy' | 'hard' | 'master';
   /**
    * The coach was on (DESIGN.md §22): set when the battle starts with it, or the
    * moment it's turned on mid-battle, and never unset. A Coached result.
    */
   coached?: true;
   /**
-   * Hard only: the AI's choices so far. A resume replays them instead of searching
+   * Hard and Master only: the AI's choices so far. A resume replays them instead of searching
    * again; with the seeds they reproduce the same battle.
    */
   aiChoices?: string[];

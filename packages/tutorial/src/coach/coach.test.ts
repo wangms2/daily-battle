@@ -8,6 +8,8 @@ import type { Position } from '../types';
 import { choiceKey, Judge, soundPick, type Verdict } from './judge';
 import { buildReview, decision } from './review';
 import { Coach, TIP_GAP, tipGap, type CoachTurn } from './simple';
+import { advancedTips } from './advanced/coach';
+import type { BranchWorld } from './facts/branches';
 
 const data = setsFor('gen3ou');
 const viewAt = (pos: Omit<Position, 'seed'>, seed = 'coach') =>
@@ -292,6 +294,72 @@ describe('Simple coach tips', () => {
   });
 });
 
+describe('Advanced coach in a battle', () => {
+  // Surf (move 1) always hits; Hydro Pump (move 2) misses 20% of the time and then loses.
+  const outcome = (own: number, p: number, value: number, foeHp = 0.5) => ({
+    own,
+    foe: 0,
+    p,
+    value,
+    ownHp: 0.2,
+    foeHp,
+    ownKo: 0,
+    foeKo: 0,
+  });
+  const world: BranchWorld = {
+    weight: 1,
+    slots: ['move 1', 'move 2'],
+    result: {
+      prior: [],
+      value: 0.6,
+      foe: [],
+      score: [0.6, 0.475],
+      positions: 1,
+      replies: [{ slot: 0, p: 1, q: [0.6, 0.475] }],
+      outcomes: [outcome(0, 1, 0.6), outcome(1, 0.75, 0.6, 1), outcome(1, 0.25, 0.1, 0)],
+    },
+  };
+  const pos = {
+    p1: [{ species: 'Swampert', moves: ['Surf', 'Hydro Pump'] }],
+    p2: [{ species: 'Blissey', setId: 'blissey-utility' }],
+  };
+  const input = { worlds: [world], legal: ['move 1', 'move 2'], top: 'move 1', value: () => NaN };
+
+  it('words a tip with the moves’ names, keyed once a battle, with its review', () => {
+    const facts = turnFacts(viewAt(pos), data);
+    const [tip, ...rest] = advancedTips({ ...input, facts });
+    expect(rest).toEqual([]);
+    expect(tip).toMatchObject({ rule: 'risk', key: 'risk:Swampert:hydropump' });
+    expect(tip!.text).toContain('Surf');
+    expect(tip!.text).toContain('Hydro Pump');
+    expect(tip!.review.choice).toBe('move 1');
+  });
+
+  it('outranks a basic tip waiting, shows once a battle, and keeps the review either way', () => {
+    const coach = new Coach(data);
+    const view = viewAt(pos);
+    coach.turn(view);
+    expect(coach.advanced(view, input)?.rule).toBe('risk');
+    expect(coach.confirm(view, 'move 1')).toBeUndefined();
+    const memo = coach.advancedMemo(view);
+    expect(memo.key).toBe('risk:Swampert:hydropump');
+
+    // Resumed: shown before, so only the review is kept.
+    const resumed = new Coach(data);
+    const again = viewAt(pos, 'later');
+    resumed.turn(again);
+    resumed.shownBefore(again, memo.key!);
+    expect(resumed.advanced(again, input)).toBeUndefined();
+    expect(resumed.advancedMemo(again)).toEqual({ review: memo.review });
+
+    // Too late to show: the review only.
+    const late = new Coach(data);
+    late.turn(view);
+    expect(late.advanced(view, input, false)).toBeUndefined();
+    expect(late.advancedMemo(view).review).toEqual(memo.review);
+  });
+});
+
 describe.skipIf(!engineBuilt(3))('Simple coach, knowing the foe’s choice', () => {
   // Machamp (Bulk Up, Cross Chop, Rock Slide, Hidden Power Ghost) against
   // Tyranitar, with Celebi and Jirachi seen in the back.
@@ -474,6 +542,27 @@ describe('buildReview', () => {
     const stillBad = worse('move 3', 'move 4');
     const missed = buildReview([decision(0, f, 'move 3', stillBad, undefined, heeded)!]);
     expect(missed.good).toEqual([]);
+  });
+
+  it('explains a turn with the advanced tip, when the player made the play it weighed', () => {
+    const f = facts(POS);
+    const advanced = {
+      choice: 'move 4',
+      against: 'move 3',
+      followed: 'Good call.',
+      missed: 'Ice Beam was safer.',
+    };
+    const key = (choice: string) =>
+      buildReview([
+        decision(0, f, choice, worse(choice, 'move 4'), undefined, undefined, advanced)!,
+      ]).key;
+    expect(key('move 3')[0]?.text).toBe('Ice Beam was safer.');
+    // Another play: the tip's trade-off isn't the one the player made.
+    expect(key('move 2')).toEqual([]);
+    const fine = { ...worse('move 4', 'move 4', 0), worse: false };
+    expect(
+      buildReview([decision(0, f, 'move 4', fine, undefined, undefined, advanced)!]).good[0]?.text,
+    ).toBe('Good call.');
   });
 
   it('says what Explosion costs when it praises it', () => {

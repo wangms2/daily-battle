@@ -3,26 +3,32 @@
 import { BallIcon } from './icons';
 import { DIFFICULTIES, type Difficulty } from '@daily-battle/ai/version';
 import clsx from 'clsx';
-import { DIFFICULTY_HINT } from '../lib/difficulty';
+import { DIFFICULTY_HINT, UNAVAILABLE_HINT } from '../lib/difficulty';
 import { DIFFICULTY_NAME } from '../lib/share';
+
+const BALL = { easy: 'poke', normal: 'great', hard: 'ultra', master: 'master' } as const;
 
 export function DifficultyPicker({
   value,
   onChange,
-  hardAvailable = true,
+  unavailable = [],
   disabled,
+  compact,
 }: {
   value: Difficulty;
   onChange: (d: Difficulty) => void;
-  /** False in a build without the Hard engine for this game. */
-  hardAvailable?: boolean;
+  /** Difficulties this build or browser can't play for this game. */
+  unavailable?: readonly Difficulty[];
   /** While a battle is unfinished, its difficulty stays. */
   disabled?: boolean;
+  /** Narrow screens: only the picked level shows its name; the rest show their ball. */
+  compact?: boolean;
 }) {
   return (
     <div className="seg flex p-0.5" role="radiogroup" aria-label="Difficulty">
       {DIFFICULTIES.map((d) => {
-        const off = disabled || (d === 'hard' && !hardAvailable);
+        const cant = unavailable.includes(d);
+        const off = disabled || cant;
         return (
           <button
             key={d}
@@ -30,17 +36,20 @@ export function DifficultyPicker({
             role="radio"
             aria-checked={value === d}
             disabled={off && value !== d}
-            title={DIFFICULTY_HINT[d]}
+            title={(cant && UNAVAILABLE_HINT[d]) || DIFFICULTY_HINT[d]}
             onClick={() => !off && onChange(d)}
             className={clsx(
-              'min-h-7 rounded-lg px-2.5 text-[12px] font-semibold',
+              'min-h-7 rounded-lg text-[12px] font-semibold',
+              compact && value !== d ? 'px-2' : 'px-2.5',
               value === d ? 'bg-surface text-ink shadow-card' : 'text-muted',
               off && value !== d && 'opacity-40',
             )}
           >
             <span className="flex items-center gap-1">
-              <BallIcon kind={d === 'hard' ? 'ultra' : d === 'easy' ? 'premier' : 'poke'} />
-              {DIFFICULTY_NAME[d]}
+              <BallIcon kind={BALL[d]} />
+              <span className={clsx(compact && value !== d && 'sr-only')}>
+                {DIFFICULTY_NAME[d]}
+              </span>
             </span>
           </button>
         );
@@ -49,7 +58,7 @@ export function DifficultyPicker({
   );
 }
 
-/** "Easy" or "Hard" as a small pill; nothing for Normal. */
+/** "Easy", "Hard" or "Master" as a small pill; nothing for Normal. */
 export function DifficultyBadge({
   difficulty,
   className,
@@ -62,7 +71,11 @@ export function DifficultyBadge({
     <span
       className={clsx(
         'inline-flex items-center rounded-badge px-1.5 py-0.5 text-[11px] font-bold',
-        difficulty === 'hard' ? 'bg-ink text-surface' : 'bg-surface-2 text-ink',
+        difficulty === 'hard'
+          ? 'bg-ink text-surface'
+          : difficulty === 'master'
+            ? 'bg-[#7a3ea6] text-white'
+            : 'bg-surface-2 text-ink',
         className,
       )}
     >

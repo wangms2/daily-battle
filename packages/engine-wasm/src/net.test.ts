@@ -8,8 +8,10 @@ import { NET_OBS, type NetInput } from './index';
 import { engineBuilt, loadEngine } from './node';
 
 const dir = fileURLToPath(new URL('../../../tools/net/data/export/', import.meta.url));
-const weights = `${dir}net.dbnet`;
-const fixture = `${dir}net.fix`;
+// NET_EXPORT picks another export's base name, e.g. gate-15447166-i8.
+const base = process.env.NET_EXPORT ?? 'net';
+const weights = `${dir}${base}.dbnet`;
+const fixture = `${dir}${base}.fix`;
 
 function readFixture() {
   const b = readFileSync(fixture);

@@ -1,3 +1,4 @@
+import { HARD_VERSION } from '@daily-battle/ai/version';
 import { describe, expect, it } from 'vitest';
 import { computeStats } from '../lib/results';
 import { attemptEngine, attemptInProgress, dayLost, gameReducer, reducer } from './reducer';
@@ -493,6 +494,17 @@ describe('attempts', () => {
     });
     const expired = gameReducer(stale, { type: 'expireAttempts', today: DAY, engine: ENGINE });
     expect(expired.days[DAY]!.attempts[0]!.result).toBe('forfeit');
+  });
+
+  it('resumes a Hard battle saved under Hard 2 (150k), which is still playable', () => {
+    const tag = attemptEngine(ENGINE, 'hard');
+    expect(tag).toContain(` hard ${HARD_VERSION} `);
+    const saved = gameReducer(locked(), {
+      type: 'startAttempt',
+      day: DAY,
+      attempt: attempt({ difficulty: 'hard', engine: tag.replace(/ hard \d+/, ' hard 2') }),
+    });
+    expect(gameReducer(saved, { type: 'expireAttempts', today: DAY, engine: ENGINE })).toBe(saved);
   });
 
   it("saves Hard's AI choices, replacing any from where a batch starts", () => {

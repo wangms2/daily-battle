@@ -1,6 +1,6 @@
 // A room before it starts: who's in, the invite, and the host's settings.
 // Everyone sees the same settings; only the host can change them.
-import { DIFFICULTIES, type Difficulty } from '@daily-battle/ai/version';
+import { DIFFICULTIES, searches, type Difficulty } from '@daily-battle/ai/version';
 import { FORMATS, formatInfo, genOf, type FormatId } from '@daily-battle/data/formats';
 import { hasEngine } from '@daily-battle/engine-wasm/version';
 import {
@@ -204,7 +204,7 @@ export function Lobby({
         label="Rival (the AI for an odd player out)"
         value={rival}
         options={RIVAL_OPTIONS.filter(
-          (o) => o.value !== 'hard' || hasEngine(genOf(room.settings.format)),
+          (o) => !searches(o.value) || hasEngine(genOf(room.settings.format)),
         )}
         onChange={edit ? (rivalDifficulty) => set({ rivalDifficulty }) : undefined}
       />

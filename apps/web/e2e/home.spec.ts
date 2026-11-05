@@ -99,6 +99,8 @@ test('a mascot opens its generation, and one cleared today has a check', async (
           battleSpeed: 'fast',
           animations: true,
           sound: false,
+          // The brief's "Want a coach?" offer, already answered.
+          coachOffered: { gen3ou: true, gen4ou: true, gen5ou: true, gen6ou: true },
           shownExplainers: ['welcome', 'cores', 'tour'],
         },
       }),

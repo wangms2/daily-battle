@@ -3,7 +3,11 @@
 //   pnpm --filter @daily-battle/tutorial coach-eval
 //     [--vs easy] [--battles 200] [--first 0] [--r 40] [--cases 60] [--per-battle 3] [--jobs 16]
 //     [--out file.json] [--hard-iterations 150000] [--save-cases f.json] [--load-cases f.json]
-//     [--shown] [--collect-only]
+//     [--shown] [--collect-only] [--judge search|net|both]
+//
+// --judge picks the coach's judge: the search (`Judge`, the default), Master's
+// network (`NetJudge`), or both at the same decisions, each judge's top choice
+// rolled out against the same pick (to set the network's thresholds).
 //
 // Against Hard (--vs hard), --hard-iterations sets the opponent's search
 // budget (Hard's own by default), and --save-cases / --load-cases roll out the
@@ -47,7 +51,9 @@ import {
   type SideView,
 } from '@daily-battle/sim-bridge';
 import type { PRNGSeed } from '@pkmn/sim';
-import { Judge, JUDGE_DEFAULTS } from '../src/coach/judge';
+import { MASTER_NET_PATH } from '@daily-battle/ai/version';
+import { Judge, JUDGE_DEFAULTS, type CoachJudge } from '../src/coach/judge';
+import { NetJudge, NET_JUDGE_DEFAULTS } from '../src/coach/net-judge';
 import { Coach, type CoachNote } from '../src/coach/simple';
 
 const arg = (name: string) => {
@@ -55,7 +61,8 @@ const arg = (name: string) => {
   return i > 0 ? process.argv[i + 1] : undefined;
 };
 const FORMAT = 'gen3ou';
-const VS = (arg('vs') ?? 'easy') as Difficulty;
+// The coach never plays against Master (it is Master's brain).
+const VS = (arg('vs') ?? 'easy') as Exclude<Difficulty, 'master'>;
 const BATTLES = Number(arg('battles') ?? 200);
 /** The first battle index: a fresh range checks results on battles not used for tuning. */
 const FIRST = Number(arg('first') ?? 0);
@@ -73,6 +80,14 @@ const COLLECT_ONLY = process.argv.includes('--collect-only');
 const JUDGE_ITERATIONS = Number(arg('judge-iterations') ?? JUDGE_DEFAULTS.iterations);
 /** Against Hard: the opponent's search budget (Hard's own when left out). */
 const HARD_ITERATIONS = arg('hard-iterations') ? Number(arg('hard-iterations')) : undefined;
+type JudgeName = 'search' | 'net';
+const JUDGE_ARG = arg('judge') ?? 'search';
+const JUDGES: JudgeName[] = JUDGE_ARG === 'both' ? ['search', 'net'] : [JUDGE_ARG as JudgeName];
+const NET_FILE = join(
+  fileURLToPath(import.meta.url),
+  '../../../../apps/web/public',
+  MASTER_NET_PATH,
+);
 const START = '2026-01-05';
 const data = setsFor(FORMAT);
 type PokemonSet = ReturnType<typeof toPokemonSet>;
@@ -108,6 +123,19 @@ type Matchup = ReturnType<typeof matchup>;
 
 let engine3: ReturnType<typeof loadEngine> | undefined;
 const engine = () => (engine3 ??= loadEngine(3));
+let netEngine3: ReturnType<typeof loadEngine> | undefined;
+const netEngine = () => {
+  if (!netEngine3) {
+    netEngine3 = loadEngine(3);
+    netEngine3.netLoad(new Uint8Array(readFileSync(NET_FILE)));
+  }
+  return netEngine3;
+};
+
+const judgeFor = (name: JudgeName, pool: string[]): CoachJudge =>
+  name === 'net'
+    ? new NetJudge(netEngine(), data, { pool })
+    : new Judge(engine(), data, { pool, iterations: JUDGE_ITERATIONS });
 
 /** The opponent as the app plays it (Hard with the week's pool, as in the daily). */
 const foe = (m: Matchup, vs: Difficulty): Policy =>
@@ -122,6 +150,16 @@ const foe = (m: Matchup, vs: Difficulty): Policy =>
     }),
   });
 
+/** A judge's opinion of the pick: its top choice, the gap, and the warning the coach would show. */
+interface Opinion {
+  top: string;
+  gap: number;
+  /** The share of worlds agreeing. */
+  agree: number;
+  text?: string;
+  rule?: CoachNote['rule'];
+}
+
 interface Case {
   battle: number;
   turn: number;
@@ -130,22 +168,22 @@ interface Case {
   p2: string[];
   /** The bot's pick, which the coach would warn about. */
   warned: string;
-  /** The coach's alternative. */
-  alt: string;
-  /** The coach's warning on the pick, if it would show one. */
-  text?: string;
-  rule?: CoachNote['rule'];
-  /** The judged gap and the share of worlds agreeing. */
-  gap: number;
-  agree: number;
+  /** Each judge's opinion (at least one has a top other than the pick). */
+  judges: Partial<Record<JudgeName, Opinion>>;
   position: string;
 }
 
-interface Result extends Case {
+/** The win rate with a choice in place of the pick: `a`, its gain over the pick, and its standard error. */
+interface Alt {
   a: number;
-  b: number;
   diff: number;
   se: number;
+}
+
+interface Result extends Case {
+  /** The pick's win rate. */
+  b: number;
+  alts: Record<string, Alt>;
 }
 
 function describe(view: SideView): string {
@@ -157,13 +195,18 @@ function describe(view: SideView): string {
   );
 }
 
+/** Decisions judged (how often the coach would warn, per decision). */
+let judgedDecisions = 0;
+
 function collect(vs: Difficulty): Case[] {
   const cases: Case[] = [];
   for (let i = FIRST; i < FIRST + BATTLES && cases.length < MAX_CASES; i++) {
     const m = matchup(i);
     const session = new BattleSession({ format: FORMAT, ...m });
-    const coach = new Coach(data, FORMAT, VS);
-    const judge = new Judge(engine(), data, { pool: m.pool, iterations: JUDGE_ITERATIONS });
+    // Each judge with its own coach, which remembers the warnings it showed.
+    const judges = JUDGES.map(
+      (name) => [name, judgeFor(name, m.pool), new Coach(data, FORMAT, VS)] as const,
+    );
     // Beginner-ish players: Easy and the mid bot, alternating.
     const player = i % 2 ? midBot({ data }) : aiFor({ difficulty: 'easy', style: 'balance', data });
     const opponent = foe(m, vs);
@@ -180,11 +223,11 @@ function collect(vs: Difficulty): Case[] {
           session.choose('p2', opponent.choose(view, rngs.p2));
           continue;
         }
-        coach.turn(view);
+        for (const [, , coach] of judges) coach.turn(view);
         const choice = player.choose(view, rngs.p1);
         const room =
           cases.length < MAX_CASES && cases.filter((c) => c.battle === i).length < PER_BATTLE;
-        let note: CoachNote | undefined;
+        const notes = new Map<JudgeName, CoachNote>();
         if (
           room &&
           view.request.requestType === 'move' &&
@@ -192,26 +235,35 @@ function collect(vs: Difficulty): Case[] {
           // Spread the cases over the battle (every decision when only shown warnings count).
           (SHOWN || pick() < 0.4)
         ) {
-          judge.begin(view, `eval:${i}:${session.turn}`);
-          const v = judge.settle(choice, Infinity);
-          if (v && v.top !== choice) note = coach.warn(view, v);
-          if (v && v.top !== choice && (note || !SHOWN)) {
+          judgedDecisions++;
+          const opinions: Case['judges'] = {};
+          for (const [name, judge, coach] of judges) {
+            judge.begin(view, `eval:${i}:${session.turn}`);
+            const v = judge.settle(choice, Infinity);
+            if (!v || v.top === choice) continue;
+            const n = coach.warn(view, v);
+            if (n) notes.set(name, n);
+            if (n || !SHOWN)
+              opinions[name] = {
+                top: v.top,
+                gap: v.gap,
+                agree: v.agree,
+                ...(n ? { text: n.text, rule: n.rule } : {}),
+              };
+          }
+          if (Object.keys(opinions).length)
             cases.push({
               battle: i,
               turn: session.turn,
               p1: [...session.choices('p1')],
               p2: [...session.choices('p2')],
               warned: choice,
-              alt: v.top,
-              gap: v.gap,
-              agree: v.agree,
-              ...(note ? { text: note.text, rule: note.rule } : {}),
+              judges: opinions,
               position: describe(view),
             });
-          }
         }
-        coach.record(view, choice, note ?? null);
-        if (!session.choose('p1', choice)) coach.forget();
+        for (const [name, , coach] of judges) coach.record(view, choice, notes.get(name) ?? null);
+        if (!session.choose('p1', choice)) for (const [, , coach] of judges) coach.forget();
       }
     }
   }
@@ -266,14 +318,19 @@ const sdOf = (xs: number[]) => {
 };
 
 function rollCase(c: Case, n: number, vs: Difficulty): Result {
-  const a: number[] = [];
+  const tops = [...new Set(Object.values(c.judges).map((o) => o.top))];
   const b: number[] = [];
+  const a = tops.map(() => [] as number[]);
   for (let k = 0; k < R; k++) {
-    a.push(rollout(c, n, c.alt, k, vs));
     b.push(rollout(c, n, c.warned, k, vs));
+    tops.forEach((t, j) => a[j]!.push(rollout(c, n, t, k, vs)));
   }
-  const diffs = a.map((x, k) => x - b[k]!);
-  return { ...c, a: mean(a), b: mean(b), diff: mean(diffs), se: sdOf(diffs) / Math.sqrt(R) };
+  const alts: Record<string, Alt> = {};
+  tops.forEach((t, j) => {
+    const diffs = a[j]!.map((x, k) => x - b[k]!);
+    alts[t] = { a: mean(a[j]!), diff: mean(diffs), se: sdOf(diffs) / Math.sqrt(R) };
+  });
+  return { ...c, b: mean(b), alts };
 }
 
 // A child process rolls out its share of the cases: --child <cases file> <shard> <jobs> <vs>.
@@ -327,15 +384,26 @@ async function rollAll(cases: Case[], vs: Difficulty): Promise<Result[]> {
 const pct = (x: number) => `${(100 * x).toFixed(1)}%`;
 const pts = (x: number) => `${x >= 0 ? '+' : ''}${(100 * x).toFixed(1)}`;
 
-function summary(label: string, rs: Result[]): string {
+/** One judge's view of a case: its opinion and how its top choice really did against the pick. */
+interface Row extends Opinion, Alt {
+  r: Result;
+}
+const rowsOf = (name: JudgeName, rs: Result[]): Row[] =>
+  rs.flatMap((r) => {
+    const o = r.judges[name];
+    return o ? [{ ...o, ...r.alts[o.top]!, r }] : [];
+  });
+
+function summary(label: string, rs: Row[], decisions = 0): string {
   if (!rs.length) return `  ${label}: no cases`;
   const d = mean(rs.map((r) => r.diff));
   const ci = (1.96 * sdOf(rs.map((r) => r.diff))) / Math.sqrt(rs.length);
   const worse = rs.filter((r) => r.diff < -2 * r.se).length;
+  const rate = decisions ? `  ${pct(rs.length / decisions)} of decisions` : '';
   return (
     `  ${label.padEnd(26)} ${String(rs.length).padStart(4)} cases  gain ${pts(d)} pts ` +
-    `(CI ${pts(d - ci)} to ${pts(d + ci)})  A ${pct(mean(rs.map((r) => r.a)))} vs B ${pct(mean(rs.map((r) => r.b)))}` +
-    `  clearly worse ${worse} (${pct(worse / rs.length)})`
+    `(CI ${pts(d - ci)} to ${pts(d + ci)})  A ${pct(mean(rs.map((r) => r.a)))} vs B ${pct(mean(rs.map((r) => r.r.b)))}` +
+    `  clearly worse ${worse} (${pct(worse / rs.length)})${rate}`
   );
 }
 
@@ -345,63 +413,74 @@ const cases = LOAD ? (JSON.parse(readFileSync(LOAD, 'utf8')) as Case[]) : collec
 const SAVE = arg('save-cases');
 if (SAVE) writeFileSync(SAVE, JSON.stringify(cases));
 if (COLLECT_ONLY) {
-  console.log(`${cases.length} cases collected`);
+  console.log(`${cases.length} cases collected (${judgedDecisions} decisions judged)`);
   process.exit(0);
 }
 console.log(
-  `${cases.length} judged cases from up to ${BATTLES} battles vs ${VS}` +
+  `${cases.length} judged cases (${judgedDecisions} decisions judged) from up to ${BATTLES} battles vs ${VS}` +
     ` (${((performance.now() - t0) / 1000).toFixed(1)}s)`,
 );
 const results = await rollAll(cases, VS);
 const secs = ((performance.now() - t0) / 1000).toFixed(0);
 console.log(
-  `\nJudge vs ${VS}: ${results.length} cases x ${R} rollouts per branch (${secs}s, ${JOBS} jobs)`,
+  `\nJudges ${JUDGES.join(', ')} vs ${VS}: ${results.length} cases x ${R} rollouts per branch (${secs}s, ${JOBS} jobs)`,
 );
-// How judged gaps turn into real wins.
-const bins: [string, (r: Result) => boolean][] = [
-  ['gap < 0.05', (r) => r.gap < 0.05],
-  ['gap 0.05-0.10', (r) => r.gap >= 0.05 && r.gap < 0.1],
-  ['gap 0.10-0.15', (r) => r.gap >= 0.1 && r.gap < 0.15],
-  ['gap 0.15-0.25', (r) => r.gap >= 0.15 && r.gap < 0.25],
-  ['gap >= 0.25', (r) => r.gap >= 0.25],
-];
-console.log('By judged gap (all worlds):');
-for (const [label, f] of bins) console.log(summary(label, results.filter(f)));
-console.log('Robust (ahead in >= 90% of worlds), by margin:');
-for (const m of [0.05, 0.1, 0.15, 0.2])
+const defaults = { search: JUDGE_DEFAULTS, net: NET_JUDGE_DEFAULTS };
+for (const name of JUDGES) {
+  const rows = rowsOf(name, results);
+  const { margin, agree } = defaults[name];
+  console.log(`\n== ${name} judge (now: margin ${margin}, agree ${agree})`);
+  // How judged gaps turn into real wins.
+  const edges = [0, 0.03, 0.05, 0.1, 0.15, 0.25, 0.4, Infinity];
+  console.log('By judged gap (all worlds):');
+  for (let e = 0; e + 1 < edges.length; e++)
+    console.log(
+      summary(
+        `gap ${edges[e]}-${edges[e + 1]}`,
+        rows.filter((r) => r.gap >= edges[e]! && r.gap < edges[e + 1]!),
+      ),
+    );
+  console.log('Warned (gap >= margin, agree >= a), share of judged decisions:');
+  for (const a of [0.5, 0.75, 0.9])
+    for (const m of [0.03, 0.05, 0.1, 0.15, 0.2, 0.3])
+      console.log(
+        summary(
+          `margin ${m} agree ${a}`,
+          rows.filter((r) => r.gap >= m && r.agree >= a),
+          judgedDecisions,
+        ),
+      );
+  console.log('Warnings the coach shows, by reason:');
+  const shown = rows.filter((r) => r.rule);
+  console.log(summary('all shown', shown, judgedDecisions));
+  for (const rule of [...new Set(shown.map((r) => r.rule))])
+    console.log(
+      summary(
+        `  ${rule}`,
+        shown.filter((r) => r.rule === rule),
+      ),
+    );
+  console.log('Worst cases:');
+  for (const r of [...rows].sort((x, y) => x.diff - y.diff).slice(0, 6))
+    console.log(
+      `  battle ${r.r.battle} turn ${r.r.turn}: ${r.r.position}` +
+        `  (judged gap ${r.gap.toFixed(2)}, agree ${r.agree.toFixed(2)})` +
+        (r.text ? `\n    "${r.text}"` : '') +
+        `\n    ${r.top} ${pct(r.a)} vs ${r.r.warned} ${pct(r.r.b)} (gain ${(100 * r.diff).toFixed(0)} ± ${(196 * r.se).toFixed(0)})`,
+    );
+}
+if (JUDGES.length > 1) {
+  // The judges' value scales, at decisions where both would pick something else.
+  const both = results.filter((r) => r.judges.search && r.judges.net);
+  const ratios = both
+    .filter((r) => r.judges.search!.gap > 0.01)
+    .map((r) => r.judges.net!.gap / r.judges.search!.gap)
+    .sort((x, y) => x - y);
+  const same = both.filter((r) => r.judges.search!.top === r.judges.net!.top).length;
   console.log(
-    summary(
-      `gap >= ${m}`,
-      results.filter((r) => r.gap >= m && r.agree >= 0.9),
-    ),
+    `\nBoth judges against the pick: ${both.length} cases, same top in ${same};` +
+      ` net/search gap ratio median ${ratios[Math.floor(ratios.length / 2)]?.toFixed(2)}` +
+      ` (quartiles ${ratios[Math.floor(ratios.length / 4)]?.toFixed(2)}-${ratios[Math.floor((3 * ratios.length) / 4)]?.toFixed(2)})`,
   );
-console.log('Not robust (ahead in < 90% of worlds), gap >= 0.10:');
-console.log(
-  summary(
-    'gap >= 0.1',
-    results.filter((r) => r.gap >= 0.1 && r.agree < 0.9),
-  ),
-);
-console.log('Warnings the coach shows, by reason:');
-console.log(
-  summary(
-    'all shown',
-    results.filter((r) => r.rule),
-  ),
-);
-for (const rule of [...new Set(results.map((r) => r.rule).filter(Boolean))])
-  console.log(
-    summary(
-      `  ${rule}`,
-      results.filter((r) => r.rule === rule),
-    ),
-  );
-console.log('\nWorst cases:');
-for (const r of [...results].sort((x, y) => x.diff - y.diff).slice(0, 6))
-  console.log(
-    `  battle ${r.battle} turn ${r.turn}: ${r.position}` +
-      `  (judged gap ${r.gap.toFixed(2)}, agree ${r.agree.toFixed(2)})` +
-      (r.text ? `\n    "${r.text}"` : '') +
-      `\n    ${r.alt} ${pct(r.a)} vs ${r.warned} ${pct(r.b)} (gain ${(100 * r.diff).toFixed(0)} ± ${(196 * r.se).toFixed(0)})`,
-  );
-if (OUT) writeFileSync(OUT, JSON.stringify({ vs: VS, R, results }, null, 1));
+}
+if (OUT) writeFileSync(OUT, JSON.stringify({ vs: VS, R, judgedDecisions, results }, null, 1));

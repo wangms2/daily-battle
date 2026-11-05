@@ -37,11 +37,13 @@ pub struct Params {
     pub branch_mass: f32,
     /// Weight of a choice's worst case over the foe's choices (vs the predicted mean).
     pub robust: f32,
+    /// Report each root outcome (`WorldResult::outcomes`), for the coach's risk facts.
+    pub outcomes: bool,
 }
 
 impl Default for Params {
     fn default() -> Params {
-        Params { own_k: 4, own_mass: 0.95, foe_k: 3, foe_mass: 0.9, branches: 6, branch_mass: 0.98, robust: 0.25 }
+        Params { own_k: 4, own_mass: 0.95, foe_k: 3, foe_mass: 0.9, branches: 6, branch_mass: 0.98, robust: 0.25, outcomes: false }
     }
 }
 
@@ -53,6 +55,19 @@ pub struct World {
     pub turn: u32,
     /// Our slots the game allows now (the engine may offer choices Showdown doesn't).
     pub legal: [bool; ACTIONS],
+    /// Our slots searched whatever the prior says (the coach's: the player's pick).
+    pub must: [bool; ACTIONS],
+}
+
+/// One of the foe's searched replies at the root, for judging a choice against it.
+#[derive(Clone, Debug)]
+pub struct Reply {
+    /// The foe's slot (None: it has no real choice).
+    pub slot: Option<usize>,
+    /// Its predicted chance, renormalized over the searched replies.
+    pub p: f32,
+    /// Each of our searched choices' win chance against it (NaN: not searched).
+    pub q: [f32; ACTIONS],
 }
 
 #[derive(Clone, Debug)]
@@ -67,6 +82,53 @@ pub struct WorldResult {
     pub score: [f32; ACTIONS],
     /// Positions the network judged for this world.
     pub positions: usize,
+    /// The foe's searched replies and our choices' win chances against each.
+    pub replies: Vec<Reply>,
+    /// With `Params::outcomes`: every searched pair's chance outcomes at the root.
+    pub outcomes: Vec<Outcome>,
+}
+
+/// What a turn's chance outcome did, as HP and faints on each side.
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub struct Change {
+    /// HP lost over the whole team, in Pokémon (1.0: one full HP bar).
+    pub own_hp: f32,
+    pub foe_hp: f32,
+    /// Pokémon that fainted.
+    pub own_ko: u8,
+    pub foe_ko: u8,
+}
+
+/// One chance outcome of one of our searched choices against one foe reply.
+#[derive(Clone, Debug)]
+pub struct Outcome {
+    pub own: Option<usize>,
+    pub foe: Option<usize>,
+    /// Its chance, given the two choices.
+    pub p: f32,
+    /// Our win chance after it.
+    pub value: f32,
+    pub change: Change,
+}
+
+/// The turn's HP and faints, from `a` to `b`.
+fn change(a: &State, b: &State) -> Change {
+    let side = |x: &poke_engine::state::Side, y: &poke_engine::state::Side| {
+        let mut hp = 0.0;
+        let mut ko = 0;
+        for (p, q) in x.pokemon.pkmn.iter().zip(y.pokemon.pkmn.iter()) {
+            if p.maxhp > 0 {
+                hp += (p.hp - q.hp) as f32 / p.maxhp as f32;
+            }
+            if p.hp > 0 && q.hp <= 0 {
+                ko += 1;
+            }
+        }
+        (hp, ko)
+    };
+    let (own_hp, own_ko) = side(&a.side_one, &b.side_one);
+    let (foe_hp, foe_ko) = side(&a.side_two, &b.side_two);
+    Change { own_hp, foe_hp, own_ko, foe_ko }
 }
 
 pub fn slot_of(c: &MoveChoice) -> Option<usize> {
@@ -236,6 +298,8 @@ struct Node {
     foe: Vec<(MoveChoice, f32)>,
     /// Per (own, foe) pair: (probability, leaf) outcomes.
     pairs: Vec<Vec<(f32, Leaf)>>,
+    /// With `record`: each outcome's change, parallel to `pairs`.
+    changes: Vec<Vec<Change>>,
 }
 
 enum Leaf {
@@ -256,9 +320,11 @@ fn expand(
     pos: &mut Pos,
     out: &Output,
     legal: Option<&[bool; ACTIONS]>,
+    must: Option<&[bool; ACTIONS]>,
     p: &Params,
     own_k: usize,
     foe_k: usize,
+    record: bool,
     batch: &mut Vec<Pos>,
 ) -> Node {
     let (o1, o2) = pos.state.root_get_all_options();
@@ -268,14 +334,26 @@ fn expand(
     let on2: Vec<usize> = o2.iter().filter_map(slot_of).collect();
     let prior = softmax(&out.policy, |s| on1.contains(&s));
     let foe_p = softmax(&out.foe_action, |s| on2.contains(&s));
-    let own = pick(&o1, &prior, own_k, p.own_mass);
+    let mut own = pick(&o1, &prior, own_k, p.own_mass);
+    if let Some(must) = must {
+        for c in &o1 {
+            if slot_of(c).is_some_and(|s| must[s]) && !own.iter().any(|(o, _)| o == c) {
+                own.push((*c, 0.0));
+            }
+        }
+    }
     let foe = pick(&o2, &foe_p, foe_k, p.foe_mass);
     let mut pairs = Vec::with_capacity(own.len() * foe.len());
+    let mut changes = Vec::new();
     for (c1, _) in &own {
         for (c2, _) in &foe {
             let mut leaves = Vec::new();
+            let mut ch = Vec::new();
             for (w, ins) in outcomes(pos, c1, c2, p) {
                 let next = pos.after([c1, c2], &ins);
+                if record {
+                    ch.push(change(&pos.state, &next.state));
+                }
                 leaves.push((
                     w,
                     match over(&next.state) {
@@ -288,17 +366,18 @@ fn expand(
                 ));
             }
             pairs.push(leaves);
+            changes.push(ch);
         }
     }
-    Node { own, foe, pairs }
+    Node { own, foe, pairs, changes: if record { changes } else { Vec::new() } }
 }
 
-/// Each of our candidates' scores at `node`, given the judged positions' values.
-fn scores(node: &Node, value: &dyn Fn(usize) -> f32, robust: f32) -> Vec<f32> {
+/// Each of our candidates' win chance against each of the foe's (own × foe).
+fn pair_values(node: &Node, value: &dyn Fn(usize) -> f32) -> Vec<Vec<f32>> {
     let nf = node.foe.len();
     (0..node.own.len())
         .map(|a| {
-            let q: Vec<f32> = (0..nf)
+            (0..nf)
                 .map(|b| {
                     node.pairs[a * nf + b]
                         .iter()
@@ -308,7 +387,16 @@ fn scores(node: &Node, value: &dyn Fn(usize) -> f32, robust: f32) -> Vec<f32> {
                         })
                         .sum()
                 })
-                .collect();
+                .collect()
+        })
+        .collect()
+}
+
+/// Each of our candidates' scores at `node`, given the judged positions' values.
+fn scores(node: &Node, value: &dyn Fn(usize) -> f32, robust: f32) -> Vec<f32> {
+    pair_values(node, value)
+        .into_iter()
+        .map(|q| {
             let mean: f32 = q.iter().zip(&node.foe).map(|(v, f)| v * f.1).sum();
             let worst = q.iter().copied().fold(f32::INFINITY, f32::min);
             (1.0 - robust) * mean + robust * worst
@@ -344,7 +432,10 @@ pub fn search(net: &Net, worlds: Vec<World>, p: &Params) -> Vec<WorldResult> {
     let nodes: Vec<Node> = roots
         .iter_mut()
         .enumerate()
-        .map(|(i, r)| expand(r, &root_out[i], Some(&worlds[i].legal), p, p.own_k, p.foe_k, &mut first))
+        .map(|(i, r)| {
+            let w = &worlds[i];
+            expand(r, &root_out[i], Some(&w.legal), Some(&w.must), p, p.own_k, p.foe_k, p.outcomes, &mut first)
+        })
         .collect();
     let first_out = judge(net, &first, |i| if first[i].forced() { mask_of(&first[i].state) } else { [true; ACTIONS] });
 
@@ -352,7 +443,7 @@ pub fn search(net: &Net, worlds: Vec<World>, p: &Params) -> Vec<WorldResult> {
     let mut second = Vec::new();
     let mut sub: Vec<Option<Node>> = Vec::with_capacity(first.len());
     for (i, pos) in first.iter_mut().enumerate() {
-        sub.push(pos.forced().then(|| expand(pos, &first_out[i], None, p, 3, 3, &mut second)));
+        sub.push(pos.forced().then(|| expand(pos, &first_out[i], None, None, p, 3, 3, false, &mut second)));
     }
     let second_out = judge(net, &second, |_| [true; ACTIONS]);
     let v2 = |i: usize| sigmoid(second_out[i].value);
@@ -390,12 +481,49 @@ pub fn search(net: &Net, worlds: Vec<World>, p: &Params) -> Vec<WorldResult> {
                     score[slot] = s;
                 }
             }
+            let q = pair_values(node, &|i| v1[i]);
+            let replies = node
+                .foe
+                .iter()
+                .enumerate()
+                .map(|(b, (c, prob))| {
+                    let mut per = [f32::NAN; ACTIONS];
+                    for (a, (own, _)) in node.own.iter().enumerate() {
+                        if let Some(slot) = slot_of(own) {
+                            per[slot] = q[a][b];
+                        }
+                    }
+                    Reply { slot: slot_of(c), p: *prob, q: per }
+                })
+                .collect();
+            let nf = node.foe.len();
+            let v1 = &v1;
+            let outcomes = node
+                .changes
+                .iter()
+                .enumerate()
+                .flat_map(|(k, ch)| {
+                    let (a, b) = (k / nf, k % nf);
+                    node.pairs[k].iter().zip(ch).map(move |((pr, leaf), c)| Outcome {
+                        own: slot_of(&node.own[a].0),
+                        foe: slot_of(&node.foe[b].0),
+                        p: *pr,
+                        value: match leaf {
+                            Leaf::Over(v) => *v,
+                            Leaf::Judged(i) => v1[*i],
+                        },
+                        change: *c,
+                    })
+                })
+                .collect();
             WorldResult {
                 prior: softmax(&out.policy, |s| on1.contains(&s)),
                 value: sigmoid(out.value),
                 foe: softmax(&out.foe_action, |s| on2.contains(&s)),
                 score,
                 positions: counts[w],
+                replies,
+                outcomes,
             }
         })
         .collect()

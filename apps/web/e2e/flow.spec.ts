@@ -104,6 +104,12 @@ for (const scheme of ['light', 'dark'] as const) {
     await shot(page, '09-lock-confirm', project);
     await page.getByRole('button', { name: 'Lock in', exact: true }).click();
 
+    // The coach is offered once, on a game's first brief.
+    const offer = page.getByRole('dialog', { name: 'Want a coach?' });
+    await expect(offer).toBeVisible();
+    await shot(page, '10-coach-offer', project);
+    await offer.getByRole('button', { name: 'Not now' }).click();
+
     // Daily brief: lead, edit mode, swap.
     await expect(page.getByRole('button', { name: /^Start · / })).toBeVisible();
     await shot(page, '10-brief', project);

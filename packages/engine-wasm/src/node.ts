@@ -1,4 +1,5 @@
 // Node loader: reads a generation's module from dist/ (built by `pnpm build`).
+// Node has WASM SIMD, so it uses the SIMD build when there is one.
 
 import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -6,11 +7,17 @@ import { Engine, engineFile, hasEngine, type WasmModule } from './index';
 
 declare const WebAssembly: { Module: new (bytes: Uint8Array) => WasmModule };
 
-export const distPath = (gen: number): string => {
-  const url = new URL(`../dist/${engineFile(gen)}`, import.meta.url);
+const pathOf = (file: string): string => {
+  const url = new URL(`../dist/${file}`, import.meta.url);
   // Vite (e.g. Vitest's jsdom environment) rewrites module URLs to `[/C:]/@fs/<absolute path>`.
   const fs = url.pathname.indexOf('/@fs/');
   return fileURLToPath(fs >= 0 ? `file://${url.pathname.slice(fs + '/@fs'.length)}` : url);
+};
+
+/** The gen's module file: the SIMD build if built (and not turned off by ENGINE_SIMD=0), else the plain one. */
+export const distPath = (gen: number): string => {
+  const simd = pathOf(engineFile(gen, true));
+  return process.env.ENGINE_SIMD !== '0' && existsSync(simd) ? simd : pathOf(engineFile(gen));
 };
 
 const modules = new Map<number, WasmModule>();

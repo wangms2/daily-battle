@@ -4,7 +4,7 @@
 // nothing; the state lives in storage and is read back when the room wakes,
 // and a battle is rebuilt from its recorded choices the first time it's needed
 // after that.
-import { aiFor } from '@daily-battle/ai';
+import { aiFor, searches } from '@daily-battle/ai';
 import { setsFor } from '@daily-battle/data';
 import { genOf } from '@daily-battle/data/formats';
 import type { Engine } from '@daily-battle/engine-wasm';
@@ -577,18 +577,27 @@ export class Room extends DurableObject<Env> {
   }
 
   /**
-   * The Rival's AI for a battle, at the difficulty it started with (Hard needs
-   * its engine; without it, it plays as Normal).
+   * The Rival's AI for a battle, at the difficulty it started with (Hard and
+   * Master need their engine; without it they play as Normal). A Master made
+   * for a battle already under way watches it replayed, as its network reads
+   * the whole battle; the rebuilt battle replaces the one in memory.
    */
   private async makePolicy(match: Match): Promise<Policy> {
     const style = match.aiStyle ?? 'balance';
     const data = setsFor(match.format);
+    const gen = genOf(match.format);
     let engine: Engine | null = null;
     if (match.aiDifficulty === 'hard') {
-      engine = (await import('./engines')).hardEngine(genOf(match.format));
+      engine = (await import('./engines')).hardEngine(gen);
+    } else if (match.aiDifficulty === 'master') {
+      engine = await (
+        await import('./engines')
+      )
+        .masterEngine(gen, this.env.ASSETS)
+        .catch(() => null);
     }
-    const difficulty = match.aiDifficulty === 'hard' && !engine ? 'normal' : match.aiDifficulty;
-    // Hard guesses its foe's unseen Pokémon from the 12 they built from.
+    const difficulty = searches(match.aiDifficulty) && !engine ? 'normal' : match.aiDifficulty;
+    // Hard and Master guess their foe's unseen Pokémon from the 12 they built from.
     const foe = match.players[match.ai === 'p1' ? 'p2' : 'p1'];
     const policy = aiFor({
       difficulty: difficulty ?? 'normal',
@@ -596,6 +605,17 @@ export class Room extends DurableObject<Env> {
       data,
       ...(engine && { engine, pool: this.room ? poolOf(this.room, foe) : [] }),
     });
+    // The battle as it is now (the engine may have taken a while to load).
+    const latest = this.room?.matches.find((x) => x.id === match.id) ?? match;
+    const watch = policy.watch?.bind(policy);
+    if (watch && latest.ai && latest.stage === 'battle' && latest.choices[latest.ai].length) {
+      const [sent, watched] = [this.sent.get(latest.id), this.watched.get(latest.id)];
+      this.battles.delete(latest.id);
+      this.battle(latest, { side: latest.ai, watch });
+      // The same battle, rebuilt: what was sent of it still was.
+      if (sent) this.sent.set(latest.id, sent);
+      if (watched !== undefined) this.watched.set(latest.id, watched);
+    }
     return policy;
   }
 
@@ -647,10 +667,10 @@ export class Room extends DurableObject<Env> {
   }
 
   /** The match's battle, rebuilt from its record if the room slept since. */
-  private battle(match: Match): LiveBattle {
+  private battle(match: Match, watch?: ConstructorParameters<typeof LiveBattle>[1]): LiveBattle {
     let battle = this.battles.get(match.id);
     if (!battle) {
-      battle = new LiveBattle(match);
+      battle = new LiveBattle(match, watch);
       // A battle that ended early (forfeit, time) ends the same way again.
       if (match.stage === 'over' && match.result && !battle.ended) {
         const { winner } = match.result;

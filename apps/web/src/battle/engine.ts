@@ -2,9 +2,13 @@
 // opponent AI, and a presenter that turns the player's side into frames.
 import {
   aiFor,
+  coachNetJudge,
   HardPolicy,
+  NetPolicy,
+  searches,
   UtilityPolicy,
   type DecisionJob,
+  type NetClaim,
   type WorldClaim,
 } from '@daily-battle/ai';
 import { DEFAULT_FORMAT, setsFor } from '@daily-battle/data';
@@ -29,11 +33,13 @@ import {
   Judge,
   LESSON_TIE,
   knownSets,
+  NetJudge,
   setStartHp,
   soundPick,
   startPosition,
   teamOf,
   withLessonSets,
+  type CoachJudge,
   type CoachNote,
   type FoeRead,
   type Mon,
@@ -47,8 +53,25 @@ import { SidePresenter } from './presenter';
 
 export { cleanText, effectiveness, moveDesc } from './presenter';
 
+/**
+ * A decision made in one go, as a job: the first `step` (the worker's spare
+ * time, while you choose) makes it, so it's usually ready before your choice.
+ */
+function wholeJob(ai: Policy, view: SideView, rng: Rng): DecisionJob {
+  let choice: string | undefined;
+  const make = () => (choice ??= ai.choose(view, rng));
+  return {
+    step: () => (make(), false),
+    claim: () => undefined,
+    result: make,
+  };
+}
+
 /** Shown when the move you picked turns out to be blocked (by Imprison, say). */
 const BLOCKED = 'That move can’t be used right now. Choose another.';
+
+/** An advanced tip not ready this long after its turn's package is skipped (about 2 s on a phone, by the plan). */
+export const ADVANCED_MS = 2000;
 
 export class BattleEngine {
   private readonly session: BattleSession;
@@ -56,25 +79,34 @@ export class BattleEngine {
   private readonly aiRng: Rng;
   private readonly presenter: SidePresenter;
   private readonly sets: PokemonSet[];
-  private readonly hard: boolean;
-  /** Hard: every AI choice so far; those past `reported` are new since the last package. */
+  /** Hard and Master: the AI's choices are saved, and replayed on resume. */
+  private readonly saves: boolean;
+  /** Hard and Master: every AI choice so far; those past `reported` are new since the last package. */
   private readonly aiLog: string[] = [];
   private reported: number;
-  /** Hard: saved AI choices still to replay (cleared if one stops fitting). */
+  /** Hard and Master: saved AI choices still to replay (cleared if one stops fitting). */
   private replay: string[];
   private readonly coach?: Coach;
   /** The request the coach last spoke on, so it isn't asked twice about one turn. */
   private coached?: unknown;
   /**
-   * The coach's judge (DESIGN.md §22): the search, from your view, decides which
+   * The coach's judge (DESIGN.md §22): Master's network search (or, without a
+   * network, and in lessons, the Hard search), from your view, decides which
    * warnings and action tips show. Without it (no engine), the coach gives only
    * fact tips: no warnings, no action tips, no review.
    */
-  private readonly judge?: Judge;
+  private readonly judge?: CoachJudge;
   /** This decision's warnings shown so far, by choice. */
   private readonly shown = new Map<string, CoachNote>();
   /** A tip waits for the judge's top choice. */
   private tipPending = false;
+  /**
+   * The advanced coach (Normal and Hard daily battles, with the network judge):
+   * it waits for the judge's searched worlds on this decision.
+   */
+  private advancedPending = false;
+  /** When this decision's package was made: an advanced tip later than `ADVANCED_MS` doesn't show. */
+  private packagedAt = 0;
   /** Your choices so far (resumed ones too): the index of the next one's memo. */
   private decisions = 0;
   /** The coach's memo on the choice just made, for the next package. */
@@ -126,14 +158,16 @@ export class BattleEngine {
       ...(start.pool ? { pool: start.pool } : {}),
       ...(budget ? { hard: budget } : {}),
       ...(start.aiVersion ? { aiVersion: start.aiVersion } : {}),
+      ...(start.hardVersion ? { hardVersion: start.hardVersion } : {}),
     });
     this.ai = ai;
     this.aiRng = makeRng(tutorial ? deriveSeed(start.battleSeed, 2) : (start.aiSeed as PRNGSeed));
-    this.hard = difficulty === 'hard';
-    this.replay = this.hard ? [...(start.aiChoices ?? [])] : [];
+    this.saves = searches(difficulty);
+    this.replay = this.saves ? [...(start.aiChoices ?? [])] : [];
     this.reported = this.replay.length;
     this.presenter = new SidePresenter('p1', this.sets, format);
-    if (start.coach) {
+    // No coach against Master: the coach plays with Master's brain.
+    if (start.coach && difficulty !== 'master') {
       // A lesson's foe is fixed content, so the coach knows its sets; a daily
       // foe's are hidden, as for the AI.
       const lessonFoe = tutorial ? (start.opponentTeam as Mon[]) : undefined;
@@ -145,7 +179,10 @@ export class BattleEngine {
         tutorial ? 'easy' : difficulty,
         tutorial?.taught ?? Infinity,
       );
-      if (coachEngine)
+      // Lessons keep the search judge their content is checked with (lesson-check.ts).
+      if (coachEngine?.netLoaded && !lessonFoe && coachNetJudge(difficulty))
+        this.judge = new NetJudge(coachEngine, data, start.pool ? { pool: start.pool } : {});
+      else if (coachEngine)
         this.judge = new Judge(coachEngine, data, {
           ...(start.pool ? { pool: start.pool } : {}),
           // Lessons leave near-ties out of the judge's agreement (daily battles don't, yet).
@@ -172,6 +209,8 @@ export class BattleEngine {
       // The coach sees each replayed turn too (with the judge's saved verdict),
       // so its review and one-time tips survive a resume.
       this.coachSees(choice, this.start.coachLog?.[this.decisions] ?? undefined);
+      const view = this.judge?.watch && this.session.view('p1');
+      if (view) this.judge!.watch!(view);
       this.made.push(choice);
       this.settleAi();
       this.session.choose('p1', choice);
@@ -181,6 +220,20 @@ export class BattleEngine {
   }
 
   choose(choice: string): TurnPackage {
+    const blocked = this.submit(choice);
+    if (blocked) return blocked;
+    this.advanceAi();
+    return this.package(false);
+  }
+
+  /**
+   * `choose` in steps, for the worker: makes your choice (a package only if
+   * it was blocked), then `proceed` until it gives the package. In between, an
+   * opponent decision you'd only wait on (a switch after a faint) is left
+   * `thinking`, so the worker can search it with its helpers. The same
+   * decisions as `choose`.
+   */
+  submit(choice: string): TurnPackage | undefined {
     this.settleAi();
     this.coachSees(choice);
     this.made.push(choice);
@@ -190,8 +243,13 @@ export class BattleEngine {
       this.coach?.forget();
       return this.package(false, BLOCKED);
     }
-    this.advanceAi();
-    return this.package(false);
+    return undefined;
+  }
+
+  /** After `submit`: the package, or undefined while an opponent decision is being searched (`ponder`). */
+  proceed(): TurnPackage | undefined {
+    this.settleAi();
+    return this.advanceAi(true) ? undefined : this.package(false);
   }
 
   /**
@@ -206,20 +264,33 @@ export class BattleEngine {
     if (!view) return;
     if (this.coached !== view.request) this.coach!.turn(view);
     if (index < this.start.choices.length) {
-      this.coach!.record(view, choice, null, saved?.verdict, saved?.heeded);
+      if (saved?.advanced?.key) this.coach!.shownBefore(view, saved.advanced.key);
+      this.coach!.record(
+        view,
+        choice,
+        null,
+        saved?.verdict,
+        saved?.heeded,
+        saved?.advanced?.review,
+      );
       return;
     }
+    // Picked before the advanced coach ran: it still finds this decision's tips for the review.
+    if (this.advancedPending) this.runAdvanced(view, false);
     const verdict = this.readVerdict(this.judge?.verdict(choice));
     const shown = this.shown.get(choice);
     // A warning you listened to: the last one shown on another pick.
     const other = [...this.shown].filter(([c]) => c !== choice).at(-1);
     const heeded = other && { choice: other[0], note: other[1] };
     this.coach!.record(view, choice, shown ?? null, verdict, heeded);
-    if (verdict || shown || heeded)
+    const advanced = this.coach!.advancedMemo(view);
+    const hasAdvanced = !!(advanced.review || advanced.key);
+    if (verdict || shown || heeded || hasAdvanced)
       this.memo = {
         ...(verdict ? { verdict } : {}),
         ...(shown ? { ignored: shown.text } : {}),
         ...(heeded ? { heeded } : {}),
+        ...(hasAdvanced ? { advanced } : {}),
       };
   }
 
@@ -267,13 +338,29 @@ export class BattleEngine {
       : verdict;
   }
 
-  /** Works on the judge for up to `ms`; true while there's more to do. */
+  /** Works on the judge for up to `ms`; true while there's more to do here (not counting worlds handed out). */
   coachWork(ms: number): boolean {
     const judge = this.judge;
     if (!judge?.busy) return false;
     const end = performance.now() + ms;
-    while (judge.step() && performance.now() < end && !(this.tipPending && this.tipReady()));
-    return judge.busy;
+    let more: boolean;
+    do more = judge.step();
+    while (
+      more &&
+      performance.now() < end &&
+      !((this.tipPending || this.advancedPending) && this.tipReady())
+    );
+    return more;
+  }
+
+  /** The verdict on `choice` is ready, or can't be. */
+  coachReady(choice: string): boolean {
+    return !this.judge?.busy || !!this.judge.verdict(choice);
+  }
+
+  /** A world of the coach's judge for another worker to search, if one's left (the network judge). */
+  claimJudge(): NetClaim | undefined {
+    return this.judge?.claim?.();
   }
 
   /**
@@ -294,12 +381,52 @@ export class BattleEngine {
   coachTip(): CoachNote | undefined {
     const top = this.judge?.best;
     const view = this.session.view('p1');
-    if (!this.tipPending || !top || !view || !this.coach || !this.tipReady()) return undefined;
+    if (!(this.tipPending || this.advancedPending) || !top || !view || !this.coach)
+      return undefined;
+    if (!this.tipReady()) return undefined;
+    if (this.start.tutorial?.guide) {
+      this.tipPending = false;
+      return guideNote(view, top);
+    }
+    // An advanced tip outranks a basic one waiting (DESIGN.md §22), if it's in time.
+    const advanced = this.advancedPending
+      ? this.runAdvanced(view, performance.now() - this.packagedAt <= ADVANCED_MS)
+      : undefined;
+    if (advanced) {
+      this.tipPending = false;
+      return advanced;
+    }
+    if (!this.tipPending) return undefined;
     this.tipPending = false;
-    if (this.start.tutorial?.guide) return guideNote(view, top);
+    return this.coach.confirm(view, top, this.sound());
+  }
+
+  /** A check of a choice against what the opponent is really doing (judge.ts `soundPick`), when known (Normal). */
+  private sound(): ((choice: string) => boolean) | undefined {
     const read = this.foeRead();
     const values = read && this.judge!.against(read);
-    return this.coach.confirm(view, top, values ? (c) => soundPick(c, values) : undefined);
+    return values ? (c) => soundPick(c, values) : undefined;
+  }
+
+  /** The advanced coach on this decision, once the judge has searched it; `show` false: for the review only. */
+  private runAdvanced(view: SideView, show: boolean): CoachNote | undefined {
+    const judge = this.judge as NetJudge;
+    const worlds = judge.searched();
+    const top = judge.best;
+    if (!worlds || !top) return undefined;
+    this.advancedPending = false;
+    const sound = this.sound();
+    return this.coach!.advanced(
+      view,
+      {
+        worlds,
+        legal: legalChoices(view.request),
+        top,
+        value: (w) => judge.value(w),
+        ...(sound ? { sound } : {}),
+      },
+      show,
+    );
   }
 
   /**
@@ -315,8 +442,8 @@ export class BattleEngine {
       {
         ...start,
         choices: this.made.slice(0, decision),
-        // Hard's choices as made, so the replay needs no search.
-        ...(this.hard ? { aiChoices: [...this.aiLog] } : {}),
+        // Hard and Master's choices as made, so the replay needs no search.
+        ...(this.saves ? { aiChoices: [...this.aiLog] } : {}),
       },
       this.engine,
       this.budget,
@@ -332,7 +459,7 @@ export class BattleEngine {
     return new ReviewJob(
       this.start,
       [...this.made],
-      this.hard ? [...this.aiLog] : [],
+      this.saves ? [...this.aiLog] : [],
       judge,
       this.engine,
     );
@@ -355,13 +482,18 @@ export class BattleEngine {
     return this.package(false);
   }
 
-  /** Hard: searches a slice (one world) of the opponent's decision; true while there's more. */
+  /** Hard and Master: works a slice (a world, or Master's whole decision) of the opponent's decision; true while there's more. */
   ponder(): boolean {
     return !!this.thinking?.step();
   }
 
-  /** Hard: a world of the opponent's decision for another worker to search, if one's left. */
-  claimWorld(): WorldClaim | undefined {
+  /** Hard and Master: the opponent's decision is still being searched. */
+  thinkingLeft(): boolean {
+    return !!this.thinking;
+  }
+
+  /** Hard and Master: a world of the opponent's decision for another worker to search, if one's left. */
+  claimWorld(): WorldClaim | NetClaim | undefined {
     return this.thinking?.claim();
   }
 
@@ -381,48 +513,52 @@ export class BattleEngine {
     this.session.choose('p2', choice);
   }
 
-  /** The opponent answers every request it has; on Hard, one made while you choose waits for `ponder`. */
-  private advanceAi() {
+  /**
+   * The opponent answers every request it has; on Hard and Master, one made
+   * while you choose waits for `ponder`. With `defer`, so does one you'd wait
+   * on, and this returns true: `settleAi` and advance again once it's searched.
+   */
+  private advanceAi(defer = false): boolean {
     this.pending = undefined;
     for (
       let view = this.session.view('p2');
       view && !this.session.ended;
       view = this.session.view('p2')
     ) {
-      if (!this.hard) {
+      if (!this.saves) {
         const choice = this.ai.choose(view, this.aiRng);
         if (this.coach && view.request.requestType === 'move') this.pending = { view, choice };
         this.session.choose('p2', choice);
         continue;
       }
-      // Hard: a saved choice skips the search (a resume would otherwise redo every
-      // one). Each decision gets its own rng, so skipping one doesn't shift the rest.
+      // Hard and Master: a saved choice skips the search (a resume would otherwise redo
+      // every one), though Master still sees the decision. Each decision gets its own
+      // rng, so skipping one doesn't shift the rest.
       const saved = this.replay.shift();
       let choice: string;
-      if (saved !== undefined && legalChoices(view.request).includes(saved)) choice = saved;
-      else {
+      if (saved !== undefined && legalChoices(view.request).includes(saved)) {
+        choice = saved;
+        this.ai.watch?.(view);
+      } else {
         // Searched from here on; the saved tail (if any) is replaced from this point.
         if (saved !== undefined) this.reported = Math.min(this.reported, this.aiLog.length);
         this.replay = [];
         const rng = makeRng(deriveSeed(this.start.aiSeed, this.aiLog.length));
         const job =
-          this.ai instanceof HardPolicy
+          this.ai instanceof HardPolicy || this.ai instanceof NetPolicy
             ? this.ai.think(view, rng)
-            : {
-                step: () => false,
-                claim: () => undefined,
-                result: () => this.ai.choose(view, rng),
-              };
+            : wholeJob(this.ai, view, rng);
         // While you choose, the search runs in the worker's spare time (`ponder`).
-        if (this.youChoose()) {
+        if (this.youChoose() || defer) {
           this.thinking = job;
-          return;
+          return !this.youChoose();
         }
         choice = job.result();
       }
       this.aiLog.push(choice);
       this.session.choose('p2', choice);
     }
+    return false;
   }
 
   private package(resumed: boolean, note?: string): TurnPackage {
@@ -445,6 +581,7 @@ export class BattleEngine {
       this.memo = undefined;
       const view = this.session.view('p1');
       this.tipPending = false;
+      this.advancedPending = false;
       if (view && pkg.controls) {
         const turn = this.coach.turn(view);
         pkg.coach = turn.tip ? { tip: turn.tip } : {};
@@ -457,6 +594,11 @@ export class BattleEngine {
           guideKey(String(this.start.battleSeed), this.session.choices('p1').length),
         );
         this.tipPending = !!turn.pending && !!this.judge;
+        this.advancedPending =
+          this.judge instanceof NetJudge &&
+          !this.start.tutorial &&
+          view.request.requestType === 'move';
+        this.packagedAt = performance.now();
         if (this.start.tutorial?.guide) {
           // The guide's tip replaces the coach's: the judge's top move, or the
           // teammate to send in when one of yours has fainted.

@@ -69,7 +69,7 @@ export interface SwitchFact {
   slot: number;
   species: string;
   hpFrac: number;
-  /** Spikes damage on the way in, as a fraction of max HP. */
+  /** Spikes and Stealth Rock damage on the way in, as a fraction of max HP. */
   entry: number;
   /** The foe's hit on it as it comes in (after Spikes). */
   taken: Threat;
@@ -78,6 +78,8 @@ export interface SwitchFact {
 }
 
 export interface Facts {
+  /** Dex generation of the format. */
+  gen: number;
   state: AIState;
   /** The foe's active, as the player sees it (its forme). */
   foe?: string;
@@ -102,19 +104,33 @@ const NO_THREAT: Threat = { frac: 0, ko: 0, move: '', type: '', effectiveness: 1
 /** Moves that knock out their user. */
 const SELF_KO = new Set(['explosion', 'selfdestruct']);
 
-/** Abilities that make a type of move do nothing (Gen 3 on). */
-const ABSORB: Record<string, string> = {
-  levitate: 'Ground',
-  voltabsorb: 'Electric',
-  waterabsorb: 'Water',
-  flashfire: 'Fire',
+/** Abilities that make a type of move do nothing, from the generation they do so. */
+const ABSORB: Record<string, { type: string; from: number }> = {
+  levitate: { type: 'Ground', from: 3 },
+  voltabsorb: { type: 'Electric', from: 3 },
+  waterabsorb: { type: 'Water', from: 3 },
+  flashfire: { type: 'Fire', from: 3 },
+  motordrive: { type: 'Electric', from: 4 },
+  dryskin: { type: 'Water', from: 4 },
+  lightningrod: { type: 'Electric', from: 5 },
+  stormdrain: { type: 'Water', from: 5 },
+  sapsipper: { type: 'Grass', from: 5 },
 };
 const ABILITY_NAMES: Record<string, string> = {
   levitate: 'Levitate',
   voltabsorb: 'Volt Absorb',
   waterabsorb: 'Water Absorb',
   flashfire: 'Flash Fire',
+  motordrive: 'Motor Drive',
+  dryskin: 'Dry Skin',
+  lightningrod: 'Lightning Rod',
+  stormdrain: 'Storm Drain',
+  sapsipper: 'Sap Sipper',
 };
+/** Our abilities that ignore the foe's (Gen 4 on). */
+const MOLD_BREAKER = new Set(['moldbreaker', 'teravolt', 'turboblaze']);
+/** Sound moves, which go through a Substitute from Gen 6 on. */
+const SOUND_STATUS = new Set(['sing', 'grasswhistle']);
 
 /** Status moves and the major status they cause. */
 const STATUS_MOVES: Record<string, string> = {
@@ -194,7 +210,15 @@ export function turnFacts(view: SideView, data: SetsFile): Facts {
   const toOwn = makeField(state.weather, state.foeSide, state.ownSide, state.terrain);
   const foe = state.foeActive;
   const forced = view.request.requestType === 'switch';
-  const facts: Facts = { state, foeFirst: 0.5, moves: [], switches: [], forced, foeMoves: {} };
+  const facts: Facts = {
+    gen: gen.num,
+    state,
+    foeFirst: 0.5,
+    moves: [],
+    switches: [],
+    forced,
+    foeMoves: {},
+  };
   if (!foe || view.request.requestType === 'wait' || view.request.requestType === 'team') {
     return facts;
   }
@@ -252,11 +276,16 @@ export function turnFacts(view: SideView, data: SetsFile): Facts {
     if (mon.active || mon.fainted) continue;
     const choice = `switch ${mon.slot}`;
     if (!legalChoices(view.request).includes(choice)) continue;
-    const grounded =
-      !typesOf(gen, mon.species).includes('Flying') && toId(mon.set.ability) !== 'levitate';
-    const entry = grounded ? [0, 1 / 8, 1 / 6, 1 / 4][Math.min(3, state.ownSide.spikes)]! : 0;
-    const calc = ownCalc(gen, view, { ...mon, hpFrac: Math.max(0.01, mon.hpFrac - entry) });
     const req = view.request.side.pokemon[mon.slot - 1]!;
+    const ability = toId(mon.set.ability);
+    const grounded =
+      !typesOf(gen, mon.species).includes('Flying') &&
+      ability !== 'levitate' &&
+      toId(req.item ?? '') !== 'airballoon';
+    const spikes = grounded ? [0, 1 / 8, 1 / 6, 1 / 4][Math.min(3, state.ownSide.spikes)]! : 0;
+    const rocks = state.ownSide.sr ? effectiveness(gen, 'Rock', mon.forme) / 8 : 0;
+    const entry = ability === 'magicguard' ? 0 : spikes + rocks;
+    const calc = ownCalc(gen, view, { ...mon, hpFrac: Math.max(0.01, mon.hpFrac - entry) });
     facts.switches.push({
       choice,
       slot: mon.slot,
@@ -310,7 +339,8 @@ export function turnFacts(view: SideView, data: SetsFile): Facts {
         info.category === 'Status' || forcedMove ? null : effectiveness(gen, info.type, foe.forme),
     };
     const noEffect =
-      !forcedMove && whyNoEffect(gen, fact, foe, foeTypes, foeAbility, state, sleeping);
+      !forcedMove &&
+      whyNoEffect(gen, fact, foe, foeTypes, foeAbility, state, sleeping, toId(me.set.ability));
     if (noEffect) fact.noEffect = noEffect;
     facts.moves.push(fact);
   });
@@ -329,12 +359,22 @@ function whyNoEffect(
   ability: string | undefined,
   state: AIState,
   sleeping: boolean,
+  /** Our active's ability. */
+  own: string,
 ): NoEffect | undefined {
+  // Mold Breaker and the like go through the foe's ability (Gen 4 on).
+  if (gen.num >= 4 && MOLD_BREAKER.has(own)) ability = undefined;
   if (move.category !== 'Status') {
     // Fixed-damage and type-chart immunities both show as a zero multiplier.
-    if (move.effectiveness === 0) return { kind: 'type', type: move.type };
-    if (ability && ABSORB[ability] === move.type)
-      return { kind: 'ability', ability: ABILITY_NAMES[ability]!, type: move.type };
+    if (move.effectiveness === 0) {
+      // Scrappy hits Ghost types with Normal and Fighting moves (Gen 4 on).
+      const scrappy =
+        gen.num >= 4 && own === 'scrappy' && ['Normal', 'Fighting'].includes(move.type);
+      return scrappy ? undefined : { kind: 'type', type: move.type };
+    }
+    const absorb = ability ? ABSORB[ability] : undefined;
+    if (absorb && absorb.type === move.type && gen.num >= absorb.from)
+      return { kind: 'ability', ability: ABILITY_NAMES[ability!]!, type: move.type };
     return undefined;
   }
   const hazard = HAZARD_MAX[move.id];
@@ -346,12 +386,17 @@ function whyNoEffect(
   }
   const status = STATUS_MOVES[move.id];
   if (!status) return undefined;
-  if (foe.substitute) return { kind: 'substitute' };
+  if (foe.substitute && !(gen.num >= 6 && SOUND_STATUS.has(move.id))) return { kind: 'substitute' };
   if (foe.status) return { kind: 'statused' };
   // Thunder Wave and Ground types: the type chart, like an attack.
   if (move.id === 'thunderwave' && foeTypes.includes('Ground'))
     return { kind: 'type', type: 'Electric' };
-  const typeImmune = STATUS_IMMUNE[status]!.find((t) => foeTypes.includes(t));
+  // Electric types can't be paralyzed from Gen 6 on.
+  const immune = [
+    ...STATUS_IMMUNE[status]!,
+    ...(status === 'par' && gen.num >= 6 ? ['Electric'] : []),
+  ];
+  const typeImmune = immune.find((t) => foeTypes.includes(t));
   if (typeImmune) return { kind: 'statusImmune', type: typeImmune, status };
   if (ability && STATUS_ABILITY[status]!.includes(ability)) {
     return { kind: 'ability', ability: abilityName(gen, ability), type: '' };

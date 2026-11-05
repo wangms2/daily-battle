@@ -34,7 +34,7 @@ export type WarningReason =
  *   - Easy: warning against an Explosion pick (+2.6, CI −0.2 to +5.3; Easy
  *     rarely answers Explosion, so it works anyway).
  *   - Normal: recommending Explosion (10 cases; quiet until a bigger run).
- *   - Hard: not checked yet (step 5); the coach isn't offered there.
+ *   - Hard: Explosion both ways, quiet like Easy's and Normal's.
  */
 export const QUIET_REASONS: Record<'easy' | 'normal' | 'hard', readonly WarningReason[]> = {
   easy: ['selfKo'],
@@ -85,7 +85,7 @@ const STRONGER = 0.2;
 export const WINNING_LEAD = 2;
 
 const SELF_KO = new Set(['explosion', 'selfdestruct']);
-const PROTECT = new Set(['protect', 'detect', 'endure']);
+const PROTECT = new Set(['protect', 'detect', 'endure', 'kingsshield', 'spikyshield']);
 /** Healing moves that fail at full HP. */
 const HEAL = new Set([
   'rest',
@@ -96,6 +96,8 @@ const HEAL = new Set([
   'moonlight',
   'morningsun',
   'synthesis',
+  'roost',
+  'healorder',
 ]);
 /** Below this much HP, saving our active isn't worth a switch: no "staysKo" warning. */
 const WORTH_SAVING = 0.3;
@@ -161,7 +163,8 @@ function explain(
   if (winningAnyway(f)) return undefined;
   const foe = f.foe;
   const me = f.me;
-  const move = (c: string) => f.moves.find((m) => m.choice === c);
+  // A Mega Evolving move ("move 1 mega") is judged as its move.
+  const move = (c: string) => f.moves.find((m) => m.choice === c.replace(/ mega$/, ''));
   const sw = (c: string) => f.switches.find((s) => s.choice === c);
   const pm = move(verdict.choice);
   const ps = sw(verdict.choice);
@@ -293,10 +296,14 @@ function explain(
     return out('noHeal', `${foe} can barely hurt ${me}: a free turn to heal with ${tm.name}.`);
 
   // Rapid Spin with nothing to clear.
-  if (pm.id === 'rapidspin' && f.state.ownSide.spikes === 0 && !seeded(view)) {
+  const { spikes, sr, tspikes } = f.state.ownSide;
+  if (pm.id === 'rapidspin' && spikes === 0 && !sr && tspikes === 0 && !seeded(view)) {
     return out(
       'noSpikes',
-      `There are no Spikes on your side to clear, so Rapid Spin only does a little damage.` +
+      (f.gen >= 4
+        ? `There are no hazards on your side to clear`
+        : `There are no Spikes on your side to clear`) +
+        `, so Rapid Spin only does a little damage.` +
         better(),
     );
   }

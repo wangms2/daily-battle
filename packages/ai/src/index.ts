@@ -22,6 +22,7 @@ export {
   searchWorlds,
   type DecisionJob,
   type DecisionRecord,
+  type NetClaim,
   type WorldClaim,
   type HardPolicyOptions,
   type HardStats,
@@ -31,19 +32,23 @@ export {
 } from './hard/policy';
 export { toChoice } from './hard/choices';
 export {
+  MASTER_DEFAULTS,
   NetPolicy,
   pickSearched,
   type NetPolicyOptions,
+  type NetPrepared,
   type NetRecord,
   type NetStats,
 } from './master/policy';
-export { AI_VERSION, EASY_VERSION, HARD_VERSION } from './version';
+export { AI_VERSION, EASY_VERSION, HARD_VERSION, MASTER_VERSION } from './version';
 export {
   aiFor,
   aiVersion,
+  coachNetJudge,
   DIFFICULTIES,
   difficultyTag,
   isDifficulty,
+  searches,
   type AiForOptions,
   type Difficulty,
 } from './difficulty';

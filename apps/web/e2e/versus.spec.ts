@@ -83,6 +83,8 @@ async function quick(page: Page) {
           beginnerHints: false,
           battleSpeed: 'instant',
           animations: false,
+          // The brief's "Want a coach?" offer, already answered.
+          coachOffered: { gen3ou: true, gen4ou: true, gen5ou: true, gen6ou: true },
           shownExplainers: [
             'welcome',
             'cores',

@@ -25,6 +25,13 @@ import {
 import type { Verdict } from './judge';
 import { TIP_LESSON } from './course';
 import { buildReview, decision, type Decision, type Heeded, type Review } from './review';
+import {
+  advancedTips,
+  type AdvancedFind,
+  type AdvancedInput,
+  type AdvancedRule,
+} from './advanced/coach';
+import type { AdvancedReview } from './advanced/review';
 
 /** The kinds of tip. Warnings have their own reasons (`WarningReason`, explain.ts). */
 export type CoachRule =
@@ -39,7 +46,7 @@ export type CoachRule =
 
 export interface CoachNote {
   /** `guide`: a guided replay's pick for the turn (guide.ts). */
-  rule: CoachRule | WarningReason | 'guide';
+  rule: CoachRule | AdvancedRule | WarningReason | 'guide';
   text: string;
   /** The lesson that explains it, if any. */
   lesson?: string;
@@ -68,7 +75,20 @@ const SURE_KO = 0.85;
 /** Sure enough to say who moves first. */
 const SURE_FIRST = 0.95;
 
-const SETUP = new Set(['dragondance', 'calmmind', 'swordsdance', 'bulkup', 'curse', 'agility']);
+const SETUP = new Set([
+  'dragondance',
+  'calmmind',
+  'swordsdance',
+  'bulkup',
+  'curse',
+  'agility',
+  'nastyplot',
+  'rockpolish',
+  'quiverdance',
+  'shellsmash',
+  'coil',
+  'shiftgear',
+]);
 /** Moves that knock out the user too: never the move to recommend. */
 const SELF_KO = new Set(['explosion', 'selfdestruct', 'memento', 'healingwish', 'lunardance']);
 
@@ -157,6 +177,10 @@ export class Coach {
     tip?: CoachNote;
     /** Candidates waiting for the judge's top choice, in order. */
     pending?: Candidate[];
+    /** The advanced coach's tips for it, once found (`advanced`). */
+    advanced?: AdvancedFind[];
+    /** The one-time key of the advanced tip shown, if one did. */
+    shownKey?: string;
   };
 
   /** Warning reasons the coach keeps quiet about against this opponent. */
@@ -213,6 +237,53 @@ export class Coach {
   }
 
   /**
+   * The advanced coach (advanced/coach.ts) on the current request, once the
+   * network judge has searched it (Normal and Hard daily battles). The first of
+   * its tips not shown before this battle shows if the pacing allows and nothing
+   * has shown this turn; it outranks the basic tips still waiting, which are
+   * dropped. Either way its first tip is kept for the review. With `show` false
+   * (too late to show), it's for the review only. Once a request.
+   */
+  advanced(
+    view: SideView,
+    input: Omit<AdvancedInput, 'facts'>,
+    show = true,
+  ): CoachNote | undefined {
+    const t = this.tipFor;
+    if (!t || t.request !== view.request || t.advanced || view.request.requestType === 'wait')
+      return undefined;
+    const facts = this.factsFor(view);
+    let found: AdvancedFind[] = [];
+    try {
+      found = advancedTips({ ...input, facts });
+    } catch {
+      // An engine error in a counterfactual search: no advanced tip this turn.
+    }
+    t.advanced = found;
+    if (!show || t.tip || facts.state.turn - this.lastTip < TIP_GAP) return undefined;
+    const hit = found.find((f) => !this.seen.has(f.key));
+    if (!hit) return undefined;
+    delete t.pending;
+    t.shownKey = hit.key;
+    this.show({ note: { rule: hit.rule, text: hit.text }, key: hit.key }, facts);
+    return t.tip;
+  }
+
+  /** The current request's advanced review texts and shown tip's key, to save with the choice. */
+  advancedMemo(view: SideView): { review?: AdvancedReview; key?: string } {
+    const t = this.tipFor;
+    if (t?.request !== view.request) return {};
+    const review = t.advanced?.[0]?.review;
+    return { ...(review ? { review } : {}), ...(t.shownKey ? { key: t.shownKey } : {}) };
+  }
+
+  /** On resume: an advanced tip shown on a replayed decision, so it isn't shown again. */
+  shownBefore(view: SideView, key: string): void {
+    this.seen.add(key);
+    this.lastTip = this.factsFor(view).state.turn;
+  }
+
+  /**
    * The judge's top choice for the current request is known: the first waiting
    * tip that's a fact or recommends `top`, if any. With `sound`, a check of a
    * choice against what the foe is really doing (judge.ts `soundPick`), a tip
@@ -255,7 +326,8 @@ export class Coach {
    * the choice is played, while the view still shows the decision. `shown` is
    * the warning the player saw and overrode, if any; `verdict` is the judge's
    * on the choice (the review only uses judged decisions); `heeded`, a warning
-   * on an earlier pick that the player listened to.
+   * on an earlier pick that the player listened to; `advanced`, the advanced
+   * coach's review texts for the decision (default: this request's, if found).
    */
   record(
     view: SideView,
@@ -263,7 +335,9 @@ export class Coach {
     shown?: CoachNote | null,
     verdict?: Verdict,
     heeded?: Heeded,
+    advanced?: AdvancedReview,
   ): void {
+    advanced ??= this.advancedMemo(view).review;
     const index = this.choices++;
     this.recorded = false;
     if (view.request.requestType === 'wait') return;
@@ -278,6 +352,7 @@ export class Coach {
       verdict,
       e ? this.warnNote(e, facts, choice) : undefined,
       heeded,
+      advanced,
     );
     if (d) this.decisions.push(d);
     this.recorded = !!d;
@@ -455,7 +530,7 @@ export class Coach {
 
 /** The lesson for a move that does nothing: types, status, or hazards. */
 function noEffectLesson(f: Facts, choice: string): LessonKey {
-  const m = f.moves.find((x) => x.choice === choice);
+  const m = f.moves.find((x) => x.choice === choice.replace(/ mega$/, ''));
   if (m?.noEffect?.kind === 'hazardMax') return 'hazard';
   return m?.category === 'Status' && m.noEffect?.kind !== 'type' ? 'status' : 'noEffect';
 }

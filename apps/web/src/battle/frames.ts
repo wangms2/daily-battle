@@ -1,7 +1,7 @@
 // What the battle worker sends the UI: plain data describing only what the
 // player's side can see. No simulator types cross this boundary.
 import type { Difficulty } from '@daily-battle/ai/version';
-import type { CoachNote, Heeded, Review, Verdict } from '@daily-battle/tutorial';
+import type { AdvancedReview, CoachNote, Heeded, Review, Verdict } from '@daily-battle/tutorial';
 import type { Position } from '@daily-battle/tutorial/lessons';
 
 export type Who = 'you' | 'foe';
@@ -196,6 +196,11 @@ export interface CoachMemo {
   ignored?: string;
   /** A warning you listened to (you picked again): your first pick and the warning. */
   heeded?: Heeded;
+  /**
+   * The advanced coach on the decision (Normal and Hard): its review texts, and
+   * the one-time key of the tip it showed, so a resume doesn't show it again.
+   */
+  advanced?: { review?: AdvancedReview; key?: string };
 }
 
 /** A past decision replayed (the coach's review): frozen at the decision, then the turn as played. */
@@ -243,6 +248,8 @@ export interface EngineStart {
   difficulty?: Difficulty;
   /** The AI version the attempt was saved under, if older than the current one (Easy and Normal). */
   aiVersion?: number;
+  /** Hard: the Hard version the attempt was saved under, if older (it keeps its search budget). */
+  hardVersion?: number;
   /** The week's pool species: Hard's prior for your unseen Pokémon, and the coach's for the foe's. */
   pool?: string[];
   /** Hard: the AI's saved choices, replayed on resume instead of searched again. */
@@ -285,7 +292,7 @@ export type ToWorker =
   /** Unanswered hints (DESIGN.md §7): the page is hidden or not (background work pauses). */
   | { type: 'visibility'; hidden: boolean }
   /** Fetch and compile the Hard engine for the format now, ahead of a start. */
-  | { type: 'warm'; format: string };
+  | { type: 'warm'; format: string; net?: boolean };
 
 export type FromWorker =
   | { type: 'package'; pkg: TurnPackage }

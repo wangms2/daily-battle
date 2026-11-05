@@ -286,16 +286,15 @@ export function Battle({
     [backend],
   );
   const silenced = useRef(new Set<string>());
-  // A battle played without the coach (Gen 3 dailies) can still be reviewed
-  // once it's over, on request: the coach judges its choices then.
+  // A battle played without the coach can still be reviewed once it's over,
+  // on request: the coach judges its choices then.
   const canReview =
     !start.coach &&
     !live &&
     !start.tutorial &&
     !staged &&
-    (start.format ?? DEFAULT_FORMAT) === 'gen3ou' &&
-    // Not against Hard: its warnings aren't checked there yet (step 5).
-    start.difficulty !== 'hard' &&
+    // Not against Master, the coach's own brain.
+    start.difficulty !== 'master' &&
     !!backend.review;
   const [reviewProgress, setReviewProgress] = useState<{ done: number; total: number } | null>(
     null,

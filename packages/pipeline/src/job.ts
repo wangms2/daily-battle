@@ -1,7 +1,10 @@
 // One simulated battle: a player bot on a pool team (p1) against the opponent
 // AI on a daily opponent (p2). Plain data, so jobs can be sent to workers.
 import { aiFor, midBot, NaivePolicy, strongBot, type KnownSets } from '@daily-battle/ai';
-import type { Difficulty } from '@daily-battle/ai/version';
+import { MASTER_NET_PATH, searches, type Difficulty } from '@daily-battle/ai/version';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { genOf, setsFor, type SetsFile } from '@daily-battle/data';
 import { loadEngine } from '@daily-battle/engine-wasm/node';
 import type { Style } from '@daily-battle/gen';
@@ -24,7 +27,7 @@ export interface Job {
   index: number;
   /** The opponent AI's difficulty; Normal when omitted (schedule validation). */
   difficulty?: Difficulty;
-  /** Hard: the week's pool species (prior for unseen foes). */
+  /** Hard and Master: the week's pool species (prior for unseen foes). */
   pool?: string[];
   /** Hard: search iterations per decision (default: the shipped budget). */
   hardIterations?: number;
@@ -57,15 +60,27 @@ function playerPolicy(job: Job, data: SetsFile): Policy {
 
 function opponentPolicy(job: Job, data: SetsFile): Policy {
   const difficulty = job.difficulty ?? 'normal';
-  if (difficulty !== 'hard') return aiFor({ difficulty, style: job.style, data });
+  if (!searches(difficulty)) return aiFor({ difficulty, style: job.style, data });
   return aiFor({
     difficulty,
     style: job.style,
     data,
     engine: loadEngine(genOf(job.format)),
+    ...(difficulty === 'master' ? { net: masterNet() } : {}),
     ...(job.pool ? { pool: job.pool } : {}),
     ...(job.hardIterations ? { hard: { iterations: job.hardIterations } } : {}),
   });
+}
+
+let net: Uint8Array | undefined;
+
+/** Master's network, as the site serves it. */
+function masterNet(): Uint8Array {
+  return (net ??= new Uint8Array(
+    readFileSync(
+      join(fileURLToPath(import.meta.url), '../../../../apps/web/public', MASTER_NET_PATH),
+    ),
+  ));
 }
 
 export function runJob(job: Job): JobResult {

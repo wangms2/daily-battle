@@ -1,6 +1,6 @@
 // Daily brief (DESIGN.md §4.3): today's opponent (species only), your team,
 // the lead, and today's single change, all on one screen.
-import type { Difficulty } from '@daily-battle/ai/version';
+import { coachNetJudge, searches, type Difficulty } from '@daily-battle/ai/version';
 import type { ScheduleFile } from '@daily-battle/gen/schedule';
 import clsx from 'clsx';
 import { useEffect, useState, type ReactNode } from 'react';
@@ -130,7 +130,7 @@ export function DailyBrief({
   onDitch,
   difficulty = 'normal',
   onDifficulty,
-  hardAvailable = true,
+  unavailable = [],
   coach,
   usingPracticeTeam = false,
   lost: lostProp,
@@ -147,8 +147,8 @@ export function DailyBrief({
   /** The CPU difficulty for this game; each has its own tries and streak. */
   difficulty?: Difficulty;
   onDifficulty?: (d: Difficulty) => void;
-  /** Whether this build has the Hard engine for the game. */
-  hardAvailable?: boolean;
+  /** Difficulties this build or browser can't play for the game. */
+  unavailable?: readonly Difficulty[];
   /** Open with the team ready to change (after a loss). */
   initialEdit?: boolean;
   /** Throw the weekly team away and build a new one (ends the streak). */
@@ -212,15 +212,19 @@ export function DailyBrief({
   useEffect(() => {
     preloadSprites(opponent.team.map((s) => s.species));
   }, [opponent]);
-  // Load the battle engine while the player looks at the opponent, and Hard's
-  // search engine (the coach's judge uses it too) when it'll be needed.
+  // Load the battle engine while the player looks at the opponent, and the
+  // search engine (and Master's network, which the coach's judge uses too)
+  // when they'll be needed.
   useEffect(() => {
     if (typeof Worker !== 'undefined') warmBattleWorker();
   }, []);
-  const needsSearch = (difficulty === 'hard' && hardAvailable) || !!coach?.on;
+  const playable = !unavailable.includes(difficulty);
+  const needsSearch = (searches(difficulty) && playable) || !!coach?.on;
+  const needsNet =
+    (difficulty === 'master' && playable) || (!!coach?.on && coachNetJudge(difficulty));
   useEffect(() => {
-    if (needsSearch) warmHardEngine(activeFormat());
-  }, [needsSearch]);
+    if (needsSearch) warmHardEngine(activeFormat(), needsNet);
+  }, [needsSearch, needsNet]);
 
   const editing = mode.kind !== 'view';
   const setEditing = (on: boolean) => {
@@ -568,8 +572,9 @@ export function DailyBrief({
         <DifficultyPicker
           value={difficulty}
           onChange={onDifficulty}
-          hardAvailable={hardAvailable}
+          unavailable={unavailable}
           disabled={inProgress}
+          compact={!wide}
         />
       </div>
     </div>

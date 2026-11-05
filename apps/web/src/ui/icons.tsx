@@ -1,4 +1,4 @@
-import type { SVGProps } from 'react';
+import { useId, type SVGProps } from 'react';
 
 const base = (props: SVGProps<SVGSVGElement>) => ({
   width: 20,
@@ -87,25 +87,51 @@ export const DiceIcon = (p: SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
-/** A tiny ball for a difficulty: Premier (Easy), Poké (Normal), Ultra (Hard). */
+/** A tiny ball for a difficulty: Poké (Easy), Great (Normal), Ultra (Hard), Master (Master). */
 export const BallIcon = ({
   kind,
   ...p
-}: SVGProps<SVGSVGElement> & { kind: 'poke' | 'ultra' | 'premier' }) => {
-  const ring = kind === 'premier' ? '#d1434b' : '#2b2d36';
-  const top = kind === 'ultra' ? '#26252b' : kind === 'poke' ? '#d1434b' : '#f4f3f1';
+}: SVGProps<SVGSVGElement> & { kind: 'poke' | 'great' | 'ultra' | 'master' }) => {
+  // Unique per icon: a repeated id can leave the clip unapplied in some browsers.
+  const clip = `ball-${useId().replace(/\W/g, '')}`;
+  const ring = '#2b2d36';
+  const top = {
+    ultra: '#26252b',
+    poke: '#d1434b',
+    great: '#3a72d6',
+    master: '#7a3ea6',
+  }[kind];
   return (
     <svg width={14} height={14} viewBox="0 0 20 20" aria-hidden {...p}>
-      <clipPath id={`ball-${kind}`}>
+      <clipPath id={clip}>
         <circle cx="10" cy="10" r="9" />
       </clipPath>
-      <g clipPath={`url(#ball-${kind})`}>
+      <g clipPath={`url(#${clip})`}>
         <rect width="20" height="20" fill="#f4f3f1" />
         <rect width="20" height="10" fill={top} />
+        {kind === 'great' && (
+          <>
+            <path d="M1 4.2l4.6-2.4 1 3.4L1.6 7.4z" fill="#e0453f" />
+            <path d="M19 4.2l-4.6-2.4-1 3.4 5 2.2z" fill="#e0453f" />
+          </>
+        )}
         {kind === 'ultra' && (
           <>
             <rect x="1" y="3.5" width="4.5" height="3.5" fill="#f2c230" />
             <rect x="14.5" y="3.5" width="4.5" height="3.5" fill="#f2c230" />
+          </>
+        )}
+        {kind === 'master' && (
+          <>
+            <circle cx="3.6" cy="5.6" r="2" fill="#e05a9c" />
+            <circle cx="16.4" cy="5.6" r="2" fill="#e05a9c" />
+            <path
+              d="M7.4 7.4V3.4L10 5.8l2.6-2.4v4"
+              fill="none"
+              stroke="#f4f3f1"
+              strokeWidth="1.3"
+              strokeLinejoin="round"
+            />
           </>
         )}
         <rect y="9" width="20" height="2" fill={ring} />

@@ -323,16 +323,31 @@ export class Engine {
   netSearch(params: NetSearchParams, worlds: readonly NetWorld[]): NetSearchResult[] {
     const p = { ...DEFAULT_NET_SEARCH, ...params };
     const lines = [
-      [p.ownK, p.ownMass, p.foeK, p.foeMass, p.branches, p.branchMass, p.robust].join(' '),
+      [
+        p.ownK,
+        p.ownMass,
+        p.foeK,
+        p.foeMass,
+        p.branches,
+        p.branchMass,
+        p.robust,
+        p.outcomes ? 1 : 0,
+      ].join(' '),
     ];
     for (const w of worlds) {
-      lines.push(['legal', ...w.legal.map((x) => (x ? 1 : 0))].join(' '));
+      lines.push(['legal', ...w.legal.map((x, i) => (x ? (w.must?.[i] ? 2 : 1) : 0))].join(' '));
       lines.push(...viewLines(w.state, w.turn, w.known, w.events), '=');
     }
     const out = this.#call('net_search', lines.join('\n'));
-    return (JSON.parse(out) as NetSearchResult[]).map((r) => ({
+    const nan = (xs: (number | null)[]) => xs.map((s) => (s === null ? NaN : s));
+    type Raw = Omit<NetSearchResult, 'score' | 'replies'> & {
+      score: (number | null)[];
+      replies: (Omit<NetReply, 'q'> & { q: (number | null)[] })[];
+    };
+    return (JSON.parse(out) as Raw[]).map((r) => ({
       ...r,
-      score: r.score.map((s) => (s === null ? NaN : s)),
+      score: nan(r.score),
+      replies: r.replies.map((x) => ({ ...x, q: nan(x.q) })),
     }));
   }
 
@@ -340,6 +355,12 @@ export class Engine {
    * Loads the Master network (a .dbnet file from tools/net/export.py) into this
    * engine; it's reloaded automatically if the instance restarts after a panic.
    */
+  /** Whether a network is loaded (
+etLoad). */
+  get netLoaded(): boolean {
+    return !!this.#net;
+  }
+
   netLoad(bytes: Uint8Array): { params: number } {
     this.#callBytes('net_load', bytes);
     this.#net = bytes;
@@ -430,6 +451,8 @@ export interface NetSearchParams {
   branchMass?: number;
   /** Weight of a choice's worst case over the foe's choices, vs the predicted mean. */
   robust?: number;
+  /** Report each root pair's chance outcomes (NetSearchResult.outcomes), for the coach's risk facts. */
+  outcomes?: boolean;
 }
 
 export const DEFAULT_NET_SEARCH: Required<NetSearchParams> = {
@@ -440,6 +463,7 @@ export const DEFAULT_NET_SEARCH: Required<NetSearchParams> = {
   branches: 6,
   branchMass: 0.98,
   robust: 0.25,
+  outcomes: false,
 };
 
 /** One sampled world to search, from side one's view. */
@@ -450,6 +474,18 @@ export interface NetWorld {
   events: readonly NetEvent[];
   /** Our action slots the game allows. */
   legal: readonly boolean[];
+  /** Our slots searched whatever the network's prior says (the coach's: the player's pick). */
+  must?: readonly boolean[];
+}
+
+/** One of the foe's searched replies at the root. */
+export interface NetReply {
+  /** The foe's slot (null: it has no real choice). */
+  slot: number | null;
+  /** Its predicted chance, over the searched replies. */
+  p: number;
+  /** Each of our searched choices' win chance against it, per slot (NaN: not searched). */
+  q: number[];
 }
 
 export interface NetSearchResult {
@@ -463,6 +499,26 @@ export interface NetSearchResult {
   score: number[];
   /** Positions the network judged. */
   positions: number;
+  /** The foe's searched replies, with our choices' win chances against each. */
+  replies: NetReply[];
+  /** With outcomes: every searched (our choice, foe reply) pair's chance outcomes; else empty. */
+  outcomes: NetOutcome[];
+}
+
+/** One chance outcome (a hit or miss, a crit, a damage roll…) of a pair of choices at the root. */
+export interface NetOutcome {
+  /** Our slot and the foe's (null: no real choice). */
+  own: number | null;
+  foe: number | null;
+  /** Its chance, given the two choices (the pair's searched outcomes sum to 1). */
+  p: number;
+  /** Our win chance after it. */
+  value: number;
+  /** HP lost over each whole team, in full HP bars, and Pokémon fainted. */
+  ownHp: number;
+  foeHp: number;
+  ownKo: number;
+  foeKo: number;
 }
 
 /** Observation v2 sizes (features.rs OBS_FLOATS, OBS_IDS; 14 action slots). */

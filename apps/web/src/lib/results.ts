@@ -40,7 +40,7 @@ export interface DaySummary {
 export type Bucket = Difficulty | 'coached';
 
 /** Every bucket, easiest first: the order a game's share lists them in. */
-export const BUCKETS: readonly Bucket[] = ['easy', 'normal', 'hard', 'coached'];
+export const BUCKETS: readonly Bucket[] = ['easy', 'normal', 'hard', 'master', 'coached'];
 
 const won = (a: Attempt) => a.result === 'win';
 
@@ -78,7 +78,7 @@ export function summarizeDay(
 const breaks = (s: DaySummary) => s.helped || (s.status !== 'none' && s.status !== 'firstTry');
 
 /** Hardest first; coached tries rank below any regular difficulty. */
-const BUCKET_RANK: Bucket[] = ['hard', 'normal', 'easy', 'coached'];
+const BUCKET_RANK: Bucket[] = ['master', 'hard', 'normal', 'easy', 'coached'];
 
 /**
  * The bucket to show for a game played at several difficulties today: the

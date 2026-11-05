@@ -3,12 +3,19 @@
 // with the visit counts combined across worlds. Falls back to the strongest
 // utility AI for Team Preview and anything the engine can't model.
 import { sets as defaultSets, type SetsFile } from '@daily-battle/data';
-import type { Engine, SearchResult } from '@daily-battle/engine-wasm';
+import type {
+  Engine,
+  NetSearchParams,
+  NetSearchResult,
+  NetWorld,
+  SearchResult,
+} from '@daily-battle/engine-wasm';
 import { legalChoices, type Policy, type Rng, type SideView } from '@daily-battle/sim-bridge';
 import type { KnownSets } from '../belief';
 import { STRONG } from '../presets';
 import { UtilityPolicy } from '../policy';
 import { extractState } from '../state';
+import { HARD_ITERATIONS, HARD_VERSION } from '../version';
 import { toChoice } from './choices';
 import { translate, type WorldFoe } from './translate';
 import { sampleWorlds } from './worlds';
@@ -49,8 +56,13 @@ export interface DecisionRecord {
   pickKey?: string;
 }
 
-// 200k beat 40k 57% head to head (120 games, Gen 4); 150k keeps a mid-range phone under ~2 s.
-export const HARD_DEFAULTS = { iterations: 150_000, worlds: 8, variety: 0.9 } as const;
+// 200k beat 40k 57% head to head (120 games, Gen 4). Hard 3 drops to 100k: the Master
+// network (net + search) is the strongest CPU now, and 100k is faster on phones.
+export const HARD_DEFAULTS = {
+  iterations: HARD_ITERATIONS[HARD_VERSION]!,
+  worlds: 8,
+  variety: 0.9,
+} as const;
 
 export interface HardStats {
   decisions: number;
@@ -173,7 +185,7 @@ export function searchWorlds(
  * do it while you choose (DESIGN.md §7). Run to the end it gives exactly what
  * `choose` would: `choose` is this job, run at once.
  */
-export interface DecisionJob {
+export interface DecisionJob<C extends WorldClaim | NetClaim = WorldClaim | NetClaim> {
   /** Does one slice of the work (one world not handed out); true while there's more. */
   step(): boolean;
   /**
@@ -181,7 +193,7 @@ export interface DecisionJob {
    * is left. Results are combined in world order however they arrive, so the
    * choice is the same; a world never given back is searched by `result`.
    */
-  claim(): WorldClaim | undefined;
+  claim(): C | undefined;
   /** Finishes any work left and gives the choice. */
   result(): string;
 }
@@ -190,6 +202,12 @@ export interface DecisionJob {
 export interface WorldClaim {
   world: PreparedWorld;
   give(result: SearchResult): void;
+}
+
+/** Master's: a world for the network search (`Engine.netSearch`), and where its result goes. */
+export interface NetClaim {
+  net: { params: NetSearchParams; world: NetWorld };
+  give(result: NetSearchResult): void;
 }
 
 /** The training record for a searched decision (HardPolicyOptions.record). */
@@ -224,7 +242,8 @@ function record(
   };
 }
 
-const settled = (choice: string): DecisionJob => ({
+/** A decision already made, as a job. */
+export const settled = (choice: string): DecisionJob<never> => ({
   step: () => false,
   claim: () => undefined,
   result: () => choice,
@@ -253,7 +272,7 @@ export class HardPolicy implements Policy {
    * The decision as a job. `rng` is drawn from as the job runs, so it should be
    * this decision's own (the battle engine derives one per decision).
    */
-  think(view: SideView, rng: Rng): DecisionJob {
+  think(view: SideView, rng: Rng): DecisionJob<WorldClaim> {
     const legal = legalChoices(view.request);
     if (legal.length <= 1) return settled(legal[0] ?? 'default');
     this.stats.decisions++;

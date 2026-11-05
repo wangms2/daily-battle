@@ -1,7 +1,12 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { MASTER_NET_PATH } from '@daily-battle/ai/version';
 import { setsFor } from '@daily-battle/data';
 import { engineBuilt, loadEngine } from '@daily-battle/engine-wasm/node';
 import { Dex } from '@pkmn/sim';
 import { deriveSeed, makeRng, randomTeam } from '@daily-battle/sim-bridge';
+import { Judge, NetJudge } from '@daily-battle/tutorial';
 import { gen3Lessons } from '@daily-battle/tutorial/lessons';
 import { describe, expect, it, vi } from 'vitest';
 import { lessonStart } from '../tutorial/lesson';
@@ -252,7 +257,19 @@ describe('lesson battles', () => {
   }, 60_000);
 });
 
-describe.skipIf(!engineBuilt(3))('the coach’s judge', () => {
+const MASTER_FILE = join(fileURLToPath(import.meta.url), '../../../public', MASTER_NET_PATH);
+
+/** The coach's judge's engine: the Hard search's, or Master's (with its network, used against Normal and Hard). */
+function judgeEngine(net: boolean) {
+  const engine = loadEngine(3);
+  if (net) engine.netLoad(new Uint8Array(readFileSync(MASTER_FILE)));
+  return engine;
+}
+
+describe.skipIf(!engineBuilt(3)).each([
+  ['search', false],
+  ['network', true],
+] as const)('the coach’s judge (%s)', (_name, net) => {
   it('warns only when the judge agrees, and never without the engine', () => {
     const rng = makeRng(deriveSeed('engine:judge', 0));
     const data = setsFor('gen3ou');
@@ -260,10 +277,10 @@ describe.skipIf(!engineBuilt(3))('the coach’s judge', () => {
       format: 'gen3ou',
       playerTeam: randomTeam(rng, data),
       opponentTeam: randomTeam(rng, data),
-      difficulty: 'easy',
+      difficulty: net ? 'normal' : 'easy',
       coach: 'simple',
     });
-    const judged = new BattleEngine(s, undefined, undefined, loadEngine(3));
+    const judged = new BattleEngine(s, undefined, undefined, judgeEngine(net));
     const blind = new BattleEngine(s);
     let pkg = judged.begin();
     blind.begin();
@@ -286,7 +303,7 @@ describe.skipIf(!engineBuilt(3))('the coach’s judge', () => {
     // Random picks blunder often enough for the judge to back a few warnings.
     expect(warned).toBeGreaterThan(0);
   }, 120_000);
-  /** A coached Gen 3 battle against Easy, judged; `n` choices in, warnings checked on every pick. */
+  /** A coached Gen 3 battle against Easy (Normal for the network's judge), judged; `n` choices in, warnings checked on every pick. */
   function coached(n: number) {
     const rng = makeRng(deriveSeed('engine:judge', 1));
     const data = setsFor('gen3ou');
@@ -294,10 +311,10 @@ describe.skipIf(!engineBuilt(3))('the coach’s judge', () => {
       format: 'gen3ou',
       playerTeam: randomTeam(rng, data),
       opponentTeam: randomTeam(rng, data),
-      difficulty: 'easy',
+      difficulty: net ? 'normal' : 'easy',
       coach: 'simple',
     });
-    const engine = new BattleEngine(s, undefined, undefined, loadEngine(3));
+    const engine = new BattleEngine(s, undefined, undefined, judgeEngine(net));
     const packages = [engine.begin()];
     const choices: string[] = [];
     const memos: (CoachMemo | null)[] = [];
@@ -334,7 +351,7 @@ describe.skipIf(!engineBuilt(3))('the coach’s judge', () => {
         { ...s, choices: choices.slice(0, k), ...(log && { coachLog: log }) },
         undefined,
         undefined,
-        loadEngine(3),
+        judgeEngine(net),
       );
       e.begin();
       return e.coachCheck(choices[k]!, Infinity);
@@ -342,6 +359,23 @@ describe.skipIf(!engineBuilt(3))('the coach’s judge', () => {
     expect(at()?.text).toBe(memos[k]!.ignored);
     expect(at(memos)).toBeNull();
   }, 120_000);
+
+  it('judges a decision after a resume just as it did live', () => {
+    const { s, choices, memos } = coached(12);
+    // The judge resumes knowing only the replayed decisions, and must still see the battle as it did.
+    for (let k = 1; k < choices.length; k++) {
+      if (!memos[k]?.verdict) continue;
+      const e = new BattleEngine(
+        { ...s, choices: choices.slice(0, k), coachLog: memos.slice(0, k) },
+        undefined,
+        undefined,
+        judgeEngine(net),
+      );
+      e.begin();
+      e.coachCheck(choices[k]!, Infinity);
+      expect(e.choose(choices[k]!).coachMemo?.verdict).toEqual(memos[k]!.verdict);
+    }
+  }, 240_000);
 
   it('replays a past decision: the battle as it was, then the turn as played', () => {
     const { engine, packages, choices } = coached(6);
@@ -362,7 +396,7 @@ describe.skipIf(!engineBuilt(3))('the coach’s judge', () => {
     const uncoached = new BattleEngine(plain);
     uncoached.begin();
     for (const c of choices) uncoached.choose(c);
-    const job = uncoached.reviewJob(loadEngine(3));
+    const job = uncoached.reviewJob(judgeEngine(net));
     let review;
     while (!(review = job.step(50)));
     expect(job.done).toBe(choices.length);
@@ -370,6 +404,30 @@ describe.skipIf(!engineBuilt(3))('the coach’s judge', () => {
     // here: every warning was overridden).
     expect(review).toEqual(engine.coachReview());
   }, 120_000);
+});
+
+describe.skipIf(!engineBuilt(3))('which judge coaches', () => {
+  it('is the network against Normal and Hard, the search against Easy and in lessons', () => {
+    const judgeOf = (s: EngineStart) =>
+      (
+        new BattleEngine(s, loadEngine(3), undefined, judgeEngine(true)) as unknown as {
+          judge: unknown;
+        }
+      ).judge;
+    const daily = (difficulty: EngineStart['difficulty']) =>
+      judgeOf(start(0, { format: 'gen3ou', difficulty, coach: 'simple' }));
+    expect(daily('easy')).toBeInstanceOf(Judge);
+    expect(daily('normal')).toBeInstanceOf(NetJudge);
+    expect(daily('hard')).toBeInstanceOf(NetJudge);
+    // Lessons play Easy; even against Normal they'd keep the search their content is checked with.
+    const lesson = gen3Lessons.find((l) => l.id === 'gen3-switching-course')!;
+    const s = lessonStart(
+      lesson.steps.find((x) => x.kind === 'battle')!,
+      lesson.format,
+      lesson.number,
+    );
+    expect(judgeOf({ ...s, difficulty: 'normal' })).toBeInstanceOf(Judge);
+  });
 });
 
 describe('lesson turns', () => {
@@ -623,5 +681,74 @@ describe.skipIf(!engineBuilt(3))('the guided replay', () => {
       pkg = engine.choose(choice);
     }
     expect(pkg.end?.winner).toBe('you');
+  }, 120_000);
+});
+
+describe.skipIf(!engineBuilt(4))('BattleEngine on Master', () => {
+  const s = start(82, { difficulty: 'master' });
+  const withNet = () => {
+    const wasm = loadEngine(4);
+    wasm.netLoad(new Uint8Array(readFileSync(MASTER_FILE)));
+    return wasm;
+  };
+
+  it('saves its choices, and a resume replays them to the same battle without searching', () => {
+    const live = withNet();
+    const engine = new BattleEngine(s, live);
+    const packages = [engine.begin()];
+    const choices: string[] = [];
+    let ai: AiChoices | undefined = packages[0]!.aiChoices;
+    const pick = makeRng('4,4,4,4');
+    while (!packages.at(-1)!.end && choices.length < 16) {
+      const c = packages.at(-1)!.controls!;
+      const options = [
+        ...c.moves.filter((m) => !m.disabled).map((m) => m.choice),
+        ...c.switches.map((x) => x.choice),
+      ];
+      const choice = c.only ?? options[Math.floor(pick() * options.length)]!;
+      choices.push(choice);
+      packages.push(engine.choose(choice));
+      ai = mergeAiChoices(ai, packages.at(-1)!.aiChoices);
+    }
+    expect(ai!.choices.length).toBeGreaterThan(5);
+
+    const wasm = withNet();
+    const search = vi.spyOn(wasm, 'netSearch');
+    const resumed = new BattleEngine({ ...s, choices, aiChoices: ai!.choices }, wasm);
+    const back = resumed.begin();
+    const last = packages.at(-1)!;
+    expect(back.frames.at(-1)!.view).toEqual(last.frames.at(-1)!.view);
+    expect(search).not.toHaveBeenCalled();
+    // The resumed AI watched the replay: its next look at the battle (the
+    // network's inputs) matches the live AI's.
+    expect(last.end).toBeNull();
+    const c = last.controls!;
+    const choice = c.only ?? c.moves.find((m) => !m.disabled)?.choice ?? c.switches[0]!.choice;
+    const liveSearch = vi.spyOn(live, 'netSearch');
+    expect(resumed.choose(choice).frames).toEqual(engine.choose(choice).frames);
+    expect(search.mock.calls).toEqual(liveSearch.mock.calls);
+    // And it remembers the same battle: what the network reads from its tracker.
+    type Tracker = {
+      ownOrder?: string[];
+      events: unknown[];
+      foeAppeared: string[];
+      speedOf(key: string, forme: string): [number, number];
+    };
+    type Peek = {
+      ai: { trackers: WeakMap<readonly string[], Tracker> };
+      session: { view(side: 'p2'): { log: readonly string[] } };
+    };
+    const seen = (e: BattleEngine) => {
+      const { ai, session } = e as unknown as Peek;
+      const t = ai.trackers.get(session.view('p2').log)!;
+      const foes = (s.playerTeam as { species: string }[]).map((m) => m.species);
+      return {
+        ownOrder: t.ownOrder,
+        events: t.events,
+        foeAppeared: t.foeAppeared,
+        speed: foes.map((f) => t.speedOf(Dex.species.get(f).id, f)),
+      };
+    };
+    expect(seen(resumed)).toEqual(seen(engine));
   }, 120_000);
 });

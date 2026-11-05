@@ -363,13 +363,26 @@ impl Net {
             let name = String::from_utf8(r.take(len)?.to_vec()).map_err(|e| e.to_string())?;
             let ndim = r.u8()? as usize;
             let dims: Vec<usize> = (0..ndim).map(|_| r.u32().map(|v| v as usize)).collect::<Result<_, _>>()?;
-            if r.u8()? != 1 {
-                return Err(format!("{name}: unsupported dtype"));
-            }
             let numel: usize = dims.iter().product();
-            let raw = r.take(numel * 2)?;
-            let data: Vec<f32> =
-                raw.chunks_exact(2).map(|c| f16_to_f32(u16::from_le_bytes([c[0], c[1]]))).collect();
+            let data: Vec<f32> = match r.u8()? {
+                1 => {
+                    let raw = r.take(numel * 2)?;
+                    raw.chunks_exact(2).map(|c| f16_to_f32(u16::from_le_bytes([c[0], c[1]]))).collect()
+                }
+                // int8 per row (first dim): f16 scales, then i8 values.
+                2 if ndim >= 2 => {
+                    let rows = dims[0];
+                    let per = numel / rows.max(1);
+                    let scales: Vec<f32> = r
+                        .take(rows * 2)?
+                        .chunks_exact(2)
+                        .map(|c| f16_to_f32(u16::from_le_bytes([c[0], c[1]])))
+                        .collect();
+                    let raw = r.take(numel)?;
+                    raw.iter().enumerate().map(|(k, &q)| q as i8 as f32 * scales[k / per]).collect()
+                }
+                _ => return Err(format!("{name}: unsupported dtype")),
+            };
             params += numel;
             map.insert(name, (dims, data));
         }

@@ -26,6 +26,7 @@ interface Summary {
     easy: number;
     normal: number;
     hard: number;
+    master: number;
     coach: number;
     learners: number;
   }[];
@@ -334,7 +335,7 @@ function Overview({ s }: { s: Summary }) {
             'Days played',
             'Avg streak',
             'Best streak',
-            'Easy / Normal / Hard',
+            'Easy / Normal / Hard / Master',
             'Coach on',
             'Took lessons',
           ]}
@@ -345,7 +346,7 @@ function Overview({ s }: { s: Summary }) {
             p.daysPlayed,
             round1(p.avgStreak),
             p.bestStreak,
-            `${p.easy} / ${p.normal} / ${p.hard}`,
+            `${p.easy} / ${p.normal} / ${p.hard} / ${p.master ?? 0}`,
             p.coach,
             p.learners,
           ])}

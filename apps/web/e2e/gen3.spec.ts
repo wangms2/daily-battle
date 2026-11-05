@@ -27,8 +27,8 @@ function gen3State({ locked = true } = {}) {
       battleSpeed: 'instant',
       animations: true,
       shownExplainers: ['welcome', 'cores', 'tour'],
-      // The Gen 3 brief's "Want a coach?" offer, already answered.
-      coachOffered: { gen3ou: true },
+      // The brief's "Want a coach?" offer, already answered.
+      coachOffered: { gen3ou: true, gen4ou: true, gen5ou: true, gen6ou: true },
       format: 'gen3ou',
     },
   };

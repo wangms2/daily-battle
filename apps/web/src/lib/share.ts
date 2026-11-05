@@ -72,6 +72,7 @@ export const DIFFICULTY_NAME: Record<Difficulty, string> = {
   easy: 'Easy',
   normal: 'Normal',
   hard: 'Hard',
+  master: 'Master',
 };
 
 /** What follows "Pokémon Daily": "Gen 4 OU · Hard · Oct 21", "Gen 3 OU · Easy · Coached · Oct 21". */

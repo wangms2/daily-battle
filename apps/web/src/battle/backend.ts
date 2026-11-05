@@ -32,7 +32,7 @@ export interface BattleBackend {
    */
   onCoachTip?(onTip: (note: CoachNote) => void): () => void;
   /**
-   * After a battle played without the coach (Gen 3): the coach's review of it,
+   * After a battle played without the coach: the coach's review of it,
    * judged on request; `onProgress` follows the choices judged.
    */
   review?(onProgress: (done: number, total: number) => void): Promise<Review>;
@@ -67,9 +67,9 @@ export function warmBattleWorker(): Worker {
   return shared;
 }
 
-/** Also fetches and compiles the Hard engine for the format, so Start doesn't wait for it. */
-export function warmHardEngine(format: string) {
-  hint({ type: 'warm', format });
+/** Also fetches and compiles the Hard engine for the format (and Master's network), so Start doesn't wait for them. */
+export function warmHardEngine(format: string, net = false) {
+  hint({ type: 'warm', format, ...(net && { net }) });
 }
 
 /** A message the worker doesn't answer, sent straight away (outside the queue). */

@@ -36,10 +36,12 @@ export {
   replyKey,
   soundPick,
   type FoeRead,
+  type CoachJudge,
   type JudgeOptions,
   type ReadValue,
   type Verdict,
 } from './coach/judge';
+export { NetJudge, NET_JUDGE_DEFAULTS, type NetJudgeOptions } from './coach/net-judge';
 export {
   buildReview,
   type Decision,
@@ -47,3 +49,5 @@ export {
   type Review,
   type ReviewTurn,
 } from './coach/review';
+export type { AdvancedReview } from './coach/advanced/review';
+export { advancedTips, type AdvancedFind, type AdvancedRule } from './coach/advanced/coach';
