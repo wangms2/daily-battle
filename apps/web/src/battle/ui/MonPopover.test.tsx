@@ -1,5 +1,5 @@
 import { cleanup, render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { speciesInfo } from '../../lib/data';
 import type { MonView } from '../frames';
 import { hpPercent, MonPopover } from './MonPopover';
@@ -123,5 +123,60 @@ describe('MonPopover (yours)', () => {
     expect(screen.getByRole('tooltip')).toHaveTextContent('12.4% (50/404)');
     expect(hpPercent(1, 2000)).toBe('0.1%');
     expect(hpPercent(404, 404)).toBe('100%');
+  });
+
+  const gengar = () => (
+    <MonPopover
+      foe={false}
+      member={{
+        slot: 0,
+        species: 'Gengar',
+        hp: 100,
+        hpExact: { hp: 261, max: 261 },
+        status: '',
+        fainted: false,
+        active: true,
+        item: 'Life Orb',
+        ability: 'Levitate',
+        moves: [],
+        stats: {},
+      }}
+    />
+  );
+  const desktop = (on: boolean) =>
+    vi.spyOn(window, 'matchMedia').mockImplementation(
+      (query: string) =>
+        ({
+          matches: on && query.includes('pointer: fine'),
+          media: query,
+          addEventListener: () => {},
+          removeEventListener: () => {},
+        }) as unknown as MediaQueryList,
+    );
+  afterEach(() => {
+    cleanup();
+    vi.restoreAllMocks();
+  });
+
+  it('shows its matchups on desktop, by its own ability (Levitate: immune to Ground)', () => {
+    desktop(true);
+    render(gengar());
+    const rows = screen.getByLabelText('Type matchups');
+    const types = (label: string) =>
+      [
+        ...[...rows.children]
+          .find((r) => r.textContent?.startsWith(label))!
+          .querySelectorAll('[title]'),
+      ].map((b) => b.getAttribute('title'));
+    expect(types('Weak to')).toEqual(expect.arrayContaining(['Psychic', 'Ghost', 'Dark']));
+    expect(types('Weak to')).not.toContain('Ground');
+    expect(types('Resists')).toEqual(expect.arrayContaining(['Grass', 'Poison', 'Bug']));
+    expect(types('Immune')).toEqual(expect.arrayContaining(['Normal', 'Fighting', 'Ground']));
+  });
+
+  it('leaves matchups off on touch screens', () => {
+    desktop(false);
+    render(gengar());
+    expect(screen.queryByLabelText('Type matchups')).toBeNull();
   });
 });

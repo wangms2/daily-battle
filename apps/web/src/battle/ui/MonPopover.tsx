@@ -2,11 +2,13 @@
 // Foes show just what the battle has revealed; yours show the set you brought.
 import clsx from 'clsx';
 import { Fragment, type ReactNode } from 'react';
-import { abilityInfo, canMega, itemInfo, speciesInfo } from '../../lib/data';
+import { abilityInfo, canMega, itemInfo, matchups, speciesInfo } from '../../lib/data';
+import { MatchupRow } from '../../sheets/InfoSheet';
 import { TypeBadge } from '../../ui/bits';
 import { Term } from '../../ui/DetailCard';
 import { ItemIcon } from '../../ui/ItemIcon';
 import { MoveChips } from '../../ui/MoveList';
+import { useMediaQuery } from '../../ui/useWide';
 import type { MonView, Revealed, TeamMember } from '../frames';
 import { scarfFlips, showdownNote, speedVerdict, type SpeedCheck } from '../../lib/speed';
 import { boostLabels, STATUS_LABEL } from './labels';
@@ -54,6 +56,8 @@ type Props = {
 );
 
 export function MonPopover(props: Props) {
+  // Desktop (a mouse): room to hover, so your own Pokémon's card also has its matchups.
+  const desktop = useMediaQuery('(hover: hover) and (pointer: fine)');
   // As it looks now (a Mega forme once Mega Evolved), and its team species.
   const species = props.foe ? props.mon.species : (props.member.forme ?? props.member.species);
   const base = props.foe ? (props.mon.base ?? species) : props.member.species;
@@ -203,6 +207,7 @@ export function MonPopover(props: Props) {
           ))}
         </p>
       )}
+      {!props.foe && desktop && <Matchups species={species} ability={props.member.ability} />}
       {moves.length > 0 && <MoveChips moves={moves} className="mt-1.5" />}
       {props.foe && !!props.likely?.length && (
         <p
@@ -261,6 +266,22 @@ export function MonPopover(props: Props) {
       )}
       {megaHint && <p className="mt-0.5 text-[12.5px] text-muted">Can Mega Evolve</p>}
       {props.children}
+    </div>
+  );
+}
+
+/** Your Pokémon's weaknesses, resistances and immunities, by its own ability. */
+function Matchups({ species, ability }: { species: string; ability: string }) {
+  const m = matchups(species, ability);
+  return (
+    <div aria-label="Type matchups" className="mt-1.5 space-y-1 text-[12px]">
+      <MatchupRow
+        label="Weak to"
+        types={m.weak.map((w) => w.type)}
+        extra={(t) => (m.weak.find((w) => w.type === t)!.mult === 4 ? '×4' : '')}
+      />
+      <MatchupRow label="Resists" types={m.resist.map((r) => r.type)} />
+      {m.immune.length > 0 && <MatchupRow label="Immune" types={m.immune} />}
     </div>
   );
 }
