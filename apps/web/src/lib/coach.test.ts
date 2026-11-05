@@ -1,7 +1,7 @@
 import { coachNetJudge } from '@daily-battle/ai/version';
 import { describe, expect, it } from 'vitest';
 import type { Attempt, DayState, Settings } from '../state/schema';
-import { coachAvailable, coachOn, coachWarning } from './coach';
+import { coachAvailable, coachOn } from './coach';
 
 const attempt = (over: Partial<Attempt>): Attempt => ({
   result: 'loss',
@@ -41,19 +41,5 @@ describe('daily coach', () => {
     expect(coachOn(settings(true), 'gen3ou', playing, 'normal')).toBe(false);
     const coached = day(attempt({ result: 'inProgress', coached: true }));
     expect(coachOn(settings(false), 'gen3ou', coached, 'normal')).toBe(true);
-  });
-
-  it('warns only while the regular first try is still ahead', () => {
-    expect(coachWarning(undefined, 'easy', 4)).toBe(
-      'Turning on the coach ends your 4-day Easy streak. Coached wins build a Coached streak of their own.',
-    );
-    expect(coachWarning(undefined, 'normal', 0)).toMatch(/^Coached battles don’t count/);
-    // Mid-battle, the first try is still undecided.
-    expect(coachWarning(day(attempt({ result: 'inProgress' })), 'normal', 2)).toMatch(
-      /ends your 2-day streak/,
-    );
-    // Already played, or already helped: nothing left to lose.
-    expect(coachWarning(day(attempt({ result: 'win' })), 'normal', 2)).toBeNull();
-    expect(coachWarning(day(attempt({ coached: true })), 'normal', 0)).toBeNull();
   });
 });

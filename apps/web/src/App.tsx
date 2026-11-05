@@ -6,7 +6,6 @@ import {
   Fragment,
   useCallback,
   useEffect,
-  useMemo,
   useRef,
   useState,
   type ReactNode,
@@ -38,7 +37,7 @@ import {
   dayHeadline,
   summarizeDay,
 } from './lib/results';
-import { bucketOf, coachAvailable, coachOn, coachWarning } from './lib/coach';
+import { coachAvailable, coachOn } from './lib/coach';
 import { preloadSchedule, useSchedule } from './lib/schedule';
 import type { ScheduleFile } from '@daily-battle/gen/schedule';
 import { currentDifficulty, unavailableDifficulties } from './lib/difficulty';
@@ -252,26 +251,17 @@ export function App() {
   const dayState = days[day] ?? emptyDay();
   // Each difficulty has its own tries and streak; the team is shared.
   const difficulty = currentDifficulty(settings, format, days[day]);
-  // Coached tries count apart, in one bucket across difficulties (DESIGN.md §22).
+  // Coached tries count at their difficulty like any other (DESIGN.md §22).
   const coached = coachOn(settings, format, days[day], difficulty);
-  const bucket = bucketOf(difficulty, coached);
-  const gameBucket = (id: FormatId) => {
-    const d = currentDifficulty(settings, id, state.games[id].days[day]);
-    return bucketOf(d, coachOn(settings, id, state.games[id].days[day], d));
-  };
+  const bucket = difficulty;
+  const gameBucket = (id: FormatId) => currentDifficulty(settings, id, state.games[id].days[day]);
   // Streaks and stats come from the saved attempts (lib/results.ts).
-  const stats = useMemo(() => computeStats(days, day, bucket), [days, day, bucket]);
-  const summary = useMemo(() => summarizeDay(days[day], true, bucket), [days, day, bucket]);
-  // What turning the coach on would cost: the regular streak at this difficulty.
-  const regularStreak = useMemo(
-    () => (coached ? stats.streak : computeStats(days, day, difficulty).streak),
-    [coached, stats.streak, days, day, difficulty],
-  );
+  const stats = computeStats(days, day, bucket);
+  const summary = summarizeDay(days[day], true, bucket);
   // After a win, the offer to protect the name (Showdown-style), until it's protected.
   const protectOffer = settings.name && !account.name && (
     <ProtectCard name={settings.name} streak={stats.streak} onProtect={account.protect} />
   );
-  const coachCost = coached ? null : coachWarning(days[day], difficulty, regularStreak);
   const share = shareModel({
     day,
     summary,
@@ -281,7 +271,6 @@ export function App() {
     game: `${game.name} OU`,
     format,
     difficulty,
-    coached,
     stars: { firstTries: stats.firstTryWins, clears: stats.clears },
     trainer: settings.name,
   });
@@ -289,7 +278,6 @@ export function App() {
   const modelFor = (id: FormatId, b: Bucket): ShareModel => {
     if (id === format && b === bucket) return share;
     const gameDays = state.games[id].days;
-    const level = b === 'coached' ? currentDifficulty(settings, id, gameDays[day]) : b;
     const gameStats = computeStats(gameDays, day, b);
     return shareModel({
       day,
@@ -300,8 +288,7 @@ export function App() {
       url: shareUrl(),
       game: `${formatInfo(id).name} OU`,
       format: id,
-      difficulty: level,
-      coached: b === 'coached',
+      difficulty: b,
       trainer: settings.name,
     });
   };
@@ -553,7 +540,7 @@ export function App() {
             today: dayHeadline(today),
             cleared: today.status === 'firstTry' || today.status === 'won',
             ...(level !== 'normal' && { difficulty: level }),
-            ...(gameBucket(id) === 'coached' && { coached: true }),
+            ...(today.helped && { coached: true }),
           };
         })}
         onPlay={() => go('daily')}
@@ -690,7 +677,7 @@ export function App() {
         {...(shownAttempt === inProgress &&
           coachAvailable(format, attemptDifficulty(shownAttempt)) && {
             coach: {
-              warning: coachCost,
+              warning: null,
               onTurnOn: () => {
                 setCoach(true);
                 dispatch({ type: 'coachAttempt', day });
@@ -737,7 +724,7 @@ export function App() {
         difficulty={difficulty}
         onDifficulty={setDifficulty}
         {...(coachAvailable(format, difficulty) && {
-          coach: { on: coached, warning: coachCost, onChange: setCoach },
+          coach: { on: coached, warning: null, onChange: setCoach },
         })}
         unavailable={unavailableDifficulties(format)}
         result={{ summary, streak: stats.streak, share: thisGameShare, countdown }}
@@ -811,7 +798,7 @@ export function App() {
         open={coachOffer}
         onOpenChange={(o) => !o && offeredCoach()}
         title="Want a coach?"
-        body={`The coach gives a tip now and then, checks before a clear mistake, and reviews the key turns after. ${coachCost ?? 'Coached wins build a Coached streak of their own.'} You can turn it on or off before any battle.`}
+        body={`The coach gives a tip now and then, checks before a clear mistake, and reviews the key turns after. Coached wins count toward your streak, and the share marks them. You can turn it on or off before any battle.`}
         confirm="Turn on coach"
         cancel="Not now"
         onConfirm={() => {

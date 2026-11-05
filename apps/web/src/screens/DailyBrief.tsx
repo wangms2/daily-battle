@@ -574,7 +574,6 @@ export function DailyBrief({
           onChange={onDifficulty}
           unavailable={unavailable}
           disabled={inProgress}
-          compact={!wide}
         />
       </div>
     </div>

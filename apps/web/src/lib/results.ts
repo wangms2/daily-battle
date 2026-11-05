@@ -6,9 +6,8 @@
 // on tries: every try counts until the day is won, and runs after a win are
 // practice.
 //
-// Coached tries (DESIGN.md §22) have a bucket of their own, shared across
-// difficulties. A coached try before the day is cleared ends that difficulty's
-// regular streak; coached practice after a clear doesn't.
+// Coached tries (DESIGN.md §22) count like any other at their difficulty; the
+// share marks a day the coach helped with.
 import type { Difficulty } from '@daily-battle/ai/version';
 import { addDays } from '@daily-battle/gen/dates';
 import type { Attempt, DayState } from '../state/schema';
@@ -32,15 +31,15 @@ export interface DaySummary {
   counted: Attempt[];
   /** 1-based try of the day's first win, if any. */
   winTry: number | null;
-  /** A regular day the coach helped with (a coached try before the clear): no streak. */
+  /** The coach helped with a try that counted (the share marks it). */
   helped: boolean;
 }
 
-/** Each difficulty's own tries and streak, or the coached ones (any difficulty). */
-export type Bucket = Difficulty | 'coached';
+/** Each difficulty's own tries and streak. */
+export type Bucket = Difficulty;
 
 /** Every bucket, easiest first: the order a game's share lists them in. */
-export const BUCKETS: readonly Bucket[] = ['easy', 'normal', 'hard', 'master', 'coached'];
+export const BUCKETS: readonly Bucket[] = ['easy', 'normal', 'hard', 'master'];
 
 const won = (a: Attempt) => a.result === 'win';
 
@@ -48,8 +47,7 @@ const won = (a: Attempt) => a.result === 'win';
 export const attemptDifficulty = (a: Pick<Attempt, 'difficulty'>): Difficulty =>
   a.difficulty ?? 'normal';
 
-export const attemptBucket = (a: Pick<Attempt, 'difficulty' | 'coached'>): Bucket =>
-  a.coached ? 'coached' : attemptDifficulty(a);
+export const attemptBucket = (a: Pick<Attempt, 'difficulty'>): Bucket => attemptDifficulty(a);
 
 /** One bucket's day: each has its own tries, first try, and streak (§4.4). */
 export function summarizeDay(
@@ -62,23 +60,20 @@ export function summarizeDay(
   const first = tries.findIndex(won);
   const winTry = first >= 0 ? first + 1 : null;
   const counted = winTry === null ? tries : tries.slice(0, winTry);
-  const clearedAt = winTry === null ? Infinity : tries[first]!.ts;
-  const helped =
-    bucket !== 'coached' &&
-    attempts.some((a) => a.coached && attemptDifficulty(a) === bucket && a.ts < clearedAt);
+  const helped = counted.some((a) => a.coached);
   let status: DayStatus;
   if (!tries.length) status = 'none';
-  else if (winTry === 1 && !helped) status = 'firstTry';
+  else if (winTry === 1) status = 'firstTry';
   else if (winTry !== null) status = 'won';
   else status = isToday ? 'pending' : 'failed';
   return { status, tries, counted, winTry, helped };
 }
 
-/** Played but not won on the first try (or with the coach's help): the streak is over. */
-const breaks = (s: DaySummary) => s.helped || (s.status !== 'none' && s.status !== 'firstTry');
+/** Played but not won on the first try: the streak is over. */
+const breaks = (s: DaySummary) => s.status !== 'none' && s.status !== 'firstTry';
 
-/** Hardest first; coached tries rank below any regular difficulty. */
-const BUCKET_RANK: Bucket[] = ['master', 'hard', 'normal', 'easy', 'coached'];
+/** Hardest first. */
+const BUCKET_RANK: Bucket[] = ['master', 'hard', 'normal', 'easy'];
 
 /**
  * The bucket to show for a game played at several difficulties today: the
@@ -113,10 +108,10 @@ export function computeStats(
   bucket: Bucket = 'normal',
 ): Stats {
   // A ditched team ends the streak, even on a first-try win or before any try.
-  // The team is shared, so that's every bucket's streak. So does the coach's help.
+  // The team is shared, so that's every bucket's streak.
   const status = (key: string): DayStatus => {
     const s = summarizeDay(days[key], key === today, bucket);
-    if (!days[key]?.ditched && !s.helped) return s.status;
+    if (!days[key]?.ditched) return s.status;
     return s.status === 'none' || s.status === 'firstTry' ? 'pending' : s.status;
   };
 
@@ -144,7 +139,7 @@ export function computeStats(
   for (const key of keys) {
     const s = summarizeDay(days[key], key === today, bucket);
     if (s.status === 'none') {
-      if (days[key]?.ditched || s.helped) {
+      if (days[key]?.ditched) {
         run = 0;
         prev = null;
       }

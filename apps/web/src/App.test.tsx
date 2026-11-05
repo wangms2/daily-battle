@@ -537,7 +537,7 @@ describe('results and streak', () => {
     expect(within(picker).getByRole('radio', { name: 'Normal' })).toBeDisabled();
   });
 
-  it('offers the coach once in Gen 3, warns about the streak, and counts coached days apart', async () => {
+  it('offers the coach once in Gen 3, and coached days count toward the streak', async () => {
     const user = userEvent.setup();
     const gen3 = gen3Schedule as ScheduleFile;
     vi.stubGlobal(
@@ -555,27 +555,22 @@ describe('results and streak', () => {
     state.games.gen3ou.days['2026-10-20'] = { swapUsed: false, attempts: [won] };
     renderApp(state);
     const offer = await screen.findByRole('dialog', { name: 'Want a coach?' });
-    expect(offer).toHaveTextContent('ends your 1-day streak');
+    expect(offer).toHaveTextContent('Coached wins count toward your streak');
     await user.click(within(offer).getByRole('button', { name: 'Not now' }));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
 
     const coach = screen.getByRole('button', { name: 'Coach off' });
     expect(coach).toHaveAttribute('aria-pressed', 'false');
+    // No streak at stake: it turns on straight away.
     await user.click(coach);
-    const ask = await screen.findByRole('dialog', { name: 'Turn on the coach?' });
-    await user.click(within(ask).getByRole('button', { name: 'Turn on' }));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Coach on' })).toHaveAttribute(
       'aria-pressed',
       'true',
     );
-    // The Coached streak starts from nothing; the header says so.
-    expect(screen.getByRole('button', { name: 'Stats. Streak 0' })).toBeInTheDocument();
-    expect(screen.getByTitle('Back')).toHaveTextContent('Gen 3 · Coached · ');
-
-    // Off again before a battle: the regular streak is still there.
-    await user.click(screen.getByRole('button', { name: 'Coach on' }));
+    // The regular streak carries on with the coach; the header says Coached.
     expect(screen.getByRole('button', { name: 'Stats. Streak 1' })).toBeInTheDocument();
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.getByTitle('Back')).toHaveTextContent('Gen 3 · Coached · ');
   });
 
   it('offers the coach in every game', async () => {

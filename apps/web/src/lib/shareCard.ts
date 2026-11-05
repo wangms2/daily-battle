@@ -307,6 +307,8 @@ export const ballFor = (level: string | undefined): BallKind =>
 const ULTRA = { top: '#26252b', band: '#f2c230' };
 const POKE_RED = '#d1434b';
 const MASTER = { top: '#7a3ea6', spot: '#e05a9c', letter: '#f4f3f1' };
+/** The app's accent, as on its Coached badge (white text on it is 5.3:1). */
+const COACH = '#4a7088';
 
 /** A ball at (cx, cy) of radius r, with a ring of width r/4 (the card's style). */
 function drawBall(
@@ -381,6 +383,8 @@ function drawLid(
   colors: typeof CLAY,
   header: string,
   ball: BallKind = 'plain',
+  /** The coach helped: a Coached tag beside the ball. */
+  coached = false,
 ) {
   const lid = ctx.createLinearGradient(0, 0, CARD_W, 150);
   lid.addColorStop(0, colors.lid);
@@ -399,6 +403,14 @@ function drawLid(
   ctx.fill();
   ctx.restore();
   drawBall(ctx, CARD_W / 2, 156, 30, ball, colors.button);
+  if (coached) {
+    const size = 18;
+    pill(ctx, 'Coached', CARD_W / 2 + 44, 156 - (size * 1.75) / 2, {
+      bg: COACH,
+      fg: '#ffffff',
+      size,
+    });
+  }
 
   ctx.textBaseline = 'middle';
   ctx.fillStyle = '#ffffff';
@@ -503,7 +515,7 @@ export async function drawShareCard(m: ShareModel): Promise<HTMLCanvasElement> {
   const mid = MID;
 
   // Header: the game's lid with the name and date; the streak on the right.
-  drawLid(ctx, m.format ? LIDS[m.format] : CLAY, shareHeader(m), ballFor(m.level));
+  drawLid(ctx, m.format ? LIDS[m.format] : CLAY, shareHeader(m), ballFor(m.level), !!m.coached);
   if (m.streak) streakPill(ctx, m.streak, right, mid - 18);
 
   // Headline.
