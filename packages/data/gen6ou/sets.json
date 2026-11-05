@@ -3,7 +3,7 @@
     "format": "gen6ou",
     "method": "curated-usage-weighted-v1",
     "simVersion": "0.10.11",
-    "builtAt": "2026-11-02T19:56:23.978Z",
+    "builtAt": "2026-11-05T01:13:32.654Z",
     "sources": {
       "sets": {
         "url": "https://raw.githubusercontent.com/pkmn/smogon/main/data/sets/gen6ou.json",
@@ -2395,7 +2395,7 @@
         "id": "lopunny-fun-choice-scarf-healing-wish",
         "sourceName": "Choice Scarf Healing Wish",
         "label": "Choice Scarf support",
-        "description": "Outspeeds and hits, Tricks its Scarf onto a wall, or faints with Healing Wish to fully heal a teammate.",
+        "description": "Outspeeds and hits, swaps its Scarf onto a wall with Switcheroo, or faints with Healing Wish to fully heal a teammate.",
         "weight": 0,
         "moves": [
           "Return",
@@ -9379,7 +9379,7 @@
           ],
           "item": "Aggronite",
           "ability": "Sturdy",
-          "nature": "Impish",
+          "nature": "Careful",
           "evs": {
             "hp": 252,
             "atk": 0,

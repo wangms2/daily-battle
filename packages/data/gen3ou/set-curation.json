@@ -1,4 +1,9 @@
 {
+  "nature": {
+    "Steelix": {
+      "Standard Wall": "Careful"
+    }
+  },
   "add": {
     "Aerodactyl": {
       "Taunt Lead": {

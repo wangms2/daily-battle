@@ -14,11 +14,15 @@
     }
   },
   "nature": {
-    "Jirachi": {
-      "Wish + Protect": "Impish"
+    "Weezing": {
+      "Specially Defensive": "Calm"
+    },
+    "Cloyster": {
+      "Support": "Careful"
     }
   },
   "drop": {
+    "Mesprit": ["Utility Counter"],
     "Azelf": ["Utility Rain Lead"],
     "Scyther": ["Baton Pass"],
     "Dragonite": ["Bulky Dragon Dance"],

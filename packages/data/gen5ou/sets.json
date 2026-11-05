@@ -3,7 +3,7 @@
     "format": "gen5ou",
     "method": "curated-usage-weighted-v1",
     "simVersion": "0.10.11",
-    "builtAt": "2026-11-02T19:56:22.560Z",
+    "builtAt": "2026-11-05T01:13:23.952Z",
     "sources": {
       "sets": {
         "url": "https://data.pkmn.cc/sets/gen5ou.json",
@@ -7515,43 +7515,11 @@
       "setSource": "gen5uu",
       "sets": [
         {
-          "id": "porygon2-defensive-duck",
-          "sourceName": "Defensive Duck",
-          "label": "Physical wall",
-          "description": "Soaks up physical attacks and heals itself back up while wearing the opponent down.",
-          "weight": 0.5667,
-          "moves": [
-            "Ice Beam",
-            "Thunderbolt",
-            "Toxic",
-            "Recover"
-          ],
-          "item": "Eviolite",
-          "ability": "Trace",
-          "nature": "Calm",
-          "evs": {
-            "hp": 252,
-            "atk": 0,
-            "def": 176,
-            "spa": 0,
-            "spd": 80,
-            "spe": 0
-          },
-          "ivs": {
-            "hp": 31,
-            "atk": 31,
-            "def": 31,
-            "spa": 31,
-            "spd": 31,
-            "spe": 31
-          }
-        },
-        {
           "id": "porygon2-duck-tank",
           "sourceName": "Duck Tank",
           "label": "Eviolite tank",
           "description": "Holds Eviolite to take hits far better than its stats suggest.",
-          "weight": 0.2176,
+          "weight": 0.356,
           "moves": [
             "Tri Attack",
             "Ice Beam",
@@ -7583,7 +7551,7 @@
           "sourceName": "Trick Room",
           "label": "Trick Room setter",
           "description": "Sets up Trick Room so that slower Pokémon move first for five turns.",
-          "weight": 0.2157,
+          "weight": 0.3528,
           "moves": [
             "Trick Room",
             "Thunderbolt",
@@ -7608,6 +7576,38 @@
             "spa": 31,
             "spd": 31,
             "spe": 0
+          }
+        },
+        {
+          "id": "porygon2-defensive-duck",
+          "sourceName": "Defensive Duck",
+          "label": "Physical wall",
+          "description": "Soaks up physical attacks and heals itself back up while wearing the opponent down.",
+          "weight": 0.2912,
+          "moves": [
+            "Ice Beam",
+            "Thunderbolt",
+            "Toxic",
+            "Recover"
+          ],
+          "item": "Eviolite",
+          "ability": "Trace",
+          "nature": "Bold",
+          "evs": {
+            "hp": 252,
+            "atk": 0,
+            "def": 176,
+            "spa": 0,
+            "spd": 80,
+            "spe": 0
+          },
+          "ivs": {
+            "hp": 31,
+            "atk": 31,
+            "def": 31,
+            "spa": 31,
+            "spd": 31,
+            "spe": 31
           }
         }
       ]
