@@ -6,6 +6,7 @@ import {
   alive,
   fail,
   freshPlayer,
+  fullTeam,
   MAX_PLAYERS,
   poolOf,
   type ErrorCode,
@@ -259,7 +260,9 @@ function seats(state: RoomState): Pick<RoomState, 'players' | 'spectators'> {
       ...stayed.map((p) => freshPlayer(p, state.settings.lives)),
       ...state.spectators
         .slice(0, room)
-        .map((s) => freshPlayer({ ...s, teamSize: 6 }, state.settings.lives)),
+        .map((s) =>
+          freshPlayer({ ...s, teamSize: fullTeam(state.settings) }, state.settings.lives),
+        ),
     ],
     spectators: state.spectators.slice(room),
   };

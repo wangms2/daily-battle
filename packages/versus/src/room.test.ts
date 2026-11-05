@@ -106,6 +106,26 @@ describe('commands', () => {
     });
   });
 
+  it('lets the host set a full team of 3, keeping each handicap', () => {
+    const room = ok(
+      applyCommand(roomWith('Ash', 'Misty'), 'id0', { type: 'teamSize', player: 'id1', size: 4 }),
+    );
+    const three = ok(applyCommand(room, 'id0', { type: 'settings', settings: { teamSize: 3 } }));
+    expect(three.players.map((p) => p.teamSize)).toEqual([3, 1]);
+    // Handicaps go down from 3, and never above it.
+    expect(applyCommand(three, 'id1', { type: 'teamSize', player: 'id1', size: 2 }).ok).toBe(true);
+    expect(applyCommand(three, 'id1', { type: 'teamSize', player: 'id1', size: 4 })).toEqual({
+      ok: false,
+      error: 'badMessage',
+    });
+    // A newcomer brings the full 3; back to 6, the gaps stay.
+    expect(ok(joinRoom(three, { id: 'x', name: 'Brock', token: 't' })).players[2]!.teamSize).toBe(
+      3,
+    );
+    const six = ok(applyCommand(three, 'id0', { type: 'settings', settings: { teamSize: 6 } }));
+    expect(six.players.map((p) => p.teamSize)).toEqual([6, 4]);
+  });
+
   it('passes the host on when the host leaves', () => {
     const state = ok(applyCommand(roomWith('Ash', 'Misty', 'Brock'), 'id0', { type: 'leave' }));
     expect(state.hostId).toBe('id1');
@@ -163,10 +183,11 @@ describe('parseClientMessage', () => {
     expect(parse({ type: 'settings', settings: { lives: 0 } })).toBeNull();
     expect(parse({ type: 'settings', settings: { lives: 2.5 } })).toBeNull();
     expect(parse({ type: 'settings', settings: { format: 'gen9ou' } })).toBeNull();
+    expect(parse({ type: 'settings', settings: { teamSize: 4 } })).toBeNull();
     expect(parse({ type: 'settings', settings: { format: 'toString' } })).toBeNull();
     expect(parse({ type: 'settings', settings: { hostId: 'me' } })).toBeNull();
     expect(parse({ type: 'settings', settings: { rivalDifficulty: 'expert' } })).toBeNull();
-    expect(parse({ type: 'teamSize', player: 'id1', size: 2 })).toBeNull();
+    expect(parse({ type: 'teamSize', player: 'id1', size: 0 })).toBeNull();
     expect(parse({ type: 'rejoin', token: 42 })).toBeNull();
     expect(parse(['join'])).toBeNull();
   });

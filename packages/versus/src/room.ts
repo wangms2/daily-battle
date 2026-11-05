@@ -12,8 +12,30 @@ export const MAX_SPECTATORS = 8;
 export const NAME_MAX = 16;
 export const LIVES_MIN = 1;
 export const LIVES_MAX = 5;
-export const TEAM_SIZES = [6, 5, 4, 3] as const;
+export const TEAM_SIZES = [6, 5, 4, 3, 2, 1] as const;
 export type TeamSize = (typeof TEAM_SIZES)[number];
+
+/** The room's full team, which the host picks: six, or three for quicker battles. */
+export const FULL_TEAMS = [6, 3] as const;
+export type FullTeam = (typeof FULL_TEAMS)[number];
+
+/** A room's full team (missing is six). */
+export const fullTeam = (settings: Pick<RoomSettings, 'teamSize'>): FullTeam =>
+  settings.teamSize ?? 6;
+
+/** The sizes a player can bring: the full team, down by up to three as a handicap. */
+export function teamSizeRange(settings: Pick<RoomSettings, 'teamSize'>): {
+  min: TeamSize;
+  max: TeamSize;
+} {
+  const max = fullTeam(settings);
+  return { min: max === 6 ? 3 : 1, max };
+}
+
+const clampSize = (size: number, settings: Pick<RoomSettings, 'teamSize'>): TeamSize => {
+  const { min, max } = teamSizeRange(settings);
+  return Math.min(max, Math.max(min, size)) as TeamSize;
+};
 
 /**
  * Turn timers, as Showdown's (`server/room-battle.ts`): a bank for the whole
@@ -49,6 +71,8 @@ export interface RoomSettings {
   week?: string;
   /** How hard the Rival plays (the AI that battles an odd player out). Missing is Normal. */
   rivalDifficulty?: Difficulty;
+  /** Everyone's full team: 6, or 3. Missing is 6. Handicaps go down from it. */
+  teamSize?: FullTeam;
 }
 
 export const DEFAULT_SETTINGS: RoomSettings = {
@@ -344,7 +368,10 @@ export function joinRoom(
     return { ok: true, state: { ...state, spectators: [...state.spectators, { ...input, name }] } };
   }
   if (state.players.length >= MAX_PLAYERS) return fail('full');
-  const player = freshPlayer({ ...input, name, teamSize: 6 }, state.settings.lives);
+  const player = freshPlayer(
+    { ...input, name, teamSize: fullTeam(state.settings) },
+    state.settings.lives,
+  );
   return {
     ok: true,
     state: { ...state, hostId: state.hostId ?? player.id, players: [...state.players, player] },
@@ -432,11 +459,18 @@ export function applyCommand(state: RoomState, by: string, command: RoomCommand)
   switch (command.type) {
     case 'settings': {
       const settings = { ...state.settings, ...command.settings };
-      const players = state.players.map((p) => ({ ...p, lives: settings.lives }));
+      // A new full team keeps each handicap: someone two down stays two down.
+      const shift = fullTeam(settings) - fullTeam(state.settings);
+      const players = state.players.map((p) => ({
+        ...p,
+        lives: settings.lives,
+        teamSize: clampSize(p.teamSize + shift, settings),
+      }));
       return { ok: true, state: { ...state, settings, players } };
     }
     case 'teamSize': {
       if (!state.players.some((p) => p.id === command.player)) return fail('badMessage');
+      if (clampSize(command.size, state.settings) !== command.size) return fail('badMessage');
       const players = state.players.map((p) =>
         p.id === command.player ? { ...p, teamSize: command.size } : p,
       );
@@ -530,6 +564,8 @@ export function validSettings(input: unknown): Partial<RoomSettings> | null {
       out.week = value;
     } else if (key === 'rivalDifficulty' && isDifficulty(value) && value !== 'master') {
       out.rivalDifficulty = value;
+    } else if (key === 'teamSize' && (FULL_TEAMS as readonly unknown[]).includes(value)) {
+      out.teamSize = value as FullTeam;
     } else {
       return null;
     }
