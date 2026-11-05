@@ -39,15 +39,6 @@ export const timerRules = (id: TimerId) => ({
   maxPerTurnMs: TIMERS[id].perTurn * 1000,
 });
 
-/** A timer in a few words, e.g. "3:30 to start, +10s a turn" (with the turn cap when it's lower). */
-export function timerHint(id: TimerId): string {
-  const t = TIMERS[id];
-  const total = t.starting + t.grace;
-  const clock = `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`;
-  const cap = t.perTurn < t.starting ? `, ${t.perTurn}s max` : '';
-  return `${clock} to start, +${t.addPerTurn}s a turn${cap}`;
-}
-
 export interface RoomSettings {
   format: FormatId;
   lives: number;

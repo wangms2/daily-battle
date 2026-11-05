@@ -8,7 +8,6 @@ import {
   LIVES_MIN,
   TEAM_SIZES,
   TIMERS,
-  timerHint,
   type RoomCommand,
   type RoomSettings,
   type RoomView,
@@ -32,7 +31,6 @@ import { Page } from './Page';
 interface Option<T> {
   value: T;
   label: string;
-  hint?: string;
 }
 
 /** A row of choices; read-only (the current choice as text) when `onChange` is left out. */
@@ -52,10 +50,7 @@ function Choice<T extends string | number>({
     return (
       <div className="flex min-h-10 items-center justify-between gap-3 py-1">
         <span className="text-[15px] font-medium">{label}</span>
-        <span className="text-right text-[15px]">
-          {current?.label}
-          {current?.hint && <span className="block text-[12px] text-muted">{current.hint}</span>}
-        </span>
+        <span className="text-right text-[15px]">{current?.label}</span>
       </div>
     );
   }
@@ -75,7 +70,6 @@ function Choice<T extends string | number>({
             )}
           >
             {o.label}
-            {o.hint && <span className="block text-[11px] font-normal text-muted">{o.hint}</span>}
           </button>
         ))}
       </div>
@@ -94,11 +88,10 @@ const LIVES_OPTIONS: Option<number>[] = Array.from(
 const TIMER_OPTIONS: Option<TimerId>[] = (Object.keys(TIMERS) as TimerId[]).map((id) => ({
   value: id,
   label: TIMERS[id].name,
-  hint: timerHint(id),
 }));
 const POOL_OPTIONS: Option<RoomSettings['pool']>[] = [
-  { value: 'random', label: 'A random 12 each', hint: 'Fewer mirror matches' },
-  { value: 'weekly', label: 'This week’s 12', hint: 'The same for everyone' },
+  { value: 'random', label: 'A random 12 each' },
+  { value: 'weekly', label: 'This week’s 12' },
 ];
 const RIVAL_OPTIONS: Option<Difficulty>[] = DIFFICULTIES.map((d) => ({
   value: d,
@@ -348,7 +341,7 @@ export function Lobby({
               )
             }
           >
-            {own ? 'Your 12 · everyone has their own' : 'The 12 · this week’s pool'}
+            {own ? 'Random' : 'Weekly'}
           </SectionLabel>
           <ul className="grid grid-cols-12 gap-0.5" aria-label="Your pool">
             {/* All 12 appear together: a redraw keeps the old pool up until every
