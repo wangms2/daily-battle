@@ -191,6 +191,7 @@ export function Battle({
   onRunItBack,
   onChangeTeam,
   topBarRight,
+  fieldTimer,
   background,
   result,
   live,
@@ -227,6 +228,8 @@ export function Battle({
   /** After a loss: back to the brief with the team open for changes. */
   onChangeTeam?: () => void;
   topBarRight?: ReactNode;
+  /** A clock (versus), on the field's top left where it can't be missed. */
+  fieldTimer?: ReactNode;
   /** Learn mode: a lesson's callout for the turn about to be chosen. */
   prompt?: (turn: number) => string | undefined;
 }) {
@@ -845,6 +848,7 @@ export function Battle({
         }}
         busy={playing}
         popover={popover}
+        corner={fieldTimer}
       />
       {explainerNote}
     </div>
@@ -1267,6 +1271,8 @@ export function Battle({
         animations={settings.animations}
         onHints={(v) => onSetting('beginnerHints', v)}
         onAnimations={(v) => onSetting('animations', v)}
+        sound={settings.sound}
+        onSound={(v) => onSetting('sound', v)}
         onLog={() => {
           setMenuOpen(false);
           setLogOpen(true);

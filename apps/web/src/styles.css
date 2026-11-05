@@ -1679,3 +1679,24 @@ button {
     margin-inline: auto;
   }
 }
+
+/* A versus clock under 10 seconds: a hard red flash (steady red for reduced motion). */
+@keyframes timer-flash {
+  0%,
+  100% {
+    background: var(--bad);
+    color: var(--surface);
+  }
+  50% {
+    background: var(--surface);
+    color: var(--bad);
+  }
+}
+.timer-flash {
+  animation: timer-flash 0.8s steps(1, end) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .timer-flash {
+    animation: none;
+  }
+}

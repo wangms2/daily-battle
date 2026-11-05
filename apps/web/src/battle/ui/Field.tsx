@@ -488,6 +488,7 @@ export function Field({
   onInfo,
   onPick,
   popover,
+  corner,
   className,
   busy = false,
   stageRef,
@@ -517,6 +518,8 @@ export function Field({
   onPick?: (species: string) => void;
   /** The details card for `info`. */
   popover: ReactNode;
+  /** Top left of the field, before the weather (versus: the battle clock). */
+  corner?: ReactNode;
 }) {
   const weather = view?.weather ?? '';
   const terrain = view?.terrain ?? '';
@@ -678,8 +681,9 @@ export function Field({
         />
       )}
 
-      {(weather || terrain) && (
-        <span className="absolute top-1.5 left-1.5 flex gap-1">
+      {(corner || weather || terrain) && (
+        <span className="absolute top-1.5 left-1.5 z-20 flex items-start gap-1">
+          {corner}
           {[weather && (WEATHER_LABEL[weather] ?? weather), terrain].filter(Boolean).map((name) => (
             <span
               key={name}
