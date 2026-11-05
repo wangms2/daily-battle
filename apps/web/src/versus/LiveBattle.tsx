@@ -96,16 +96,14 @@ export default function LiveBattle({
         onChoice={() => {}}
         onEnd={() => {}}
         onExit={onBack}
-        topBarRight={
-          <>
-            <Countdown
-              ms={match.timeLeftMs}
-              at={match.receivedAt}
-              // Waiting on the foe, your clock stops: it stays up, paused at your bank.
-              {...(!match.result && { paused: match.bankMs })}
-            />
-            {right}
-          </>
+        topBarRight={right}
+        logTimer={
+          <Countdown
+            ms={match.timeLeftMs}
+            at={match.receivedAt}
+            // Waiting on the foe, your clock stops: it stays up, paused at your bank.
+            {...(!match.result && { paused: match.bankMs })}
+          />
         }
         live={{
           waiting: `Waiting for ${foe}…`,
