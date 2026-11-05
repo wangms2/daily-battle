@@ -30,13 +30,15 @@ export class Simulator {
   async run(jobs: Job[]): Promise<JobResult[]> {
     if (!this.pool.length) return jobs.map(runJob);
     const results: JobResult[] = new Array(jobs.length);
+    // Small runs (slow Hard games) are spread over every worker.
+    const size = Math.max(1, Math.min(BATCH, Math.ceil(jobs.length / this.pool.length)));
     let cursor = 0;
     await Promise.all(
       this.pool.map(async (worker) => {
         while (cursor < jobs.length) {
           const start = cursor;
-          cursor += BATCH;
-          const batch = jobs.slice(start, start + BATCH);
+          cursor += size;
+          const batch = jobs.slice(start, start + size);
           const done = await this.send(worker, batch);
           done.forEach((r, i) => (results[start + i] = r));
         }

@@ -1,7 +1,7 @@
 {
   "version": 1,
   "generatorVersion": 6,
-  "dataBuiltAt": "2026-11-02T20:05:16.370Z",
+  "dataBuiltAt": "2026-11-05T01:13:22.750Z",
   "week": "2026-11-02",
   "pool": {
     "species": [
@@ -150,127 +150,131 @@
     },
     {
       "day": "2026-11-05",
-      "style": "balance",
+      "style": "offense",
       "team": [
         {
-          "species": "Latias",
-          "setId": "latias-choice-specs"
+          "species": "Aerodactyl",
+          "setId": "aerodactyl-lead"
+        },
+        {
+          "species": "Rotom-Wash",
+          "setId": "rotomwash-choice-scarf"
+        },
+        {
+          "species": "Jirachi",
+          "setId": "jirachi-choice-scarf"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-dragon-dance"
         },
         {
           "species": "Suicune",
-          "setId": "suicune-subcune"
+          "setId": "suicune-supercune-offensive-calm-mind"
         },
         {
-          "species": "Magnezone",
-          "setId": "magnezone-magnet-rise"
-        },
-        {
-          "species": "Azelf",
-          "setId": "azelf-nasty-plot"
-        },
-        {
-          "species": "Scizor",
-          "setId": "scizor-choice-band"
-        },
-        {
-          "species": "Hitmontop",
-          "setId": "hitmontop-rapid-spin"
+          "species": "Forretress",
+          "setId": "forretress-physically-defensive"
         }
       ],
-      "candidate": 13
+      "candidate": 0,
+      "opponentVersion": 7
     },
     {
       "day": "2026-11-06",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Blastoise",
+          "setId": "blastoise-utility"
+        },
+        {
+          "species": "Metagross",
+          "setId": "metagross-agility"
+        },
+        {
+          "species": "Heatran",
+          "setId": "heatran-utility"
+        },
+        {
+          "species": "Kingdra",
+          "setId": "kingdra-rain-dance"
+        },
+        {
+          "species": "Skarmory",
+          "setId": "skarmory-physically-defensive"
+        },
+        {
+          "species": "Flygon",
+          "setId": "flygon-choice-scarf"
+        }
+      ],
+      "candidate": 1,
+      "opponentVersion": 7
+    },
+    {
+      "day": "2026-11-07",
       "style": "stall",
       "team": [
         {
-          "species": "Starmie",
-          "setId": "starmie-defensive-rapid-spin"
+          "species": "Tentacruel",
+          "setId": "tentacruel-defensive-rapid-spin"
         },
         {
-          "species": "Steelix",
-          "setId": "steelix-standard-wall"
+          "species": "Azelf",
+          "setId": "azelf-standard-lead"
         },
         {
-          "species": "Swampert",
-          "setId": "swampert-tank"
-        },
-        {
-          "species": "Azumarill",
-          "setId": "azumarill-choice-band"
+          "species": "Weavile",
+          "setId": "weavile-swords-dance"
         },
         {
           "species": "Scizor",
           "setId": "scizor-bulky-swords-dance"
         },
         {
-          "species": "Jirachi",
-          "setId": "jirachi-wish-protect"
+          "species": "Rotom-Heat",
+          "setId": "rotomheat-defensive"
+        },
+        {
+          "species": "Infernape",
+          "setId": "infernape-nasty-plot"
         }
       ],
-      "candidate": 3
-    },
-    {
-      "day": "2026-11-07",
-      "style": "balance",
-      "team": [
-        {
-          "species": "Forretress",
-          "setId": "forretress-physically-defensive"
-        },
-        {
-          "species": "Yanmega",
-          "setId": "yanmega-choice-specs"
-        },
-        {
-          "species": "Clefable",
-          "setId": "clefable-support"
-        },
-        {
-          "species": "Gyarados",
-          "setId": "gyarados-offensive-dragon-dance"
-        },
-        {
-          "species": "Snorlax",
-          "setId": "snorlax-utility"
-        },
-        {
-          "species": "Jolteon",
-          "setId": "jolteon-choice-specs"
-        }
-      ],
-      "candidate": 4
+      "candidate": 0,
+      "opponentVersion": 7
     },
     {
       "day": "2026-11-08",
       "style": "offense",
       "team": [
         {
-          "species": "Suicune",
-          "setId": "suicune-supercune-offensive-calm-mind"
+          "species": "Nidoking",
+          "setId": "nidoking-mixed-attacker"
+        },
+        {
+          "species": "Gyarados",
+          "setId": "gyarados-offensive-dragon-dance"
         },
         {
           "species": "Jirachi",
           "setId": "jirachi-offensive"
         },
         {
-          "species": "Raikou",
-          "setId": "raikou-calm-mind-protect"
+          "species": "Forretress",
+          "setId": "forretress-physically-defensive"
         },
         {
-          "species": "Starmie",
-          "setId": "starmie-defensive-rapid-spin"
+          "species": "Rotom-Wash",
+          "setId": "rotomwash-choice-scarf"
         },
         {
-          "species": "Tyranitar",
-          "setId": "tyranitar-all-purpose"
-        },
-        {
-          "species": "Qwilfish",
-          "setId": "qwilfish-swords-dance"
+          "species": "Aerodactyl",
+          "setId": "aerodactyl-lead"
         }
       ],
-      "candidate": 4
+      "candidate": 2,
+      "opponentVersion": 7
     }
   ]
 }

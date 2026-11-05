@@ -10,7 +10,7 @@ import type { FormatId } from './formats';
 import type { Core, SetsFile } from './types';
 
 export * from './formats';
-export type { Core, SetEntry, SetsFile, SpeciesEntry, Stats, StatID } from './types';
+export type { Core, SetEntry, SetsFile, SpeciesEntry, Stats, StatID, TeammatesFile } from './types';
 export { FUN_SET_PRIOR, playerSetPrior, playerSets } from './player-sets';
 
 /** The Gen 4 OU set snapshot (see README for how it's built). */

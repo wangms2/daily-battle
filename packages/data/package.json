@@ -7,6 +7,7 @@
   "exports": {
     ".": "./src/index.ts",
     "./species": "./src/species-data.ts",
+    "./teammates": "./src/teammates.ts",
     "./formats": "./src/formats.ts"
   },
   "scripts": {
@@ -15,6 +16,7 @@
     "typecheck": "tsc --noEmit",
     "build-species": "tsx scripts/build-species.ts",
     "fetch-randbats": "tsx scripts/fetch-randbats.ts",
+    "fetch-teammates": "tsx scripts/fetch-teammates.ts",
     "audit-sets": "tsx scripts/audit-sets.ts"
   },
   "dependencies": {

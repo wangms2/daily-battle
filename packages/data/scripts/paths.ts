@@ -21,6 +21,7 @@ export const SOURCES = {
   meta: root(`sources/${FORMAT.id}-sources.json`),
   randbats: root(`sources/${FORMAT.id}-randbats.json`),
 };
+export const TEAMMATES = root(`sources/${FORMAT.id}-teammates.json`);
 export const OUTPUT = root(`${FORMAT.id}/sets.json`);
 export const OVERRIDES = root(`${FORMAT.id}/role-overrides.json`);
 export const CURATION = root(`${FORMAT.id}/set-curation.json`);

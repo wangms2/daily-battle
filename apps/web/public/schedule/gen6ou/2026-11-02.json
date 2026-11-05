@@ -1,7 +1,7 @@
 {
   "version": 1,
   "generatorVersion": 6,
-  "dataBuiltAt": "2026-11-02T19:56:23.978Z",
+  "dataBuiltAt": "2026-11-05T01:13:32.654Z",
   "week": "2026-11-02",
   "pool": {
     "species": [
@@ -150,65 +150,67 @@
     },
     {
       "day": "2026-11-05",
-      "style": "balance",
+      "style": "stall",
       "team": [
         {
-          "species": "Heatran",
-          "setId": "heatran-fast-utility"
+          "species": "Empoleon",
+          "setId": "empoleon-specially-defensive"
         },
         {
-          "species": "Tornadus-Therian",
-          "setId": "tornadustherian-assault-vest-pivot"
+          "species": "Garchomp",
+          "setId": "garchomp-tank-chomp"
         },
         {
-          "species": "Tyranitar",
-          "setId": "tyranitar-bulky-support"
+          "species": "Skarmory",
+          "setId": "skarmory-physically-defensive"
         },
         {
-          "species": "Kyurem-Black",
-          "setId": "kyuremblack-choice-item-attacker"
+          "species": "Alakazam",
+          "setId": "alakazam-utility-attacker"
         },
         {
-          "species": "Cofagrigus",
-          "setId": "cofagrigus-toxic-spikes-support"
+          "species": "Serperior",
+          "setId": "serperior-dual-screens"
         },
         {
-          "species": "Magnezone",
-          "setId": "magnezone-choice-scarf"
+          "species": "Conkeldurr",
+          "setId": "conkeldurr-assault-vest"
         }
       ],
-      "candidate": 4
+      "candidate": 0,
+      "opponentVersion": 7
     },
     {
       "day": "2026-11-06",
-      "style": "balance",
+      "style": "offense",
       "team": [
         {
-          "species": "Zapdos",
-          "setId": "zapdos-physically-defensive"
+          "species": "Latias",
+          "setId": "latias-utility"
         },
         {
-          "species": "Talonflame",
-          "setId": "talonflame-offensive-swords-dance"
+          "species": "Gallade",
+          "setId": "gallade-bulky-drain-punch-sweeper"
         },
         {
-          "species": "Clefable",
-          "setId": "clefable-calm-mind"
+          "species": "Bisharp",
+          "setId": "bisharp-swords-dance"
         },
         {
-          "species": "Azumarill",
-          "setId": "azumarill-belly-drum"
+          "species": "Metagross",
+          "setId": "metagross-offensive-stealth-rock"
         },
         {
-          "species": "Keldeo",
-          "setId": "keldeo-choice-specs"
+          "species": "Landorus-Therian",
+          "setId": "landorustherian-suicide-lead"
         },
         {
-          "species": "Magnezone",
-          "setId": "magnezone-choice-scarf"
+          "species": "Manaphy",
+          "setId": "manaphy-tail-glow-3-attacks"
         }
       ],
-      "candidate": 3
+      "candidate": 3,
+      "opponentVersion": 7
     },
     {
       "day": "2026-11-07",
@@ -219,58 +221,60 @@
           "setId": "skarmory-defog"
         },
         {
-          "species": "Scolipede",
-          "setId": "scolipede-bulky-sweeper"
+          "species": "Garchomp",
+          "setId": "garchomp-tank-chomp"
         },
         {
-          "species": "Conkeldurr",
-          "setId": "conkeldurr-assault-vest"
-        },
-        {
-          "species": "Gengar",
-          "setId": "gengar-choice-specs"
-        },
-        {
-          "species": "Landorus-Therian",
-          "setId": "landorustherian-choice-scarf"
-        },
-        {
-          "species": "Klefki",
-          "setId": "klefki-support"
-        }
-      ],
-      "candidate": 5
-    },
-    {
-      "day": "2026-11-08",
-      "style": "offense",
-      "team": [
-        {
-          "species": "Thundurus",
-          "setId": "thundurus-bulky-pivot"
+          "species": "Heracross",
+          "setId": "heracross-bulky-wallbreaker"
         },
         {
           "species": "Weavile",
           "setId": "weavile-choice-band"
         },
         {
-          "species": "Victini",
-          "setId": "victini-choice-band"
-        },
-        {
           "species": "Gengar",
           "setId": "gengar-hex"
         },
         {
-          "species": "Rotom-Wash",
-          "setId": "rotomwash-fast-utility"
-        },
-        {
-          "species": "Nidoking",
-          "setId": "nidoking-wallbreaker"
+          "species": "Heatran",
+          "setId": "heatran-fast-utility"
         }
       ],
-      "candidate": 7
+      "candidate": 0,
+      "opponentVersion": 7
+    },
+    {
+      "day": "2026-11-08",
+      "style": "offense",
+      "team": [
+        {
+          "species": "Bisharp",
+          "setId": "bisharp-swords-dance"
+        },
+        {
+          "species": "Manaphy",
+          "setId": "manaphy-tail-glow-3-attacks"
+        },
+        {
+          "species": "Latias",
+          "setId": "latias-utility"
+        },
+        {
+          "species": "Landorus-Therian",
+          "setId": "landorustherian-suicide-lead"
+        },
+        {
+          "species": "Serperior",
+          "setId": "serperior-stallbreaker"
+        },
+        {
+          "species": "Dragonite",
+          "setId": "dragonite-dragon-dance-three-attacks"
+        }
+      ],
+      "candidate": 2,
+      "opponentVersion": 7
     }
   ]
 }

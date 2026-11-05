@@ -2,6 +2,7 @@
 import { bestDamage, genFor, type SetLike } from '@daily-battle/ai';
 import { sets as defaultSets, type SetsFile } from '@daily-battle/data';
 import { generateOpponent, teamSets, type DailyOpponent, type Style } from '@daily-battle/gen';
+import type { OpponentHistory } from '@daily-battle/gen/builder';
 import type { PokemonSet } from '@pkmn/sim';
 import { PIPELINE } from './config';
 import type { Bot, Job, JobResult } from './job';
@@ -178,6 +179,165 @@ export async function validateDay(
     if (!check.problems.length) return { opponent, candidate, accepted: 'pass', check, rejected };
     rejected.push({ candidate, check });
     if (!best || check.distance < best.check.distance) best = { opponent, candidate, check };
+  }
+  return { ...best!, accepted: 'closest', rejected };
+}
+
+/** What a v7 day is checked against: the week's pool and recommended team. */
+export interface WeekPlayers {
+  /** Teams a player might bring, for the Normal check. */
+  playerTeams: PokemonSet[][];
+  poolSets: SetLike[];
+  /** The pool's species (the Hard AI's prior for unseen foes). */
+  pool: string[];
+  /** The week's recommended team, for the Hard check; skipped without one. */
+  recommended?: PokemonSet[];
+}
+
+type ConfigV7 = typeof PIPELINE.opponentV7;
+
+/**
+ * Picks a day's v7 opponent (`PIPELINE.opponentV7`). Candidates come from the
+ * builder best first, `batch` at a time: each must not wall the pool, and a
+ * player's first try against Normal must win in the band (all the batch's
+ * games at once). Those in the band then face the slow check in order: the
+ * recommended team, played well, beats Hard often enough. The first to pass
+ * is the day's; if none does, the closest, leaning too strong (owner: a
+ * slightly too strong team beats a weak one).
+ * `build` is the v7 builder (`opponentBuilder`); `history` the earlier days, for variety.
+ */
+export async function validateDayV7(
+  day: string,
+  build: (day: string, history: OpponentHistory, candidate: number) => DailyOpponent,
+  history: OpponentHistory,
+  players: WeekPlayers,
+  sim: Simulator,
+  data: SetsFile = defaultSets,
+  cfg: ConfigV7 = PIPELINE.opponentV7,
+): Promise<DayResult> {
+  const rejected: DayResult['rejected'] = [];
+  let best: { opponent: DailyOpponent; candidate: number; check: OpponentCheck } | undefined;
+  const job = (
+    opponent: PokemonSet[],
+    style: Style,
+    bot: Bot,
+    player: PokemonSet[],
+    seed: string,
+    index: number,
+    hard: boolean,
+  ): Job => ({
+    format: data.meta.format,
+    bot,
+    player,
+    opponent,
+    style,
+    seed,
+    index,
+    ...(hard && { difficulty: 'hard' as const, pool: players.pool }),
+  });
+  const reject = (c: { opponent: DailyOpponent; candidate: number; check: OpponentCheck }) => {
+    rejected.push({ candidate: c.candidate, check: c.check });
+    if (!best || c.check.distance < best.check.distance) best = c;
+  };
+  const capRate = (rs: JobResult[]) => rs.filter((r) => r.turnCap).length / rs.length;
+
+  for (let start = 0; start < cfg.maxCandidates; start += cfg.batch) {
+    const batch = Array.from({ length: Math.min(cfg.batch, cfg.maxCandidates - start) }, (_, k) => {
+      const candidate = start + k;
+      const opponent = build(day, history, candidate);
+      const sets = teamSets(data, opponent.team);
+      const metrics: OpponentMetrics = {
+        turnCapRate: 0,
+        hardCounters: hardCounters(sets, players.poolSets, cfg.hardCounterMinDamage, data),
+      };
+      return { candidate, opponent, sets, metrics, problems: [] as string[] };
+    });
+    const open = batch.filter((c) => {
+      if (!c.metrics.hardCounters.length) return true;
+      c.problems.push(
+        `hard counter: nothing in the pool hurts ${c.metrics.hardCounters.join(', ')}`,
+      );
+      reject({ ...c, check: { metrics: c.metrics, problems: c.problems, distance: 1 } });
+      return false;
+    });
+
+    // Every open candidate's Normal games in one run.
+    const jobs = open.flatMap((c) =>
+      Array.from({ length: cfg.normalSamples }, (_, k) =>
+        job(
+          c.sets,
+          c.opponent.style,
+          'mid',
+          players.playerTeams[k % players.playerTeams.length]!,
+          `pipeline:v7:${day}:c${c.candidate}:normal`,
+          k,
+          false,
+        ),
+      ),
+    );
+    const results = await sim.run(jobs);
+    const inBand: typeof open = [];
+    for (const [i, c] of open.entries()) {
+      const rs = results.slice(i * cfg.normalSamples, (i + 1) * cfg.normalSamples);
+      c.metrics.uninformed = rateOf(rs);
+      c.metrics.turnCapRate = capRate(rs);
+      const rate = c.metrics.uninformed.rate;
+      const d = bandDistance(rate, cfg.normalBand);
+      if (d > 0 || c.metrics.turnCapRate > cfg.maxTurnCapRate) {
+        const easy = rate > cfg.normalBand[1];
+        if (d > 0) {
+          c.problems.push(
+            `${easy ? 'too easy' : 'too hard'} on Normal: ${pct(rate)} ` +
+              `(want ${pct(cfg.normalBand[0])}–${pct(cfg.normalBand[1])})`,
+          );
+        } else {
+          c.problems.push(`stalemates: ${pct(c.metrics.turnCapRate)} hit the turn cap`);
+        }
+        const distance = d > 0 ? (easy ? 1 + d : d) : 0.5;
+        reject({ ...c, check: { metrics: c.metrics, problems: c.problems, distance } });
+      } else {
+        inBand.push(c);
+      }
+    }
+
+    // The slow check, best candidate first, until one passes.
+    for (const c of inBand) {
+      const pass = (): DayResult => ({
+        opponent: c.opponent,
+        candidate: c.candidate,
+        accepted: 'pass',
+        check: { metrics: c.metrics, problems: [], distance: 0 },
+        rejected,
+      });
+      if (!players.recommended) return pass();
+      const rs = await sim.run(
+        Array.from({ length: cfg.hardSamples }, (_, k) =>
+          job(
+            c.sets,
+            c.opponent.style,
+            'strong',
+            players.recommended!,
+            `pipeline:v7:${day}:c${c.candidate}:hard`,
+            k,
+            true,
+          ),
+        ),
+      );
+      c.metrics.strong = rateOf(rs);
+      if (c.metrics.strong.rate >= cfg.minBeatable) return pass();
+      c.problems.push(
+        `too hard on Hard: the recommended team wins ${pct(c.metrics.strong.rate)} ` +
+          `(want at least ${pct(cfg.minBeatable)})`,
+      );
+      reject({
+        ...c,
+        check: {
+          metrics: c.metrics,
+          problems: c.problems,
+          distance: cfg.minBeatable - c.metrics.strong.rate,
+        },
+      });
+    }
   }
   return { ...best!, accepted: 'closest', rejected };
 }

@@ -1,0 +1,13406 @@
+{
+ "source": {
+  "url": "https://www.smogon.com/stats/2026-09/chaos/gen3ou-1500.json",
+  "month": "2026-09",
+  "cutoff": 1500,
+  "fetchedAt": "2026-11-04T23:48:41.638Z"
+ },
+ "data": {
+  "Aerodactyl": {
+   "teammates": {
+    "Tyranitar": 0.738,
+    "Swampert": 0.665,
+    "Skarmory": 0.486,
+    "Gengar": 0.392,
+    "Celebi": 0.289,
+    "Metagross": 0.256,
+    "Zapdos": 0.256,
+    "Blissey": 0.242,
+    "Forretress": 0.151,
+    "Magneton": 0.15,
+    "Jirachi": 0.142,
+    "Salamence": 0.126,
+    "Starmie": 0.102,
+    "Suicune": 0.087,
+    "Snorlax": 0.081,
+    "Dugtrio": 0.07,
+    "Claydol": 0.056,
+    "Registeel": 0.05,
+    "Smeargle": 0.049,
+    "Heracross": 0.038,
+    "Gyarados": 0.033,
+    "Flygon": 0.03,
+    "Charizard": 0.027,
+    "Venusaur": 0.027,
+    "Jolteon": 0.026,
+    "Breloom": 0.026,
+    "Medicham": 0.024
+   },
+   "counters": {
+    "Swampert": [
+     13015,
+     0.682,
+     0.004
+    ],
+    "Golduck": [
+     29,
+     0.882,
+     0.06
+    ],
+    "Porygon2": [
+     575,
+     0.689,
+     0.019
+    ],
+    "Suicune": [
+     6116,
+     0.605,
+     0.006
+    ],
+    "Metagross": [
+     9870,
+     0.596,
+     0.005
+    ],
+    "Regirock": [
+     508,
+     0.659,
+     0.021
+    ],
+    "Donphan": [
+     427,
+     0.66,
+     0.023
+    ],
+    "Milotic": [
+     958,
+     0.6,
+     0.016
+    ],
+    "Registeel": [
+     2036,
+     0.575,
+     0.011
+    ],
+    "Flygon": [
+     3016,
+     0.56,
+     0.009
+    ],
+    "Quagsire": [
+     151,
+     0.663,
+     0.038
+    ],
+    "Kingdra": [
+     542,
+     0.582,
+     0.021
+    ],
+    "Electrode": [
+     52,
+     0.741,
+     0.061
+    ],
+    "Jolteon": [
+     1608,
+     0.535,
+     0.012
+    ],
+    "Steelix": [
+     325,
+     0.584,
+     0.027
+    ],
+    "Vaporeon": [
+     438,
+     0.569,
+     0.024
+    ],
+    "Jirachi": [
+     5268,
+     0.501,
+     0.007
+    ],
+    "Slowbro": [
+     52,
+     0.717,
+     0.062
+    ],
+    "Aerodactyl": [
+     6186,
+     0.481,
+     0.006
+    ],
+    "Skarmory": [
+     9662,
+     0.442,
+     0.005
+    ],
+    "Scizor": [
+     172,
+     0.57,
+     0.038
+    ],
+    "Tyranitar": [
+     11891,
+     0.424,
+     0.005
+    ],
+    "Miltank": [
+     70,
+     0.62,
+     0.058
+    ],
+    "Rhydon": [
+     103,
+     0.544,
+     0.049
+    ],
+    "Marowak": [
+     215,
+     0.481,
+     0.034
+    ],
+    "Breloom": [
+     997,
+     0.398,
+     0.016
+    ],
+    "Linoone": [
+     106,
+     0.527,
+     0.048
+    ],
+    "Salamence": [
+     11246,
+     0.345,
+     0.004
+    ],
+    "Claydol": [
+     4104,
+     0.354,
+     0.007
+    ],
+    "Snorlax": [
+     3132,
+     0.353,
+     0.009
+    ]
+   }
+  },
+  "Alakazam": {
+   "teammates": {
+    "Gengar": 0.316,
+    "Tyranitar": 0.302,
+    "Swampert": 0.288,
+    "Blissey": 0.258,
+    "Salamence": 0.247,
+    "Zapdos": 0.222,
+    "Dugtrio": 0.21,
+    "Skarmory": 0.198,
+    "Forretress": 0.163,
+    "Metagross": 0.162,
+    "Aerodactyl": 0.158,
+    "Suicune": 0.147,
+    "Claydol": 0.145,
+    "Heracross": 0.135,
+    "Gyarados": 0.123,
+    "Jirachi": 0.117,
+    "Snorlax": 0.115,
+    "Starmie": 0.109,
+    "Medicham": 0.107,
+    "Raikou": 0.098,
+    "Jolteon": 0.097,
+    "Celebi": 0.079,
+    "Venusaur": 0.07,
+    "Slowbro": 0.064,
+    "Magneton": 0.059,
+    "Charizard": 0.057,
+    "Breloom": 0.047,
+    "Donphan": 0.046,
+    "Flygon": 0.042,
+    "Registeel": 0.038,
+    "Sceptile": 0.037,
+    "Machamp": 0.035,
+    "Scizor": 0.03,
+    "Linoone": 0.03,
+    "Moltres": 0.03,
+    "Ludicolo": 0.027,
+    "Regice": 0.027,
+    "Cloyster": 0.027,
+    "Hariyama": 0.024,
+    "Vaporeon": 0.023
+   },
+   "counters": {
+    "Aerodactyl": [
+     190,
+     0.926,
+     0.019
+    ],
+    "Tyranitar": [
+     567,
+     0.772,
+     0.018
+    ],
+    "Snorlax": [
+     172,
+     0.78,
+     0.032
+    ],
+    "Blissey": [
+     408,
+     0.661,
+     0.023
+    ],
+    "Houndoom": [
+     24,
+     0.852,
+     0.073
+    ],
+    "Jolteon": [
+     93,
+     0.689,
+     0.048
+    ],
+    "Metagross": [
+     236,
+     0.549,
+     0.032
+    ],
+    "Claydol": [
+     113,
+     0.522,
+     0.047
+    ],
+    "Registeel": [
+     47,
+     0.59,
+     0.072
+    ],
+    "Suicune": [
+     162,
+     0.42,
+     0.039
+    ],
+    "Dugtrio": [
+     89,
+     0.437,
+     0.053
+    ],
+    "Jirachi": [
+     125,
+     0.378,
+     0.043
+    ],
+    "Salamence": [
+     171,
+     0.35,
+     0.036
+    ],
+    "Swampert": [
+     251,
+     0.3,
+     0.029
+    ],
+    "Zapdos": [
+     185,
+     0.3,
+     0.034
+    ],
+    "Medicham": [
+     42,
+     0.457,
+     0.077
+    ],
+    "Celebi": [
+     248,
+     0.254,
+     0.028
+    ],
+    "Raikou": [
+     33,
+     0.477,
+     0.087
+    ],
+    "Regice": [
+     24,
+     0.53,
+     0.103
+    ],
+    "Starmie": [
+     143,
+     0.254,
+     0.036
+    ],
+    "Skarmory": [
+     365,
+     0.184,
+     0.02
+    ],
+    "Gyarados": [
+     33,
+     0.421,
+     0.086
+    ],
+    "Dusclops": [
+     22,
+     0.477,
+     0.107
+    ],
+    "Flygon": [
+     56,
+     0.271,
+     0.059
+    ],
+    "Magneton": [
+     74,
+     0.187,
+     0.045
+    ],
+    "Gengar": [
+     327,
+     0.052,
+     0.012
+    ],
+    "Charizard": [
+     45,
+     0.255,
+     0.065
+    ],
+    "Breloom": [
+     34,
+     0.295,
+     0.078
+    ],
+    "Moltres": [
+     30,
+     0.318,
+     0.085
+    ],
+    "Vaporeon": [
+     23,
+     0.388,
+     0.102
+    ]
+   }
+  },
+  "Armaldo": {
+   "teammates": {
+    "Blissey": 0.596,
+    "Claydol": 0.483,
+    "Suicune": 0.428,
+    "Dugtrio": 0.361,
+    "Zapdos": 0.339,
+    "Tyranitar": 0.211,
+    "Salamence": 0.205,
+    "Skarmory": 0.197,
+    "Forretress": 0.189,
+    "Swampert": 0.168,
+    "Metagross": 0.157,
+    "Flygon": 0.103,
+    "Jirachi": 0.098,
+    "Starmie": 0.092,
+    "Raikou": 0.081,
+    "Heracross": 0.077,
+    "Celebi": 0.073,
+    "Scizor": 0.072,
+    "Sceptile": 0.07,
+    "Gyarados": 0.069,
+    "Quagsire": 0.063,
+    "Milotic": 0.06,
+    "Magneton": 0.057,
+    "Snorlax": 0.049,
+    "Aerodactyl": 0.048,
+    "Gengar": 0.047,
+    "Breloom": 0.03,
+    "Cloyster": 0.028,
+    "Donphan": 0.026,
+    "Vaporeon": 0.024,
+    "Regice": 0.022
+   },
+   "counters": {
+    "Metagross": [
+     214,
+     0.887,
+     0.022
+    ],
+    "Kingdra": [
+     22,
+     0.953,
+     0.045
+    ],
+    "Swampert": [
+     378,
+     0.821,
+     0.02
+    ],
+    "Milotic": [
+     59,
+     0.861,
+     0.045
+    ],
+    "Suicune": [
+     224,
+     0.786,
+     0.027
+    ],
+    "Tyranitar": [
+     224,
+     0.619,
+     0.032
+    ],
+    "Aerodactyl": [
+     130,
+     0.647,
+     0.042
+    ],
+    "Magneton": [
+     64,
+     0.689,
+     0.058
+    ],
+    "Breloom": [
+     49,
+     0.712,
+     0.065
+    ],
+    "Heracross": [
+     25,
+     0.758,
+     0.086
+    ],
+    "Regirock": [
+     21,
+     0.763,
+     0.092
+    ],
+    "Flygon": [
+     61,
+     0.633,
+     0.062
+    ],
+    "Starmie": [
+     117,
+     0.563,
+     0.046
+    ],
+    "Salamence": [
+     197,
+     0.505,
+     0.036
+    ],
+    "Jirachi": [
+     111,
+     0.478,
+     0.047
+    ],
+    "Dugtrio": [
+     65,
+     0.532,
+     0.062
+    ],
+    "Medicham": [
+     24,
+     0.663,
+     0.096
+    ],
+    "Skarmory": [
+     362,
+     0.363,
+     0.025
+    ],
+    "Gengar": [
+     215,
+     0.273,
+     0.03
+    ],
+    "Zapdos": [
+     203,
+     0.264,
+     0.031
+    ],
+    "Blissey": [
+     291,
+     0.237,
+     0.025
+    ],
+    "Snorlax": [
+     230,
+     0.251,
+     0.029
+    ],
+    "Claydol": [
+     89,
+     0.323,
+     0.049
+    ],
+    "Registeel": [
+     50,
+     0.373,
+     0.068
+    ],
+    "Jolteon": [
+     42,
+     0.38,
+     0.075
+    ],
+    "Forretress": [
+     117,
+     0.235,
+     0.039
+    ],
+    "Charizard": [
+     41,
+     0.381,
+     0.076
+    ],
+    "Celebi": [
+     255,
+     0.11,
+     0.02
+    ],
+    "Gyarados": [
+     41,
+     0.309,
+     0.072
+    ],
+    "Raikou": [
+     21,
+     0.339,
+     0.103
+    ]
+   }
+  },
+  "Articuno": {
+   "teammates": {
+    "Skarmory": 0.803,
+    "Flygon": 0.614,
+    "Zapdos": 0.456,
+    "Blissey": 0.351,
+    "Jirachi": 0.282,
+    "Gyarados": 0.273,
+    "Gengar": 0.27,
+    "Moltres": 0.235,
+    "Aerodactyl": 0.212,
+    "Claydol": 0.13,
+    "Tyranitar": 0.128,
+    "Suicune": 0.116,
+    "Misdreavus": 0.109,
+    "Gligar": 0.099,
+    "Salamence": 0.068,
+    "Celebi": 0.068,
+    "Dugtrio": 0.066,
+    "Swampert": 0.061,
+    "Metagross": 0.06,
+    "Snorlax": 0.046,
+    "Magneton": 0.044,
+    "Starmie": 0.037,
+    "Dusclops": 0.028,
+    "Forretress": 0.026,
+    "Weezing": 0.026
+   },
+   "counters": {
+    "Aerodactyl": [
+     162,
+     0.887,
+     0.025
+    ],
+    "Metagross": [
+     259,
+     0.854,
+     0.022
+    ],
+    "Jirachi": [
+     197,
+     0.808,
+     0.028
+    ],
+    "Tyranitar": [
+     368,
+     0.779,
+     0.022
+    ],
+    "Charizard": [
+     53,
+     0.849,
+     0.049
+    ],
+    "Magneton": [
+     104,
+     0.79,
+     0.04
+    ],
+    "Moltres": [
+     51,
+     0.795,
+     0.057
+    ],
+    "Heracross": [
+     35,
+     0.826,
+     0.064
+    ],
+    "Raikou": [
+     31,
+     0.812,
+     0.07
+    ],
+    "Snorlax": [
+     149,
+     0.673,
+     0.038
+    ],
+    "Jolteon": [
+     48,
+     0.67,
+     0.068
+    ],
+    "Suicune": [
+     337,
+     0.499,
+     0.027
+    ],
+    "Regice": [
+     34,
+     0.686,
+     0.08
+    ],
+    "Zapdos": [
+     241,
+     0.479,
+     0.032
+    ],
+    "Jynx": [
+     24,
+     0.709,
+     0.093
+    ],
+    "Starmie": [
+     373,
+     0.436,
+     0.026
+    ],
+    "Registeel": [
+     83,
+     0.536,
+     0.055
+    ],
+    "Blissey": [
+     776,
+     0.386,
+     0.017
+    ],
+    "Forretress": [
+     70,
+     0.552,
+     0.059
+    ],
+    "Salamence": [
+     229,
+     0.421,
+     0.033
+    ],
+    "Skarmory": [
+     560,
+     0.31,
+     0.02
+    ],
+    "Gengar": [
+     326,
+     0.324,
+     0.026
+    ],
+    "Flygon": [
+     47,
+     0.481,
+     0.073
+    ],
+    "Celebi": [
+     305,
+     0.265,
+     0.025
+    ],
+    "Hariyama": [
+     35,
+     0.485,
+     0.085
+    ],
+    "Dugtrio": [
+     80,
+     0.353,
+     0.053
+    ],
+    "Swampert": [
+     494,
+     0.174,
+     0.017
+    ],
+    "Milotic": [
+     111,
+     0.27,
+     0.042
+    ],
+    "Dusclops": [
+     31,
+     0.407,
+     0.088
+    ],
+    "Claydol": [
+     195,
+     0.106,
+     0.022
+    ]
+   }
+  },
+  "Blastoise": {
+   "teammates": {
+    "Blissey": 0.591,
+    "Skarmory": 0.551,
+    "Jirachi": 0.448,
+    "Flygon": 0.442,
+    "Slaking": 0.439,
+    "Snorlax": 0.193,
+    "Metagross": 0.165,
+    "Salamence": 0.144,
+    "Charizard": 0.143,
+    "Magneton": 0.124,
+    "Venusaur": 0.111,
+    "Gengar": 0.101,
+    "Tyranitar": 0.092,
+    "Dugtrio": 0.084,
+    "Gyarados": 0.068,
+    "Alakazam": 0.052,
+    "Ludicolo": 0.049,
+    "Machamp": 0.047,
+    "Lapras": 0.043,
+    "Jolteon": 0.042,
+    "Vaporeon": 0.04,
+    "Suicune": 0.038,
+    "Aerodactyl": 0.036,
+    "Swampert": 0.033,
+    "Zapdos": 0.033,
+    "Starmie": 0.032,
+    "Blaziken": 0.026,
+    "Porygon2": 0.026,
+    "Sceptile": 0.025,
+    "Kingdra": 0.024,
+    "Celebi": 0.024,
+    "Heracross": 0.024,
+    "Weezing": 0.023,
+    "Medicham": 0.021
+   },
+   "counters": {
+    "Heracross": [
+     24,
+     0.938,
+     0.049
+    ],
+    "Snorlax": [
+     60,
+     0.824,
+     0.049
+    ],
+    "Zapdos": [
+     88,
+     0.786,
+     0.044
+    ],
+    "Blissey": [
+     123,
+     0.764,
+     0.038
+    ],
+    "Jolteon": [
+     25,
+     0.875,
+     0.066
+    ],
+    "Celebi": [
+     93,
+     0.761,
+     0.044
+    ],
+    "Gengar": [
+     127,
+     0.718,
+     0.04
+    ],
+    "Suicune": [
+     59,
+     0.74,
+     0.057
+    ],
+    "Starmie": [
+     70,
+     0.694,
+     0.055
+    ],
+    "Milotic": [
+     38,
+     0.674,
+     0.076
+    ],
+    "Jirachi": [
+     34,
+     0.587,
+     0.084
+    ],
+    "Aerodactyl": [
+     70,
+     0.443,
+     0.059
+    ],
+    "Metagross": [
+     99,
+     0.356,
+     0.048
+    ],
+    "Swampert": [
+     126,
+     0.307,
+     0.041
+    ],
+    "Salamence": [
+     95,
+     0.27,
+     0.045
+    ],
+    "Tyranitar": [
+     159,
+     0.215,
+     0.033
+    ],
+    "Skarmory": [
+     156,
+     0.202,
+     0.032
+    ],
+    "Medicham": [
+     30,
+     0.412,
+     0.09
+    ],
+    "Dugtrio": [
+     32,
+     0.23,
+     0.074
+    ],
+    "Claydol": [
+     41,
+     0.1,
+     0.047
+    ],
+    "Forretress": [
+     37,
+     0.098,
+     0.049
+    ],
+    "Charizard": [
+     25,
+     0.235,
+     0.084
+    ]
+   }
+  },
+  "Blaziken": {
+   "teammates": {
+    "Metagross": 0.537,
+    "Salamence": 0.485,
+    "Suicune": 0.316,
+    "Tyranitar": 0.283,
+    "Swampert": 0.266,
+    "Snorlax": 0.265,
+    "Sceptile": 0.252,
+    "Zapdos": 0.227,
+    "Gengar": 0.201,
+    "Celebi": 0.199,
+    "Starmie": 0.189,
+    "Heracross": 0.113,
+    "Raikou": 0.104,
+    "Dugtrio": 0.099,
+    "Porygon2": 0.096,
+    "Jirachi": 0.083,
+    "Gyarados": 0.075,
+    "Skarmory": 0.07,
+    "Aerodactyl": 0.062,
+    "Blissey": 0.06,
+    "Vaporeon": 0.058,
+    "Registeel": 0.056,
+    "Jolteon": 0.055,
+    "Magneton": 0.053,
+    "Breloom": 0.051,
+    "Claydol": 0.051,
+    "Forretress": 0.049,
+    "Regirock": 0.03,
+    "Flygon": 0.026,
+    "Cloyster": 0.022,
+    "Hariyama": 0.022,
+    "Regice": 0.022
+   },
+   "counters": {
+    "Starmie": [
+     454,
+     0.822,
+     0.018
+    ],
+    "Aerodactyl": [
+     350,
+     0.79,
+     0.022
+    ],
+    "Suicune": [
+     470,
+     0.777,
+     0.019
+    ],
+    "Dugtrio": [
+     157,
+     0.807,
+     0.032
+    ],
+    "Salamence": [
+     588,
+     0.703,
+     0.019
+    ],
+    "Milotic": [
+     95,
+     0.789,
+     0.042
+    ],
+    "Gyarados": [
+     92,
+     0.759,
+     0.045
+    ],
+    "Swampert": [
+     638,
+     0.577,
+     0.02
+    ],
+    "Flygon": [
+     124,
+     0.665,
+     0.042
+    ],
+    "Claydol": [
+     170,
+     0.637,
+     0.037
+    ],
+    "Vaporeon": [
+     32,
+     0.77,
+     0.074
+    ],
+    "Moltres": [
+     74,
+     0.648,
+     0.055
+    ],
+    "Zapdos": [
+     409,
+     0.5,
+     0.025
+    ],
+    "Kingdra": [
+     29,
+     0.706,
+     0.085
+    ],
+    "Raikou": [
+     44,
+     0.606,
+     0.074
+    ],
+    "Gengar": [
+     463,
+     0.375,
+     0.022
+    ],
+    "Charizard": [
+     144,
+     0.432,
+     0.041
+    ],
+    "Jolteon": [
+     114,
+     0.446,
+     0.047
+    ],
+    "Jirachi": [
+     160,
+     0.394,
+     0.039
+    ],
+    "Medicham": [
+     93,
+     0.445,
+     0.052
+    ],
+    "Slaking": [
+     23,
+     0.635,
+     0.101
+    ],
+    "Celebi": [
+     241,
+     0.336,
+     0.03
+    ],
+    "Snorlax": [
+     175,
+     0.313,
+     0.035
+    ],
+    "Hariyama": [
+     29,
+     0.536,
+     0.093
+    ],
+    "Blaziken": [
+     32,
+     0.492,
+     0.088
+    ],
+    "Regirock": [
+     26,
+     0.487,
+     0.097
+    ],
+    "Metagross": [
+     374,
+     0.165,
+     0.019
+    ],
+    "Tyranitar": [
+     762,
+     0.127,
+     0.012
+    ],
+    "Blissey": [
+     347,
+     0.125,
+     0.018
+    ],
+    "Skarmory": [
+     680,
+     0.061,
+     0.009
+    ]
+   }
+  },
+  "Blissey": {
+   "teammates": {
+    "Skarmory": 0.57,
+    "Tyranitar": 0.531,
+    "Swampert": 0.441,
+    "Gengar": 0.386,
+    "Claydol": 0.235,
+    "Starmie": 0.233,
+    "Salamence": 0.23,
+    "Suicune": 0.209,
+    "Forretress": 0.197,
+    "Aerodactyl": 0.194,
+    "Dugtrio": 0.184,
+    "Metagross": 0.177,
+    "Zapdos": 0.171,
+    "Jirachi": 0.11,
+    "Celebi": 0.094,
+    "Magneton": 0.08,
+    "Flygon": 0.079,
+    "Charizard": 0.066,
+    "Milotic": 0.051,
+    "Snorlax": 0.048,
+    "Hariyama": 0.041,
+    "Moltres": 0.041,
+    "Gyarados": 0.033,
+    "Dusclops": 0.031,
+    "Raikou": 0.031,
+    "Heracross": 0.03,
+    "Breloom": 0.024,
+    "Donphan": 0.021
+   },
+   "counters": {
+    "Heracross": [
+     2107,
+     0.89,
+     0.007
+    ],
+    "Machamp": [
+     525,
+     0.91,
+     0.012
+    ],
+    "Medicham": [
+     1404,
+     0.882,
+     0.009
+    ],
+    "Ursaring": [
+     165,
+     0.906,
+     0.023
+    ],
+    "Metagross": [
+     10366,
+     0.814,
+     0.004
+    ],
+    "Snorlax": [
+     6587,
+     0.812,
+     0.005
+    ],
+    "Hariyama": [
+     858,
+     0.836,
+     0.013
+    ],
+    "Breloom": [
+     1265,
+     0.814,
+     0.011
+    ],
+    "Tyranitar": [
+     19769,
+     0.78,
+     0.003
+    ],
+    "Blaziken": [
+     347,
+     0.818,
+     0.021
+    ],
+    "Regirock": [
+     608,
+     0.789,
+     0.017
+    ],
+    "Slaking": [
+     392,
+     0.736,
+     0.022
+    ],
+    "Scizor": [
+     196,
+     0.764,
+     0.03
+    ],
+    "Aerodactyl": [
+     5586,
+     0.637,
+     0.006
+    ],
+    "Marowak": [
+     207,
+     0.723,
+     0.031
+    ],
+    "Linoone": [
+     104,
+     0.761,
+     0.042
+    ],
+    "Smeargle": [
+     585,
+     0.66,
+     0.02
+    ],
+    "Armaldo": [
+     291,
+     0.684,
+     0.027
+    ],
+    "Rhydon": [
+     158,
+     0.712,
+     0.036
+    ],
+    "Swampert": [
+     15206,
+     0.551,
+     0.004
+    ],
+    "Quagsire": [
+     209,
+     0.66,
+     0.033
+    ],
+    "Suicune": [
+     12219,
+     0.535,
+     0.005
+    ],
+    "Camerupt": [
+     132,
+     0.668,
+     0.041
+    ],
+    "Jirachi": [
+     7395,
+     0.512,
+     0.006
+    ],
+    "Dusclops": [
+     775,
+     0.556,
+     0.018
+    ],
+    "Dugtrio": [
+     4185,
+     0.504,
+     0.008
+    ],
+    "Registeel": [
+     2100,
+     0.509,
+     0.011
+    ],
+    "Cloyster": [
+     635,
+     0.543,
+     0.02
+    ],
+    "Forretress": [
+     3709,
+     0.496,
+     0.008
+    ],
+    "Entei": [
+     67,
+     0.665,
+     0.058
+    ]
+   }
+  },
+  "Breloom": {
+   "teammates": {
+    "Tyranitar": 0.46,
+    "Snorlax": 0.381,
+    "Metagross": 0.322,
+    "Zapdos": 0.301,
+    "Salamence": 0.295,
+    "Swampert": 0.23,
+    "Suicune": 0.206,
+    "Charizard": 0.202,
+    "Blissey": 0.15,
+    "Aerodactyl": 0.131,
+    "Starmie": 0.128,
+    "Forretress": 0.117,
+    "Skarmory": 0.117,
+    "Houndoom": 0.11,
+    "Jirachi": 0.107,
+    "Gengar": 0.106,
+    "Magneton": 0.105,
+    "Registeel": 0.102,
+    "Jolteon": 0.089,
+    "Dugtrio": 0.087,
+    "Gyarados": 0.08,
+    "Claydol": 0.076,
+    "Celebi": 0.069,
+    "Regice": 0.052,
+    "Marowak": 0.051,
+    "Heracross": 0.047,
+    "Raikou": 0.047,
+    "Milotic": 0.045,
+    "Flygon": 0.044,
+    "Vaporeon": 0.043,
+    "Scizor": 0.042,
+    "Regirock": 0.041,
+    "Cloyster": 0.04,
+    "Linoone": 0.028,
+    "Medicham": 0.027,
+    "Weezing": 0.026,
+    "Moltres": 0.025,
+    "Kingdra": 0.023,
+    "Lapras": 0.022,
+    "Umbreon": 0.021
+   },
+   "counters": {
+    "Salamence": [
+     2114,
+     0.712,
+     0.01
+    ],
+    "Moltres": [
+     236,
+     0.774,
+     0.027
+    ],
+    "Charizard": [
+     335,
+     0.748,
+     0.024
+    ],
+    "Starmie": [
+     916,
+     0.653,
+     0.016
+    ],
+    "Gengar": [
+     1797,
+     0.632,
+     0.011
+    ],
+    "Celebi": [
+     1189,
+     0.634,
+     0.014
+    ],
+    "Jynx": [
+     64,
+     0.78,
+     0.052
+    ],
+    "Heracross": [
+     242,
+     0.649,
+     0.031
+    ],
+    "Gyarados": [
+     290,
+     0.636,
+     0.028
+    ],
+    "Zapdos": [
+     1199,
+     0.57,
+     0.014
+    ],
+    "Aerodactyl": [
+     997,
+     0.575,
+     0.016
+    ],
+    "Jirachi": [
+     457,
+     0.576,
+     0.023
+    ],
+    "Medicham": [
+     203,
+     0.575,
+     0.035
+    ],
+    "Venusaur": [
+     68,
+     0.637,
+     0.058
+    ],
+    "Blaziken": [
+     45,
+     0.67,
+     0.07
+    ],
+    "Kingdra": [
+     75,
+     0.605,
+     0.057
+    ],
+    "Dugtrio": [
+     652,
+     0.453,
+     0.019
+    ],
+    "Ludicolo": [
+     82,
+     0.549,
+     0.055
+    ],
+    "Claydol": [
+     762,
+     0.393,
+     0.018
+    ],
+    "Breloom": [
+     139,
+     0.479,
+     0.042
+    ],
+    "Metagross": [
+     1042,
+     0.368,
+     0.015
+    ],
+    "Suicune": [
+     1065,
+     0.366,
+     0.015
+    ],
+    "Alakazam": [
+     34,
+     0.61,
+     0.083
+    ],
+    "Slaking": [
+     91,
+     0.481,
+     0.052
+    ],
+    "Swampert": [
+     1780,
+     0.316,
+     0.011
+    ],
+    "Weezing": [
+     59,
+     0.531,
+     0.065
+    ],
+    "Raikou": [
+     163,
+     0.418,
+     0.039
+    ],
+    "Jolteon": [
+     295,
+     0.372,
+     0.028
+    ],
+    "Skarmory": [
+     1806,
+     0.295,
+     0.011
+    ],
+    "Dusclops": [
+     105,
+     0.428,
+     0.048
+    ]
+   }
+  },
+  "Camerupt": {
+   "teammates": {
+    "Metagross": 0.443,
+    "Salamence": 0.381,
+    "Snorlax": 0.318,
+    "Tyranitar": 0.288,
+    "Celebi": 0.249,
+    "Zapdos": 0.195,
+    "Suicune": 0.191,
+    "Swampert": 0.184,
+    "Gyarados": 0.177,
+    "Starmie": 0.171,
+    "Gengar": 0.162,
+    "Skarmory": 0.151,
+    "Aerodactyl": 0.128,
+    "Magneton": 0.121,
+    "Forretress": 0.119,
+    "Regirock": 0.119,
+    "Registeel": 0.117,
+    "Dugtrio": 0.106,
+    "Breloom": 0.098,
+    "Flygon": 0.095,
+    "Cloyster": 0.09,
+    "Heracross": 0.071,
+    "Blissey": 0.069,
+    "Rhydon": 0.063,
+    "Weezing": 0.062,
+    "Porygon2": 0.059,
+    "Regice": 0.058,
+    "Venusaur": 0.043,
+    "Jolteon": 0.042,
+    "Quagsire": 0.039,
+    "Raikou": 0.039,
+    "Charizard": 0.036,
+    "Claydol": 0.033,
+    "Vaporeon": 0.033,
+    "Hariyama": 0.032,
+    "Jirachi": 0.031,
+    "Milotic": 0.031,
+    "Houndoom": 0.022
+   },
+   "counters": {
+    "Swampert": [
+     267,
+     0.797,
+     0.025
+    ],
+    "Aerodactyl": [
+     102,
+     0.835,
+     0.037
+    ],
+    "Starmie": [
+     88,
+     0.803,
+     0.042
+    ],
+    "Suicune": [
+     135,
+     0.703,
+     0.039
+    ],
+    "Dugtrio": [
+     51,
+     0.737,
+     0.061
+    ],
+    "Flygon": [
+     51,
+     0.717,
+     0.063
+    ],
+    "Tyranitar": [
+     169,
+     0.611,
+     0.037
+    ],
+    "Milotic": [
+     23,
+     0.758,
+     0.088
+    ],
+    "Claydol": [
+     58,
+     0.642,
+     0.063
+    ],
+    "Salamence": [
+     122,
+     0.564,
+     0.045
+    ],
+    "Cloyster": [
+     22,
+     0.732,
+     0.095
+    ],
+    "Metagross": [
+     70,
+     0.56,
+     0.059
+    ],
+    "Snorlax": [
+     70,
+     0.465,
+     0.06
+    ],
+    "Charizard": [
+     41,
+     0.502,
+     0.078
+    ],
+    "Jirachi": [
+     91,
+     0.28,
+     0.047
+    ],
+    "Gengar": [
+     257,
+     0.152,
+     0.022
+    ],
+    "Celebi": [
+     102,
+     0.154,
+     0.036
+    ],
+    "Zapdos": [
+     174,
+     0.1,
+     0.023
+    ],
+    "Skarmory": [
+     162,
+     0.095,
+     0.023
+    ],
+    "Moltres": [
+     35,
+     0.307,
+     0.078
+    ],
+    "Blissey": [
+     132,
+     0.078,
+     0.023
+    ],
+    "Magneton": [
+     56,
+     0.074,
+     0.035
+    ],
+    "Jolteon": [
+     46,
+     0.029,
+     0.025
+    ],
+    "Registeel": [
+     45,
+     0.056,
+     0.034
+    ],
+    "Forretress": [
+     43,
+     0.06,
+     0.036
+    ],
+    "Raikou": [
+     35,
+     0.083,
+     0.046
+    ]
+   }
+  },
+  "Celebi": {
+   "teammates": {
+    "Tyranitar": 0.555,
+    "Swampert": 0.494,
+    "Metagross": 0.36,
+    "Aerodactyl": 0.281,
+    "Skarmory": 0.28,
+    "Salamence": 0.262,
+    "Zapdos": 0.224,
+    "Starmie": 0.21,
+    "Dugtrio": 0.19,
+    "Magneton": 0.178,
+    "Gengar": 0.162,
+    "Jirachi": 0.154,
+    "Suicune": 0.14,
+    "Blissey": 0.113,
+    "Claydol": 0.112,
+    "Snorlax": 0.102,
+    "Forretress": 0.096,
+    "Charizard": 0.089,
+    "Raikou": 0.085,
+    "Registeel": 0.081,
+    "Jolteon": 0.066,
+    "Gyarados": 0.061,
+    "Medicham": 0.052,
+    "Heracross": 0.044,
+    "Milotic": 0.039,
+    "Porygon2": 0.038,
+    "Flygon": 0.033,
+    "Moltres": 0.03,
+    "Kingdra": 0.027,
+    "Jynx": 0.027,
+    "Vaporeon": 0.027,
+    "Regirock": 0.022
+   },
+   "counters": {
+    "Houndoom": [
+     768,
+     0.915,
+     0.01
+    ],
+    "Charizard": [
+     2321,
+     0.826,
+     0.008
+    ],
+    "Jynx": [
+     428,
+     0.825,
+     0.018
+    ],
+    "Aerodactyl": [
+     7492,
+     0.767,
+     0.005
+    ],
+    "Regice": [
+     654,
+     0.791,
+     0.016
+    ],
+    "Moltres": [
+     1689,
+     0.759,
+     0.01
+    ],
+    "Salamence": [
+     8068,
+     0.696,
+     0.005
+    ],
+    "Armaldo": [
+     255,
+     0.763,
+     0.027
+    ],
+    "Linoone": [
+     93,
+     0.781,
+     0.043
+    ],
+    "Heracross": [
+     1096,
+     0.666,
+     0.014
+    ],
+    "Gyarados": [
+     1006,
+     0.632,
+     0.015
+    ],
+    "Raikou": [
+     1225,
+     0.616,
+     0.014
+    ],
+    "Tyranitar": [
+     10544,
+     0.58,
+     0.005
+    ],
+    "Entei": [
+     60,
+     0.766,
+     0.055
+    ],
+    "Alakazam": [
+     248,
+     0.647,
+     0.03
+    ],
+    "Dugtrio": [
+     3919,
+     0.547,
+     0.008
+    ],
+    "Metagross": [
+     5870,
+     0.533,
+     0.007
+    ],
+    "Articuno": [
+     305,
+     0.592,
+     0.028
+    ],
+    "Blaziken": [
+     241,
+     0.601,
+     0.032
+    ],
+    "Scizor": [
+     113,
+     0.647,
+     0.045
+    ],
+    "Jirachi": [
+     3974,
+     0.498,
+     0.008
+    ],
+    "Ludicolo": [
+     560,
+     0.545,
+     0.021
+    ],
+    "Camerupt": [
+     102,
+     0.635,
+     0.048
+    ],
+    "Medicham": [
+     1131,
+     0.481,
+     0.015
+    ],
+    "Kingdra": [
+     628,
+     0.497,
+     0.02
+    ],
+    "Dragonite": [
+     130,
+     0.589,
+     0.043
+    ],
+    "Snorlax": [
+     4589,
+     0.442,
+     0.007
+    ],
+    "Slaking": [
+     355,
+     0.516,
+     0.027
+    ],
+    "Celebi": [
+     8024,
+     0.425,
+     0.006
+    ],
+    "Flygon": [
+     1776,
+     0.435,
+     0.012
+    ]
+   }
+  },
+  "Charizard": {
+   "teammates": {
+    "Tyranitar": 0.617,
+    "Swampert": 0.452,
+    "Skarmory": 0.376,
+    "Metagross": 0.357,
+    "Zapdos": 0.288,
+    "Celebi": 0.269,
+    "Gengar": 0.258,
+    "Blissey": 0.242,
+    "Snorlax": 0.179,
+    "Flygon": 0.156,
+    "Suicune": 0.127,
+    "Salamence": 0.121,
+    "Breloom": 0.118,
+    "Jirachi": 0.117,
+    "Dugtrio": 0.113,
+    "Jolteon": 0.103,
+    "Claydol": 0.081,
+    "Aerodactyl": 0.08,
+    "Registeel": 0.076,
+    "Starmie": 0.07,
+    "Forretress": 0.065,
+    "Regice": 0.048,
+    "Raikou": 0.043,
+    "Medicham": 0.039,
+    "Venusaur": 0.036,
+    "Gyarados": 0.029,
+    "Magneton": 0.029,
+    "Heracross": 0.029,
+    "Lapras": 0.028,
+    "Vaporeon": 0.028,
+    "Milotic": 0.024,
+    "Umbreon": 0.022
+   },
+   "counters": {
+    "Aerodactyl": [
+     2901,
+     0.834,
+     0.007
+    ],
+    "Starmie": [
+     1927,
+     0.814,
+     0.009
+    ],
+    "Jolteon": [
+     626,
+     0.832,
+     0.015
+    ],
+    "Raikou": [
+     384,
+     0.839,
+     0.019
+    ],
+    "Milotic": [
+     492,
+     0.829,
+     0.017
+    ],
+    "Gyarados": [
+     462,
+     0.796,
+     0.019
+    ],
+    "Suicune": [
+     2209,
+     0.716,
+     0.01
+    ],
+    "Kingdra": [
+     206,
+     0.783,
+     0.029
+    ],
+    "Vaporeon": [
+     178,
+     0.749,
+     0.033
+    ],
+    "Zapdos": [
+     1773,
+     0.648,
+     0.011
+    ],
+    "Snorlax": [
+     1193,
+     0.654,
+     0.014
+    ],
+    "Tyranitar": [
+     3382,
+     0.604,
+     0.008
+    ],
+    "Flygon": [
+     716,
+     0.639,
+     0.018
+    ],
+    "Salamence": [
+     2280,
+     0.587,
+     0.01
+    ],
+    "Regirock": [
+     117,
+     0.709,
+     0.042
+    ],
+    "Miltank": [
+     30,
+     0.777,
+     0.075
+    ],
+    "Blissey": [
+     2334,
+     0.504,
+     0.01
+    ],
+    "Blastoise": [
+     25,
+     0.763,
+     0.085
+    ],
+    "Moltres": [
+     496,
+     0.513,
+     0.022
+    ],
+    "Gengar": [
+     1855,
+     0.448,
+     0.012
+    ],
+    "Charizard": [
+     560,
+     0.485,
+     0.021
+    ],
+    "Linoone": [
+     22,
+     0.762,
+     0.091
+    ],
+    "Houndoom": [
+     195,
+     0.534,
+     0.036
+    ],
+    "Alakazam": [
+     45,
+     0.667,
+     0.07
+    ],
+    "Blaziken": [
+     144,
+     0.525,
+     0.042
+    ],
+    "Ludicolo": [
+     91,
+     0.551,
+     0.052
+    ],
+    "Porygon2": [
+     106,
+     0.515,
+     0.049
+    ],
+    "Dragonite": [
+     40,
+     0.623,
+     0.077
+    ],
+    "Armaldo": [
+     41,
+     0.618,
+     0.076
+    ],
+    "Hariyama": [
+     99,
+     0.476,
+     0.05
+    ]
+   }
+  },
+  "Claydol": {
+   "teammates": {
+    "Suicune": 0.509,
+    "Metagross": 0.405,
+    "Blissey": 0.391,
+    "Tyranitar": 0.368,
+    "Skarmory": 0.352,
+    "Salamence": 0.34,
+    "Snorlax": 0.281,
+    "Dugtrio": 0.246,
+    "Gengar": 0.175,
+    "Celebi": 0.154,
+    "Zapdos": 0.136,
+    "Jirachi": 0.128,
+    "Magneton": 0.125,
+    "Swampert": 0.105,
+    "Milotic": 0.087,
+    "Aerodactyl": 0.074,
+    "Gyarados": 0.069,
+    "Jolteon": 0.063,
+    "Raikou": 0.059,
+    "Regice": 0.049,
+    "Registeel": 0.049,
+    "Hariyama": 0.043,
+    "Charizard": 0.037,
+    "Heracross": 0.036,
+    "Starmie": 0.036,
+    "Medicham": 0.033,
+    "Vaporeon": 0.031,
+    "Kingdra": 0.03,
+    "Dusclops": 0.03,
+    "Forretress": 0.027,
+    "Umbreon": 0.023,
+    "Regirock": 0.021,
+    "Jynx": 0.02,
+    "Breloom": 0.02
+   },
+   "counters": {
+    "Heracross": [
+     665,
+     0.802,
+     0.015
+    ],
+    "Ludicolo": [
+     253,
+     0.78,
+     0.026
+    ],
+    "Starmie": [
+     2158,
+     0.712,
+     0.01
+    ],
+    "Skarmory": [
+     8328,
+     0.66,
+     0.005
+    ],
+    "Suicune": [
+     3206,
+     0.666,
+     0.008
+    ],
+    "Swampert": [
+     4371,
+     0.66,
+     0.007
+    ],
+    "Jynx": [
+     134,
+     0.771,
+     0.036
+    ],
+    "Scizor": [
+     72,
+     0.798,
+     0.047
+    ],
+    "Kingdra": [
+     214,
+     0.711,
+     0.031
+    ],
+    "Cloyster": [
+     272,
+     0.692,
+     0.028
+    ],
+    "Dusclops": [
+     437,
+     0.663,
+     0.023
+    ],
+    "Porygon2": [
+     280,
+     0.674,
+     0.028
+    ],
+    "Celebi": [
+     2740,
+     0.582,
+     0.009
+    ],
+    "Charizard": [
+     732,
+     0.612,
+     0.018
+    ],
+    "Sableye": [
+     120,
+     0.703,
+     0.042
+    ],
+    "Sceptile": [
+     125,
+     0.698,
+     0.041
+    ],
+    "Milotic": [
+     523,
+     0.604,
+     0.021
+    ],
+    "Vaporeon": [
+     212,
+     0.639,
+     0.033
+    ],
+    "Umbreon": [
+     235,
+     0.622,
+     0.032
+    ],
+    "Aerodactyl": [
+     4104,
+     0.527,
+     0.008
+    ],
+    "Venusaur": [
+     150,
+     0.644,
+     0.039
+    ],
+    "Moltres": [
+     545,
+     0.562,
+     0.021
+    ],
+    "Medicham": [
+     698,
+     0.548,
+     0.019
+    ],
+    "Forretress": [
+     1509,
+     0.511,
+     0.013
+    ],
+    "Slaking": [
+     202,
+     0.588,
+     0.035
+    ],
+    "Gengar": [
+     6740,
+     0.439,
+     0.006
+    ],
+    "Armaldo": [
+     89,
+     0.6,
+     0.052
+    ],
+    "Breloom": [
+     762,
+     0.463,
+     0.018
+    ],
+    "Articuno": [
+     195,
+     0.531,
+     0.036
+    ],
+    "Misdreavus": [
+     183,
+     0.53,
+     0.037
+    ]
+   }
+  },
+  "Cloyster": {
+   "teammates": {
+    "Tyranitar": 0.59,
+    "Gengar": 0.467,
+    "Swampert": 0.444,
+    "Metagross": 0.409,
+    "Salamence": 0.4,
+    "Jolteon": 0.257,
+    "Snorlax": 0.211,
+    "Registeel": 0.201,
+    "Zapdos": 0.198,
+    "Aerodactyl": 0.136,
+    "Dugtrio": 0.132,
+    "Celebi": 0.127,
+    "Jirachi": 0.103,
+    "Raikou": 0.103,
+    "Blissey": 0.084,
+    "Suicune": 0.084,
+    "Claydol": 0.081,
+    "Starmie": 0.075,
+    "Magneton": 0.073,
+    "Moltres": 0.062,
+    "Breloom": 0.055,
+    "Regice": 0.049,
+    "Charizard": 0.045,
+    "Gyarados": 0.044,
+    "Flygon": 0.042,
+    "Regirock": 0.042,
+    "Houndoom": 0.036,
+    "Heracross": 0.034,
+    "Steelix": 0.026,
+    "Medicham": 0.024
+   },
+   "counters": {
+    "Gengar": [
+     1060,
+     0.914,
+     0.009
+    ],
+    "Magneton": [
+     350,
+     0.863,
+     0.018
+    ],
+    "Sceptile": [
+     25,
+     0.951,
+     0.043
+    ],
+    "Zapdos": [
+     962,
+     0.814,
+     0.013
+    ],
+    "Jolteon": [
+     216,
+     0.855,
+     0.024
+    ],
+    "Jirachi": [
+     404,
+     0.827,
+     0.019
+    ],
+    "Raikou": [
+     109,
+     0.868,
+     0.032
+    ],
+    "Celebi": [
+     363,
+     0.802,
+     0.021
+    ],
+    "Medicham": [
+     183,
+     0.818,
+     0.028
+    ],
+    "Starmie": [
+     558,
+     0.733,
+     0.019
+    ],
+    "Charizard": [
+     86,
+     0.821,
+     0.041
+    ],
+    "Moltres": [
+     52,
+     0.847,
+     0.05
+    ],
+    "Metagross": [
+     708,
+     0.694,
+     0.017
+    ],
+    "Aerodactyl": [
+     307,
+     0.697,
+     0.026
+    ],
+    "Breloom": [
+     94,
+     0.742,
+     0.045
+    ],
+    "Regice": [
+     56,
+     0.779,
+     0.055
+    ],
+    "Venusaur": [
+     46,
+     0.771,
+     0.062
+    ],
+    "Dusclops": [
+     49,
+     0.766,
+     0.061
+    ],
+    "Heracross": [
+     108,
+     0.691,
+     0.044
+    ],
+    "Suicune": [
+     659,
+     0.558,
+     0.019
+    ],
+    "Tyranitar": [
+     1133,
+     0.528,
+     0.015
+    ],
+    "Registeel": [
+     152,
+     0.617,
+     0.039
+    ],
+    "Blaziken": [
+     38,
+     0.712,
+     0.074
+    ],
+    "Salamence": [
+     595,
+     0.45,
+     0.02
+    ],
+    "Snorlax": [
+     483,
+     0.432,
+     0.023
+    ],
+    "Forretress": [
+     399,
+     0.425,
+     0.025
+    ],
+    "Houndoom": [
+     28,
+     0.679,
+     0.088
+    ],
+    "Kingdra": [
+     50,
+     0.594,
+     0.069
+    ],
+    "Jynx": [
+     56,
+     0.577,
+     0.066
+    ],
+    "Swampert": [
+     1213,
+     0.354,
+     0.014
+    ]
+   }
+  },
+  "Donphan": {
+   "teammates": {
+    "Blissey": 0.534,
+    "Tyranitar": 0.329,
+    "Suicune": 0.263,
+    "Celebi": 0.245,
+    "Zapdos": 0.213,
+    "Skarmory": 0.206,
+    "Salamence": 0.205,
+    "Forretress": 0.198,
+    "Magneton": 0.185,
+    "Umbreon": 0.158,
+    "Snorlax": 0.143,
+    "Dugtrio": 0.134,
+    "Milotic": 0.131,
+    "Gengar": 0.119,
+    "Jolteon": 0.116,
+    "Gyarados": 0.115,
+    "Dusclops": 0.101,
+    "Metagross": 0.1,
+    "Starmie": 0.085,
+    "Aerodactyl": 0.081,
+    "Vaporeon": 0.077,
+    "Heracross": 0.071,
+    "Jirachi": 0.066,
+    "Charizard": 0.063,
+    "Raikou": 0.054,
+    "Alakazam": 0.049,
+    "Sableye": 0.048,
+    "Hariyama": 0.046,
+    "Claydol": 0.044,
+    "Venusaur": 0.043,
+    "Slaking": 0.043,
+    "Porygon2": 0.042,
+    "Dragonite": 0.038,
+    "Quagsire": 0.037,
+    "Cloyster": 0.036,
+    "Houndoom": 0.035,
+    "Regice": 0.027,
+    "Moltres": 0.027,
+    "Lapras": 0.026,
+    "Breloom": 0.025
+   },
+   "counters": {
+    "Ludicolo": [
+     24,
+     0.957,
+     0.041
+    ],
+    "Milotic": [
+     38,
+     0.929,
+     0.041
+    ],
+    "Cloyster": [
+     26,
+     0.942,
+     0.046
+    ],
+    "Swampert": [
+     449,
+     0.823,
+     0.018
+    ],
+    "Celebi": [
+     272,
+     0.822,
+     0.023
+    ],
+    "Gengar": [
+     411,
+     0.775,
+     0.021
+    ],
+    "Suicune": [
+     324,
+     0.779,
+     0.023
+    ],
+    "Starmie": [
+     178,
+     0.79,
+     0.03
+    ],
+    "Skarmory": [
+     681,
+     0.623,
+     0.019
+    ],
+    "Claydol": [
+     147,
+     0.659,
+     0.039
+    ],
+    "Vaporeon": [
+     23,
+     0.791,
+     0.085
+    ],
+    "Breloom": [
+     69,
+     0.669,
+     0.056
+    ],
+    "Blissey": [
+     319,
+     0.495,
+     0.028
+    ],
+    "Charizard": [
+     56,
+     0.637,
+     0.064
+    ],
+    "Heracross": [
+     83,
+     0.594,
+     0.054
+    ],
+    "Flygon": [
+     108,
+     0.539,
+     0.048
+    ],
+    "Zapdos": [
+     343,
+     0.454,
+     0.027
+    ],
+    "Salamence": [
+     499,
+     0.431,
+     0.022
+    ],
+    "Venusaur": [
+     22,
+     0.714,
+     0.097
+    ],
+    "Regice": [
+     24,
+     0.642,
+     0.098
+    ],
+    "Moltres": [
+     48,
+     0.527,
+     0.072
+    ],
+    "Snorlax": [
+     166,
+     0.383,
+     0.038
+    ],
+    "Gyarados": [
+     65,
+     0.468,
+     0.062
+    ],
+    "Jirachi": [
+     128,
+     0.383,
+     0.043
+    ],
+    "Metagross": [
+     338,
+     0.291,
+     0.025
+    ],
+    "Jolteon": [
+     75,
+     0.367,
+     0.056
+    ],
+    "Registeel": [
+     71,
+     0.372,
+     0.057
+    ],
+    "Aerodactyl": [
+     427,
+     0.222,
+     0.02
+    ],
+    "Raikou": [
+     76,
+     0.343,
+     0.054
+    ],
+    "Tyranitar": [
+     1022,
+     0.168,
+     0.012
+    ]
+   }
+  },
+  "Dragonite": {
+   "teammates": {
+    "Umbreon": 0.325,
+    "Tyranitar": 0.284,
+    "Salamence": 0.231,
+    "Forretress": 0.221,
+    "Gyarados": 0.215,
+    "Claydol": 0.209,
+    "Snorlax": 0.199,
+    "Suicune": 0.178,
+    "Skarmory": 0.175,
+    "Swampert": 0.169,
+    "Metagross": 0.168,
+    "Gengar": 0.163,
+    "Jirachi": 0.14,
+    "Celebi": 0.116,
+    "Steelix": 0.099,
+    "Blissey": 0.091,
+    "Quagsire": 0.085,
+    "Zapdos": 0.082,
+    "Registeel": 0.079,
+    "Magneton": 0.078,
+    "Raikou": 0.076,
+    "Aerodactyl": 0.067,
+    "Starmie": 0.066,
+    "Donphan": 0.063,
+    "Smeargle": 0.063,
+    "Jolteon": 0.057,
+    "Regice": 0.057,
+    "Charizard": 0.055,
+    "Hariyama": 0.052,
+    "Ludicolo": 0.049,
+    "Scizor": 0.041,
+    "Kingdra": 0.037,
+    "Moltres": 0.036,
+    "Dusclops": 0.035,
+    "Milotic": 0.035,
+    "Vaporeon": 0.033,
+    "Flygon": 0.032,
+    "Blaziken": 0.031,
+    "Dugtrio": 0.03,
+    "Breloom": 0.028
+   },
+   "counters": {
+    "Suicune": [
+     203,
+     0.701,
+     0.032
+    ],
+    "Aerodactyl": [
+     118,
+     0.686,
+     0.043
+    ],
+    "Starmie": [
+     105,
+     0.681,
+     0.045
+    ],
+    "Swampert": [
+     257,
+     0.611,
+     0.03
+    ],
+    "Gengar": [
+     101,
+     0.619,
+     0.048
+    ],
+    "Zapdos": [
+     146,
+     0.586,
+     0.041
+    ],
+    "Blissey": [
+     193,
+     0.516,
+     0.036
+    ],
+    "Tyranitar": [
+     227,
+     0.486,
+     0.033
+    ],
+    "Snorlax": [
+     77,
+     0.557,
+     0.057
+    ],
+    "Salamence": [
+     205,
+     0.432,
+     0.035
+    ],
+    "Milotic": [
+     29,
+     0.641,
+     0.089
+    ],
+    "Raikou": [
+     33,
+     0.612,
+     0.084
+    ],
+    "Metagross": [
+     139,
+     0.426,
+     0.042
+    ],
+    "Skarmory": [
+     278,
+     0.336,
+     0.028
+    ],
+    "Gyarados": [
+     47,
+     0.503,
+     0.073
+    ],
+    "Jolteon": [
+     31,
+     0.56,
+     0.089
+    ],
+    "Dusclops": [
+     20,
+     0.618,
+     0.107
+    ],
+    "Jirachi": [
+     68,
+     0.4,
+     0.059
+    ],
+    "Celebi": [
+     130,
+     0.326,
+     0.041
+    ],
+    "Breloom": [
+     38,
+     0.474,
+     0.081
+    ],
+    "Registeel": [
+     28,
+     0.481,
+     0.094
+    ],
+    "Flygon": [
+     39,
+     0.413,
+     0.079
+    ],
+    "Heracross": [
+     44,
+     0.375,
+     0.073
+    ],
+    "Medicham": [
+     30,
+     0.402,
+     0.089
+    ],
+    "Charizard": [
+     40,
+     0.342,
+     0.075
+    ],
+    "Claydol": [
+     71,
+     0.201,
+     0.048
+    ],
+    "Dugtrio": [
+     85,
+     0.137,
+     0.037
+    ],
+    "Magneton": [
+     35,
+     0.271,
+     0.076
+    ],
+    "Forretress": [
+     62,
+     0.119,
+     0.041
+    ],
+    "Moltres": [
+     25,
+     0.279,
+     0.09
+    ]
+   }
+  },
+  "Dugtrio": {
+   "teammates": {
+    "Suicune": 0.441,
+    "Zapdos": 0.375,
+    "Blissey": 0.306,
+    "Metagross": 0.266,
+    "Celebi": 0.26,
+    "Gengar": 0.253,
+    "Claydol": 0.245,
+    "Tyranitar": 0.21,
+    "Skarmory": 0.195,
+    "Starmie": 0.183,
+    "Swampert": 0.171,
+    "Jirachi": 0.168,
+    "Snorlax": 0.16,
+    "Magneton": 0.132,
+    "Salamence": 0.103,
+    "Kingdra": 0.099,
+    "Aerodactyl": 0.094,
+    "Jynx": 0.089,
+    "Forretress": 0.084,
+    "Heracross": 0.083,
+    "Raikou": 0.078,
+    "Milotic": 0.077,
+    "Registeel": 0.058,
+    "Jolteon": 0.054,
+    "Regice": 0.052,
+    "Charizard": 0.051,
+    "Gyarados": 0.035,
+    "Porygon2": 0.034,
+    "Ludicolo": 0.029,
+    "Vaporeon": 0.027,
+    "Cloyster": 0.025,
+    "Dusclops": 0.023,
+    "Breloom": 0.023,
+    "Medicham": 0.022
+   },
+   "counters": {
+    "Aerodactyl": [
+     3099,
+     0.908,
+     0.005
+    ],
+    "Skarmory": [
+     5868,
+     0.884,
+     0.004
+    ],
+    "Salamence": [
+     5183,
+     0.853,
+     0.005
+    ],
+    "Donphan": [
+     98,
+     0.922,
+     0.027
+    ],
+    "Flygon": [
+     775,
+     0.827,
+     0.014
+    ],
+    "Porygon2": [
+     315,
+     0.849,
+     0.02
+    ],
+    "Gyarados": [
+     756,
+     0.818,
+     0.014
+    ],
+    "Weezing": [
+     90,
+     0.882,
+     0.034
+    ],
+    "Milotic": [
+     305,
+     0.828,
+     0.022
+    ],
+    "Gengar": [
+     2839,
+     0.755,
+     0.008
+    ],
+    "Linoone": [
+     67,
+     0.879,
+     0.04
+    ],
+    "Cloyster": [
+     266,
+     0.804,
+     0.024
+    ],
+    "Suicune": [
+     3019,
+     0.739,
+     0.008
+    ],
+    "Swampert": [
+     3540,
+     0.717,
+     0.008
+    ],
+    "Dragonite": [
+     85,
+     0.843,
+     0.039
+    ],
+    "Claydol": [
+     1036,
+     0.737,
+     0.014
+    ],
+    "Sceptile": [
+     112,
+     0.801,
+     0.038
+    ],
+    "Kingdra": [
+     209,
+     0.762,
+     0.029
+    ],
+    "Charizard": [
+     984,
+     0.696,
+     0.015
+    ],
+    "Ludicolo": [
+     190,
+     0.754,
+     0.031
+    ],
+    "Scizor": [
+     79,
+     0.804,
+     0.045
+    ],
+    "Starmie": [
+     1508,
+     0.646,
+     0.012
+    ],
+    "Vaporeon": [
+     211,
+     0.711,
+     0.031
+    ],
+    "Moltres": [
+     553,
+     0.64,
+     0.02
+    ],
+    "Forretress": [
+     941,
+     0.593,
+     0.016
+    ],
+    "Snorlax": [
+     1931,
+     0.569,
+     0.011
+    ],
+    "Zapdos": [
+     4040,
+     0.531,
+     0.008
+    ],
+    "Lapras": [
+     35,
+     0.776,
+     0.071
+    ],
+    "Blastoise": [
+     32,
+     0.77,
+     0.074
+    ],
+    "Breloom": [
+     652,
+     0.544,
+     0.019
+    ]
+   }
+  },
+  "Dusclops": {
+   "teammates": {
+    "Blissey": 0.553,
+    "Skarmory": 0.503,
+    "Suicune": 0.357,
+    "Claydol": 0.324,
+    "Zapdos": 0.269,
+    "Dugtrio": 0.251,
+    "Tyranitar": 0.221,
+    "Starmie": 0.212,
+    "Celebi": 0.211,
+    "Swampert": 0.207,
+    "Forretress": 0.201,
+    "Snorlax": 0.16,
+    "Hariyama": 0.122,
+    "Aerodactyl": 0.081,
+    "Magneton": 0.074,
+    "Milotic": 0.071,
+    "Donphan": 0.071,
+    "Vaporeon": 0.07,
+    "Smeargle": 0.068,
+    "Salamence": 0.068,
+    "Gyarados": 0.053,
+    "Breloom": 0.05,
+    "Houndoom": 0.049,
+    "Heracross": 0.047,
+    "Metagross": 0.038,
+    "Flygon": 0.034,
+    "Cloyster": 0.033,
+    "Moltres": 0.03,
+    "Medicham": 0.029,
+    "Jirachi": 0.028,
+    "Raikou": 0.024,
+    "Jolteon": 0.024,
+    "Gengar": 0.022
+   },
+   "counters": {
+    "Houndoom": [
+     50,
+     0.9,
+     0.042
+    ],
+    "Suicune": [
+     516,
+     0.765,
+     0.019
+    ],
+    "Tyranitar": [
+     717,
+     0.729,
+     0.017
+    ],
+    "Metagross": [
+     336,
+     0.753,
+     0.024
+    ],
+    "Raikou": [
+     86,
+     0.801,
+     0.043
+    ],
+    "Moltres": [
+     116,
+     0.761,
+     0.04
+    ],
+    "Magneton": [
+     182,
+     0.693,
+     0.034
+    ],
+    "Medicham": [
+     119,
+     0.687,
+     0.042
+    ],
+    "Smeargle": [
+     38,
+     0.768,
+     0.068
+    ],
+    "Machamp": [
+     23,
+     0.814,
+     0.081
+    ],
+    "Aerodactyl": [
+     274,
+     0.601,
+     0.03
+    ],
+    "Charizard": [
+     147,
+     0.627,
+     0.04
+    ],
+    "Milotic": [
+     98,
+     0.659,
+     0.048
+    ],
+    "Celebi": [
+     514,
+     0.518,
+     0.022
+    ],
+    "Jirachi": [
+     244,
+     0.556,
+     0.032
+    ],
+    "Heracross": [
+     124,
+     0.602,
+     0.044
+    ],
+    "Zapdos": [
+     493,
+     0.515,
+     0.023
+    ],
+    "Swampert": [
+     406,
+     0.518,
+     0.025
+    ],
+    "Gyarados": [
+     61,
+     0.639,
+     0.062
+    ],
+    "Salamence": [
+     418,
+     0.489,
+     0.024
+    ],
+    "Skarmory": [
+     707,
+     0.442,
+     0.019
+    ],
+    "Dugtrio": [
+     131,
+     0.528,
+     0.044
+    ],
+    "Snorlax": [
+     551,
+     0.427,
+     0.021
+    ],
+    "Jolteon": [
+     96,
+     0.541,
+     0.051
+    ],
+    "Hariyama": [
+     57,
+     0.584,
+     0.065
+    ],
+    "Breloom": [
+     105,
+     0.496,
+     0.049
+    ],
+    "Ludicolo": [
+     31,
+     0.636,
+     0.087
+    ],
+    "Blissey": [
+     775,
+     0.337,
+     0.017
+    ],
+    "Jynx": [
+     31,
+     0.607,
+     0.087
+    ],
+    "Regice": [
+     34,
+     0.587,
+     0.085
+    ]
+   }
+  },
+  "Electrode": {
+   "teammates": {
+    "Metagross": 0.448,
+    "Dugtrio": 0.44,
+    "Kingdra": 0.379,
+    "Snorlax": 0.281,
+    "Heracross": 0.276,
+    "Porygon2": 0.221,
+    "Marowak": 0.216,
+    "Zapdos": 0.175,
+    "Jynx": 0.155,
+    "Suicune": 0.154,
+    "Weezing": 0.154,
+    "Gengar": 0.148,
+    "Regice": 0.146,
+    "Salamence": 0.141,
+    "Breloom": 0.116,
+    "Houndoom": 0.115,
+    "Starmie": 0.098,
+    "Skarmory": 0.095,
+    "Medicham": 0.093,
+    "Jolteon": 0.076,
+    "Ludicolo": 0.074,
+    "Celebi": 0.074,
+    "Registeel": 0.065,
+    "Hariyama": 0.04,
+    "Claydol": 0.039,
+    "Charizard": 0.037,
+    "Tyranitar": 0.035,
+    "Aerodactyl": 0.032,
+    "Forretress": 0.029,
+    "Raikou": 0.028,
+    "Jirachi": 0.027,
+    "Regirock": 0.027,
+    "Milotic": 0.024,
+    "Swampert": 0.024
+   },
+   "counters": {
+    "Tyranitar": [
+     113,
+     0.805,
+     0.037
+    ],
+    "Claydol": [
+     39,
+     0.843,
+     0.058
+    ],
+    "Metagross": [
+     72,
+     0.703,
+     0.054
+    ],
+    "Snorlax": [
+     35,
+     0.718,
+     0.076
+    ],
+    "Swampert": [
+     115,
+     0.578,
+     0.046
+    ],
+    "Jirachi": [
+     30,
+     0.683,
+     0.085
+    ],
+    "Celebi": [
+     73,
+     0.569,
+     0.058
+    ],
+    "Blissey": [
+     57,
+     0.549,
+     0.066
+    ],
+    "Flygon": [
+     24,
+     0.653,
+     0.098
+    ],
+    "Registeel": [
+     26,
+     0.622,
+     0.095
+    ],
+    "Salamence": [
+     67,
+     0.415,
+     0.06
+    ],
+    "Magneton": [
+     25,
+     0.482,
+     0.099
+    ],
+    "Zapdos": [
+     71,
+     0.207,
+     0.048
+    ],
+    "Dugtrio": [
+     31,
+     0.351,
+     0.086
+    ],
+    "Gengar": [
+     64,
+     0.198,
+     0.05
+    ],
+    "Jolteon": [
+     34,
+     0.294,
+     0.078
+    ],
+    "Aerodactyl": [
+     52,
+     0.208,
+     0.056
+    ],
+    "Suicune": [
+     43,
+     0.214,
+     0.062
+    ],
+    "Skarmory": [
+     98,
+     0.041,
+     0.02
+    ],
+    "Starmie": [
+     45,
+     0.057,
+     0.035
+    ]
+   }
+  },
+  "Entei": {
+   "teammates": {
+    "Dugtrio": 0.501,
+    "Zapdos": 0.352,
+    "Suicune": 0.316,
+    "Skarmory": 0.253,
+    "Salamence": 0.213,
+    "Raikou": 0.206,
+    "Tyranitar": 0.195,
+    "Claydol": 0.189,
+    "Registeel": 0.153,
+    "Swampert": 0.15,
+    "Aerodactyl": 0.148,
+    "Blissey": 0.146,
+    "Gyarados": 0.146,
+    "Dusclops": 0.142,
+    "Exeggutor": 0.139,
+    "Snorlax": 0.138,
+    "Jirachi": 0.126,
+    "Starmie": 0.114,
+    "Jynx": 0.107,
+    "Kingdra": 0.099,
+    "Forretress": 0.098,
+    "Gengar": 0.09,
+    "Metagross": 0.088,
+    "Moltres": 0.087,
+    "Porygon2": 0.08,
+    "Hariyama": 0.077,
+    "Regirock": 0.055,
+    "Celebi": 0.051,
+    "Heracross": 0.038,
+    "Milotic": 0.023
+   },
+   "counters": {
+    "Aerodactyl": [
+     46,
+     0.855,
+     0.052
+    ],
+    "Starmie": [
+     33,
+     0.851,
+     0.062
+    ],
+    "Salamence": [
+     36,
+     0.738,
+     0.073
+    ],
+    "Tyranitar": [
+     84,
+     0.612,
+     0.053
+    ],
+    "Suicune": [
+     49,
+     0.637,
+     0.068
+    ],
+    "Swampert": [
+     45,
+     0.431,
+     0.074
+    ],
+    "Blissey": [
+     67,
+     0.334,
+     0.058
+    ],
+    "Gengar": [
+     53,
+     0.332,
+     0.064
+    ],
+    "Zapdos": [
+     25,
+     0.362,
+     0.096
+    ],
+    "Celebi": [
+     60,
+     0.152,
+     0.047
+    ],
+    "Skarmory": [
+     66,
+     0.02,
+     0.017
+    ],
+    "Metagross": [
+     47,
+     0.16,
+     0.053
+    ],
+    "Jirachi": [
+     29,
+     0.132,
+     0.063
+    ]
+   }
+  },
+  "Exeggutor": {
+   "teammates": {
+    "Snorlax": 0.495,
+    "Dugtrio": 0.416,
+    "Metagross": 0.359,
+    "Houndoom": 0.316,
+    "Heracross": 0.302,
+    "Moltres": 0.243,
+    "Charizard": 0.234,
+    "Suicune": 0.152,
+    "Swampert": 0.137,
+    "Claydol": 0.129,
+    "Salamence": 0.102,
+    "Gengar": 0.101,
+    "Blissey": 0.099,
+    "Zapdos": 0.097,
+    "Magneton": 0.096,
+    "Gyarados": 0.091,
+    "Jirachi": 0.087,
+    "Jolteon": 0.086,
+    "Skarmory": 0.074,
+    "Entei": 0.064,
+    "Hariyama": 0.06,
+    "Regirock": 0.058,
+    "Blaziken": 0.046,
+    "Registeel": 0.046,
+    "Forretress": 0.044,
+    "Dusclops": 0.042,
+    "Rhydon": 0.041,
+    "Linoone": 0.036,
+    "Celebi": 0.03,
+    "Cloyster": 0.028,
+    "Starmie": 0.026,
+    "Regice": 0.022,
+    "Alakazam": 0.021,
+    "Raikou": 0.02
+   },
+   "counters": {
+    "Jirachi": [
+     49,
+     0.687,
+     0.066
+    ],
+    "Salamence": [
+     84,
+     0.604,
+     0.053
+    ],
+    "Tyranitar": [
+     139,
+     0.524,
+     0.042
+    ],
+    "Aerodactyl": [
+     67,
+     0.587,
+     0.06
+    ],
+    "Charizard": [
+     24,
+     0.707,
+     0.093
+    ],
+    "Blissey": [
+     119,
+     0.492,
+     0.046
+    ],
+    "Metagross": [
+     59,
+     0.55,
+     0.065
+    ],
+    "Zapdos": [
+     91,
+     0.353,
+     0.05
+    ],
+    "Snorlax": [
+     42,
+     0.444,
+     0.076
+    ],
+    "Skarmory": [
+     99,
+     0.314,
+     0.047
+    ],
+    "Celebi": [
+     73,
+     0.33,
+     0.055
+    ],
+    "Starmie": [
+     55,
+     0.369,
+     0.065
+    ],
+    "Gengar": [
+     64,
+     0.3,
+     0.057
+    ],
+    "Dugtrio": [
+     47,
+     0.345,
+     0.07
+    ],
+    "Swampert": [
+     115,
+     0.13,
+     0.031
+    ],
+    "Suicune": [
+     65,
+     0.168,
+     0.046
+    ],
+    "Claydol": [
+     35,
+     0.132,
+     0.057
+    ],
+    "Magneton": [
+     21,
+     0.237,
+     0.093
+    ],
+    "Jolteon": [
+     21,
+     0.233,
+     0.093
+    ]
+   }
+  },
+  "Flygon": {
+   "teammates": {
+    "Skarmory": 0.674,
+    "Tyranitar": 0.608,
+    "Gengar": 0.436,
+    "Jirachi": 0.413,
+    "Zapdos": 0.356,
+    "Blissey": 0.316,
+    "Charizard": 0.169,
+    "Moltres": 0.168,
+    "Magneton": 0.122,
+    "Celebi": 0.109,
+    "Starmie": 0.103,
+    "Aerodactyl": 0.097,
+    "Metagross": 0.087,
+    "Forretress": 0.073,
+    "Articuno": 0.073,
+    "Swampert": 0.069,
+    "Gyarados": 0.067,
+    "Snorlax": 0.062,
+    "Medicham": 0.062,
+    "Milotic": 0.06,
+    "Registeel": 0.057,
+    "Salamence": 0.052,
+    "Jolteon": 0.051,
+    "Suicune": 0.043,
+    "Porygon2": 0.037,
+    "Misdreavus": 0.036,
+    "Dugtrio": 0.036,
+    "Weezing": 0.031,
+    "Machamp": 0.031,
+    "Breloom": 0.028,
+    "Slaking": 0.026,
+    "Blastoise": 0.025,
+    "Heracross": 0.024,
+    "Venusaur": 0.021
+   },
+   "counters": {
+    "Porygon2": [
+     190,
+     0.87,
+     0.024
+    ],
+    "Gengar": [
+     2625,
+     0.802,
+     0.008
+    ],
+    "Skarmory": [
+     5012,
+     0.755,
+     0.006
+    ],
+    "Suicune": [
+     1860,
+     0.721,
+     0.01
+    ],
+    "Milotic": [
+     369,
+     0.764,
+     0.022
+    ],
+    "Kingdra": [
+     181,
+     0.793,
+     0.03
+    ],
+    "Swampert": [
+     2988,
+     0.705,
+     0.008
+    ],
+    "Starmie": [
+     1313,
+     0.716,
+     0.012
+    ],
+    "Sceptile": [
+     47,
+     0.84,
+     0.053
+    ],
+    "Ludicolo": [
+     97,
+     0.775,
+     0.042
+    ],
+    "Cloyster": [
+     128,
+     0.732,
+     0.039
+    ],
+    "Lapras": [
+     30,
+     0.841,
+     0.067
+    ],
+    "Weezing": [
+     56,
+     0.768,
+     0.056
+    ],
+    "Regice": [
+     109,
+     0.711,
+     0.044
+    ],
+    "Vaporeon": [
+     126,
+     0.682,
+     0.042
+    ],
+    "Breloom": [
+     249,
+     0.614,
+     0.031
+    ],
+    "Snorlax": [
+     1098,
+     0.542,
+     0.015
+    ],
+    "Blissey": [
+     2211,
+     0.503,
+     0.011
+    ],
+    "Heracross": [
+     364,
+     0.564,
+     0.026
+    ],
+    "Salamence": [
+     3102,
+     0.496,
+     0.009
+    ],
+    "Alakazam": [
+     56,
+     0.664,
+     0.063
+    ],
+    "Quagsire": [
+     47,
+     0.677,
+     0.068
+    ],
+    "Celebi": [
+     1776,
+     0.434,
+     0.012
+    ],
+    "Forretress": [
+     687,
+     0.423,
+     0.019
+    ],
+    "Claydol": [
+     1235,
+     0.38,
+     0.014
+    ],
+    "Zapdos": [
+     2869,
+     0.359,
+     0.009
+    ],
+    "Gyarados": [
+     500,
+     0.401,
+     0.022
+    ],
+    "Aerodactyl": [
+     3016,
+     0.342,
+     0.009
+    ],
+    "Jirachi": [
+     1032,
+     0.367,
+     0.015
+    ],
+    "Flygon": [
+     693,
+     0.371,
+     0.018
+    ]
+   }
+  },
+  "Forretress": {
+   "teammates": {
+    "Tyranitar": 0.668,
+    "Swampert": 0.568,
+    "Blissey": 0.486,
+    "Gengar": 0.362,
+    "Aerodactyl": 0.3,
+    "Salamence": 0.234,
+    "Celebi": 0.194,
+    "Zapdos": 0.194,
+    "Metagross": 0.147,
+    "Suicune": 0.138,
+    "Jirachi": 0.131,
+    "Dugtrio": 0.124,
+    "Starmie": 0.12,
+    "Registeel": 0.092,
+    "Snorlax": 0.086,
+    "Moltres": 0.086,
+    "Jolteon": 0.084,
+    "Milotic": 0.073,
+    "Houndoom": 0.056,
+    "Breloom": 0.046,
+    "Flygon": 0.045,
+    "Charizard": 0.044,
+    "Raikou": 0.04,
+    "Claydol": 0.039,
+    "Heracross": 0.037,
+    "Umbreon": 0.035,
+    "Magneton": 0.032,
+    "Hariyama": 0.03,
+    "Medicham": 0.028,
+    "Dusclops": 0.028,
+    "Vaporeon": 0.026
+   },
+   "counters": {
+    "Charizard": [
+     1044,
+     0.903,
+     0.009
+    ],
+    "Jirachi": [
+     1602,
+     0.854,
+     0.009
+    ],
+    "Blaziken": [
+     193,
+     0.875,
+     0.024
+    ],
+    "Moltres": [
+     826,
+     0.806,
+     0.014
+    ],
+    "Houndoom": [
+     175,
+     0.854,
+     0.027
+    ],
+    "Gengar": [
+     5335,
+     0.767,
+     0.006
+    ],
+    "Tyranitar": [
+     4599,
+     0.734,
+     0.007
+    ],
+    "Camerupt": [
+     43,
+     0.892,
+     0.047
+    ],
+    "Salamence": [
+     2863,
+     0.726,
+     0.008
+    ],
+    "Breloom": [
+     487,
+     0.764,
+     0.019
+    ],
+    "Magneton": [
+     2069,
+     0.708,
+     0.01
+    ],
+    "Alakazam": [
+     81,
+     0.826,
+     0.042
+    ],
+    "Weezing": [
+     95,
+     0.809,
+     0.04
+    ],
+    "Sableye": [
+     86,
+     0.813,
+     0.042
+    ],
+    "Suicune": [
+     1877,
+     0.681,
+     0.011
+    ],
+    "Dusclops": [
+     263,
+     0.73,
+     0.027
+    ],
+    "Zapdos": [
+     2424,
+     0.64,
+     0.01
+    ],
+    "Blastoise": [
+     37,
+     0.826,
+     0.063
+    ],
+    "Swampert": [
+     3830,
+     0.588,
+     0.008
+    ],
+    "Armaldo": [
+     117,
+     0.715,
+     0.042
+    ],
+    "Aerodactyl": [
+     1910,
+     0.586,
+     0.011
+    ],
+    "Marowak": [
+     80,
+     0.73,
+     0.05
+    ],
+    "Vaporeon": [
+     232,
+     0.645,
+     0.031
+    ],
+    "Raikou": [
+     298,
+     0.623,
+     0.028
+    ],
+    "Starmie": [
+     1757,
+     0.553,
+     0.012
+    ],
+    "Celebi": [
+     2287,
+     0.532,
+     0.01
+    ],
+    "Kingdra": [
+     132,
+     0.653,
+     0.041
+    ],
+    "Donphan": [
+     117,
+     0.656,
+     0.044
+    ],
+    "Gardevoir": [
+     25,
+     0.798,
+     0.081
+    ],
+    "Venusaur": [
+     190,
+     0.617,
+     0.035
+    ]
+   }
+  },
+  "Gardevoir": {
+   "teammates": {
+    "Metagross": 0.583,
+    "Starmie": 0.524,
+    "Skarmory": 0.503,
+    "Blissey": 0.459,
+    "Raikou": 0.368,
+    "Magneton": 0.306,
+    "Linoone": 0.25,
+    "Snorlax": 0.237,
+    "Heracross": 0.217,
+    "Suicune": 0.111,
+    "Dugtrio": 0.105,
+    "Tyranitar": 0.083,
+    "Salamence": 0.076,
+    "Porygon2": 0.073,
+    "Claydol": 0.073,
+    "Breloom": 0.072,
+    "Zapdos": 0.046,
+    "Jirachi": 0.042,
+    "Aerodactyl": 0.04,
+    "Registeel": 0.038,
+    "Swampert": 0.036,
+    "Gyarados": 0.034,
+    "Flygon": 0.033,
+    "Houndoom": 0.027,
+    "Gengar": 0.026,
+    "Forretress": 0.023,
+    "Smeargle": 0.023
+   },
+   "counters": {
+    "Tyranitar": [
+     244,
+     0.866,
+     0.022
+    ],
+    "Snorlax": [
+     76,
+     0.832,
+     0.043
+    ],
+    "Aerodactyl": [
+     76,
+     0.794,
+     0.046
+    ],
+    "Blissey": [
+     204,
+     0.621,
+     0.034
+    ],
+    "Suicune": [
+     91,
+     0.599,
+     0.051
+    ],
+    "Metagross": [
+     97,
+     0.584,
+     0.05
+    ],
+    "Swampert": [
+     115,
+     0.513,
+     0.047
+    ],
+    "Salamence": [
+     95,
+     0.531,
+     0.051
+    ],
+    "Celebi": [
+     108,
+     0.502,
+     0.048
+    ],
+    "Jirachi": [
+     67,
+     0.511,
+     0.061
+    ],
+    "Zapdos": [
+     86,
+     0.474,
+     0.054
+    ],
+    "Charizard": [
+     26,
+     0.619,
+     0.096
+    ],
+    "Starmie": [
+     93,
+     0.418,
+     0.051
+    ],
+    "Dugtrio": [
+     75,
+     0.402,
+     0.057
+    ],
+    "Flygon": [
+     29,
+     0.467,
+     0.093
+    ],
+    "Magneton": [
+     101,
+     0.26,
+     0.044
+    ],
+    "Skarmory": [
+     139,
+     0.211,
+     0.035
+    ],
+    "Gengar": [
+     144,
+     0.206,
+     0.034
+    ],
+    "Registeel": [
+     20,
+     0.508,
+     0.112
+    ],
+    "Claydol": [
+     56,
+     0.293,
+     0.061
+    ],
+    "Jolteon": [
+     50,
+     0.293,
+     0.064
+    ],
+    "Breloom": [
+     26,
+     0.409,
+     0.096
+    ],
+    "Forretress": [
+     25,
+     0.129,
+     0.067
+    ]
+   }
+  },
+  "Gengar": {
+   "teammates": {
+    "Tyranitar": 0.736,
+    "Skarmory": 0.529,
+    "Swampert": 0.51,
+    "Blissey": 0.322,
+    "Metagross": 0.287,
+    "Aerodactyl": 0.262,
+    "Starmie": 0.215,
+    "Zapdos": 0.203,
+    "Jolteon": 0.172,
+    "Dugtrio": 0.127,
+    "Jirachi": 0.123,
+    "Forretress": 0.122,
+    "Salamence": 0.122,
+    "Suicune": 0.12,
+    "Celebi": 0.111,
+    "Flygon": 0.091,
+    "Claydol": 0.088,
+    "Charizard": 0.058,
+    "Magneton": 0.058,
+    "Snorlax": 0.057,
+    "Moltres": 0.055,
+    "Registeel": 0.049,
+    "Cloyster": 0.045,
+    "Smeargle": 0.043,
+    "Ludicolo": 0.039,
+    "Regice": 0.031,
+    "Kingdra": 0.024,
+    "Jynx": 0.023,
+    "Raikou": 0.022,
+    "Heracross": 0.021
+   },
+   "counters": {
+    "Alakazam": [
+     327,
+     0.863,
+     0.019
+    ],
+    "Raikou": [
+     1690,
+     0.805,
+     0.01
+    ],
+    "Regice": [
+     886,
+     0.763,
+     0.014
+    ],
+    "Aerodactyl": [
+     6594,
+     0.727,
+     0.005
+    ],
+    "Jirachi": [
+     4598,
+     0.709,
+     0.007
+    ],
+    "Jolteon": [
+     3107,
+     0.71,
+     0.008
+    ],
+    "Metagross": [
+     6916,
+     0.668,
+     0.006
+    ],
+    "Umbreon": [
+     749,
+     0.706,
+     0.017
+    ],
+    "Tyranitar": [
+     15519,
+     0.655,
+     0.004
+    ],
+    "Camerupt": [
+     257,
+     0.741,
+     0.027
+    ],
+    "Snorlax": [
+     6370,
+     0.643,
+     0.006
+    ],
+    "Dusclops": [
+     491,
+     0.644,
+     0.022
+    ],
+    "Porygon2": [
+     424,
+     0.646,
+     0.023
+    ],
+    "Regirock": [
+     491,
+     0.638,
+     0.022
+    ],
+    "Celebi": [
+     6628,
+     0.573,
+     0.006
+    ],
+    "Armaldo": [
+     215,
+     0.671,
+     0.032
+    ],
+    "Electrode": [
+     64,
+     0.751,
+     0.054
+    ],
+    "Blissey": [
+     14684,
+     0.544,
+     0.004
+    ],
+    "Gardevoir": [
+     144,
+     0.677,
+     0.039
+    ],
+    "Magneton": [
+     2745,
+     0.551,
+     0.009
+    ],
+    "Machamp": [
+     451,
+     0.58,
+     0.023
+    ],
+    "Kingdra": [
+     577,
+     0.563,
+     0.021
+    ],
+    "Medicham": [
+     1951,
+     0.522,
+     0.011
+    ],
+    "Articuno": [
+     326,
+     0.575,
+     0.027
+    ],
+    "Zapdos": [
+     6685,
+     0.489,
+     0.006
+    ],
+    "Gengar": [
+     7721,
+     0.47,
+     0.006
+    ],
+    "Ludicolo": [
+     380,
+     0.542,
+     0.026
+    ],
+    "Jynx": [
+     288,
+     0.546,
+     0.029
+    ],
+    "Claydol": [
+     6740,
+     0.447,
+     0.006
+    ],
+    "Houndoom": [
+     934,
+     0.478,
+     0.016
+    ]
+   }
+  },
+  "Gligar": {
+   "teammates": {
+    "Zapdos": 0.816,
+    "Skarmory": 0.813,
+    "Gyarados": 0.521,
+    "Aerodactyl": 0.449,
+    "Articuno": 0.435,
+    "Blissey": 0.256,
+    "Jirachi": 0.256,
+    "Misdreavus": 0.21,
+    "Weezing": 0.121,
+    "Flygon": 0.12,
+    "Tyranitar": 0.098,
+    "Gengar": 0.098,
+    "Starmie": 0.081,
+    "Magneton": 0.075,
+    "Dugtrio": 0.062,
+    "Swampert": 0.06,
+    "Celebi": 0.052,
+    "Heracross": 0.043,
+    "Claydol": 0.042,
+    "Blaziken": 0.041,
+    "Suicune": 0.033,
+    "Forretress": 0.021
+   },
+   "counters": {
+    "Skarmory": [
+     149,
+     0.864,
+     0.028
+    ],
+    "Gengar": [
+     44,
+     0.869,
+     0.051
+    ],
+    "Suicune": [
+     38,
+     0.831,
+     0.061
+    ],
+    "Swampert": [
+     51,
+     0.771,
+     0.059
+    ],
+    "Starmie": [
+     30,
+     0.814,
+     0.071
+    ],
+    "Salamence": [
+     74,
+     0.634,
+     0.056
+    ],
+    "Claydol": [
+     23,
+     0.691,
+     0.096
+    ],
+    "Zapdos": [
+     67,
+     0.497,
+     0.061
+    ],
+    "Celebi": [
+     34,
+     0.582,
+     0.085
+    ],
+    "Aerodactyl": [
+     47,
+     0.52,
+     0.073
+    ],
+    "Blissey": [
+     28,
+     0.548,
+     0.094
+    ],
+    "Tyranitar": [
+     134,
+     0.219,
+     0.036
+    ],
+    "Snorlax": [
+     27,
+     0.432,
+     0.095
+    ],
+    "Metagross": [
+     48,
+     0.282,
+     0.065
+    ],
+    "Magneton": [
+     50,
+     0.063,
+     0.034
+    ],
+    "Raikou": [
+     21,
+     0.21,
+     0.089
+    ]
+   }
+  },
+  "Golduck": {
+   "teammates": {
+    "Metagross": 0.574,
+    "Tyranitar": 0.519,
+    "Dugtrio": 0.499,
+    "Celebi": 0.365,
+    "Zapdos": 0.327,
+    "Gengar": 0.287,
+    "Suicune": 0.263,
+    "Salamence": 0.251,
+    "Magneton": 0.245,
+    "Registeel": 0.242,
+    "Snorlax": 0.207,
+    "Starmie": 0.158,
+    "Jolteon": 0.148,
+    "Claydol": 0.115,
+    "Swampert": 0.111,
+    "Smeargle": 0.074,
+    "Skarmory": 0.06,
+    "Gyarados": 0.047,
+    "Moltres": 0.033,
+    "Jirachi": 0.026,
+    "Breloom": 0.021,
+    "Charizard": 0.021,
+    "Dragonite": 0.02
+   },
+   "counters": {
+    "Blissey": [
+     57,
+     0.677,
+     0.062
+    ],
+    "Snorlax": [
+     31,
+     0.738,
+     0.079
+    ],
+    "Zapdos": [
+     32,
+     0.599,
+     0.086
+    ],
+    "Starmie": [
+     28,
+     0.619,
+     0.092
+    ],
+    "Suicune": [
+     26,
+     0.526,
+     0.098
+    ],
+    "Metagross": [
+     53,
+     0.34,
+     0.065
+    ],
+    "Gengar": [
+     26,
+     0.455,
+     0.098
+    ],
+    "Celebi": [
+     32,
+     0.41,
+     0.088
+    ],
+    "Swampert": [
+     39,
+     0.35,
+     0.076
+    ],
+    "Tyranitar": [
+     71,
+     0.122,
+     0.039
+    ],
+    "Salamence": [
+     44,
+     0.154,
+     0.055
+    ],
+    "Skarmory": [
+     32,
+     0.146,
+     0.063
+    ],
+    "Aerodactyl": [
+     29,
+     0.098,
+     0.055
+    ]
+   }
+  },
+  "Gyarados": {
+   "teammates": {
+    "Magneton": 0.379,
+    "Metagross": 0.369,
+    "Tyranitar": 0.286,
+    "Snorlax": 0.266,
+    "Celebi": 0.254,
+    "Salamence": 0.253,
+    "Claydol": 0.208,
+    "Blissey": 0.166,
+    "Medicham": 0.148,
+    "Suicune": 0.138,
+    "Aerodactyl": 0.133,
+    "Zapdos": 0.123,
+    "Skarmory": 0.12,
+    "Gengar": 0.118,
+    "Swampert": 0.114,
+    "Dugtrio": 0.107,
+    "Raikou": 0.106,
+    "Heracross": 0.093,
+    "Starmie": 0.088,
+    "Kingdra": 0.087,
+    "Flygon": 0.084,
+    "Breloom": 0.064,
+    "Umbreon": 0.063,
+    "Jirachi": 0.062,
+    "Jolteon": 0.061,
+    "Registeel": 0.056,
+    "Houndoom": 0.045,
+    "Steelix": 0.042,
+    "Articuno": 0.041,
+    "Regirock": 0.041,
+    "Scizor": 0.041,
+    "Charizard": 0.04,
+    "Moltres": 0.035,
+    "Forretress": 0.033,
+    "Marowak": 0.026,
+    "Cloyster": 0.026,
+    "Alakazam": 0.026,
+    "Dragonite": 0.025,
+    "Donphan": 0.023,
+    "Blaziken": 0.021
+   },
+   "counters": {
+    "Zapdos": [
+     1608,
+     0.753,
+     0.011
+    ],
+    "Regice": [
+     136,
+     0.792,
+     0.035
+    ],
+    "Porygon2": [
+     125,
+     0.781,
+     0.037
+    ],
+    "Aerodactyl": [
+     1798,
+     0.622,
+     0.011
+    ],
+    "Starmie": [
+     910,
+     0.623,
+     0.016
+    ],
+    "Regirock": [
+     115,
+     0.725,
+     0.042
+    ],
+    "Gengar": [
+     1044,
+     0.609,
+     0.015
+    ],
+    "Snorlax": [
+     1114,
+     0.6,
+     0.015
+    ],
+    "Linoone": [
+     34,
+     0.79,
+     0.07
+    ],
+    "Jolteon": [
+     334,
+     0.603,
+     0.027
+    ],
+    "Raikou": [
+     163,
+     0.644,
+     0.037
+    ],
+    "Skarmory": [
+     1721,
+     0.473,
+     0.012
+    ],
+    "Blissey": [
+     1267,
+     0.478,
+     0.014
+    ],
+    "Salamence": [
+     2705,
+     0.45,
+     0.01
+    ],
+    "Flygon": [
+     500,
+     0.466,
+     0.022
+    ],
+    "Tyranitar": [
+     2562,
+     0.415,
+     0.01
+    ],
+    "Gyarados": [
+     438,
+     0.464,
+     0.024
+    ],
+    "Marowak": [
+     70,
+     0.593,
+     0.059
+    ],
+    "Slaking": [
+     92,
+     0.542,
+     0.052
+    ],
+    "Jirachi": [
+     558,
+     0.414,
+     0.021
+    ],
+    "Scizor": [
+     44,
+     0.616,
+     0.073
+    ],
+    "Kingdra": [
+     136,
+     0.481,
+     0.043
+    ],
+    "Armaldo": [
+     41,
+     0.61,
+     0.076
+    ],
+    "Suicune": [
+     1089,
+     0.353,
+     0.014
+    ],
+    "Rhydon": [
+     20,
+     0.687,
+     0.104
+    ],
+    "Lapras": [
+     22,
+     0.67,
+     0.1
+    ],
+    "Weezing": [
+     43,
+     0.569,
+     0.075
+    ],
+    "Registeel": [
+     240,
+     0.393,
+     0.032
+    ],
+    "Metagross": [
+     1810,
+     0.297,
+     0.011
+    ],
+    "Claydol": [
+     707,
+     0.315,
+     0.017
+    ]
+   }
+  },
+  "Hariyama": {
+   "teammates": {
+    "Blissey": 0.609,
+    "Salamence": 0.424,
+    "Suicune": 0.394,
+    "Claydol": 0.379,
+    "Jirachi": 0.339,
+    "Zapdos": 0.261,
+    "Tyranitar": 0.252,
+    "Skarmory": 0.222,
+    "Starmie": 0.218,
+    "Forretress": 0.182,
+    "Celebi": 0.165,
+    "Metagross": 0.13,
+    "Dugtrio": 0.119,
+    "Dusclops": 0.1,
+    "Swampert": 0.094,
+    "Vaporeon": 0.072,
+    "Snorlax": 0.065,
+    "Gengar": 0.057,
+    "Breloom": 0.045,
+    "Houndoom": 0.04,
+    "Gyarados": 0.038,
+    "Flygon": 0.031,
+    "Milotic": 0.031,
+    "Magneton": 0.03,
+    "Marowak": 0.029,
+    "Jolteon": 0.028,
+    "Umbreon": 0.027,
+    "Donphan": 0.027,
+    "Heracross": 0.026,
+    "Moltres": 0.026,
+    "Aerodactyl": 0.026
+   },
+   "counters": {
+    "Metagross": [
+     552,
+     0.834,
+     0.016
+    ],
+    "Venusaur": [
+     45,
+     0.904,
+     0.044
+    ],
+    "Salamence": [
+     1019,
+     0.778,
+     0.013
+    ],
+    "Gyarados": [
+     139,
+     0.801,
+     0.034
+    ],
+    "Claydol": [
+     332,
+     0.749,
+     0.024
+    ],
+    "Breloom": [
+     102,
+     0.797,
+     0.04
+    ],
+    "Celebi": [
+     569,
+     0.696,
+     0.019
+    ],
+    "Skarmory": [
+     1142,
+     0.667,
+     0.014
+    ],
+    "Swampert": [
+     630,
+     0.681,
+     0.019
+    ],
+    "Suicune": [
+     532,
+     0.675,
+     0.02
+    ],
+    "Starmie": [
+     428,
+     0.665,
+     0.023
+    ],
+    "Medicham": [
+     137,
+     0.706,
+     0.039
+    ],
+    "Aerodactyl": [
+     395,
+     0.642,
+     0.024
+    ],
+    "Jirachi": [
+     282,
+     0.658,
+     0.028
+    ],
+    "Zapdos": [
+     637,
+     0.592,
+     0.019
+    ],
+    "Weezing": [
+     39,
+     0.746,
+     0.07
+    ],
+    "Vaporeon": [
+     53,
+     0.681,
+     0.064
+    ],
+    "Raikou": [
+     67,
+     0.647,
+     0.058
+    ],
+    "Flygon": [
+     125,
+     0.588,
+     0.044
+    ],
+    "Machamp": [
+     37,
+     0.707,
+     0.075
+    ],
+    "Milotic": [
+     113,
+     0.578,
+     0.046
+    ],
+    "Heracross": [
+     105,
+     0.582,
+     0.048
+    ],
+    "Donphan": [
+     25,
+     0.737,
+     0.088
+    ],
+    "Forretress": [
+     280,
+     0.489,
+     0.03
+    ],
+    "Ludicolo": [
+     25,
+     0.7,
+     0.092
+    ],
+    "Gengar": [
+     589,
+     0.411,
+     0.02
+    ],
+    "Kingdra": [
+     27,
+     0.685,
+     0.09
+    ],
+    "Alakazam": [
+     22,
+     0.707,
+     0.096
+    ],
+    "Magneton": [
+     172,
+     0.461,
+     0.038
+    ],
+    "Moltres": [
+     78,
+     0.519,
+     0.057
+    ]
+   }
+  },
+  "Heracross": {
+   "teammates": {
+    "Metagross": 0.498,
+    "Snorlax": 0.439,
+    "Salamence": 0.375,
+    "Magneton": 0.345,
+    "Suicune": 0.285,
+    "Zapdos": 0.224,
+    "Starmie": 0.212,
+    "Tyranitar": 0.206,
+    "Dugtrio": 0.204,
+    "Swampert": 0.171,
+    "Celebi": 0.149,
+    "Aerodactyl": 0.124,
+    "Blissey": 0.123,
+    "Kingdra": 0.101,
+    "Gengar": 0.101,
+    "Claydol": 0.089,
+    "Jirachi": 0.081,
+    "Gyarados": 0.076,
+    "Houndoom": 0.071,
+    "Forretress": 0.062,
+    "Skarmory": 0.06,
+    "Medicham": 0.058,
+    "Milotic": 0.047,
+    "Raikou": 0.044,
+    "Jolteon": 0.043,
+    "Registeel": 0.042,
+    "Porygon2": 0.04,
+    "Charizard": 0.032,
+    "Jynx": 0.032,
+    "Vaporeon": 0.03,
+    "Breloom": 0.03,
+    "Scizor": 0.027,
+    "Blaziken": 0.026,
+    "Flygon": 0.025,
+    "Linoone": 0.024,
+    "Ludicolo": 0.024,
+    "Alakazam": 0.023,
+    "Gardevoir": 0.023
+   },
+   "counters": {
+    "Salamence": [
+     3002,
+     0.724,
+     0.008
+    ],
+    "Charizard": [
+     494,
+     0.72,
+     0.02
+    ],
+    "Aerodactyl": [
+     1428,
+     0.656,
+     0.013
+    ],
+    "Skarmory": [
+     2173,
+     0.647,
+     0.01
+    ],
+    "Alakazam": [
+     54,
+     0.804,
+     0.054
+    ],
+    "Moltres": [
+     319,
+     0.682,
+     0.026
+    ],
+    "Dugtrio": [
+     1054,
+     0.566,
+     0.015
+    ],
+    "Gyarados": [
+     445,
+     0.597,
+     0.023
+    ],
+    "Gengar": [
+     1801,
+     0.524,
+     0.012
+    ],
+    "Weezing": [
+     72,
+     0.694,
+     0.054
+    ],
+    "Blaziken": [
+     52,
+     0.704,
+     0.063
+    ],
+    "Houndoom": [
+     76,
+     0.667,
+     0.054
+    ],
+    "Jynx": [
+     86,
+     0.612,
+     0.053
+    ],
+    "Zapdos": [
+     1410,
+     0.454,
+     0.013
+    ],
+    "Jirachi": [
+     738,
+     0.463,
+     0.018
+    ],
+    "Metagross": [
+     1330,
+     0.441,
+     0.014
+    ],
+    "Heracross": [
+     308,
+     0.496,
+     0.028
+    ],
+    "Starmie": [
+     942,
+     0.442,
+     0.016
+    ],
+    "Scizor": [
+     29,
+     0.689,
+     0.086
+    ],
+    "Raikou": [
+     271,
+     0.439,
+     0.03
+    ],
+    "Flygon": [
+     364,
+     0.405,
+     0.026
+    ],
+    "Dragonite": [
+     44,
+     0.58,
+     0.075
+    ],
+    "Jolteon": [
+     423,
+     0.373,
+     0.024
+    ],
+    "Swampert": [
+     2030,
+     0.317,
+     0.01
+    ],
+    "Linoone": [
+     21,
+     0.678,
+     0.103
+    ],
+    "Slaking": [
+     150,
+     0.409,
+     0.04
+    ],
+    "Suicune": [
+     1329,
+     0.29,
+     0.012
+    ],
+    "Forretress": [
+     477,
+     0.315,
+     0.021
+    ],
+    "Celebi": [
+     1096,
+     0.273,
+     0.013
+    ],
+    "Steelix": [
+     47,
+     0.482,
+     0.073
+    ]
+   }
+  },
+  "Houndoom": {
+   "teammates": {
+    "Snorlax": 0.496,
+    "Metagross": 0.297,
+    "Forretress": 0.288,
+    "Swampert": 0.284,
+    "Salamence": 0.283,
+    "Magneton": 0.278,
+    "Zapdos": 0.24,
+    "Breloom": 0.223,
+    "Heracross": 0.222,
+    "Starmie": 0.129,
+    "Aerodactyl": 0.124,
+    "Suicune": 0.12,
+    "Gyarados": 0.114,
+    "Dugtrio": 0.113,
+    "Medicham": 0.111,
+    "Gengar": 0.086,
+    "Claydol": 0.085,
+    "Celebi": 0.082,
+    "Skarmory": 0.071,
+    "Milotic": 0.07,
+    "Blissey": 0.061,
+    "Exeggutor": 0.058,
+    "Steelix": 0.056,
+    "Cloyster": 0.053,
+    "Venusaur": 0.046,
+    "Registeel": 0.046,
+    "Tyranitar": 0.046,
+    "Jolteon": 0.042,
+    "Jynx": 0.041,
+    "Jirachi": 0.036,
+    "Machamp": 0.035,
+    "Dusclops": 0.035,
+    "Hariyama": 0.035,
+    "Raikou": 0.032,
+    "Quagsire": 0.031,
+    "Moltres": 0.031,
+    "Vaporeon": 0.029,
+    "Flygon": 0.028,
+    "Regirock": 0.028,
+    "Linoone": 0.027
+   },
+   "counters": {
+    "Aerodactyl": [
+     507,
+     0.924,
+     0.012
+    ],
+    "Dugtrio": [
+     252,
+     0.865,
+     0.022
+    ],
+    "Tyranitar": [
+     1058,
+     0.809,
+     0.012
+    ],
+    "Starmie": [
+     285,
+     0.812,
+     0.023
+    ],
+    "Flygon": [
+     137,
+     0.822,
+     0.033
+    ],
+    "Salamence": [
+     430,
+     0.769,
+     0.02
+    ],
+    "Snorlax": [
+     288,
+     0.772,
+     0.025
+    ],
+    "Suicune": [
+     396,
+     0.759,
+     0.021
+    ],
+    "Milotic": [
+     89,
+     0.807,
+     0.042
+    ],
+    "Blissey": [
+     598,
+     0.694,
+     0.019
+    ],
+    "Kingdra": [
+     30,
+     0.863,
+     0.063
+    ],
+    "Gyarados": [
+     80,
+     0.77,
+     0.047
+    ],
+    "Jolteon": [
+     109,
+     0.738,
+     0.042
+    ],
+    "Raikou": [
+     72,
+     0.749,
+     0.051
+    ],
+    "Swampert": [
+     548,
+     0.621,
+     0.021
+    ],
+    "Zapdos": [
+     320,
+     0.621,
+     0.027
+    ],
+    "Blaziken": [
+     29,
+     0.803,
+     0.074
+    ],
+    "Hariyama": [
+     26,
+     0.796,
+     0.08
+    ],
+    "Regirock": [
+     23,
+     0.791,
+     0.084
+    ],
+    "Porygon2": [
+     45,
+     0.654,
+     0.071
+    ],
+    "Vaporeon": [
+     45,
+     0.64,
+     0.071
+    ],
+    "Breloom": [
+     60,
+     0.567,
+     0.064
+    ],
+    "Charizard": [
+     195,
+     0.443,
+     0.036
+    ],
+    "Claydol": [
+     149,
+     0.441,
+     0.041
+    ],
+    "Medicham": [
+     58,
+     0.536,
+     0.066
+    ],
+    "Houndoom": [
+     62,
+     0.489,
+     0.064
+    ],
+    "Umbreon": [
+     23,
+     0.59,
+     0.102
+    ],
+    "Machamp": [
+     21,
+     0.602,
+     0.106
+    ],
+    "Gengar": [
+     934,
+     0.21,
+     0.013
+    ],
+    "Metagross": [
+     479,
+     0.177,
+     0.017
+    ]
+   }
+  },
+  "Jirachi": {
+   "teammates": {
+    "Tyranitar": 0.565,
+    "Skarmory": 0.412,
+    "Swampert": 0.357,
+    "Gengar": 0.28,
+    "Zapdos": 0.267,
+    "Salamence": 0.265,
+    "Celebi": 0.24,
+    "Suicune": 0.225,
+    "Aerodactyl": 0.215,
+    "Blissey": 0.208,
+    "Flygon": 0.195,
+    "Dugtrio": 0.191,
+    "Claydol": 0.145,
+    "Snorlax": 0.117,
+    "Forretress": 0.101,
+    "Starmie": 0.095,
+    "Metagross": 0.087,
+    "Moltres": 0.073,
+    "Charizard": 0.06,
+    "Porygon2": 0.046,
+    "Raikou": 0.046,
+    "Hariyama": 0.044,
+    "Magneton": 0.042,
+    "Heracross": 0.037,
+    "Kingdra": 0.035,
+    "Medicham": 0.034,
+    "Machamp": 0.033,
+    "Breloom": 0.032,
+    "Registeel": 0.024,
+    "Regice": 0.024,
+    "Smeargle": 0.024,
+    "Jolteon": 0.024,
+    "Marowak": 0.023,
+    "Gyarados": 0.023,
+    "Cloyster": 0.023,
+    "Milotic": 0.022
+   },
+   "counters": {
+    "Houndoom": [
+     369,
+     0.816,
+     0.02
+    ],
+    "Charizard": [
+     1282,
+     0.76,
+     0.012
+    ],
+    "Moltres": [
+     812,
+     0.742,
+     0.015
+    ],
+    "Dugtrio": [
+     2260,
+     0.699,
+     0.01
+    ],
+    "Tyranitar": [
+     9190,
+     0.647,
+     0.005
+    ],
+    "Entei": [
+     29,
+     0.868,
+     0.063
+    ],
+    "Snorlax": [
+     2791,
+     0.614,
+     0.009
+    ],
+    "Raikou": [
+     723,
+     0.611,
+     0.018
+    ],
+    "Camerupt": [
+     91,
+     0.709,
+     0.048
+    ],
+    "Flygon": [
+     1032,
+     0.567,
+     0.015
+    ],
+    "Suicune": [
+     3340,
+     0.531,
+     0.009
+    ],
+    "Marowak": [
+     129,
+     0.65,
+     0.042
+    ],
+    "Salamence": [
+     4092,
+     0.506,
+     0.008
+    ],
+    "Claydol": [
+     2068,
+     0.513,
+     0.011
+    ],
+    "Gyarados": [
+     558,
+     0.535,
+     0.021
+    ],
+    "Metagross": [
+     4888,
+     0.475,
+     0.007
+    ],
+    "Jirachi": [
+     1818,
+     0.484,
+     0.012
+    ],
+    "Blaziken": [
+     160,
+     0.587,
+     0.039
+    ],
+    "Heracross": [
+     738,
+     0.496,
+     0.018
+    ],
+    "Swampert": [
+     6514,
+     0.446,
+     0.006
+    ],
+    "Aerodactyl": [
+     5268,
+     0.441,
+     0.007
+    ],
+    "Alakazam": [
+     125,
+     0.588,
+     0.044
+    ],
+    "Blissey": [
+     7395,
+     0.42,
+     0.006
+    ],
+    "Linoone": [
+     62,
+     0.602,
+     0.062
+    ],
+    "Ludicolo": [
+     269,
+     0.471,
+     0.03
+    ],
+    "Dragonite": [
+     68,
+     0.581,
+     0.06
+    ],
+    "Celebi": [
+     3974,
+     0.373,
+     0.008
+    ],
+    "Donphan": [
+     128,
+     0.518,
+     0.044
+    ],
+    "Regirock": [
+     260,
+     0.458,
+     0.031
+    ],
+    "Steelix": [
+     136,
+     0.498,
+     0.043
+    ]
+   }
+  },
+  "Jolteon": {
+   "teammates": {
+    "Tyranitar": 0.72,
+    "Gengar": 0.629,
+    "Metagross": 0.511,
+    "Skarmory": 0.44,
+    "Starmie": 0.388,
+    "Swampert": 0.292,
+    "Celebi": 0.167,
+    "Salamence": 0.15,
+    "Claydol": 0.115,
+    "Forretress": 0.104,
+    "Suicune": 0.101,
+    "Dugtrio": 0.1,
+    "Cloyster": 0.091,
+    "Charizard": 0.086,
+    "Snorlax": 0.073,
+    "Aerodactyl": 0.064,
+    "Moltres": 0.063,
+    "Zapdos": 0.049,
+    "Blissey": 0.044,
+    "Breloom": 0.043,
+    "Flygon": 0.039,
+    "Jirachi": 0.038,
+    "Gyarados": 0.036,
+    "Vaporeon": 0.036,
+    "Milotic": 0.032,
+    "Heracross": 0.032,
+    "Registeel": 0.029,
+    "Smeargle": 0.028,
+    "Medicham": 0.026
+   },
+   "counters": {
+    "Blissey": [
+     3615,
+     0.875,
+     0.006
+    ],
+    "Snorlax": [
+     1902,
+     0.826,
+     0.009
+    ],
+    "Camerupt": [
+     46,
+     0.93,
+     0.038
+    ],
+    "Steelix": [
+     121,
+     0.884,
+     0.029
+    ],
+    "Registeel": [
+     752,
+     0.821,
+     0.014
+    ],
+    "Regice": [
+     307,
+     0.819,
+     0.022
+    ],
+    "Tyranitar": [
+     4540,
+     0.706,
+     0.007
+    ],
+    "Claydol": [
+     1577,
+     0.698,
+     0.012
+    ],
+    "Porygon2": [
+     170,
+     0.777,
+     0.032
+    ],
+    "Celebi": [
+     2161,
+     0.678,
+     0.01
+    ],
+    "Metagross": [
+     2272,
+     0.667,
+     0.01
+    ],
+    "Linoone": [
+     33,
+     0.853,
+     0.062
+    ],
+    "Regirock": [
+     130,
+     0.729,
+     0.039
+    ],
+    "Jirachi": [
+     1238,
+     0.624,
+     0.014
+    ],
+    "Raikou": [
+     564,
+     0.623,
+     0.02
+    ],
+    "Venusaur": [
+     129,
+     0.68,
+     0.041
+    ],
+    "Heracross": [
+     423,
+     0.592,
+     0.024
+    ],
+    "Breloom": [
+     295,
+     0.595,
+     0.029
+    ],
+    "Swampert": [
+     3604,
+     0.497,
+     0.008
+    ],
+    "Flygon": [
+     798,
+     0.509,
+     0.018
+    ],
+    "Kingdra": [
+     190,
+     0.58,
+     0.036
+    ],
+    "Ludicolo": [
+     113,
+     0.603,
+     0.046
+    ],
+    "Machamp": [
+     76,
+     0.625,
+     0.055
+    ],
+    "Jolteon": [
+     1289,
+     0.459,
+     0.014
+    ],
+    "Exeggutor": [
+     21,
+     0.767,
+     0.093
+    ],
+    "Dugtrio": [
+     1070,
+     0.441,
+     0.015
+    ],
+    "Hariyama": [
+     100,
+     0.577,
+     0.05
+    ],
+    "Aerodactyl": [
+     1608,
+     0.426,
+     0.012
+    ],
+    "Forretress": [
+     524,
+     0.46,
+     0.022
+    ],
+    "Umbreon": [
+     119,
+     0.55,
+     0.046
+    ]
+   }
+  },
+  "Jynx": {
+   "teammates": {
+    "Dugtrio": 0.796,
+    "Suicune": 0.521,
+    "Gengar": 0.412,
+    "Celebi": 0.333,
+    "Metagross": 0.295,
+    "Blissey": 0.227,
+    "Magneton": 0.207,
+    "Starmie": 0.199,
+    "Snorlax": 0.197,
+    "Claydol": 0.181,
+    "Jirachi": 0.15,
+    "Swampert": 0.127,
+    "Heracross": 0.115,
+    "Zapdos": 0.109,
+    "Tyranitar": 0.079,
+    "Kingdra": 0.075,
+    "Salamence": 0.072,
+    "Gyarados": 0.054,
+    "Charizard": 0.053,
+    "Weezing": 0.05,
+    "Houndoom": 0.048,
+    "Porygon2": 0.047,
+    "Skarmory": 0.046,
+    "Raikou": 0.045,
+    "Registeel": 0.039,
+    "Regice": 0.037,
+    "Forretress": 0.035,
+    "Steelix": 0.032,
+    "Quagsire": 0.032,
+    "Electrode": 0.029,
+    "Flygon": 0.028
+   },
+   "counters": {
+    "Aerodactyl": [
+     297,
+     0.875,
+     0.019
+    ],
+    "Charizard": [
+     105,
+     0.811,
+     0.038
+    ],
+    "Dugtrio": [
+     173,
+     0.761,
+     0.032
+    ],
+    "Metagross": [
+     616,
+     0.663,
+     0.019
+    ],
+    "Tyranitar": [
+     1220,
+     0.602,
+     0.014
+    ],
+    "Starmie": [
+     451,
+     0.579,
+     0.023
+    ],
+    "Snorlax": [
+     424,
+     0.579,
+     0.024
+    ],
+    "Jolteon": [
+     141,
+     0.621,
+     0.041
+    ],
+    "Jirachi": [
+     274,
+     0.57,
+     0.03
+    ],
+    "Suicune": [
+     496,
+     0.52,
+     0.022
+    ],
+    "Medicham": [
+     145,
+     0.58,
+     0.041
+    ],
+    "Raikou": [
+     88,
+     0.584,
+     0.053
+    ],
+    "Blissey": [
+     656,
+     0.436,
+     0.019
+    ],
+    "Houndoom": [
+     38,
+     0.661,
+     0.077
+    ],
+    "Registeel": [
+     115,
+     0.533,
+     0.047
+    ],
+    "Swampert": [
+     472,
+     0.356,
+     0.022
+    ],
+    "Slaking": [
+     49,
+     0.527,
+     0.071
+    ],
+    "Gyarados": [
+     59,
+     0.491,
+     0.065
+    ],
+    "Forretress": [
+     157,
+     0.371,
+     0.039
+    ],
+    "Gengar": [
+     288,
+     0.308,
+     0.027
+    ],
+    "Magneton": [
+     179,
+     0.315,
+     0.035
+    ],
+    "Heracross": [
+     86,
+     0.385,
+     0.052
+    ],
+    "Jynx": [
+     39,
+     0.482,
+     0.08
+    ],
+    "Hariyama": [
+     44,
+     0.452,
+     0.075
+    ],
+    "Moltres": [
+     53,
+     0.389,
+     0.067
+    ],
+    "Blaziken": [
+     27,
+     0.501,
+     0.095
+    ],
+    "Flygon": [
+     65,
+     0.349,
+     0.059
+    ],
+    "Salamence": [
+     391,
+     0.189,
+     0.02
+    ],
+    "Regirock": [
+     39,
+     0.422,
+     0.08
+    ],
+    "Skarmory": [
+     649,
+     0.133,
+     0.013
+    ]
+   }
+  },
+  "Kingdra": {
+   "teammates": {
+    "Dugtrio": 0.565,
+    "Suicune": 0.314,
+    "Zapdos": 0.306,
+    "Gengar": 0.275,
+    "Metagross": 0.268,
+    "Snorlax": 0.256,
+    "Heracross": 0.234,
+    "Celebi": 0.214,
+    "Salamence": 0.19,
+    "Jirachi": 0.176,
+    "Claydol": 0.173,
+    "Gyarados": 0.162,
+    "Ludicolo": 0.158,
+    "Raikou": 0.127,
+    "Magneton": 0.126,
+    "Swampert": 0.106,
+    "Starmie": 0.094,
+    "Tyranitar": 0.071,
+    "Registeel": 0.063,
+    "Blissey": 0.055,
+    "Medicham": 0.051,
+    "Jynx": 0.048,
+    "Electrode": 0.045,
+    "Jolteon": 0.038,
+    "Scizor": 0.037,
+    "Regice": 0.037,
+    "Porygon2": 0.036,
+    "Breloom": 0.035,
+    "Skarmory": 0.035,
+    "Forretress": 0.033,
+    "Aerodactyl": 0.029,
+    "Regirock": 0.023,
+    "Cloyster": 0.022
+   },
+   "counters": {
+    "Blissey": [
+     1095,
+     0.798,
+     0.012
+    ],
+    "Suicune": [
+     732,
+     0.695,
+     0.017
+    ],
+    "Snorlax": [
+     448,
+     0.669,
+     0.022
+    ],
+    "Milotic": [
+     104,
+     0.734,
+     0.043
+    ],
+    "Jirachi": [
+     359,
+     0.623,
+     0.026
+    ],
+    "Heracross": [
+     92,
+     0.697,
+     0.048
+    ],
+    "Ludicolo": [
+     70,
+     0.715,
+     0.054
+    ],
+    "Regice": [
+     64,
+     0.712,
+     0.056
+    ],
+    "Registeel": [
+     185,
+     0.608,
+     0.036
+    ],
+    "Lapras": [
+     35,
+     0.736,
+     0.074
+    ],
+    "Raikou": [
+     110,
+     0.613,
+     0.046
+    ],
+    "Jynx": [
+     37,
+     0.677,
+     0.076
+    ],
+    "Celebi": [
+     628,
+     0.44,
+     0.02
+    ],
+    "Zapdos": [
+     618,
+     0.426,
+     0.02
+    ],
+    "Vaporeon": [
+     99,
+     0.546,
+     0.05
+    ],
+    "Starmie": [
+     455,
+     0.418,
+     0.023
+    ],
+    "Aerodactyl": [
+     542,
+     0.397,
+     0.021
+    ],
+    "Gyarados": [
+     136,
+     0.472,
+     0.043
+    ],
+    "Jolteon": [
+     190,
+     0.4,
+     0.036
+    ],
+    "Medicham": [
+     112,
+     0.438,
+     0.047
+    ],
+    "Kingdra": [
+     62,
+     0.5,
+     0.063
+    ],
+    "Gengar": [
+     577,
+     0.286,
+     0.019
+    ],
+    "Swampert": [
+     796,
+     0.262,
+     0.016
+    ],
+    "Metagross": [
+     560,
+     0.273,
+     0.019
+    ],
+    "Umbreon": [
+     38,
+     0.509,
+     0.081
+    ],
+    "Salamence": [
+     772,
+     0.233,
+     0.015
+    ],
+    "Magneton": [
+     165,
+     0.315,
+     0.036
+    ],
+    "Slaking": [
+     39,
+     0.478,
+     0.08
+    ],
+    "Tyranitar": [
+     1309,
+     0.183,
+     0.011
+    ],
+    "Breloom": [
+     75,
+     0.344,
+     0.055
+    ]
+   }
+  },
+  "Lanturn": {
+   "teammates": {
+    "Gyarados": 0.413,
+    "Tyranitar": 0.363,
+    "Dugtrio": 0.353,
+    "Celebi": 0.339,
+    "Blissey": 0.324,
+    "Kingdra": 0.321,
+    "Salamence": 0.271,
+    "Gengar": 0.253,
+    "Skarmory": 0.236,
+    "Aerodactyl": 0.192,
+    "Metagross": 0.178,
+    "Flygon": 0.152,
+    "Cloyster": 0.148,
+    "Dusclops": 0.134,
+    "Swampert": 0.099,
+    "Magneton": 0.078,
+    "Jirachi": 0.076,
+    "Zapdos": 0.069,
+    "Heracross": 0.055,
+    "Claydol": 0.048,
+    "Charizard": 0.048,
+    "Forretress": 0.045,
+    "Milotic": 0.043,
+    "Starmie": 0.042,
+    "Steelix": 0.04,
+    "Suicune": 0.039,
+    "Porygon2": 0.038,
+    "Sceptile": 0.035,
+    "Ludicolo": 0.033,
+    "Snorlax": 0.03,
+    "Alakazam": 0.028,
+    "Smeargle": 0.028,
+    "Blaziken": 0.026,
+    "Breloom": 0.023,
+    "Marowak": 0.022
+   },
+   "counters": {
+    "Dugtrio": [
+     31,
+     0.836,
+     0.067
+    ],
+    "Metagross": [
+     45,
+     0.785,
+     0.061
+    ],
+    "Celebi": [
+     57,
+     0.746,
+     0.058
+    ],
+    "Blissey": [
+     81,
+     0.713,
+     0.05
+    ],
+    "Snorlax": [
+     47,
+     0.682,
+     0.068
+    ],
+    "Swampert": [
+     52,
+     0.631,
+     0.067
+    ],
+    "Flygon": [
+     21,
+     0.669,
+     0.102
+    ],
+    "Jirachi": [
+     30,
+     0.613,
+     0.09
+    ],
+    "Salamence": [
+     52,
+     0.493,
+     0.069
+    ],
+    "Tyranitar": [
+     60,
+     0.471,
+     0.064
+    ],
+    "Aerodactyl": [
+     27,
+     0.568,
+     0.096
+    ],
+    "Suicune": [
+     40,
+     0.345,
+     0.075
+    ],
+    "Gengar": [
+     77,
+     0.238,
+     0.049
+    ],
+    "Zapdos": [
+     101,
+     0.199,
+     0.04
+    ],
+    "Magneton": [
+     26,
+     0.34,
+     0.093
+    ],
+    "Skarmory": [
+     70,
+     0.058,
+     0.028
+    ],
+    "Starmie": [
+     51,
+     0.09,
+     0.04
+    ]
+   }
+  },
+  "Lapras": {
+   "teammates": {
+    "Charizard": 0.507,
+    "Snorlax": 0.353,
+    "Claydol": 0.337,
+    "Dugtrio": 0.262,
+    "Tyranitar": 0.254,
+    "Venusaur": 0.246,
+    "Skarmory": 0.245,
+    "Breloom": 0.227,
+    "Umbreon": 0.217,
+    "Steelix": 0.178,
+    "Registeel": 0.176,
+    "Aerodactyl": 0.157,
+    "Metagross": 0.107,
+    "Magneton": 0.103,
+    "Forretress": 0.099,
+    "Jolteon": 0.09,
+    "Swampert": 0.082,
+    "Starmie": 0.08,
+    "Gengar": 0.077,
+    "Celebi": 0.077,
+    "Ludicolo": 0.073,
+    "Salamence": 0.069,
+    "Donphan": 0.067,
+    "Misdreavus": 0.06,
+    "Blastoise": 0.041,
+    "Hariyama": 0.035,
+    "Scizor": 0.029,
+    "Dusclops": 0.028,
+    "Houndoom": 0.026,
+    "Milotic": 0.025,
+    "Blissey": 0.023,
+    "Dragonite": 0.022,
+    "Jirachi": 0.022
+   },
+   "counters": {
+    "Jirachi": [
+     103,
+     0.819,
+     0.038
+    ],
+    "Raikou": [
+     28,
+     0.885,
+     0.061
+    ],
+    "Snorlax": [
+     109,
+     0.774,
+     0.04
+    ],
+    "Magneton": [
+     42,
+     0.816,
+     0.06
+    ],
+    "Blissey": [
+     161,
+     0.708,
+     0.036
+    ],
+    "Metagross": [
+     87,
+     0.684,
+     0.05
+    ],
+    "Zapdos": [
+     97,
+     0.644,
+     0.049
+    ],
+    "Aerodactyl": [
+     80,
+     0.643,
+     0.053
+    ],
+    "Heracross": [
+     21,
+     0.761,
+     0.092
+    ],
+    "Tyranitar": [
+     127,
+     0.564,
+     0.044
+    ],
+    "Gengar": [
+     74,
+     0.61,
+     0.057
+    ],
+    "Jolteon": [
+     31,
+     0.696,
+     0.082
+    ],
+    "Suicune": [
+     210,
+     0.323,
+     0.032
+    ],
+    "Celebi": [
+     73,
+     0.421,
+     0.058
+    ],
+    "Salamence": [
+     107,
+     0.337,
+     0.046
+    ],
+    "Starmie": [
+     111,
+     0.331,
+     0.045
+    ],
+    "Swampert": [
+     218,
+     0.253,
+     0.029
+    ],
+    "Forretress": [
+     32,
+     0.42,
+     0.088
+    ],
+    "Skarmory": [
+     115,
+     0.149,
+     0.033
+    ],
+    "Milotic": [
+     49,
+     0.259,
+     0.062
+    ],
+    "Moltres": [
+     25,
+     0.357,
+     0.096
+    ],
+    "Dugtrio": [
+     35,
+     0.197,
+     0.068
+    ],
+    "Gyarados": [
+     22,
+     0.326,
+     0.1
+    ],
+    "Kingdra": [
+     35,
+     0.188,
+     0.066
+    ],
+    "Flygon": [
+     30,
+     0.127,
+     0.061
+    ],
+    "Claydol": [
+     26,
+     0.107,
+     0.061
+    ],
+    "Vaporeon": [
+     24,
+     0.088,
+     0.058
+    ]
+   }
+  },
+  "Linoone": {
+   "teammates": {
+    "Snorlax": 0.685,
+    "Metagross": 0.406,
+    "Magneton": 0.352,
+    "Gardevoir": 0.296,
+    "Heracross": 0.275,
+    "Gengar": 0.274,
+    "Umbreon": 0.229,
+    "Starmie": 0.206,
+    "Breloom": 0.203,
+    "Zapdos": 0.162,
+    "Blissey": 0.14,
+    "Suicune": 0.126,
+    "Houndoom": 0.1,
+    "Ludicolo": 0.067,
+    "Dugtrio": 0.061,
+    "Alakazam": 0.058,
+    "Charizard": 0.049,
+    "Claydol": 0.046,
+    "Celebi": 0.042,
+    "Jirachi": 0.04,
+    "Medicham": 0.038,
+    "Machamp": 0.037,
+    "Aerodactyl": 0.034,
+    "Smeargle": 0.034,
+    "Cloyster": 0.033,
+    "Registeel": 0.031,
+    "Swampert": 0.028,
+    "Exeggutor": 0.024,
+    "Kingdra": 0.022,
+    "Dusclops": 0.022
+   },
+   "counters": {
+    "Gengar": [
+     75,
+     0.626,
+     0.056
+    ],
+    "Aerodactyl": [
+     106,
+     0.472,
+     0.048
+    ],
+    "Suicune": [
+     94,
+     0.419,
+     0.051
+    ],
+    "Skarmory": [
+     127,
+     0.378,
+     0.043
+    ],
+    "Tyranitar": [
+     211,
+     0.326,
+     0.032
+    ],
+    "Swampert": [
+     135,
+     0.342,
+     0.041
+    ],
+    "Jirachi": [
+     62,
+     0.391,
+     0.062
+    ],
+    "Metagross": [
+     131,
+     0.284,
+     0.039
+    ],
+    "Zapdos": [
+     53,
+     0.339,
+     0.065
+    ],
+    "Blissey": [
+     104,
+     0.213,
+     0.04
+    ],
+    "Celebi": [
+     93,
+     0.205,
+     0.042
+    ],
+    "Snorlax": [
+     77,
+     0.222,
+     0.048
+    ],
+    "Salamence": [
+     176,
+     0.129,
+     0.025
+    ],
+    "Starmie": [
+     64,
+     0.172,
+     0.047
+    ],
+    "Registeel": [
+     28,
+     0.331,
+     0.089
+    ],
+    "Dugtrio": [
+     67,
+     0.12,
+     0.04
+    ],
+    "Magneton": [
+     66,
+     0.051,
+     0.027
+    ],
+    "Gyarados": [
+     34,
+     0.21,
+     0.07
+    ],
+    "Claydol": [
+     37,
+     0.162,
+     0.061
+    ],
+    "Heracross": [
+     21,
+     0.322,
+     0.103
+    ],
+    "Jolteon": [
+     33,
+     0.118,
+     0.056
+    ],
+    "Forretress": [
+     20,
+     0.293,
+     0.101
+    ],
+    "Charizard": [
+     22,
+     0.238,
+     0.091
+    ]
+   }
+  },
+  "Ludicolo": {
+   "teammates": {
+    "Gengar": 0.655,
+    "Metagross": 0.63,
+    "Tyranitar": 0.52,
+    "Salamence": 0.505,
+    "Magneton": 0.5,
+    "Dugtrio": 0.242,
+    "Kingdra": 0.233,
+    "Suicune": 0.161,
+    "Zapdos": 0.12,
+    "Snorlax": 0.106,
+    "Jirachi": 0.103,
+    "Starmie": 0.089,
+    "Swampert": 0.086,
+    "Skarmory": 0.084,
+    "Heracross": 0.082,
+    "Blissey": 0.054,
+    "Claydol": 0.05,
+    "Gyarados": 0.049,
+    "Jolteon": 0.048,
+    "Forretress": 0.04,
+    "Breloom": 0.035,
+    "Celebi": 0.032,
+    "Raikou": 0.029,
+    "Aerodactyl": 0.026,
+    "Linoone": 0.02,
+    "Cloyster": 0.02
+   },
+   "counters": {
+    "Heracross": [
+     80,
+     0.764,
+     0.048
+    ],
+    "Aerodactyl": [
+     373,
+     0.589,
+     0.025
+    ],
+    "Raikou": [
+     86,
+     0.686,
+     0.05
+    ],
+    "Gyarados": [
+     68,
+     0.675,
+     0.057
+    ],
+    "Snorlax": [
+     372,
+     0.523,
+     0.026
+    ],
+    "Salamence": [
+     431,
+     0.491,
+     0.024
+    ],
+    "Jirachi": [
+     269,
+     0.474,
+     0.03
+    ],
+    "Blissey": [
+     1043,
+     0.393,
+     0.015
+    ],
+    "Celebi": [
+     560,
+     0.401,
+     0.021
+    ],
+    "Tyranitar": [
+     768,
+     0.38,
+     0.018
+    ],
+    "Regice": [
+     52,
+     0.555,
+     0.069
+    ],
+    "Zapdos": [
+     404,
+     0.364,
+     0.024
+    ],
+    "Skarmory": [
+     639,
+     0.342,
+     0.019
+    ],
+    "Suicune": [
+     604,
+     0.342,
+     0.019
+    ],
+    "Medicham": [
+     45,
+     0.552,
+     0.074
+    ],
+    "Metagross": [
+     446,
+     0.303,
+     0.022
+    ],
+    "Starmie": [
+     373,
+     0.301,
+     0.024
+    ],
+    "Breloom": [
+     82,
+     0.419,
+     0.054
+    ],
+    "Charizard": [
+     91,
+     0.396,
+     0.051
+    ],
+    "Jolteon": [
+     113,
+     0.369,
+     0.045
+    ],
+    "Gengar": [
+     380,
+     0.259,
+     0.022
+    ],
+    "Ludicolo": [
+     39,
+     0.486,
+     0.08
+    ],
+    "Slaking": [
+     32,
+     0.505,
+     0.088
+    ],
+    "Registeel": [
+     123,
+     0.294,
+     0.041
+    ],
+    "Dugtrio": [
+     190,
+     0.246,
+     0.031
+    ],
+    "Milotic": [
+     76,
+     0.328,
+     0.054
+    ],
+    "Jynx": [
+     23,
+     0.525,
+     0.105
+    ],
+    "Moltres": [
+     68,
+     0.33,
+     0.057
+    ],
+    "Magneton": [
+     127,
+     0.228,
+     0.037
+    ],
+    "Forretress": [
+     155,
+     0.19,
+     0.031
+    ]
+   }
+  },
+  "Machamp": {
+   "teammates": {
+    "Salamence": 0.427,
+    "Jirachi": 0.347,
+    "Metagross": 0.335,
+    "Tyranitar": 0.281,
+    "Snorlax": 0.269,
+    "Celebi": 0.255,
+    "Medicham": 0.226,
+    "Swampert": 0.224,
+    "Starmie": 0.197,
+    "Porygon2": 0.161,
+    "Zapdos": 0.157,
+    "Flygon": 0.155,
+    "Raikou": 0.141,
+    "Dugtrio": 0.136,
+    "Aerodactyl": 0.123,
+    "Claydol": 0.103,
+    "Registeel": 0.1,
+    "Magneton": 0.098,
+    "Vaporeon": 0.093,
+    "Suicune": 0.092,
+    "Blissey": 0.091,
+    "Skarmory": 0.084,
+    "Gyarados": 0.071,
+    "Houndoom": 0.054,
+    "Heracross": 0.053,
+    "Charizard": 0.049,
+    "Regice": 0.044,
+    "Breloom": 0.04,
+    "Jolteon": 0.034,
+    "Gengar": 0.034,
+    "Kingdra": 0.032,
+    "Cloyster": 0.029,
+    "Alakazam": 0.029,
+    "Marowak": 0.028
+   },
+   "counters": {
+    "Aerodactyl": [
+     276,
+     0.782,
+     0.025
+    ],
+    "Salamence": [
+     638,
+     0.713,
+     0.018
+    ],
+    "Metagross": [
+     350,
+     0.683,
+     0.025
+    ],
+    "Venusaur": [
+     26,
+     0.846,
+     0.071
+    ],
+    "Jirachi": [
+     160,
+     0.698,
+     0.036
+    ],
+    "Celebi": [
+     277,
+     0.656,
+     0.029
+    ],
+    "Starmie": [
+     222,
+     0.662,
+     0.032
+    ],
+    "Suicune": [
+     258,
+     0.617,
+     0.03
+    ],
+    "Claydol": [
+     215,
+     0.605,
+     0.033
+    ],
+    "Gyarados": [
+     74,
+     0.684,
+     0.054
+    ],
+    "Breloom": [
+     53,
+     0.707,
+     0.063
+    ],
+    "Swampert": [
+     392,
+     0.535,
+     0.025
+    ],
+    "Zapdos": [
+     372,
+     0.527,
+     0.026
+    ],
+    "Medicham": [
+     75,
+     0.645,
+     0.055
+    ],
+    "Dugtrio": [
+     128,
+     0.59,
+     0.043
+    ],
+    "Charizard": [
+     78,
+     0.617,
+     0.055
+    ],
+    "Raikou": [
+     38,
+     0.679,
+     0.075
+    ],
+    "Flygon": [
+     74,
+     0.598,
+     0.057
+    ],
+    "Slaking": [
+     37,
+     0.656,
+     0.078
+    ],
+    "Skarmory": [
+     423,
+     0.435,
+     0.024
+    ],
+    "Moltres": [
+     66,
+     0.548,
+     0.061
+    ],
+    "Heracross": [
+     52,
+     0.572,
+     0.069
+    ],
+    "Smeargle": [
+     34,
+     0.592,
+     0.084
+    ],
+    "Magneton": [
+     95,
+     0.457,
+     0.051
+    ],
+    "Jynx": [
+     21,
+     0.64,
+     0.104
+    ],
+    "Gengar": [
+     451,
+     0.275,
+     0.021
+    ],
+    "Milotic": [
+     32,
+     0.517,
+     0.089
+    ],
+    "Jolteon": [
+     76,
+     0.346,
+     0.055
+    ],
+    "Kingdra": [
+     24,
+     0.516,
+     0.102
+    ],
+    "Tyranitar": [
+     727,
+     0.16,
+     0.014
+    ]
+   }
+  },
+  "Magneton": {
+   "teammates": {
+    "Metagross": 0.572,
+    "Salamence": 0.516,
+    "Snorlax": 0.473,
+    "Suicune": 0.344,
+    "Tyranitar": 0.336,
+    "Celebi": 0.24,
+    "Aerodactyl": 0.196,
+    "Swampert": 0.184,
+    "Medicham": 0.151,
+    "Heracross": 0.138,
+    "Blissey": 0.131,
+    "Dugtrio": 0.129,
+    "Claydol": 0.123,
+    "Gyarados": 0.122,
+    "Skarmory": 0.121,
+    "Gengar": 0.115,
+    "Starmie": 0.078,
+    "Zapdos": 0.075,
+    "Ludicolo": 0.058,
+    "Flygon": 0.05,
+    "Regirock": 0.041,
+    "Milotic": 0.04,
+    "Slaking": 0.037,
+    "Jirachi": 0.036,
+    "Houndoom": 0.036,
+    "Registeel": 0.028,
+    "Breloom": 0.027,
+    "Umbreon": 0.026,
+    "Jynx": 0.023,
+    "Kingdra": 0.022,
+    "Forretress": 0.021,
+    "Scizor": 0.021,
+    "Venusaur": 0.021,
+    "Porygon2": 0.02
+   },
+   "counters": {
+    "Linoone": [
+     66,
+     0.944,
+     0.028
+    ],
+    "Moltres": [
+     752,
+     0.869,
+     0.012
+    ],
+    "Houndoom": [
+     165,
+     0.9,
+     0.023
+    ],
+    "Dugtrio": [
+     2147,
+     0.838,
+     0.008
+    ],
+    "Salamence": [
+     2762,
+     0.821,
+     0.007
+    ],
+    "Flygon": [
+     1187,
+     0.832,
+     0.011
+    ],
+    "Charizard": [
+     930,
+     0.836,
+     0.012
+    ],
+    "Tyranitar": [
+     5623,
+     0.803,
+     0.005
+    ],
+    "Medicham": [
+     373,
+     0.843,
+     0.019
+    ],
+    "Blaziken": [
+     91,
+     0.869,
+     0.035
+    ],
+    "Jirachi": [
+     1935,
+     0.758,
+     0.01
+    ],
+    "Claydol": [
+     1613,
+     0.753,
+     0.011
+    ],
+    "Blissey": [
+     4440,
+     0.737,
+     0.007
+    ],
+    "Camerupt": [
+     56,
+     0.876,
+     0.044
+    ],
+    "Breloom": [
+     484,
+     0.763,
+     0.019
+    ],
+    "Snorlax": [
+     1794,
+     0.702,
+     0.011
+    ],
+    "Raikou": [
+     404,
+     0.738,
+     0.022
+    ],
+    "Gligar": [
+     50,
+     0.845,
+     0.051
+    ],
+    "Celebi": [
+     2390,
+     0.667,
+     0.01
+    ],
+    "Venusaur": [
+     188,
+     0.75,
+     0.032
+    ],
+    "Alakazam": [
+     74,
+     0.807,
+     0.046
+    ],
+    "Heracross": [
+     506,
+     0.699,
+     0.02
+    ],
+    "Ludicolo": [
+     127,
+     0.759,
+     0.038
+    ],
+    "Registeel": [
+     877,
+     0.65,
+     0.016
+    ],
+    "Aerodactyl": [
+     3046,
+     0.62,
+     0.009
+    ],
+    "Steelix": [
+     110,
+     0.75,
+     0.041
+    ],
+    "Gardevoir": [
+     101,
+     0.734,
+     0.044
+    ],
+    "Smeargle": [
+     240,
+     0.663,
+     0.031
+    ],
+    "Swampert": [
+     4740,
+     0.569,
+     0.007
+    ],
+    "Gyarados": [
+     348,
+     0.636,
+     0.026
+    ]
+   }
+  },
+  "Marowak": {
+   "teammates": {
+    "Snorlax": 0.468,
+    "Zapdos": 0.393,
+    "Tyranitar": 0.362,
+    "Jirachi": 0.343,
+    "Metagross": 0.24,
+    "Salamence": 0.231,
+    "Breloom": 0.225,
+    "Aerodactyl": 0.189,
+    "Magneton": 0.176,
+    "Celebi": 0.167,
+    "Gyarados": 0.147,
+    "Blissey": 0.143,
+    "Starmie": 0.122,
+    "Claydol": 0.12,
+    "Dugtrio": 0.107,
+    "Registeel": 0.1,
+    "Swampert": 0.091,
+    "Porygon2": 0.089,
+    "Skarmory": 0.08,
+    "Suicune": 0.076,
+    "Electrode": 0.075,
+    "Heracross": 0.075,
+    "Gengar": 0.072,
+    "Vaporeon": 0.066,
+    "Hariyama": 0.055,
+    "Jolteon": 0.055,
+    "Weezing": 0.053,
+    "Machamp": 0.039,
+    "Umbreon": 0.039,
+    "Charizard": 0.03,
+    "Medicham": 0.029,
+    "Raikou": 0.028,
+    "Kingdra": 0.027,
+    "Forretress": 0.025,
+    "Houndoom": 0.024,
+    "Milotic": 0.021,
+    "Smeargle": 0.021
+   },
+   "counters": {
+    "Suicune": [
+     301,
+     0.833,
+     0.022
+    ],
+    "Starmie": [
+     190,
+     0.842,
+     0.026
+    ],
+    "Jynx": [
+     25,
+     0.882,
+     0.064
+    ],
+    "Milotic": [
+     28,
+     0.87,
+     0.063
+    ],
+    "Vaporeon": [
+     34,
+     0.826,
+     0.065
+    ],
+    "Swampert": [
+     376,
+     0.656,
+     0.024
+    ],
+    "Gengar": [
+     302,
+     0.661,
+     0.027
+    ],
+    "Cloyster": [
+     24,
+     0.846,
+     0.074
+    ],
+    "Heracross": [
+     51,
+     0.76,
+     0.06
+    ],
+    "Breloom": [
+     46,
+     0.745,
+     0.065
+    ],
+    "Celebi": [
+     245,
+     0.596,
+     0.031
+    ],
+    "Flygon": [
+     80,
+     0.673,
+     0.053
+    ],
+    "Weezing": [
+     25,
+     0.725,
+     0.089
+    ],
+    "Salamence": [
+     433,
+     0.461,
+     0.024
+    ],
+    "Aerodactyl": [
+     215,
+     0.5,
+     0.034
+    ],
+    "Zapdos": [
+     338,
+     0.437,
+     0.027
+    ],
+    "Charizard": [
+     54,
+     0.54,
+     0.068
+    ],
+    "Skarmory": [
+     373,
+     0.337,
+     0.024
+    ],
+    "Claydol": [
+     124,
+     0.397,
+     0.044
+    ],
+    "Raikou": [
+     54,
+     0.49,
+     0.068
+    ],
+    "Smeargle": [
+     35,
+     0.535,
+     0.084
+    ],
+    "Dugtrio": [
+     73,
+     0.428,
+     0.058
+    ],
+    "Jolteon": [
+     78,
+     0.416,
+     0.056
+    ],
+    "Moltres": [
+     31,
+     0.539,
+     0.089
+    ],
+    "Jirachi": [
+     129,
+     0.342,
+     0.042
+    ],
+    "Blissey": [
+     207,
+     0.253,
+     0.03
+    ],
+    "Metagross": [
+     271,
+     0.226,
+     0.025
+    ],
+    "Gyarados": [
+     70,
+     0.347,
+     0.057
+    ],
+    "Magneton": [
+     107,
+     0.289,
+     0.044
+    ],
+    "Hariyama": [
+     21,
+     0.527,
+     0.108
+    ]
+   }
+  },
+  "Medicham": {
+   "teammates": {
+    "Metagross": 0.539,
+    "Snorlax": 0.516,
+    "Magneton": 0.475,
+    "Salamence": 0.458,
+    "Suicune": 0.433,
+    "Celebi": 0.221,
+    "Swampert": 0.188,
+    "Tyranitar": 0.185,
+    "Gyarados": 0.151,
+    "Zapdos": 0.137,
+    "Claydol": 0.101,
+    "Aerodactyl": 0.099,
+    "Jirachi": 0.091,
+    "Starmie": 0.091,
+    "Blissey": 0.082,
+    "Flygon": 0.079,
+    "Skarmory": 0.076,
+    "Heracross": 0.072,
+    "Dugtrio": 0.067,
+    "Gengar": 0.061,
+    "Machamp": 0.059,
+    "Forretress": 0.058,
+    "Charizard": 0.055,
+    "Porygon2": 0.052,
+    "Raikou": 0.045,
+    "Houndoom": 0.045,
+    "Jolteon": 0.044,
+    "Registeel": 0.035,
+    "Kingdra": 0.028,
+    "Moltres": 0.027,
+    "Umbreon": 0.024,
+    "Regice": 0.024,
+    "Alakazam": 0.023,
+    "Breloom": 0.022
+   },
+   "counters": {
+    "Aerodactyl": [
+     1158,
+     0.78,
+     0.012
+    ],
+    "Salamence": [
+     3368,
+     0.732,
+     0.008
+    ],
+    "Metagross": [
+     1710,
+     0.684,
+     0.011
+    ],
+    "Heracross": [
+     295,
+     0.74,
+     0.026
+    ],
+    "Weezing": [
+     71,
+     0.816,
+     0.046
+    ],
+    "Charizard": [
+     353,
+     0.702,
+     0.024
+    ],
+    "Gyarados": [
+     417,
+     0.676,
+     0.023
+    ],
+    "Raikou": [
+     180,
+     0.71,
+     0.034
+    ],
+    "Flygon": [
+     309,
+     0.676,
+     0.027
+    ],
+    "Swampert": [
+     1851,
+     0.613,
+     0.011
+    ],
+    "Marowak": [
+     74,
+     0.756,
+     0.05
+    ],
+    "Suicune": [
+     1124,
+     0.608,
+     0.015
+    ],
+    "Slaking": [
+     225,
+     0.671,
+     0.031
+    ],
+    "Sableye": [
+     49,
+     0.777,
+     0.059
+    ],
+    "Jirachi": [
+     618,
+     0.612,
+     0.02
+    ],
+    "Dugtrio": [
+     705,
+     0.574,
+     0.019
+    ],
+    "Venusaur": [
+     106,
+     0.677,
+     0.045
+    ],
+    "Starmie": [
+     1057,
+     0.552,
+     0.015
+    ],
+    "Skarmory": [
+     2300,
+     0.505,
+     0.01
+    ],
+    "Zapdos": [
+     2015,
+     0.492,
+     0.011
+    ],
+    "Jolteon": [
+     436,
+     0.532,
+     0.024
+    ],
+    "Donphan": [
+     58,
+     0.671,
+     0.062
+    ],
+    "Moltres": [
+     238,
+     0.543,
+     0.032
+    ],
+    "Celebi": [
+     1131,
+     0.456,
+     0.015
+    ],
+    "Milotic": [
+     178,
+     0.543,
+     0.037
+    ],
+    "Kingdra": [
+     112,
+     0.55,
+     0.047
+    ],
+    "Medicham": [
+     456,
+     0.445,
+     0.023
+    ],
+    "Forretress": [
+     579,
+     0.399,
+     0.02
+    ],
+    "Gengar": [
+     1951,
+     0.313,
+     0.011
+    ],
+    "Vaporeon": [
+     131,
+     0.445,
+     0.043
+    ]
+   }
+  },
+  "Metagross": {
+   "teammates": {
+    "Tyranitar": 0.502,
+    "Salamence": 0.463,
+    "Snorlax": 0.32,
+    "Suicune": 0.303,
+    "Magneton": 0.258,
+    "Gengar": 0.254,
+    "Starmie": 0.234,
+    "Skarmory": 0.226,
+    "Celebi": 0.219,
+    "Swampert": 0.2,
+    "Zapdos": 0.194,
+    "Claydol": 0.179,
+    "Aerodactyl": 0.151,
+    "Blissey": 0.131,
+    "Jolteon": 0.123,
+    "Dugtrio": 0.118,
+    "Heracross": 0.089,
+    "Medicham": 0.077,
+    "Charizard": 0.071,
+    "Gyarados": 0.054,
+    "Raikou": 0.053,
+    "Forretress": 0.044,
+    "Breloom": 0.038,
+    "Regice": 0.037,
+    "Smeargle": 0.036,
+    "Cloyster": 0.035,
+    "Jirachi": 0.034,
+    "Ludicolo": 0.033,
+    "Registeel": 0.024,
+    "Regirock": 0.023,
+    "Milotic": 0.023,
+    "Blaziken": 0.022,
+    "Kingdra": 0.021
+   },
+   "counters": {
+    "Moltres": [
+     1848,
+     0.765,
+     0.01
+    ],
+    "Charizard": [
+     2605,
+     0.758,
+     0.008
+    ],
+    "Blaziken": [
+     374,
+     0.785,
+     0.021
+    ],
+    "Houndoom": [
+     479,
+     0.743,
+     0.02
+    ],
+    "Flygon": [
+     2045,
+     0.618,
+     0.011
+    ],
+    "Swampert": [
+     16055,
+     0.577,
+     0.004
+    ],
+    "Dugtrio": [
+     3259,
+     0.575,
+     0.009
+    ],
+    "Marowak": [
+     271,
+     0.655,
+     0.029
+    ],
+    "Entei": [
+     47,
+     0.77,
+     0.061
+    ],
+    "Steelix": [
+     335,
+     0.603,
+     0.027
+    ],
+    "Breloom": [
+     1042,
+     0.529,
+     0.015
+    ],
+    "Suicune": [
+     7873,
+     0.483,
+     0.006
+    ],
+    "Salamence": [
+     8741,
+     0.476,
+     0.005
+    ],
+    "Gyarados": [
+     1810,
+     0.493,
+     0.012
+    ],
+    "Linoone": [
+     131,
+     0.612,
+     0.043
+    ],
+    "Skarmory": [
+     12452,
+     0.457,
+     0.004
+    ],
+    "Jirachi": [
+     4888,
+     0.455,
+     0.007
+    ],
+    "Donphan": [
+     338,
+     0.53,
+     0.027
+    ],
+    "Zapdos": [
+     8591,
+     0.437,
+     0.005
+    ],
+    "Metagross": [
+     11283,
+     0.432,
+     0.005
+    ],
+    "Heracross": [
+     1330,
+     0.462,
+     0.014
+    ],
+    "Kingdra": [
+     560,
+     0.487,
+     0.021
+    ],
+    "Registeel": [
+     2066,
+     0.443,
+     0.011
+    ],
+    "Vaporeon": [
+     840,
+     0.465,
+     0.017
+    ],
+    "Starmie": [
+     5349,
+     0.419,
+     0.007
+    ],
+    "Milotic": [
+     1396,
+     0.419,
+     0.013
+    ],
+    "Ludicolo": [
+     446,
+     0.457,
+     0.024
+    ],
+    "Forretress": [
+     3826,
+     0.39,
+     0.008
+    ],
+    "Claydol": [
+     3001,
+     0.393,
+     0.009
+    ],
+    "Magneton": [
+     4552,
+     0.384,
+     0.007
+    ]
+   }
+  },
+  "Milotic": {
+   "teammates": {
+    "Tyranitar": 0.447,
+    "Claydol": 0.422,
+    "Blissey": 0.413,
+    "Skarmory": 0.382,
+    "Dugtrio": 0.371,
+    "Celebi": 0.256,
+    "Metagross": 0.249,
+    "Forretress": 0.237,
+    "Magneton": 0.196,
+    "Salamence": 0.195,
+    "Gengar": 0.142,
+    "Snorlax": 0.132,
+    "Zapdos": 0.122,
+    "Flygon": 0.121,
+    "Jirachi": 0.094,
+    "Heracross": 0.092,
+    "Jolteon": 0.085,
+    "Aerodactyl": 0.081,
+    "Registeel": 0.073,
+    "Breloom": 0.057,
+    "Swampert": 0.057,
+    "Charizard": 0.053,
+    "Houndoom": 0.044,
+    "Donphan": 0.041,
+    "Venusaur": 0.041,
+    "Moltres": 0.036,
+    "Dusclops": 0.032,
+    "Suicune": 0.03,
+    "Starmie": 0.03,
+    "Sableye": 0.027,
+    "Umbreon": 0.025,
+    "Medicham": 0.025,
+    "Gyarados": 0.024,
+    "Regice": 0.02
+   },
+   "counters": {
+    "Jolteon": [
+     429,
+     0.793,
+     0.02
+    ],
+    "Raikou": [
+     185,
+     0.825,
+     0.028
+    ],
+    "Venusaur": [
+     98,
+     0.854,
+     0.036
+    ],
+    "Zapdos": [
+     1433,
+     0.745,
+     0.012
+    ],
+    "Magneton": [
+     326,
+     0.764,
+     0.024
+    ],
+    "Snorlax": [
+     906,
+     0.704,
+     0.015
+    ],
+    "Suicune": [
+     1465,
+     0.687,
+     0.012
+    ],
+    "Breloom": [
+     158,
+     0.771,
+     0.033
+    ],
+    "Jirachi": [
+     858,
+     0.677,
+     0.016
+    ],
+    "Heracross": [
+     199,
+     0.729,
+     0.031
+    ],
+    "Celebi": [
+     1652,
+     0.647,
+     0.012
+    ],
+    "Gengar": [
+     1010,
+     0.596,
+     0.015
+    ],
+    "Registeel": [
+     317,
+     0.569,
+     0.028
+    ],
+    "Jynx": [
+     68,
+     0.679,
+     0.057
+    ],
+    "Regice": [
+     129,
+     0.617,
+     0.043
+    ],
+    "Starmie": [
+     1170,
+     0.502,
+     0.015
+    ],
+    "Alakazam": [
+     37,
+     0.716,
+     0.074
+    ],
+    "Gyarados": [
+     192,
+     0.556,
+     0.036
+    ],
+    "Smeargle": [
+     81,
+     0.617,
+     0.054
+    ],
+    "Sceptile": [
+     29,
+     0.725,
+     0.083
+    ],
+    "Blissey": [
+     2779,
+     0.407,
+     0.009
+    ],
+    "Milotic": [
+     382,
+     0.447,
+     0.025
+    ],
+    "Lapras": [
+     49,
+     0.62,
+     0.069
+    ],
+    "Slaking": [
+     71,
+     0.569,
+     0.059
+    ],
+    "Ludicolo": [
+     76,
+     0.554,
+     0.057
+    ],
+    "Cloyster": [
+     133,
+     0.493,
+     0.043
+    ],
+    "Skarmory": [
+     1973,
+     0.352,
+     0.011
+    ],
+    "Aerodactyl": [
+     958,
+     0.355,
+     0.015
+    ],
+    "Medicham": [
+     178,
+     0.436,
+     0.037
+    ],
+    "Quagsire": [
+     37,
+     0.578,
+     0.081
+    ]
+   }
+  },
+  "Miltank": {
+   "teammates": {
+    "Snorlax": 0.425,
+    "Dugtrio": 0.353,
+    "Blissey": 0.342,
+    "Salamence": 0.294,
+    "Slaking": 0.248,
+    "Celebi": 0.245,
+    "Claydol": 0.235,
+    "Magneton": 0.207,
+    "Suicune": 0.144,
+    "Starmie": 0.144,
+    "Smeargle": 0.131,
+    "Metagross": 0.09,
+    "Vaporeon": 0.087,
+    "Swampert": 0.077,
+    "Porygon2": 0.073,
+    "Houndoom": 0.069,
+    "Skarmory": 0.068,
+    "Jirachi": 0.066,
+    "Ursaring": 0.064,
+    "Jolteon": 0.063,
+    "Steelix": 0.06,
+    "Cloyster": 0.058,
+    "Forretress": 0.051,
+    "Sceptile": 0.049,
+    "Gengar": 0.047,
+    "Tyranitar": 0.046,
+    "Raikou": 0.044,
+    "Regice": 0.043,
+    "Milotic": 0.043,
+    "Zapdos": 0.041,
+    "Gyarados": 0.034,
+    "Breloom": 0.034,
+    "Dusclops": 0.033,
+    "Aerodactyl": 0.03,
+    "Rhydon": 0.028,
+    "Alakazam": 0.028,
+    "Dragonite": 0.026,
+    "Umbreon": 0.025,
+    "Jynx": 0.023,
+    "Articuno": 0.023
+   },
+   "counters": {
+    "Medicham": [
+     23,
+     0.905,
+     0.061
+    ],
+    "Breloom": [
+     22,
+     0.861,
+     0.074
+    ],
+    "Suicune": [
+     67,
+     0.751,
+     0.053
+    ],
+    "Skarmory": [
+     123,
+     0.64,
+     0.043
+    ],
+    "Celebi": [
+     58,
+     0.694,
+     0.06
+    ],
+    "Gengar": [
+     108,
+     0.618,
+     0.047
+    ],
+    "Swampert": [
+     112,
+     0.591,
+     0.047
+    ],
+    "Tyranitar": [
+     165,
+     0.473,
+     0.039
+    ],
+    "Jirachi": [
+     40,
+     0.603,
+     0.077
+    ],
+    "Magneton": [
+     27,
+     0.637,
+     0.092
+    ],
+    "Forretress": [
+     32,
+     0.57,
+     0.088
+    ],
+    "Snorlax": [
+     73,
+     0.451,
+     0.058
+    ],
+    "Blissey": [
+     98,
+     0.398,
+     0.05
+    ],
+    "Metagross": [
+     117,
+     0.352,
+     0.044
+    ],
+    "Salamence": [
+     143,
+     0.331,
+     0.039
+    ],
+    "Starmie": [
+     42,
+     0.477,
+     0.077
+    ],
+    "Aerodactyl": [
+     70,
+     0.351,
+     0.057
+    ],
+    "Zapdos": [
+     55,
+     0.371,
+     0.065
+    ],
+    "Jolteon": [
+     23,
+     0.513,
+     0.105
+    ],
+    "Flygon": [
+     27,
+     0.45,
+     0.095
+    ],
+    "Claydol": [
+     42,
+     0.337,
+     0.073
+    ],
+    "Charizard": [
+     30,
+     0.173,
+     0.069
+    ],
+    "Dugtrio": [
+     21,
+     0.263,
+     0.095
+    ]
+   }
+  },
+  "Misdreavus": {
+   "teammates": {
+    "Skarmory": 0.763,
+    "Blissey": 0.622,
+    "Zapdos": 0.556,
+    "Flygon": 0.497,
+    "Jirachi": 0.289,
+    "Articuno": 0.179,
+    "Moltres": 0.164,
+    "Aerodactyl": 0.158,
+    "Celebi": 0.116,
+    "Dugtrio": 0.115,
+    "Swampert": 0.113,
+    "Suicune": 0.104,
+    "Forretress": 0.1,
+    "Metagross": 0.098,
+    "Gligar": 0.078,
+    "Salamence": 0.077,
+    "Gengar": 0.077,
+    "Magneton": 0.062,
+    "Claydol": 0.059,
+    "Tyranitar": 0.051,
+    "Gyarados": 0.05,
+    "Lapras": 0.05,
+    "Weezing": 0.048,
+    "Jynx": 0.048,
+    "Raikou": 0.033,
+    "Milotic": 0.027,
+    "Jolteon": 0.023,
+    "Smeargle": 0.02,
+    "Alakazam": 0.02
+   },
+   "counters": {
+    "Tyranitar": [
+     198,
+     0.9,
+     0.021
+    ],
+    "Metagross": [
+     99,
+     0.862,
+     0.035
+    ],
+    "Suicune": [
+     128,
+     0.772,
+     0.037
+    ],
+    "Snorlax": [
+     115,
+     0.73,
+     0.041
+    ],
+    "Aerodactyl": [
+     83,
+     0.742,
+     0.048
+    ],
+    "Salamence": [
+     91,
+     0.726,
+     0.047
+    ],
+    "Raikou": [
+     22,
+     0.836,
+     0.079
+    ],
+    "Magneton": [
+     30,
+     0.8,
+     0.073
+    ],
+    "Skarmory": [
+     275,
+     0.616,
+     0.029
+    ],
+    "Zapdos": [
+     140,
+     0.593,
+     0.042
+    ],
+    "Medicham": [
+     23,
+     0.774,
+     0.087
+    ],
+    "Charizard": [
+     32,
+     0.713,
+     0.08
+    ],
+    "Moltres": [
+     26,
+     0.689,
+     0.092
+    ],
+    "Starmie": [
+     167,
+     0.471,
+     0.039
+    ],
+    "Celebi": [
+     80,
+     0.537,
+     0.056
+    ],
+    "Dusclops": [
+     25,
+     0.659,
+     0.095
+    ],
+    "Swampert": [
+     150,
+     0.423,
+     0.04
+    ],
+    "Jirachi": [
+     72,
+     0.495,
+     0.059
+    ],
+    "Gengar": [
+     145,
+     0.408,
+     0.041
+    ],
+    "Jolteon": [
+     37,
+     0.543,
+     0.082
+    ],
+    "Breloom": [
+     31,
+     0.53,
+     0.09
+    ],
+    "Forretress": [
+     122,
+     0.339,
+     0.043
+    ],
+    "Claydol": [
+     183,
+     0.238,
+     0.031
+    ],
+    "Blissey": [
+     253,
+     0.184,
+     0.024
+    ],
+    "Cloyster": [
+     47,
+     0.27,
+     0.065
+    ],
+    "Dugtrio": [
+     32,
+     0.33,
+     0.083
+    ],
+    "Flygon": [
+     33,
+     0.292,
+     0.079
+    ],
+    "Registeel": [
+     50,
+     0.182,
+     0.054
+    ]
+   }
+  },
+  "Moltres": {
+   "teammates": {
+    "Tyranitar": 0.647,
+    "Skarmory": 0.457,
+    "Swampert": 0.431,
+    "Gengar": 0.423,
+    "Flygon": 0.269,
+    "Blissey": 0.263,
+    "Jirachi": 0.246,
+    "Forretress": 0.223,
+    "Celebi": 0.157,
+    "Metagross": 0.149,
+    "Jolteon": 0.132,
+    "Zapdos": 0.122,
+    "Registeel": 0.107,
+    "Snorlax": 0.088,
+    "Starmie": 0.084,
+    "Aerodactyl": 0.079,
+    "Claydol": 0.069,
+    "Suicune": 0.069,
+    "Dugtrio": 0.062,
+    "Salamence": 0.05,
+    "Cloyster": 0.046,
+    "Articuno": 0.045,
+    "Gyarados": 0.045,
+    "Medicham": 0.033,
+    "Raikou": 0.031,
+    "Heracross": 0.03,
+    "Regirock": 0.03,
+    "Milotic": 0.028,
+    "Breloom": 0.025,
+    "Magneton": 0.025,
+    "Exeggutor": 0.022,
+    "Vaporeon": 0.022,
+    "Quagsire": 0.021,
+    "Smeargle": 0.02
+   },
+   "counters": {
+    "Aerodactyl": [
+     1585,
+     0.807,
+     0.01
+    ],
+    "Raikou": [
+     219,
+     0.831,
+     0.025
+    ],
+    "Jolteon": [
+     320,
+     0.816,
+     0.022
+    ],
+    "Starmie": [
+     1073,
+     0.774,
+     0.013
+    ],
+    "Blissey": [
+     2562,
+     0.741,
+     0.009
+    ],
+    "Kingdra": [
+     130,
+     0.809,
+     0.035
+    ],
+    "Zapdos": [
+     1370,
+     0.7,
+     0.012
+    ],
+    "Salamence": [
+     1345,
+     0.7,
+     0.012
+    ],
+    "Milotic": [
+     278,
+     0.722,
+     0.027
+    ],
+    "Suicune": [
+     1258,
+     0.652,
+     0.013
+    ],
+    "Gyarados": [
+     194,
+     0.72,
+     0.032
+    ],
+    "Tyranitar": [
+     2448,
+     0.605,
+     0.01
+    ],
+    "Flygon": [
+     367,
+     0.654,
+     0.025
+    ],
+    "Snorlax": [
+     761,
+     0.583,
+     0.018
+    ],
+    "Regirock": [
+     79,
+     0.708,
+     0.051
+    ],
+    "Houndoom": [
+     98,
+     0.684,
+     0.047
+    ],
+    "Gengar": [
+     1226,
+     0.522,
+     0.014
+    ],
+    "Ludicolo": [
+     68,
+     0.655,
+     0.058
+    ],
+    "Vaporeon": [
+     88,
+     0.618,
+     0.052
+    ],
+    "Charizard": [
+     496,
+     0.434,
+     0.022
+    ],
+    "Moltres": [
+     278,
+     0.413,
+     0.03
+    ],
+    "Alakazam": [
+     30,
+     0.641,
+     0.088
+    ],
+    "Medicham": [
+     238,
+     0.416,
+     0.032
+    ],
+    "Porygon2": [
+     71,
+     0.526,
+     0.059
+    ],
+    "Jynx": [
+     53,
+     0.561,
+     0.068
+    ],
+    "Dragonite": [
+     25,
+     0.661,
+     0.094
+    ],
+    "Regice": [
+     90,
+     0.484,
+     0.053
+    ],
+    "Slaking": [
+     76,
+     0.491,
+     0.057
+    ],
+    "Swampert": [
+     1665,
+     0.259,
+     0.011
+    ],
+    "Lapras": [
+     25,
+     0.602,
+     0.098
+    ]
+   }
+  },
+  "Omastar": {
+   "teammates": {
+    "Celebi": 0.413,
+    "Gengar": 0.376,
+    "Dugtrio": 0.329,
+    "Claydol": 0.305,
+    "Blissey": 0.298,
+    "Zapdos": 0.283,
+    "Kingdra": 0.278,
+    "Jolteon": 0.212,
+    "Metagross": 0.208,
+    "Tyranitar": 0.169,
+    "Snorlax": 0.168,
+    "Starmie": 0.157,
+    "Salamence": 0.153,
+    "Suicune": 0.151,
+    "Ludicolo": 0.093,
+    "Moltres": 0.084,
+    "Umbreon": 0.083,
+    "Weezing": 0.083,
+    "Swampert": 0.073,
+    "Registeel": 0.073,
+    "Medicham": 0.069,
+    "Aerodactyl": 0.064,
+    "Sceptile": 0.06,
+    "Charizard": 0.057,
+    "Jirachi": 0.051,
+    "Heracross": 0.048,
+    "Magneton": 0.046,
+    "Regirock": 0.038,
+    "Electrode": 0.037,
+    "Hariyama": 0.036,
+    "Flygon": 0.033,
+    "Armaldo": 0.031,
+    "Raikou": 0.026,
+    "Ursaring": 0.024,
+    "Steelix": 0.022,
+    "Skarmory": 0.021
+   },
+   "counters": {
+    "Zapdos": [
+     51,
+     0.76,
+     0.06
+    ],
+    "Suicune": [
+     29,
+     0.798,
+     0.074
+    ],
+    "Blissey": [
+     37,
+     0.738,
+     0.073
+    ],
+    "Metagross": [
+     30,
+     0.555,
+     0.09
+    ],
+    "Snorlax": [
+     39,
+     0.4,
+     0.079
+    ],
+    "Tyranitar": [
+     37,
+     0.316,
+     0.077
+    ],
+    "Skarmory": [
+     48,
+     0.18,
+     0.056
+    ],
+    "Swampert": [
+     23,
+     0.25,
+     0.091
+    ]
+   }
+  },
+  "Porygon2": {
+   "teammates": {
+    "Celebi": 0.474,
+    "Jirachi": 0.373,
+    "Dugtrio": 0.316,
+    "Metagross": 0.292,
+    "Raikou": 0.279,
+    "Suicune": 0.215,
+    "Tyranitar": 0.199,
+    "Magneton": 0.188,
+    "Medicham": 0.154,
+    "Snorlax": 0.152,
+    "Heracross": 0.148,
+    "Salamence": 0.143,
+    "Flygon": 0.141,
+    "Machamp": 0.125,
+    "Starmie": 0.119,
+    "Swampert": 0.114,
+    "Gengar": 0.097,
+    "Claydol": 0.094,
+    "Blaziken": 0.084,
+    "Zapdos": 0.072,
+    "Skarmory": 0.071,
+    "Kingdra": 0.057,
+    "Blissey": 0.057,
+    "Aerodactyl": 0.057,
+    "Marowak": 0.049,
+    "Jynx": 0.048,
+    "Breloom": 0.044,
+    "Electrode": 0.042,
+    "Registeel": 0.039,
+    "Gyarados": 0.036,
+    "Forretress": 0.036,
+    "Weezing": 0.029,
+    "Gardevoir": 0.028,
+    "Houndoom": 0.028,
+    "Jolteon": 0.027,
+    "Donphan": 0.025,
+    "Regirock": 0.025,
+    "Charizard": 0.022,
+    "Milotic": 0.02
+   },
+   "counters": {
+    "Snorlax": [
+     369,
+     0.805,
+     0.021
+    ],
+    "Heracross": [
+     79,
+     0.845,
+     0.041
+    ],
+    "Tyranitar": [
+     872,
+     0.702,
+     0.015
+    ],
+    "Magneton": [
+     167,
+     0.769,
+     0.033
+    ],
+    "Jirachi": [
+     217,
+     0.753,
+     0.029
+    ],
+    "Medicham": [
+     71,
+     0.812,
+     0.046
+    ],
+    "Raikou": [
+     74,
+     0.789,
+     0.047
+    ],
+    "Breloom": [
+     74,
+     0.779,
+     0.048
+    ],
+    "Milotic": [
+     63,
+     0.789,
+     0.052
+    ],
+    "Suicune": [
+     375,
+     0.66,
+     0.024
+    ],
+    "Hariyama": [
+     32,
+     0.823,
+     0.068
+    ],
+    "Metagross": [
+     492,
+     0.622,
+     0.022
+    ],
+    "Blaziken": [
+     20,
+     0.851,
+     0.079
+    ],
+    "Registeel": [
+     111,
+     0.66,
+     0.045
+    ],
+    "Blissey": [
+     1004,
+     0.536,
+     0.016
+    ],
+    "Forretress": [
+     160,
+     0.592,
+     0.039
+    ],
+    "Jynx": [
+     25,
+     0.768,
+     0.084
+    ],
+    "Ludicolo": [
+     29,
+     0.745,
+     0.081
+    ],
+    "Regice": [
+     46,
+     0.689,
+     0.068
+    ],
+    "Celebi": [
+     491,
+     0.5,
+     0.023
+    ],
+    "Swampert": [
+     777,
+     0.468,
+     0.018
+    ],
+    "Smeargle": [
+     33,
+     0.708,
+     0.079
+    ],
+    "Machamp": [
+     23,
+     0.735,
+     0.092
+    ],
+    "Kingdra": [
+     33,
+     0.627,
+     0.084
+    ],
+    "Zapdos": [
+     360,
+     0.376,
+     0.026
+    ],
+    "Charizard": [
+     106,
+     0.459,
+     0.049
+    ],
+    "Umbreon": [
+     30,
+     0.584,
+     0.09
+    ],
+    "Skarmory": [
+     507,
+     0.297,
+     0.02
+    ],
+    "Aerodactyl": [
+     575,
+     0.273,
+     0.019
+    ],
+    "Starmie": [
+     365,
+     0.28,
+     0.023
+    ]
+   }
+  },
+  "Quagsire": {
+   "teammates": {
+    "Tyranitar": 0.564,
+    "Blissey": 0.364,
+    "Forretress": 0.332,
+    "Skarmory": 0.324,
+    "Gengar": 0.258,
+    "Moltres": 0.206,
+    "Magneton": 0.192,
+    "Claydol": 0.164,
+    "Houndoom": 0.154,
+    "Steelix": 0.151,
+    "Gyarados": 0.15,
+    "Charizard": 0.145,
+    "Jynx": 0.134,
+    "Dragonite": 0.124,
+    "Jolteon": 0.109,
+    "Jirachi": 0.108,
+    "Salamence": 0.103,
+    "Umbreon": 0.096,
+    "Donphan": 0.09,
+    "Armaldo": 0.086,
+    "Venusaur": 0.078,
+    "Aerodactyl": 0.078,
+    "Metagross": 0.044,
+    "Camerupt": 0.043,
+    "Dusclops": 0.043,
+    "Starmie": 0.042,
+    "Celebi": 0.042,
+    "Ludicolo": 0.041,
+    "Dugtrio": 0.034,
+    "Swampert": 0.033,
+    "Flygon": 0.03,
+    "Zapdos": 0.028,
+    "Gardevoir": 0.026,
+    "Porygon2": 0.025
+   },
+   "counters": {
+    "Celebi": [
+     151,
+     0.82,
+     0.031
+    ],
+    "Ludicolo": [
+     20,
+     0.914,
+     0.062
+    ],
+    "Charizard": [
+     41,
+     0.844,
+     0.057
+    ],
+    "Raikou": [
+     29,
+     0.845,
+     0.067
+    ],
+    "Skarmory": [
+     209,
+     0.691,
+     0.032
+    ],
+    "Gengar": [
+     167,
+     0.684,
+     0.036
+    ],
+    "Zapdos": [
+     142,
+     0.632,
+     0.04
+    ],
+    "Heracross": [
+     36,
+     0.742,
+     0.073
+    ],
+    "Suicune": [
+     239,
+     0.522,
+     0.032
+    ],
+    "Snorlax": [
+     57,
+     0.567,
+     0.066
+    ],
+    "Breloom": [
+     20,
+     0.693,
+     0.102
+    ],
+    "Jolteon": [
+     28,
+     0.616,
+     0.092
+    ],
+    "Salamence": [
+     176,
+     0.381,
+     0.037
+    ],
+    "Tyranitar": [
+     378,
+     0.313,
+     0.024
+    ],
+    "Jirachi": [
+     78,
+     0.419,
+     0.056
+    ],
+    "Swampert": [
+     337,
+     0.29,
+     0.025
+    ],
+    "Forretress": [
+     62,
+     0.441,
+     0.063
+    ],
+    "Metagross": [
+     176,
+     0.299,
+     0.035
+    ],
+    "Blissey": [
+     209,
+     0.269,
+     0.031
+    ],
+    "Cloyster": [
+     23,
+     0.556,
+     0.104
+    ],
+    "Registeel": [
+     26,
+     0.516,
+     0.097
+    ],
+    "Magneton": [
+     51,
+     0.388,
+     0.068
+    ],
+    "Starmie": [
+     121,
+     0.26,
+     0.04
+    ],
+    "Aerodactyl": [
+     151,
+     0.236,
+     0.035
+    ],
+    "Claydol": [
+     50,
+     0.352,
+     0.068
+    ],
+    "Dugtrio": [
+     37,
+     0.386,
+     0.08
+    ],
+    "Flygon": [
+     47,
+     0.22,
+     0.06
+    ],
+    "Milotic": [
+     37,
+     0.23,
+     0.069
+    ]
+   }
+  },
+  "Raikou": {
+   "teammates": {
+    "Salamence": 0.547,
+    "Tyranitar": 0.47,
+    "Swampert": 0.412,
+    "Metagross": 0.315,
+    "Celebi": 0.308,
+    "Suicune": 0.288,
+    "Registeel": 0.287,
+    "Dugtrio": 0.206,
+    "Claydol": 0.155,
+    "Blissey": 0.134,
+    "Skarmory": 0.124,
+    "Gengar": 0.117,
+    "Snorlax": 0.113,
+    "Starmie": 0.108,
+    "Jirachi": 0.107,
+    "Zapdos": 0.099,
+    "Gyarados": 0.092,
+    "Porygon2": 0.08,
+    "Forretress": 0.071,
+    "Kingdra": 0.059,
+    "Cloyster": 0.052,
+    "Charizard": 0.051,
+    "Aerodactyl": 0.049,
+    "Heracross": 0.047,
+    "Gardevoir": 0.041,
+    "Medicham": 0.039,
+    "Vaporeon": 0.038,
+    "Breloom": 0.032,
+    "Machamp": 0.031,
+    "Blaziken": 0.026,
+    "Regice": 0.023,
+    "Moltres": 0.021,
+    "Regirock": 0.021
+   },
+   "counters": {
+    "Snorlax": [
+     1210,
+     0.774,
+     0.012
+    ],
+    "Aerodactyl": [
+     1448,
+     0.729,
+     0.012
+    ],
+    "Dugtrio": [
+     796,
+     0.726,
+     0.016
+    ],
+    "Steelix": [
+     96,
+     0.801,
+     0.041
+    ],
+    "Tyranitar": [
+     2804,
+     0.657,
+     0.009
+    ],
+    "Blissey": [
+     2315,
+     0.62,
+     0.01
+    ],
+    "Camerupt": [
+     35,
+     0.82,
+     0.065
+    ],
+    "Claydol": [
+     953,
+     0.617,
+     0.016
+    ],
+    "Metagross": [
+     1426,
+     0.567,
+     0.013
+    ],
+    "Registeel": [
+     423,
+     0.595,
+     0.024
+    ],
+    "Flygon": [
+     524,
+     0.576,
+     0.022
+    ],
+    "Regice": [
+     148,
+     0.636,
+     0.039
+    ],
+    "Heracross": [
+     271,
+     0.527,
+     0.03
+    ],
+    "Breloom": [
+     163,
+     0.544,
+     0.039
+    ],
+    "Raikou": [
+     294,
+     0.489,
+     0.029
+    ],
+    "Regirock": [
+     72,
+     0.585,
+     0.058
+    ],
+    "Donphan": [
+     76,
+     0.524,
+     0.057
+    ],
+    "Jirachi": [
+     723,
+     0.358,
+     0.018
+    ],
+    "Swampert": [
+     2211,
+     0.322,
+     0.01
+    ],
+    "Salamence": [
+     1213,
+     0.324,
+     0.013
+    ],
+    "Sceptile": [
+     54,
+     0.541,
+     0.068
+    ],
+    "Jolteon": [
+     564,
+     0.346,
+     0.02
+    ],
+    "Celebi": [
+     1225,
+     0.318,
+     0.013
+    ],
+    "Venusaur": [
+     82,
+     0.456,
+     0.055
+    ],
+    "Marowak": [
+     54,
+     0.486,
+     0.068
+    ],
+    "Gligar": [
+     21,
+     0.628,
+     0.106
+    ],
+    "Armaldo": [
+     21,
+     0.616,
+     0.106
+    ],
+    "Kingdra": [
+     110,
+     0.373,
+     0.046
+    ],
+    "Jynx": [
+     88,
+     0.384,
+     0.052
+    ],
+    "Forretress": [
+     298,
+     0.272,
+     0.026
+    ]
+   }
+  },
+  "Regice": {
+   "teammates": {
+    "Metagross": 0.543,
+    "Suicune": 0.426,
+    "Gengar": 0.396,
+    "Dugtrio": 0.335,
+    "Skarmory": 0.326,
+    "Claydol": 0.315,
+    "Tyranitar": 0.205,
+    "Swampert": 0.205,
+    "Salamence": 0.201,
+    "Zapdos": 0.162,
+    "Charizard": 0.14,
+    "Snorlax": 0.137,
+    "Jirachi": 0.137,
+    "Starmie": 0.105,
+    "Breloom": 0.088,
+    "Magneton": 0.075,
+    "Celebi": 0.071,
+    "Regirock": 0.069,
+    "Aerodactyl": 0.065,
+    "Cloyster": 0.06,
+    "Raikou": 0.057,
+    "Medicham": 0.05,
+    "Flygon": 0.046,
+    "Forretress": 0.043,
+    "Kingdra": 0.042,
+    "Registeel": 0.041,
+    "Gyarados": 0.035,
+    "Heracross": 0.03,
+    "Milotic": 0.027,
+    "Jynx": 0.027,
+    "Moltres": 0.025,
+    "Machamp": 0.024,
+    "Vaporeon": 0.024
+   },
+   "counters": {
+    "Metagross": [
+     1010,
+     0.864,
+     0.011
+    ],
+    "Tyranitar": [
+     1216,
+     0.844,
+     0.01
+    ],
+    "Registeel": [
+     180,
+     0.845,
+     0.027
+    ],
+    "Jirachi": [
+     501,
+     0.786,
+     0.018
+    ],
+    "Heracross": [
+     128,
+     0.836,
+     0.033
+    ],
+    "Medicham": [
+     97,
+     0.838,
+     0.037
+    ],
+    "Snorlax": [
+     496,
+     0.731,
+     0.02
+    ],
+    "Aerodactyl": [
+     382,
+     0.729,
+     0.023
+    ],
+    "Breloom": [
+     83,
+     0.757,
+     0.047
+    ],
+    "Blissey": [
+     990,
+     0.627,
+     0.015
+    ],
+    "Hariyama": [
+     61,
+     0.765,
+     0.054
+    ],
+    "Regirock": [
+     40,
+     0.784,
+     0.065
+    ],
+    "Charizard": [
+     153,
+     0.644,
+     0.039
+    ],
+    "Machamp": [
+     30,
+     0.764,
+     0.078
+    ],
+    "Forretress": [
+     272,
+     0.564,
+     0.03
+    ],
+    "Houndoom": [
+     35,
+     0.716,
+     0.077
+    ],
+    "Armaldo": [
+     22,
+     0.767,
+     0.09
+    ],
+    "Swampert": [
+     867,
+     0.458,
+     0.017
+    ],
+    "Blaziken": [
+     33,
+     0.7,
+     0.08
+    ],
+    "Magneton": [
+     251,
+     0.432,
+     0.031
+    ],
+    "Suicune": [
+     699,
+     0.37,
+     0.018
+    ],
+    "Dugtrio": [
+     228,
+     0.417,
+     0.033
+    ],
+    "Smeargle": [
+     40,
+     0.597,
+     0.078
+    ],
+    "Slaking": [
+     20,
+     0.685,
+     0.103
+    ],
+    "Jynx": [
+     50,
+     0.525,
+     0.071
+    ],
+    "Moltres": [
+     90,
+     0.451,
+     0.052
+    ],
+    "Regice": [
+     83,
+     0.453,
+     0.054
+    ],
+    "Umbreon": [
+     43,
+     0.536,
+     0.076
+    ],
+    "Salamence": [
+     602,
+     0.278,
+     0.018
+    ],
+    "Raikou": [
+     148,
+     0.279,
+     0.037
+    ]
+   }
+  },
+  "Regirock": {
+   "teammates": {
+    "Snorlax": 0.532,
+    "Metagross": 0.421,
+    "Salamence": 0.392,
+    "Magneton": 0.334,
+    "Tyranitar": 0.242,
+    "Celebi": 0.241,
+    "Suicune": 0.205,
+    "Claydol": 0.166,
+    "Zapdos": 0.158,
+    "Swampert": 0.144,
+    "Blissey": 0.132,
+    "Starmie": 0.129,
+    "Gengar": 0.118,
+    "Gyarados": 0.107,
+    "Skarmory": 0.103,
+    "Jirachi": 0.098,
+    "Aerodactyl": 0.098,
+    "Breloom": 0.086,
+    "Dugtrio": 0.085,
+    "Regice": 0.085,
+    "Registeel": 0.079,
+    "Cloyster": 0.064,
+    "Raikou": 0.063,
+    "Moltres": 0.062,
+    "Forretress": 0.061,
+    "Heracross": 0.052,
+    "Vaporeon": 0.052,
+    "Jolteon": 0.044,
+    "Charizard": 0.039,
+    "Rhydon": 0.038,
+    "Kingdra": 0.032,
+    "Weezing": 0.03,
+    "Houndoom": 0.029,
+    "Camerupt": 0.028,
+    "Medicham": 0.027,
+    "Slaking": 0.027,
+    "Blaziken": 0.023,
+    "Porygon2": 0.022
+   },
+   "counters": {
+    "Metagross": [
+     696,
+     0.721,
+     0.017
+    ],
+    "Vaporeon": [
+     48,
+     0.847,
+     0.052
+    ],
+    "Swampert": [
+     1262,
+     0.679,
+     0.013
+    ],
+    "Breloom": [
+     120,
+     0.742,
+     0.04
+    ],
+    "Starmie": [
+     346,
+     0.673,
+     0.025
+    ],
+    "Suicune": [
+     458,
+     0.639,
+     0.022
+    ],
+    "Kingdra": [
+     37,
+     0.779,
+     0.068
+    ],
+    "Ludicolo": [
+     28,
+     0.795,
+     0.077
+    ],
+    "Skarmory": [
+     776,
+     0.521,
+     0.018
+    ],
+    "Medicham": [
+     116,
+     0.593,
+     0.046
+    ],
+    "Flygon": [
+     166,
+     0.552,
+     0.039
+    ],
+    "Claydol": [
+     362,
+     0.497,
+     0.026
+    ],
+    "Milotic": [
+     70,
+     0.611,
+     0.058
+    ],
+    "Celebi": [
+     391,
+     0.461,
+     0.025
+    ],
+    "Forretress": [
+     192,
+     0.494,
+     0.036
+    ],
+    "Jirachi": [
+     260,
+     0.442,
+     0.031
+    ],
+    "Heracross": [
+     98,
+     0.516,
+     0.05
+    ],
+    "Machamp": [
+     39,
+     0.625,
+     0.078
+    ],
+    "Smeargle": [
+     55,
+     0.571,
+     0.067
+    ],
+    "Steelix": [
+     27,
+     0.656,
+     0.091
+    ],
+    "Registeel": [
+     109,
+     0.449,
+     0.048
+    ],
+    "Hariyama": [
+     50,
+     0.514,
+     0.071
+    ],
+    "Weezing": [
+     26,
+     0.608,
+     0.095
+    ],
+    "Gengar": [
+     491,
+     0.304,
+     0.021
+    ],
+    "Dusclops": [
+     27,
+     0.587,
+     0.096
+    ],
+    "Magneton": [
+     141,
+     0.366,
+     0.041
+    ],
+    "Donphan": [
+     28,
+     0.568,
+     0.093
+    ],
+    "Dugtrio": [
+     158,
+     0.34,
+     0.038
+    ],
+    "Jynx": [
+     39,
+     0.504,
+     0.081
+    ],
+    "Aerodactyl": [
+     508,
+     0.249,
+     0.019
+    ]
+   }
+  },
+  "Registeel": {
+   "teammates": {
+    "Tyranitar": 0.709,
+    "Swampert": 0.539,
+    "Salamence": 0.496,
+    "Celebi": 0.253,
+    "Raikou": 0.248,
+    "Gengar": 0.221,
+    "Suicune": 0.199,
+    "Starmie": 0.167,
+    "Skarmory": 0.166,
+    "Aerodactyl": 0.152,
+    "Forretress": 0.141,
+    "Zapdos": 0.136,
+    "Dugtrio": 0.131,
+    "Metagross": 0.122,
+    "Claydol": 0.11,
+    "Snorlax": 0.105,
+    "Cloyster": 0.088,
+    "Charizard": 0.078,
+    "Magneton": 0.065,
+    "Moltres": 0.063,
+    "Breloom": 0.061,
+    "Flygon": 0.054,
+    "Jirachi": 0.049,
+    "Blissey": 0.043,
+    "Gyarados": 0.042,
+    "Heracross": 0.039,
+    "Vaporeon": 0.038,
+    "Jolteon": 0.036,
+    "Milotic": 0.034,
+    "Medicham": 0.026,
+    "Kingdra": 0.025,
+    "Regirock": 0.023
+   },
+   "counters": {
+    "Breloom": [
+     320,
+     0.831,
+     0.021
+    ],
+    "Dusclops": [
+     135,
+     0.813,
+     0.034
+    ],
+    "Charizard": [
+     385,
+     0.757,
+     0.022
+    ],
+    "Medicham": [
+     279,
+     0.74,
+     0.026
+    ],
+    "Machamp": [
+     101,
+     0.781,
+     0.041
+    ],
+    "Tyranitar": [
+     2869,
+     0.634,
+     0.009
+    ],
+    "Gengar": [
+     2564,
+     0.628,
+     0.01
+    ],
+    "Moltres": [
+     244,
+     0.706,
+     0.029
+    ],
+    "Blaziken": [
+     60,
+     0.794,
+     0.052
+    ],
+    "Marowak": [
+     56,
+     0.794,
+     0.054
+    ],
+    "Sableye": [
+     39,
+     0.813,
+     0.063
+    ],
+    "Smeargle": [
+     119,
+     0.694,
+     0.042
+    ],
+    "Jirachi": [
+     1161,
+     0.564,
+     0.015
+    ],
+    "Hariyama": [
+     124,
+     0.663,
+     0.042
+    ],
+    "Houndoom": [
+     143,
+     0.646,
+     0.04
+    ],
+    "Forretress": [
+     763,
+     0.548,
+     0.018
+    ],
+    "Heracross": [
+     326,
+     0.58,
+     0.027
+    ],
+    "Swampert": [
+     3091,
+     0.492,
+     0.009
+    ],
+    "Camerupt": [
+     45,
+     0.717,
+     0.067
+    ],
+    "Flygon": [
+     503,
+     0.53,
+     0.022
+    ],
+    "Celebi": [
+     1890,
+     0.477,
+     0.011
+    ],
+    "Metagross": [
+     2066,
+     0.471,
+     0.011
+    ],
+    "Dugtrio": [
+     995,
+     0.475,
+     0.016
+    ],
+    "Suicune": [
+     1771,
+     0.455,
+     0.012
+    ],
+    "Claydol": [
+     866,
+     0.473,
+     0.017
+    ],
+    "Snorlax": [
+     1099,
+     0.446,
+     0.015
+    ],
+    "Registeel": [
+     444,
+     0.479,
+     0.024
+    ],
+    "Salamence": [
+     1883,
+     0.383,
+     0.011
+    ],
+    "Steelix": [
+     62,
+     0.587,
+     0.062
+    ],
+    "Skarmory": [
+     2500,
+     0.364,
+     0.01
+    ]
+   }
+  },
+  "Rhydon": {
+   "teammates": {
+    "Magneton": 0.453,
+    "Zapdos": 0.43,
+    "Tyranitar": 0.392,
+    "Snorlax": 0.382,
+    "Starmie": 0.335,
+    "Salamence": 0.251,
+    "Gyarados": 0.238,
+    "Regirock": 0.203,
+    "Blissey": 0.201,
+    "Metagross": 0.166,
+    "Jirachi": 0.163,
+    "Skarmory": 0.127,
+    "Celebi": 0.122,
+    "Heracross": 0.103,
+    "Registeel": 0.101,
+    "Camerupt": 0.079,
+    "Claydol": 0.071,
+    "Flygon": 0.069,
+    "Jolteon": 0.066,
+    "Suicune": 0.057,
+    "Regice": 0.055,
+    "Forretress": 0.053,
+    "Exeggutor": 0.042,
+    "Gengar": 0.041,
+    "Houndoom": 0.035,
+    "Hariyama": 0.034,
+    "Breloom": 0.033,
+    "Cloyster": 0.029,
+    "Jynx": 0.025,
+    "Raikou": 0.023,
+    "Porygon2": 0.023,
+    "Miltank": 0.023,
+    "Swampert": 0.022,
+    "Aerodactyl": 0.021,
+    "Charizard": 0.02
+   },
+   "counters": {
+    "Milotic": [
+     31,
+     0.886,
+     0.057
+    ],
+    "Swampert": [
+     141,
+     0.773,
+     0.035
+    ],
+    "Starmie": [
+     58,
+     0.823,
+     0.05
+    ],
+    "Suicune": [
+     120,
+     0.759,
+     0.039
+    ],
+    "Gengar": [
+     80,
+     0.757,
+     0.048
+    ],
+    "Celebi": [
+     81,
+     0.599,
+     0.054
+    ],
+    "Skarmory": [
+     128,
+     0.544,
+     0.044
+    ],
+    "Salamence": [
+     156,
+     0.484,
+     0.04
+    ],
+    "Zapdos": [
+     85,
+     0.502,
+     0.054
+    ],
+    "Flygon": [
+     26,
+     0.636,
+     0.095
+    ],
+    "Metagross": [
+     95,
+     0.447,
+     0.051
+    ],
+    "Aerodactyl": [
+     103,
+     0.408,
+     0.048
+    ],
+    "Dugtrio": [
+     42,
+     0.483,
+     0.077
+    ],
+    "Magneton": [
+     32,
+     0.523,
+     0.089
+    ],
+    "Vaporeon": [
+     26,
+     0.547,
+     0.097
+    ],
+    "Tyranitar": [
+     233,
+     0.262,
+     0.029
+    ],
+    "Jirachi": [
+     67,
+     0.383,
+     0.059
+    ],
+    "Claydol": [
+     40,
+     0.429,
+     0.078
+    ],
+    "Blissey": [
+     158,
+     0.252,
+     0.035
+    ],
+    "Snorlax": [
+     80,
+     0.178,
+     0.043
+    ],
+    "Jolteon": [
+     22,
+     0.394,
+     0.105
+    ],
+    "Forretress": [
+     30,
+     0.165,
+     0.068
+    ],
+    "Registeel": [
+     21,
+     0.293,
+     0.1
+    ],
+    "Gyarados": [
+     20,
+     0.288,
+     0.101
+    ]
+   }
+  },
+  "Sableye": {
+   "teammates": {
+    "Blissey": 0.879,
+    "Skarmory": 0.692,
+    "Claydol": 0.534,
+    "Milotic": 0.28,
+    "Forretress": 0.259,
+    "Dugtrio": 0.235,
+    "Zapdos": 0.23,
+    "Swampert": 0.225,
+    "Suicune": 0.182,
+    "Aerodactyl": 0.182,
+    "Donphan": 0.155,
+    "Vaporeon": 0.151,
+    "Starmie": 0.13,
+    "Salamence": 0.108,
+    "Jynx": 0.093,
+    "Tyranitar": 0.078,
+    "Jirachi": 0.06,
+    "Raikou": 0.055,
+    "Snorlax": 0.049,
+    "Moltres": 0.038,
+    "Umbreon": 0.035,
+    "Flygon": 0.031,
+    "Celebi": 0.029,
+    "Slaking": 0.026,
+    "Armaldo": 0.02
+   },
+   "counters": {
+    "Tyranitar": [
+     116,
+     0.879,
+     0.03
+    ],
+    "Swampert": [
+     93,
+     0.867,
+     0.035
+    ],
+    "Houndoom": [
+     22,
+     0.934,
+     0.053
+    ],
+    "Metagross": [
+     98,
+     0.852,
+     0.036
+    ],
+    "Salamence": [
+     74,
+     0.817,
+     0.045
+    ],
+    "Starmie": [
+     87,
+     0.803,
+     0.043
+    ],
+    "Suicune": [
+     96,
+     0.782,
+     0.042
+    ],
+    "Raikou": [
+     23,
+     0.872,
+     0.069
+    ],
+    "Magneton": [
+     49,
+     0.809,
+     0.056
+    ],
+    "Milotic": [
+     31,
+     0.838,
+     0.066
+    ],
+    "Zapdos": [
+     138,
+     0.715,
+     0.038
+    ],
+    "Heracross": [
+     22,
+     0.835,
+     0.079
+    ],
+    "Jirachi": [
+     55,
+     0.72,
+     0.061
+    ],
+    "Skarmory": [
+     198,
+     0.526,
+     0.036
+    ],
+    "Gengar": [
+     49,
+     0.643,
+     0.069
+    ],
+    "Aerodactyl": [
+     44,
+     0.612,
+     0.073
+    ],
+    "Celebi": [
+     98,
+     0.512,
+     0.051
+    ],
+    "Blissey": [
+     151,
+     0.437,
+     0.04
+    ],
+    "Moltres": [
+     20,
+     0.673,
+     0.104
+    ],
+    "Claydol": [
+     120,
+     0.277,
+     0.041
+    ],
+    "Dugtrio": [
+     30,
+     0.474,
+     0.091
+    ],
+    "Breloom": [
+     29,
+     0.418,
+     0.091
+    ],
+    "Snorlax": [
+     185,
+     0.145,
+     0.026
+    ],
+    "Forretress": [
+     86,
+     0.154,
+     0.039
+    ],
+    "Medicham": [
+     49,
+     0.194,
+     0.056
+    ],
+    "Registeel": [
+     39,
+     0.102,
+     0.049
+    ],
+    "Slaking": [
+     24,
+     0.124,
+     0.067
+    ]
+   }
+  },
+  "Salamence": {
+   "teammates": {
+    "Metagross": 0.569,
+    "Tyranitar": 0.544,
+    "Snorlax": 0.336,
+    "Suicune": 0.317,
+    "Swampert": 0.301,
+    "Magneton": 0.286,
+    "Blissey": 0.208,
+    "Celebi": 0.195,
+    "Claydol": 0.185,
+    "Skarmory": 0.175,
+    "Starmie": 0.135,
+    "Gengar": 0.132,
+    "Jirachi": 0.127,
+    "Registeel": 0.119,
+    "Raikou": 0.113,
+    "Zapdos": 0.099,
+    "Aerodactyl": 0.091,
+    "Forretress": 0.086,
+    "Heracross": 0.083,
+    "Medicham": 0.081,
+    "Dugtrio": 0.056,
+    "Gyarados": 0.045,
+    "Jolteon": 0.045,
+    "Breloom": 0.042,
+    "Cloyster": 0.042,
+    "Ludicolo": 0.033,
+    "Charizard": 0.03,
+    "Regirock": 0.027,
+    "Hariyama": 0.026,
+    "Blaziken": 0.025,
+    "Milotic": 0.022,
+    "Houndoom": 0.02
+   },
+   "counters": {
+    "Linoone": [
+     176,
+     0.86,
+     0.026
+    ],
+    "Porygon2": [
+     783,
+     0.788,
+     0.015
+    ],
+    "Starmie": [
+     6225,
+     0.73,
+     0.006
+    ],
+    "Jynx": [
+     391,
+     0.762,
+     0.022
+    ],
+    "Milotic": [
+     1662,
+     0.718,
+     0.011
+    ],
+    "Kingdra": [
+     772,
+     0.735,
+     0.016
+    ],
+    "Suicune": [
+     9146,
+     0.665,
+     0.005
+    ],
+    "Gengar": [
+     6662,
+     0.661,
+     0.006
+    ],
+    "Regirock": [
+     695,
+     0.705,
+     0.017
+    ],
+    "Regice": [
+     602,
+     0.69,
+     0.019
+    ],
+    "Sceptile": [
+     260,
+     0.721,
+     0.028
+    ],
+    "Golduck": [
+     44,
+     0.829,
+     0.057
+    ],
+    "Jolteon": [
+     2039,
+     0.637,
+     0.011
+    ],
+    "Blissey": [
+     8961,
+     0.607,
+     0.005
+    ],
+    "Raikou": [
+     1213,
+     0.635,
+     0.014
+    ],
+    "Aerodactyl": [
+     11246,
+     0.581,
+     0.005
+    ],
+    "Swampert": [
+     14698,
+     0.572,
+     0.004
+    ],
+    "Vaporeon": [
+     774,
+     0.61,
+     0.018
+    ],
+    "Zapdos": [
+     8510,
+     0.532,
+     0.005
+    ],
+    "Slowbro": [
+     41,
+     0.758,
+     0.067
+    ],
+    "Snorlax": [
+     5907,
+     0.488,
+     0.007
+    ],
+    "Miltank": [
+     143,
+     0.622,
+     0.041
+    ],
+    "Alakazam": [
+     171,
+     0.607,
+     0.037
+    ],
+    "Tauros": [
+     108,
+     0.641,
+     0.046
+    ],
+    "Lapras": [
+     107,
+     0.627,
+     0.047
+    ],
+    "Blastoise": [
+     95,
+     0.625,
+     0.05
+    ],
+    "Salamence": [
+     14018,
+     0.441,
+     0.004
+    ],
+    "Gyarados": [
+     2705,
+     0.46,
+     0.01
+    ],
+    "Registeel": [
+     1883,
+     0.457,
+     0.011
+    ],
+    "Jirachi": [
+     4092,
+     0.435,
+     0.008
+    ]
+   }
+  },
+  "Sceptile": {
+   "teammates": {
+    "Metagross": 0.617,
+    "Salamence": 0.443,
+    "Suicune": 0.413,
+    "Blaziken": 0.389,
+    "Starmie": 0.322,
+    "Snorlax": 0.251,
+    "Swampert": 0.202,
+    "Tyranitar": 0.202,
+    "Dugtrio": 0.151,
+    "Gengar": 0.133,
+    "Claydol": 0.117,
+    "Skarmory": 0.085,
+    "Jirachi": 0.075,
+    "Zapdos": 0.07,
+    "Raikou": 0.069,
+    "Jolteon": 0.069,
+    "Magneton": 0.069,
+    "Aerodactyl": 0.069,
+    "Forretress": 0.068,
+    "Celebi": 0.054,
+    "Heracross": 0.052,
+    "Steelix": 0.051,
+    "Alakazam": 0.042,
+    "Armaldo": 0.042,
+    "Flygon": 0.041,
+    "Milotic": 0.04,
+    "Moltres": 0.035,
+    "Smeargle": 0.035,
+    "Charizard": 0.033,
+    "Scizor": 0.033,
+    "Houndoom": 0.029,
+    "Kingdra": 0.027,
+    "Gyarados": 0.022,
+    "Medicham": 0.022
+   },
+   "counters": {
+    "Aerodactyl": [
+     207,
+     0.851,
+     0.025
+    ],
+    "Jynx": [
+     25,
+     0.861,
+     0.069
+    ],
+    "Metagross": [
+     263,
+     0.636,
+     0.03
+    ],
+    "Moltres": [
+     38,
+     0.717,
+     0.073
+    ],
+    "Jirachi": [
+     150,
+     0.571,
+     0.04
+    ],
+    "Celebi": [
+     243,
+     0.533,
+     0.032
+    ],
+    "Heracross": [
+     50,
+     0.654,
+     0.067
+    ],
+    "Charizard": [
+     72,
+     0.581,
+     0.058
+    ],
+    "Forretress": [
+     107,
+     0.535,
+     0.048
+    ],
+    "Snorlax": [
+     189,
+     0.484,
+     0.036
+    ],
+    "Blissey": [
+     390,
+     0.436,
+     0.025
+    ],
+    "Gengar": [
+     228,
+     0.463,
+     0.033
+    ],
+    "Jolteon": [
+     73,
+     0.548,
+     0.058
+    ],
+    "Skarmory": [
+     361,
+     0.418,
+     0.026
+    ],
+    "Magneton": [
+     75,
+     0.541,
+     0.057
+    ],
+    "Medicham": [
+     58,
+     0.533,
+     0.066
+    ],
+    "Regice": [
+     38,
+     0.584,
+     0.08
+    ],
+    "Registeel": [
+     67,
+     0.501,
+     0.061
+    ],
+    "Houndoom": [
+     22,
+     0.638,
+     0.102
+    ],
+    "Tyranitar": [
+     388,
+     0.301,
+     0.023
+    ],
+    "Kingdra": [
+     39,
+     0.523,
+     0.08
+    ],
+    "Gyarados": [
+     30,
+     0.555,
+     0.091
+    ],
+    "Zapdos": [
+     266,
+     0.263,
+     0.027
+    ],
+    "Suicune": [
+     269,
+     0.262,
+     0.027
+    ],
+    "Salamence": [
+     260,
+     0.236,
+     0.026
+    ],
+    "Breloom": [
+     41,
+     0.436,
+     0.077
+    ],
+    "Raikou": [
+     54,
+     0.388,
+     0.066
+    ],
+    "Dugtrio": [
+     112,
+     0.197,
+     0.038
+    ],
+    "Swampert": [
+     421,
+     0.084,
+     0.013
+    ],
+    "Starmie": [
+     180,
+     0.123,
+     0.025
+    ]
+   }
+  },
+  "Scizor": {
+   "teammates": {
+    "Tyranitar": 0.43,
+    "Magneton": 0.389,
+    "Snorlax": 0.365,
+    "Metagross": 0.262,
+    "Gyarados": 0.242,
+    "Breloom": 0.2,
+    "Heracross": 0.195,
+    "Celebi": 0.179,
+    "Salamence": 0.167,
+    "Aerodactyl": 0.166,
+    "Blissey": 0.151,
+    "Starmie": 0.131,
+    "Kingdra": 0.117,
+    "Forretress": 0.101,
+    "Gengar": 0.096,
+    "Suicune": 0.088,
+    "Flygon": 0.082,
+    "Swampert": 0.077,
+    "Smeargle": 0.07,
+    "Jolteon": 0.066,
+    "Vaporeon": 0.065,
+    "Charizard": 0.058,
+    "Umbreon": 0.057,
+    "Zapdos": 0.055,
+    "Armaldo": 0.047,
+    "Jirachi": 0.041,
+    "Claydol": 0.039,
+    "Skarmory": 0.039,
+    "Regice": 0.039,
+    "Alakazam": 0.037,
+    "Sceptile": 0.036,
+    "Weezing": 0.036,
+    "Slaking": 0.035,
+    "Dugtrio": 0.029,
+    "Dragonite": 0.029,
+    "Raikou": 0.028,
+    "Regirock": 0.027,
+    "Venusaur": 0.021
+   },
+   "counters": {
+    "Jirachi": [
+     81,
+     0.696,
+     0.051
+    ],
+    "Magneton": [
+     90,
+     0.641,
+     0.05
+    ],
+    "Raikou": [
+     32,
+     0.748,
+     0.077
+    ],
+    "Salamence": [
+     249,
+     0.561,
+     0.031
+    ],
+    "Breloom": [
+     26,
+     0.742,
+     0.086
+    ],
+    "Gengar": [
+     158,
+     0.545,
+     0.04
+    ],
+    "Skarmory": [
+     128,
+     0.562,
+     0.044
+    ],
+    "Suicune": [
+     117,
+     0.566,
+     0.046
+    ],
+    "Zapdos": [
+     131,
+     0.488,
+     0.044
+    ],
+    "Swampert": [
+     232,
+     0.404,
+     0.032
+    ],
+    "Aerodactyl": [
+     172,
+     0.426,
+     0.038
+    ],
+    "Moltres": [
+     35,
+     0.602,
+     0.083
+    ],
+    "Charizard": [
+     57,
+     0.521,
+     0.066
+    ],
+    "Metagross": [
+     208,
+     0.386,
+     0.034
+    ],
+    "Jolteon": [
+     46,
+     0.492,
+     0.073
+    ],
+    "Tyranitar": [
+     267,
+     0.271,
+     0.027
+    ],
+    "Registeel": [
+     31,
+     0.519,
+     0.09
+    ],
+    "Celebi": [
+     113,
+     0.297,
+     0.043
+    ],
+    "Flygon": [
+     30,
+     0.447,
+     0.09
+    ],
+    "Gyarados": [
+     44,
+     0.365,
+     0.072
+    ],
+    "Blissey": [
+     196,
+     0.183,
+     0.028
+    ],
+    "Starmie": [
+     99,
+     0.238,
+     0.043
+    ],
+    "Milotic": [
+     25,
+     0.428,
+     0.099
+    ],
+    "Snorlax": [
+     109,
+     0.16,
+     0.035
+    ],
+    "Dugtrio": [
+     79,
+     0.194,
+     0.044
+    ],
+    "Forretress": [
+     40,
+     0.305,
+     0.073
+    ],
+    "Heracross": [
+     29,
+     0.311,
+     0.086
+    ],
+    "Claydol": [
+     72,
+     0.102,
+     0.036
+    ]
+   }
+  },
+  "Skarmory": {
+   "teammates": {
+    "Tyranitar": 0.714,
+    "Gengar": 0.489,
+    "Swampert": 0.46,
+    "Blissey": 0.439,
+    "Aerodactyl": 0.3,
+    "Starmie": 0.285,
+    "Metagross": 0.236,
+    "Zapdos": 0.233,
+    "Celebi": 0.178,
+    "Jirachi": 0.168,
+    "Claydol": 0.163,
+    "Salamence": 0.149,
+    "Flygon": 0.13,
+    "Jolteon": 0.111,
+    "Suicune": 0.108,
+    "Dugtrio": 0.09,
+    "Charizard": 0.079,
+    "Magneton": 0.057,
+    "Moltres": 0.055,
+    "Snorlax": 0.037,
+    "Milotic": 0.037,
+    "Registeel": 0.034,
+    "Regice": 0.023,
+    "Raikou": 0.022,
+    "Dusclops": 0.022
+   },
+   "counters": {
+    "Magneton": [
+     8163,
+     0.979,
+     0.002
+    ],
+    "Charizard": [
+     3544,
+     0.932,
+     0.004
+    ],
+    "Raikou": [
+     2105,
+     0.914,
+     0.006
+    ],
+    "Blaziken": [
+     680,
+     0.922,
+     0.01
+    ],
+    "Entei": [
+     66,
+     0.956,
+     0.025
+    ],
+    "Moltres": [
+     2663,
+     0.873,
+     0.006
+    ],
+    "Houndoom": [
+     521,
+     0.898,
+     0.013
+    ],
+    "Jolteon": [
+     3468,
+     0.86,
+     0.006
+    ],
+    "Jirachi": [
+     4778,
+     0.842,
+     0.005
+    ],
+    "Gengar": [
+     11635,
+     0.834,
+     0.003
+    ],
+    "Camerupt": [
+     162,
+     0.889,
+     0.025
+    ],
+    "Electrode": [
+     98,
+     0.908,
+     0.029
+    ],
+    "Zapdos": [
+     14209,
+     0.793,
+     0.003
+    ],
+    "Lanturn": [
+     70,
+     0.902,
+     0.035
+    ],
+    "Jynx": [
+     649,
+     0.82,
+     0.015
+    ],
+    "Starmie": [
+     10569,
+     0.766,
+     0.004
+    ],
+    "Kingdra": [
+     784,
+     0.806,
+     0.014
+    ],
+    "Regice": [
+     779,
+     0.798,
+     0.014
+    ],
+    "Forretress": [
+     7213,
+     0.71,
+     0.005
+    ],
+    "Alakazam": [
+     365,
+     0.765,
+     0.022
+    ],
+    "Tyranitar": [
+     18763,
+     0.684,
+     0.003
+    ],
+    "Suicune": [
+     6534,
+     0.692,
+     0.006
+    ],
+    "Slowbro": [
+     43,
+     0.867,
+     0.052
+    ],
+    "Blastoise": [
+     156,
+     0.753,
+     0.035
+    ],
+    "Gardevoir": [
+     139,
+     0.748,
+     0.037
+    ],
+    "Breloom": [
+     1806,
+     0.637,
+     0.011
+    ],
+    "Golduck": [
+     32,
+     0.846,
+     0.064
+    ],
+    "Smeargle": [
+     1050,
+     0.648,
+     0.015
+    ],
+    "Lapras": [
+     115,
+     0.745,
+     0.041
+    ],
+    "Weezing": [
+     370,
+     0.667,
+     0.024
+    ]
+   }
+  },
+  "Slaking": {
+   "teammates": {
+    "Magneton": 0.495,
+    "Metagross": 0.44,
+    "Salamence": 0.438,
+    "Snorlax": 0.37,
+    "Blissey": 0.361,
+    "Aerodactyl": 0.306,
+    "Skarmory": 0.206,
+    "Jirachi": 0.182,
+    "Flygon": 0.143,
+    "Blastoise": 0.137,
+    "Swampert": 0.12,
+    "Claydol": 0.115,
+    "Celebi": 0.096,
+    "Suicune": 0.092,
+    "Tyranitar": 0.09,
+    "Zapdos": 0.079,
+    "Starmie": 0.067,
+    "Miltank": 0.062,
+    "Dugtrio": 0.059,
+    "Vaporeon": 0.055,
+    "Umbreon": 0.052,
+    "Jolteon": 0.049,
+    "Gengar": 0.047,
+    "Breloom": 0.046,
+    "Forretress": 0.046,
+    "Regirock": 0.044,
+    "Heracross": 0.042,
+    "Donphan": 0.037,
+    "Gyarados": 0.036,
+    "Houndoom": 0.034,
+    "Smeargle": 0.032,
+    "Regice": 0.029,
+    "Moltres": 0.027,
+    "Scizor": 0.026,
+    "Charizard": 0.024,
+    "Dusclops": 0.023,
+    "Registeel": 0.021,
+    "Tauros": 0.021,
+    "Kingdra": 0.021,
+    "Milotic": 0.02
+   },
+   "counters": {
+    "Skarmory": [
+     826,
+     0.719,
+     0.016
+    ],
+    "Sableye": [
+     24,
+     0.876,
+     0.067
+    ],
+    "Aerodactyl": [
+     302,
+     0.711,
+     0.026
+    ],
+    "Forretress": [
+     207,
+     0.725,
+     0.031
+    ],
+    "Jirachi": [
+     287,
+     0.63,
+     0.028
+    ],
+    "Swampert": [
+     391,
+     0.58,
+     0.025
+    ],
+    "Raikou": [
+     60,
+     0.691,
+     0.06
+    ],
+    "Charizard": [
+     97,
+     0.631,
+     0.049
+    ],
+    "Gengar": [
+     538,
+     0.5,
+     0.022
+    ],
+    "Heracross": [
+     150,
+     0.574,
+     0.04
+    ],
+    "Metagross": [
+     743,
+     0.486,
+     0.018
+    ],
+    "Umbreon": [
+     31,
+     0.725,
+     0.08
+    ],
+    "Regirock": [
+     50,
+     0.665,
+     0.067
+    ],
+    "Magneton": [
+     198,
+     0.54,
+     0.035
+    ],
+    "Salamence": [
+     806,
+     0.464,
+     0.018
+    ],
+    "Suicune": [
+     427,
+     0.49,
+     0.024
+    ],
+    "Jolteon": [
+     106,
+     0.57,
+     0.048
+    ],
+    "Registeel": [
+     79,
+     0.582,
+     0.056
+    ],
+    "Armaldo": [
+     21,
+     0.74,
+     0.097
+    ],
+    "Tyranitar": [
+     1184,
+     0.376,
+     0.014
+    ],
+    "Dusclops": [
+     44,
+     0.602,
+     0.074
+    ],
+    "Dugtrio": [
+     229,
+     0.437,
+     0.033
+    ],
+    "Celebi": [
+     355,
+     0.405,
+     0.026
+    ],
+    "Snorlax": [
+     282,
+     0.415,
+     0.029
+    ],
+    "Breloom": [
+     91,
+     0.489,
+     0.052
+    ],
+    "Zapdos": [
+     518,
+     0.304,
+     0.02
+    ],
+    "Moltres": [
+     76,
+     0.429,
+     0.057
+    ],
+    "Flygon": [
+     88,
+     0.396,
+     0.052
+    ],
+    "Starmie": [
+     214,
+     0.314,
+     0.032
+    ],
+    "Medicham": [
+     225,
+     0.302,
+     0.031
+    ]
+   }
+  },
+  "Slowbro": {
+   "teammates": {
+    "Dugtrio": 0.65,
+    "Jirachi": 0.55,
+    "Starmie": 0.504,
+    "Gengar": 0.491,
+    "Alakazam": 0.413,
+    "Zapdos": 0.207,
+    "Claydol": 0.168,
+    "Metagross": 0.167,
+    "Regice": 0.11,
+    "Tyranitar": 0.108,
+    "Salamence": 0.093,
+    "Magneton": 0.089,
+    "Jolteon": 0.084,
+    "Snorlax": 0.076,
+    "Heracross": 0.076,
+    "Blissey": 0.075,
+    "Skarmory": 0.064,
+    "Celebi": 0.064,
+    "Forretress": 0.057,
+    "Charizard": 0.047,
+    "Breloom": 0.042,
+    "Gyarados": 0.04,
+    "Dragonite": 0.038,
+    "Scizor": 0.037,
+    "Umbreon": 0.034,
+    "Weezing": 0.028,
+    "Swampert": 0.025,
+    "Donphan": 0.024,
+    "Machamp": 0.023,
+    "Armaldo": 0.022,
+    "Blastoise": 0.022,
+    "Kingdra": 0.021
+   },
+   "counters": {
+    "Snorlax": [
+     28,
+     0.756,
+     0.081
+    ],
+    "Celebi": [
+     33,
+     0.677,
+     0.081
+    ],
+    "Gengar": [
+     42,
+     0.625,
+     0.075
+    ],
+    "Zapdos": [
+     25,
+     0.668,
+     0.095
+    ],
+    "Starmie": [
+     29,
+     0.598,
+     0.091
+    ],
+    "Blissey": [
+     47,
+     0.501,
+     0.073
+    ],
+    "Suicune": [
+     22,
+     0.61,
+     0.105
+    ],
+    "Tyranitar": [
+     60,
+     0.371,
+     0.062
+    ],
+    "Aerodactyl": [
+     52,
+     0.257,
+     0.06
+    ],
+    "Swampert": [
+     37,
+     0.266,
+     0.073
+    ],
+    "Salamence": [
+     41,
+     0.235,
+     0.066
+    ],
+    "Metagross": [
+     45,
+     0.178,
+     0.057
+    ],
+    "Skarmory": [
+     43,
+     0.128,
+     0.051
+    ]
+   }
+  },
+  "Smeargle": {
+   "teammates": {
+    "Tyranitar": 0.62,
+    "Gengar": 0.56,
+    "Metagross": 0.538,
+    "Swampert": 0.486,
+    "Aerodactyl": 0.43,
+    "Zapdos": 0.202,
+    "Snorlax": 0.182,
+    "Salamence": 0.156,
+    "Suicune": 0.142,
+    "Jirachi": 0.138,
+    "Blissey": 0.126,
+    "Celebi": 0.108,
+    "Magneton": 0.101,
+    "Jolteon": 0.1,
+    "Umbreon": 0.082,
+    "Starmie": 0.069,
+    "Claydol": 0.057,
+    "Skarmory": 0.051,
+    "Raikou": 0.049,
+    "Vaporeon": 0.045,
+    "Forretress": 0.044,
+    "Dusclops": 0.042,
+    "Gyarados": 0.035,
+    "Moltres": 0.034,
+    "Medicham": 0.032,
+    "Dugtrio": 0.03,
+    "Charizard": 0.026,
+    "Scizor": 0.025,
+    "Registeel": 0.021
+   },
+   "counters": {
+    "Aerodactyl": [
+     317,
+     0.832,
+     0.021
+    ],
+    "Medicham": [
+     196,
+     0.833,
+     0.027
+    ],
+    "Dugtrio": [
+     294,
+     0.806,
+     0.023
+    ],
+    "Salamence": [
+     638,
+     0.759,
+     0.017
+    ],
+    "Jynx": [
+     50,
+     0.85,
+     0.051
+    ],
+    "Charizard": [
+     82,
+     0.78,
+     0.046
+    ],
+    "Moltres": [
+     75,
+     0.785,
+     0.047
+    ],
+    "Gengar": [
+     426,
+     0.639,
+     0.023
+    ],
+    "Raikou": [
+     57,
+     0.74,
+     0.058
+    ],
+    "Jolteon": [
+     145,
+     0.66,
+     0.039
+    ],
+    "Breloom": [
+     106,
+     0.675,
+     0.045
+    ],
+    "Starmie": [
+     423,
+     0.585,
+     0.024
+    ],
+    "Flygon": [
+     92,
+     0.67,
+     0.049
+    ],
+    "Tyranitar": [
+     1461,
+     0.526,
+     0.013
+    ],
+    "Heracross": [
+     106,
+     0.642,
+     0.047
+    ],
+    "Zapdos": [
+     695,
+     0.531,
+     0.019
+    ],
+    "Houndoom": [
+     40,
+     0.722,
+     0.071
+    ],
+    "Slaking": [
+     68,
+     0.661,
+     0.057
+    ],
+    "Blaziken": [
+     43,
+     0.704,
+     0.069
+    ],
+    "Metagross": [
+     611,
+     0.495,
+     0.02
+    ],
+    "Forretress": [
+     286,
+     0.529,
+     0.03
+    ],
+    "Jirachi": [
+     255,
+     0.498,
+     0.031
+    ],
+    "Alakazam": [
+     25,
+     0.703,
+     0.092
+    ],
+    "Celebi": [
+     406,
+     0.434,
+     0.025
+    ],
+    "Swampert": [
+     578,
+     0.404,
+     0.02
+    ],
+    "Claydol": [
+     228,
+     0.454,
+     0.033
+    ],
+    "Snorlax": [
+     360,
+     0.425,
+     0.026
+    ],
+    "Kingdra": [
+     34,
+     0.648,
+     0.082
+    ],
+    "Suicune": [
+     500,
+     0.391,
+     0.022
+    ],
+    "Gyarados": [
+     67,
+     0.54,
+     0.061
+    ]
+   }
+  },
+  "Snorlax": {
+   "teammates": {
+    "Metagross": 0.598,
+    "Salamence": 0.51,
+    "Suicune": 0.448,
+    "Magneton": 0.398,
+    "Tyranitar": 0.272,
+    "Claydol": 0.232,
+    "Zapdos": 0.15,
+    "Heracross": 0.147,
+    "Swampert": 0.14,
+    "Medicham": 0.138,
+    "Dugtrio": 0.133,
+    "Celebi": 0.115,
+    "Starmie": 0.102,
+    "Gengar": 0.093,
+    "Aerodactyl": 0.089,
+    "Jirachi": 0.085,
+    "Breloom": 0.083,
+    "Gyarados": 0.072,
+    "Charizard": 0.067,
+    "Blissey": 0.066,
+    "Skarmory": 0.066,
+    "Regirock": 0.055,
+    "Houndoom": 0.053,
+    "Forretress": 0.048,
+    "Registeel": 0.038,
+    "Kingdra": 0.037,
+    "Raikou": 0.035,
+    "Cloyster": 0.034,
+    "Jolteon": 0.033,
+    "Umbreon": 0.025,
+    "Slaking": 0.023,
+    "Marowak": 0.023,
+    "Smeargle": 0.023,
+    "Milotic": 0.023,
+    "Flygon": 0.021,
+    "Blaziken": 0.021,
+    "Linoone": 0.02
+   },
+   "counters": {
+    "Breloom": [
+     965,
+     0.795,
+     0.013
+    ],
+    "Sableye": [
+     185,
+     0.845,
+     0.027
+    ],
+    "Medicham": [
+     934,
+     0.755,
+     0.014
+    ],
+    "Machamp": [
+     325,
+     0.771,
+     0.023
+    ],
+    "Metagross": [
+     6792,
+     0.666,
+     0.006
+    ],
+    "Heracross": [
+     1016,
+     0.689,
+     0.015
+    ],
+    "Hariyama": [
+     542,
+     0.671,
+     0.02
+    ],
+    "Regirock": [
+     404,
+     0.673,
+     0.023
+    ],
+    "Rhydon": [
+     80,
+     0.762,
+     0.048
+    ],
+    "Skarmory": [
+     6914,
+     0.567,
+     0.006
+    ],
+    "Tyranitar": [
+     10076,
+     0.557,
+     0.005
+    ],
+    "Scizor": [
+     109,
+     0.691,
+     0.044
+    ],
+    "Marowak": [
+     138,
+     0.671,
+     0.04
+    ],
+    "Armaldo": [
+     230,
+     0.62,
+     0.032
+    ],
+    "Aerodactyl": [
+     3132,
+     0.527,
+     0.009
+    ],
+    "Weezing": [
+     230,
+     0.603,
+     0.032
+    ],
+    "Forretress": [
+     2160,
+     0.489,
+     0.011
+    ],
+    "Linoone": [
+     77,
+     0.65,
+     0.055
+    ],
+    "Blaziken": [
+     175,
+     0.576,
+     0.037
+    ],
+    "Slaking": [
+     282,
+     0.541,
+     0.03
+    ],
+    "Dusclops": [
+     551,
+     0.482,
+     0.021
+    ],
+    "Ursaring": [
+     60,
+     0.622,
+     0.063
+    ],
+    "Smeargle": [
+     360,
+     0.473,
+     0.026
+    ],
+    "Registeel": [
+     1099,
+     0.409,
+     0.015
+    ],
+    "Swampert": [
+     6102,
+     0.363,
+     0.006
+    ],
+    "Dugtrio": [
+     1931,
+     0.381,
+     0.011
+    ],
+    "Steelix": [
+     209,
+     0.47,
+     0.035
+    ],
+    "Donphan": [
+     166,
+     0.48,
+     0.039
+    ],
+    "Salamence": [
+     5907,
+     0.346,
+     0.006
+    ],
+    "Snorlax": [
+     2760,
+     0.348,
+     0.009
+    ]
+   }
+  },
+  "Starmie": {
+   "teammates": {
+    "Tyranitar": 0.609,
+    "Skarmory": 0.537,
+    "Metagross": 0.461,
+    "Gengar": 0.374,
+    "Blissey": 0.338,
+    "Swampert": 0.322,
+    "Celebi": 0.251,
+    "Salamence": 0.217,
+    "Jolteon": 0.185,
+    "Dugtrio": 0.16,
+    "Zapdos": 0.131,
+    "Aerodactyl": 0.119,
+    "Snorlax": 0.108,
+    "Suicune": 0.087,
+    "Heracross": 0.075,
+    "Jirachi": 0.073,
+    "Forretress": 0.071,
+    "Magneton": 0.069,
+    "Registeel": 0.064,
+    "Flygon": 0.037,
+    "Raikou": 0.036,
+    "Claydol": 0.031,
+    "Breloom": 0.029,
+    "Charizard": 0.027,
+    "Medicham": 0.026,
+    "Gyarados": 0.025,
+    "Hariyama": 0.022
+   },
+   "counters": {
+    "Regice": [
+     707,
+     0.856,
+     0.013
+    ],
+    "Raikou": [
+     1205,
+     0.837,
+     0.011
+    ],
+    "Snorlax": [
+     4780,
+     0.8,
+     0.006
+    ],
+    "Jolteon": [
+     2305,
+     0.792,
+     0.008
+    ],
+    "Blissey": [
+     11438,
+     0.76,
+     0.004
+    ],
+    "Sceptile": [
+     180,
+     0.822,
+     0.029
+    ],
+    "Lanturn": [
+     51,
+     0.868,
+     0.047
+    ],
+    "Jirachi": [
+     3324,
+     0.687,
+     0.008
+    ],
+    "Aerodactyl": [
+     4024,
+     0.681,
+     0.007
+    ],
+    "Linoone": [
+     64,
+     0.825,
+     0.048
+    ],
+    "Registeel": [
+     1781,
+     0.672,
+     0.011
+    ],
+    "Zapdos": [
+     5298,
+     0.634,
+     0.007
+    ],
+    "Umbreon": [
+     444,
+     0.686,
+     0.022
+    ],
+    "Scizor": [
+     99,
+     0.758,
+     0.043
+    ],
+    "Ludicolo": [
+     373,
+     0.667,
+     0.024
+    ],
+    "Celebi": [
+     5355,
+     0.588,
+     0.007
+    ],
+    "Alakazam": [
+     143,
+     0.705,
+     0.038
+    ],
+    "Porygon2": [
+     365,
+     0.636,
+     0.025
+    ],
+    "Electrode": [
+     45,
+     0.769,
+     0.063
+    ],
+    "Slaking": [
+     214,
+     0.64,
+     0.033
+    ],
+    "Dusclops": [
+     451,
+     0.594,
+     0.023
+    ],
+    "Venusaur": [
+     297,
+     0.571,
+     0.029
+    ],
+    "Kingdra": [
+     455,
+     0.549,
+     0.023
+    ],
+    "Gengar": [
+     6377,
+     0.48,
+     0.006
+    ],
+    "Magneton": [
+     1473,
+     0.502,
+     0.013
+    ],
+    "Heracross": [
+     942,
+     0.514,
+     0.016
+    ],
+    "Quagsire": [
+     121,
+     0.598,
+     0.045
+    ],
+    "Lapras": [
+     111,
+     0.602,
+     0.046
+    ],
+    "Starmie": [
+     3775,
+     0.441,
+     0.008
+    ],
+    "Suicune": [
+     5065,
+     0.433,
+     0.007
+    ]
+   }
+  },
+  "Steelix": {
+   "teammates": {
+    "Tyranitar": 0.336,
+    "Salamence": 0.283,
+    "Snorlax": 0.252,
+    "Suicune": 0.252,
+    "Gyarados": 0.235,
+    "Starmie": 0.233,
+    "Magneton": 0.233,
+    "Blissey": 0.207,
+    "Claydol": 0.19,
+    "Aerodactyl": 0.183,
+    "Forretress": 0.162,
+    "Zapdos": 0.151,
+    "Dugtrio": 0.131,
+    "Houndoom": 0.125,
+    "Umbreon": 0.122,
+    "Gengar": 0.116,
+    "Celebi": 0.112,
+    "Metagross": 0.107,
+    "Heracross": 0.106,
+    "Weezing": 0.098,
+    "Raikou": 0.09,
+    "Cloyster": 0.086,
+    "Breloom": 0.085,
+    "Lapras": 0.077,
+    "Quagsire": 0.069,
+    "Dragonite": 0.066,
+    "Jynx": 0.061,
+    "Vaporeon": 0.055,
+    "Sceptile": 0.053,
+    "Milotic": 0.05,
+    "Skarmory": 0.046,
+    "Kingdra": 0.037,
+    "Charizard": 0.034,
+    "Regice": 0.027,
+    "Jirachi": 0.026,
+    "Jolteon": 0.026,
+    "Swampert": 0.025
+   },
+   "counters": {
+    "Swampert": [
+     395,
+     0.819,
+     0.019
+    ],
+    "Moltres": [
+     43,
+     0.897,
+     0.046
+    ],
+    "Skarmory": [
+     385,
+     0.777,
+     0.021
+    ],
+    "Suicune": [
+     264,
+     0.771,
+     0.026
+    ],
+    "Charizard": [
+     64,
+     0.822,
+     0.048
+    ],
+    "Starmie": [
+     128,
+     0.735,
+     0.039
+    ],
+    "Gengar": [
+     211,
+     0.65,
+     0.033
+    ],
+    "Breloom": [
+     35,
+     0.78,
+     0.07
+    ],
+    "Forretress": [
+     79,
+     0.683,
+     0.052
+    ],
+    "Celebi": [
+     165,
+     0.624,
+     0.038
+    ],
+    "Milotic": [
+     39,
+     0.74,
+     0.07
+    ],
+    "Salamence": [
+     306,
+     0.47,
+     0.029
+    ],
+    "Claydol": [
+     111,
+     0.534,
+     0.047
+    ],
+    "Flygon": [
+     60,
+     0.568,
+     0.064
+    ],
+    "Jirachi": [
+     136,
+     0.465,
+     0.043
+    ],
+    "Tyranitar": [
+     578,
+     0.34,
+     0.02
+    ],
+    "Medicham": [
+     34,
+     0.583,
+     0.085
+    ],
+    "Vaporeon": [
+     21,
+     0.651,
+     0.105
+    ],
+    "Metagross": [
+     335,
+     0.309,
+     0.025
+    ],
+    "Snorlax": [
+     209,
+     0.322,
+     0.032
+    ],
+    "Dugtrio": [
+     91,
+     0.339,
+     0.05
+    ],
+    "Aerodactyl": [
+     325,
+     0.233,
+     0.023
+    ],
+    "Blissey": [
+     248,
+     0.242,
+     0.027
+    ],
+    "Gyarados": [
+     45,
+     0.404,
+     0.073
+    ],
+    "Registeel": [
+     62,
+     0.319,
+     0.059
+    ],
+    "Heracross": [
+     47,
+     0.359,
+     0.07
+    ],
+    "Magneton": [
+     110,
+     0.23,
+     0.04
+    ],
+    "Zapdos": [
+     445,
+     0.121,
+     0.015
+    ],
+    "Raikou": [
+     96,
+     0.118,
+     0.033
+    ],
+    "Jolteon": [
+     121,
+     0.063,
+     0.022
+    ]
+   }
+  },
+  "Suicune": {
+   "teammates": {
+    "Metagross": 0.5,
+    "Salamence": 0.426,
+    "Snorlax": 0.396,
+    "Claydol": 0.371,
+    "Dugtrio": 0.322,
+    "Magneton": 0.255,
+    "Blissey": 0.253,
+    "Tyranitar": 0.224,
+    "Zapdos": 0.186,
+    "Gengar": 0.175,
+    "Skarmory": 0.17,
+    "Jirachi": 0.144,
+    "Celebi": 0.141,
+    "Medicham": 0.102,
+    "Aerodactyl": 0.085,
+    "Heracross": 0.084,
+    "Raikou": 0.08,
+    "Starmie": 0.073,
+    "Forretress": 0.068,
+    "Swampert": 0.065,
+    "Registeel": 0.064,
+    "Regice": 0.048,
+    "Jynx": 0.043,
+    "Charizard": 0.042,
+    "Kingdra": 0.04,
+    "Jolteon": 0.04,
+    "Breloom": 0.039,
+    "Gyarados": 0.033,
+    "Hariyama": 0.033,
+    "Dusclops": 0.024,
+    "Blaziken": 0.022
+   },
+   "counters": {
+    "Raikou": [
+     1584,
+     0.829,
+     0.009
+    ],
+    "Jolteon": [
+     2345,
+     0.737,
+     0.009
+    ],
+    "Zapdos": [
+     8503,
+     0.687,
+     0.005
+    ],
+    "Heracross": [
+     1329,
+     0.682,
+     0.013
+    ],
+    "Venusaur": [
+     555,
+     0.685,
+     0.02
+    ],
+    "Exeggutor": [
+     65,
+     0.789,
+     0.051
+    ],
+    "Snorlax": [
+     5507,
+     0.607,
+     0.007
+    ],
+    "Magneton": [
+     2261,
+     0.619,
+     0.01
+    ],
+    "Sceptile": [
+     269,
+     0.691,
+     0.028
+    ],
+    "Celebi": [
+     7574,
+     0.597,
+     0.006
+    ],
+    "Gyarados": [
+     1089,
+     0.603,
+     0.015
+    ],
+    "Breloom": [
+     1065,
+     0.575,
+     0.015
+    ],
+    "Gengar": [
+     5619,
+     0.534,
+     0.007
+    ],
+    "Regice": [
+     699,
+     0.569,
+     0.019
+    ],
+    "Starmie": [
+     5065,
+     0.491,
+     0.007
+    ],
+    "Electrode": [
+     43,
+     0.728,
+     0.068
+    ],
+    "Lapras": [
+     210,
+     0.589,
+     0.034
+    ],
+    "Ludicolo": [
+     604,
+     0.526,
+     0.02
+    ],
+    "Smeargle": [
+     500,
+     0.532,
+     0.022
+    ],
+    "Suicune": [
+     5871,
+     0.464,
+     0.007
+    ],
+    "Jirachi": [
+     3340,
+     0.431,
+     0.009
+    ],
+    "Blissey": [
+     12219,
+     0.405,
+     0.004
+    ],
+    "Alakazam": [
+     162,
+     0.534,
+     0.039
+    ],
+    "Linoone": [
+     94,
+     0.57,
+     0.051
+    ],
+    "Slaking": [
+     427,
+     0.452,
+     0.024
+    ],
+    "Registeel": [
+     1771,
+     0.379,
+     0.012
+    ],
+    "Jynx": [
+     496,
+     0.408,
+     0.022
+    ],
+    "Lanturn": [
+     40,
+     0.624,
+     0.077
+    ],
+    "Aerodactyl": [
+     6116,
+     0.342,
+     0.006
+    ],
+    "Medicham": [
+     1124,
+     0.347,
+     0.014
+    ]
+   }
+  },
+  "Swampert": {
+   "teammates": {
+    "Tyranitar": 0.816,
+    "Gengar": 0.436,
+    "Skarmory": 0.426,
+    "Aerodactyl": 0.38,
+    "Blissey": 0.314,
+    "Celebi": 0.29,
+    "Zapdos": 0.283,
+    "Salamence": 0.237,
+    "Metagross": 0.194,
+    "Forretress": 0.164,
+    "Starmie": 0.158,
+    "Jirachi": 0.134,
+    "Registeel": 0.101,
+    "Charizard": 0.087,
+    "Magneton": 0.08,
+    "Dugtrio": 0.073,
+    "Snorlax": 0.073,
+    "Jolteon": 0.068,
+    "Raikou": 0.067,
+    "Moltres": 0.048,
+    "Claydol": 0.045,
+    "Suicune": 0.038,
+    "Cloyster": 0.037,
+    "Smeargle": 0.032,
+    "Heracross": 0.03,
+    "Medicham": 0.026,
+    "Breloom": 0.026
+   },
+   "counters": {
+    "Venusaur": [
+     824,
+     0.881,
+     0.011
+    ],
+    "Ludicolo": [
+     803,
+     0.878,
+     0.012
+    ],
+    "Sceptile": [
+     421,
+     0.874,
+     0.016
+    ],
+    "Celebi": [
+     13797,
+     0.814,
+     0.003
+    ],
+    "Suicune": [
+     10730,
+     0.776,
+     0.004
+    ],
+    "Milotic": [
+     2198,
+     0.788,
+     0.009
+    ],
+    "Exeggutor": [
+     115,
+     0.812,
+     0.036
+    ],
+    "Kingdra": [
+     796,
+     0.705,
+     0.016
+    ],
+    "Moltres": [
+     1665,
+     0.682,
+     0.011
+    ],
+    "Gyarados": [
+     2535,
+     0.666,
+     0.009
+    ],
+    "Gengar": [
+     11570,
+     0.641,
+     0.004
+    ],
+    "Heracross": [
+     2030,
+     0.648,
+     0.011
+    ],
+    "Charizard": [
+     2429,
+     0.642,
+     0.01
+    ],
+    "Articuno": [
+     494,
+     0.678,
+     0.021
+    ],
+    "Breloom": [
+     1780,
+     0.639,
+     0.011
+    ],
+    "Raikou": [
+     2211,
+     0.626,
+     0.01
+    ],
+    "Lapras": [
+     218,
+     0.698,
+     0.031
+    ],
+    "Zapdos": [
+     12402,
+     0.555,
+     0.004
+    ],
+    "Jynx": [
+     472,
+     0.622,
+     0.022
+    ],
+    "Alakazam": [
+     251,
+     0.652,
+     0.03
+    ],
+    "Cloyster": [
+     1213,
+     0.583,
+     0.014
+    ],
+    "Skarmory": [
+     16531,
+     0.536,
+     0.004
+    ],
+    "Quagsire": [
+     337,
+     0.625,
+     0.026
+    ],
+    "Starmie": [
+     7914,
+     0.531,
+     0.006
+    ],
+    "Vaporeon": [
+     1090,
+     0.556,
+     0.015
+    ],
+    "Snorlax": [
+     6102,
+     0.516,
+     0.006
+    ],
+    "Linoone": [
+     135,
+     0.648,
+     0.041
+    ],
+    "Jirachi": [
+     6514,
+     0.505,
+     0.006
+    ],
+    "Swampert": [
+     13119,
+     0.48,
+     0.004
+    ],
+    "Scizor": [
+     232,
+     0.581,
+     0.032
+    ]
+   }
+  },
+  "Tauros": {
+   "teammates": {
+    "Magneton": 0.656,
+    "Aerodactyl": 0.435,
+    "Swampert": 0.399,
+    "Medicham": 0.342,
+    "Tyranitar": 0.303,
+    "Metagross": 0.291,
+    "Snorlax": 0.234,
+    "Blissey": 0.16,
+    "Houndoom": 0.151,
+    "Dugtrio": 0.149,
+    "Salamence": 0.124,
+    "Suicune": 0.11,
+    "Slaking": 0.106,
+    "Regice": 0.104,
+    "Zapdos": 0.101,
+    "Starmie": 0.084,
+    "Gyarados": 0.081,
+    "Gengar": 0.063,
+    "Celebi": 0.056,
+    "Forretress": 0.051,
+    "Flygon": 0.05,
+    "Jirachi": 0.049,
+    "Smeargle": 0.047,
+    "Kingdra": 0.035,
+    "Skarmory": 0.034,
+    "Ludicolo": 0.032,
+    "Blastoise": 0.029,
+    "Vaporeon": 0.028,
+    "Miltank": 0.025
+   },
+   "counters": {
+    "Aerodactyl": [
+     66,
+     0.736,
+     0.054
+    ],
+    "Skarmory": [
+     66,
+     0.706,
+     0.056
+    ],
+    "Metagross": [
+     86,
+     0.58,
+     0.053
+    ],
+    "Gengar": [
+     62,
+     0.595,
+     0.063
+    ],
+    "Tyranitar": [
+     149,
+     0.493,
+     0.041
+    ],
+    "Suicune": [
+     68,
+     0.461,
+     0.06
+    ],
+    "Jirachi": [
+     38,
+     0.52,
+     0.081
+    ],
+    "Swampert": [
+     66,
+     0.424,
+     0.061
+    ],
+    "Snorlax": [
+     51,
+     0.436,
+     0.069
+    ],
+    "Salamence": [
+     108,
+     0.309,
+     0.044
+    ],
+    "Celebi": [
+     49,
+     0.333,
+     0.067
+    ],
+    "Magneton": [
+     22,
+     0.479,
+     0.106
+    ],
+    "Starmie": [
+     28,
+     0.429,
+     0.094
+    ],
+    "Heracross": [
+     26,
+     0.38,
+     0.095
+    ],
+    "Zapdos": [
+     46,
+     0.237,
+     0.063
+    ],
+    "Blissey": [
+     43,
+     0.251,
+     0.066
+    ],
+    "Claydol": [
+     20,
+     0.396,
+     0.109
+    ]
+   }
+  },
+  "Tyranitar": {
+   "teammates": {
+    "Swampert": 0.563,
+    "Skarmory": 0.456,
+    "Gengar": 0.434,
+    "Metagross": 0.335,
+    "Salamence": 0.295,
+    "Aerodactyl": 0.29,
+    "Blissey": 0.261,
+    "Celebi": 0.225,
+    "Zapdos": 0.218,
+    "Starmie": 0.206,
+    "Jirachi": 0.147,
+    "Forretress": 0.133,
+    "Jolteon": 0.116,
+    "Claydol": 0.109,
+    "Magneton": 0.101,
+    "Snorlax": 0.097,
+    "Registeel": 0.092,
+    "Suicune": 0.091,
+    "Charizard": 0.082,
+    "Flygon": 0.075,
+    "Dugtrio": 0.062,
+    "Raikou": 0.053,
+    "Moltres": 0.05,
+    "Breloom": 0.036,
+    "Cloyster": 0.034,
+    "Smeargle": 0.028,
+    "Gyarados": 0.028,
+    "Milotic": 0.027,
+    "Heracross": 0.025
+   },
+   "counters": {
+    "Medicham": [
+     3773,
+     0.864,
+     0.006
+    ],
+    "Hariyama": [
+     1568,
+     0.851,
+     0.009
+    ],
+    "Marowak": [
+     587,
+     0.869,
+     0.014
+    ],
+    "Breloom": [
+     2643,
+     0.825,
+     0.007
+    ],
+    "Blaziken": [
+     762,
+     0.843,
+     0.013
+    ],
+    "Heracross": [
+     2605,
+     0.804,
+     0.008
+    ],
+    "Suicune": [
+     12740,
+     0.784,
+     0.004
+    ],
+    "Machamp": [
+     727,
+     0.813,
+     0.014
+    ],
+    "Flygon": [
+     6761,
+     0.763,
+     0.005
+    ],
+    "Kingdra": [
+     1309,
+     0.787,
+     0.011
+    ],
+    "Vaporeon": [
+     1393,
+     0.784,
+     0.011
+    ],
+    "Milotic": [
+     2588,
+     0.773,
+     0.008
+    ],
+    "Regirock": [
+     1228,
+     0.769,
+     0.012
+    ],
+    "Swampert": [
+     31257,
+     0.728,
+     0.003
+    ],
+    "Metagross": [
+     17844,
+     0.725,
+     0.003
+    ],
+    "Golduck": [
+     71,
+     0.863,
+     0.041
+    ],
+    "Dugtrio": [
+     7680,
+     0.712,
+     0.005
+    ],
+    "Donphan": [
+     1022,
+     0.734,
+     0.014
+    ],
+    "Starmie": [
+     7889,
+     0.635,
+     0.005
+    ],
+    "Rhydon": [
+     233,
+     0.715,
+     0.03
+    ],
+    "Venusaur": [
+     774,
+     0.658,
+     0.017
+    ],
+    "Blastoise": [
+     159,
+     0.73,
+     0.035
+    ],
+    "Scizor": [
+     267,
+     0.696,
+     0.028
+    ],
+    "Gligar": [
+     134,
+     0.73,
+     0.038
+    ],
+    "Salamence": [
+     19110,
+     0.571,
+     0.004
+    ],
+    "Slaking": [
+     1184,
+     0.582,
+     0.014
+    ],
+    "Claydol": [
+     7635,
+     0.546,
+     0.006
+    ],
+    "Aerodactyl": [
+     11891,
+     0.539,
+     0.005
+    ],
+    "Ludicolo": [
+     768,
+     0.586,
+     0.018
+    ],
+    "Linoone": [
+     211,
+     0.638,
+     0.033
+    ]
+   }
+  },
+  "Umbreon": {
+   "teammates": {
+    "Snorlax": 0.283,
+    "Metagross": 0.249,
+    "Magneton": 0.248,
+    "Forretress": 0.223,
+    "Claydol": 0.215,
+    "Blissey": 0.211,
+    "Suicune": 0.204,
+    "Zapdos": 0.203,
+    "Gyarados": 0.193,
+    "Salamence": 0.159,
+    "Aerodactyl": 0.158,
+    "Dugtrio": 0.133,
+    "Swampert": 0.121,
+    "Dragonite": 0.118,
+    "Smeargle": 0.117,
+    "Skarmory": 0.114,
+    "Celebi": 0.111,
+    "Gengar": 0.097,
+    "Donphan": 0.096,
+    "Charizard": 0.094,
+    "Jirachi": 0.085,
+    "Tyranitar": 0.084,
+    "Linoone": 0.076,
+    "Medicham": 0.073,
+    "Steelix": 0.067,
+    "Breloom": 0.052,
+    "Lapras": 0.051,
+    "Milotic": 0.049,
+    "Moltres": 0.048,
+    "Venusaur": 0.047,
+    "Jolteon": 0.043,
+    "Starmie": 0.042,
+    "Flygon": 0.038,
+    "Slaking": 0.037,
+    "Vaporeon": 0.034,
+    "Heracross": 0.033,
+    "Scizor": 0.029,
+    "Weezing": 0.029,
+    "Hariyama": 0.028,
+    "Quagsire": 0.024
+   },
+   "counters": {
+    "Breloom": [
+     93,
+     0.926,
+     0.027
+    ],
+    "Heracross": [
+     131,
+     0.908,
+     0.025
+    ],
+    "Hariyama": [
+     40,
+     0.937,
+     0.038
+    ],
+    "Medicham": [
+     76,
+     0.893,
+     0.036
+    ],
+    "Metagross": [
+     451,
+     0.775,
+     0.02
+    ],
+    "Skarmory": [
+     787,
+     0.738,
+     0.016
+    ],
+    "Tyranitar": [
+     753,
+     0.729,
+     0.016
+    ],
+    "Suicune": [
+     491,
+     0.695,
+     0.021
+    ],
+    "Jynx": [
+     30,
+     0.862,
+     0.063
+    ],
+    "Raikou": [
+     85,
+     0.786,
+     0.044
+    ],
+    "Magneton": [
+     149,
+     0.646,
+     0.039
+    ],
+    "Jirachi": [
+     281,
+     0.601,
+     0.029
+    ],
+    "Snorlax": [
+     378,
+     0.575,
+     0.025
+    ],
+    "Aerodactyl": [
+     316,
+     0.567,
+     0.028
+    ],
+    "Gyarados": [
+     90,
+     0.656,
+     0.05
+    ],
+    "Milotic": [
+     64,
+     0.66,
+     0.059
+    ],
+    "Swampert": [
+     566,
+     0.497,
+     0.021
+    ],
+    "Charizard": [
+     101,
+     0.595,
+     0.049
+    ],
+    "Registeel": [
+     100,
+     0.585,
+     0.049
+    ],
+    "Forretress": [
+     216,
+     0.516,
+     0.034
+    ],
+    "Celebi": [
+     569,
+     0.461,
+     0.021
+    ],
+    "Dugtrio": [
+     175,
+     0.491,
+     0.038
+    ],
+    "Salamence": [
+     552,
+     0.414,
+     0.021
+    ],
+    "Ludicolo": [
+     34,
+     0.642,
+     0.082
+    ],
+    "Zapdos": [
+     543,
+     0.365,
+     0.021
+    ],
+    "Sceptile": [
+     21,
+     0.683,
+     0.101
+    ],
+    "Blissey": [
+     595,
+     0.348,
+     0.02
+    ],
+    "Smeargle": [
+     34,
+     0.594,
+     0.084
+    ],
+    "Venusaur": [
+     30,
+     0.608,
+     0.089
+    ],
+    "Umbreon": [
+     84,
+     0.46,
+     0.054
+    ]
+   }
+  },
+  "Ursaring": {
+   "teammates": {
+    "Salamence": 0.48,
+    "Metagross": 0.403,
+    "Claydol": 0.364,
+    "Tyranitar": 0.35,
+    "Blissey": 0.262,
+    "Suicune": 0.238,
+    "Snorlax": 0.207,
+    "Vaporeon": 0.205,
+    "Raikou": 0.204,
+    "Registeel": 0.199,
+    "Gyarados": 0.189,
+    "Magneton": 0.181,
+    "Houndoom": 0.168,
+    "Starmie": 0.147,
+    "Celebi": 0.136,
+    "Skarmory": 0.085,
+    "Smeargle": 0.067,
+    "Umbreon": 0.066,
+    "Miltank": 0.063,
+    "Slaking": 0.055,
+    "Marowak": 0.052,
+    "Milotic": 0.052,
+    "Porygon2": 0.052,
+    "Jirachi": 0.047,
+    "Aerodactyl": 0.046,
+    "Zapdos": 0.041,
+    "Swampert": 0.038,
+    "Dugtrio": 0.036,
+    "Regice": 0.035,
+    "Weezing": 0.031,
+    "Machamp": 0.031,
+    "Forretress": 0.03,
+    "Charizard": 0.027,
+    "Jolteon": 0.026,
+    "Dragonite": 0.022,
+    "Armaldo": 0.022,
+    "Regirock": 0.022
+   },
+   "counters": {
+    "Aerodactyl": [
+     60,
+     0.799,
+     0.052
+    ],
+    "Metagross": [
+     99,
+     0.76,
+     0.043
+    ],
+    "Salamence": [
+     125,
+     0.549,
+     0.045
+    ],
+    "Tyranitar": [
+     180,
+     0.516,
+     0.037
+    ],
+    "Jirachi": [
+     60,
+     0.582,
+     0.064
+    ],
+    "Skarmory": [
+     118,
+     0.498,
+     0.046
+    ],
+    "Suicune": [
+     82,
+     0.514,
+     0.055
+    ],
+    "Swampert": [
+     96,
+     0.489,
+     0.051
+    ],
+    "Celebi": [
+     82,
+     0.449,
+     0.055
+    ],
+    "Dugtrio": [
+     40,
+     0.539,
+     0.079
+    ],
+    "Starmie": [
+     64,
+     0.416,
+     0.062
+    ],
+    "Magneton": [
+     23,
+     0.574,
+     0.103
+    ],
+    "Gengar": [
+     112,
+     0.306,
+     0.044
+    ],
+    "Zapdos": [
+     70,
+     0.342,
+     0.057
+    ],
+    "Snorlax": [
+     60,
+     0.221,
+     0.054
+    ],
+    "Claydol": [
+     25,
+     0.38,
+     0.096
+    ],
+    "Blissey": [
+     165,
+     0.076,
+     0.021
+    ],
+    "Forretress": [
+     34,
+     0.274,
+     0.076
+    ],
+    "Registeel": [
+     35,
+     0.238,
+     0.072
+    ]
+   }
+  },
+  "Vaporeon": {
+   "teammates": {
+    "Tyranitar": 0.302,
+    "Celebi": 0.287,
+    "Salamence": 0.268,
+    "Blissey": 0.257,
+    "Claydol": 0.239,
+    "Metagross": 0.239,
+    "Dugtrio": 0.208,
+    "Zapdos": 0.191,
+    "Snorlax": 0.176,
+    "Swampert": 0.158,
+    "Jolteon": 0.152,
+    "Skarmory": 0.144,
+    "Forretress": 0.138,
+    "Registeel": 0.131,
+    "Starmie": 0.118,
+    "Aerodactyl": 0.116,
+    "Raikou": 0.113,
+    "Magneton": 0.103,
+    "Charizard": 0.098,
+    "Heracross": 0.097,
+    "Gengar": 0.09,
+    "Breloom": 0.089,
+    "Jirachi": 0.076,
+    "Hariyama": 0.064,
+    "Machamp": 0.061,
+    "Suicune": 0.056,
+    "Smeargle": 0.054,
+    "Dusclops": 0.051,
+    "Regirock": 0.051,
+    "Moltres": 0.044,
+    "Blaziken": 0.043,
+    "Medicham": 0.04,
+    "Donphan": 0.04,
+    "Slaking": 0.032,
+    "Ursaring": 0.031,
+    "Marowak": 0.03,
+    "Houndoom": 0.029,
+    "Regice": 0.028,
+    "Scizor": 0.028,
+    "Umbreon": 0.028
+   },
+   "counters": {
+    "Regice": [
+     78,
+     0.939,
+     0.027
+    ],
+    "Raikou": [
+     116,
+     0.865,
+     0.032
+    ],
+    "Jolteon": [
+     229,
+     0.817,
+     0.026
+    ],
+    "Magneton": [
+     208,
+     0.819,
+     0.027
+    ],
+    "Celebi": [
+     770,
+     0.762,
+     0.015
+    ],
+    "Snorlax": [
+     587,
+     0.767,
+     0.017
+    ],
+    "Zapdos": [
+     826,
+     0.749,
+     0.015
+    ],
+    "Blissey": [
+     1044,
+     0.741,
+     0.014
+    ],
+    "Jirachi": [
+     338,
+     0.772,
+     0.023
+    ],
+    "Venusaur": [
+     89,
+     0.835,
+     0.039
+    ],
+    "Suicune": [
+     1237,
+     0.711,
+     0.013
+    ],
+    "Breloom": [
+     106,
+     0.778,
+     0.04
+    ],
+    "Lapras": [
+     24,
+     0.869,
+     0.069
+    ],
+    "Starmie": [
+     596,
+     0.668,
+     0.019
+    ],
+    "Sceptile": [
+     30,
+     0.847,
+     0.065
+    ],
+    "Gyarados": [
+     109,
+     0.739,
+     0.042
+    ],
+    "Heracross": [
+     103,
+     0.729,
+     0.044
+    ],
+    "Gengar": [
+     444,
+     0.626,
+     0.023
+    ],
+    "Ludicolo": [
+     58,
+     0.743,
+     0.058
+    ],
+    "Registeel": [
+     170,
+     0.644,
+     0.037
+    ],
+    "Smeargle": [
+     66,
+     0.612,
+     0.06
+    ],
+    "Milotic": [
+     135,
+     0.524,
+     0.043
+    ],
+    "Jynx": [
+     64,
+     0.567,
+     0.062
+    ],
+    "Medicham": [
+     131,
+     0.494,
+     0.044
+    ],
+    "Swampert": [
+     1090,
+     0.37,
+     0.015
+    ],
+    "Porygon2": [
+     35,
+     0.635,
+     0.081
+    ],
+    "Aerodactyl": [
+     438,
+     0.377,
+     0.023
+    ],
+    "Metagross": [
+     840,
+     0.333,
+     0.016
+    ],
+    "Skarmory": [
+     791,
+     0.329,
+     0.017
+    ],
+    "Salamence": [
+     774,
+     0.275,
+     0.016
+    ]
+   }
+  },
+  "Venusaur": {
+   "teammates": {
+    "Tyranitar": 0.591,
+    "Skarmory": 0.483,
+    "Aerodactyl": 0.437,
+    "Swampert": 0.318,
+    "Magneton": 0.259,
+    "Metagross": 0.219,
+    "Gengar": 0.219,
+    "Charizard": 0.198,
+    "Snorlax": 0.187,
+    "Starmie": 0.172,
+    "Forretress": 0.15,
+    "Salamence": 0.115,
+    "Blissey": 0.11,
+    "Flygon": 0.104,
+    "Milotic": 0.104,
+    "Dugtrio": 0.095,
+    "Lapras": 0.076,
+    "Houndoom": 0.074,
+    "Jirachi": 0.073,
+    "Umbreon": 0.062,
+    "Alakazam": 0.059,
+    "Claydol": 0.053,
+    "Heracross": 0.049,
+    "Suicune": 0.048,
+    "Moltres": 0.045,
+    "Registeel": 0.036,
+    "Donphan": 0.035,
+    "Zapdos": 0.033,
+    "Blastoise": 0.032,
+    "Regirock": 0.03,
+    "Quagsire": 0.025,
+    "Porygon2": 0.022,
+    "Jolteon": 0.022,
+    "Medicham": 0.021
+   },
+   "counters": {
+    "Blaziken": [
+     30,
+     0.899,
+     0.055
+    ],
+    "Aerodactyl": [
+     393,
+     0.752,
+     0.022
+    ],
+    "Charizard": [
+     155,
+     0.79,
+     0.033
+    ],
+    "Houndoom": [
+     48,
+     0.859,
+     0.05
+    ],
+    "Salamence": [
+     483,
+     0.67,
+     0.021
+    ],
+    "Gengar": [
+     458,
+     0.638,
+     0.022
+    ],
+    "Celebi": [
+     482,
+     0.596,
+     0.022
+    ],
+    "Metagross": [
+     404,
+     0.586,
+     0.025
+    ],
+    "Heracross": [
+     88,
+     0.675,
+     0.05
+    ],
+    "Moltres": [
+     112,
+     0.64,
+     0.045
+    ],
+    "Regice": [
+     47,
+     0.721,
+     0.066
+    ],
+    "Jirachi": [
+     237,
+     0.54,
+     0.032
+    ],
+    "Slaking": [
+     37,
+     0.7,
+     0.076
+    ],
+    "Gyarados": [
+     70,
+     0.622,
+     0.058
+    ],
+    "Smeargle": [
+     37,
+     0.643,
+     0.079
+    ],
+    "Snorlax": [
+     286,
+     0.441,
+     0.029
+    ],
+    "Blissey": [
+     761,
+     0.376,
+     0.018
+    ],
+    "Raikou": [
+     82,
+     0.512,
+     0.055
+    ],
+    "Dugtrio": [
+     136,
+     0.458,
+     0.043
+    ],
+    "Jynx": [
+     37,
+     0.594,
+     0.081
+    ],
+    "Articuno": [
+     39,
+     0.583,
+     0.079
+    ],
+    "Starmie": [
+     297,
+     0.377,
+     0.028
+    ],
+    "Zapdos": [
+     715,
+     0.324,
+     0.017
+    ],
+    "Skarmory": [
+     787,
+     0.303,
+     0.016
+    ],
+    "Tyranitar": [
+     774,
+     0.28,
+     0.016
+    ],
+    "Flygon": [
+     91,
+     0.41,
+     0.051
+    ],
+    "Ludicolo": [
+     31,
+     0.544,
+     0.089
+    ],
+    "Suicune": [
+     555,
+     0.261,
+     0.019
+    ],
+    "Kingdra": [
+     40,
+     0.493,
+     0.079
+    ],
+    "Registeel": [
+     102,
+     0.347,
+     0.047
+    ]
+   }
+  },
+  "Weezing": {
+   "teammates": {
+    "Blissey": 0.355,
+    "Suicune": 0.281,
+    "Skarmory": 0.28,
+    "Snorlax": 0.271,
+    "Starmie": 0.251,
+    "Zapdos": 0.234,
+    "Metagross": 0.214,
+    "Flygon": 0.211,
+    "Tyranitar": 0.208,
+    "Celebi": 0.192,
+    "Gengar": 0.185,
+    "Dugtrio": 0.152,
+    "Aerodactyl": 0.136,
+    "Salamence": 0.111,
+    "Breloom": 0.11,
+    "Swampert": 0.108,
+    "Steelix": 0.093,
+    "Jynx": 0.091,
+    "Jirachi": 0.084,
+    "Forretress": 0.084,
+    "Registeel": 0.079,
+    "Claydol": 0.077,
+    "Magneton": 0.063,
+    "Regirock": 0.061,
+    "Moltres": 0.06,
+    "Porygon2": 0.051,
+    "Electrode": 0.051,
+    "Marowak": 0.051,
+    "Umbreon": 0.051,
+    "Houndoom": 0.041,
+    "Charizard": 0.041,
+    "Milotic": 0.039,
+    "Regice": 0.038,
+    "Gyarados": 0.038,
+    "Heracross": 0.032,
+    "Scizor": 0.032,
+    "Camerupt": 0.029,
+    "Raikou": 0.028,
+    "Cloyster": 0.025,
+    "Misdreavus": 0.024
+   },
+   "counters": {
+    "Suicune": [
+     212,
+     0.783,
+     0.028
+    ],
+    "Charizard": [
+     70,
+     0.822,
+     0.046
+    ],
+    "Magneton": [
+     95,
+     0.783,
+     0.042
+    ],
+    "Gengar": [
+     212,
+     0.711,
+     0.031
+    ],
+    "Zapdos": [
+     254,
+     0.7,
+     0.029
+    ],
+    "Jirachi": [
+     123,
+     0.695,
+     0.041
+    ],
+    "Starmie": [
+     203,
+     0.662,
+     0.033
+    ],
+    "Claydol": [
+     114,
+     0.696,
+     0.043
+    ],
+    "Swampert": [
+     350,
+     0.623,
+     0.026
+    ],
+    "Celebi": [
+     184,
+     0.642,
+     0.035
+    ],
+    "Jolteon": [
+     52,
+     0.71,
+     0.063
+    ],
+    "Tyranitar": [
+     549,
+     0.516,
+     0.021
+    ],
+    "Milotic": [
+     49,
+     0.694,
+     0.066
+    ],
+    "Raikou": [
+     24,
+     0.741,
+     0.089
+    ],
+    "Metagross": [
+     278,
+     0.454,
+     0.03
+    ],
+    "Moltres": [
+     55,
+     0.597,
+     0.066
+    ],
+    "Aerodactyl": [
+     165,
+     0.48,
+     0.039
+    ],
+    "Salamence": [
+     231,
+     0.452,
+     0.033
+    ],
+    "Kingdra": [
+     23,
+     0.675,
+     0.098
+    ],
+    "Smeargle": [
+     27,
+     0.65,
+     0.092
+    ],
+    "Vaporeon": [
+     23,
+     0.621,
+     0.102
+    ],
+    "Cloyster": [
+     25,
+     0.591,
+     0.099
+    ],
+    "Blissey": [
+     341,
+     0.285,
+     0.024
+    ],
+    "Skarmory": [
+     370,
+     0.26,
+     0.023
+    ],
+    "Snorlax": [
+     230,
+     0.256,
+     0.029
+    ],
+    "Breloom": [
+     59,
+     0.373,
+     0.063
+    ],
+    "Registeel": [
+     38,
+     0.428,
+     0.081
+    ],
+    "Heracross": [
+     72,
+     0.285,
+     0.053
+    ],
+    "Machamp": [
+     23,
+     0.461,
+     0.105
+    ],
+    "Forretress": [
+     95,
+     0.128,
+     0.034
+    ]
+   }
+  },
+  "Zapdos": {
+   "teammates": {
+    "Tyranitar": 0.535,
+    "Swampert": 0.479,
+    "Skarmory": 0.365,
+    "Metagross": 0.317,
+    "Gengar": 0.294,
+    "Dugtrio": 0.272,
+    "Aerodactyl": 0.247,
+    "Celebi": 0.222,
+    "Blissey": 0.206,
+    "Suicune": 0.185,
+    "Jirachi": 0.17,
+    "Salamence": 0.131,
+    "Snorlax": 0.131,
+    "Starmie": 0.109,
+    "Flygon": 0.107,
+    "Claydol": 0.099,
+    "Forretress": 0.095,
+    "Charizard": 0.094,
+    "Heracross": 0.066,
+    "Breloom": 0.057,
+    "Magneton": 0.056,
+    "Registeel": 0.043,
+    "Kingdra": 0.039,
+    "Medicham": 0.032,
+    "Gyarados": 0.029,
+    "Cloyster": 0.028,
+    "Raikou": 0.027,
+    "Moltres": 0.023,
+    "Houndoom": 0.023,
+    "Smeargle": 0.022,
+    "Hariyama": 0.021
+   },
+   "counters": {
+    "Regice": [
+     1083,
+     0.874,
+     0.01
+    ],
+    "Raikou": [
+     1233,
+     0.867,
+     0.01
+    ],
+    "Jynx": [
+     524,
+     0.858,
+     0.015
+    ],
+    "Snorlax": [
+     6813,
+     0.788,
+     0.005
+    ],
+    "Tyranitar": [
+     15913,
+     0.731,
+     0.004
+    ],
+    "Regirock": [
+     571,
+     0.778,
+     0.017
+    ],
+    "Steelix": [
+     445,
+     0.776,
+     0.02
+    ],
+    "Aerodactyl": [
+     5969,
+     0.715,
+     0.006
+    ],
+    "Blissey": [
+     15241,
+     0.702,
+     0.004
+    ],
+    "Registeel": [
+     2505,
+     0.71,
+     0.009
+    ],
+    "Jolteon": [
+     3538,
+     0.701,
+     0.008
+    ],
+    "Jirachi": [
+     3588,
+     0.633,
+     0.008
+    ],
+    "Camerupt": [
+     174,
+     0.723,
+     0.034
+    ],
+    "Armaldo": [
+     203,
+     0.702,
+     0.032
+    ],
+    "Sceptile": [
+     266,
+     0.681,
+     0.029
+    ],
+    "Magneton": [
+     2226,
+     0.6,
+     0.01
+    ],
+    "Celebi": [
+     8795,
+     0.573,
+     0.005
+    ],
+    "Lanturn": [
+     101,
+     0.724,
+     0.044
+    ],
+    "Alakazam": [
+     185,
+     0.664,
+     0.035
+    ],
+    "Venusaur": [
+     715,
+     0.597,
+     0.018
+    ],
+    "Slaking": [
+     518,
+     0.607,
+     0.021
+    ],
+    "Ludicolo": [
+     404,
+     0.608,
+     0.024
+    ],
+    "Electrode": [
+     71,
+     0.723,
+     0.053
+    ],
+    "Kingdra": [
+     618,
+     0.545,
+     0.02
+    ],
+    "Porygon2": [
+     360,
+     0.557,
+     0.026
+    ],
+    "Heracross": [
+     1410,
+     0.489,
+     0.013
+    ],
+    "Flygon": [
+     2869,
+     0.469,
+     0.009
+    ],
+    "Zapdos": [
+     8651,
+     0.452,
+     0.005
+    ],
+    "Tauros": [
+     46,
+     0.689,
+     0.068
+    ],
+    "Marowak": [
+     338,
+     0.521,
+     0.027
+    ]
+   }
+  }
+ }
+}

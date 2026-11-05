@@ -1,7 +1,7 @@
 {
   "version": 1,
   "generatorVersion": 6,
-  "dataBuiltAt": "2026-11-02T19:56:19.638Z",
+  "dataBuiltAt": "2026-11-05T01:13:21.551Z",
   "week": "2026-11-02",
   "pool": {
     "species": [
@@ -153,124 +153,128 @@
       "style": "balance",
       "team": [
         {
-          "species": "Exeggutor",
-          "setId": "exeggutor-sunnybeam"
+          "species": "Magneton",
+          "setId": "magneton-trapper"
         },
         {
-          "species": "Gyarados",
-          "setId": "gyarados-rest"
-        },
-        {
-          "species": "Dugtrio",
-          "setId": "dugtrio-choice-band"
-        },
-        {
-          "species": "Claydol",
-          "setId": "claydol-utility"
-        },
-        {
-          "species": "Metagross",
-          "setId": "metagross-bulky-attacker"
+          "species": "Skarmory",
+          "setId": "skarmory-standard"
         },
         {
           "species": "Swampert",
           "setId": "swampert-standard-defensive"
-        }
-      ],
-      "candidate": 0
-    },
-    {
-      "day": "2026-11-06",
-      "style": "offense",
-      "team": [
+        },
         {
-          "species": "Claydol",
-          "setId": "claydol-utility"
+          "species": "Cloyster",
+          "setId": "cloyster-spiker"
         },
         {
           "species": "Raikou",
           "setId": "raikou-calm-mind-sweeper"
         },
         {
-          "species": "Suicune",
-          "setId": "suicune-offensive"
-        },
-        {
-          "species": "Medicham",
-          "setId": "medicham-bulk-up"
-        },
-        {
-          "species": "Cloyster",
-          "setId": "cloyster-spiker"
-        },
-        {
-          "species": "Hariyama",
-          "setId": "hariyama-offensive"
+          "species": "Snorlax",
+          "setId": "snorlax-utility-lax"
         }
       ],
-      "candidate": 8
+      "candidate": 0,
+      "opponentVersion": 7
     },
     {
-      "day": "2026-11-07",
-      "style": "balance",
+      "day": "2026-11-06",
+      "style": "offense",
       "team": [
         {
-          "species": "Charizard",
-          "setId": "charizard-mixed-attacker"
+          "species": "Blastoise",
+          "setId": "blastoise-standard"
         },
         {
-          "species": "Donphan",
-          "setId": "donphan-tank"
+          "species": "Blissey",
+          "setId": "blissey-utility"
+        },
+        {
+          "species": "Dugtrio",
+          "setId": "dugtrio-choice-band"
+        },
+        {
+          "species": "Flygon",
+          "setId": "flygon-offensive"
         },
         {
           "species": "Metagross",
           "setId": "metagross-agility"
         },
         {
+          "species": "Heracross",
+          "setId": "heracross-standard"
+        }
+      ],
+      "candidate": 3,
+      "opponentVersion": 7
+    },
+    {
+      "day": "2026-11-07",
+      "style": "balance",
+      "team": [
+        {
           "species": "Swampert",
           "setId": "swampert-standard-defensive"
         },
         {
-          "species": "Salamence",
-          "setId": "salamence-dragon-dance"
-        },
-        {
-          "species": "Gyarados",
-          "setId": "gyarados-standard"
-        }
-      ],
-      "candidate": 8
-    },
-    {
-      "day": "2026-11-08",
-      "style": "balance",
-      "team": [
-        {
           "species": "Zapdos",
-          "setId": "zapdos-rest"
-        },
-        {
-          "species": "Tyranitar",
-          "setId": "tyranitar-bulky-dragon-dance"
-        },
-        {
-          "species": "Celebi",
-          "setId": "celebi-defensive-calm-mind"
+          "setId": "zapdos-standard-offensive"
         },
         {
           "species": "Cloyster",
           "setId": "cloyster-spiker"
         },
         {
-          "species": "Forretress",
-          "setId": "forretress-standard"
+          "species": "Medicham",
+          "setId": "medicham-choice-band"
+        },
+        {
+          "species": "Registeel",
+          "setId": "registeel-mixed-wall"
+        },
+        {
+          "species": "Charizard",
+          "setId": "charizard-mixed-attacker"
+        }
+      ],
+      "candidate": 0,
+      "opponentVersion": 7
+    },
+    {
+      "day": "2026-11-08",
+      "style": "stall",
+      "team": [
+        {
+          "species": "Donphan",
+          "setId": "donphan-tank"
+        },
+        {
+          "species": "Magneton",
+          "setId": "magneton-trapper"
         },
         {
           "species": "Blissey",
-          "setId": "blissey-calm-mind"
+          "setId": "blissey-utility"
+        },
+        {
+          "species": "Milotic",
+          "setId": "milotic-standard"
+        },
+        {
+          "species": "Skarmory",
+          "setId": "skarmory-standard"
+        },
+        {
+          "species": "Dugtrio",
+          "setId": "dugtrio-salac-berry"
         }
       ],
-      "candidate": 2
+      "candidate": 4,
+      "opponentVersion": 7
     }
   ]
 }

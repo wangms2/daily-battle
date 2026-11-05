@@ -4,13 +4,17 @@
 // Existing week files are skipped unless --force: published weeks must not change.
 // --from-day rebuilds only an existing week's days from that day on, keeping
 // its pool, suggestions, and earlier days (for a week already being played).
+// --v7 (with --from-day) rebuilds them with the v7 builder and its checks.
 // Gen 4 OU writes to schedule/ and reports/; other formats to a subfolder named
 // for the format (schedule/gen5ou/).
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { DEFAULT_FORMAT, setsFor } from '@daily-battle/data';
 import { addDays, mondayOf } from '@daily-battle/gen';
+import { teammatesFor } from '@daily-battle/data/teammates';
+import { opponentBuilder } from '@daily-battle/gen/builder';
 import { buildWeek, rebuildDays, reportMarkdown, Simulator } from '../src/index';
+import { publishedDays } from './published';
 
 const arg = (name: string) => {
   const i = process.argv.indexOf(`--${name}`);
@@ -20,6 +24,7 @@ const from = mondayOf(arg('from') ?? new Date().toISOString().slice(0, 10));
 const weeks = Number(arg('weeks') ?? 8);
 const force = process.argv.includes('--force');
 const fromDay = arg('from-day');
+const v7 = process.argv.includes('--v7');
 const workers = arg('workers') === undefined ? undefined : Number(arg('workers'));
 const format = arg('format') ?? DEFAULT_FORMAT;
 const data = setsFor(format);
@@ -47,6 +52,10 @@ try {
         sim,
         data,
         console.log,
+        // Re-read each week, so a week sees the days rebuilt before it.
+        v7
+          ? { build: opponentBuilder(data, teammatesFor(format)), history: publishedDays(format) }
+          : undefined,
       );
       writeFileSync(
         file,

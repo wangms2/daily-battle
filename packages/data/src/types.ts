@@ -68,6 +68,23 @@ export interface SetsFile {
   species: Record<string, SpeciesEntry>;
 }
 
+/**
+ * Who plays with whom and who beats whom, from Smogon's chaos stats
+ * (`sources/<fmt>-teammates.json`, see `scripts/fetch-teammates.ts`).
+ */
+export interface TeammatesFile {
+  source: { url: string; month: string; cutoff: number; fetchedAt: string };
+  data: Record<
+    string,
+    {
+      /** Teammate -> share of this species' teams that also carry it. */
+      teammates: Record<string, number>;
+      /** Foe -> [encounters, share where the foe KOs or forces it out, standard deviation]. */
+      counters: Record<string, number[]>;
+    }
+  >;
+}
+
 // Source shapes.
 
 type OneOrMany<T> = T | T[];

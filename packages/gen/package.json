@@ -6,6 +6,7 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
+    "./builder": "./src/builder.ts",
     "./checklist": "./src/checklist.ts",
     "./dates": "./src/dates.ts",
     "./offered": "./src/offered.ts",

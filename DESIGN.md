@@ -198,6 +198,11 @@ Weighted random draw by usage, **seeded with two cores** (Nov 2026): hand-picked
 - Coherence constraints (soft, via rejection sampling): at most 1–2 hazard setters, a remover likely present, role balance, Species clause (no repeated species). No item clause: gen4ou has none, so items may repeat.
 - Assign a **style** label (`offense`, `balance`, `stall`) derived from the team's role mix; the AI uses it (§8.5).
 - The generator outputs the full team including sets. The client shows only species.
+- **v7 builder** (`packages/gen/src/builder.ts`, days from 2026-11-05 on; `opponentVersion: 7` on the day): teams are put together like a player's, not drawn at random.
+  - Each day has a target style from a fixed cycle: offense, balance, offense, balance, defensive (stall), shifted by gen (`styleFor`), so about 40/40/20 and never two defensive days in a row.
+  - Members come from usage and Smogon teammate shares (`sources/gen*ou-teammates.json`), weighted towards what the team lacks (Stealth Rock, a remover, speed, bulk off offense, type patches) and the day's style.
+  - 300 built teams are scored (threat coverage, hazards, removal, speed, synergy, usage strength, shared weaknesses); the day's style first, best first. Candidate n is the next one down.
+  - Variety: at most 2 of the format's 8 most used species per team; a species at most twice a week, never on two days running, and less often after recent use.
 
 ### 6.4 Schedule file
 
@@ -312,6 +317,11 @@ Weights are parameters (§8.5).
 - Assumption to validate: the mid bot approximates an average player. Calibrate the bands against real playtests (§9.4) rather than treating them as exact.
 - Because the first attempt is what counts, check the first-attempt result across many simulated runs per matchup, not one, and reject matchups that depend heavily on crits or misses.
 - Reject degenerate cases: stalemates (turn cap, e.g. 300 turns), hard counters with no answers in the pool.
+- **v7 checks** (`validateDayV7`, `PIPELINE.opponentV7`), candidates in batches of 3 (up to 12), each check only for those that passed the last:
+  - no hard counter (something in the pool does at least 30% to each member);
+  - Normal: the mid bot with random pool teams wins 25–60% on a first try (60 games), and under 5% of games hit the turn cap;
+  - Hard: the strong bot with the week's recommended team wins at least 35% (40 games), so the best team can clear it.
+  - None passes: the closest, leaning too strong over too easy (owner: a slightly strong team beats a mess).
 
 ### 9.4 Reporting
 

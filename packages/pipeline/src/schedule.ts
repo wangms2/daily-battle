@@ -5,13 +5,21 @@ import {
   rngFor,
   teamSets,
   weekDays,
+  type DailyOpponent,
   type ScheduleFile,
 } from '@daily-battle/gen';
+import { OPPONENT_VERSION, type OpponentHistory } from '@daily-battle/gen/builder';
 import { PIPELINE } from './config';
 import { poolTeams } from './sample';
 import type { Simulator } from './simulate';
 import { pct } from './stats';
-import { poolSetsOf, validateDay, type DayResult } from './validate-opponent';
+import {
+  poolSetsOf,
+  validateDay,
+  validateDayV7,
+  type DayResult,
+  type WeekPlayers,
+} from './validate-opponent';
 import { validatePool, type PoolResult } from './validate-pool';
 
 export interface WeekReport {
@@ -86,10 +94,18 @@ export async function buildWeek(
   return { schedule, report };
 }
 
+/** Rebuild days with the v7 builder instead of `generateOpponent` (`PIPELINE.opponentV7`). */
+export interface V7Options {
+  build: (day: string, history: OpponentHistory, candidate: number) => DailyOpponent;
+  /** Published days of the format; only those before `fromDay` count, then the rebuilt ones. */
+  history: OpponentHistory;
+}
+
 /**
  * Regenerates a published week's days from `fromDay` on, keeping its pool,
  * recommended team, and earlier days: for picking up a set data change in a
  * week that's already being played (locked teams and played days stay valid).
+ * With `v7`, the days come from the v7 builder and its checks.
  */
 export async function rebuildDays(
   schedule: ScheduleFile,
@@ -98,6 +114,7 @@ export async function rebuildDays(
   sim: Simulator,
   data: SetsFile = defaultSets,
   log: (msg: string) => void = () => {},
+  v7?: V7Options,
 ): Promise<{ schedule: ScheduleFile; report: WeekReport }> {
   const { week } = schedule;
   const species = schedule.pool.species;
@@ -109,16 +126,41 @@ export async function rebuildDays(
     week,
   ).map((team) => teamSets(data, team));
   const poolSets = poolSetsOf(species, data);
+  const suggested = schedule.suggestedTeams[0];
+  const players: WeekPlayers = {
+    playerTeams,
+    poolSets,
+    pool: species,
+    ...(suggested && { recommended: teamSets(data, suggested.team) }),
+  };
+  const history = (v7?.history ?? []).filter((h) => h.day < fromDay);
 
   const days = [...schedule.days];
   const reportDays = [...report.days];
   for (const [i, day] of weekDays(week).entries()) {
     if (day < fromDay) continue;
-    const result = await validateDay(day, playerTeams, poolSets, sim, data);
-    log(`  ${day} c${result.candidate} ${result.accepted} (rebuilt)`);
+    const result = v7
+      ? await validateDayV7(day, v7.build, history, players, sim, data)
+      : await validateDay(day, playerTeams, poolSets, sim, data);
+    const m = result.check.metrics;
+    log(
+      `  ${day} c${result.candidate} ${result.accepted} (rebuilt${v7 ? ', v7' : ''})` +
+        (v7
+          ? `  Normal ${m.uninformed ? pct(m.uninformed.rate) : '-'}` +
+            `  Hard rec ${m.strong ? pct(m.strong.rate) : '-'}  (${result.rejected.length} rejected)` +
+            `  ${result.opponent.style}: ${result.opponent.team.map((t) => t.species).join(', ')}`
+          : ''),
+    );
     const { opponent, candidate, ...rest } = result;
-    days[i] = { day, style: opponent.style, team: opponent.team, candidate };
+    days[i] = {
+      day,
+      style: opponent.style,
+      team: opponent.team,
+      candidate,
+      ...(v7 && { opponentVersion: OPPONENT_VERSION }),
+    };
     reportDays[i] = { ...rest, candidate, day, style: opponent.style };
+    history.push({ day, species: opponent.team.map((t) => t.species) });
   }
   return {
     schedule: { ...schedule, dataBuiltAt: data.meta.builtAt, days },

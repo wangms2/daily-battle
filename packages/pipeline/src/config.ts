@@ -22,6 +22,26 @@ export const PIPELINE = {
     hardCounterMinDamage: 0.3,
     maxCandidates: 20,
   },
+  /**
+   * Daily opponents from the v7 builder (owner, Nov 2026): always a strong
+   * team, with the difficulty in the AI. Normal must stay winnable and not too
+   * easy; Hard must be beatable with the week's recommended team.
+   */
+  opponentV7: {
+    /** Candidates built and screened together, so the workers stay busy. */
+    batch: 3,
+    /** Later batches run only while none has passed (offense days are often too easy). */
+    maxCandidates: 12,
+    /** Mid bot vs the Normal AI, first try (random pool teams), per candidate. */
+    normalSamples: 60,
+    /** Owner: 60% top (offense days sat just over 55%; 60 games are ±12%). */
+    normalBand: [0.25, 0.6] as const,
+    /** Strong bot with the recommended team vs the Hard AI (the slow part): only for candidates in the Normal band. */
+    hardSamples: 40,
+    minBeatable: 0.35,
+    maxTurnCapRate: 0.05,
+    hardCounterMinDamage: 0.3,
+  },
   pool: {
     /** Pool teams sampled for pool validation. */
     teams: 60,

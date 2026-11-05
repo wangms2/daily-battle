@@ -15,7 +15,14 @@ export interface ScheduleFile {
   /** The builder's recommended team: none or one (older files had up to three). */
   suggestedTeams: { team: TeamSlot[] }[];
   /** Monday first. The client shows only species from these teams. */
-  days: { day: string; style: Style; team: TeamSlot[]; candidate: number }[];
+  days: {
+    day: string;
+    style: Style;
+    team: TeamSlot[];
+    candidate: number;
+    /** 7 for days from the v7 builder (`@daily-battle/gen/builder`); absent for `generateOpponent`'s. */
+    opponentVersion?: number;
+  }[];
 }
 
 const isDay = (s: unknown) => typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s);

@@ -1,7 +1,7 @@
 {
   "version": 1,
   "generatorVersion": 6,
-  "dataBuiltAt": "2026-11-02T19:56:22.560Z",
+  "dataBuiltAt": "2026-11-05T01:13:23.952Z",
   "week": "2026-11-02",
   "pool": {
     "species": [
@@ -150,127 +150,131 @@
     },
     {
       "day": "2026-11-05",
-      "style": "stall",
-      "team": [
-        {
-          "species": "Darmanitan",
-          "setId": "darmanitan-choice-scarf"
-        },
-        {
-          "species": "Porygon2",
-          "setId": "porygon2-defensive-duck"
-        },
-        {
-          "species": "Togekiss",
-          "setId": "togekiss-physically-defensive"
-        },
-        {
-          "species": "Venusaur",
-          "setId": "venusaur-leech-seed"
-        },
-        {
-          "species": "Kyurem-Black",
-          "setId": "kyuremblack-choice-band"
-        },
-        {
-          "species": "Gastrodon",
-          "setId": "gastrodon-physically-defensive"
-        }
-      ],
-      "candidate": 1
-    },
-    {
-      "day": "2026-11-06",
       "style": "balance",
       "team": [
         {
-          "species": "Latios",
-          "setId": "latios-choice-scarf"
+          "species": "Tentacruel",
+          "setId": "tentacruel-utility"
         },
         {
-          "species": "Seismitoad",
-          "setId": "seismitoad-utility"
+          "species": "Jirachi",
+          "setId": "jirachi-choice-scarf"
         },
         {
-          "species": "Scizor",
-          "setId": "scizor-choice-band"
-        },
-        {
-          "species": "Flygon",
-          "setId": "flygon-choice-scarf"
-        },
-        {
-          "species": "Haxorus",
-          "setId": "haxorus-choice-band"
-        },
-        {
-          "species": "Forretress",
-          "setId": "forretress-entry-hazard-control"
-        }
-      ],
-      "candidate": 7
-    },
-    {
-      "day": "2026-11-07",
-      "style": "stall",
-      "team": [
-        {
-          "species": "Azelf",
-          "setId": "azelf-choice-band"
-        },
-        {
-          "species": "Volcarona",
-          "setId": "volcarona-lum-berry-quiver-dance"
-        },
-        {
-          "species": "Starmie",
-          "setId": "starmie-rapid-spin"
-        },
-        {
-          "species": "Hippowdon",
-          "setId": "hippowdon-mixed-wall"
-        },
-        {
-          "species": "Forretress",
-          "setId": "forretress-custap-lead"
-        },
-        {
-          "species": "Conkeldurr",
-          "setId": "conkeldurr-bulk-up"
-        }
-      ],
-      "candidate": 0
-    },
-    {
-      "day": "2026-11-08",
-      "style": "balance",
-      "team": [
-        {
-          "species": "Jellicent",
-          "setId": "jellicent-standard"
-        },
-        {
-          "species": "Excadrill",
-          "setId": "excadrill-swords-dance"
-        },
-        {
-          "species": "Breloom",
-          "setId": "breloom-technician"
+          "species": "Ferrothorn",
+          "setId": "ferrothorn-standard"
         },
         {
           "species": "Politoed",
           "setId": "politoed-defensive"
         },
         {
-          "species": "Cofagrigus",
-          "setId": "cofagrigus-offensive-trick-room"
+          "species": "Thundurus-Therian",
+          "setId": "thundurustherian-offensive"
         },
         {
-          "species": "Froslass",
-          "setId": "froslass-suicide-lead"
+          "species": "Gyarados",
+          "setId": "gyarados-offensive-dragon-dance"
         }
       ],
-      "candidate": 17
+      "candidate": 0,
+      "opponentVersion": 7
+    },
+    {
+      "day": "2026-11-06",
+      "style": "stall",
+      "team": [
+        {
+          "species": "Forretress",
+          "setId": "forretress-custap-lead"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-bulky-pursuit-trapper"
+        },
+        {
+          "species": "Reuniclus",
+          "setId": "reuniclus-calm-mind"
+        },
+        {
+          "species": "Alakazam",
+          "setId": "alakazam-attacker"
+        },
+        {
+          "species": "Conkeldurr",
+          "setId": "conkeldurr-bulk-up"
+        },
+        {
+          "species": "Skarmory",
+          "setId": "skarmory-lead"
+        }
+      ],
+      "candidate": 3,
+      "opponentVersion": 7
+    },
+    {
+      "day": "2026-11-07",
+      "style": "offense",
+      "team": [
+        {
+          "species": "Nidoking",
+          "setId": "nidoking-special-attacker"
+        },
+        {
+          "species": "Starmie",
+          "setId": "starmie-rapid-spin"
+        },
+        {
+          "species": "Ferrothorn",
+          "setId": "ferrothorn-offensive"
+        },
+        {
+          "species": "Dragonite",
+          "setId": "dragonite-3-attacks-dragon-dance"
+        },
+        {
+          "species": "Volcarona",
+          "setId": "volcarona-lum-berry-quiver-dance"
+        },
+        {
+          "species": "Kyurem-Black",
+          "setId": "kyuremblack-choice-band"
+        }
+      ],
+      "candidate": 0,
+      "opponentVersion": 7
+    },
+    {
+      "day": "2026-11-08",
+      "style": "balance",
+      "team": [
+        {
+          "species": "Espeon",
+          "setId": "espeon-screens-setter"
+        },
+        {
+          "species": "Tyranitar",
+          "setId": "tyranitar-bulky-pursuit-trapper"
+        },
+        {
+          "species": "Alakazam",
+          "setId": "alakazam-attacker"
+        },
+        {
+          "species": "Garchomp",
+          "setId": "garchomp-swords-dance"
+        },
+        {
+          "species": "Forretress",
+          "setId": "forretress-custap-lead"
+        },
+        {
+          "species": "Jellicent",
+          "setId": "jellicent-standard"
+        }
+      ],
+      "candidate": 7,
+      "opponentVersion": 7
     }
   ]
 }
