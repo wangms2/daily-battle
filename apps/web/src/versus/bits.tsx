@@ -1,6 +1,6 @@
 // Small pieces the versus screens share: lives as hearts, the standings, and
 // a strip of Pokémon icons.
-import type { RoomView } from '@daily-battle/versus';
+import { fullTeam, type RoomView } from '@daily-battle/versus';
 import clsx from 'clsx';
 import { getSprite } from '../lib/sprites';
 import { placeText, standings } from './standings';
@@ -41,7 +41,7 @@ export function Standings({ room, you }: { room: RoomView; you: string }) {
               {[
                 `${p.wins}–${p.losses}`,
                 // A handicap, so the standings say why someone brought fewer.
-                p.teamSize < 6 && `${p.teamSize} Pokémon`,
+                p.teamSize < fullTeam(room.settings) && `${p.teamSize} Pokémon`,
                 p.place !== null && placeText(p.place),
                 p.left && 'Left',
               ]

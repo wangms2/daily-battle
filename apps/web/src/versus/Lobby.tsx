@@ -6,11 +6,14 @@ import { hasEngine } from '@daily-battle/engine-wasm/version';
 import {
   LIVES_MAX,
   LIVES_MIN,
-  TEAM_SIZES,
+  FULL_TEAMS,
+  fullTeam,
+  teamSizeRange,
   TIMERS,
   type RoomCommand,
   type RoomSettings,
   type RoomView,
+  type FullTeam,
   type TeamSize,
   type TimerId,
 } from '@daily-battle/versus';
@@ -93,6 +96,10 @@ const POOL_OPTIONS: Option<RoomSettings['pool']>[] = [
   { value: 'random', label: 'A random 12 each' },
   { value: 'weekly', label: 'This week’s 12' },
 ];
+const TEAM_OPTIONS: Option<FullTeam>[] = FULL_TEAMS.map((n) => ({
+  value: n,
+  label: `${n} Pokémon`,
+}));
 const RIVAL_OPTIONS: Option<Difficulty>[] = PICKABLE_DIFFICULTIES.map((d) => ({
   value: d,
   label: DIFFICULTY_NAME[d],
@@ -161,6 +168,7 @@ export function Lobby({
   const rules = [
     `${formatInfo(room.settings.format).name} OU`,
     `${lives} ${lives === 1 ? 'life' : 'lives'}`,
+    `${fullTeam(room.settings)} Pokémon`,
     `${TIMERS[room.settings.timer].name} timer`,
     own ? 'A random 12 each' : 'This week’s 12',
     `Rival ${DIFFICULTY_NAME[rival]}`,
@@ -180,6 +188,12 @@ export function Lobby({
         value={room.settings.lives}
         options={LIVES_OPTIONS}
         onChange={edit ? (l) => set({ lives: l }) : undefined}
+      />
+      <Choice
+        label="Team size"
+        value={fullTeam(room.settings)}
+        options={TEAM_OPTIONS}
+        onChange={edit ? (teamSize) => set({ teamSize }) : undefined}
       />
       <Choice
         label="Turn timer"
@@ -295,6 +309,7 @@ export function Lobby({
                   compact={dense}
                   name={p.name}
                   size={p.teamSize}
+                  {...teamSizeRange(room.settings)}
                   onChange={
                     editable || (p.id === you && room.phase === 'lobby')
                       ? (size) => command({ type: 'teamSize', player: p.id, size })
@@ -468,9 +483,14 @@ export function Lobby({
 function SizeStepper({
   name,
   size,
+  min,
+  max,
   onChange,
   compact = false,
 }: {
+  /** The room's range: its full team, down by up to three. */
+  min: TeamSize;
+  max: TeamSize;
   /** Smaller, for the one-line rows of a big room. */
   compact?: boolean;
   /** The player's name, for the labels. */
@@ -478,8 +498,6 @@ function SizeStepper({
   size: TeamSize;
   onChange?: (size: TeamSize) => void;
 }) {
-  const min = Math.min(...TEAM_SIZES);
-  const max = Math.max(...TEAM_SIZES);
   const step = (d: number) => onChange?.(Math.min(max, Math.max(min, size + d)) as TeamSize);
   const box = compact ? 'size-6' : 'size-8';
   // Light round buttons, no 3D edge: the number is what matters. Smaller in a big room.
