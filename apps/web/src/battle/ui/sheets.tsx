@@ -48,6 +48,8 @@ export function MenuSheet({
   animations,
   onHints,
   onAnimations,
+  sound,
+  onSound,
   onLog,
   onChart,
   onLeave,
@@ -64,6 +66,9 @@ export function MenuSheet({
   animations: boolean;
   onHints: (v: boolean) => void;
   onAnimations: (v: boolean) => void;
+  /** Music and sound effects. */
+  sound: boolean;
+  onSound: (v: boolean) => void;
   onLog: () => void;
   /** The type chart, for this battle's game. */
   onChart: () => void;
@@ -78,6 +83,7 @@ export function MenuSheet({
       <div className="divide-y divide-line">
         <Switch checked={hints} onCheckedChange={onHints} label="Beginner hints" />
         <Switch checked={animations} onCheckedChange={onAnimations} label="Animations" />
+        <Switch checked={sound} onCheckedChange={onSound} label="Sound" />
         {coach && (
           <Switch
             checked={coach.on}

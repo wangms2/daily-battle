@@ -574,6 +574,7 @@ export function App() {
         route={route}
         go={go}
         onExit={() => go('')}
+        onSettings={() => setSettingsOpen(true)}
         battle={{
           settings,
           onSetting: setSetting,
