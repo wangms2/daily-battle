@@ -309,7 +309,7 @@ export function Lobby({
                   compact={dense}
                   name={p.name}
                   size={p.teamSize}
-                  {...teamSizeRange(room.settings)}
+                  {...teamSizeRange()}
                   onChange={
                     editable || (p.id === you && room.phase === 'lobby')
                       ? (size) => command({ type: 'teamSize', player: p.id, size })
@@ -488,7 +488,7 @@ function SizeStepper({
   onChange,
   compact = false,
 }: {
-  /** The room's range: its full team, down by up to three. */
+  /** The sizes a player can bring (1 to 6). */
   min: TeamSize;
   max: TeamSize;
   /** Smaller, for the one-line rows of a big room. */
