@@ -28,6 +28,8 @@ export type GameAction =
       /** Defaults to Normal. */
       difficulty?: Difficulty;
       bucket?: Bucket;
+      /** A change after today's one is used: it goes through and ends the streak. */
+      extra?: boolean;
     }
   /** Today's practice team, or null to go back to the weekly team. */
   | { type: 'setPracticeTeam'; day: string; team: Slot[] | null }
@@ -234,7 +236,9 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       const day = state.days[action.day] ?? emptyDay();
       const week = state.weeks[action.week];
       const lost = dayLost(day); // after a loss the streak is gone: swap as much as you like
-      if ((day.swapUsed && !lost) || !week) return state; // otherwise one change per day
+      // Otherwise one change a day; another one ends the streak (asked first, `extra`).
+      const extra = day.swapUsed && !lost;
+      if ((extra && !action.extra) || !week) return state;
       if (attemptInProgress(day)) return state; // not mid-battle
       // Once this difficulty is cleared, its changes are to the practice team instead.
       if (dayDecided(day, action.bucket)) return state;
@@ -256,6 +260,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
                 change: action.change,
                 changeOn: action.difficulty ?? 'normal',
                 lead,
+                ...(extra && { ditched: true }),
               },
         },
       };

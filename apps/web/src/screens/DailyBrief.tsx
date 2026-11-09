@@ -248,6 +248,8 @@ export function DailyBrief({
 
   // Tried today and not won: the streak is over, so the team can change freely.
   const lost = lostProp ?? result.summary.status === 'pending';
+  // Today's change is used and the streak still stands: another change ends it.
+  const extraChange = !practice && dayState.swapUsed && !lost;
   const chip = 'rounded-chip px-3 py-1.5 text-[13px] font-semibold';
   const editChip = (label: string) => (
     <button
@@ -270,10 +272,11 @@ export function DailyBrief({
       )}
       {editChip('Practice changes')}
     </span>
-  ) : dayState.swapUsed && !lost ? (
-    <span className={clsx(chip, 'bg-surface-2 text-muted')}>
-      {dayState.changeOn ? `Change used on ${DIFFICULTY_NAME[dayState.changeOn]}` : 'Change used'}
-    </span>
+  ) : extraChange ? (
+    // Used, but still a way in: another change (or a new team) ends the streak, asked first.
+    editChip(
+      dayState.changeOn ? `Change used on ${DIFFICULTY_NAME[dayState.changeOn]}` : 'Change used',
+    )
   ) : (
     editChip(lost ? 'Edit team' : '1 change left')
   );
@@ -448,7 +451,9 @@ export function DailyBrief({
     ? 'Practice changes are for today only; your team and streak stay as they are.'
     : lost
       ? 'Your streak is over for today, so change as much as you like.'
-      : 'One change a day, shared by every difficulty.';
+      : extraChange
+        ? 'Today’s change is used. Another change, or a new team, ends your streak.'
+        : 'One change a day, shared by every difficulty.';
 
   // Editing happens in place, under the teams (beside them on a computer), so the
   // opponent stays in view and can still be tapped while you decide.
@@ -752,12 +757,17 @@ export function DailyBrief({
       <ConfirmDialog
         open={!!pending}
         onOpenChange={(o) => !o && setPending(null)}
-        title={lost ? 'Change your team?' : 'Use today’s change?'}
+        danger={extraChange}
+        title={
+          lost ? 'Change your team?' : extraChange ? 'End your streak?' : 'Use today’s change?'
+        }
         body={
           pending
             ? lost
               ? `${describe(pending)}. Your streak is over for today, so change as much as you like; it sticks for the rest of the week.`
-              : `${describe(pending)}. It’s the one change for all difficulties today, and it sticks for the rest of the week.`
+              : extraChange
+                ? `${describe(pending)}. Today’s change is already used, so this ${result.streak > 0 ? `ends your ${result.streak}-day streak` : 'means no streak today'}. It sticks for the rest of the week.`
+                : `${describe(pending)}. It’s the one change for all difficulties today, and it sticks for the rest of the week.`
             : ''
         }
         confirm="Make change"

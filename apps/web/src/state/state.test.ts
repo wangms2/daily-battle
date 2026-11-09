@@ -292,6 +292,24 @@ describe('daily change', () => {
     ).toBe(once);
   });
 
+  it('takes another change once asked to end the streak (extra)', () => {
+    const once = gameReducer(locked(), {
+      type: 'applyChange',
+      day: DAY,
+      week: WEEK,
+      change: replace,
+    });
+    const twice = gameReducer(once, {
+      type: 'applyChange',
+      day: DAY,
+      week: WEEK,
+      change: changeSet,
+      extra: true,
+    });
+    expect(twice.weeks[WEEK]!.team[0]).toEqual(changeSet.to);
+    expect(twice.days[DAY]).toMatchObject({ swapUsed: true, change: changeSet, ditched: true });
+  });
+
   it('resets the next day', () => {
     const once = gameReducer(locked(), {
       type: 'applyChange',
