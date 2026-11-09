@@ -716,7 +716,15 @@ export function App() {
               team: change ? withChange(runTeam, change) : null,
             });
           } else if (change) {
-            dispatch({ type: 'applyChange', day, week, change, difficulty, bucket });
+            dispatch({
+              type: 'applyChange',
+              day,
+              week,
+              change,
+              difficulty,
+              bucket,
+              extra: dayState.swapUsed && !dayLost(dayState),
+            });
           }
         }}
         inProgress={!!inProgress}
