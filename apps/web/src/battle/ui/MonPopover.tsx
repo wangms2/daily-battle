@@ -7,6 +7,7 @@ import { MatchupRow } from '../../sheets/InfoSheet';
 import { TypeBadge } from '../../ui/bits';
 import { Term } from '../../ui/DetailCard';
 import { ItemIcon } from '../../ui/ItemIcon';
+import { Effects } from '../../ui/Effects';
 import { MoveChips } from '../../ui/MoveList';
 import { useMediaQuery } from '../../ui/useWide';
 import type { MonView, Revealed, TeamMember } from '../frames';
@@ -147,10 +148,8 @@ export function MonPopover(props: Props) {
           {ability && term(ability, 'Ability')}
         </p>
       )}
-      {/* A hover card can't open the item's own card, so it says what the item does. */}
-      {item && !props.children && itemInfo(item) && (
-        <p className="mt-0.5 text-[12px] leading-snug text-muted">{itemInfo(item)}</p>
-      )}
+      {/* A hover card can't open the item's or ability's own card, so it says what they do. */}
+      {!props.children && <Effects item={item} ability={ability} />}
       {abilities.length > 0 && (
         <p
           data-spot="foe-ability"

@@ -9,7 +9,6 @@ import {
   activeFormat,
   canMega,
   findSet,
-  itemInfo,
   megaClash,
   megaFor,
   ONE_MEGA_MESSAGE,
@@ -35,6 +34,7 @@ import { MoveChips } from '../ui/MoveList';
 import { PokemonTile } from '../ui/PokemonTile';
 import type { ShareGame, ShareModel } from '../lib/share';
 import { DIFFICULTY_NAME } from '../lib/share';
+import { Effects } from '../ui/Effects';
 import { OtherGames } from '../ui/OtherGames';
 import { ShareButton } from '../ui/results';
 import { useMediaQuery, useWide } from '../ui/useWide';
@@ -323,9 +323,7 @@ export function DailyBrief({
               {set.label} · {set.item && <ItemIcon name={set.item} className="size-5" />}
               {set.item} · {set.ability}
             </p>
-            {set.item && itemInfo(set.item) && (
-              <p className="text-[12px] leading-snug text-muted">{itemInfo(set.item)}</p>
-            )}
+            <Effects item={set.item} ability={set.ability} />
             <MoveChips moves={set.moves} />
           </>
         )}
