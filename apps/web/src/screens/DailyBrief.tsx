@@ -9,6 +9,7 @@ import {
   activeFormat,
   canMega,
   findSet,
+  itemInfo,
   megaClash,
   megaFor,
   ONE_MEGA_MESSAGE,
@@ -322,6 +323,9 @@ export function DailyBrief({
               {set.label} · {set.item && <ItemIcon name={set.item} className="size-5" />}
               {set.item} · {set.ability}
             </p>
+            {set.item && itemInfo(set.item) && (
+              <p className="text-[12px] leading-snug text-muted">{itemInfo(set.item)}</p>
+            )}
             <MoveChips moves={set.moves} />
           </>
         )}
