@@ -147,6 +147,10 @@ export function MonPopover(props: Props) {
           {ability && term(ability, 'Ability')}
         </p>
       )}
+      {/* A hover card can't open the item's own card, so it says what the item does. */}
+      {item && !props.children && itemInfo(item) && (
+        <p className="mt-0.5 text-[12px] leading-snug text-muted">{itemInfo(item)}</p>
+      )}
       {abilities.length > 0 && (
         <p
           data-spot="foe-ability"
